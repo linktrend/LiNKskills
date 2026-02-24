@@ -1,0 +1,17 @@
+# Ignore local task state and raw traces
+.workdir/
+**/trace.log
+**/state.json
+**/state.jsonl
+
+# Ignore system-specific files
+.DS_Store
+__pycache__/
+*.pyc
+
+# GW Gateway Identity Isolation
+tools/gw/src/token.json
+tools/gw/src/credentials.json
+tools/gw/src/__pycache__/
+tools/gw/src/*.log
+tools/gw/src/venv/

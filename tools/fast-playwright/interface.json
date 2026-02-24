@@ -1,0 +1,39 @@
+{
+  "name": "fast-playwright",
+  "description": "FastMCP Playwright server wrapper for interactive, session-based browser automation.",
+  "capability_summary": "Provides persistent browser sessions with accessibility snapshots and high-speed interaction tools for navigation, click/type actions, screenshots, and network inspection.",
+  "parameters": [
+    {
+      "name": "mcp_command",
+      "type": "string",
+      "description": "MCP tool to invoke (browser_navigate, browser_click, browser_type, browser_screenshot, browser_network_requests)."
+    },
+    {
+      "name": "arguments",
+      "type": "string",
+      "description": "JSON-serialized arguments forwarded to the selected MCP tool."
+    }
+  ],
+  "mcp_tools": [
+    {
+      "name": "browser_navigate",
+      "description": "Navigate to a URL within the persistent browser session."
+    },
+    {
+      "name": "browser_click",
+      "description": "Click an element using role/text/selector-driven targeting."
+    },
+    {
+      "name": "browser_type",
+      "description": "Type text into an input/field with session-aware targeting."
+    },
+    {
+      "name": "browser_screenshot",
+      "description": "Capture a visual snapshot of page or element state."
+    },
+    {
+      "name": "browser_network_requests",
+      "description": "Inspect network requests observed during session execution."
+    }
+  ]
+}

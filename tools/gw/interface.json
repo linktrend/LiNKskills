@@ -1,0 +1,74 @@
+{
+  "name": "gw",
+  "description": "Unified Google Workspace CLI gateway for Gmail, Drive, Docs, Sheets, Calendar, and Chat operations.",
+  "capability_summary": "Unified gateway for Google Workspace. Use for Gmail (send/list), Drive (upload/share), Docs (formatting/markdown), Sheets (logging), Calendar (scheduling), and Chat.",
+  "parameters": [
+    {
+      "name": "service",
+      "type": "string",
+      "description": "Top-level service selector: gmail, drive, docs, sheets, calendar, chat."
+    },
+    {
+      "name": "command",
+      "type": "string",
+      "description": "Service command to execute (examples: send, list, upload, share, append-markdown, log, schedule)."
+    },
+    {
+      "name": "args",
+      "type": "string",
+      "description": "Additional CLI flags/values passed through to gw (supports --json for structured output)."
+    }
+  ],
+  "subcommands": [
+    {
+      "name": "gmail send",
+      "description": "Send an email message via Gmail with recipient, subject, body, and optional attachments."
+    },
+    {
+      "name": "gmail list",
+      "description": "List Gmail messages with optional query and pagination controls."
+    },
+    {
+      "name": "drive upload",
+      "description": "Upload a local file to Google Drive with optional target folder selection."
+    },
+    {
+      "name": "drive share",
+      "description": "Grant Drive file permissions to user/group/domain with role controls."
+    },
+    {
+      "name": "docs append-markdown",
+      "description": "Append markdown-formatted content to an existing Google Doc."
+    },
+    {
+      "name": "docs format",
+      "description": "Apply document formatting operations to ranges or structural elements."
+    },
+    {
+      "name": "sheets log",
+      "description": "Write log/event values into a spreadsheet range for operational tracking."
+    },
+    {
+      "name": "calendar schedule",
+      "description": "Create or update calendar events with start/end times and attendees."
+    },
+    {
+      "name": "chat send",
+      "description": "Send messages to Google Chat spaces for notifications and updates."
+    }
+  ],
+  "flags": [
+    {
+      "name": "--help",
+      "description": "Show command help and available usage patterns."
+    },
+    {
+      "name": "--version",
+      "description": "Show gateway CLI version."
+    },
+    {
+      "name": "--json",
+      "description": "Emit structured JSON output for machine/agent consumption."
+    }
+  ]
+}

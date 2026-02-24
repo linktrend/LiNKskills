@@ -1,0 +1,27 @@
+system_name: "Venture Studio Agent Registry"
+version: "1.0.0"
+timezone: "Asia/Taipei"
+logging:
+  ledger_path: "execution_ledger.jsonl"
+  retention_days: 90
+persistence:
+  root_task_dir: ".workdir/tasks"
+  format: "json"
+security:
+  strict_mode: true  # If true, validator fails on unknown frontmatter keys
+  allowed_permissions: [fs_read, fs_write, email_send, api_access, shell_exec]
+  task_id_regex: "^\d{8}-\d{4}-[A-Z0-9]+-\d{6}$"
+engine:
+  tier_order: [fast, balanced, high]
+  model_map:
+    fast: "gpt-4o-mini"
+    balanced: "gpt-4.1"
+    high: "gpt-5"
+  environment:
+    reasoning_tier: "high"
+    model: "gpt-5"
+    context_window: 200000
+tooling:
+  policy: "cli-first"
+  jit_tool_threshold: 10
+  require_get_tool_details: true

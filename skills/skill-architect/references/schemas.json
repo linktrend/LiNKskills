@@ -1,0 +1,147 @@
+{
+  "definitions": {
+    "spec": {
+      "type": "object",
+      "description": "Input specification for scaffold, reverse-engineering, or refiner mode.",
+      "required": ["mode", "name", "engine", "tooling"],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": ["SCAFFOLD", "REVERSE_ENGINEER", "REFINER"],
+          "description": "Architect execution mode"
+        },
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "description": "Skill name in kebab-case (e.g., 'web-scraper', 'email-responder')"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 10,
+          "description": "Third-person summary of what the skill does"
+        },
+        "tools": {
+          "type": "array",
+          "items": {"type": "string"},
+          "minItems": 1,
+          "description": "List of tools the skill will use (e.g., ['write_file', 'read_file', 'codebase_search'])"
+        },
+        "usage_trigger": {
+          "type": "string",
+          "description": "Explicit context for when to use this skill (e.g., 'Use when the user wants to scrape web content')"
+        },
+        "engine": {
+          "type": "object",
+          "description": "Intelligence floor requirements for the target skill runtime.",
+          "required": ["min_reasoning_tier", "preferred_model", "context_required"],
+          "properties": {
+            "min_reasoning_tier": {
+              "type": "string",
+              "enum": ["fast", "balanced", "high"]
+            },
+            "preferred_model": { "type": "string", "minLength": 1 },
+            "context_required": { "type": "integer", "minimum": 1024 }
+          }
+        },
+        "tooling": {
+          "type": "object",
+          "description": "Tooling protocol requirements for the target skill.",
+          "required": ["policy", "jit_enabled_if", "jit_tool_threshold", "require_get_tool_details"],
+          "properties": {
+            "policy": { "type": "string", "enum": ["cli-first"] },
+            "jit_enabled_if": { "type": "string", "enum": ["generalist_or_gt10_tools"] },
+            "jit_tool_threshold": { "type": "integer", "minimum": 1 },
+            "require_get_tool_details": { "type": "boolean" }
+          }
+        },
+        "source_artifact": {
+          "type": "string",
+          "description": "Third-party prompt/code source used in REVERSE_ENGINEER mode"
+        },
+        "improvement_drivers": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Reasons for REFINER mode updates (failures, feature requests, tool changes, quality upgrades)"
+        },
+        "tags": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Optional category tags (e.g., ['web', 'automation', 'data'])"
+        },
+        "dependencies": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Optional MCP server IDs or local script paths"
+        },
+        "permissions": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Optional permission scopes (e.g., ['fs_read', 'fs_write', 'api_access'])"
+        }
+      }
+    },
+    "report": {
+      "type": "object",
+      "description": "Output report after architect execution.",
+      "required": ["status", "skill_name", "task_id", "mode", "version"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["SUCCESS", "VALIDATION_FAILED", "PARTIAL", "REFINED", "MIGRATED"]
+        },
+        "mode": { "type": "string", "enum": ["SCAFFOLD", "REVERSE_ENGINEER", "REFINER"] },
+        "skill_name": {"type": "string"},
+        "task_id": {"type": "string"},
+        "version": {
+          "type": "string",
+          "pattern": "^v?\\d+\\.\\d+\\.\\d+$"
+        },
+        "validation_errors": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "List of validation errors if status is VALIDATION_FAILED"
+        },
+        "files_created": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "List of file paths created during scaffolding"
+        }
+      }
+    },
+    "state": {
+      "type": "object",
+      "description": "Validation for .workdir state persistence during skill generation.",
+      "required": ["task_id", "workflow_step", "status", "last_updated", "variables"],
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "pattern": "^\\d{8}-\\d{4}-[A-Z0-9]+-\\d{6}$"
+        },
+        "workflow_step": {"type": "integer", "minimum": 0, "maximum": 5},
+        "status": {
+          "type": "string",
+          "enum": [
+            "AUDITED",
+            "INITIALIZED",
+            "DESIGNED",
+            "SCAFFOLDED",
+            "MIGRATED",
+            "REFINED",
+            "VALIDATED",
+            "VALIDATION_FAILED",
+            "COMPLETED"
+          ]
+        },
+        "last_updated": { "type": "string" },
+        "variables": {
+          "type": "object",
+          "description": "Mode data, specs, drafts, and validation results."
+        },
+        "seek_index": {
+          "type": "object",
+          "description": "Offsets/keys used to seek phase-specific records from state.jsonl or flat files."
+        }
+      }
+    }
+  }
+}

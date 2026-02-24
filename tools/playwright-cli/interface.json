@@ -1,0 +1,45 @@
+{
+  "name": "playwright-cli",
+  "description": "Stateless Playwright CLI wrapper for browser install and one-shot automation tasks with deterministic JSON outputs.",
+  "capability_summary": "Provides install, screenshot, pdf, and codegen command access through a JSON-stable wrapper suitable for non-session automation.",
+  "parameters": [
+    {
+      "name": "command",
+      "type": "string",
+      "description": "Command to run: install, screenshot, pdf, or codegen."
+    },
+    {
+      "name": "url",
+      "type": "string",
+      "description": "Target page URL for screenshot, pdf, and codegen commands."
+    },
+    {
+      "name": "path",
+      "type": "string",
+      "description": "Output artifact path for screenshot/pdf/codegen commands."
+    }
+  ],
+  "commands": [
+    {
+      "name": "install",
+      "description": "Download required Playwright browser binaries."
+    },
+    {
+      "name": "screenshot",
+      "description": "Capture a screenshot from URL to output path."
+    },
+    {
+      "name": "pdf",
+      "description": "Export URL page as PDF to output path."
+    },
+    {
+      "name": "codegen",
+      "description": "Start Playwright code generator for URL and write script output for review."
+    }
+  ],
+  "output_contract": {
+    "status": "success|error",
+    "output": "human-readable command result",
+    "path": "artifact path or empty string"
+  }
+}

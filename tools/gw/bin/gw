@@ -1,0 +1,4 @@
+#!/bin/bash
+# Execute the internal source using a relative path to the script's location
+PARENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+python3 "$PARENT_DIR/src/cli.py" "$@"

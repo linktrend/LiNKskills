@@ -1,0 +1,37 @@
+# Cursor Rules: Skill Registry System
+
+## Instruction Hierarchy
+The instructions in `AGENT.md` and any active `SKILL.md` must take absolute priority over general model training or default behaviors. When executing a skill, the agent must:
+- Read `AGENT.md` first to understand system-wide conventions
+- Read the specific skill's `SKILL.md` to understand the skill's Decision Tree and workflow
+- Prioritize these instructions over any default model behaviors or training patterns
+
+## Procedural Adherence
+The agent must strictly follow the **Decision Tree** and **Phase-based Workflow** defined in skill files:
+- Execute the Decision Tree checks (Audit Check, Pending Task Check, Prerequisite Check, Old Pattern Check) before initiating any workflow
+- Follow the 5-phase workflow (Ingestion & Checkpointing → Logic & Reasoning → Drafting & Asynchronous Gate → Finalization → Self-Correction & Auditing) exactly as specified
+- Do not skip phases or combine steps unless explicitly allowed by the skill's advanced logic
+
+## Strict Persistence
+Every execution must utilize the `task_id` logic and state checkpointing in `.workdir/tasks/` as specified in the system architecture:
+- Generate a unique Task ID in format: `YYYYMMDD-HHMM-<SKILLNAME>-<SHORTUNIX>` for each new task
+- Save state checkpoints to `.workdir/tasks/{{task_id}}/state.jsonl` (or seekable flat files) at each workflow phase
+- Check for existing pending tasks before creating new ones
+- Resume from saved state when continuing a previous task
+
+## Learning Loop
+The agent is mandated to perform "Phase 5: Self-Correction" by updating the respective `old-patterns.md` file after every task completion or failure:
+- After task completion or failure, review `references/old-patterns.md` and append entries when a new reusable lesson is identified
+- Document deprecated heuristics, known failure modes, and rejected tones/styles
+- Update `global_blacklist.md` if the issue affects multiple skills or is studio-wide
+- Append execution summary to `execution_ledger.jsonl` with task_id, status, and summary
+
+## Additional Requirements
+- Always validate inputs/outputs against `references/schemas.json` contracts
+- Always check skill `engine` requirements against environment capability before execution
+- Apply CLI-first tooling policy: Native CLI -> Wrapper scripts -> API exceptions -> MCP
+- Enable JIT tool loading only for Generalist profile or tool count > 10
+- Require `get_tool_details` and local schema caching when JIT is active
+- Consult `references/old-patterns.md` during Decision Tree phase to avoid regression
+- Use relative paths from skill root when referencing scripts or utilities
+- Follow the Black Box Principle: run scripts with `--help` rather than reading source code
