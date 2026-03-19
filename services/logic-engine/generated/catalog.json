@@ -1,0 +1,1630 @@
+{
+  "generated_at": "2026-03-19T05:27:48.041057+00:00",
+  "repo_root": "/Users/linktrend/Projects/LiNKskills",
+  "manifest_entries": 52,
+  "capabilities": [
+    {
+      "capability_id": "gw",
+      "source_type": "tool",
+      "version": "v2.1.0",
+      "name": "gw",
+      "description": "Unified Google Workspace and operations gateway with audited JSON outputs, including secure vault, container sandbox controls, and Apify-backed news retrieval.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": null,
+      "output_schema_ref": null,
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "8e3b10972bd7ccef5d519622dd79295dc9e00cdd53b4f49747e1f1ccb3d769e8",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "tools/gw/interface.json",
+          "tools/gw/README.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "playwright-cli",
+      "source_type": "tool",
+      "version": "1.0.0",
+      "name": "playwright-cli",
+      "description": "Stateless Playwright CLI wrapper for browser install and one-shot automation tasks with deterministic JSON outputs.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": null,
+      "output_schema_ref": null,
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "f4ed5c687d49abdf41663448e74da69f6e6baa842611e9590226251e4ae048e4",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "tools/playwright-cli/interface.json",
+          "tools/playwright-cli/README.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "fast-playwright",
+      "source_type": "tool",
+      "version": "1.0.0",
+      "name": "fast-playwright",
+      "description": "FastMCP Playwright server wrapper for interactive, session-based browser automation.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": null,
+      "output_schema_ref": null,
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "f9958e9d6f98a7110f405c1ed7acd48f5ab2b4eff7247c97887e40e9cfaf6283",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "tools/fast-playwright/interface.json",
+          "tools/fast-playwright/README.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "vault",
+      "source_type": "tool",
+      "version": "1.0.0",
+      "name": "vault",
+      "description": "Encrypted key/value credential store for secrets and identity material, protected by LSL_MASTER_KEY.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": null,
+      "output_schema_ref": null,
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "8617433d905756ae2626127b7f4f86b497880e86afb7a5ee78e43781c83b54a4",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "tools/vault/interface.json",
+          "tools/vault/README.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "sandbox",
+      "source_type": "tool",
+      "version": "1.0.0",
+      "name": "sandbox",
+      "description": "Ephemeral Docker runtime wrapper for constrained shell execution with deterministic outputs.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": null,
+      "output_schema_ref": null,
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "0e45b86f13fe7bad11690a6ea9aedb2d158a03bca94df2f1deaf57370cf2df07",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "tools/sandbox/interface.json",
+          "tools/sandbox/README.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "usage",
+      "source_type": "tool",
+      "version": "1.1.0",
+      "name": "usage",
+      "description": "Langfuse telemetry logger for gw execution observability with vault-backed credentials and silent local fallback mode.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": null,
+      "output_schema_ref": null,
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "ab8011fb1720c6ef9938481490cf2c83c26d92fcc3f89fb214516ea1242d9b73",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "tools/usage/interface.json",
+          "tools/usage/README.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "memory",
+      "source_type": "tool",
+      "version": "1.1.0",
+      "name": "memory",
+      "description": "Supabase memory storage with scoped recall plus Markdown notes in lsl_memory.notes.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": null,
+      "output_schema_ref": null,
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "af68d1fe235a32c2c7635da59dd7764cd2e47e643600617c512b8e32a774530a",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "tools/memory/interface.json",
+          "tools/memory/README.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "n8n",
+      "source_type": "tool",
+      "version": "1.0.0",
+      "name": "n8n",
+      "description": "Workflow API wrapper for n8n to read, create, activate, and trigger workflows.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": null,
+      "output_schema_ref": null,
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "d89c115a548c871b987969d14eab2c54789a13f16cd23ca7d16319eb1fed83e5",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "tools/n8n/interface.json",
+          "tools/n8n/README.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "stripe",
+      "source_type": "tool",
+      "version": "1.0.0",
+      "name": "stripe",
+      "description": "Stripe billing API wrapper for invoice listing with vault-managed authentication.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": null,
+      "output_schema_ref": null,
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "a1af25a36a7b2440a8a78f7832bb9ceb41fb070cb46b1d41c218ee41889b3840",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "tools/stripe/interface.json",
+          "tools/stripe/README.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "shopify",
+      "source_type": "tool",
+      "version": "1.0.0",
+      "name": "shopify",
+      "description": "Shopify Admin API wrapper for product listing with vault-managed authentication.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": null,
+      "output_schema_ref": null,
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "5219f0bab440b9d025aa7621e4f1393b102ad0cc78825946733f20b7f31b87be",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "tools/shopify/interface.json",
+          "tools/shopify/README.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "doc-engine",
+      "source_type": "tool",
+      "version": "1.0.0",
+      "name": "doc-engine",
+      "description": "Document engine for OCR, conversion, and Markdown print-to-Google-Doc workflows.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": null,
+      "output_schema_ref": null,
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "e375dc52d0abbee3f2d48c7dbcdbb80dfd4aeb0033740b5c3c5d6a02cea04670",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "tools/doc-engine/interface.json",
+          "tools/doc-engine/README.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "research",
+      "source_type": "tool",
+      "version": "1.0.0",
+      "name": "research",
+      "description": "Cost-aware multi-tier research router supporting web, neural, brief, and social query strategies.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": null,
+      "output_schema_ref": null,
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "7083e484e438161dd2ff189dfd52e290f6a299d6d5a385c13d07df5a0eaa49a7",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "tools/research/interface.json",
+          "tools/research/README.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "text-echo",
+      "source_type": "tool",
+      "version": "1.0.0",
+      "name": "text-echo",
+      "description": "Echoes input text with optional JSON formatting.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": null,
+      "output_schema_ref": null,
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "3862950cfa238d197252bfa6a82cce43d6eae1e8e74f235cae4d9ba96d8de3c8",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "tools/text-echo/interface.json",
+          "tools/text-echo/README.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "sync-scheduler",
+      "source_type": "tool",
+      "version": "1.0.0",
+      "name": "sync-scheduler",
+      "description": "Suggests Project Review meeting slots by querying Google Calendar through gw and returning deterministic JSON.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": null,
+      "output_schema_ref": null,
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "6c0b5977ce94b18fa369ecfb9020989c54e2456e8650d19b178e6f917679a4b8",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "tools/sync-scheduler/interface.json",
+          "tools/sync-scheduler/README.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "ad-intel",
+      "source_type": "tool",
+      "version": "1.0.0",
+      "name": "ad-intel",
+      "description": "Ad performance monitor that analyzes Spend vs CTR and reports anomalies for growth operations.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": null,
+      "output_schema_ref": null,
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "246462d117e1d73e2e1adbeac0322fd0f3da7ce987e1c01e8769a0d3eb8ebd54",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "tools/ad-intel/interface.json",
+          "tools/ad-intel/README.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "n8n-bridge",
+      "source_type": "tool",
+      "version": "1.0.0",
+      "name": "n8n-bridge",
+      "description": "Secure bridge for triggering local n8n workflows through gw with Vault-managed tokens.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": null,
+      "output_schema_ref": null,
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "35758532b6feb09741188722b621b44fedb3881184834c9f8f600660696a4ee2",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "tools/n8n-bridge/interface.json",
+          "tools/n8n-bridge/README.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "asset-filer",
+      "source_type": "tool",
+      "version": "1.0.0",
+      "name": "asset-filer",
+      "description": "Uploads creative assets via gw and records metadata for retrieval in lsl_memory.assets.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": null,
+      "output_schema_ref": null,
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "ec260c32e8238f23d1e0ac61a6beaf17b305528874902b37d5152379c15494c2",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "tools/asset-filer/interface.json",
+          "tools/asset-filer/README.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "social-gw",
+      "source_type": "tool",
+      "version": "1.0.0",
+      "name": "social-gw",
+      "description": "Unified social posting and comment retrieval wrapper built on top of the gw tool.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": null,
+      "output_schema_ref": null,
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "e53b37831a93d00a313adf8a324a9c8003f8162fb01780a3edb517b3249da41f",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "tools/social-gw/interface.json",
+          "tools/social-gw/README.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "skill-template",
+      "source_type": "skill",
+      "version": "1.2.0",
+      "name": "skill-template",
+      "description": "Golden template for creating production-grade LiNKskills skills.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/skill-template/references/schemas.json#/definitions/input",
+      "output_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/skill-template/references/schemas.json#/definitions/output",
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "4e5aae44f89f8ea8d2b3f83920df35142e3cccf60d584c23bcf81aa73476346d",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "skills/skill-template/SKILL.md",
+          "skills/skill-template/references/schemas.json",
+          "skills/skill-template/references/changelog.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "skill-architect",
+      "source_type": "skill",
+      "version": "1.3.0",
+      "name": "skill-architect",
+      "description": "Designs, migrates, and refines production-grade skills following the LiNKskills Golden Template.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/skill-architect/references/schemas.json#/definitions/spec",
+      "output_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/skill-architect/references/schemas.json#/definitions/spec",
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "185fb276172c13810c03d17f8b6e4d3d3cfd30ccc873c89467c7107f46152fc8",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "skills/skill-architect/SKILL.md",
+          "skills/skill-architect/references/schemas.json",
+          "skills/skill-architect/references/changelog.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "tool-architect",
+      "source_type": "skill",
+      "version": "1.0.0",
+      "name": "tool-architect",
+      "description": "Designs, wraps, and validates CLI-first tools for the LiNKskills Global Tools Registry.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/tool-architect/references/schemas.json#/definitions/input",
+      "output_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/tool-architect/references/schemas.json#/definitions/output",
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "f38194e5ee9ffded3a975c84c002e228ffed305130540670702a6d65b6e695af",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "skills/tool-architect/SKILL.md",
+          "skills/tool-architect/references/schemas.json",
+          "skills/tool-architect/references/changelog.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "workflow-architect",
+      "source_type": "skill",
+      "version": "1.0.0",
+      "name": "workflow-architect",
+      "description": "Designs, creates, activates, and validates n8n workflows from structured task requirements.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/workflow-architect/references/schemas.json#/definitions/input",
+      "output_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/workflow-architect/references/schemas.json#/definitions/output",
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "4046ad5abcfdd756daf4c37d36f4597e0bbb25adcf4c17fd15eeb4aedb6dbfc6",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "skills/workflow-architect/SKILL.md",
+          "skills/workflow-architect/references/schemas.json",
+          "skills/workflow-architect/references/changelog.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "repository-manager",
+      "source_type": "skill",
+      "version": "1.0.0",
+      "name": "repository-manager",
+      "description": "Manages repository hygiene, progress sync handoffs, and safe Git flow enforcement for LiNKskills sessions.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/repository-manager/references/schemas.json#/definitions/input",
+      "output_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/repository-manager/references/schemas.json#/definitions/output",
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "a2cb5d7833b61c4150bb650a0e1b8f5466d1c3de23b29bd60d24703438644863",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "skills/repository-manager/SKILL.md",
+          "skills/repository-manager/references/schemas.json",
+          "skills/repository-manager/references/changelog.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "audit-protocol",
+      "source_type": "skill",
+      "version": "1.0.0",
+      "name": "audit-protocol",
+      "description": "Enforces predictive auditing so intent is logged before any write-action across Google Workspace and n8n operations.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/audit-protocol/references/schemas.json#/definitions/input",
+      "output_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/audit-protocol/references/schemas.json#/definitions/output",
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "082d04b44e8727037ce89dabd22b8fd5f120ec4f8b0573f1670990845ce1751e",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "skills/audit-protocol/SKILL.md",
+          "skills/audit-protocol/references/schemas.json",
+          "skills/audit-protocol/references/changelog.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "git-safeguard",
+      "source_type": "skill",
+      "version": "1.0.0",
+      "name": "git-safeguard",
+      "description": "Applies a mandatory safety checklist before git push operations to prevent accidental or unsafe repository publication.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/git-safeguard/references/schemas.json#/definitions/input",
+      "output_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/git-safeguard/references/schemas.json#/definitions/output",
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "6d7fd2c374c661fca4d0844892b05a03596f6af80d723a11bba5856eb5e02775",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "skills/git-safeguard/SKILL.md",
+          "skills/git-safeguard/references/schemas.json",
+          "skills/git-safeguard/references/changelog.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "task-decomposition",
+      "source_type": "skill",
+      "version": "1.0.0",
+      "name": "task-decomposition",
+      "description": "Applies Factored Cognition to decompose complex studio work into atomic, verifiable execution steps.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/task-decomposition/references/schemas.json#/definitions/input",
+      "output_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/task-decomposition/references/schemas.json#/definitions/output",
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "e063894c71df296ea8d7e79c6f1e61586e1fee0241a4cef0f395037f568d2c98",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "skills/task-decomposition/SKILL.md",
+          "skills/task-decomposition/references/schemas.json",
+          "skills/task-decomposition/references/changelog.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "citation-enforcer",
+      "source_type": "skill",
+      "version": "1.0.0",
+      "name": "citation-enforcer",
+      "description": "Enforces evidence-first reasoning by requiring source attribution for every material claim.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/citation-enforcer/references/schemas.json#/definitions/input",
+      "output_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/citation-enforcer/references/schemas.json#/definitions/output",
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "1cc0407e529c5d738be76e5f36eb479bd74e10e847b246f4fbb7d94651328190",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "skills/citation-enforcer/SKILL.md",
+          "skills/citation-enforcer/references/schemas.json",
+          "skills/citation-enforcer/references/changelog.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "self-critique-loop",
+      "source_type": "skill",
+      "version": "1.0.0",
+      "name": "self-critique-loop",
+      "description": "Runs a System 2 audit loop that stress-tests draft outputs for correctness, consistency, and risk before release.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/self-critique-loop/references/schemas.json#/definitions/input",
+      "output_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/self-critique-loop/references/schemas.json#/definitions/output",
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "d94fcd3e14512122b725fbc2d0f6dd45c44e5eb418e75682a024206b2cca2b33",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "skills/self-critique-loop/SKILL.md",
+          "skills/self-critique-loop/references/schemas.json",
+          "skills/self-critique-loop/references/changelog.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "self-improvement",
+      "source_type": "skill",
+      "version": "1.0.0",
+      "name": "self-improvement",
+      "description": "Analyzes execution_ledger and historical failure patterns to propose versioned upgrades to LiNKskills tools and skills.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/self-improvement/references/schemas.json#/definitions/input",
+      "output_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/self-improvement/references/schemas.json#/definitions/output",
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "3bd5a29bd9ba8259d65b8615d7bfff2079ddbfd8307962034e7d606075353179",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "skills/self-improvement/SKILL.md",
+          "skills/self-improvement/references/schemas.json",
+          "skills/self-improvement/references/changelog.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "search-strategy",
+      "source_type": "skill",
+      "version": "1.0.0",
+      "name": "search-strategy",
+      "description": "Defines research intent, tiered escalation, and HITL controls for cost-aware evidence retrieval workflows.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/search-strategy/references/schemas.json#/definitions/input",
+      "output_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/search-strategy/references/schemas.json#/definitions/output",
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "d672c97ece17ae7d5ea504a884508653eccbe6746bbe147212ffc0c43d0d557f",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "skills/search-strategy/SKILL.md",
+          "skills/search-strategy/references/schemas.json",
+          "skills/search-strategy/references/changelog.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "lead-engineer",
+      "source_type": "skill",
+      "version": "1.0.0",
+      "name": "lead-engineer",
+      "description": "Refactored senior execution model for PRD decomposition, factory.json routing, and sub-agent sessions_spawn coordination.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/lead-engineer/references/schemas.json#/definitions/input",
+      "output_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/lead-engineer/references/schemas.json#/definitions/output",
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "b247ced8e05eb97fa60b0ee97bbab7cb412cb168402102bf88893e21b352d6c0",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "skills/lead-engineer/SKILL.md",
+          "skills/lead-engineer/references/schemas.json",
+          "skills/lead-engineer/references/changelog.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "studio-architect",
+      "source_type": "skill",
+      "version": "1.0.0",
+      "name": "studio-architect",
+      "description": "Template-first architecture skill that enforces factory.json discovery and initialization from approved starter kits before custom development.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/studio-architect/references/schemas.json#/definitions/input",
+      "output_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/studio-architect/references/schemas.json#/definitions/output",
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "94a9f7445cca49d3e6db80204df080d450fb7afccd37504d9795129a341f2119",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "skills/studio-architect/SKILL.md",
+          "skills/studio-architect/references/schemas.json",
+          "skills/studio-architect/references/changelog.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "ui-ux-guardian",
+      "source_type": "skill",
+      "version": "1.0.0",
+      "name": "ui-ux-guardian",
+      "description": "Design system guardian skill for enforcing Studio CSS standards and Playwright-based visual regression controls.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/ui-ux-guardian/references/schemas.json#/definitions/input",
+      "output_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/ui-ux-guardian/references/schemas.json#/definitions/output",
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "0ffd6974defffb50cff54d97fe7d49c2d47484e96cd6dcbe8d24d7cb3e61854a",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "skills/ui-ux-guardian/SKILL.md",
+          "skills/ui-ux-guardian/references/schemas.json",
+          "skills/ui-ux-guardian/references/changelog.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "persistent-qa",
+      "source_type": "skill",
+      "version": "1.0.0",
+      "name": "persistent-qa",
+      "description": "Independent quality assurance skill that audits outputs and maintains recurring defect memory in Supabase-backed BUG_HISTORY.md artifacts.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/persistent-qa/references/schemas.json#/definitions/input",
+      "output_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/persistent-qa/references/schemas.json#/definitions/output",
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "8d77101851439e911b62533e7635719b0e969acb40915db287194007ca497ad4",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "skills/persistent-qa/SKILL.md",
+          "skills/persistent-qa/references/schemas.json",
+          "skills/persistent-qa/references/changelog.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "devops-sre",
+      "source_type": "skill",
+      "version": "1.0.0",
+      "name": "devops-sre",
+      "description": "DevOps/SRE persona skill for automated Dockerization, VPS deployment hardening, and secure LSL_MASTER_KEY propagation.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/devops-sre/references/schemas.json#/definitions/input",
+      "output_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/devops-sre/references/schemas.json#/definitions/output",
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "9f19c41757c2c86638a4e35dded060035bac562c5ce2d38be1ad10a4a6304fbc",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "skills/devops-sre/SKILL.md",
+          "skills/devops-sre/references/schemas.json",
+          "skills/devops-sre/references/changelog.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "prd-architect",
+      "source_type": "skill",
+      "version": "1.0.0",
+      "name": "prd-architect",
+      "description": "Converts a vibe or rough idea into a professional technical specification with scope, architecture, constraints, and delivery criteria.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/prd-architect/references/schemas.json#/definitions/input",
+      "output_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/prd-architect/references/schemas.json#/definitions/output",
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "1dcc301a27d49ef723b528a32c0c285a92b14618637c8629dba5785bddce0b26",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "skills/prd-architect/SKILL.md",
+          "skills/prd-architect/references/schemas.json",
+          "skills/prd-architect/references/changelog.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "market-analyst",
+      "source_type": "skill",
+      "version": "1.0.0",
+      "name": "market-analyst",
+      "description": "Runs competitor teardown and SWOT analysis workflows using the research tool with confidence-based escalation and cost controls.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/market-analyst/references/schemas.json#/definitions/input",
+      "output_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/market-analyst/references/schemas.json#/definitions/output",
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "0288d4dfcd51ea46be855cb53478a5e9ba4679796e2151e3c7a9ee9dfab05857",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "skills/market-analyst/SKILL.md",
+          "skills/market-analyst/references/schemas.json",
+          "skills/market-analyst/references/changelog.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "department-head",
+      "source_type": "skill",
+      "version": "1.0.0",
+      "name": "department-head",
+      "description": "COO-level coordination skill for managing Lead Engineer and Persistent QA workstreams through PROGRESS.md-driven governance.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/department-head/references/schemas.json#/definitions/input",
+      "output_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/department-head/references/schemas.json#/definitions/output",
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "47ae984dca1e761e0c3d4adc00cdf7e2e0ada4d3058ed6ebd5c9abbdb395a094",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "skills/department-head/SKILL.md",
+          "skills/department-head/references/schemas.json",
+          "skills/department-head/references/changelog.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "software-pm",
+      "source_type": "skill",
+      "version": "1.0.0",
+      "name": "software-pm",
+      "description": "Software project management orchestrator that converts PRDs into technical backlogs aligned to SaaS/Web factories and enforces QA-backed Definition of Done.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/software-pm/references/schemas.json#/definitions/input",
+      "output_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/software-pm/references/schemas.json#/definitions/output",
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "b939b59b6b7a132b06de44c49a6977d3fa2c0ed80438be1f74fe721a2fe51a95",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "skills/software-pm/SKILL.md",
+          "skills/software-pm/references/schemas.json",
+          "skills/software-pm/references/changelog.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "blocker-resolution",
+      "source_type": "skill",
+      "version": "1.0.0",
+      "name": "blocker-resolution",
+      "description": "Fail-fast escalation protocol for stuck worker agents that triggers Root Cause Analysis when PROGRESS.md remains Blocked for more than two turns.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/blocker-resolution/references/schemas.json#/definitions/input",
+      "output_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/blocker-resolution/references/schemas.json#/definitions/output",
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "792e99fc83c403356bbb5030c2d43dca7cd0dde8efa197f5a8df3d2c54950dea",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "skills/blocker-resolution/SKILL.md",
+          "skills/blocker-resolution/references/schemas.json",
+          "skills/blocker-resolution/references/changelog.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "studio-health-reporting",
+      "source_type": "skill",
+      "version": "1.0.0",
+      "name": "studio-health-reporting",
+      "description": "Aggregates lsl_memory.audit_logs and PROGRESS.md streams into a Venture Studio Health Report for COO oversight.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/studio-health-reporting/references/schemas.json#/definitions/input",
+      "output_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/studio-health-reporting/references/schemas.json#/definitions/output",
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "2ad637a56dc213e86cae5fad7f7208d96cd68e7737f32af6dc850326941bb13e",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "skills/studio-health-reporting/SKILL.md",
+          "skills/studio-health-reporting/references/schemas.json",
+          "skills/studio-health-reporting/references/changelog.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "marketing-strategist",
+      "source_type": "skill",
+      "version": "1.0.0",
+      "name": "marketing-strategist",
+      "description": "Senior VP of Growth persona that converts product PRDs into multi-channel growth strategies with SEO targets, ad spend projections, and funnel architecture.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/marketing-strategist/references/schemas.json#/definitions/input",
+      "output_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/marketing-strategist/references/schemas.json#/definitions/output",
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "77fc5673aa3b9715c37e193481c3789607c7db64f6d2a3eeaa456d9487089d87",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "skills/marketing-strategist/SKILL.md",
+          "skills/marketing-strategist/references/schemas.json",
+          "skills/marketing-strategist/references/changelog.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "seo-semantic-auditor",
+      "source_type": "skill",
+      "version": "1.0.0",
+      "name": "seo-semantic-auditor",
+      "description": "Reverse-engineers competitor keyword strategies using research tiers (Brave/Exa) and outputs prioritized content gaps for content operations.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/seo-semantic-auditor/references/schemas.json#/definitions/input",
+      "output_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/seo-semantic-auditor/references/schemas.json#/definitions/output",
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "85145e7d95862731a226f4626112f24a7384ae5ac437d1bfac709fad7b8afc7a",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "skills/seo-semantic-auditor/SKILL.md",
+          "skills/seo-semantic-auditor/references/schemas.json",
+          "skills/seo-semantic-auditor/references/changelog.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "revenue-adapter-base",
+      "source_type": "skill",
+      "version": "1.0.0",
+      "name": "revenue-adapter-base",
+      "description": "Foundational revenue protocol that ingests heterogeneous monetization signals (YouTube, AdSense, Stripe) and normalizes them into Venture Studio Transaction records.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/revenue-adapter-base/references/schemas.json#/definitions/input",
+      "output_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/revenue-adapter-base/references/schemas.json#/definitions/output",
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "28fb5063049dde0906af36570fc8410338c052854ef56e63beafdcab7baa1e32",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "skills/revenue-adapter-base/SKILL.md",
+          "skills/revenue-adapter-base/references/schemas.json",
+          "skills/revenue-adapter-base/references/changelog.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "creative-director",
+      "source_type": "skill",
+      "version": "1.0.0",
+      "name": "creative-director",
+      "description": "Senior Creative Lead persona that converts marketing briefs into structured asset orders and triggers rendering workflows through n8n-bridge.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/creative-director/references/schemas.json#/definitions/input",
+      "output_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/creative-director/references/schemas.json#/definitions/output",
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "abc0900e656ecf8e1d62874618ff129898c9205bd175b142be2799173d1e0282",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "skills/creative-director/SKILL.md",
+          "skills/creative-director/references/schemas.json",
+          "skills/creative-director/references/changelog.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "creative-qa",
+      "source_type": "skill",
+      "version": "1.0.0",
+      "name": "creative-qa",
+      "description": "High-fidelity creative auditor that validates rendered assets against brand_guidelines.md and PRD, issuing mandatory PASS/FAIL with revision logic.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/creative-qa/references/schemas.json#/definitions/input",
+      "output_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/creative-qa/references/schemas.json#/definitions/output",
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "92eb8b5d923809e3e25151f7123fb32a9d060070fce89646c716263e13d0acb0",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "skills/creative-qa/SKILL.md",
+          "skills/creative-qa/references/schemas.json",
+          "skills/creative-qa/references/changelog.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "channel-ops",
+      "source_type": "skill",
+      "version": "1.0.0",
+      "name": "channel-ops",
+      "description": "Platform-specific channel operations skill for YouTube, TikTok, and X, covering scheduling, comment workflows, and support-to-sales conversion motions.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/channel-ops/references/schemas.json#/definitions/input",
+      "output_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/channel-ops/references/schemas.json#/definitions/output",
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "5a182f54a76272fc11084cf5e147f8ef1c2929415628d01814ca6d455b26dcbf",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "skills/channel-ops/SKILL.md",
+          "skills/channel-ops/references/schemas.json",
+          "skills/channel-ops/references/changelog.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "compliance-guardian",
+      "source_type": "skill",
+      "version": "1.0.0",
+      "name": "compliance-guardian",
+      "description": "Platform legal and terms specialist that monitors YouTube/Meta policy requirements, AI disclosure obligations, and safety standards before publication.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/compliance-guardian/references/schemas.json#/definitions/input",
+      "output_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/compliance-guardian/references/schemas.json#/definitions/output",
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "c515a25041c9f1bc0839d6c3f223899490807c206d820cbec812d68340535fb6",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "skills/compliance-guardian/SKILL.md",
+          "skills/compliance-guardian/references/schemas.json",
+          "skills/compliance-guardian/references/changelog.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "engagement-to-strategy-loop",
+      "source_type": "skill",
+      "version": "1.0.0",
+      "name": "engagement-to-strategy-loop",
+      "description": "Analyzes channel metrics (views, CTR, sentiment) and produces high-signal strategic feedback for marketing iteration loops.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/engagement-to-strategy-loop/references/schemas.json#/definitions/input",
+      "output_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/engagement-to-strategy-loop/references/schemas.json#/definitions/output",
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "6b4a67be11cc37f748f24599280cc8692b0393b6fdb61a1db30421c43f9845f4",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "skills/engagement-to-strategy-loop/SKILL.md",
+          "skills/engagement-to-strategy-loop/references/schemas.json",
+          "skills/engagement-to-strategy-loop/references/changelog.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "studio-controller",
+      "source_type": "skill",
+      "version": "1.0.0",
+      "name": "studio-controller",
+      "description": "Financial oversight skill implementing GAAP reporting (P&L, Balance Sheet, Cashflow, AR/AP, Budget vs Actual) with Supabase lsl_finance logging and reconciliation controls.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/studio-controller/references/schemas.json#/definitions/input",
+      "output_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/studio-controller/references/schemas.json#/definitions/output",
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "dfb384fdd6d20a2c59f86458f73a51a47f559e8d3dddb3552919b38910c7f899",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "skills/studio-controller/SKILL.md",
+          "skills/studio-controller/references/schemas.json",
+          "skills/studio-controller/references/changelog.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "smart-file-clerk",
+      "source_type": "skill",
+      "version": "1.0.0",
+      "name": "smart-file-clerk",
+      "description": "Senior Document Manager skill for hybrid storage orchestration: Supabase Buckets for active RAG and Google Drive for deep archive, with OCR pipelines for financial/legal documents.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/smart-file-clerk/references/schemas.json#/definitions/input",
+      "output_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/smart-file-clerk/references/schemas.json#/definitions/output",
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "adf1d477d72672f31e23012893d23240bf03276d48f971fbc55eda24643e1137",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "skills/smart-file-clerk/SKILL.md",
+          "skills/smart-file-clerk/references/schemas.json",
+          "skills/smart-file-clerk/references/changelog.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    },
+    {
+      "capability_id": "executive-sync-8am",
+      "source_type": "skill",
+      "version": "1.0.0",
+      "name": "executive-sync-8am",
+      "description": "Executive sync orchestration skill that starts data collection at 06:00 Taipei, queries department leads, and consolidates Wins, Blockers, and Financial Health into the 08:00 AM briefing.",
+      "lifecycle_state": "internal",
+      "visibility": "internal",
+      "execution_modes": [
+        "MANAGED"
+      ],
+      "disclosure_mode": "managed_server_disclosure",
+      "input_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/executive-sync-8am/references/schemas.json#/definitions/input",
+      "output_schema_ref": "/Users/linktrend/Projects/LiNKskills/skills/executive-sync-8am/references/schemas.json#/definitions/output",
+      "source_trace": {
+        "repo_commit_sha": "5aa915fb0352400c4fc3a6a6f2446f1f77c578c4",
+        "source_path_hash": "35b75df69610ebd869f5b1c5f0cc7eebbec76128dfc8cf1cfc87673d4d636110",
+        "extracted_at": "2026-03-19T05:27:48.041057+00:00",
+        "extractor_version": "phase0-3-v1",
+        "source_paths": [
+          "skills/executive-sync-8am/SKILL.md",
+          "skills/executive-sync-8am/references/schemas.json",
+          "skills/executive-sync-8am/references/changelog.md"
+        ]
+      },
+      "capability_class": "class_a",
+      "license_type": "standard",
+      "certification_state": "certified",
+      "activation_state": "active",
+      "active_from": null
+    }
+  ],
+  "packages": [
+    {
+      "package_id": "engineering-dept",
+      "version": "1.0.0",
+      "included_capabilities": [
+        "lead-engineer",
+        "persistent-qa",
+        "market-analyst",
+        "marketing-strategist"
+      ],
+      "step_order": [
+        "market-analyst",
+        "marketing-strategist",
+        "lead-engineer",
+        "persistent-qa"
+      ],
+      "gates": [
+        "schema_validation",
+        "policy_validation",
+        "audit_receipt"
+      ],
+      "policy_profile": "class-a-managed-internal",
+      "lifecycle_state": "internal",
+      "visibility": "internal"
+    }
+  ],
+  "extraction_warnings": [
+    "Schema /Users/linktrend/Projects/LiNKskills/skills/skill-architect/references/schemas.json missing standard input/output keys; fallback applied (spec/spec)"
+  ]
+}
