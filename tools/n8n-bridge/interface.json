@@ -1,27 +1,17 @@
 {
   "name": "n8n-bridge",
-  "description": "Secure bridge for triggering local n8n workflows through gw with Vault-managed tokens.",
-  "capability_summary": "Triggers n8n workflows via gw command routing, enforcing Vault-backed token handling and deterministic JSON outputs.",
+  "description": "Secure bridge for triggering local n8n workflows through the n8n API wrapper with vault-managed tokens.",
+  "capability_summary": "Triggers n8n workflows via the n8n CLI wrapper and deterministic JSON outputs.",
   "parameters": [
-    {
-      "name": "command",
-      "type": "string",
-      "description": "Command name. Supported: trigger."
-    },
     {
       "name": "workflow",
       "type": "string",
-      "description": "Workflow identifier passed to gw n8n trigger."
+      "description": "Workflow identifier passed to n8n trigger."
     },
     {
       "name": "payload",
       "type": "string",
-      "description": "Inline JSON payload string for workflow trigger input."
-    },
-    {
-      "name": "payload_file",
-      "type": "string",
-      "description": "Path to JSON payload file when inline payload is not used."
+      "description": "JSON payload or payload file reference for the workflow trigger."
     }
   ]
 }

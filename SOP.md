@@ -56,7 +56,7 @@ What this protects:
    - `tools/vault/bin/vault set SUPABASE_URL "https://<project>.supabase.co"`
    - `tools/vault/bin/vault set SUPABASE_SECRET_KEY "sb_secret_..."`
 4. Store from file (example Google OAuth credentials):
-   - `tools/vault/bin/vault set gw.credentials.json /absolute/path/credentials.json`
+   - `tools/vault/bin/vault set ltr.credentials.json /absolute/path/credentials.json`
 
 ### List stored credentials
 1. List key names only:
@@ -96,10 +96,17 @@ Move from one agent identity (Lisa) to another (Bob) without data leakage.
 1. Call the tool wrapper in `/tools/<tool>/bin/`.
 2. Prefer JSON-compatible outputs for automation.
 3. Examples:
-   - `tools/gw/bin/gw news trending --limit 10`
+   - `tools/gws/bin/gws drive files list --params '{"pageSize": 5}'`
+   - `tools/ltr/bin/ltr news trending --limit 10`
    - `tools/n8n/bin/n8n trigger --workflow-id 123 --payload-json '{"lead_id":"abc"}'`
    - `tools/stripe/bin/stripe list-invoices --limit 20`
    - `tools/shopify/bin/shopify list-products --limit 50`
+
+### Service Ownership Gate
+1. Resolve service routing using `configs/service_ownership.json`.
+2. Workspace services must route through `gws`.
+3. Non-Workspace Google/non-Google/interim gap services must route through `ltr`.
+4. Validate matrix integrity with `python3 scripts/check-service-ownership.py`.
 
 ### Apply Cognitive Skills (Mental Models)
 Use the following model based on task shape:
@@ -111,13 +118,14 @@ Use the following model based on task shape:
 | Final quality gate before delivery | `self-critique-loop` | Catch logic/factual errors pre-release |
 | Improve system based on history | `self-improvement` | Use ledger trends to drive versioned upgrades |
 
-## 6. The Catalog (23 Active Entries)
+## 6. The Catalog (Manifest-Driven)
 Catalog validated against `manifest.json`.
 
-### Tools (12)
+### Tools (13)
 | UID | Path | What It Does for the Business |
 | :--- | :--- | :--- |
-| `gw` | `tools/gw/src/cli.py` | Unified operations gateway for Google Workspace + selected external actions with auditability. |
+| `gws` | `tools/gws` | Primary Workspace CLI with pinned release/checksum verification. |
+| `ltr` | `tools/ltr/src/cli.py` | Runtime gateway for non-Workspace Google services, non-Google services, and local runtime controls. |
 | `playwright-cli` | `tools/playwright-cli` | Stateless web automation for screenshots, PDFs, codegen, and browser setup. |
 | `fast-playwright` | `tools/fast-playwright` | Interactive browser session control for complex multi-step web tasks. |
 | `vault` | `tools/vault` | Encrypts and manages credentials safely for all tools and agents. |
@@ -181,7 +189,7 @@ Catalog validated against `manifest.json`.
 | Error / Signal | Root Cause | Verified Fix |
 | :--- | :--- | :--- |
 | `SECURE_ENV_REQUIRED` | `LSL_MASTER_KEY` is not set | `export LSL_MASTER_KEY="<value>"`, then rerun command |
-| Google `403 Forbidden` | Token scopes stale/insufficient | Remove `tools/gw/src/token.json`, rerun `tools/gw/bin/gw setup --config tools/gw/src/credentials.json` |
+| Google `403 Forbidden` | Token scopes stale/insufficient | For Workspace routes rerun `tools/gws/bin/gws auth login`; for non-Workspace routes rerun `tools/ltr/bin/ltr setup --config tools/ltr/src/credentials.json` |
 | Vault key missing | Required key not stored in Vault | `tools/vault/bin/vault set <KEY> <VALUE_OR_FILE>` then retry |
 | Vault decryption failure / locked behavior | Wrong `LSL_MASTER_KEY` for current `vault.bin` | Set correct master key and retry `tools/vault/bin/vault list` |
 | `[UsageTracker] Disconnected: Running in local-only mode.` | Langfuse credentials unavailable/unreachable | Add `LANGFUSE_PUBLIC_KEY` and `LANGFUSE_SECRET_KEY` to Vault; optional `LANGFUSE_HOST` |

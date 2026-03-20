@@ -8,5 +8,6 @@
 - `summary`
 
 ## Coverage Scope
-- Google Workspace write actions via gw.
+- Google Workspace write actions via `gws`.
+- `ltr` write actions for non-Workspace Google and non-Google lanes.
 - n8n workflow mutation actions (create/activate/trigger/deactivate).

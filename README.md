@@ -23,6 +23,12 @@ LiNKskills is the Venture Studio's governed skill-and-tool operating layer and n
 - Service root: [`services/logic-engine`](./services/logic-engine)
 - Service README: [`services/logic-engine/README.md`](./services/logic-engine/README.md)
 
+## Google CLI Operating Model (Launch)
+- `gws` is the primary Workspace CLI (pinned runtime in [`tools/gws`](./tools/gws)).
+- `ltr` replaces legacy `gw` for non-Workspace Google, non-Google, and local runtime controls (in [`tools/ltr`](./tools/ltr)).
+- Service ownership source of truth: [`configs/service_ownership.json`](./configs/service_ownership.json).
+- Ownership validation gate: `python3 scripts/check-service-ownership.py`.
+
 ## Core Commands
 - Full repo validation:
   - `python3 validator.py --repo-root . --scan-all`

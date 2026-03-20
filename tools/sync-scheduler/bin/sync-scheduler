@@ -37,28 +37,39 @@ def overlaps(a_start: dt.datetime, a_end: dt.datetime, b_start: dt.datetime, b_e
     return a_start < b_end and b_start < a_end
 
 
-def call_gw_events(date_str: str) -> Dict[str, Any]:
-    gw_path = shutil.which("gw")
-    if gw_path is None:
-        return {"status": "error", "message": "gw executable not found in PATH", "events": []}
+def call_gws_events(date_str: str) -> Dict[str, Any]:
+    gws_path = shutil.which("gws")
+    if gws_path is None:
+        return {"status": "error", "message": "gws executable not found in PATH", "events": []}
+
+    time_min = f"{date_str}T00:00:00Z"
+    time_max = f"{date_str}T23:59:59Z"
+    params = {
+        "calendarId": "primary",
+        "timeMin": time_min,
+        "timeMax": time_max,
+        "singleEvents": True,
+        "orderBy": "startTime",
+        "maxResults": 250,
+    }
 
     cmd = [
-        gw_path,
+        gws_path,
         "calendar",
+        "events",
         "list",
-        "--date",
-        date_str,
-        "--json"
+        "--params",
+        json.dumps(params),
     ]
     try:
         result = subprocess.run(cmd, capture_output=True, text=True, check=False)
     except Exception as exc:
-        return {"status": "error", "message": f"gw invocation failed: {exc}", "events": []}
+        return {"status": "error", "message": f"gws invocation failed: {exc}", "events": []}
 
     if result.returncode != 0:
         return {
             "status": "error",
-            "message": "gw calendar query failed",
+            "message": "gws calendar query failed",
             "stderr": result.stderr.strip(),
             "events": []
         }
@@ -68,7 +79,7 @@ def call_gw_events(date_str: str) -> Dict[str, Any]:
     except json.JSONDecodeError:
         return {
             "status": "error",
-            "message": "gw returned non-JSON output",
+            "message": "gws returned non-JSON output",
             "events": []
         }
 
@@ -99,16 +110,16 @@ def extract_intervals(events: List[Dict[str, Any]]) -> List[Tuple[dt.datetime, d
 
 def suggest(date_str: str, duration_minutes: int, count: int, start_hour: int, end_hour: int) -> Dict[str, Any]:
     day = dt.datetime.strptime(date_str, "%Y-%m-%d").date()
-    gw_result = call_gw_events(date_str)
-    if gw_result.get("status") != "success":
+    gws_result = call_gws_events(date_str)
+    if gws_result.get("status") != "success":
         return {
             "status": "error",
-            "output": "Unable to fetch calendar events via gw",
+            "output": "Unable to fetch calendar events via gws",
             "suggestions": [],
-            "details": gw_result
+            "details": gws_result
         }
 
-    intervals = extract_intervals(gw_result.get("events", []))
+    intervals = extract_intervals(gws_result.get("events", []))
     candidates = build_candidate_slots(day, start_hour, end_hour, duration_minutes)
 
     suggestions: List[Dict[str, str]] = []
@@ -133,12 +144,12 @@ def suggest(date_str: str, duration_minutes: int, count: int, start_hour: int, e
         "status": "success",
         "output": "Project Review slots generated",
         "suggestions": suggestions,
-        "source": "gw calendar list"
+        "source": "gws calendar events list"
     }
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Suggest project review slots using gw calendar data.")
+    parser = argparse.ArgumentParser(description="Suggest project review slots using gws calendar data.")
     parser.add_argument("command", nargs="?", default="suggest", choices=["suggest"], help="Command to execute")
     parser.add_argument("--date", required=False, help="Date in YYYY-MM-DD; defaults to today")
     parser.add_argument("--duration-minutes", type=int, default=45, help="Meeting duration in minutes")

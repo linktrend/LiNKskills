@@ -7,21 +7,32 @@ Comprehensive command index for all executable tool wrappers under `tools/*/bin`
 - `--version`: show wrapper version when supported
 - `--json`: structured machine-readable output when supported
 
-## `gw`
-- Registry Path: `tools/gw/src/cli.py`
-- Description: Internalized v2.1.0 gateway with fortress enforcement, studio integrations, venture operations hooks, and hardened observability.
-- Binaries: `gw`
+## Runtime Routing Standard
+- Workspace services: `gws`
+- Non-Workspace Google + non-Google + local runtime controls: `ltr`
+- Service ownership source of truth: `configs/service_ownership.json`
+
+## `gws`
+- Registry Path: `/tools/gws`
+- Description: Pinned Google Workspace CLI wrapper sourced from `link-gws-cli` with strict checksum/version validation.
+- Binaries: `gws`
 - Usage Examples:
-  - `bin/gw gmail send --to user@example.com --subject "Hello" --body "Test message"`
-  - `bin/gw drive upload --file-path ./report.pdf`
-  - `bin/gw docs append --document-id <doc_id> --text "# Update" --markdown`
-  - `bin/gw tasks list --list-id @default`
-  - `bin/gw youtube stats`
-  - `bin/gw news search "artificial intelligence regulation"`
-  - `bin/gw news trending --limit 10`
-  - `bin/gw vault set gw.credentials.json ./credentials.json`
-  - `bin/gw vault get gw.credentials.json`
-  - `bin/gw sandbox run "python3 -V"`
+  - `tools/gws/bin/gws --version`
+  - `tools/gws/bin/gws drive files list --params '{"pageSize": 5}'`
+  - `tools/gws/bin/gws gmail +send --to user@example.com --subject "Hello" --body "Test"`
+  - `tools/gws/bin/gws calendar +agenda --today`
+
+## `ltr`
+- Registry Path: `tools/ltr/src/cli.py`
+- Description: LiNKtrend Runtime gateway for non-Workspace Google services, non-Google services, and local security/runtime controls.
+- Binaries: `ltr`
+- Usage Examples:
+  - `tools/ltr/bin/ltr analytics report --property-id <id> --start-date 2026-01-01 --end-date 2026-01-31 --metrics activeUsers`
+  - `tools/ltr/bin/ltr ads campaigns --customer-id <id>`
+  - `tools/ltr/bin/ltr youtube stats`
+  - `tools/ltr/bin/ltr news trending --limit 10`
+  - `tools/ltr/bin/ltr vault set ltr.credentials.json ./credentials.json`
+  - `tools/ltr/bin/ltr sandbox run "python3 -V"`
 
 ## `playwright-cli`
 - Registry Path: `/tools/playwright-cli`
@@ -127,7 +138,7 @@ Comprehensive command index for all executable tool wrappers under `tools/*/bin`
 
 ## `sync-scheduler`
 - Registry Path: `/tools/sync-scheduler`
-- Description: Calendar scheduling helper that uses gw to suggest Project Review time slots in deterministic JSON.
+- Description: Calendar scheduling helper that uses `gws` to suggest Project Review time slots in deterministic JSON.
 - Binaries: `sync-scheduler`
 - Usage Examples:
   - `bin/sync-scheduler suggest --date 2026-02-25 --duration-minutes 45 --count 3 --json`
@@ -135,16 +146,16 @@ Comprehensive command index for all executable tool wrappers under `tools/*/bin`
 
 ## `ad-intel`
 - Registry Path: `/tools/ad-intel`
-- Description: Ad performance monitor for Spend vs CTR anomaly detection using gw bridge inputs and deterministic JSON alerts.
+- Description: Ad performance monitor for Spend vs CTR anomaly detection using `ltr` bridge inputs and deterministic JSON alerts.
 - Binaries: `ad-intel`
 - Usage Examples:
   - `bin/ad-intel monitor --input ./campaign_metrics.json --json`
   - `bin/ad-intel monitor --spend-threshold-pct 35 --ctr-threshold-pct 20 --json`
-  - `bin/ad-intel monitor --bridge-command "gw news search 'meta ads benchmark ctr' --json" --json`
+  - `bin/ad-intel monitor --bridge-command "ltr news search 'meta ads benchmark ctr' --json" --json`
 
 ## `n8n-bridge`
 - Registry Path: `/tools/n8n-bridge`
-- Description: Secure webhook trigger bridge for local n8n workflows using gw commands and Vault-backed token retrieval.
+- Description: Secure webhook trigger bridge for local n8n workflows using n8n API wrapper commands with Vault-backed token retrieval.
 - Binaries: `n8n-bridge`
 - Usage Examples:
   - `bin/n8n-bridge trigger --workflow 123 --payload '{"job":"render"}' --json`
@@ -152,18 +163,17 @@ Comprehensive command index for all executable tool wrappers under `tools/*/bin`
 
 ## `asset-filer`
 - Registry Path: `/tools/asset-filer`
-- Description: Uploads assets through gw and registers metadata records for retrieval in lsl_memory.assets.
+- Description: Uploads assets through `ltr` and registers metadata records for retrieval in `lsl_memory.assets`.
 - Binaries: `asset-filer`
 - Usage Examples:
   - `bin/asset-filer upload ./outputs/thumbnail.png --json`
   - `bin/asset-filer upload ./outputs/script.md --asset-type script --project-id launch-q2 --json`
 
-## `social-gw`
-- Registry Path: `/tools/social-gw`
-- Description: Unified social wrapper for posting and comment retrieval across YouTube, TikTok, and X via gw.
-- Binaries: `social-gw`
+## `social-ltr`
+- Registry Path: `/tools/social-ltr`
+- Description: Unified social wrapper for posting and comment retrieval across YouTube, TikTok, and X via `ltr`.
+- Binaries: `social-ltr`
 - Usage Examples:
-  - `bin/social-gw post --provider youtube --target-id <comment_id> --text "Thanks for your feedback" --json`
-  - `bin/social-gw fetch-comments --provider youtube --target-id <video_id> --json`
-  - `bin/social-gw post --provider x --target-id <thread_id> --text "Launch update" --json`
-
+  - `bin/social-ltr post --provider youtube --target-id <comment_id> --text "Thanks for your feedback" --json`
+  - `bin/social-ltr fetch-comments --provider youtube --target-id <video_id> --json`
+  - `bin/social-ltr post --provider x --target-id <thread_id> --text "Launch update" --json`

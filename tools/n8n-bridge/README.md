@@ -1,7 +1,9 @@
 # n8n-bridge
 
 ## Capability Summary
-Webhook trigger bridge for local n8n workflows. Uses `gw n8n trigger` and Vault-backed token retrieval for secure workflow execution.
+Webhook trigger bridge for local n8n workflows.
+
+Uses `n8n trigger` for deterministic workflow execution.
 
 ## CLI
 - `--help`
@@ -9,9 +11,8 @@ Webhook trigger bridge for local n8n workflows. Uses `gw n8n trigger` and Vault-
 - `--json`
 
 ## Usage
-- `bin/n8n-bridge trigger --workflow 123 --payload '{"job":"render"}' --json`
-- `bin/n8n-bridge trigger --workflow creative-pipeline --payload-file ./payload.json --json`
+- `bin/n8n-bridge trigger --workflow 123 --payload '{"lead_id":"abc"}' --json`
+- `bin/n8n-bridge trigger --workflow 123 --payload-file ./payload.json --json`
 
-## Security
-- Reads n8n token from Vault key `N8N_API_KEY` via `gw vault get N8N_API_KEY`.
-- Never logs raw token content.
+## Notes
+- n8n credentials are resolved by `tools/n8n` via vault keys `N8N_BASE_URL` and `N8N_API_KEY`.

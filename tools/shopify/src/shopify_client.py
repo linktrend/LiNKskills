@@ -84,11 +84,11 @@ class ShopifyService:
             value = str(vault.get_value(key_name)).strip()
         except KeyError as exc:
             raise RuntimeError(
-                f"Missing vault secret '{key_name}'. Run: gw vault set {key_name} <value>"
+                f"Missing vault secret '{key_name}'. Run: ltr vault set {key_name} <value>"
             ) from exc
         if not value:
             raise RuntimeError(
-                f"Vault secret '{key_name}' is empty. Run: gw vault set {key_name} <value>"
+                f"Vault secret '{key_name}' is empty. Run: ltr vault set {key_name} <value>"
             )
         return value
 

@@ -7,6 +7,11 @@ Machine-facing protocol for LiNKskills Logic Engine after Phase 0-3 implementati
 - Enforce identity, idempotency, policy, billing, and audit controls per PRD v4.0.
 - Preserve source skill frontmatter immutability.
 
+## 1A. Google Service Routing Contract
+- Workspace services route to `gws`.
+- Non-Workspace Google/non-Google/interim gap services route to `ltr`.
+- Routing source of truth: `configs/service_ownership.json` validated by `python3 scripts/check-service-ownership.py`.
+
 ## 2. Mandatory Contract for Write APIs
 ### `POST /v1/runs`
 Required fields:

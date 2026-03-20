@@ -17,7 +17,7 @@ tooling:
   jit_tool_threshold: 10
   require_get_tool_details: true
 tools: [write_file, read_file, list_dir, get_tool_details]
-dependencies: [gw, stripe]
+dependencies: [ltr, stripe]
 permissions: [fs_read, fs_write, api_access]
 scope_out: ["Do not emit raw source-specific payloads as final output", "Do not finalize without Venture Studio Transaction normalization"]
 persistence:

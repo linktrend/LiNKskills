@@ -1,0 +1,225 @@
+{
+  "version": "2026-03-20",
+  "policy": {
+    "rule": "each_service_exactly_one_owner",
+    "owners": [
+      "gws",
+      "ltr"
+    ],
+    "migration_rule": "When gws adds a service currently owned by ltr, run parity checks, switch ownership to gws, then deprecate/remove from ltr."
+  },
+  "services": [
+    {
+      "service": "drive",
+      "owner": "gws",
+      "category": "workspace"
+    },
+    {
+      "service": "sheets",
+      "owner": "gws",
+      "category": "workspace"
+    },
+    {
+      "service": "gmail",
+      "owner": "gws",
+      "category": "workspace"
+    },
+    {
+      "service": "calendar",
+      "owner": "gws",
+      "category": "workspace"
+    },
+    {
+      "service": "admin-reports",
+      "owner": "gws",
+      "category": "workspace"
+    },
+    {
+      "service": "docs",
+      "owner": "gws",
+      "category": "workspace"
+    },
+    {
+      "service": "slides",
+      "owner": "gws",
+      "category": "workspace"
+    },
+    {
+      "service": "tasks",
+      "owner": "gws",
+      "category": "workspace"
+    },
+    {
+      "service": "people",
+      "owner": "gws",
+      "category": "workspace"
+    },
+    {
+      "service": "chat",
+      "owner": "gws",
+      "category": "workspace"
+    },
+    {
+      "service": "classroom",
+      "owner": "gws",
+      "category": "workspace"
+    },
+    {
+      "service": "forms",
+      "owner": "gws",
+      "category": "workspace"
+    },
+    {
+      "service": "keep",
+      "owner": "gws",
+      "category": "workspace"
+    },
+    {
+      "service": "meet",
+      "owner": "gws",
+      "category": "workspace"
+    },
+    {
+      "service": "events",
+      "owner": "gws",
+      "category": "workspace"
+    },
+    {
+      "service": "modelarmor",
+      "owner": "gws",
+      "category": "workspace"
+    },
+    {
+      "service": "workflow",
+      "owner": "gws",
+      "category": "workspace"
+    },
+    {
+      "service": "analytics",
+      "owner": "ltr",
+      "category": "google-non-workspace"
+    },
+    {
+      "service": "ads",
+      "owner": "ltr",
+      "category": "google-non-workspace"
+    },
+    {
+      "service": "search-console",
+      "owner": "ltr",
+      "category": "google-non-workspace"
+    },
+    {
+      "service": "maps",
+      "owner": "ltr",
+      "category": "google-non-workspace"
+    },
+    {
+      "service": "youtube",
+      "owner": "ltr",
+      "category": "google-non-workspace"
+    },
+    {
+      "service": "yt-analytics",
+      "owner": "ltr",
+      "category": "google-non-workspace"
+    },
+    {
+      "service": "script",
+      "owner": "ltr",
+      "category": "workspace-gap"
+    },
+    {
+      "service": "groupssettings",
+      "owner": "ltr",
+      "category": "workspace-gap"
+    },
+    {
+      "service": "licensing",
+      "owner": "ltr",
+      "category": "workspace-gap"
+    },
+    {
+      "service": "reseller",
+      "owner": "ltr",
+      "category": "workspace-gap"
+    },
+    {
+      "service": "cloudidentity",
+      "owner": "ltr",
+      "category": "workspace-gap"
+    },
+    {
+      "service": "alertcenter",
+      "owner": "ltr",
+      "category": "workspace-gap"
+    },
+    {
+      "service": "vault-api",
+      "owner": "ltr",
+      "category": "workspace-gap"
+    },
+    {
+      "service": "pubsub",
+      "owner": "ltr",
+      "category": "workspace-gap"
+    },
+    {
+      "service": "news",
+      "owner": "ltr",
+      "category": "non-google"
+    },
+    {
+      "service": "env",
+      "owner": "ltr",
+      "category": "non-google"
+    },
+    {
+      "service": "vault-local",
+      "owner": "ltr",
+      "category": "platform-local"
+    },
+    {
+      "service": "sandbox-local",
+      "owner": "ltr",
+      "category": "platform-local"
+    }
+  ],
+  "required_services": [
+    "drive",
+    "sheets",
+    "gmail",
+    "calendar",
+    "admin-reports",
+    "docs",
+    "slides",
+    "tasks",
+    "people",
+    "chat",
+    "classroom",
+    "forms",
+    "keep",
+    "meet",
+    "events",
+    "modelarmor",
+    "workflow",
+    "analytics",
+    "ads",
+    "search-console",
+    "maps",
+    "youtube",
+    "yt-analytics",
+    "script",
+    "groupssettings",
+    "licensing",
+    "reseller",
+    "cloudidentity",
+    "alertcenter",
+    "vault-api",
+    "pubsub",
+    "news",
+    "env",
+    "vault-local",
+    "sandbox-local"
+  ]
+}

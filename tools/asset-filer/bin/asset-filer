@@ -21,7 +21,7 @@ def run_cmd(cmd: list[str]) -> subprocess.CompletedProcess:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Asset upload bridge via gw")
+    parser = argparse.ArgumentParser(description="Asset upload bridge via ltr")
     parser.add_argument("command", nargs="?", default="upload", choices=["upload"])
     parser.add_argument("file", nargs="?")
     parser.add_argument("--asset-type", default="other")
@@ -40,12 +40,12 @@ def main() -> int:
     if not file_path.exists() or not file_path.is_file():
         return emit({"status": "error", "output": f"file not found: {args.file}"}, 1)
 
-    gw_bin = shutil.which("gw")
-    if not gw_bin:
-        return emit({"status": "error", "output": "gw executable not found in PATH"}, 1)
+    ltr_bin = shutil.which("ltr")
+    if not ltr_bin:
+        return emit({"status": "error", "output": "ltr executable not found in PATH"}, 1)
 
     # Primary upload command required by protocol.
-    upload_cmd = [gw_bin, "asset", "upload", str(file_path), "--json"]
+    upload_cmd = [ltr_bin, "asset", "upload", str(file_path), "--json"]
     upload_res = run_cmd(upload_cmd)
     if upload_res.returncode != 0:
         return emit(
@@ -53,7 +53,7 @@ def main() -> int:
                 "status": "error",
                 "output": "asset upload failed",
                 "stderr": upload_res.stderr.strip(),
-                "path": "gw asset upload"
+                "path": "ltr asset upload"
             },
             1,
         )
@@ -71,9 +71,9 @@ def main() -> int:
         "storage_path": upload_payload.get("path", "unknown"),
     }
 
-    # Secondary metadata registration bridge; expected to map to lsl_memory.assets in gw backend.
+    # Secondary metadata registration bridge; expected to map to lsl_memory.assets in ltr backend.
     register_cmd = [
-        gw_bin,
+        ltr_bin,
         "asset",
         "register",
         "--metadata",

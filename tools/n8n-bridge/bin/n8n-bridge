@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 import argparse
 import json
-import os
 import shutil
 import subprocess
 import sys
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, List, Optional
 
 VERSION = "1.0.0"
 
@@ -16,11 +15,11 @@ def emit(payload: Dict[str, Any], code: int = 0) -> int:
     return code
 
 
-def run_cmd(cmd: list[str], env: dict[str, str] | None = None) -> subprocess.CompletedProcess:
+def run_cmd(cmd: List[str], env: Optional[Dict[str, str]] = None) -> subprocess.CompletedProcess:
     return subprocess.run(cmd, capture_output=True, text=True, check=False, env=env)
 
 
-def read_payload(payload: str | None, payload_file: str | None) -> str:
+def read_payload(payload: Optional[str], payload_file: Optional[str]) -> str:
     if payload and payload_file:
         raise ValueError("Provide either --payload or --payload-file, not both")
     if payload:
@@ -36,18 +35,8 @@ def read_payload(payload: str | None, payload_file: str | None) -> str:
     raise ValueError("--payload or --payload-file is required")
 
 
-def get_vault_token(gw_bin: str) -> str:
-    res = run_cmd([gw_bin, "vault", "get", "N8N_API_KEY"]) 
-    if res.returncode != 0:
-        raise RuntimeError("Unable to fetch N8N_API_KEY from Vault")
-    token = res.stdout.strip()
-    if not token:
-        raise RuntimeError("Vault key N8N_API_KEY is empty")
-    return token
-
-
 def main() -> int:
-    parser = argparse.ArgumentParser(description="n8n webhook trigger bridge via gw")
+    parser = argparse.ArgumentParser(description="n8n webhook trigger bridge via n8n")
     parser.add_argument("command", nargs="?", default="trigger", choices=["trigger"])
     parser.add_argument("--workflow", required=False)
     parser.add_argument("--payload", required=False)
@@ -62,46 +51,42 @@ def main() -> int:
     if not args.workflow:
         return emit({"status": "error", "output": "--workflow is required"}, 1)
 
-    gw_bin = shutil.which("gw")
-    if not gw_bin:
-        return emit({"status": "error", "output": "gw executable not found in PATH"}, 1)
+    n8n_bin = shutil.which("n8n")
+    if not n8n_bin:
+        return emit({"status": "error", "output": "n8n executable not found in PATH"}, 1)
 
     try:
         payload = read_payload(args.payload, args.payload_file)
-        token = get_vault_token(gw_bin)
-        env = dict(os.environ)
-        env["N8N_API_KEY"] = token
-
-        cmd = [gw_bin, "n8n", "trigger", "--workflow", args.workflow, "--payload", payload, "--json"]
-        res = run_cmd(cmd, env=env)
+        cmd = [n8n_bin, "trigger", "--workflow-id", args.workflow, "--payload-json", payload, "--json"]
+        res = run_cmd(cmd)
         if res.returncode != 0:
             return emit(
                 {
                     "status": "error",
                     "output": "n8n trigger failed",
                     "stderr": res.stderr.strip(),
-                    "path": "gw n8n trigger"
+                    "path": "n8n trigger"
                 },
                 1,
             )
 
         try:
-            gw_payload = json.loads(res.stdout)
+            n8n_payload = json.loads(res.stdout)
         except json.JSONDecodeError:
-            gw_payload = {"raw": res.stdout.strip()}
+            n8n_payload = {"raw": res.stdout.strip()}
 
         return emit(
             {
                 "status": "success",
                 "output": "Workflow triggered",
                 "workflow": args.workflow,
-                "path": "gw n8n trigger",
-                "result": gw_payload
+                "path": "n8n trigger",
+                "result": n8n_payload
             }
         )
 
     except Exception as exc:
-        return emit({"status": "error", "output": str(exc), "path": "gw n8n trigger"}, 1)
+        return emit({"status": "error", "output": str(exc), "path": "n8n trigger"}, 1)
 
 
 if __name__ == "__main__":

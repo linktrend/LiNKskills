@@ -39,7 +39,7 @@ last_updated: 2026-02-25
 5. **Tier-1 Start Rule**: Run Tier 1 (`web`) first unless user explicitly requires another tier.
 6. **Escalation Rule**: If Tier 1 confidence is low, escalate to Tier 2 (`neural`) for technical similarity retrieval.
 7. **Deep Research HITL Rule (Mandatory)**:
-   - If plan requires deep multi-step `brief` reasoning, write intent event via `GWAuditLogger` and pause.
+   - If plan requires deep multi-step `brief` reasoning, write intent event via `LTRAuditLogger` and pause.
    - Wait for operator response `PROCEED` before continuing.
 
 ## Rules
@@ -82,7 +82,7 @@ last_updated: 2026-02-25
 6. Execute Tier 1 `web` search by default.
 7. Score confidence from retrieved results.
 8. If confidence below threshold, escalate to Tier 2 `neural` and merge evidence.
-9. If `brief` deep-research mode is required, write intent log via `GWAuditLogger` and checkpoint `PENDING_APPROVAL`.
+9. If `brief` deep-research mode is required, write intent log via `LTRAuditLogger` and checkpoint `PENDING_APPROVAL`.
 
 ### Phase 3: Drafting & HITL Gate
 10. Build draft evidence report from gathered results.

@@ -1,10 +1,17 @@
 [
   {
-    "uid": "gw",
+    "uid": "ltr",
     "type": "tool",
-    "path": "tools/gw/src/cli.py",
+    "path": "tools/ltr/src/cli.py",
     "version": "v2.1.0",
-    "description": "Internalized v2.1.0 gateway with fortress enforcement, studio integrations, venture operations hooks, and hardened observability."
+    "description": "LiNKtrend Runtime gateway for non-Workspace Google services, non-Google services, and local security/runtime controls; Workspace lanes are handled by gws."
+  },
+  {
+    "uid": "gws",
+    "type": "tool",
+    "path": "/tools/gws",
+    "version": "0.18.1",
+    "description": "Pinned Google Workspace CLI integration sourced from link-gws-cli with strict release checksum verification and deterministic output contracts."
   },
   {
     "uid": "playwright-cli",
@@ -95,35 +102,35 @@
     "type": "tool",
     "path": "/tools/sync-scheduler",
     "version": "1.0.0",
-    "description": "Calendar scheduling helper that uses gw to suggest Project Review time slots in deterministic JSON."
+    "description": "Calendar scheduling helper that uses gws to suggest Project Review time slots in deterministic JSON."
   },
   {
     "uid": "ad-intel",
     "type": "tool",
     "path": "/tools/ad-intel",
     "version": "1.0.0",
-    "description": "Ad performance monitor for Spend vs CTR anomaly detection using gw bridge inputs and deterministic JSON alerts."
+    "description": "Ad performance monitor for Spend vs CTR anomaly detection using ltr bridge inputs and deterministic JSON alerts."
   },
   {
     "uid": "n8n-bridge",
     "type": "tool",
     "path": "/tools/n8n-bridge",
     "version": "1.0.0",
-    "description": "Secure webhook trigger bridge for local n8n workflows using gw commands and Vault-backed token retrieval."
+    "description": "Secure webhook trigger bridge for local n8n workflows using n8n API wrapper commands with vault-backed token retrieval."
   },
   {
     "uid": "asset-filer",
     "type": "tool",
     "path": "/tools/asset-filer",
     "version": "1.0.0",
-    "description": "Uploads assets through gw and registers metadata records for retrieval in lsl_memory.assets."
+    "description": "Uploads assets through ltr and registers metadata records for retrieval in lsl_memory.assets."
   },
   {
-    "uid": "social-gw",
+    "uid": "social-ltr",
     "type": "tool",
-    "path": "/tools/social-gw",
+    "path": "/tools/social-ltr",
     "version": "1.0.0",
-    "description": "Unified social wrapper for posting and comment retrieval across YouTube, TikTok, and X via gw."
+    "description": "Unified social wrapper for posting and comment retrieval across YouTube, TikTok, and X via ltr."
   },
   {
     "uid": "skill-template",
@@ -165,7 +172,7 @@
     "type": "skill",
     "path": "/skills/audit-protocol",
     "version": "1.0.0",
-    "description": "Enforces predictive intent logging to GWAuditLogger before write actions across GW and n8n."
+    "description": "Enforces predictive intent logging to LTRAuditLogger before write actions across gws, ltr, and n8n."
   },
   {
     "uid": "git-safeguard",

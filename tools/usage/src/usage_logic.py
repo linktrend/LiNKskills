@@ -10,7 +10,7 @@ from typing import Any
 
 
 class LangfuseUsageTracker:
-    """Log gw execution telemetry to Langfuse using vault-managed keys."""
+    """Log runtime execution telemetry to Langfuse using vault-managed keys."""
 
     DEFAULT_PUBLIC_KEY_NAME = "LANGFUSE_PUBLIC_KEY"
     DEFAULT_SECRET_KEY_NAME = "LANGFUSE_SECRET_KEY"
@@ -55,7 +55,7 @@ class LangfuseUsageTracker:
             payload_metadata.update(metadata)
 
         try:
-            trace_name = f"gw.{service}.{action}"
+            trace_name = f"ltr.{service}.{action}"
             trace = client.trace(
                 name=trace_name,
                 input={"service": service, "action": action},
@@ -65,16 +65,16 @@ class LangfuseUsageTracker:
 
             if hasattr(trace, "generation"):
                 trace.generation(
-                    name="gw.execution",
-                    model="gw-cli",
+                    name="ltr.execution",
+                    model="ltr-cli",
                     input={"service": service, "action": action},
                     output={"success": bool(success), "latency_ms": int(latency_ms)},
                     metadata=payload_metadata,
                 )
             elif hasattr(client, "generation"):
                 client.generation(
-                    name="gw.execution",
-                    model="gw-cli",
+                    name="ltr.execution",
+                    model="ltr-cli",
                     input={"service": service, "action": action},
                     output={"success": bool(success), "latency_ms": int(latency_ms)},
                     metadata=payload_metadata,

@@ -28,7 +28,7 @@ Multi-tier research gateway with cost-aware routing. Starts on low-cost web sear
 - If `web` confidence is below threshold, router escalates to Tier 2 (`neural`).
 
 ## Vault Keys
-Set these with `gw vault set`:
+Set these with `tools/vault/bin/vault set`:
 - `BRAVE_API_KEY`
 - `EXA_API_KEY`
 - `PERPLEXITY_API_KEY`

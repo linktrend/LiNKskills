@@ -101,7 +101,7 @@ This means skills are governed operating assets, not ad hoc prompts.
 
 A tool is a reusable execution primitive that skills can rely on. Tools are typically implemented as CLI-first wrappers or adapters and are expected to provide deterministic or governed behavior. Examples include:
 
-- `gw` for Google Workspace and selected external actions;
+- `gws` for Google Workspace actions and `ltr` for non-Workspace Google + selected external actions;
 - `memory` for scoped recall and notes;
 - `vault` for secrets management;
 - `sandbox` for isolated execution;

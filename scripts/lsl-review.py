@@ -40,42 +40,42 @@ def list_remote_dev_branches(repo_root: Path, remote: str) -> List[str]:
     return sorted(set(branches))
 
 
-def verify_gw_syntax(repo_root: Path) -> Dict[str, Any]:
-    """Verify internalized GW source structure and Python syntax."""
-    gw_root = repo_root / "tools" / "gw" / "src"
-    services_dir = gw_root / "services"
-    utils_dir = gw_root / "utils"
-    required_files = [gw_root / "cli.py", gw_root / "requirements.txt"]
+def verify_runtime_syntax(repo_root: Path) -> Dict[str, Any]:
+    """Verify internalized ltr source structure and Python syntax."""
+    ltr_root = repo_root / "tools" / "ltr" / "src"
+    services_dir = ltr_root / "services"
+    utils_dir = ltr_root / "utils"
+    required_files = [ltr_root / "cli.py", ltr_root / "requirements.txt", repo_root / "tools" / "gws" / "bin" / "gws"]
     required_dirs = [services_dir, utils_dir]
 
     missing_paths = [str(p.relative_to(repo_root)) for p in required_files + required_dirs if not p.exists()]
     if missing_paths:
         return {
-            "gw_syntax_exit_code": 1,
-            "gw_syntax_output": f"Missing required internalized GW paths: {', '.join(missing_paths)}",
-            "gw_checked_files": [],
+            "runtime_syntax_exit_code": 1,
+            "runtime_syntax_output": f"Missing required runtime paths: {', '.join(missing_paths)}",
+            "runtime_checked_files": [],
         }
 
-    python_files = [gw_root / "cli.py"]
+    python_files = [ltr_root / "cli.py"]
     python_files.extend(sorted(services_dir.rglob("*.py")))
     python_files.extend(sorted(utils_dir.rglob("*.py")))
     checked_files = [str(path.relative_to(repo_root)) for path in python_files]
 
     if not python_files:
         return {
-            "gw_syntax_exit_code": 1,
-            "gw_syntax_output": "No Python files found for GW syntax verification.",
-            "gw_checked_files": [],
+            "runtime_syntax_exit_code": 1,
+            "runtime_syntax_output": "No Python files found for ltr syntax verification.",
+            "runtime_checked_files": [],
         }
 
     proc = run(["python3", "-m", "py_compile", *[str(path) for path in python_files]], cwd=repo_root, check=False)
     output = (proc.stdout + "\n" + proc.stderr).strip()
     if not output:
-        output = f"Validated syntax for {len(python_files)} GW Python files."
+        output = f"Validated syntax for {len(python_files)} ltr Python files."
     return {
-        "gw_syntax_exit_code": proc.returncode,
-        "gw_syntax_output": output,
-        "gw_checked_files": checked_files,
+        "runtime_syntax_exit_code": proc.returncode,
+        "runtime_syntax_output": output,
+        "runtime_checked_files": checked_files,
     }
 
 
@@ -89,9 +89,9 @@ def validate_branch(repo_root: Path, remote: str, branch: str) -> Dict[str, Any]
                 "branch": branch,
                 "validator_exit_code": add_proc.returncode,
                 "validator_output": (add_proc.stderr or add_proc.stdout).strip(),
-                "gw_syntax_exit_code": 1,
-                "gw_syntax_output": "Skipped due to worktree checkout failure.",
-                "gw_checked_files": [],
+                "runtime_syntax_exit_code": 1,
+                "runtime_syntax_output": "Skipped due to worktree checkout failure.",
+                "runtime_checked_files": [],
                 "ready_for_merge": False,
             }
 
@@ -102,15 +102,15 @@ def validate_branch(repo_root: Path, remote: str, branch: str) -> Dict[str, Any]
                 check=False,
             )
             combined = (validator_proc.stdout + "\n" + validator_proc.stderr).strip()
-            gw_check = verify_gw_syntax(worktree)
-            ready_for_merge = validator_proc.returncode == 0 and gw_check["gw_syntax_exit_code"] == 0
+            runtime_check = verify_runtime_syntax(worktree)
+            ready_for_merge = validator_proc.returncode == 0 and runtime_check["runtime_syntax_exit_code"] == 0
             return {
                 "branch": branch,
                 "validator_exit_code": validator_proc.returncode,
                 "validator_output": combined,
-                "gw_syntax_exit_code": gw_check["gw_syntax_exit_code"],
-                "gw_syntax_output": gw_check["gw_syntax_output"],
-                "gw_checked_files": gw_check["gw_checked_files"],
+                "runtime_syntax_exit_code": runtime_check["runtime_syntax_exit_code"],
+                "runtime_syntax_output": runtime_check["runtime_syntax_output"],
+                "runtime_checked_files": runtime_check["runtime_checked_files"],
                 "ready_for_merge": ready_for_merge,
             }
         finally:

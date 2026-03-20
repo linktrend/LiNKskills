@@ -82,7 +82,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Ad performance monitor (Spend vs CTR anomalies).")
     parser.add_argument("command", nargs="?", default="monitor", choices=["monitor"], help="Command to execute")
     parser.add_argument("--input", help="Local JSON file with campaign records")
-    parser.add_argument("--bridge-command", help="Optional gw bridge command that returns JSON")
+    parser.add_argument("--bridge-command", help="Optional ltr bridge command that returns JSON")
     parser.add_argument("--spend-threshold-pct", type=float, default=35.0)
     parser.add_argument("--ctr-threshold-pct", type=float, default=20.0)
     parser.add_argument("--json", action="store_true", help="Emit JSON output")
@@ -97,7 +97,7 @@ def main() -> int:
         source = "none"
         if args.bridge_command:
             records = load_records_from_bridge(args.bridge_command)
-            source = "gw-bridge"
+            source = "ltr-bridge"
         elif args.input:
             records = load_records_from_file(args.input)
             source = "file"

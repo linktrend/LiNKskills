@@ -17,7 +17,7 @@ tooling:
   jit_tool_threshold: 10
   require_get_tool_details: true
 tools: [write_file, read_file, list_dir, get_tool_details]
-dependencies: [doc-engine, asset-filer, gw]
+dependencies: [doc-engine, asset-filer, gws, ltr]
 permissions: [fs_read, fs_write, api_access]
 scope_out: ["Do not store sensitive docs without classification", "Do not skip OCR for eligible financial/legal documents in Supabase"]
 persistence:

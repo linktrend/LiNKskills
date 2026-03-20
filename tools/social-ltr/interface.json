@@ -1,0 +1,22 @@
+{
+  "name": "social-ltr",
+  "description": "Unified social posting and comment retrieval wrapper built on top of the ltr tool.",
+  "capability_summary": "Routes cross-platform social actions (YouTube, TikTok, X) through ltr with deterministic JSON results for channel operations.",
+  "parameters": [
+    {
+      "name": "command",
+      "type": "string",
+      "description": "One of: post, fetch-comments"
+    },
+    {
+      "name": "provider",
+      "type": "string",
+      "description": "Social provider: youtube, tiktok, x"
+    },
+    {
+      "name": "target_id",
+      "type": "string",
+      "description": "Platform target id (comment/thread/video id depending on provider)."
+    }
+  ]
+}

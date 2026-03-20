@@ -17,7 +17,7 @@ tooling:
   jit_tool_threshold: 10
   require_get_tool_details: true
 tools: [write_file, read_file, list_dir, get_tool_details]
-dependencies: [channel-ops, marketing-strategist, social-gw]
+dependencies: [channel-ops, marketing-strategist, social-ltr]
 permissions: [fs_read, fs_write, api_access]
 scope_out: ["Do not report metric changes without evidence context", "Do not omit high-signal feedback routing to marketing"]
 persistence:
@@ -97,7 +97,7 @@ last_updated: 2026-02-25
 ## Tools
 | Tool Name | Workflow Scope | Critical Execution Rule |
 | :--- | :--- | :--- |
-| `social-gw` | Phases 1-2 | Use to collect comment signal inputs when available. |
+| `social-ltr` | Phases 1-2 | Use to collect comment signal inputs when available. |
 | `write_file` | All | Persist feedback reports and checkpoint artifacts. |
 | `get_tool_details` | Phase 1+ | Required for generalist/JIT profile. |
 

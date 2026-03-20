@@ -17,7 +17,7 @@ tooling:
   jit_tool_threshold: 10
   require_get_tool_details: true
 tools: [write_file, read_file, list_dir, get_tool_details]
-dependencies: [social-gw, sync-scheduler, marketing-strategist]
+dependencies: [social-ltr, sync-scheduler, marketing-strategist]
 permissions: [fs_read, fs_write, api_access]
 scope_out: ["Do not publish without platform-specific SOP alignment", "Do not ignore support-to-sales handoff opportunities"]
 persistence:
@@ -52,7 +52,7 @@ last_updated: 2026-02-25
 
 ### Tooling Protocol (CLI-First)
 1. Level 1 - Native CLI: stage schedule and response context.
-2. Level 2 - CLI Wrapper Scripts: use `social-gw`/`sync-scheduler` for deterministic actions.
+2. Level 2 - CLI Wrapper Scripts: use `social-ltr`/`sync-scheduler` for deterministic actions.
 3. Level 3 - Direct API: exception-only for unsupported high-frequency operations.
 4. Level 4 - MCP: persistent background sessions only.
 
@@ -97,7 +97,7 @@ last_updated: 2026-02-25
 ## Tools
 | Tool Name | Workflow Scope | Critical Execution Rule |
 | :--- | :--- | :--- |
-| `social-gw` | Phases 2-4 | Use for post and comment actions across supported platforms. |
+| `social-ltr` | Phases 2-4 | Use for post and comment actions across supported platforms. |
 | `sync-scheduler` | Phases 1-2 | Align schedule windows before publishing actions. |
 | `get_tool_details` | Phase 1+ | Required for generalist/JIT profile. |
 

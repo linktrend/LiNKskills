@@ -10,6 +10,7 @@ Machine-facing operating protocol for AI-to-AI orchestration in the LiNKskills L
 ## 2. AI-to-AI Orchestration Protocol
 - Source of routing truth:
   - `manifest.json` for registry membership.
+  - `configs/service_ownership.json` for `gws` vs `ltr` service ownership.
   - Skill `SKILL.md` frontmatter for engine/tooling/persistence policies.
 - Mandatory execution lifecycle:
   1. Ingestion & checkpointing.
@@ -45,7 +46,7 @@ Machine-facing operating protocol for AI-to-AI orchestration in the LiNKskills L
   - Avoid full-table context loading unless explicitly required.
 
 ## 5. Vault Access Protocols
-- Secret source: Vault only (`tools/vault` or `gw vault ...`).
+- Secret source: Vault only (`tools/vault` or `ltr vault ...`).
 - Master key requirement:
   - `LSL_MASTER_KEY` must be set before secret operations.
 - Logging policy:

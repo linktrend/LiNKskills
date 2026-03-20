@@ -1,32 +1,17 @@
 {
   "name": "ad-intel",
-  "description": "Ad performance monitor that analyzes Spend vs CTR and reports anomalies for growth operations.",
-  "capability_summary": "Monitors ad performance using gw bridge inputs, flags spend/CTR anomalies, and outputs deterministic JSON alerts for the marketing strategist.",
+  "description": "Ad performance monitor for Spend vs CTR anomaly detection using ltr bridge inputs.",
+  "capability_summary": "Monitors ad performance using ltr bridge inputs, flags spend/CTR anomalies, and outputs deterministic JSON alerts for the marketing strategist.",
   "parameters": [
-    {
-      "name": "command",
-      "type": "string",
-      "description": "Command name. Supported: monitor."
-    },
     {
       "name": "input",
       "type": "string",
-      "description": "Path to JSON file containing campaign records with spend and ctr fields."
-    },
-    {
-      "name": "spend_threshold_pct",
-      "type": "string",
-      "description": "Percent increase threshold for spend anomaly detection (default 35)."
-    },
-    {
-      "name": "ctr_threshold_pct",
-      "type": "string",
-      "description": "Percent decrease threshold for ctr anomaly detection (default 20)."
+      "description": "Optional local JSON file with campaign records"
     },
     {
       "name": "bridge_command",
       "type": "string",
-      "description": "Optional gw bridge shell command that returns JSON records."
+      "description": "Optional ltr bridge shell command that returns JSON records."
     }
   ]
 }

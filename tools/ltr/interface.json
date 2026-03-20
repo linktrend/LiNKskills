@@ -1,0 +1,66 @@
+{
+  "name": "ltr",
+  "description": "LiNKtrend Runtime gateway for non-Workspace Google services, external service adapters, and local security/runtime controls.",
+  "capability_summary": "Use ltr for Analytics, Ads, Search Console, YouTube, Maps, News, Env Context, Vault secrets, and sandboxed execution. Workspace services are provided by gws.",
+  "parameters": [
+    {
+      "name": "service",
+      "type": "string",
+      "description": "Top-level selector (analytics, search-console, ads, news, maps, env, youtube, vault, sandbox)."
+    },
+    {
+      "name": "command",
+      "type": "string",
+      "description": "Service command to execute."
+    },
+    {
+      "name": "args",
+      "type": "string",
+      "description": "Additional CLI flags/values passed through to ltr commands."
+    }
+  ],
+  "subcommands": [
+    {
+      "name": "analytics report",
+      "description": "Run GA4 report queries through Analytics Data API."
+    },
+    {
+      "name": "ads campaigns",
+      "description": "Fetch campaign overview metrics through Google Ads API."
+    },
+    {
+      "name": "search-console query",
+      "description": "Query Search Console performance metrics."
+    },
+    {
+      "name": "youtube stats",
+      "description": "Read channel-level YouTube metrics."
+    },
+    {
+      "name": "news search",
+      "description": "Search real-time news via Apify actor integration."
+    },
+    {
+      "name": "vault set",
+      "description": "Encrypt and store secret values using LSL_MASTER_KEY."
+    },
+    {
+      "name": "sandbox run",
+      "description": "Execute shell command in an ephemeral Docker container."
+    }
+  ],
+  "flags": [
+    {
+      "name": "--help",
+      "description": "Show command help and available usage patterns."
+    },
+    {
+      "name": "--version",
+      "description": "Show ltr CLI version and active service inventory."
+    },
+    {
+      "name": "--json",
+      "description": "Emit structured JSON output for machine/agent consumption."
+    }
+  ]
+}

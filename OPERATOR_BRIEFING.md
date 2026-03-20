@@ -58,39 +58,49 @@ python3 scripts/lsl-review.py --repo-root . --remote origin --merge-safe
 ./scripts/lsl-deploy.sh
 ```
 
-## Internalized GW Gateway: First-Time Setup
-The Google Workspace gateway (`gw`) is now internal to this repository under `tools/gw/src/`.
+## Google CLI Model: First-Time Setup
+LiNKskills now uses two Google command lanes:
+- `gws` for Workspace services.
+- `ltr` for non-Workspace Google services + non-Google services + local runtime controls.
 
-For a new clone or new machine:
-1. Create and activate the local GW virtual environment:
+### `gws` setup (Workspace lane)
+1. Prime the pinned runtime wrapper:
 ```bash
-cd tools/gw/src
+tools/gws/bin/gws --version
+```
+2. Authenticate Workspace access:
+```bash
+tools/gws/bin/gws auth login
+```
+
+### `ltr` setup (non-Workspace lane)
+1. Create and activate local runtime environment:
+```bash
+cd tools/ltr/src
 python3 -m venv venv
 source venv/bin/activate
 python -m pip install --upgrade pip
-```
-2. Install dependencies inside that virtual environment:
-```bash
 pip install -r requirements.txt
 ```
-3. Manually place local identity files in `tools/gw/src/` if they are not already present:
+2. Place machine-local identity files when needed:
 ```bash
-cp /path/to/credentials.json tools/gw/src/credentials.json
-cp /path/to/token.json tools/gw/src/token.json
+cp /path/to/credentials.json tools/ltr/src/credentials.json
+cp /path/to/token.json tools/ltr/src/token.json
 ```
-4. Run initial authentication (required when token is missing, expired, or replaced):
+3. Run setup for non-Workspace Google flows:
 ```bash
-tools/gw/bin/gw setup --config tools/gw/src/credentials.json
+tools/ltr/bin/ltr setup --config tools/ltr/src/credentials.json
 ```
 
 Identity behavior:
-- `credentials.json` and local token files are machine-specific and excluded from Git.
-- The local `tools/gw/src/venv` plus local identity files keep the gateway machine-independent in code while preserving strict per-machine account isolation.
+- `tools/ltr/src/credentials.json` and `tools/ltr/src/token.json` are machine-specific and excluded from Git.
+- `tools/gws/bin/gws` uses pinned binary/runtime metadata in-repo (`tools/gws/pin.json`).
 
-## Internalized GW Gateway: Daily Operations
-- Use `tools/gw/bin/gw` for Gmail/Drive/Docs/Sheets/Calendar/Chat operations.
+## Google CLI Model: Daily Operations
+- Route Workspace actions through `tools/gws/bin/gws`.
+- Route non-Workspace/non-Google actions through `tools/ltr/bin/ltr`.
+- Confirm service ownership using `configs/service_ownership.json` before adding or changing wrappers.
 - Sync code changes through MAS (`lsl-update`, `lsl-review`, `lsl-deploy`).
-- Do not commit credentials/tokens; only code in `tools/gw/src/` should travel through GitHub.
 
 ## When To Use Skill Architect
 Use `skill-architect` in one of 3 modes:

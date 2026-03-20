@@ -2,16 +2,17 @@
 
 Descriptive index of all registry targets (skills + tools), grouped by department/function.
 
-- Total Targets: **52**
-- Tools: **18**
+- Total Targets: **53**
+- Tools: **19**
 - Skills: **34**
 
 ## Platform Core
-- Tool `gw`: Internalized v2.1.0 gateway with fortress enforcement, studio integrations, venture operations hooks, and hardened observability. (`tools/gw/src/cli.py`)
+- Tool `gws`: Pinned Google Workspace CLI integration sourced from the `link-gws-cli` fork with strict checksum/version pinning. (`/tools/gws`)
+- Tool `ltr`: LiNKtrend Runtime gateway for non-Workspace Google services, non-Google services, and local runtime controls. (`tools/ltr/src/cli.py`)
 - Tool `memory`: Supabase-backed memory tool with scoped recall plus Markdown notes in lsl_memory.notes. (`/tools/memory`)
 - Tool `n8n`: n8n workflow API tool for read, create, activate/deactivate, and trigger operations with vault-backed API keys. (`/tools/n8n`)
-- Tool `n8n-bridge`: Secure webhook trigger bridge for local n8n workflows using gw commands and Vault-backed token retrieval. (`/tools/n8n-bridge`)
-- Tool `asset-filer`: Uploads assets through gw and registers metadata records for retrieval in lsl_memory.assets. (`/tools/asset-filer`)
+- Tool `n8n-bridge`: Secure webhook trigger bridge for local n8n workflows using n8n API wrapper commands with Vault-backed token retrieval. (`/tools/n8n-bridge`)
+- Tool `asset-filer`: Uploads assets through ltr and registers metadata records for retrieval in lsl_memory.assets. (`/tools/asset-filer`)
 - Tool `usage`: Langfuse-based usage telemetry tool with silent local fallback, host defaulting, and vault-managed credentials. (`/tools/usage`)
 - Skill `skill-template`: Golden template for creating production-grade LiNKskills skills. (`/skills/skill-template`)
 - Skill `skill-architect`: Designs, migrates, and refines production-grade skills following the LiNKskills Golden Template. (`/skills/skill-architect`)
@@ -45,15 +46,15 @@ Descriptive index of all registry targets (skills + tools), grouped by departmen
 - Skill `engagement-to-strategy-loop`: Analyzes views, CTR, and sentiment to deliver high-signal strategic feedback loops back to marketing. (`/skills/engagement-to-strategy-loop`)
 
 ## Growth & Marketing
-- Tool `ad-intel`: Ad performance monitor for Spend vs CTR anomaly detection using gw bridge inputs and deterministic JSON alerts. (`/tools/ad-intel`)
-- Tool `sync-scheduler`: Calendar scheduling helper that uses gw to suggest Project Review time slots in deterministic JSON. (`/tools/sync-scheduler`)
+- Tool `ad-intel`: Ad performance monitor for Spend vs CTR anomaly detection using ltr bridge inputs and deterministic JSON alerts. (`/tools/ad-intel`)
+- Tool `sync-scheduler`: Calendar scheduling helper that uses gws to suggest Project Review time slots in deterministic JSON. (`/tools/sync-scheduler`)
 - Skill `marketing-strategist`: Senior VP of Growth skill that decomposes product PRDs into multi-channel strategy with mandatory MARKETING_STRATEGY.md output. (`/skills/marketing-strategist`)
 - Skill `seo-semantic-auditor`: Reverse-engineers competitor keyword strategy via Brave/Exa research and outputs prioritized content gaps. (`/skills/seo-semantic-auditor`)
 - Skill `channel-ops`: Platform operations skill for YouTube, TikTok, and X scheduling, comment management, and support-to-sales funnel execution. (`/skills/channel-ops`)
 
 ## Creative & Content
 - Tool `doc-engine`: Document engine for OCR via unstructured, conversion via pandoc, and Markdown print-to-Google-Doc. (`/tools/doc-engine`)
-- Tool `social-gw`: Unified social wrapper for posting and comment retrieval across YouTube, TikTok, and X via gw. (`/tools/social-gw`)
+- Tool `social-ltr`: Unified social wrapper for posting and comment retrieval across YouTube, TikTok, and X via ltr. (`/tools/social-ltr`)
 - Skill `creative-director`: Senior Creative Lead skill that decomposes marketing briefs into asset orders and orchestrates n8n rendering triggers. (`/skills/creative-director`)
 - Skill `creative-qa`: High-fidelity creative QA gate that audits assets against brand guidelines and PRD with mandatory PASS/FAIL plus revision logic. (`/skills/creative-qa`)
 
@@ -68,7 +69,7 @@ Descriptive index of all registry targets (skills + tools), grouped by departmen
 - Skill `studio-health-reporting`: Aggregates lsl_memory.audit_logs and PROGRESS.md streams into Venture Studio Health Reports for COO oversight. (`/skills/studio-health-reporting`)
 - Skill `executive-sync-8am`: Exec sync skill that starts 06:00 Taipei data collection and produces the 08:00 AM Wins/Blockers/Financial Health briefing. (`/skills/executive-sync-8am`)
 - Skill `repository-manager`: Enforces progress-sync handoffs, branch discipline, and staged file commit safeguards. (`/skills/repository-manager`)
-- Skill `audit-protocol`: Enforces predictive intent logging to GWAuditLogger before write actions across GW and n8n. (`/skills/audit-protocol`)
+- Skill `audit-protocol`: Enforces predictive intent logging to LTRAuditLogger before write actions across gws, ltr, and n8n. (`/skills/audit-protocol`)
 - Skill `git-safeguard`: Requires mandatory safety checklist review (`git status`, `git diff --cached`) before any push. (`/skills/git-safeguard`)
 - Skill `smart-file-clerk`: Senior document manager skill for hybrid Supabase/GDrive storage and OCR indexing of financial/legal documents. (`/skills/smart-file-clerk`)
 

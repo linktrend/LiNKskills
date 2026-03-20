@@ -13,6 +13,11 @@ LiNKskills now has two coordinated planes:
 - Interface: REST-first.
 - Runtime mode: managed only.
 
+## 2A. Google CLI Ownership Standard
+- Workspace services are owned by `gws`.
+- Non-Workspace Google, non-Google, and interim gap services are owned by `ltr`.
+- Ownership source of truth: `configs/service_ownership.json`.
+
 ## 3. Security and Identity Baseline
 ### Fortress Controls
 - Vault-based secret handling remains required.

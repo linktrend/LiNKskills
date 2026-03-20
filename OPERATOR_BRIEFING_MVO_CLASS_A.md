@@ -6,6 +6,11 @@ This document is for operators coordinating LiNKskills Logic Engine usage after 
 ## What Changed
 The repository is no longer only a static library. It now includes an internal control-plane service under `services/logic-engine` that executes managed runs through REST APIs with policy, billing, and retention controls.
 
+## Google CLI Ownership (Launch Baseline)
+- `gws` is the primary Workspace CLI.
+- `ltr` handles non-Workspace Google, non-Google, and interim gap services.
+- Resolve ownership using `configs/service_ownership.json` before tool routing decisions.
+
 ## MVO Scope (Now)
 - Class A execution is active.
 - Class B/C remain scaffolded but non-active for commercial execution.

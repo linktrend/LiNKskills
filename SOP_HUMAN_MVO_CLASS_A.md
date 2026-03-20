@@ -15,6 +15,11 @@ You request outcomes; the system enforces policy, identity, and audit controls b
 - Execution mode: managed server execution only.
 - Access mode: internal machine clients using service API keys.
 
+## 2A. Google CLI Routing Standard
+- Use `gws` for Google Workspace services.
+- Use `ltr` for non-Workspace Google and non-Google lanes.
+- Confirm ownership in `configs/service_ownership.json` before adding/changing service routes.
+
 ## 3. Inputs You Must Provide (Business Side)
 For run requests, ensure the caller supplies:
 - tenant and principal identity,

@@ -17,7 +17,7 @@ tooling:
   jit_tool_threshold: 10
   require_get_tool_details: true
 tools: [write_file, read_file, list_dir, get_tool_details]
-dependencies: [gw, n8n]
+dependencies: [gws, ltr, n8n]
 permissions: [fs_read, fs_write, api_access]
 scope_out: ["Do not execute write actions without pre-write intent logs", "Do not suppress failed intent audit entries"]
 persistence:
@@ -37,7 +37,7 @@ last_updated: 2026-02-24
 5. Block execution if intent log cannot be written.
 
 ## Predictive Auditing Rule (Mandatory)
-Before any write-action in Google Workspace or n8n, agent must log intent through `GWAuditLogger`:
+Before any write-action in `gws`, `ltr`, or `n8n`, agent must log intent through `LTRAuditLogger`:
 - Service
 - Action
 - Target resource
@@ -72,7 +72,7 @@ This intent entry must be written **before** calling the write command.
 - Validate intent fields and checkpoint `IN_PROGRESS`.
 
 ### Phase 3: Intent Logging Gate
-- Write intent to `GWAuditLogger` before write action.
+- Write intent to `LTRAuditLogger` before write action.
 - If log write fails, set `FAILED` and stop.
 
 ### Phase 4: Action Execution

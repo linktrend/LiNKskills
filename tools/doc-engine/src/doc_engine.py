@@ -12,7 +12,7 @@ class DocEngineService:
 
     def __init__(self, repo_root: str | Path | None = None) -> None:
         self.repo_root = Path(repo_root).expanduser().resolve() if repo_root else Path(__file__).resolve().parents[3]
-        self.gw_cli_path = self.repo_root / "tools" / "gw" / "bin" / "gw"
+        self.gws_cli_path = self.repo_root / "tools" / "gws" / "bin" / "gws"
 
     def ocr_extract(self, file_path: str | Path) -> dict[str, Any]:
         path = Path(file_path).expanduser().resolve()
@@ -79,63 +79,59 @@ class DocEngineService:
         }
 
     def print_to_google_doc(self, markdown_text: str, title: str) -> dict[str, Any]:
-        if not self.gw_cli_path.exists():
-            raise FileNotFoundError(f"gw CLI not found at {self.gw_cli_path}")
+        if not self.gws_cli_path.exists():
+            raise FileNotFoundError(f"gws CLI not found at {self.gws_cli_path}")
         if not markdown_text.strip():
             raise ValueError("markdown_text must be non-empty")
 
-        create_payload = self._run_gw_json([
-            str(self.gw_cli_path),
+        create_payload = self._run_gws_json([
+            str(self.gws_cli_path),
             "docs",
+            "documents",
             "create",
-            "--title",
-            title,
+            "--json",
+            json.dumps({"title": title}),
         ])
 
-        if not bool(create_payload.get("ok", False)):
-            raise RuntimeError(str(create_payload.get("error", "Failed to create Google Doc")))
-
-        data = create_payload.get("data", {})
-        document_id = data.get("document_id")
+        document_id = (
+            create_payload.get("documentId")
+            or create_payload.get("id")
+            or create_payload.get("document_id")
+        )
         if not isinstance(document_id, str) or not document_id:
             raise RuntimeError("Google Doc create response missing document_id")
 
-        append_payload = self._run_gw_json([
-            str(self.gw_cli_path),
+        append_payload = self._run_gws_json([
+            str(self.gws_cli_path),
             "docs",
-            "append",
+            "+write",
             "--document-id",
             document_id,
             "--text",
             markdown_text,
-            "--markdown",
         ])
 
-        if not bool(append_payload.get("ok", False)):
-            raise RuntimeError(str(append_payload.get("error", "Failed to append Markdown to Google Doc")))
-
-        append_data = append_payload.get("data", {})
         return {
             "status": "success",
             "document_id": document_id,
             "title": title,
-            "appended_chars": append_data.get("appended_chars"),
-            "headings_applied": append_data.get("headings_applied"),
+            "appended_chars": len(markdown_text),
+            "write_result": append_payload,
         }
 
-    def _run_gw_json(self, command: list[str]) -> dict[str, Any]:
+    def _run_gws_json(self, command: list[str]) -> dict[str, Any]:
         completed = subprocess.run(command, capture_output=True, text=True, check=False)
         stdout = completed.stdout.strip()
         if not stdout:
-            raise RuntimeError(completed.stderr.strip() or "gw command returned no output")
+            raise RuntimeError(completed.stderr.strip() or "gws command returned no output")
 
         try:
             payload = json.loads(stdout.splitlines()[-1])
         except json.JSONDecodeError as exc:
-            raise RuntimeError(f"Unable to parse gw JSON output: {stdout}") from exc
+            raise RuntimeError(f"Unable to parse gws JSON output: {stdout}") from exc
 
         if completed.returncode != 0 and not payload:
-            raise RuntimeError(completed.stderr.strip() or "gw command failed")
+            raise RuntimeError(completed.stderr.strip() or "gws command failed")
         return payload
 
 

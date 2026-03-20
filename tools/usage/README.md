@@ -1,7 +1,7 @@
 # usage
 
 ## Capability Summary
-Langfuse observability tool for LiNKskills. Logs gw execution telemetry (action, latency, success) using vault-managed Langfuse credentials with silent-fail local mode.
+Langfuse observability tool for LiNKskills. Logs ltr execution telemetry (action, latency, success) using vault-managed Langfuse credentials with silent-fail local mode.
 
 ## Commands
 - `log`

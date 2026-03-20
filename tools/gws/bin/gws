@@ -1,0 +1,146 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+PIN_FILE="$ROOT_DIR/pin.json"
+RUNTIME_BIN="$ROOT_DIR/runtime/bin/gws"
+CHECKSUM_DIR="$ROOT_DIR/runtime/checksums"
+mkdir -p "$CHECKSUM_DIR"
+
+if [[ ! -f "$PIN_FILE" ]]; then
+  echo "gws pin metadata not found: $PIN_FILE" >&2
+  exit 1
+fi
+
+read_pin_field() {
+  python3 - "$PIN_FILE" "$1" <<'PY'
+import json,sys
+pin_path,field=sys.argv[1],sys.argv[2]
+with open(pin_path,'r',encoding='utf-8') as f:
+    obj=json.load(f)
+parts=field.split('.')
+cur=obj
+for p in parts:
+    if p not in cur:
+        print("")
+        sys.exit(0)
+    cur=cur[p]
+print(cur if isinstance(cur,str) else json.dumps(cur,separators=(',',':')))
+PY
+}
+
+platform_target() {
+  local uname_s uname_m
+  uname_s="$(uname -s)"
+  uname_m="$(uname -m)"
+  case "$uname_s:$uname_m" in
+    Darwin:arm64) echo "aarch64-apple-darwin" ;;
+    Darwin:x86_64) echo "x86_64-apple-darwin" ;;
+    Linux:aarch64|Linux:arm64) echo "aarch64-unknown-linux-gnu" ;;
+    Linux:x86_64) echo "x86_64-unknown-linux-gnu" ;;
+    MINGW64_NT-*:x86_64|MSYS_NT-*:x86_64|CYGWIN_NT-*:x86_64) echo "x86_64-pc-windows-msvc" ;;
+    *)
+      echo "Unsupported platform for pinned gws runtime: $uname_s/$uname_m" >&2
+      exit 1
+      ;;
+  esac
+}
+
+verify_checksum() {
+  local file="$1"
+  local expected="$2"
+  local actual
+  actual="$(shasum -a 256 "$file" | awk '{print $1}')"
+  if [[ "$actual" != "$expected" ]]; then
+    echo "Checksum mismatch for $file" >&2
+    echo "expected=$expected" >&2
+    echo "actual=$actual" >&2
+    exit 1
+  fi
+}
+
+install_if_missing() {
+  local target filename archive_sha version urls_json archive_path
+  target="$(platform_target)"
+  filename="$(read_pin_field "runtime.artifacts.${target}.filename")"
+  archive_sha="$(read_pin_field "runtime.artifacts.${target}.archive_sha256")"
+  version="$(read_pin_field "runtime.version")"
+  urls_json="$(read_pin_field "runtime.artifact_base_urls")"
+
+  if [[ -z "$filename" || -z "$archive_sha" || -z "$version" || -z "$urls_json" ]]; then
+    echo "Missing required pin metadata for target '$target' in $PIN_FILE" >&2
+    exit 1
+  fi
+
+  if [[ -x "$RUNTIME_BIN" ]]; then
+    return
+  fi
+
+  archive_path="$CHECKSUM_DIR/$filename"
+
+  python3 - "$urls_json" "$filename" "$archive_path" <<'PY'
+import json,sys,urllib.request
+urls=json.loads(sys.argv[1])
+filename=sys.argv[2]
+out_path=sys.argv[3]
+last_err=None
+for base in urls:
+    url=f"{base.rstrip('/')}/{filename}"
+    try:
+        with urllib.request.urlopen(url) as r, open(out_path,'wb') as f:
+            f.write(r.read())
+        print(url)
+        sys.exit(0)
+    except Exception as exc:
+        last_err=exc
+if last_err is not None:
+    raise SystemExit(f"Failed to download pinned gws artifact from all configured URLs: {last_err}")
+PY
+
+  verify_checksum "$archive_path" "$archive_sha"
+
+  case "$filename" in
+    *.tar.gz)
+      tar -xzf "$archive_path" -C "$ROOT_DIR/runtime/bin"
+      if [[ ! -x "$ROOT_DIR/runtime/bin/gws" ]]; then
+        local found
+        found="$(tar -tzf "$archive_path" | grep '/gws$' | head -n 1 || true)"
+        if [[ -z "$found" ]]; then
+          echo "Unable to locate gws binary in archive: $filename" >&2
+          exit 1
+        fi
+        rm -f "$ROOT_DIR/runtime/bin/gws"
+        tar -xzf "$archive_path" --strip-components=1 -C "$ROOT_DIR/runtime/bin" "$found"
+      fi
+      ;;
+    *.zip)
+      unzip -q "$archive_path" -d "$ROOT_DIR/runtime/bin"
+      if [[ -x "$ROOT_DIR/runtime/bin/gws.exe" ]]; then
+        cp "$ROOT_DIR/runtime/bin/gws.exe" "$ROOT_DIR/runtime/bin/gws"
+      fi
+      ;;
+    *)
+      echo "Unsupported archive type for pinned gws artifact: $filename" >&2
+      exit 1
+      ;;
+  esac
+
+  chmod +x "$RUNTIME_BIN"
+
+  local expected_bin_sha actual_version
+  expected_bin_sha="$(read_pin_field "runtime.expected_binary_checksums.${target}")"
+  if [[ -z "$expected_bin_sha" ]]; then
+    echo "Missing expected binary checksum for target '$target' in $PIN_FILE" >&2
+    exit 1
+  fi
+  verify_checksum "$RUNTIME_BIN" "$expected_bin_sha"
+
+  actual_version="$($RUNTIME_BIN --version 2>/dev/null | head -n 1 | awk '{print $2}')"
+  if [[ "$actual_version" != "$version" ]]; then
+    echo "Pinned gws version mismatch: expected=$version actual=$actual_version" >&2
+    exit 1
+  fi
+}
+
+install_if_missing
+exec "$RUNTIME_BIN" "$@"

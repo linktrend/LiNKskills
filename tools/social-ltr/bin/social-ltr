@@ -1,0 +1,90 @@
+#!/usr/bin/env python3
+import argparse
+import json
+import shutil
+import subprocess
+import sys
+from typing import Any, Dict
+
+VERSION = "1.0.0"
+
+
+def emit(payload: Dict[str, Any], code: int = 0) -> int:
+    print(json.dumps(payload, indent=2))
+    return code
+
+
+def run_cmd(cmd: list[str]) -> subprocess.CompletedProcess:
+    return subprocess.run(cmd, capture_output=True, text=True, check=False)
+
+
+def parse_json_or_raw(raw: str) -> Any:
+    try:
+        return json.loads(raw)
+    except Exception:
+        return {"raw": raw.strip()}
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Unified social bridge via ltr")
+    parser.add_argument("command", nargs="?", default="fetch-comments", choices=["post", "fetch-comments"])
+    parser.add_argument("--provider", required=False, choices=["youtube", "tiktok", "x"])
+    parser.add_argument("--target-id", required=False)
+    parser.add_argument("--text", required=False)
+    parser.add_argument("--json", action="store_true")
+    parser.add_argument("--version", action="store_true")
+    args = parser.parse_args()
+
+    if args.version:
+        return emit({"status": "success", "output": VERSION})
+
+    if not args.provider or not args.target_id:
+        return emit({"status": "error", "output": "--provider and --target-id are required"}, 1)
+
+    ltr_bin = shutil.which("ltr")
+    if not ltr_bin:
+        return emit({"status": "error", "output": "ltr executable not found in PATH"}, 1)
+
+    if args.command == "post" and not args.text:
+        return emit({"status": "error", "output": "--text is required for post command"}, 1)
+
+    if args.provider == "youtube":
+        if args.command == "post":
+            cmd = [ltr_bin, "youtube", "comments-reply", "--parent-id", args.target_id, "--text", args.text, "--json"]
+        else:
+            cmd = [ltr_bin, "youtube", "comments-list", "--video-id", args.target_id, "--json"]
+    else:
+        if args.command == "post":
+            cmd = [ltr_bin, "social", "post", "--provider", args.provider, "--target-id", args.target_id, "--text", args.text, "--json"]
+        else:
+            cmd = [ltr_bin, "social", "fetch-comments", "--provider", args.provider, "--target-id", args.target_id, "--json"]
+
+    res = run_cmd(cmd)
+    payload = parse_json_or_raw(res.stdout)
+    if res.returncode != 0:
+        return emit(
+            {
+                "status": "error",
+                "output": "social action failed",
+                "provider": args.provider,
+                "command": args.command,
+                "stderr": res.stderr.strip(),
+                "path": "ltr"
+            },
+            1,
+        )
+
+    return emit(
+        {
+            "status": "success",
+            "output": "social action completed",
+            "provider": args.provider,
+            "command": args.command,
+            "path": "ltr",
+            "result": payload
+        }
+    )
+
+
+if __name__ == "__main__":
+    sys.exit(main())

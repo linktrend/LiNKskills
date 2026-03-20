@@ -1,0 +1,36 @@
+{
+  "name": "gws",
+  "description": "Pinned Google Workspace CLI wrapper backed by the link-gws-cli fork snapshot and strict binary checksum verification.",
+  "capability_summary": "Primary Workspace CLI for LiNKskills. Provides dynamic method discovery within exposed top-level services and deterministic JSON output.",
+  "parameters": [
+    {
+      "name": "service",
+      "type": "string",
+      "description": "Top-level gws service alias (for example: drive, gmail, calendar, docs, sheets, chat)."
+    },
+    {
+      "name": "resource_method",
+      "type": "string",
+      "description": "Discovery-based resource and method path for the selected service."
+    },
+    {
+      "name": "args",
+      "type": "string",
+      "description": "Additional CLI flags/values passed through to gws commands."
+    }
+  ],
+  "flags": [
+    {
+      "name": "--help",
+      "description": "Show command help and available usage patterns."
+    },
+    {
+      "name": "--version",
+      "description": "Show gws version and support disclaimer."
+    },
+    {
+      "name": "--format",
+      "description": "Output format (json default; table/yaml/csv available per gws)."
+    }
+  ]
+}

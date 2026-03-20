@@ -1,0 +1,61 @@
+{
+  "tool": "gws",
+  "source": {
+    "fork_url": "https://github.com/linktrend/link-gws-cli",
+    "upstream_url": "https://github.com/googleworkspace/cli",
+    "fork_commit": "e9970db26fb32ca97f11ce0d8c7c53e4eedd81cc"
+  },
+  "runtime": {
+    "version": "0.18.1",
+    "release_tag": "v0.18.1",
+    "artifact_base_urls": [
+      "https://github.com/linktrend/link-gws-cli/releases/download/v0.18.1",
+      "https://github.com/googleworkspace/cli/releases/download/v0.18.1"
+    ],
+    "artifacts": {
+      "aarch64-apple-darwin": {
+        "filename": "gws-aarch64-apple-darwin.tar.gz",
+        "archive_sha256": "86053fc16efb0f3752949c5d8e3d5dce909994b85870f0883c292725e2971911"
+      },
+      "x86_64-apple-darwin": {
+        "filename": "gws-x86_64-apple-darwin.tar.gz",
+        "archive_sha256": "7bef15f1f20d4647edfaf7c026efceff449f8e2852f4031f4f54d197c8133ffe"
+      },
+      "aarch64-unknown-linux-gnu": {
+        "filename": "gws-aarch64-unknown-linux-gnu.tar.gz",
+        "archive_sha256": "450a3cfa6401ec1e22b009d4cb5084b0f012bbadef32832aef1da73e630d2ead"
+      },
+      "x86_64-unknown-linux-gnu": {
+        "filename": "gws-x86_64-unknown-linux-gnu.tar.gz",
+        "archive_sha256": "e7cc4495a616acd2fe93383fc55c0544394bda06b7f6d63a362903053bcb3ba4"
+      },
+      "aarch64-unknown-linux-musl": {
+        "filename": "gws-aarch64-unknown-linux-musl.tar.gz",
+        "archive_sha256": "85056ea3d83752d026fef446db0cf233ad8f2acb018cb7c5476acdbf55b49be2"
+      },
+      "x86_64-unknown-linux-musl": {
+        "filename": "gws-x86_64-unknown-linux-musl.tar.gz",
+        "archive_sha256": "de1f87533266d6fe4c29b42630af44ea130f1727abf254eed1c1ef22658f92fe"
+      },
+      "x86_64-pc-windows-msvc": {
+        "filename": "gws-x86_64-pc-windows-msvc.zip",
+        "archive_sha256": "9191a615a74a0385b87aa0b2a7320756f217d255231da1738110487f2d892e43"
+      }
+    },
+    "expected_binary_checksums": {
+      "aarch64-apple-darwin": "c6657c45b325c63e107202be98d871d20f64f24dbe0136aa17ef23468d13df1a",
+      "x86_64-apple-darwin": "a08e66f8b4301a90e95affd595b259ee03e4f394319c436926bf0a707c7e9740",
+      "aarch64-unknown-linux-gnu": "9ff118eb5f558c54cda1aacb80e8f967acb486a274ab8a9e28e416e0a462f944",
+      "x86_64-unknown-linux-gnu": "1ee79f28333cc362bc633f1ba1f2fab9664a33f2f2832f3c2ca7db1e39df4745",
+      "aarch64-unknown-linux-musl": "923ddc297ddd331515fbb2f75fd3bd91ccda36f3adaee05139965cfb6a90e4bc",
+      "x86_64-pc-windows-msvc": "c2f88a7d41c1608ded4587519a9633f1aca6c5c91bdee0fef9e99936435c3f2a"
+    }
+  },
+  "sync": {
+    "last_sync_date": "2026-03-20",
+    "notes": "Fork release URL is primary. Upstream release URL remains as deterministic fallback until fork releases are published.",
+    "missing_binary_checksum_targets": {
+      "x86_64-unknown-linux-musl": "HTTP Error 500: Internal Server Error"
+    }
+  }
+}

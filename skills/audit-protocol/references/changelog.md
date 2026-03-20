@@ -2,4 +2,4 @@
 
 ## v1.0.0 - 2026-02-24
 - Introduced predictive auditing protocol.
-- Mandated intent logging before all GW and n8n write actions.
+- Mandated intent logging before all `gws`, `ltr`, and `n8n` write actions.

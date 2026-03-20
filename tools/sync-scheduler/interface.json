@@ -1,27 +1,17 @@
 {
   "name": "sync-scheduler",
-  "description": "Suggests Project Review meeting slots by querying Google Calendar through gw and returning deterministic JSON.",
-  "capability_summary": "Find and recommend available Project Review slots from Google Calendar using the gw tool, with JSON outputs for orchestration.",
+  "description": "Suggests Project Review meeting slots by querying Google Calendar through gws and returning deterministic JSON.",
+  "capability_summary": "Find and recommend available Project Review slots from Google Calendar using gws, with JSON outputs for orchestration.",
   "parameters": [
-    {
-      "name": "command",
-      "type": "string",
-      "description": "Command name. Supported: suggest."
-    },
     {
       "name": "date",
       "type": "string",
-      "description": "Target local date in YYYY-MM-DD format for slot suggestions."
+      "description": "Date in YYYY-MM-DD"
     },
     {
       "name": "duration_minutes",
       "type": "integer",
-      "description": "Desired meeting duration in minutes (default 45)."
-    },
-    {
-      "name": "count",
-      "type": "integer",
-      "description": "Maximum number of suggested slots to return (default 3)."
+      "description": "Target meeting duration in minutes"
     }
   ]
 }

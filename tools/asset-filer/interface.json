@@ -1,27 +1,17 @@
 {
   "name": "asset-filer",
-  "description": "Uploads creative assets via gw and records metadata for retrieval in lsl_memory.assets.",
-  "capability_summary": "Moves generated assets into Supabase Storage and registers canonical metadata for agent retrieval workflows.",
+  "description": "Uploads creative assets via ltr and registers metadata for retrieval in lsl_memory.assets.",
+  "capability_summary": "Asset ingestion bridge for creative outputs with deterministic JSON status and metadata registration.",
   "parameters": [
-    {
-      "name": "command",
-      "type": "string",
-      "description": "Command name. Supported: upload."
-    },
     {
       "name": "file",
       "type": "string",
-      "description": "Local file path to upload."
+      "description": "Local file path to upload"
     },
     {
       "name": "asset_type",
       "type": "string",
-      "description": "Asset category (script, thumbnail, post, video, other)."
-    },
-    {
-      "name": "project_id",
-      "type": "string",
-      "description": "Project identifier stored alongside metadata."
+      "description": "Asset classification label"
     }
   ]
 }

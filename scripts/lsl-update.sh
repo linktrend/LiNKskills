@@ -11,25 +11,28 @@ if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
   exit 1
 fi
 
-# MAS preflight: verify internalized GW gateway structure before branching.
-GW_REQUIRED_FILES=(
-  "tools/gw/src/cli.py"
-  "tools/gw/src/requirements.txt"
+# MAS preflight: verify ltr + gws gateway structure before branching.
+LTR_REQUIRED_FILES=(
+  "tools/ltr/src/cli.py"
+  "tools/ltr/src/requirements.txt"
+  "tools/gws/bin/gws"
+  "tools/gws/pin.json"
 )
-GW_REQUIRED_DIRS=(
-  "tools/gw/src/services"
-  "tools/gw/src/utils"
+LTR_REQUIRED_DIRS=(
+  "tools/ltr/src/services"
+  "tools/ltr/src/utils"
+  "tools/gws/vendor/link-gws-cli/src"
 )
 
-for gw_file in "${GW_REQUIRED_FILES[@]}"; do
-  if [[ ! -f "$gw_file" ]]; then
-    echo "Error: missing required GW file '$gw_file'." >&2
+for ltr_file in "${LTR_REQUIRED_FILES[@]}"; do
+  if [[ ! -f "$ltr_file" ]]; then
+    echo "Error: missing required runtime file '$ltr_file'." >&2
     exit 1
   fi
 done
-for gw_dir in "${GW_REQUIRED_DIRS[@]}"; do
-  if [[ ! -d "$gw_dir" ]]; then
-    echo "Error: missing required GW directory '$gw_dir'." >&2
+for ltr_dir in "${LTR_REQUIRED_DIRS[@]}"; do
+  if [[ ! -d "$ltr_dir" ]]; then
+    echo "Error: missing required runtime directory '$ltr_dir'." >&2
     exit 1
   fi
 done

@@ -19,6 +19,11 @@ LiNKskills is a managed operating system of AI skills and tools.
 - Tools = command wrappers that execute actions.
 - The system tracks state automatically and can resume paused work.
 
+### Google CLI Routing (Launch Standard)
+- Workspace actions must use `gws`.
+- Non-Workspace Google and non-Google actions must use `ltr`.
+- Routing source of truth: `configs/service_ownership.json`.
+
 ## 2. Department Functions
 
 ### Engineering

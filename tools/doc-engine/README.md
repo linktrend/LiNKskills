@@ -24,4 +24,4 @@ Document processing engine with OCR extraction (`unstructured`), format conversi
 ## Dependencies
 - `unstructured`
 - `pandoc` executable available on PATH
-- `gw` configured with vault-backed Google credentials
+- `gws` configured for Workspace Docs operations (plus Vault credentials as needed)
