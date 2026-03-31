@@ -1,0 +1,22 @@
+services:
+  linkskills-api:
+    image: python:3.11-slim
+    working_dir: /app
+    command: bash -lc "pip install -r services/logic-engine/requirements.txt && python services/logic-engine/scripts/run_api.py"
+    env_file:
+      - .env.runtime
+    volumes:
+      - ../..:/app
+    ports:
+      - "8081:8081"
+    restart: unless-stopped
+
+  linkskills-retention:
+    image: python:3.11-slim
+    working_dir: /app
+    command: bash -lc "pip install -r services/logic-engine/requirements.txt && while true; do python services/logic-engine/scripts/run_retention_worker.py; sleep 86400; done"
+    env_file:
+      - .env.runtime
+    volumes:
+      - ../..:/app
+    restart: unless-stopped
