@@ -5,6 +5,7 @@ import os
 import tempfile
 import time
 import unittest
+import uuid
 from pathlib import Path
 
 import sys
@@ -20,7 +21,7 @@ from logic_engine.security import TokenError, issue_disclosure_token, validate_d
 
 
 INTERNAL_TENANT = "00000000-0000-0000-0000-000000000001"
-API_KEY = "security-test-key"
+API_KEY = f"security-test-key-{uuid.uuid4().hex}"
 PRINCIPAL = "linktrend-internal-agent"
 
 
