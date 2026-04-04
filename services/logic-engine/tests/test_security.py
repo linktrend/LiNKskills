@@ -21,6 +21,7 @@ from logic_engine.security import TokenError, issue_disclosure_token, validate_d
 
 
 INTERNAL_TENANT = "00000000-0000-0000-0000-000000000001"
+# codeql[py/clear-text-storage-sensitive-data]: Test-only ephemeral key fixture.
 API_KEY = f"security-test-key-{uuid.uuid4().hex}"
 PRINCIPAL = "linktrend-internal-agent"
 
