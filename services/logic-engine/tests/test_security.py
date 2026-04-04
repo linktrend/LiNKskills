@@ -17,7 +17,12 @@ if str(SRC_ROOT) not in sys.path:
     sys.path.insert(0, str(SRC_ROOT))
 
 from logic_engine.api import create_app  # noqa: E402
-from logic_engine.security import TokenError, issue_disclosure_token, validate_disclosure_token  # noqa: E402
+from logic_engine.security import (
+    TokenError,
+    hash_api_key,
+    issue_disclosure_token,
+    validate_disclosure_token,
+)  # noqa: E402
 
 
 INTERNAL_TENANT = "00000000-0000-0000-0000-000000000001"
@@ -72,7 +77,7 @@ class ProductionSecretFailClosedTests(unittest.TestCase):
                     "records": [
                         {
                             "key_id": "primary",
-                            "api_key": API_KEY,
+                            "key_hash": hash_api_key(API_KEY),
                             "tenant_id": INTERNAL_TENANT,
                             "principal_id": PRINCIPAL,
                             "state": "active",
