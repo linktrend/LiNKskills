@@ -207,7 +207,8 @@ def create_app() -> FastAPI:
             _raise_engine_error(exc)
 
     @app.get("/v1/ops/safe-mode")
-    def ops_safe_mode(_: AuthContext = Depends(require_auth)) -> dict[str, object]:
+    def ops_safe_mode() -> dict[str, object]:
+        """Unauthenticated probe for orchestration (matches unified dev health gates)."""
         return engine.get_safe_mode_state()
 
     return app

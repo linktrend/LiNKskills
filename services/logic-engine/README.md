@@ -73,7 +73,7 @@ python scripts/run_retention_worker.py
 - `GET /v1/ops/safe-mode`
 
 Write contract highlights:
-- Service API key bearer auth required for all `/v1/*`.
+- Service API key bearer auth required for all `/v1/*` except `GET /v1/ops/safe-mode` (orchestration health probe).
 - `POST /v1/runs` requires `idempotency_key`, one of `capability_id|package_id`, and billing identity by track.
 - `origin=AIOS` additionally requires `mission_id`, `task_id`, `dpr_id` (regex + active registry check).
 - `POST /v1/disclosures/issue` requires `idempotency_key` and executes managed step immediately (30s timeout, else polling).
