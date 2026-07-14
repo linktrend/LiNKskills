@@ -1,19 +1,38 @@
 # LiNKskills — Catalog, Eval, and Telemetry Design Spec
 
 Owner: LiNKtrend Platform
-Status: Design / schema draft — **not** a live migration
-Last updated: 2026-07-14
+Status: Implemented as schema — migration written, not yet applied to a live project
+Last updated: 2026-07-15
 References: `LiNKplatform/docs/specs/shared-foundation-spec.md` §3, §7; `docs/adr/0001-retire-logic-engine-governance-layer.md`
 
-> **Scope note (read first).** This is a **design/schema document**, not an applied
-> database migration. No Supabase project or schema exists for LiNKskills yet, so this
-> spec deliberately does **not** ship a `supabase/migrations/*.sql` file. When LiNKskills
-> gets its own project (or its `lskills_` schema in the shared platform, per
-> shared-foundation-spec §10 step 3), these table shapes become the basis for that
-> migration. Field names are given in the shared-foundation §3 style (real Postgres schema
-> `lskills`, plain table names inside it — e.g. `lskills.catalog`), but the section
-> headers use the spec's logical names (`lskills_catalog`, `lskills_telemetry`,
+> **Scope note (read first).** This document is now **implemented as a real, dated
+> migration**: `supabase/migrations/20260715_000002_lskills_catalog_core.sql`. The
+> migration is the source of truth for the applied shape; this spec is kept in sync with
+> it (update both in the same change). Field names are given in the shared-foundation §3
+> style (real Postgres schema `lskills`, plain table names inside it — e.g.
+> `lskills.catalog`, `lskills.telemetry`, `lskills.eval_runs`), while the section headers
+> below keep the spec's logical names (`lskills_catalog`, `lskills_telemetry`,
 > `lskills_eval_runs`) for continuity with shared-foundation §7.
+>
+> **Applied vs written.** *Writing* the migration is done; *applying* it to a live
+> Supabase project is still deferred until LiNKskills has its own project (or its `lskills`
+> schema in the shared platform, per shared-foundation-spec §10 step 3). Until then,
+> `execution_ledger.jsonl` (extended) remains the local telemetry buffer and eval suites
+> live as in-repo YAML (§7).
+>
+> **Where the real SQL extends this design (kept in sync here):**
+> - `lskills.catalog` carries a **nullable `org_id`** (future-proofing only; NULL = global
+>   /internal). See §1 and the migration's `ORG-SCOPING DECISION` header for the full
+>   reasoning.
+> - `lskills.eval_runs` adds a **`judge_tier`** enum column (`high` | `frontier`, NOT NULL,
+>   with a CHECK) so shared-foundation §7's "never a cheap/fast judge" rule is a real DB
+>   constraint, mirroring LiNKbrain — see §3.
+> - `lskills.eval_runs` adds a **self-referencing FK `compared_to_eval_run_id`** alongside
+>   the `compared_to_version` string, to pin the exact prior run a delta was computed
+>   against — see §3.
+> - The `usable` gate is enforced by **two catalog CHECK constraints plus a `BEFORE`
+>   trigger** (latest eval_run must pass), with an **auto-demote trigger** on `eval_runs`
+>   for regressions — see §1.1.
 
 ## 0. What LiNKskills is (and is not) after ADR 0001
 
@@ -45,6 +64,7 @@ certification state.
 |---|---|---|
 | `skill_id` | text | Stable kebab-case id, e.g. `git-safeguard`, `market-analyst` (matches `skills/<skill_id>/`) |
 | `version` | text | semver, matches `SKILL.md` frontmatter `version` |
+| `org_id` | uuid, nullable, FK → `platform.organizations` | **Future-proofing only.** `NULL` = global/internal skill (all internal agents). No authorization semantics today; per-client skill licensing (if it ever exists) lives in `platform.capabilities`, not here. See §1.2 and the migration's `ORG-SCOPING DECISION` header. |
 | `display_name` | text | Human-readable name |
 | `description` | text | From frontmatter `description` |
 | `format_profile` | text | `simple` \| `heavy` — right-sized template profile (see §5). Drives which structural rules `validator.py` enforces |
@@ -57,12 +77,38 @@ certification state.
 
 Primary key: `(skill_id, version)`.
 
-Constraints (schema-enforced, not conventional):
-- `eval_suite_ref` is `NOT NULL`.
-- `certification_state = 'usable'` is only permitted when `eval_suite_ref` resolves to an
-  existing suite **and** the latest `lskills_eval_runs` row for `(skill_id, version)` is a
-  pass at or above threshold. (Enforced by the promotion function/trigger, §1.1 — not by
-  application-layer discipline.)
+Constraints (schema-enforced, not conventional — as implemented in the migration):
+- `eval_suite_ref` is `NOT NULL`, **and** a CHECK (`catalog_eval_suite_ref_nonempty`)
+  forbids an empty/whitespace-only value for any row in any state — closing the
+  "empty-string placeholder" loophole a bare `NOT NULL` would leave open.
+- A second CHECK (`catalog_usable_requires_eval_suite`) makes the gate explicit and
+  path-shaped: a `usable` row's `eval_suite_ref` must be non-empty, contain a `/`, and end
+  in `.yaml` — so a token like `tbd` can never masquerade as an attached suite once the
+  skill is `usable`.
+- `certification_state = 'usable'` is only permitted when the **latest** `lskills_eval_runs`
+  row for `(skill_id, version)` is a **pass**. Because that reads another table it can't be
+  a CHECK; it is enforced by a `BEFORE INSERT OR UPDATE` trigger on the catalog
+  (`enforce_usable_requires_passing_eval`), not by application-layer discipline (§1.1).
+- A companion `AFTER INSERT` trigger on `lskills_eval_runs`
+  (`demote_on_eval_regression`) auto-demotes a currently-`usable` version to `eval_pending`
+  when a failing run lands, keeping the "latest run passed" invariant true over time (§1.1).
+
+### 1.2 Org-scoping: skills are global/internal
+
+Skills are LiNKtrend's own internal library; every internal agent uses the same catalog
+regardless of which client project it is serving. There is no "client A may use skill X but
+client B may not" — that per-tenant permission-to-act differentiation is precisely the
+reversed Logic Engine design ADR 0001 excised, and its legitimate home is
+`platform.capabilities` / `platform.capability_grants` plus each Program's own Ledger, not
+LiNKskills. So the catalog/telemetry/eval data is **global/internal** — the same posture as
+LiNKbrain's `org_id is null` case.
+
+The migration therefore adds a **nullable `org_id`** to `lskills_catalog` (default `NULL` =
+global) purely for future-proofing a hypothetical single-org-authored skill; it carries no
+authorization semantics today and no RLS policy is built around it yet (deferred hardening,
+mirroring `platform_foundation` / `lbrain`). `lskills_telemetry` and `lskills_eval_runs`
+get **no** `org_id` at all — telemetry explicitly excludes tenant columns (§2) and eval runs
+are internal quality data.
 
 ### 1.1 `certification_state` — a LiNKskills-internal curation gate (NOT governance)
 
@@ -112,7 +158,7 @@ column. Telemetry is observational; it never gates anything.
 | `issue_ref` | text, nullable | Program Ledger Issue id, if invoked inside one | new (audit gap) |
 | `run_ref` | text, nullable | Program Ledger Run id, if invoked inside one | new (audit gap; cf. `runs.run_id`) |
 | `task_id` | text, nullable | Skill-local task id (`YYYYMMDD-HHMM-<SKILL>-<UNIX>`) | (ledger `task_id`) |
-| `status` | text | `initialized` \| `in_progress` \| `pending_approval` \| `completed` \| `failed` | (ledger `status`) |
+| `status` | enum | `initialized` \| `in_progress` \| `pending_approval` \| `completed` \| `failed` (typed as `lskills.telemetry_status` in the migration) | (ledger `status`) |
 | `outcome_detail` | jsonb | Structured outcome: error class, HITL reason, corrected-from, artifact refs | new (cf. `runs.output_metadata`) |
 | `duration_ms` | integer, nullable | Wall-clock duration | new (cf. `usage_events.latency_ms`) |
 | `cost` | jsonb, nullable | `{ tokens_in, tokens_out, model, usd_estimate }` — cost *observation* only, no billing/ledger semantics | new (name from `runs.cost_breakdown`, stripped of `financial_ledger` coupling) |
@@ -151,10 +197,12 @@ One row per execution of a skill version's eval suite against a candidate build.
 | `pass_threshold` | numeric | The threshold applied (copied from the suite for auditability) |
 | `efficiency_metrics` | jsonb | `{ tokens_used, duration_ms, tool_calls, disclosure_files_read }` — did it stay lean? |
 | `size_metrics` | jsonb | `{ skill_md_lines, total_skill_bytes, context_required }` — guards against skill bloat |
-| `judge_model` | text | Model that judged the run, e.g. `gpt-5` |
+| `judge_model` | text **NOT NULL** | Model that judged the run, e.g. `gpt-5` |
+| `judge_tier` | enum **NOT NULL** | `high` \| `frontier` — the model tier that judged the run. Enforces shared-foundation §7's "never a cheap/fast judge" rule as a real DB constraint (enum has no cheap member; a belt-and-braces CHECK backs it). Added by the migration, mirroring LiNKbrain's `judge_tier`. |
 | `judge_model_version` | text | Pinned model/version string for reproducibility |
-| `compared_to_version` | text, nullable | Previous version this candidate was compared against |
-| `delta_vs_previous` | jsonb, nullable | Per-dimension and overall deltas vs `compared_to_version` (e.g. `{ "overall": +0.04, "correctness": +0.02, "tokens_used": -1200 }`) — the Librarian's clean-improvement signal |
+| `compared_to_eval_run_id` | uuid, nullable, self-FK → `lskills_eval_runs` | The **exact** prior run this candidate was judged against. Preferred over a bare version string because one skill version can have many eval runs — the FK removes that ambiguity and is referential-integrity-backed. `delta_vs_previous` is computed relative to this run. |
+| `compared_to_version` | text, nullable | Previous version this candidate was compared against (denormalized convenience alongside `compared_to_eval_run_id`) |
+| `delta_vs_previous` | jsonb, nullable | Per-dimension and overall deltas vs the compared run (e.g. `{ "overall": +0.04, "correctness": +0.02, "tokens_used": -1200 }`) — the Librarian's clean-improvement signal |
 | `created_at` | timestamptz | |
 
 The Librarian auto-promotes a candidate only on a **clean improvement**
