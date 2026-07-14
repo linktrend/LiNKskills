@@ -5,16 +5,27 @@ For full rules, see `.cursor/rules/` (Cursor) or `.agent/` (Antigravity).
 
 ## Identity
 
-LiNKtrend is an AI-native venture studio. The Chairman is the sole human operator (non-technical).
+LiNKtrend is an AI-native venture studio. The Principal is the sole human operator (non-technical).
 All other roles are AI agents. See `.cursor/rules/00-identity.mdc` for full context.
 
-## Git Workflow (SOP v2)
+## Repository scope
 
-- Branch format: `dev/<machine><ide>` (e.g., `dev/minicodex`)
-- Flow: `dev/*` → PR to `staging` → PR to `main`
-- No direct pushes to `staging` or `main`
-- Conventional commits: `type(scope): summary`
-- Forks (`link-*`): modify freely, never push upstream. Upstream sync lands in `staging`.
+LiNKskills is the studio's **centralized skill catalog**: catalog + mandatory eval-suite +
+usage telemetry, curated by the Librarian process. It does **not** own governance or
+permission-to-act — no entitlements, leases, kill-switches, financial ledger, or per-tenant
+policy. Those live in each Program's own Program Ledger and in
+`platform.capabilities` / `platform.capability_grants` (LiNKplatform repo). See
+`docs/adr/0001-retire-logic-engine-governance-layer.md`.
+
+## Git Workflow (LiNKdev-aligned)
+
+- **Integration branch:** `development` — all agent and ad-hoc work lands here via PR.
+- **Branch prefixes:** `issue/<id>-<slug>` (LiNKdev issues) or `dev/<machine><ide>` (ad-hoc IDE work).
+- **Flow:** `issue/*` or `dev/*` → PR to **`development`** → Integrator merges when merge-ready.
+- **Promotion:** `development` → `staging` → `main` — **Principal only** (after Release OK).
+- No direct pushes to `staging` or `main`.
+- Conventional commits: `type(scope): summary`.
+- Forks (`link-*`): modify freely, never push upstream. Upstream sync lands in `development`, not `staging`.
 
 ## Secrets
 
@@ -31,12 +42,12 @@ All other roles are AI agents. See `.cursor/rules/00-identity.mdc` for full cont
 
 ## Agent Behavior
 
-- **Autonomous execution:** Run terminal commands, tests, and linters yourself; deliver work end-to-end. Do not instruct the Chairman to run routine dev commands unless execution is impossible in-session (missing auth, blocked network, policy, or UI-only step). See `.cursor/rules/05-agent-behavior.mdc`.
+- **Autonomous execution:** Run terminal commands, tests, and linters yourself; deliver work end-to-end. Do not instruct the Principal to run routine dev commands unless execution is impossible in-session (missing auth, blocked network, policy, or UI-only step). See `.cursor/rules/05-agent-behavior.mdc`.
 - Plan before coding (Batch Header: scope, inputs, plan, risks) — then **implement** unless the batch is approval-gated or the user asked for plan-only.
 - Small, incremental changes.
 - Ask max 3 questions, then proceed with stated assumptions.
 - On failure, generate a Briefing Pack (structured 12-section report).
-- Communicate in plain English for the non-technical Chairman; “next steps” = what you finished + human-only gaps, not a generic todo list for the operator.
+- Communicate in plain English for the non-technical Principal; “next steps” = what you finished + human-only gaps, not a generic todo list for the operator.
 
 ## Other LiNKtrend repositories
 
