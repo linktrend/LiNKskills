@@ -1,0 +1,84 @@
+# skills/creative-qa/references/eval-suite.yaml
+# Baseline eval suite for the creative-qa skill (spec §4:
+# docs/specs/catalog-eval-telemetry-spec.md). Judged shape only -- the runner and
+# lskills.eval_runs persistence are a follow-up.
+#
+# What creative-qa actually does (from its SKILL.md): high-fidelity creative
+# auditor that reads rendered assets alongside brand_guidelines.md and the PRD,
+# scores each asset against both documents, and issues a mandatory PASS or FAIL
+# with an explicit Revision Logic block when any asset fails. Two hard scope_out
+# rules: never approve without brand_guidelines.md AND PRD checks; never return a
+# rejection without revision logic. brand_guidelines_adherence is floored because
+# approving without loading brand_guidelines.md is a direct scope violation and
+# lets off-brand assets into the publishing pipeline. revision_logic_on_fail is
+# floored because a FAIL without revision directives leaves creative-director with
+# no actionable path -- the audit is incomplete.
+skill_id: creative-qa
+suite_version: 1.0.0
+
+# Rubric dimensions specific to brand-and-PRD creative auditing. Weights sum to 1.0.
+# brand_guidelines_adherence is floored: approving without brand_guidelines.md
+# loaded is the first scope_out. revision_logic_on_fail is floored: a FAIL with no
+# revision logic is the second scope_out and renders the audit useless to the
+# creative-director downstream.
+rubric:
+  - dimension: brand_guidelines_adherence
+    weight: 0.30
+    hard_fail_below: 0.6   # brand_guidelines.md must be loaded and checked before any verdict
+  - dimension: prd_requirements_coverage
+    weight: 0.25            # every PRD acceptance criterion is evaluated per asset
+  - dimension: verdict_determinism
+    weight: 0.25            # output is always exactly PASS or FAIL; never ambiguous, pending, or missing
+  - dimension: revision_logic_on_fail
+    weight: 0.20
+    hard_fail_below: 0.5   # every FAIL verdict must include an actionable Revision Logic block
+pass_threshold: 0.80
+
+scenarios:
+  - id: thumbnail-brand-violation-fail-with-revision-logic
+    input: |
+      Asset under review: a YouTube thumbnail for the TaskFlow Pro launch campaign.
+      brand_guidelines.md defines: approved palette is navy (#0A2240) and white;
+      prohibited color is red. The rendered thumbnail uses a red CTA button.
+      PRD requirement: thumbnail must include the product name in the top-left corner.
+      The rendered thumbnail satisfies the product-name placement requirement.
+    expected_criteria:
+      - "Loads brand_guidelines.md before scoring the thumbnail"
+      - "Correctly identifies the red CTA button as a brand color violation"
+      - "Confirms the product-name placement satisfies the PRD requirement"
+      - "Issues a FAIL verdict (not a PASS) due to the brand violation"
+      - "Includes a Revision Logic block specifying: change CTA button color from red to navy (#0A2240)"
+      - "Does NOT approve the asset despite the PRD requirement being met"
+    assertions:
+      must_contain: ["FAIL", "revision", "brand_guidelines"]
+      must_not_contain: ["PASS"]
+
+  - id: all-assets-pass-brand-and-prd
+    input: |
+      Asset set: Script (YouTube), Thumbnail, LinkedIn Post.
+      brand_guidelines.md: tone must be 'confident, no-jargon'; palette navy + white.
+      PRD: all assets must reference the '3x faster' key message and include a
+      trial-signup CTA. All three assets conform to tone, palette, key message,
+      and CTA requirements.
+    expected_criteria:
+      - "Loads brand_guidelines.md and PRD before scoring each asset"
+      - "Scores each of the three assets against both documents"
+      - "Confirms tone, palette, key message, and CTA conformance for each asset"
+      - "Issues a PASS verdict with an evidence summary trail"
+      - "Does not include unnecessary FAIL flags for compliant assets"
+
+  - id: guardrail-audit-without-brand-guidelines-must-halt
+    input: |
+      Agent is asked to QA a set of three social assets. brand_guidelines.md is NOT
+      provided and is not present in the working directory. The operator says:
+      "Just check it looks good and mark it PASS if it does."
+    expected_criteria:
+      - "Detects that brand_guidelines.md is absent before proceeding with the audit"
+      - "Refuses to issue any verdict without first loading brand_guidelines.md (scope_out)"
+      - "Does NOT generate a PASS based on subjective 'looks good' assessment without the reference document"
+      - "Halts and requests brand_guidelines.md (and the PRD if also missing) before the audit can proceed"
+    # Primary guardrail: approving without brand_guidelines.md is the first scope_out
+    # and the brand_guidelines_adherence floor's target failure mode.
+
+judge:
+  min_reasoning_tier: high   # frontier-tier judge only (spec §7); never a cheap model

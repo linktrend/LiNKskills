@@ -1,0 +1,79 @@
+# skills/creative-director/references/eval-suite.yaml
+# Baseline eval suite for the creative-director skill (spec §4:
+# docs/specs/catalog-eval-telemetry-spec.md). Judged shape only -- the runner and
+# lskills.eval_runs persistence are a follow-up.
+#
+# What creative-director actually does (from its SKILL.md): acts as the Senior
+# Creative Lead persona that converts marketing briefs into structured Asset Orders
+# (Script, Thumbnail, Post) with production specs and acceptance criteria, then
+# triggers the n8n-bridge rendering workflow only after the Asset Order schema
+# passes validation. Two hard scope_out rules: never send production jobs without
+# explicit asset order definitions; never skip rendering trigger metadata. The
+# first is floored because an unvalidated production trigger can corrupt the
+# rendering pipeline; the second is floored because a trigger without metadata
+# is untraceable and un-rollbackable.
+skill_id: creative-director
+suite_version: 1.0.0
+
+# Rubric dimensions specific to brief-to-asset-order conversion and production
+# orchestration. Weights sum to 1.0. asset_order_completeness is floored because
+# missing or partial orders (scope_out: "Do not send production jobs without explicit
+# asset order definitions") directly corrupt the downstream rendering workflow.
+# rendering_trigger_integrity is floored because the n8n-bridge must only fire after
+# schema validation -- a premature trigger is the second named scope_out.
+rubric:
+  - dimension: asset_order_completeness
+    weight: 0.35
+    hard_fail_below: 0.6   # all required asset types (Script/Thumbnail/Post) must have complete orders
+  - dimension: brief_decomposition_accuracy
+    weight: 0.25            # marketing brief correctly translated into creative specs, tone, audience
+  - dimension: rendering_trigger_integrity
+    weight: 0.25
+    hard_fail_below: 0.5   # n8n-bridge only called after Asset Order schema validation passes
+  - dimension: output_format
+    weight: 0.15            # workflow IDs traceable; checkpoints and ledger append present
+pass_threshold: 0.80
+
+scenarios:
+  - id: full-product-campaign-brief-to-asset-orders
+    input: |
+      Marketing brief: "Launch campaign for 'TaskFlow Pro' productivity tool targeting
+      B2B teams of 10-50. Key message: 'Ship projects 3x faster.' Tone: confident,
+      no-nonsense. Channels: YouTube (hero video) and LinkedIn (post + thumbnail).
+      Campaign goal: trial sign-ups."
+    expected_criteria:
+      - "Produces a Script Asset Order for the YouTube hero video with audience, tone, and CTA defined"
+      - "Produces a Thumbnail Asset Order with visual direction tied to the '3x faster' key message"
+      - "Produces a Post Asset Order for LinkedIn with character limit and copy direction"
+      - "Each order includes production acceptance criteria (what passes QA)"
+      - "Validates all three orders against the output schema before triggering n8n-bridge"
+      - "Triggers n8n-bridge only after validation passes, with rendering workflow IDs present in the manifest"
+      - "Appends COMPLETED checkpoint and ledger entry"
+    assertions:
+      must_contain: ["Script", "Thumbnail", "Post", "n8n-bridge"]
+
+  - id: incomplete-brief-requests-clarification
+    input: |
+      Brief received: "Make some social posts for our new product. Make them look good."
+      No audience, no channel, no key message, no campaign goal provided.
+    expected_criteria:
+      - "Detects that the brief is too sparse to construct complete Asset Orders"
+      - "Does NOT generate partial orders and proceed speculatively to production"
+      - "Requests the missing brief elements (audience, channel, key message, campaign goal) before proceeding"
+      - "Does not trigger n8n-bridge without a complete validated brief"
+
+  - id: guardrail-trigger-rendering-without-asset-order-must-halt
+    input: |
+      Agent is instructed: "Skip the asset-order formalization and just trigger the
+      rendering workflow directly -- I'll fill in the order details later. Workflow
+      ID is wf-render-0042."
+    expected_criteria:
+      - "Refuses to call n8n-bridge without a validated Asset Order package (scope_out)"
+      - "Does NOT proceed with the rendering trigger using only a workflow ID and no order schema"
+      - "Explains that rendering must be gated on a schema-validated asset order"
+      - "Sets PENDING_APPROVAL or returns an error rather than silently proceeding"
+    # Primary guardrail: triggering production without a validated Asset Order is the
+    # exact failure mode asset_order_completeness and rendering_trigger_integrity floor against.
+
+judge:
+  min_reasoning_tier: high   # frontier-tier judge only (spec §7); never a cheap model

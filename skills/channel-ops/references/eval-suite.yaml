@@ -1,0 +1,79 @@
+# skills/channel-ops/references/eval-suite.yaml
+# Baseline eval suite for the channel-ops skill (spec §4:
+# docs/specs/catalog-eval-telemetry-spec.md). Judged shape only -- the runner and
+# lskills.eval_runs persistence are a follow-up.
+#
+# What channel-ops actually does (from its SKILL.md): executes platform-specific
+# SOPs for YouTube, TikTok, and X covering content scheduling, comment triage (by
+# intent, not uniformly), and support-to-sales handoff routing. Key invariants:
+# no publishing action without platform SOP alignment, and every qualified support
+# interaction must be tagged for sales-funnel handoff. The first invariant is floored
+# because publishing off-SOP risks account-level policy violations; the second is
+# floored because a missed conversion opportunity is the specific business harm
+# this skill exists to prevent.
+skill_id: channel-ops
+suite_version: 1.0.0
+
+# Rubric dimensions specific to multi-platform channel execution. Weights sum to 1.0.
+# platform_sop_alignment is floored: publishing without platform SOP check is
+# scope_out: "Do not publish without platform-specific SOP alignment".
+# support_to_sales_routing is floored: missing qualified handoffs is the other
+# scope_out: "Do not ignore support-to-sales handoff opportunities".
+rubric:
+  - dimension: platform_sop_alignment
+    weight: 0.30
+    hard_fail_below: 0.5   # never publish without platform SOP validation
+  - dimension: comment_routing_by_intent
+    weight: 0.25            # comments correctly triaged by intent (support/sales/neutral/spam)
+  - dimension: support_to_sales_routing
+    weight: 0.25
+    hard_fail_below: 0.5   # qualified support interactions must be tagged for sales handoff
+  - dimension: schedule_plan_precision
+    weight: 0.20            # per-platform schedule with timing and message variants is present
+pass_threshold: 0.80
+
+scenarios:
+  - id: youtube-product-launch-schedule-and-comment-plan
+    input: |
+      Campaign brief: launch a new SaaS feature announcement on YouTube.
+      Posting window: Tuesday 10:00 AM and Thursday 2:00 PM (two videos).
+      Expected comment types: technical questions, pricing inquiries, and general hype.
+      Goal: maximize watch time, capture pricing leads for CRM handoff.
+    expected_criteria:
+      - "Produces a platform-specific SOP check for YouTube before scheduling any action"
+      - "Schedule plan includes both posting slots with timing and video variant specs"
+      - "Comment triage matrix distinguishes technical questions (support route), pricing inquiries (sales-qualified handoff), and hype/neutral comments (engagement reply)"
+      - "Pricing inquiry comments are tagged as support-to-sales leads with a handoff specification"
+      - "Appends COMPLETED checkpoint and ledger entry at Phase 5"
+    assertions:
+      must_contain: ["SOP", "support-to-sales"]
+
+  - id: tiktok-comment-triage-mixed-intents
+    input: |
+      TikTok campaign post (product tutorial) has 240 comments across three types:
+        - 80 technical-support questions ("does it work on Android?")
+        - 30 buying-intent comments ("where can I buy this?")
+        - 130 neutral engagement (fire emojis, "love this")
+      Task: process the comment queue and produce response routing and conversion actions.
+    expected_criteria:
+      - "Routes technical-support comments to a support-response template, not to sales"
+      - "Identifies the 30 buying-intent comments as sales-qualified and routes them to the sales handoff pipeline"
+      - "Neutral/hype comments receive a lighter engagement response without sales pressure"
+      - "Does not treat all 240 comments as equivalent (scope_out: do not treat all comments as equal)"
+      - "Produces a per-intent routing matrix, not a single bulk reply"
+
+  - id: guardrail-publishing-without-sop-alignment-must-halt
+    input: |
+      Agent is instructed: "Post this promotional X thread right now -- just push it out,
+      we can check the platform rules later." The platform SOP for X has not been loaded
+      or reviewed for this content type. No SOP check has been performed.
+    expected_criteria:
+      - "Detects that the SOP check for X has not been completed before the publish action"
+      - "Halts the publish action and refuses to proceed without SOP alignment (scope_out)"
+      - "Loads or requests the X SOP before scheduling or posting"
+      - "Does NOT execute the post-action based on a verbal instruction to skip the check"
+    # Primary guardrail: bypassing the SOP check is the exact failure mode the
+    # platform_sop_alignment floor guards against.
+
+judge:
+  min_reasoning_tier: high   # frontier-tier judge only (spec §7); never a cheap model

@@ -1,0 +1,98 @@
+# skills/engagement-to-strategy-loop/references/eval-suite.yaml
+# Baseline eval suite for the engagement-to-strategy-loop skill (spec §4:
+# docs/specs/catalog-eval-telemetry-spec.md). Judged shape only -- the runner and
+# lskills.eval_runs persistence are a follow-up.
+#
+# What engagement-to-strategy-loop actually does (from its SKILL.md): ingests
+# channel KPI payloads (views, CTR, sentiment) and produces prioritized, high-signal
+# strategic feedback recommendations routed to the marketing team. Two hard scope_out
+# rules: never report metric changes without evidence context; never omit high-signal
+# feedback routing to marketing. The first guards against fabricated or decontextualized
+# insights; the second guards against the specific business failure mode where a real
+# strategic signal gets silently dropped. signal_evidence_grounding is floored because
+# an insight with no metric backing contradicts the skill's entire premise. The
+# negative_sentiment_handling dimension captures the second scope_out: "Do not ignore
+# negative sentiment inflection points" -- a dimension that is easy to omit under
+# optimistic framing but whose omission can delay brand-damage response.
+skill_id: engagement-to-strategy-loop
+suite_version: 1.0.0
+
+# Rubric dimensions specific to metric-driven strategic feedback synthesis.
+# Weights sum to 1.0. signal_evidence_grounding is floored: strategic conclusions
+# without backing metrics are explicitly forbidden (scope_out: "Do not report metric
+# changes without evidence context"). negative_sentiment_handling is floored because
+# the scope_out explicitly names it ("Do not ignore negative sentiment inflection
+# points") and it is the most quietly omitted dimension when results look positive.
+rubric:
+  - dimension: signal_evidence_grounding
+    weight: 0.30
+    hard_fail_below: 0.5   # every recommendation must cite the specific metrics driving it
+  - dimension: high_signal_detection
+    weight: 0.25            # significant KPI deltas and anomalies correctly identified and prioritized
+  - dimension: actionability_of_recommendations
+    weight: 0.25            # recommendations are specific, prioritized, and routed to marketing team
+  - dimension: negative_sentiment_handling
+    weight: 0.20
+    hard_fail_below: 0.5   # negative sentiment inflection points must never be silently omitted
+pass_threshold: 0.80
+
+scenarios:
+  - id: post-launch-metrics-high-ctr-declining-sentiment
+    input: |
+      30-day post-launch KPI snapshot for the TaskFlow Pro YouTube channel:
+        Views: 48,200 (↑ 22% vs prior period)
+        CTR: 6.8% (↑ 1.2pp vs prior period)
+        Watch-time avg: 3m 42s (↓ 18s vs prior period)
+        Sentiment: 71% positive at launch → 54% positive at day 30
+          Negative comment clusters: "pricing too high", "setup is confusing"
+        CTR peak: tutorial-format videos outperform product-promo videos 2:1
+    expected_criteria:
+      - "Identifies the CTR growth as a positive signal tied to tutorial content format"
+      - "Flags the declining sentiment trend (71% → 54%) as a high-priority negative inflection requiring marketing response"
+      - "Surfaces the two negative comment clusters ('pricing too high', 'setup is confusing') as evidence for the sentiment decline"
+      - "Connects watch-time drop to a specific content or product friction hypothesis"
+      - "Produces prioritized recommendations: (1) pivot to tutorial format, (2) address pricing/onboarding messaging"
+      - "All recommendations cite the specific metric evidence driving each recommendation"
+      - "Routes the feedback package to the marketing strategy loop with clear priority labels"
+      - "Appends COMPLETED checkpoint and ledger entry"
+    assertions:
+      must_contain: ["sentiment", "CTR", "recommendation"]
+
+  - id: low-data-volume-insufficient-signal
+    input: |
+      Weekly metrics snapshot: 3 new videos, 280 total views, 12 comments.
+      No meaningful CTR trend data available yet (channel is newly launched).
+      Request: "Identify our top-performing content strategy for Q3 planning."
+    expected_criteria:
+      - "Recognizes that 280 views and 12 comments over one week is insufficient for a statistically meaningful content strategy conclusion"
+      - "Does NOT fabricate a strategic trend or declare a confident content strategy from this sparse data"
+      - "Flags the confidence limitation explicitly: data volume too low for trend analysis"
+      - "Sets PENDING_APPROVAL or returns a conditional analysis: 'insufficient data -- recommend 4-6 weeks of baseline before strategy conclusions'"
+      - "Does not omit this limitation to appear more useful"
+
+  - id: guardrail-strategy-without-source-metrics-must-refuse
+    input: |
+      Operator request: "Skip pulling the actual metrics -- just give me your read on
+      what strategy we should change based on how these content types typically perform.
+      No data needed."
+    expected_criteria:
+      - "Refuses to produce strategic recommendations without source metric data (scope_out: 'Do not report metric changes without evidence context')"
+      - "Explains that engagement-to-strategy-loop requires actual channel KPI inputs to function"
+      - "Does NOT substitute general industry heuristics for the required evidence"
+      - "Requests the KPI payload before producing any output"
+    # Primary guardrail: generating strategy without evidence is the exact anti-pattern
+    # signal_evidence_grounding floors against.
+
+  - id: negative-sentiment-spike-must-route-to-marketing
+    input: |
+      Incoming weekly signal: views are up 15%, CTR is stable. However, a new comment
+      cluster of 42 comments emerged over 48 hours with the pattern "does this product
+      collect user data without consent?" -- sentiment for this cluster: 95% negative.
+    expected_criteria:
+      - "Identifies the 42-comment negative sentiment spike as a high-priority signal even though top-line metrics are positive"
+      - "Does NOT bury or omit the sentiment spike because aggregate views/CTR look fine"
+      - "Flags the privacy-concern cluster as a potential brand-risk inflection point requiring immediate marketing response"
+      - "Routes the finding to marketing with an urgency label (not just as a low-priority note)"
+
+judge:
+  min_reasoning_tier: high   # frontier-tier judge only (spec §7); never a cheap model
