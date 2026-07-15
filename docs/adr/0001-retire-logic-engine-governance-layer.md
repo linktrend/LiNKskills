@@ -173,3 +173,23 @@ expected) and closes out the follow-up flagged in `LiNKplatform/docs/adr/0001`.
 - A live `lskills_` schema / migration is deferred until LiNKskills gets its own Supabase
   project or schema in the shared platform (spec §10 step 3) — no migration is written in
   this change.
+
+## Addendum (2026-07-15) — the Librarian is implemented in LiNKplatform
+
+The `self-improvement` skill in this repo (`skills/self-improvement/SKILL.md`) is the doctrinal
+**instructions** for the LiNKskills half of the Librarian's job. The Librarian itself is now a
+single named agent with standing authority over **two** Programs (this repo's `lskills.catalog`
+certification *and* LiNKbrain's `lbrain.knowledge` curation). Its one identity and its runnable
+orchestration body therefore live in the neutral cross-Program home:
+
+- **Identity/definition:** `LiNKplatform/agents/librarian.md`.
+- **Runnable worker:** `LiNKplatform/packages/librarian-runner` — turns Phases 1–4 of
+  `self-improvement/SKILL.md` into real code that queries `lskills.telemetry` + `lskills.eval_runs`
+  via Supabase, calls a frontier-tier judge, records an `lskills.eval_runs` row with real rubric
+  scores + `delta_vs_previous`, and advances `lskills.catalog.certification_state` toward `usable`
+  only on a clean, no-regression improvement (else leaves `eval_pending` and escalates). It relies
+  on — and never re-implements — this schema's DB-enforced gate (`usable` requires a passing latest
+  eval run) and its auto-demote-on-regression trigger. It operates as `svc_lskills_librarian`.
+
+`self-improvement/SKILL.md` remains the skill-side workflow spec; the executable agent lives in
+LiNKplatform so the one shared Librarian is not split across repos.
