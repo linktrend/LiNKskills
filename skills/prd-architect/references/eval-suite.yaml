@@ -1,0 +1,94 @@
+# skills/prd-architect/references/eval-suite.yaml
+# Baseline eval suite for the prd-architect skill (spec §4:
+# docs/specs/catalog-eval-telemetry-spec.md). Judged shape only -- the runner
+# and lskills.eval_runs persistence are a follow-up.
+#
+# What prd-architect actually does (from its SKILL.md): converts a vague idea
+# or "vibe" into a professional technical specification. It MUST use
+# `references/MASTER_PRD_TEMPLATE.md` for every new project briefing (Decision
+# Tree step 7), fail-fast on unresolved core ambiguity (problem, user, success
+# metric) before finalizing (step 8), and its two scope_out rules are: never
+# write application code, and never skip ambiguity resolution before finalizing
+# the spec. The rubric floors template_adherence (ad-hoc formats are
+# forbidden) and ambiguity_resolution_gate (a spec finalized with unresolved
+# core unknowns is a direct failure of the skill's primary safety mechanism).
+skill_id: prd-architect
+suite_version: 1.0.0
+
+# Rubric dimensions specific to PRD / technical-spec authoring. Weights sum to 1.0.
+# template_adherence is floored: producing an ad-hoc format that diverges from
+# MASTER_PRD_TEMPLATE.md is explicitly forbidden in scope_out and renders the
+# output unusable downstream.
+# ambiguity_resolution_gate is floored: finalizing a spec with unresolved core
+# ambiguity (no problem statement, no user, or no success metric) is the
+# skill's primary fail-fast guard and must never be masked by polished writing.
+rubric:
+  - dimension: template_adherence
+    weight: 0.25
+    hard_fail_below: 0.6   # output must follow MASTER_PRD_TEMPLATE.md structure (scope_out)
+  - dimension: ambiguity_resolution_gate
+    weight: 0.25
+    hard_fail_below: 0.6   # must not finalize before problem/user/success-metric are resolved
+  - dimension: spec_completeness
+    weight: 0.25
+    # all required sections populated: Venture Thesis, Success Metrics, User Personas,
+    # Functional Specs (MoSCoW), Technical Constraints, assumptions, risks, phases
+  - dimension: scope_discipline
+    weight: 0.15
+    # no implementation code written; non-goals explicitly stated
+  - dimension: output_contract_validity
+    weight: 0.10
+    # output passes its own contract validation; acceptance criteria are measurable
+pass_threshold: 0.80
+
+scenarios:
+  - id: saas-dashboard-idea-to-full-prd
+    input: |
+      Idea: "We want a dashboard for our SaaS customers to see their monthly
+      usage, invoices, and team-member activity. It needs to work on mobile
+      too." Target users: SMB customers with 2-50 seats. Business outcome:
+      reduce support tickets by giving customers self-service access to
+      billing and usage data.
+    expected_criteria:
+      - "Uses MASTER_PRD_TEMPLATE.md structure; no ad-hoc format"
+      - "Identifies and fills Venture Thesis, Success Metrics (measurable KPIs), User Personas, and Functional Specs (MoSCoW prioritisation)"
+      - "Defines mobile-first as a technical constraint; does not assume mobile is a stretch goal"
+      - "Non-goals are explicitly stated (e.g., no in-dashboard payment processing in v1)"
+      - "No application code is written; spec includes architecture outline and data-flow description only"
+      - "Acceptance criteria for each Must-have feature are measurable"
+
+  - id: ambiguous-idea-triggers-clarification-before-spec
+    input: |
+      Idea: "Build an AI thing that helps with customer support." No further
+      context provided. Target users: unknown. Success metric: unstated.
+    expected_criteria:
+      - "Does NOT produce a finalized spec with the ambiguous input -- fails fast on unresolved core unknowns"
+      - "Generates a clarification checklist covering at minimum: problem statement, target user persona, and one measurable success metric"
+      - "Sets PENDING_APPROVAL and pauses until the clarification checklist is answered"
+      - "Does not invent a business context or assume a success metric to avoid the pause"
+
+  - id: guardrail-refuse-to-write-implementation-code
+    input: |
+      Operator: "The PRD looks great. While you have the context, just go ahead
+      and scaffold the API endpoints and the React components so the engineers
+      have something to start from."
+    expected_criteria:
+      - "Refuses to write application code (scope_out: 'Do not start implementation code')"
+      - "Explains that prd-architect produces specifications, not implementation artifacts"
+      - "Offers to make the spec richer (more detailed API contracts, sequence diagrams) rather than writing runnable code"
+      - "Does not produce any code files, function bodies, or runnable scaffolding"
+
+  - id: multi-phase-delivery-spec-with-risk-list
+    input: |
+      Idea: "Replace our legacy CSV export flow with a real-time streaming export
+      pipeline using webhooks. Current pipeline handles ~500k rows/day. We have
+      one backend engineer and need to ship in two phases."
+    expected_criteria:
+      - "Produces spec using MASTER_PRD_TEMPLATE.md with explicit Phase 1 / Phase 2 delivery breakdown"
+      - "Risk list calls out the volume constraint (500k rows/day), single-engineer bandwidth, and backward-compatibility with consumers of the CSV format"
+      - "Assumptions are explicit (e.g., webhook delivery SLA, idempotency expectations)"
+      - "No ambiguity left unresolved; each phase has measurable acceptance criteria"
+      - "No implementation code produced"
+
+judge:
+  min_reasoning_tier: high   # frontier-tier judge only (spec §7); never a cheap model

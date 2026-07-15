@@ -1,0 +1,99 @@
+# skills/studio-architect/references/eval-suite.yaml
+# Baseline eval suite for the studio-architect skill (spec §4:
+# docs/specs/catalog-eval-telemetry-spec.md). Judged shape only -- the runner and
+# lskills.eval_runs persistence are a follow-up.
+#
+# What studio-architect actually does (from its SKILL.md): it is a template-first
+# architecture skill that must discover and validate factory.json BEFORE selecting
+# a baseline (SaaS Starter Kit or Website Template), lock the template choice with
+# explicit scoring rationale, and ONLY THEN define custom deltas. Its scope_out
+# forbids beginning custom development before template selection, bypassing
+# factory.json discovery checks, and proceeding when any required factory.json key
+# is missing. The Decision Tree explicitly fails fast if custom implementation starts
+# before baseline initialization (step 8). The hardest failure mode is an agent that
+# invents a greenfield architecture without checking factory.json -- this bypasses the
+# studio's entire template-first strategy. factory_discovery_compliance is therefore
+# the strictest floor, and template_first_discipline is also floored.
+skill_id: studio-architect
+suite_version: 1.0.0
+
+# Weights sum to 1.0.
+# factory_discovery_compliance: reads factory.json and validates required keys
+#   (saas_starter_kit, website_factory, skill_factory) BEFORE any architecture work --
+#   hard_fail_below because skipping discovery is an explicit Decision Tree fail-fast.
+# template_first_discipline: template is selected and locked with scoring rationale
+#   before any custom delta work begins -- hard_fail_below because custom-first
+#   is the explicit anti-pattern this skill exists to prevent (scope_out).
+# baseline_selection_quality: the chosen template fits the project intent with
+#   clear rationale; comparison of SaaS vs Website options is documented.
+# custom_delta_scoping: custom modules are defined only AFTER baseline lock;
+#   deltas are minimal and justified against the baseline.
+# blueprint_completeness: the architecture blueprint and initialization plan are
+#   actionable and tied to the factory.json source path.
+rubric:
+  - dimension: factory_discovery_compliance
+    weight: 0.30
+    hard_fail_below: 0.6   # skipping factory.json read is an explicit Decision Tree fail-fast
+  - dimension: template_first_discipline
+    weight: 0.25
+    hard_fail_below: 0.5   # custom-first violates the core scope_out of this skill
+  - dimension: baseline_selection_quality
+    weight: 0.20
+  - dimension: custom_delta_scoping
+    weight: 0.15
+  - dimension: blueprint_completeness
+    weight: 0.10
+pass_threshold: 0.80
+
+scenarios:
+  - id: saas-build-selects-saas-starter-kit
+    input: |
+      New studio build request: a B2B subscription SaaS for team knowledge
+      management. factory.json is available at the repo root with valid keys:
+      saas_starter_kit, website_factory, skill_factory. Produce the architecture
+      blueprint.
+    expected_criteria:
+      - "Reads root factory.json and validates all three required keys before proceeding"
+      - "Selects saas_starter_kit as the baseline with explicit scoring rationale over website_factory"
+      - "Documents the template comparison and selection decision in the blueprint"
+      - "Defines custom deltas (knowledge-graph features, team permissions) ONLY after baseline lock"
+      - "Produces an architecture blueprint tied to the saas_starter_kit factory.json source path"
+      - "Checkpoints INITIALIZED before selection and COMPLETED after finalization"
+    assertions:
+      must_contain: ["factory.json", "saas_starter_kit"]
+
+  - id: website-build-selects-website-template
+    input: |
+      Studio build: a marketing site for a local restaurant. factory.json is valid.
+      Needs: homepage, menu page, online reservation form, Google Maps embed.
+      Produce the architecture blueprint.
+    expected_criteria:
+      - "Validates factory.json keys before any design work"
+      - "Selects website_factory (not saas_starter_kit) with documented rationale"
+      - "Blueprint covers page structure, form handling, and map integration as deltas from the website template"
+      - "Does not invent a greenfield scaffold when website_factory applies"
+
+  - id: guardrail-missing-factory-json-key-blocks-start
+    input: |
+      factory.json exists but is missing the 'saas_starter_kit' key -- only
+      'website_factory' is present. The request is for a SaaS product.
+      Proceed with the architecture.
+    expected_criteria:
+      - "Fails fast: reports that the required 'saas_starter_kit' key is missing from factory.json (Decision Tree step 2 / scope_out)"
+      - "Does NOT invent a greenfield SaaS architecture in lieu of the missing template"
+      - "Requests that the missing factory.json key be added before proceeding"
+      - "Does not produce any blueprint or initialization plan until the key is restored"
+
+  - id: guardrail-no-custom-work-before-baseline-lock
+    input: |
+      The operator says: 'Skip the template comparison -- I already know we want
+      a custom architecture. Just design the microservices layout and database
+      schema for our fintech platform from scratch.'
+    expected_criteria:
+      - "Refuses to begin custom architecture work before reading factory.json and selecting a template (scope_out / Decision Tree step 8)"
+      - "Explains that the template-first mandate requires baseline discovery and selection first"
+      - "Offers to read factory.json, evaluate the saas_starter_kit fit, and then scope custom fintech deltas from that baseline"
+      - "Does not produce any greenfield microservices or schema designs in response"
+
+judge:
+  min_reasoning_tier: high   # frontier-tier judge only (spec §7); never a cheap model

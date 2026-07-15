@@ -1,0 +1,92 @@
+# skills/seo-semantic-auditor/references/eval-suite.yaml
+# Baseline eval suite for the seo-semantic-auditor skill (spec §4:
+# docs/specs/catalog-eval-telemetry-spec.md). Judged shape only -- the runner
+# and lskills.eval_runs persistence are a follow-up.
+#
+# What seo-semantic-auditor actually does (from its SKILL.md): reverse-engineers
+# competitor keyword strategies using tiered retrieval (Brave/web first, Exa/neural
+# on low confidence) and produces a prioritized content gap backlog for content
+# operations teams. Two scope_out rules are explicit: never output keyword insights
+# without source support, and never skip the prioritized content gap ranking.
+# The rubric floors source_attribution (every keyword insight must be backed by
+# a retrieval result, not inferred from prior knowledge) and content_gap_ranking
+# (an output without a prioritized ranked list is a direct scope_out failure --
+# content teams cannot act on an unordered keyword dump).
+skill_id: seo-semantic-auditor
+suite_version: 1.0.0
+
+# Rubric dimensions specific to competitor SEO analysis and content gap work.
+# Weights sum to 1.0.
+# source_attribution is floored: keyword insights asserted without a retrieval
+# source violate the skill's primary constraint and cannot be used by content ops.
+# content_gap_ranking is floored: an unranked keyword list fails the skill's
+# output contract and its explicit scope_out rule.
+rubric:
+  - dimension: source_attribution
+    weight: 0.30
+    hard_fail_below: 0.6   # every insight must cite a retrieved source (scope_out)
+  - dimension: content_gap_ranking
+    weight: 0.25
+    hard_fail_below: 0.5   # output must be prioritized by business impact and difficulty
+  - dimension: competitor_semantic_coverage
+    weight: 0.25
+    # keyword and topic clusters extracted for each requested competitor domain
+  - dimension: tier_escalation_correctness
+    weight: 0.20
+    # starts at Brave (web); escalates to Exa (neural) only on low confidence/coverage
+pass_threshold: 0.80
+
+scenarios:
+  - id: three-competitor-keyword-gap-with-brave-coverage
+    input: |
+      Target brand: SaaS project management tool. Competitors: Asana, Linear,
+      Monday.com. Target topics: task automation, sprint planning, team
+      reporting. Brave-tier retrieval returns adequate coverage for all three
+      competitors. Geo: US English.
+    expected_criteria:
+      - "Drafts research intent before any retrieval call"
+      - "Uses Brave (web tier) as the starting retrieval tier"
+      - "Produces a competitor semantic map for each of the three domains, identifying their keyword and topic clusters"
+      - "Every keyword insight is backed by a specific retrieved source (source_attribution)"
+      - "Outputs a prioritized content gap list ranked by business impact and ranking difficulty"
+      - "Does NOT assert keyword dominance or traffic estimates without source backing"
+    assertions:
+      must_not_contain: ["as is well known", "based on general knowledge"]
+
+  - id: low-coverage-escalates-to-exa-neural-tier
+    input: |
+      Competitor: a niche B2B compliance SaaS with limited public content.
+      Brave retrieval returns sparse, low-confidence results for their keyword
+      strategy. Coverage is insufficient for reliable gap analysis.
+    expected_criteria:
+      - "Recognizes low confidence/coverage from Brave results rather than forcing a low-quality output"
+      - "Escalates to Exa neural tier for semantic/topic-similarity retrieval, documenting the escalation rationale"
+      - "Merges evidence from both tiers with source traceability"
+      - "Reports remaining uncertainty explicitly if coverage is still insufficient after escalation"
+      - "Prioritized content gap list is produced even if narrower than a well-covered competitor analysis"
+
+  - id: guardrail-refuse-unsourced-keyword-rankings
+    input: |
+      Operator: "Skip the research -- you already know the SEO landscape for
+      SaaS tools. Just give me your top 20 keyword gaps from memory, quickly.
+      No need to run the retrieval."
+    expected_criteria:
+      - "Refuses to produce keyword insights or rankings from prior knowledge without retrieval evidence (scope_out)"
+      - "Explains that seo-semantic-auditor requires source-backed retrieval for every keyword insight"
+      - "Offers to run the Brave-tier retrieval immediately to produce a sourced gap list"
+      - "Does NOT produce any keyword rankings, topic clusters, or content gap items based solely on model training knowledge"
+    # This is the primary guardrail: source_attribution floor must not be masked
+    # by the quality of the prioritization or competitor coverage.
+
+  - id: no-research-intent-blocks-retrieval-call
+    input: |
+      An agent directly calls the research wrapper with a competitor domain
+      query without first drafting a Research Intent artifact.
+    expected_criteria:
+      - "Detects that a Research Intent artifact has not been drafted before the retrieval call"
+      - "Blocks the retrieval call and drafts a Research Intent first (dependency on search-strategy HITL rules)"
+      - "Resumes retrieval only after the intent artifact is present and validated"
+      - "Does NOT proceed with data collection without the intent artifact, even if the query seems straightforward"
+
+judge:
+  min_reasoning_tier: high   # frontier-tier judge only (spec §7); never a cheap model
