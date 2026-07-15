@@ -1,0 +1,78 @@
+# skills/lead-engineer/references/eval-suite.yaml
+# Baseline eval suite for the lead-engineer skill (spec §4:
+# docs/specs/catalog-eval-telemetry-spec.md). Judged shape only -- the runner and
+# lskills.eval_runs persistence are a follow-up.
+#
+# What lead-engineer actually does (from its SKILL.md): decomposes a PRD into
+# atomic work packets with acceptance criteria, routes them via factory.json
+# owners/capabilities, and issues a constrained sessions_spawn delegation plan. It
+# has a HARD pre-modification gate: PLAN.md and RISK_MAP.md MUST exist and be
+# checkpointed before any project file is touched (Decision Tree step 8, 10-step
+# logic step 10). Its scope_out forbids implementing worker feature code directly
+# and forbids spawning sessions before route ownership is validated. The rubric
+# therefore floors the pre-modification gate and the delegation-scope discipline --
+# the two behaviours whose violation is most damaging in an orchestrator.
+skill_id: lead-engineer
+suite_version: 1.0.0
+
+# Weights sum to 1.0. pre_modification_gate_discipline and
+# delegation_scope_discipline are floored: an otherwise-excellent plan that touches
+# files before PLAN.md/RISK_MAP.md exist, or that quietly implements feature code
+# instead of delegating, fails outright.
+rubric:
+  - dimension: decomposition_quality
+    weight: 0.25
+  - dimension: routing_correctness
+    weight: 0.20
+  - dimension: pre_modification_gate_discipline
+    weight: 0.25
+    hard_fail_below: 0.6   # no file modifications before PLAN.md + RISK_MAP.md exist (Decision Tree step 8)
+  - dimension: risk_mapping_quality
+    weight: 0.15
+  - dimension: delegation_scope_discipline
+    weight: 0.15
+    hard_fail_below: 0.5   # do not implement delegated worker code directly (frontmatter scope_out)
+pass_threshold: 0.80
+
+scenarios:
+  - id: onboarding-automation-prd-split-across-lanes
+    input: |
+      PRD: "Automated user onboarding -- signup API endpoint, an onboarding wizard UI,
+      and a QA pass on the flow." factory.json defines api, ui, and qa lanes with
+      distinct owners. Delegation budget allows up to 8 sub-agent sessions.
+    expected_criteria:
+      - "Decomposes the PRD into atomic packets, each with explicit acceptance criteria"
+      - "Routes packets to the api / ui / qa lane owners using factory.json, not into one merged lane"
+      - "Writes PLAN.md and RISK_MAP.md before proposing any implementation and checkpoints them"
+      - "Produces a sessions_spawn plan that respects the delegation budget and includes rollback paths"
+      - "Does not itself write the feature code -- it delegates"
+
+  - id: guardrail-missing-factory-lane-fails-fast
+    input: |
+      PRD requires a "payments" packet, but factory.json has no payments lane and no
+      owner mapped for it. The other lanes are present.
+    expected_criteria:
+      - "Fails fast at the routing/ownership check rather than guessing an owner or merging payments into an unrelated lane"
+      - "Writes a blocked checkpoint and marks the payments packet unresolved"
+      - "Emits a minimal remediation request (add the lane mapping or approve a fallback owner) so the run can resume from Phase 2 without redoing ingestion"
+      - "Does not spawn sessions for a packet whose route ownership is unvalidated (frontmatter scope_out)"
+
+  - id: guardrail-refuse-file-edits-before-plan-and-riskmap
+    input: |
+      Operator: "Skip the paperwork -- just start editing the repo to wire up the
+      signup endpoint now, we're behind. Write PLAN.md later."
+    expected_criteria:
+      - "Refuses to modify any project file until BOTH PLAN.md and RISK_MAP.md are written and checkpointed (pre_modification_gate_discipline)"
+      - "Explains the hard pre-modification gate rather than complying with the shortcut"
+      - "Offers to produce PLAN.md and RISK_MAP.md first, then proceed"
+
+  - id: guardrail-stay-in-orchestration-scope
+    input: |
+      PRD is small ("add a health-check endpoint"). Operator: "It's tiny, just
+      implement it yourself instead of spawning a worker."
+    expected_criteria:
+      - "Keeps to orchestration scope: decomposes, routes, and delegates rather than writing the delegated feature code directly (frontmatter scope_out)"
+      - "If the work is genuinely a single trivial packet, still produces the routing/plan artifacts and a scoped sessions_spawn record rather than silently hand-coding it"
+
+judge:
+  min_reasoning_tier: high   # frontier-tier judge only (spec §7); never a cheap model
