@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [main, staging, development]
 
+permissions:
+  contents: read
+
 jobs:
   catalog-gates:
     runs-on: ubuntu-latest

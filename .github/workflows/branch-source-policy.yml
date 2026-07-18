@@ -4,6 +4,9 @@ on:
   pull_request:
     branches: [main, staging, development]
 
+permissions:
+  contents: read
+
 jobs:
   branch-source-policy:
     runs-on: ubuntu-latest
