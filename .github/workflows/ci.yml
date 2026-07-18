@@ -7,11 +7,27 @@ on:
     branches: [main, staging, development]
 
 jobs:
-  build-test:
+  catalog-gates:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Repository policy checkpoint
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate skills + tools registry
+        run: python3 validator.py --repo-root . --scan-all
+
+      - name: Ensure catalog index is current
         run: |
-          echo "CI placeholder: add repository-specific build/test commands."
+          python3 scripts/build-catalog-index.py
+          python3 scripts/build-catalog-index.py --check
+
+      - name: Unit tests (skill runtime)
+        run: python3 -m unittest discover -s tests/skill_runtime -v
+
+      - name: Service ownership gate
+        run: python3 scripts/check-service-ownership.py

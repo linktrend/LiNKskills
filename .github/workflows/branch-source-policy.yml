@@ -24,7 +24,7 @@ jobs:
               if [ "${HEAD_BRANCH}" != "development" ]; then echo "Only development may be merged into staging."; exit 1; fi
               ;;
             development)
-              case "${HEAD_BRANCH}" in dev/*|feature/*|fix/*|chore/*|codex/*|cursor/*|antigravity/*|dependabot/*) ;; *) echo "Only short-lived work branches may be merged into development."; exit 1 ;; esac
+              case "${HEAD_BRANCH}" in dev/*|issue/*|feature/*|fix/*|chore/*|codex/*|cursor/*|antigravity/*|dependabot/*) ;; *) echo "Only short-lived work branches may be merged into development."; exit 1 ;; esac
               ;;
             *) echo "Unhandled base branch: ${BASE_BRANCH}"; exit 1 ;;
           esac

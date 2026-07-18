@@ -5,13 +5,15 @@ things and one curation process:
 
 1. **Catalog** — the library of progressive-disclosure skills (`SKILL.md` + `advanced/` +
    `examples/` + `references/` + `scripts/`), authored via the `skill-architect` /
-   `skill-template` pattern and validated by `validator.py`.
+   `skill-template` pattern and validated by `validator.py`. Machine index:
+   [`catalog/index.json`](./catalog/index.json).
 2. **Mandatory eval suite** — every skill ships a baseline eval suite before it is
    `usable` (quality proof, not just an I/O contract).
-3. **Usage telemetry** — every real skill invocation is recorded (see
-   `execution_ledger.jsonl` and `global_evaluator.py`).
-4. **Librarian curation** — the `self-improvement` skill (being promoted to the
-   "Librarian") reads telemetry + eval runs and proposes versioned upgrades.
+3. **Usage telemetry** — every real skill invocation is recorded (local
+   `execution_ledger.jsonl` buffer + `lskills.telemetry` via
+   [`lib/skill_runtime`](./lib/skill_runtime)).
+4. **Librarian curation** — skill-side instructions live in `skills/self-improvement`;
+   the runnable agent is `LiNKplatform/packages/librarian-runner`.
 
 > **Scope boundary (important).** LiNKskills does **not** own governance or
 > permission-to-act. It has no entitlements, leases, kill-switches, financial ledger, or
@@ -24,6 +26,7 @@ things and one curation process:
 ## Source of Truth Documents
 
 - Catalog / eval / telemetry design: [`docs/specs/catalog-eval-telemetry-spec.md`](./docs/specs/catalog-eval-telemetry-spec.md)
+- Consumer load path: [`docs/CONSUMER-SKILL-LOAD-PATH.md`](./docs/CONSUMER-SKILL-LOAD-PATH.md)
 - Shared foundation (cross-Program substrate): `LiNKplatform/docs/specs/shared-foundation-spec.md` (§3, §7)
 - ADR — retiring the Logic Engine: [`docs/adr/0001-retire-logic-engine-governance-layer.md`](./docs/adr/0001-retire-logic-engine-governance-layer.md)
 - Original PRD (MVO): [`260319 LiNKskills PRD.md`](./260319%20LiNKskills%20PRD.md)
@@ -31,12 +34,23 @@ things and one curation process:
 
 ## Skill Catalog
 
+- Machine index: [`catalog/index.json`](./catalog/index.json) (regenerate with
+  `python3 scripts/build-catalog-index.py`)
 - Catalogue index: [`SKILLS_CATALOGUE.md`](./SKILLS_CATALOGUE.md)
 - Manifest: [`manifest.json`](./manifest.json)
 - Skills live under [`skills/`](./skills); authoring meta-skills:
   [`skill-architect`](./skills/skill-architect), [`skill-template`](./skills/skill-template),
   [`tool-architect`](./skills/tool-architect).
-- Curation precursor: [`self-improvement`](./skills/self-improvement).
+- Curation skill instructions: [`self-improvement`](./skills/self-improvement).
+
+## Consumer runtime
+
+Programs load skills from a git checkout of this repo (not a LiNKskills API):
+
+- Python package: [`lib/skill_runtime`](./lib/skill_runtime)
+- Docs: [`docs/CONSUMER-SKILL-LOAD-PATH.md`](./docs/CONSUMER-SKILL-LOAD-PATH.md)
+- Host bootstrap: [`deploy/vps/`](./deploy/vps) +
+  [`docs/runbooks/PRODUCTION_OPERATIONS.md`](./docs/runbooks/PRODUCTION_OPERATIONS.md)
 
 ## Google CLI Operating Model (Launch)
 
@@ -49,14 +63,20 @@ things and one curation process:
 
 - Full repo validation:
   - `python3 validator.py --repo-root . --scan-all`
-- Frontmatter immutability check:
-  - `bash scripts/ci-check-frontmatter.sh`
-- Telemetry aggregation:
+- Catalog index:
+  - `python3 scripts/build-catalog-index.py`
+  - `python3 scripts/build-catalog-index.py --check`
+- Skill runtime unit tests:
+  - `python3 -m unittest discover -s tests/skill_runtime -v`
+- Telemetry flush to Supabase:
+  - `python3 scripts/flush-telemetry.py`
+- Telemetry aggregation report:
   - `python3 global_evaluator.py`
 
 ## Documentation Map
 
 - [Docs Index](./docs/README.md)
+- [Consumer skill load path](./docs/CONSUMER-SKILL-LOAD-PATH.md)
 - [Branching and Deployment Policy](./docs/BRANCHING_AND_DEPLOYMENT_POLICY.md)
 - [Documentation Governance](./docs/DOCUMENTATION_GOVERNANCE.md)
 - [Architecture Decision Records](./docs/adr/)
