@@ -37,7 +37,14 @@ def _sign(message: bytes, secret: str) -> str:
 
 
 def hash_api_key(raw_key: str) -> str:
-    return hashlib.sha256(raw_key.encode("utf-8")).hexdigest()
+    # Use a slow KDF for API-key fingerprinting so leaked digests are harder to brute-force.
+    digest = hashlib.pbkdf2_hmac(
+        "sha256",
+        raw_key.encode("utf-8"),
+        b"logic-engine-api-key",
+        600_000,
+    )
+    return digest.hex()
 
 
 def hash_payload(payload: Dict[str, Any]) -> str:
