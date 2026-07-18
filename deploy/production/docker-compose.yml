@@ -1,22 +1,10 @@
-services:
-  linkskills-api:
-    image: python:3.11-slim
-    working_dir: /app
-    command: bash -lc "pip install -r services/logic-engine/requirements.txt && python services/logic-engine/scripts/run_api.py"
-    env_file:
-      - .env.runtime
-    volumes:
-      - ../..:/app
-    ports:
-      - "8081:8081"
-    restart: unless-stopped
+# RETIRED — Logic Engine deploy surface
+#
+# The FastAPI Logic Engine control plane was archived on 2026-07-14
+# (docs/adr/0001-retire-logic-engine-governance-layer.md).
+# Do not start these services.
+#
+# Current host bootstrap: deploy/vps/ + docs/runbooks/PRODUCTION_OPERATIONS.md
+# Librarian scheduling: LiNKplatform/packages/librarian-runner/ops/
 
-  linkskills-retention:
-    image: python:3.11-slim
-    working_dir: /app
-    command: bash -lc "pip install -r services/logic-engine/requirements.txt && while true; do python services/logic-engine/scripts/run_retention_worker.py; sleep 86400; done"
-    env_file:
-      - .env.runtime
-    volumes:
-      - ../..:/app
-    restart: unless-stopped
+services: {}

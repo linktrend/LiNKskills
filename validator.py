@@ -487,10 +487,9 @@ def extract_frontmatter(content: str) -> Tuple[Optional[str], List[str], List[st
 def validate_skill_structure(skill_path: Path, profile: str = DEFAULT_FORMAT_PROFILE) -> Tuple[bool, List[str]]:
     """Validate that a skill folder adheres to the Golden Template structure.
 
-    Both profiles share the same progressive-disclosure file shape. The only
-    structural difference is the persistence machinery: `heavy` skills must ship a
-    `.workdir/tasks` checkpoint directory for resumability; `simple` (single-pass,
-    stateless) skills do not (spec §5).
+    Both profiles share the same progressive-disclosure file shape. Heavy skills
+    *declare* persistence paths in frontmatter; the `.workdir/tasks` directory is
+    created at runtime (gitignored) and is not required in a clean checkout (spec §5).
     """
     errors: List[str] = []
 
@@ -507,19 +506,15 @@ def validate_skill_structure(skill_path: Path, profile: str = DEFAULT_FORMAT_PRO
         "scripts/README.md": "Scripts guide",
         ".gitignore": "Skill-local ignore file",
     }
-    # Persistent task checkpoint directory is a heavy-profile-only requirement.
-    required_dirs = {}
-    if profile == "heavy":
-        required_dirs[".workdir/tasks"] = "Persistent task checkpoint directory"
+    # `.workdir/tasks` is a *runtime* checkpoint directory created when a heavy
+    # skill runs. It must not be required in a clean catalog checkout / CI clone
+    # (gitignores `.workdir/`). Presence of task state is validated only when
+    # the directory already exists (see validate_runtime_state).
 
     for rel_path, description in required_files.items():
         full_path = skill_path / rel_path
         if not full_path.is_file():
             errors.append(f"Missing required file: {rel_path} ({description})")
-    for rel_path, description in required_dirs.items():
-        full_path = skill_path / rel_path
-        if not full_path.is_dir():
-            errors.append(f"Missing required directory: {rel_path} ({description})")
 
     return len(errors) == 0, errors
 
@@ -923,8 +918,9 @@ def validate_runtime_state(
     errors: List[str] = []
     tasks_dir = skill_path / ".workdir" / "tasks"
     if not tasks_dir.exists():
-        errors.append("Missing .workdir/tasks directory for resumability")
-        return False, errors
+        # Clean checkouts / CI do not ship runtime workdirs (gitignored). Nothing
+        # to validate until a heavy skill creates checkpoint state at runtime.
+        return True, errors
 
     task_dirs = [path for path in tasks_dir.iterdir() if path.is_dir()]
     for task_dir in task_dirs:
@@ -995,6 +991,50 @@ def parse_iso8601(timestamp: str) -> Optional[datetime]:
         return None
 
 
+def validate_eval_suite(skill_path: Path) -> Tuple[bool, List[str]]:
+    """Every skill must ship references/eval-suite.yaml before agents may rely on it.
+
+    Enforces the Principal requirement and catalog-eval-telemetry-spec §4 / §7.
+    Uses structural checks (not full YAML parse) because eval suites contain nested
+    lists the repo's frontmatter-oriented parser does not support; the Librarian
+    runner loads the full YAML with a real parser when judging.
+    """
+    errors: List[str] = []
+    suite_path = skill_path / "references" / "eval-suite.yaml"
+    if not suite_path.is_file():
+        errors.append("Missing required file: references/eval-suite.yaml (baseline eval suite)")
+        return False, errors
+
+    text = suite_path.read_text(encoding="utf-8")
+    if not text.strip():
+        errors.append("references/eval-suite.yaml is empty")
+        return False, errors
+
+    skill_id_match = re.search(r"(?m)^skill_id:\s*[\"']?([A-Za-z0-9_-]+)[\"']?\s*$", text)
+    if skill_id_match is None:
+        errors.append("references/eval-suite.yaml must declare skill_id")
+    elif skill_id_match.group(1) != skill_path.name:
+        errors.append(
+            f"references/eval-suite.yaml skill_id '{skill_id_match.group(1)}' "
+            f"must match folder name '{skill_path.name}'"
+        )
+
+    if re.search(r"(?m)^pass_threshold:\s*", text) is None:
+        errors.append("references/eval-suite.yaml must declare pass_threshold")
+
+    if re.search(r"(?m)^rubric:\s*$", text) is None:
+        errors.append("references/eval-suite.yaml must declare a rubric block")
+    elif re.search(r"(?m)^\s*-\s+dimension:\s*", text) is None:
+        errors.append("references/eval-suite.yaml rubric must include at least one dimension")
+
+    if re.search(r"(?m)^scenarios:\s*$", text) is None:
+        errors.append("references/eval-suite.yaml must declare a scenarios block")
+    elif re.search(r"(?m)^\s*-\s+id:\s*", text) is None:
+        errors.append("references/eval-suite.yaml scenarios must include at least one scenario id")
+
+    return len(errors) == 0, errors
+
+
 def validate_execution_ledger(
     repo_root: Path,
     ledger_path: str,
@@ -1009,7 +1049,21 @@ def validate_execution_ledger(
         return False, errors, warnings
 
     now = datetime.now(timezone.utc)
+    # Legacy required fields. Extended catalog-eval-telemetry fields
+    # (skill_version, agent_id, program_ref, …) are optional for older lines and
+    # recommended for new writers (see lib/skill_runtime/telemetry.py).
     required_fields = {"timestamp", "skill", "task_id", "status", "summary"}
+    extended_fields = (
+        "skill_version",
+        "agent_id",
+        "program_ref",
+        "issue_ref",
+        "run_ref",
+        "duration_ms",
+        "cost",
+        "outcome_detail",
+        "event_id",
+    )
     with ledger_file.open("r", encoding="utf-8") as handle:
         for idx, raw_line in enumerate(handle, start=1):
             line = raw_line.strip()
@@ -1043,6 +1097,12 @@ def validate_execution_ledger(
                     warnings.append(
                         f"{ledger_path}:{idx} is older than retention_days={retention_days} ({timestamp_raw})"
                     )
+
+            if not any(field in payload for field in extended_fields):
+                warnings.append(
+                    f"{ledger_path}:{idx} legacy ledger shape (no extended telemetry fields); "
+                    "prefer lib/skill_runtime.record_invocation for new events"
+                )
 
     return len(errors) == 0, errors, warnings
 
@@ -1104,6 +1164,9 @@ def validate_single_skill(
 
     _, errors = validate_skill_structure(skill_path, profile)
     all_errors.extend(errors)
+
+    _, eval_errors = validate_eval_suite(skill_path)
+    all_errors.extend(eval_errors)
 
     schema_doc, errors = load_schemas(skill_path, profile)
     all_errors.extend(errors)
