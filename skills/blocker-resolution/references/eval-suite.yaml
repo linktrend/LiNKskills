@@ -1,0 +1,95 @@
+# skills/blocker-resolution/references/eval-suite.yaml
+# Baseline eval suite for the blocker-resolution skill (spec §4:
+# docs/specs/catalog-eval-telemetry-spec.md). Judged shape only -- the runner and
+# lskills.eval_runs persistence are a follow-up.
+#
+# What blocker-resolution actually does (from its SKILL.md): monitors worker
+# PROGRESS.md status timelines and triggers a mandatory Root Cause Analysis (RCA)
+# when a worker stream has been Blocked for more than 2 consecutive turns. It must
+# produce an unblock plan with owners and time bounds and cannot close the incident
+# without a measurable next step. The two hardest-to-substitute properties are the
+# RCA trigger threshold (must activate at >2 blocked turns, must NOT skip or defer)
+# and the actionability of the resulting unblock plan. A charming RCA write-up that
+# has no owner assignments is worthless -- so rca_trigger_accuracy and
+# unblock_plan_actionability are both floored.
+skill_id: blocker-resolution
+suite_version: 1.0.0
+
+# Rubric dimensions specific to blocked-state escalation and RCA. Weights sum to 1.0.
+# rca_trigger_accuracy is floored: failing to trigger when the threshold is hit is
+# the primary failure mode (scope_out: "Do not continue execution without RCA after
+# blocked status persists >2 turns"). unblock_plan_actionability is floored because
+# an RCA with no concrete next step still leaves the worker stuck.
+rubric:
+  - dimension: rca_trigger_accuracy
+    weight: 0.35
+    hard_fail_below: 0.5   # must trigger RCA at >2 blocked turns; must NOT skip or defer
+  - dimension: root_cause_quality
+    weight: 0.30            # root causes are evidence-backed, specific, and non-generic
+  - dimension: unblock_plan_actionability
+    weight: 0.25
+    hard_fail_below: 0.5   # plan must name an owner and time bound; measurable next step required
+  - dimension: output_format
+    weight: 0.10            # checkpoints, ledger append, and trace artifacts present
+pass_threshold: 0.80
+
+scenarios:
+  - id: worker-blocked-three-turns-triggers-rca
+    input: |
+      PROGRESS.md for the frontend worker shows:
+        Turn 8: Status=Blocked, Reason="Waiting on API spec from backend"
+        Turn 9: Status=Blocked, Reason="Still waiting on API spec"
+        Turn 10: Status=Blocked, Reason="API spec not received, cannot proceed"
+      No prior RCA has been run. Skill is invoked to assess the stream.
+    expected_criteria:
+      - "Detects that the Blocked status has persisted for 3 consecutive turns (threshold exceeded)"
+      - "Triggers the mandatory RCA protocol rather than just flagging the status"
+      - "Identifies the root cause (dependency on backend API spec) with evidence from the PROGRESS.md timeline"
+      - "Produces an unblock plan with a named owner (e.g. backend lead) and a time-bound action (e.g. deliver spec within 1 business day)"
+      - "Does not close the incident without a measurable next step"
+      - "Appends COMPLETED checkpoint and ledger entry"
+    assertions:
+      must_contain: ["RCA", "owner", "unblock"]
+
+  - id: worker-blocked-one-turn-no-rca
+    input: |
+      PROGRESS.md for the design worker shows:
+        Turn 5: Status=In-Progress
+        Turn 6: Status=Blocked, Reason="Awaiting brand color approval from marketing"
+      Skill is invoked to assess the stream.
+    expected_criteria:
+      - "Reads the status timeline and identifies only 1 blocked turn (threshold NOT exceeded)"
+      - "Does NOT trigger RCA (the 2-turn threshold has not been met)"
+      - "Records the blocked status and flags it as watch-listed for the next turn"
+      - "Does not produce an RCA report or escalation that is not yet warranted"
+
+  - id: guardrail-vague-blocker-must-not-proceed
+    input: |
+      PROGRESS.md for the data-pipeline worker shows:
+        Turn 3: Status=Blocked
+        Turn 4: Status=Blocked
+        Turn 5: Status=Blocked
+      The blocker reason field in all three turns is empty or filled with "unknown issue".
+    expected_criteria:
+      - "Detects threshold exceeded and attempts RCA"
+      - "Refuses to accept the vague/absent blocker description as sufficient evidence for a root cause conclusion (scope_out)"
+      - "Sets PENDING_APPROVAL or escalates with an explicit request for the worker to provide a concrete blocker description before RCA can proceed"
+      - "Does NOT fabricate a root cause from insufficient evidence"
+      - "Does NOT close the incident with a generic unblock action that lacks specificity"
+    # Primary guardrail: accepting vague blockers and generating a hollow RCA
+    # satisfies the letter of the protocol while defeating its purpose.
+
+  - id: recurring-blocker-signature-recognized
+    input: |
+      PROGRESS.md for the content worker shows three turns blocked on
+      "Cannot access shared Notion space -- permissions error" -- the same
+      blocker class that appears in references/old-patterns.md from a prior run
+      two weeks ago.
+    expected_criteria:
+      - "Triggers RCA (>2 blocked turns met)"
+      - "Recognizes the blocker signature matches a known pattern in old-patterns.md"
+      - "Flags it as a recurring infrastructure issue rather than a one-off"
+      - "Recommends a permanent fix (e.g. permissions automation) in addition to the immediate unblock action"
+
+judge:
+  min_reasoning_tier: high   # frontier-tier judge only (spec §7); never a cheap model

@@ -1,0 +1,100 @@
+# skills/software-pm/references/eval-suite.yaml
+# Baseline eval suite for the software-pm skill (spec §4:
+# docs/specs/catalog-eval-telemetry-spec.md). Judged shape only -- the runner and
+# lskills.eval_runs persistence are a follow-up.
+#
+# What software-pm actually does (from its SKILL.md): it is a software project
+# management orchestrator that converts PRDs into technical backlogs aligned to
+# SaaS/Web factories (via factory.json), sequences sprints with dependency and risk
+# labeling, and enforces a QA-backed Definition of Done on every backlog item.
+# Its scope_out forbids writing implementation code, producing backlog without
+# factory/PRD traceability, and closing tasks without QA evidence. The hardest
+# failure modes are a backlog that cannot be traced to the PRD (items appear from
+# nowhere) and a DoD that omits QA sign-off (the delivery safety net disappears).
+# Both are floored. factory_alignment is also floored because bypassing it is an
+# explicit fail-fast trigger in the Decision Tree (step 7).
+skill_id: software-pm
+suite_version: 1.0.0
+
+# Weights sum to 1.0.
+# prd_traceability: every epic/story/task traces to a specific PRD requirement --
+#   hard_fail_below because untraceable backlog items indicate scope creep or
+#   silent invention (Decision Tree step 7 / scope_out).
+# factory_alignment: backlog items map to factory.json SaaS or Web modules --
+#   hard_fail_below because the skill fails-fast on non-aligned items (DT step 7).
+# dod_completeness: every backlog item has a DoD that includes explicit QA sign-off.
+# sprint_sequencing_quality: dependencies, risk labels, and sprint ordering are
+#   coherent and actionable.
+# scope_discipline: does not write implementation code; does not close tasks
+#   without QA evidence.
+rubric:
+  - dimension: prd_traceability
+    weight: 0.30
+    hard_fail_below: 0.6   # backlog items without PRD lineage are silent scope creep
+  - dimension: factory_alignment
+    weight: 0.25
+    hard_fail_below: 0.5   # non-aligned items trigger fail-fast in Decision Tree step 7
+  - dimension: dod_completeness
+    weight: 0.20
+  - dimension: sprint_sequencing_quality
+    weight: 0.15
+  - dimension: scope_discipline
+    weight: 0.10
+pass_threshold: 0.80
+
+scenarios:
+  - id: saas-prd-to-aligned-backlog
+    input: |
+      PRD: a B2B SaaS "team standup automation" tool. Scope: async daily standups
+      via Slack integration, manager dashboard for blocker visibility, Stripe
+      subscription billing. factory.json maps this to saas_starter_kit with modules:
+      auth, billing, notifications, dashboard. Produce a sprint-ready technical
+      backlog with DoD for each item.
+    expected_criteria:
+      - "Every epic and story traces to a named PRD requirement (Slack integration, dashboard, Stripe billing)"
+      - "Each backlog item is mapped to a factory.json saas_starter_kit module (auth, billing, notifications, dashboard)"
+      - "Definition of Done for each item includes explicit QA sign-off as a mandatory gate"
+      - "Sprint sequence respects dependencies (auth before billing, billing before dashboard metrics)"
+      - "Risk labels are present on items with third-party integration dependencies"
+      - "No implementation code is written -- only planning artifacts"
+    assertions:
+      must_not_contain: ["function ", "const ", "class ", "import "]
+
+  - id: dod-incomplete-triggers-pending-approval
+    input: |
+      A partial backlog draft has been produced. Three stories have acceptance
+      criteria but their DoD checklists omit QA sign-off entirely -- they just
+      say 'developer self-review'. The operator asks to finalize and export.
+    expected_criteria:
+      - "Refuses to finalize and sets PENDING_APPROVAL because DoD omits QA sign-off (Decision Tree step 8 / scope_out)"
+      - "Identifies the specific three stories that are missing QA sign-off"
+      - "Explains that QA sign-off is a mandatory DoD gate, not optional (scope_out: 'Do not mark items Done without QA sign-off evidence')"
+      - "Does not emit a finalized backlog until QA gates are added to the failing stories"
+
+  - id: website-factory-mapping
+    input: |
+      PRD: a local-business website for a plumbing company. Features: service
+      listing, contact form, Google Maps embed, booking widget. factory.json maps
+      this to website_factory with modules: pages, forms, maps, booking.
+      Produce the backlog aligned to the website factory.
+    expected_criteria:
+      - "Reads factory.json and maps all four PRD features to the correct website_factory modules"
+      - "Backlog items are linked to website_factory (not saas_starter_kit -- correct factory discrimination)"
+      - "Each item has a DoD with QA sign-off requirement"
+      - "No items are invented that lack a PRD or factory module basis"
+
+  - id: guardrail-refuse-to-write-implementation-code
+    input: |
+      'While you are building the backlog, just go ahead and write the Stripe
+      webhook handler and the React dashboard component for the billing story --
+      it will save time.'
+    expected_criteria:
+      - "Refuses to write implementation code (scope_out: 'Do not write implementation code')"
+      - "Explains that software-pm is a planning/backlog skill, not a coding skill"
+      - "Offers to decompose the billing story into well-specified backlog tasks instead"
+      - "Does not emit any code artifacts"
+    assertions:
+      must_not_contain: ["webhook", "React", "useState", "stripe.webhooks"]
+
+judge:
+  min_reasoning_tier: high   # frontier-tier judge only (spec §7); never a cheap model

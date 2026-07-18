@@ -1,0 +1,95 @@
+# skills/revenue-adapter-base/references/eval-suite.yaml
+# Baseline eval suite for the revenue-adapter-base skill (spec §4:
+# docs/specs/catalog-eval-telemetry-spec.md). Judged shape only -- the runner
+# and lskills.eval_runs persistence are a follow-up.
+#
+# What revenue-adapter-base actually does (from its SKILL.md): ingests
+# heterogeneous monetization signals (YouTube views, AdSense, Stripe) and
+# normalizes them into Venture Studio Transaction records. Two scope_out rules
+# are explicit: never emit raw source-specific payloads as final output, and
+# never finalize without normalization into the canonical Venture Studio
+# Transaction schema. The rubric floors normalization_completeness (every
+# transaction must carry all required canonical fields -- no partial records)
+# and source_payload_discipline (raw source records must never leak through
+# as the final artifact).
+skill_id: revenue-adapter-base
+suite_version: 1.0.0
+
+# Rubric dimensions specific to heterogeneous revenue normalization.
+# Weights sum to 1.0.
+# normalization_completeness is floored: a batch that drops required canonical
+# fields (currency, timestamp, source_id) cannot be used for reconciliation
+# and is a hard failure regardless of other score.
+# source_payload_discipline is floored: returning raw Stripe/AdSense payloads
+# as the final output is the explicit scope_out violation this skill exists to
+# prevent.
+rubric:
+  - dimension: normalization_completeness
+    weight: 0.30
+    hard_fail_below: 0.6   # all canonical Venture Studio Transaction fields present
+  - dimension: source_payload_discipline
+    weight: 0.25
+    hard_fail_below: 0.5   # raw source records must not be the final output (scope_out)
+  - dimension: source_traceability
+    weight: 0.25
+    # each normalized record links back to its originating source entry for reconciliation
+  - dimension: integrity_gate_discipline
+    weight: 0.20
+    # PENDING_APPROVAL set correctly when data integrity risk is high (missing fields,
+    # conflicting timestamps, currency mismatch); no silent finalization with bad data
+pass_threshold: 0.80
+
+scenarios:
+  - id: multi-source-normalization-stripe-adsense-youtube
+    input: |
+      Input batch:
+      - Stripe charge: { "id": "ch_abc", "amount": 4900, "currency": "usd",
+        "created": 1720000000, "customer": "cus_xyz" }
+      - AdSense report row: { "date": "2026-07-01", "revenue": 12.47,
+        "currency": "USD", "ad_unit": "ca-pub-12345/ad-slot-6" }
+      - YouTube analytics row: { "date": "2026-07-01", "estimated_revenue": 8.20,
+        "currency": "USD", "video_id": "dQw4w9WgXcQ" }
+      Normalize all three into Venture Studio Transaction records.
+    expected_criteria:
+      - "Produces three normalized Venture Studio Transaction records -- one per source row"
+      - "Each record contains all required canonical fields: amount, currency, timestamp, source_id, source_type, and reconciliation pointer"
+      - "Currency is standardized consistently across all records"
+      - "The original source identifier is preserved in each record for traceability"
+      - "Final output is the canonical batch, NOT the raw source payloads"
+    assertions:
+      must_not_contain: ["ch_abc as final", "raw payload"]
+
+  - id: missing-required-field-triggers-integrity-gate
+    input: |
+      Stripe charge payload is missing the `created` (timestamp) field:
+      { "id": "ch_def", "amount": 1200, "currency": "usd", "customer": "cus_abc" }
+      AdSense and YouTube rows are complete.
+    expected_criteria:
+      - "Detects the missing `created` timestamp on the Stripe record"
+      - "Sets PENDING_APPROVAL for the batch rather than silently finalizing with a missing required field"
+      - "Reports the specific missing field and the source record ID in the approval gate message"
+      - "Does NOT fabricate a timestamp or carry over a timestamp from another record to fill the gap"
+
+  - id: guardrail-refuse-raw-source-output
+    input: |
+      After ingesting a YouTube analytics payload, an operator says:
+      "Just return the raw YouTube JSON -- finance can parse it themselves,
+      no need to normalize."
+    expected_criteria:
+      - "Refuses to emit the raw YouTube payload as the final output (scope_out)"
+      - "Explains that the skill's contract requires normalization into Venture Studio Transaction records for downstream reconciliation"
+      - "Produces the normalized record from the YouTube data and returns that instead"
+      - "Does NOT return any source-native payload object as the primary output artifact"
+
+  - id: currency-mismatch-across-sources
+    input: |
+      Stripe charge is in USD, AdSense row is in EUR (revenue: 5.30, currency: EUR).
+      No explicit conversion rate is provided in the input.
+    expected_criteria:
+      - "Detects the currency mismatch across sources"
+      - "Does NOT silently mix USD and EUR amounts in a single normalized batch without flagging it"
+      - "Sets PENDING_APPROVAL or annotates the mismatch prominently, noting that a conversion rate is needed for a unified batch"
+      - "Each normalized record still carries the correct original currency rather than being forced to a single currency without a rate"
+
+judge:
+  min_reasoning_tier: high   # frontier-tier judge only (spec §7); never a cheap model

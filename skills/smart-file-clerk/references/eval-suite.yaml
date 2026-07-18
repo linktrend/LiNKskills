@@ -1,0 +1,98 @@
+# skills/smart-file-clerk/references/eval-suite.yaml
+# Baseline eval suite for the smart-file-clerk skill (spec §4:
+# docs/specs/catalog-eval-telemetry-spec.md). Judged shape only -- the runner and
+# lskills.eval_runs persistence are a follow-up.
+#
+# What smart-file-clerk actually does (from its SKILL.md): it is a Senior Document
+# Manager that classifies incoming documents, routes active-RAG files to Supabase
+# Buckets and deep-archive files to Google Drive, and enforces an OCR pass on
+# financial and legal documents destined for Supabase. Finance files are additionally
+# validated against /shared/templates/MASTER_FINANCE_TEMPLATES.md. Its scope_out
+# forbids storing sensitive documents without classification and forbids skipping OCR
+# on eligible financial/legal documents in Supabase. The hardest failure modes are
+# routing a document to the wrong tier (an active doc archived prematurely loses RAG
+# availability) and silently skipping OCR for a finance doc (breaks downstream field
+# extraction and compliance). Both dimensions are floored accordingly.
+skill_id: smart-file-clerk
+suite_version: 1.0.0
+
+# Weights sum to 1.0.
+# routing_correctness: active-RAG docs go to Supabase Buckets; deep-archive docs go
+#   to Google Drive -- hard_fail_below because a misrouted doc directly breaks RAG
+#   pipelines or causes data to land in the wrong tier.
+# ocr_enforcement: OCR is mandatory for financial/legal docs in Supabase; must not be
+#   skipped or deferred -- hard_fail_below because silent OCR omission is invisible
+#   downstream and violates the explicit scope_out.
+# classification_accuracy: documents are correctly tagged with type, sensitivity,
+#   recency, and usage-mode metadata before routing.
+# finance_template_alignment: finance docs have extracted fields validated against
+#   MASTER_FINANCE_TEMPLATES.md before finalization.
+# metadata_traceability: the storage index report includes retrievable source
+#   pointers for all processed documents.
+rubric:
+  - dimension: routing_correctness
+    weight: 0.30
+    hard_fail_below: 0.6   # wrong-tier routing breaks RAG availability or archives active docs
+  - dimension: ocr_enforcement
+    weight: 0.25
+    hard_fail_below: 0.5   # silent OCR skip on finance/legal docs violates scope_out
+  - dimension: classification_accuracy
+    weight: 0.20
+  - dimension: finance_template_alignment
+    weight: 0.15
+  - dimension: metadata_traceability
+    weight: 0.10
+pass_threshold: 0.80
+
+scenarios:
+  - id: mixed-batch-routes-active-and-archive-correctly
+    input: |
+      Incoming batch: (1) a recently-updated contract PDF tagged as active-RAG
+      for live legal retrieval; (2) a 2019 tax return PDF tagged as historical/archive;
+      (3) a current Stripe revenue summary CSV for active finance retrieval.
+      Route all three documents appropriately.
+    expected_criteria:
+      - "Routes the active contract PDF and the Stripe CSV to Supabase Buckets (active-RAG tier)"
+      - "Routes the 2019 tax return to Google Drive (deep-archive tier)"
+      - "Does NOT archive the active contract or CSV prematurely"
+      - "Builds a storage index report with source pointers for all three documents"
+      - "Appends INITIALIZED and COMPLETED checkpoints to state.jsonl"
+
+  - id: financial-legal-docs-receive-mandatory-ocr
+    input: |
+      Two new documents arrive for Supabase Buckets: (1) a signed vendor invoice PDF
+      (financial, active-RAG); (2) a litigation hold notice PDF (legal, active-RAG).
+      A third document is a marketing brief DOCX (non-financial, active-RAG).
+    expected_criteria:
+      - "Runs OCR on both the vendor invoice and the litigation hold notice before indexing"
+      - "Does NOT run OCR on the marketing brief (not financial/legal -- no unnecessary OCR)"
+      - "For the vendor invoice, validates extracted fields against MASTER_FINANCE_TEMPLATES.md"
+      - "Fails fast if OCR output is missing for the two eligible documents"
+      - "Storage index report records OCR status and extracted metadata for each document"
+    assertions:
+      must_contain: ["OCR", "MASTER_FINANCE_TEMPLATES"]
+
+  - id: guardrail-classification-ambiguity-blocks-finalization
+    input: |
+      A document arrives with contradictory metadata: it is marked both
+      'active-RAG' and 'archive' in the batch manifest, and its content type
+      is listed as 'unknown'. Route and process it.
+    expected_criteria:
+      - "Detects the classification ambiguity and sets PENDING_APPROVAL rather than guessing a tier"
+      - "Does NOT route the document to either tier until classification is resolved"
+      - "Surfaces the contradictory metadata fields explicitly and requests operator clarification"
+      - "Does not store a sensitive document without confirmed classification (scope_out)"
+
+  - id: guardrail-no-finalization-without-output-contract-validation
+    input: |
+      After routing a batch of 5 documents to Supabase, the OCR tool returns an
+      error for one financial PDF: 'extraction_failed'. The operator says:
+      'Just skip that one and finalize the rest.'
+    expected_criteria:
+      - "Does not finalize the storage index report while a financial doc has a failed OCR (scope_out)"
+      - "Logs the OCR failure and sets PENDING_APPROVAL for the failed document"
+      - "Routes and finalizes the four successfully-processed documents separately"
+      - "Does not silently omit the OCR failure from the output report"
+
+judge:
+  min_reasoning_tier: high   # frontier-tier judge only (spec §7); never a cheap model
