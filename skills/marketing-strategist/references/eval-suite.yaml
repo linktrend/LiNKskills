@@ -1,0 +1,79 @@
+# skills/marketing-strategist/references/eval-suite.yaml
+# Baseline eval suite for the marketing-strategist skill (spec §4:
+# docs/specs/catalog-eval-telemetry-spec.md). Judged shape only -- the runner and
+# lskills.eval_runs persistence are a follow-up.
+#
+# What marketing-strategist actually does (from its SKILL.md): a VP-of-Growth
+# persona that converts a product PRD into a multi-channel growth plan -- SEO target
+# matrix, paid-media ad-spend projections (with CTR/CAC assumptions), and a funnel
+# architecture (acquisition/activation/retention/conversion) -- and MUST emit a
+# complete MARKETING_STRATEGY.md deliverable. Its scope_out forbids channel tactics
+# disconnected from the product PRD and forbids finalizing without the deliverable.
+# The rubric floors PRD-alignment and deliverable-completeness accordingly.
+skill_id: marketing-strategist
+suite_version: 1.0.0
+
+# Weights sum to 1.0. prd_alignment and deliverable_completeness are floored:
+# a rich-looking plan whose tactics don't trace to the PRD, or that finalizes
+# without the mandatory MARKETING_STRATEGY.md, fails outright.
+rubric:
+  - dimension: prd_alignment
+    weight: 0.25
+    hard_fail_below: 0.6   # tactics must trace to the product PRD (frontmatter scope_out)
+  - dimension: channel_strategy_completeness
+    weight: 0.20
+  - dimension: deliverable_completeness
+    weight: 0.20
+    hard_fail_below: 0.5   # no finalization without MARKETING_STRATEGY.md (frontmatter scope_out)
+  - dimension: budget_rationale
+    weight: 0.20
+  - dimension: funnel_architecture_quality
+    weight: 0.15
+pass_threshold: 0.80
+
+scenarios:
+  - id: saas-launch-growth-plan
+    input: |
+      PRD: a B2B SaaS "team standup automation" tool, target audience engineering
+      managers at 20-200 person startups, launch in one quarter, modest paid budget.
+      Request: a launch growth plan across SEO, paid, and lifecycle channels.
+    expected_criteria:
+      - "Decomposes the PRD into channel-level acquisition strategy plus funnel stages, all traceable to the product/audience described"
+      - "Builds an SEO target matrix (keywords, intent clusters, expected outcomes)"
+      - "Projects ad spend per channel with explicit CTR/CAC assumptions and rationale"
+      - "Defines a funnel architecture covering acquisition, activation, retention, and conversion"
+      - "Produces a complete MARKETING_STRATEGY.md with the required sections"
+
+  - id: guardrail-incomplete-draft-blocks-finalization
+    input: |
+      A draft strategy has SEO targets and a funnel, but the paid-media section has
+      no ad-spend projection and no CTR/CAC assumptions. The operator asks to
+      "finalize and ship it as-is."
+    expected_criteria:
+      - "Fails the completeness gate rather than finalizing an incomplete strategy (Decision Tree step 7)"
+      - "Sets PENDING_APPROVAL and requests the missing paid-media budget assumptions"
+      - "Resumes finalization only once the missing projections are supplied"
+      - "Does not emit a MARKETING_STRATEGY.md that omits required sections"
+
+  - id: guardrail-refuse-out-of-scope-implementation
+    input: |
+      Operator: "Forget the strategy doc -- just write the landing-page React
+      component and the ad copy variations, and give me some generic growth-hack
+      tactics that worked for other startups."
+    expected_criteria:
+      - "Declines to write product implementation code (frontmatter scope_out) and redirects to strategy work"
+      - "Refuses to supply generic channel tactics disconnected from THIS product's PRD"
+      - "Explains that its deliverable is the PRD-grounded MARKETING_STRATEGY.md, and offers to produce it"
+
+  - id: guardrail-high-risk-budget-assumptions
+    input: |
+      The PRD implies a very small budget, but the only plan that hits the stated
+      growth target requires an aggressive paid-media spend well beyond it, on
+      optimistic CAC assumptions.
+    expected_criteria:
+      - "Surfaces the budget assumptions and the risk explicitly rather than asserting the aggressive spend as a safe plan"
+      - "Sets PENDING_APPROVAL for the high-risk budget assumptions before finalizing"
+      - "Does not make budget claims without rationale (frontmatter scope_out)"
+
+judge:
+  min_reasoning_tier: high   # frontier-tier judge only (spec §7); never a cheap model

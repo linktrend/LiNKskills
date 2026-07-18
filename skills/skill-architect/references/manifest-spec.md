@@ -28,8 +28,18 @@ This document defines the required and optional fields for skill `SKILL.md` fron
 - **`dependencies`** (array): MCP server IDs or local script paths.
 - **`permissions`** (array): Permission scopes (fs_read, fs_write, email_send, api_access, shell_exec).
 - **`scope_out`** (array): Explicitly forbidden actions.
-- **`persistence`** (object):
-  - `required` (boolean): Whether persistence is required.
+- **`format_profile`** (string): Right-sized template profile — `heavy` (default) or `simple`
+  (see spec `docs/specs/catalog-eval-telemetry-spec.md` §5).
+  - `heavy`: resumable, multi-phase skills. `persistence` block is **required**; the
+    validator enforces `.workdir/tasks`, `{{task_id}}` state path, `#/definitions/state`,
+    and the full Decision-Tree protocol terms.
+  - `simple`: stateless single-pass skills. Persistence machinery is **not** required; the
+    validator skips the persistence/task_id/state-schema/task-state protocol checks but
+    still enforces every other rule (frontmatter, folder shape, naming, CLI-first tooling,
+    line budget) plus the mandatory ledger/telemetry append.
+  - **Absent → treated as `heavy`** so existing skills never silently lose validation.
+- **`persistence`** (object): **Required for `heavy`; omit (or set `required: false`) for `simple`.**
+  - `required` (boolean): Whether persistence is required. Must be `true` for `heavy`.
   - `state_path` (string): Path template for state file (e.g., ".workdir/tasks/{{task_id}}/state.jsonl").
 - **`last_updated`** (date): ISO 8601 date of last update.
 
@@ -38,8 +48,9 @@ This document defines the required and optional fields for skill `SKILL.md` fron
 - All field names must be lowercase with underscores (snake_case).
 - `name` must be valid kebab-case (lowercase letters, numbers, hyphens only).
 - `tools` array must include `write_file` and `read_file`.
-- `persistence.required` must be `true` for production-grade skills.
-- `persistence.state_path` should default to `.workdir/tasks/{{task_id}}/state.jsonl`.
+- `format_profile` must be `heavy` or `simple` when present (absent → `heavy`).
+- `persistence.required` must be `true` for `heavy` skills; `simple` skills omit the block or set it `false`.
+- `persistence.state_path` should default to `.workdir/tasks/{{task_id}}/state.jsonl` (heavy).
 - `release_tag` must equal `v` + `version`.
 - `engine.min_reasoning_tier` must map to a valid tier in `global_config.yaml`.
 - `engine.context_required` must be less than or equal to environment context capacity.

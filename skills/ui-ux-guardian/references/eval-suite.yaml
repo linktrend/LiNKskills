@@ -1,0 +1,100 @@
+# skills/ui-ux-guardian/references/eval-suite.yaml
+# Baseline eval suite for the ui-ux-guardian skill (spec §4:
+# docs/specs/catalog-eval-telemetry-spec.md). Judged shape only -- the runner and
+# lskills.eval_runs persistence are a follow-up.
+#
+# What ui-ux-guardian actually does (from its SKILL.md): it is a design system
+# guardian that captures Playwright screenshots of changed pages, runs visual and
+# token-level diffs against baselines, classifies deltas as pass/warn/fail, checks
+# accessibility and responsive compliance, and produces actionable remediation
+# guidance. Its scope_out forbids approving visual changes without a baseline diff,
+# modifying design tokens without explicit policy update, and passing UI changes
+# without evidence artifacts. The hardest failure mode is approving a change that
+# has a genuine visual regression (invisible to the development team) -- this is
+# exactly what the skill exists to prevent. regression_detection_accuracy is
+# therefore floored with the strictest threshold. evidence_requirement is also
+# floored because approving without a diff artifact is the explicit scope_out.
+skill_id: ui-ux-guardian
+suite_version: 1.0.0
+
+# Weights sum to 1.0.
+# regression_detection_accuracy: catches genuine visual regressions in token use,
+#   spacing, typography, and component states; does not raise false positives for
+#   intentional changes -- hard_fail_below because missing a real regression is the
+#   primary failure mode (scope_out: no approval without baseline diff).
+# evidence_requirement: every pass/warn/fail decision is backed by screenshot and
+#   diff artifacts; no approval without evidence -- hard_fail_below because
+#   evidence-free approval is the explicit scope_out violation.
+# remediation_quality: failing selectors/pages have specific, actionable remediation
+#   guidance (not just "fix it"); pass/warn items are documented.
+# accessibility_and_responsive_coverage: accessibility and responsive checks are
+#   not skipped; failures are included in the audit report.
+# token_override_discipline: one-off CSS overrides that bypass design tokens are
+#   flagged and refused; token changes require explicit policy update.
+rubric:
+  - dimension: regression_detection_accuracy
+    weight: 0.30
+    hard_fail_below: 0.6   # missing a real regression defeats the purpose of the skill
+  - dimension: evidence_requirement
+    weight: 0.25
+    hard_fail_below: 0.5   # approval without diff artifacts is the core scope_out violation
+  - dimension: remediation_quality
+    weight: 0.20
+  - dimension: accessibility_and_responsive_coverage
+    weight: 0.15
+  - dimension: token_override_discipline
+    weight: 0.10
+pass_threshold: 0.80
+
+scenarios:
+  - id: detects-typography-regression-and-reports
+    input: |
+      PR changes the checkout page. Baseline screenshots exist. The new build
+      has the correct layout but the heading font-size has drifted from the
+      design token 'heading-xl' (24px → 18px) due to a CSS specificity bug.
+      The button color is unchanged and correct. Run the visual audit.
+    expected_criteria:
+      - "Captures fresh Playwright screenshots of the checkout page"
+      - "Diffs against baseline and identifies the heading font-size regression (24px → 18px token violation)"
+      - "Does NOT flag the button color as a regression (it is correct)"
+      - "Classifies the heading drift as a fail with the specific selector and expected vs actual values"
+      - "Produces actionable remediation: 'heading element must use var(--heading-xl, 24px) -- remove the overriding specificity in checkout.css line X'"
+      - "Sets PENDING_APPROVAL and does not approve the PR until the regression is fixed"
+    assertions:
+      must_contain: ["PENDING_APPROVAL", "heading"]
+
+  - id: passes-intentional-design-update-with-evidence
+    input: |
+      A design update changes the primary action button color from '#1A56DB'
+      to '#1E40AF' per an approved design system policy update. Baselines are
+      updated accordingly. All other tokens and layout are unchanged. Run audit.
+    expected_criteria:
+      - "Captures screenshots and runs diff against updated baselines"
+      - "Detects the button color change and cross-references it as intentional (policy update was applied to baselines)"
+      - "Classifies the change as pass, not fail -- intentional changes against updated baselines are not regressions"
+      - "Audit report includes screenshot diff artifacts as evidence for the approval"
+      - "Does not flag the color change as a token violation since it matches the updated policy"
+
+  - id: guardrail-no-approval-without-baseline-diff
+    input: |
+      A team member says: 'We don't have baseline screenshots for this new
+      onboarding page -- just approve it, it looks fine visually in the browser.'
+    expected_criteria:
+      - "Refuses to approve the page without a baseline diff (scope_out: 'Do not approve visual changes without baseline diff')"
+      - "Explains that approval requires Playwright-captured evidence artifacts, not subjective browser review"
+      - "Offers to establish a new baseline run for the onboarding page so future audits have a reference"
+      - "Sets PENDING_APPROVAL rather than issuing a pass"
+
+  - id: guardrail-token-override-blocked
+    input: |
+      A developer's PR includes the following CSS: `.modal-title { font-size: 20px !important; }`
+      to fix a layout issue, bypassing the design token 'heading-lg'. The visual
+      regression test passes (the pixel diff is within tolerance).
+    expected_criteria:
+      - "Flags the !important token bypass as a scope_out violation even though the pixel diff passes threshold"
+      - "Refuses to approve the change because it introduces a one-off CSS override that bypasses the design token (scope_out)"
+      - "Provides specific remediation: replace the hardcoded value with the design token var(--heading-lg)"
+      - "Does not issue a pass verdict based solely on passing pixel diff when a token policy violation is present"
+
+judge:
+  min_reasoning_tier: high   # frontier-tier judge only (spec §7); never a cheap model

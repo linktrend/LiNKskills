@@ -15,6 +15,35 @@ from typing import Any, Dict, List, Optional, Tuple
 
 TASK_ID_REGEX_DEFAULT = r"^\d{8}-\d{4}-[A-Z0-9]+-\d{6}$"
 
+# Right-sized template profiles (spec docs/specs/catalog-eval-telemetry-spec.md §5).
+# A skill's `format_profile` selects which structural rules the validator enforces:
+#   - "heavy": resumable multi-phase skills. Full persistence/task_id/state-machine
+#     machinery is required (this is the historical, only behavior).
+#   - "simple": stateless single-pass skills. Persistence/task_id/state-schema and the
+#     heavy Decision-Tree protocol terms are NOT required, but every other check
+#     (frontmatter completeness, folder shape, naming, tooling protocol, line budget,
+#     ledger/telemetry) still applies.
+# DEFAULT is "heavy" (see resolve_format_profile): absence of the field must never
+# silently weaken an existing skill's validation. Opting down to "simple" is explicit.
+VALID_FORMAT_PROFILES = ("simple", "heavy")
+DEFAULT_FORMAT_PROFILE = "heavy"
+
+
+def resolve_format_profile(frontmatter: Optional[Dict[str, Any]]) -> str:
+    """Return the effective format profile, defaulting to heavy when absent/invalid.
+
+    Heavy is the safe default so that adding the `format_profile` capability does not
+    retroactively relax validation for any skill that predates the field. Invalid
+    values also fall back to heavy here; validate_frontmatter separately records the
+    invalid value as an error so it is surfaced rather than silently ignored.
+    """
+    if not isinstance(frontmatter, dict):
+        return DEFAULT_FORMAT_PROFILE
+    value = frontmatter.get("format_profile", DEFAULT_FORMAT_PROFILE)
+    if value not in VALID_FORMAT_PROFILES:
+        return DEFAULT_FORMAT_PROFILE
+    return value
+
 DEFAULT_CONFIG = {
     "logging": {
         "ledger_path": "execution_ledger.jsonl",
@@ -75,6 +104,7 @@ FRONTMATTER_SCHEMA = {
         "permissions",
         "scope_out",
         "persistence",
+        "format_profile",
         "last_updated",
     },
 }
@@ -391,23 +421,32 @@ def validate_tooling_block(
     return errors, warnings
 
 
-def validate_skill_protocol_content(skill_path: Path, frontmatter: Dict[str, Any]) -> Tuple[bool, List[str]]:
+def validate_skill_protocol_content(
+    skill_path: Path,
+    frontmatter: Dict[str, Any],
+    profile: str = DEFAULT_FORMAT_PROFILE,
+) -> Tuple[bool, List[str]]:
     """
     Validate that SKILL.md body encodes key protocol requirements.
+
+    The CLI-first tooling protocol cues apply to every skill. The task-state-machine
+    cues (`state.jsonl`, `specialist`/`generalist` execution-profile terms) are only
+    required for `heavy` skills; `simple` single-pass skills carry no task ledger and
+    are exempt from them (spec §5).
     """
     errors: List[str] = []
     content = (skill_path / "SKILL.md").read_text(encoding="utf-8").lower()
 
-    # Tooling protocol cues
+    # Tooling protocol cues (universal to both profiles).
     required_terms = [
         "native cli",
         "cli wrapper",
         "direct api",
         "mcp",
-        "state.jsonl",
-        "specialist",
-        "generalist",
     ]
+    if profile == "heavy":
+        # Heavy skills must document the resumable task-state machine.
+        required_terms.extend(["state.jsonl", "specialist", "generalist"])
     for term in required_terms:
         if term not in content:
             errors.append(f"SKILL.md is missing protocol guidance term: '{term}'")
@@ -445,8 +484,13 @@ def extract_frontmatter(content: str) -> Tuple[Optional[str], List[str], List[st
     return frontmatter_text, body_lines, errors
 
 
-def validate_skill_structure(skill_path: Path) -> Tuple[bool, List[str]]:
-    """Validate that a skill folder adheres to the Golden Template structure."""
+def validate_skill_structure(skill_path: Path, profile: str = DEFAULT_FORMAT_PROFILE) -> Tuple[bool, List[str]]:
+    """Validate that a skill folder adheres to the Golden Template structure.
+
+    Both profiles share the same progressive-disclosure file shape. Heavy skills
+    *declare* persistence paths in frontmatter; the `.workdir/tasks` directory is
+    created at runtime (gitignored) and is not required in a clean checkout (spec §5).
+    """
     errors: List[str] = []
 
     required_files = {
@@ -462,18 +506,15 @@ def validate_skill_structure(skill_path: Path) -> Tuple[bool, List[str]]:
         "scripts/README.md": "Scripts guide",
         ".gitignore": "Skill-local ignore file",
     }
-    required_dirs = {
-        ".workdir/tasks": "Persistent task checkpoint directory",
-    }
+    # `.workdir/tasks` is a *runtime* checkpoint directory created when a heavy
+    # skill runs. It must not be required in a clean catalog checkout / CI clone
+    # (gitignores `.workdir/`). Presence of task state is validated only when
+    # the directory already exists (see validate_runtime_state).
 
     for rel_path, description in required_files.items():
         full_path = skill_path / rel_path
         if not full_path.is_file():
             errors.append(f"Missing required file: {rel_path} ({description})")
-    for rel_path, description in required_dirs.items():
-        full_path = skill_path / rel_path
-        if not full_path.is_dir():
-            errors.append(f"Missing required directory: {rel_path} ({description})")
 
     return len(errors) == 0, errors
 
@@ -628,7 +669,18 @@ def validate_frontmatter(
     if parse_errors or frontmatter is None:
         return None, [f"Frontmatter parse error: {err}" for err in parse_errors], []
 
-    required_keys = FRONTMATTER_SCHEMA["required"]
+    # Resolve the right-sized template profile before key checks: a `simple` skill is
+    # not required to declare a persistence block (it carries no task-state machine).
+    raw_profile = frontmatter.get("format_profile", DEFAULT_FORMAT_PROFILE)
+    if raw_profile not in VALID_FORMAT_PROFILES:
+        errors.append(
+            f"Frontmatter key 'format_profile' must be one of {list(VALID_FORMAT_PROFILES)} (got '{raw_profile}')"
+        )
+    profile = resolve_format_profile(frontmatter)
+
+    required_keys = list(FRONTMATTER_SCHEMA["required"])
+    if profile == "simple" and "persistence" in required_keys:
+        required_keys.remove("persistence")
     for key in required_keys:
         if key not in frontmatter:
             errors.append(f"Missing required frontmatter key: {key}")
@@ -690,25 +742,39 @@ def validate_frontmatter(
                         f"Permission '{permission}' is not allowed by global_config.yaml security.allowed_permissions"
                     )
 
-    persistence = frontmatter.get("persistence")
-    if not isinstance(persistence, dict):
-        errors.append("Frontmatter key 'persistence' must be an object")
-    else:
-        required_flag = persistence.get("required")
-        state_path = persistence.get("state_path")
-        if required_flag is not True:
-            errors.append("persistence.required must be true for production-grade skills")
-        if not isinstance(state_path, str):
-            errors.append("persistence.state_path must be a string")
+    # Persistence machinery is required only for `heavy` skills. A `simple` skill may
+    # omit the block entirely or declare `required: false`; either way it is exempt
+    # from the {{task_id}} state-path resumability checks (spec §5).
+    if profile == "heavy":
+        persistence = frontmatter.get("persistence")
+        if not isinstance(persistence, dict):
+            errors.append("Frontmatter key 'persistence' must be an object")
         else:
-            if "{{task_id}}" not in state_path:
-                errors.append("persistence.state_path must include '{{task_id}}' for resumability")
-            if not (state_path.endswith("state.json") or state_path.endswith("state.jsonl")):
-                errors.append("persistence.state_path must end with 'state.json' or 'state.jsonl'")
-            if root_task_dir and not state_path.startswith(root_task_dir):
-                errors.append(
-                    f"persistence.state_path must start with '{root_task_dir}' from global_config.yaml"
-                )
+            required_flag = persistence.get("required")
+            state_path = persistence.get("state_path")
+            if required_flag is not True:
+                errors.append("persistence.required must be true for production-grade skills")
+            if not isinstance(state_path, str):
+                errors.append("persistence.state_path must be a string")
+            else:
+                if "{{task_id}}" not in state_path:
+                    errors.append("persistence.state_path must include '{{task_id}}' for resumability")
+                if not (state_path.endswith("state.json") or state_path.endswith("state.jsonl")):
+                    errors.append("persistence.state_path must end with 'state.json' or 'state.jsonl'")
+                if root_task_dir and not state_path.startswith(root_task_dir):
+                    errors.append(
+                        f"persistence.state_path must start with '{root_task_dir}' from global_config.yaml"
+                    )
+    elif "persistence" in frontmatter:
+        # Simple skills may declare persistence, but only as `required: false`.
+        persistence = frontmatter.get("persistence")
+        if not isinstance(persistence, dict):
+            errors.append("Frontmatter key 'persistence' must be an object when present")
+        elif persistence.get("required") is True:
+            errors.append(
+                "format_profile 'simple' must not set persistence.required: true; "
+                "use 'heavy' for resumable task-state skills"
+            )
 
     engine_errors, engine_warnings = validate_engine_block(frontmatter.get("engine"), engine_policy)
     errors.extend(engine_errors)
@@ -721,7 +787,7 @@ def validate_frontmatter(
     return frontmatter, errors, warnings
 
 
-def load_schemas(skill_path: Path) -> Tuple[Optional[Dict[str, Any]], List[str]]:
+def load_schemas(skill_path: Path, profile: str = DEFAULT_FORMAT_PROFILE) -> Tuple[Optional[Dict[str, Any]], List[str]]:
     errors: List[str] = []
     schemas_path = skill_path / "references" / "schemas.json"
     if not schemas_path.exists():
@@ -738,7 +804,9 @@ def load_schemas(skill_path: Path) -> Tuple[Optional[Dict[str, Any]], List[str]]
     definitions = schema_doc.get("definitions")
     if not isinstance(definitions, dict) or not definitions:
         errors.append("references/schemas.json must include a non-empty 'definitions' object")
-    if "state" not in definitions:
+    # The `state` contract backs the persistent checkpoint machine, which only heavy
+    # skills carry. Simple skills still ship input/output contracts but no state schema.
+    elif profile == "heavy" and "state" not in definitions:
         errors.append("references/schemas.json definitions must include 'state'")
 
     return schema_doc, errors
@@ -850,8 +918,9 @@ def validate_runtime_state(
     errors: List[str] = []
     tasks_dir = skill_path / ".workdir" / "tasks"
     if not tasks_dir.exists():
-        errors.append("Missing .workdir/tasks directory for resumability")
-        return False, errors
+        # Clean checkouts / CI do not ship runtime workdirs (gitignored). Nothing
+        # to validate until a heavy skill creates checkpoint state at runtime.
+        return True, errors
 
     task_dirs = [path for path in tasks_dir.iterdir() if path.is_dir()]
     for task_dir in task_dirs:
@@ -922,6 +991,50 @@ def parse_iso8601(timestamp: str) -> Optional[datetime]:
         return None
 
 
+def validate_eval_suite(skill_path: Path) -> Tuple[bool, List[str]]:
+    """Every skill must ship references/eval-suite.yaml before agents may rely on it.
+
+    Enforces the Principal requirement and catalog-eval-telemetry-spec §4 / §7.
+    Uses structural checks (not full YAML parse) because eval suites contain nested
+    lists the repo's frontmatter-oriented parser does not support; the Librarian
+    runner loads the full YAML with a real parser when judging.
+    """
+    errors: List[str] = []
+    suite_path = skill_path / "references" / "eval-suite.yaml"
+    if not suite_path.is_file():
+        errors.append("Missing required file: references/eval-suite.yaml (baseline eval suite)")
+        return False, errors
+
+    text = suite_path.read_text(encoding="utf-8")
+    if not text.strip():
+        errors.append("references/eval-suite.yaml is empty")
+        return False, errors
+
+    skill_id_match = re.search(r"(?m)^skill_id:\s*[\"']?([A-Za-z0-9_-]+)[\"']?\s*$", text)
+    if skill_id_match is None:
+        errors.append("references/eval-suite.yaml must declare skill_id")
+    elif skill_id_match.group(1) != skill_path.name:
+        errors.append(
+            f"references/eval-suite.yaml skill_id '{skill_id_match.group(1)}' "
+            f"must match folder name '{skill_path.name}'"
+        )
+
+    if re.search(r"(?m)^pass_threshold:\s*", text) is None:
+        errors.append("references/eval-suite.yaml must declare pass_threshold")
+
+    if re.search(r"(?m)^rubric:\s*$", text) is None:
+        errors.append("references/eval-suite.yaml must declare a rubric block")
+    elif re.search(r"(?m)^\s*-\s+dimension:\s*", text) is None:
+        errors.append("references/eval-suite.yaml rubric must include at least one dimension")
+
+    if re.search(r"(?m)^scenarios:\s*$", text) is None:
+        errors.append("references/eval-suite.yaml must declare a scenarios block")
+    elif re.search(r"(?m)^\s*-\s+id:\s*", text) is None:
+        errors.append("references/eval-suite.yaml scenarios must include at least one scenario id")
+
+    return len(errors) == 0, errors
+
+
 def validate_execution_ledger(
     repo_root: Path,
     ledger_path: str,
@@ -936,7 +1049,21 @@ def validate_execution_ledger(
         return False, errors, warnings
 
     now = datetime.now(timezone.utc)
+    # Legacy required fields. Extended catalog-eval-telemetry fields
+    # (skill_version, agent_id, program_ref, …) are optional for older lines and
+    # recommended for new writers (see lib/skill_runtime/telemetry.py).
     required_fields = {"timestamp", "skill", "task_id", "status", "summary"}
+    extended_fields = (
+        "skill_version",
+        "agent_id",
+        "program_ref",
+        "issue_ref",
+        "run_ref",
+        "duration_ms",
+        "cost",
+        "outcome_detail",
+        "event_id",
+    )
     with ledger_file.open("r", encoding="utf-8") as handle:
         for idx, raw_line in enumerate(handle, start=1):
             line = raw_line.strip()
@@ -970,6 +1097,12 @@ def validate_execution_ledger(
                     warnings.append(
                         f"{ledger_path}:{idx} is older than retention_days={retention_days} ({timestamp_raw})"
                     )
+
+            if not any(field in payload for field in extended_fields):
+                warnings.append(
+                    f"{ledger_path}:{idx} legacy ledger shape (no extended telemetry fields); "
+                    "prefer lib/skill_runtime.record_invocation for new events"
+                )
 
     return len(errors) == 0, errors, warnings
 
@@ -1011,9 +1144,6 @@ def validate_single_skill(
     _, errors = validate_naming(skill_path.name)
     all_errors.extend(errors)
 
-    _, errors = validate_skill_structure(skill_path)
-    all_errors.extend(errors)
-
     _, errors = validate_skill_md_line_count(skill_path)
     all_errors.extend(errors)
 
@@ -1028,7 +1158,17 @@ def validate_single_skill(
     all_errors.extend(errors)
     all_warnings.extend(frontmatter_warnings)
 
-    schema_doc, errors = load_schemas(skill_path)
+    # Resolve the right-sized template profile (default heavy) so every downstream
+    # structural check enforces exactly the rules that profile requires.
+    profile = resolve_format_profile(frontmatter)
+
+    _, errors = validate_skill_structure(skill_path, profile)
+    all_errors.extend(errors)
+
+    _, eval_errors = validate_eval_suite(skill_path)
+    all_errors.extend(eval_errors)
+
+    schema_doc, errors = load_schemas(skill_path, profile)
     all_errors.extend(errors)
 
     state_schema: Optional[Dict[str, Any]] = None
@@ -1049,11 +1189,14 @@ def validate_single_skill(
                 state_filename = Path(state_path).name
 
     if isinstance(frontmatter, dict):
-        _, protocol_errors = validate_skill_protocol_content(skill_path, frontmatter)
+        _, protocol_errors = validate_skill_protocol_content(skill_path, frontmatter, profile)
         all_errors.extend(protocol_errors)
 
-    _, errors = validate_runtime_state(skill_path, state_schema, task_id_regex, state_filename)
-    all_errors.extend(errors)
+    # Runtime task-checkpoint validation only applies to heavy skills; simple skills
+    # have no .workdir/tasks state machine to inspect.
+    if profile == "heavy":
+        _, errors = validate_runtime_state(skill_path, state_schema, task_id_regex, state_filename)
+        all_errors.extend(errors)
 
     return all_errors, all_warnings
 

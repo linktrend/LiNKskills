@@ -2,8 +2,8 @@
 name: skill-architect
 description: "Designs, migrates, and refines production-grade skills following the LiNKskills Golden Template."
 usage_trigger: "Use when the user wants to create a new skill, reverse-engineer a third-party skill/prompt into LiNKskills standards, or improve an existing LiNKskills skill."
-version: 1.3.0
-release_tag: v1.3.0
+version: 1.5.0
+release_tag: v1.5.0
 created: 2026-02-20
 author: LiNKskills Library
 tags: [meta, generator, migration, refiner]
@@ -19,7 +19,7 @@ tooling:
 tools: [write_file, read_file, make_dir, list_dir, shell_exec, get_tool_details]
 dependencies: []
 permissions: [fs_read, fs_write, shell_exec]
-scope_out: ["Do not create minimalist skills without persistence layers", "Do not execute business actions of target skills; only design, migrate, or refine skill artifacts"]
+scope_out: ["Do not create simple-profile skills that still need resumable task state", "Do not execute business actions of target skills; only design, migrate, or refine skill artifacts"]
 persistence:
   required: true
   state_path: ".workdir/tasks/{{task_id}}/state.jsonl"
@@ -40,7 +40,9 @@ last_updated: 2026-02-20
 3.  **Tooling Protocol Check**: Does execution plan satisfy CLI-first policy and API/MCP limits in `frontmatter.tooling`?
     - NO: Re-plan using tooling protocol before continuing.
 4.  **Requirement Check**:
-    - `SCAFFOLD`: Require `name`, `description`, `tools`, `usage_trigger`, and `engine`.
+    - `SCAFFOLD`: Require `name`, `description`, `tools`, `usage_trigger`, and `engine`. Also select a `format_profile`:
+      - Ask the user, or infer: resumable / multi-phase / HITL-gated / task-ledger needed → `heavy`; genuinely stateless single-pass with few tools → `simple`.
+      - **Default to `heavy`** when unspecified or ambiguous (safe default; opting down to `simple` is an explicit, reviewable choice). For `simple`, scaffold from [`../skill-template/references/simple-profile.md`](#) (no `.workdir/tasks`, no `{{task_id}}` state path, no `#/definitions/state`, trimmed Decision Tree — but keep the folder shape, CLI-first protocol, eval suite, and the mandatory Phase 5 ledger append).
     - `REVERSE_ENGINEER`: Require source artifact (files/text), target skill name, expected outputs, and `engine`.
     - `REFINER`: Require target skill name and at least one improvement driver:
       - execution failures/HITL friction
@@ -67,7 +69,7 @@ last_updated: 2026-02-20
 - Maintain versioning discipline (`version`, `release_tag`, and `references/changelog.md` updates).
 
 ### Scope-Out
-- **CRITICAL**: Do not create "minimalist" skills without persistence layers.
+- **CRITICAL**: Do not create a `simple`-profile skill for work that actually needs resumable task state, HITL resume, or a task ledger — those must be `heavy`. (A stateless single-pass skill *may* be `simple`, which legitimately omits the persistence layer.)
 - Do not execute business operations of target skills; architect only modifies skill artifacts.
 - Do not preserve third-party anti-patterns that violate LiNKskills standards.
 
@@ -115,7 +117,7 @@ If a third-party skill/prompt/codebase is provided, perform a **Structural Audit
 9. **CHECKPOINT**: Generate `task_id` (`YYYYMMDD-HHMM-SKILLARCH-<SHORTUNIX>`) and append `status: "INITIALIZED"` to `state.jsonl`.
 
 ### Phase 2: Schema & Manifest Design
-10. Generate/modify YAML frontmatter with `version`, `release_tag`, `engine`, `tooling`, persistence, tools, dependencies, and permissions.
+10. Generate/modify YAML frontmatter with `version`, `release_tag`, `engine`, `tooling`, `format_profile`, persistence (heavy only), tools, dependencies, and permissions.
 11. Build or refactor the Decision Tree for the selected mode and domain, including Specialist/Generalist branch logic.
 12. Generate or tighten Input/Output/State contracts in `references/schemas.json`.
 13. For `REFINER`, explicitly map observed failures or requested features to contract and workflow updates.

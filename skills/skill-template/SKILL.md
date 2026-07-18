@@ -20,6 +20,7 @@ tools: [write_file, read_file, list_dir, get_tool_details]
 dependencies: []
 permissions: [fs_read, fs_write]
 scope_out: ["Do not execute business workflows from this template", "Do not remove persistence and audit primitives"]
+format_profile: heavy
 persistence:
   required: true
   state_path: ".workdir/tasks/{{task_id}}/state.jsonl"
@@ -27,6 +28,20 @@ last_updated: 2026-02-20
 ---
 
 # <Skill Name Identifier>
+
+## Format Profile (choose before scaffolding)
+This file is the **`heavy`** profile of the golden template (`format_profile: heavy`):
+resumable, multi-phase, HITL-gated skills that carry a task-state machine. Declare the
+profile in frontmatter with `format_profile: heavy | simple`. Default is `heavy` when the
+field is absent (backward compatible — no existing skill's validation weakens).
+
+Use the **`simple`** profile instead for genuinely stateless, single-pass skills (≤ a few
+tools, no cross-phase state, no HITL resume). The simple profile keeps the same folder
+shape, the same core frontmatter, the CLI-first tooling protocol, and the **mandatory
+Phase 5 ledger append** (telemetry is universal), but drops the `.workdir/tasks` task
+ledger, the `{{task_id}}` state path, the `#/definitions/state` schema, and the full
+multi-phase Decision Tree. See [`./references/simple-profile.md`](#) for the simple
+authoring shape. The rest of this file is the heavy profile.
 
 ## Decision Tree (Fail-Fast & Persistence)
 0.  **Audit Check**: Does the user request refer to a previous execution?
