@@ -3,7 +3,7 @@
 -- population into the new lskills.catalog table.
 --
 -- Context/authority:
---   * LiNKskills/docs/specs/catalog-eval-telemetry-spec.md (§1 catalog columns,
+--   * LiNKskills/docs/archive/specs/catalog-eval-telemetry-spec.md (§1 catalog columns,
 --     §1.1 certification_state gate, §4 eval-suite path convention, §5 format
 --     profiles, §7 phasing -- "backfill eval suites per-skill, behind the
 --     certification_state != usable gate")

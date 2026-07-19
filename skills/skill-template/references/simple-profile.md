@@ -1,7 +1,8 @@
 # Simple Profile — Right-Sized Template Variant
 
 This is the authoring shape for a **`format_profile: simple`** skill, per
-`docs/specs/catalog-eval-telemetry-spec.md` §5. Use it for genuinely stateless,
+[`docs/LINKSKILLS-TECHNICAL-PRD.md`](../../../docs/LINKSKILLS-TECHNICAL-PRD.md) §3.3
+(historical design notes: `docs/archive/specs/catalog-eval-telemetry-spec.md` §5). Use it for genuinely stateless,
 single-pass skills (a mandatory checklist, a one-shot enforcement pass, a stateless
 transform) that finish in one pass with no cross-phase state, no HITL resume, and only a
 handful of tools. The heavy profile (`SKILL.md`) forces a task-state machine those skills

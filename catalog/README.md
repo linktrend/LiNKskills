@@ -8,4 +8,4 @@ python3 scripts/build-catalog-index.py
 python3 scripts/build-catalog-index.py --check
 ```
 
-See [`docs/CONSUMER-SKILL-LOAD-PATH.md`](../docs/CONSUMER-SKILL-LOAD-PATH.md).
+See [`docs/LINKSKILLS-TECHNICAL-PRD.md`](../docs/LINKSKILLS-TECHNICAL-PRD.md) §6 (consumer load path).
