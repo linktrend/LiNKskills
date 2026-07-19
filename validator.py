@@ -15,7 +15,8 @@ from typing import Any, Dict, List, Optional, Tuple
 
 TASK_ID_REGEX_DEFAULT = r"^\d{8}-\d{4}-[A-Z0-9]+-\d{6}$"
 
-# Right-sized template profiles (spec docs/specs/catalog-eval-telemetry-spec.md §5).
+# Right-sized template profiles (docs/LINKSKILLS-TECHNICAL-PRD.md §3.3; archived design:
+# docs/archive/specs/catalog-eval-telemetry-spec.md §5).
 # A skill's `format_profile` selects which structural rules the validator enforces:
 #   - "heavy": resumable multi-phase skills. Full persistence/task_id/state-machine
 #     machinery is required (this is the historical, only behavior).

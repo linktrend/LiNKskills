@@ -40,7 +40,7 @@ python3 -m unittest discover -s tests/skill_runtime -v
 
 6. Point consumer Programs at this checkout (`LINKSKILLS_REPO_PATH` /
    `repo_root=` in `lib.skill_runtime`). See
-   [`docs/CONSUMER-SKILL-LOAD-PATH.md`](../docs/CONSUMER-SKILL-LOAD-PATH.md).
+   [`LINKSKILLS-TECHNICAL-PRD.md`](../LINKSKILLS-TECHNICAL-PRD.md) §6 (consumer load path).
 
 ## Optional: scheduled telemetry flush
 

@@ -48,7 +48,7 @@ LiNKskills repo work as exactly that — "catalog + mandatory eval schema + tele
 
 **1. Retire the Logic Engine governance layer.** Governance and permission-to-act are
 removed from LiNKskills' scope permanently. Per this repo's own "archive before delete"
-governance (`docs/DOCUMENTATION_GOVERNANCE.md`) and the sibling `LiNKsites/archive/` house
+governance (`docs/archive/DOCUMENTATION_GOVERNANCE.md`) and the sibling `LiNKsites/archive/` house
 style, the subsystem is **archived, not deleted** — moved with history preserved
 (`git mv`) into `archive/logic-engine-2026-07-14/`:
 
@@ -71,7 +71,8 @@ packages load on startup — it is **not** the Logic Engine's governance `activa
 and is unrelated to the reversed design.
 
 **2. LiNKskills is now permanently scoped to catalog + mandatory eval-suite + usage
-telemetry only.** Specifically (detailed in `docs/specs/catalog-eval-telemetry-spec.md`):
+telemetry only.** Specifically (current reference: `docs/LINKSKILLS-TECHNICAL-PRD.md`;
+historical design notes: `docs/archive/specs/catalog-eval-telemetry-spec.md`):
 
 - the skills **catalog** (`lskills_catalog`) with a **not-null `eval_suite_ref`** and an
   internal `certification_state` promotion gate,
@@ -161,18 +162,22 @@ expected) and closes out the follow-up flagged in `LiNKplatform/docs/adr/0001`.
 
 ## Follow-up
 
-- Implement the catalog + telemetry + right-sized-template design in
-  `docs/specs/catalog-eval-telemetry-spec.md`; backfill per-skill eval suites behind the
+- Implement the catalog + telemetry + right-sized-template design (originally
+  `docs/archive/specs/catalog-eval-telemetry-spec.md`; now described in
+  `docs/LINKSKILLS-TECHNICAL-PRD.md`); backfill per-skill eval suites behind the
   `certification_state != usable` gate, prioritized by real usage telemetry.
+  **Progress since ADR:** format_profile + validator branching landed; all skills ship
+  `eval-suite.yaml`; consumer runtime + CI gates landed 2026-07-18. Live `usable`
+  certification remains operational (see `docs/OPEN-ISSUES.md`).
 - Promote `skills/self-improvement/` to the doctrine's "Librarian" (async scheduling,
-  eval-suite re-runs alongside ledger review) — specified in the spec doc; not executed
-  here.
+  eval-suite re-runs alongside ledger review) — **skill instructions updated; runnable
+  worker lives in `LiNKplatform/packages/librarian-runner`** (see Addendum below).
 - Wire this repo's `.cursor/` to the shared IDE Development `.cursor` system, and refresh
   the older local rule set (currently uses "Chairman" and a pre-`development` git-flow) —
   tracked as a separate follow-up, **not** done in this change.
 - A live `lskills_` schema / migration is deferred until LiNKskills gets its own Supabase
-  project or schema in the shared platform (spec §10 step 3) — no migration is written in
-  this change.
+  project or schema in the shared platform (spec §10 step 3) — **migrations were later
+  written** (`supabase/migrations/20260715_*`, `20260718_*`); apply-per-env remains ops.
 
 ## Addendum (2026-07-15) — the Librarian is implemented in LiNKplatform
 

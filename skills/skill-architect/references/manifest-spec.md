@@ -29,7 +29,8 @@ This document defines the required and optional fields for skill `SKILL.md` fron
 - **`permissions`** (array): Permission scopes (fs_read, fs_write, email_send, api_access, shell_exec).
 - **`scope_out`** (array): Explicitly forbidden actions.
 - **`format_profile`** (string): Right-sized template profile — `heavy` (default) or `simple`
-  (see spec `docs/specs/catalog-eval-telemetry-spec.md` §5).
+  (see `docs/LINKSKILLS-TECHNICAL-PRD.md` §3.3; archived design notes in
+  `docs/archive/specs/catalog-eval-telemetry-spec.md` §5).
   - `heavy`: resumable, multi-phase skills. `persistence` block is **required**; the
     validator enforces `.workdir/tasks`, `{{task_id}}` state path, `#/definitions/state`,
     and the full Decision-Tree protocol terms.
