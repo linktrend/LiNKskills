@@ -15,7 +15,9 @@ usage telemetry, curated by the Librarian process. It does **not** own governanc
 permission-to-act — no entitlements, leases, kill-switches, financial ledger, or per-tenant
 policy. Those live in each Program's own Program Ledger and in
 `platform.capabilities` / `platform.capability_grants` (LiNKplatform repo). See
-`docs/adr/0001-retire-logic-engine-governance-layer.md`.
+`docs/adr/0001-retire-logic-engine-governance-layer.md`. Authoritative product docs:
+`docs/LINKSKILLS-INTENT.md`, `docs/LINKSKILLS-TECHNICAL-PRD.md`,
+`docs/LINKSKILLS-OPERATIONS-MANUAL.md`, `docs/OPEN-ISSUES.md`.
 
 ## Git Workflow (LiNKdev-aligned)
 
