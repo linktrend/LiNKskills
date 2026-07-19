@@ -4,7 +4,7 @@
 -- LiNKskills; it turns the reviewed design doc into applied schema.
 --
 -- Context/authority:
---   * LiNKskills/docs/specs/catalog-eval-telemetry-spec.md (this repo -- the full
+--   * LiNKskills/docs/archive/specs/catalog-eval-telemetry-spec.md (this repo -- the full
 --     design; §1 catalog, §2 telemetry, §3 eval_runs, §1.1 certification gate)
 --   * LiNKskills/docs/adr/0001-retire-logic-engine-governance-layer.md
 --     (why LiNKskills is scoped to catalog + eval + telemetry ONLY -- never

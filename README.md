@@ -1,83 +1,63 @@
-# LiNKskills Library
+# LiNKskills
 
-LiNKskills is the Venture Studio's **centralized skill catalog**. It is scoped to three
-things and one curation process:
+LiNKskills is LiNKtrend's **centralized skill catalog**. It provides progressive-disclosure skills, a mandatory per-skill eval suite, usage telemetry, and Librarian curation — and deliberately does **not** own governance or permission-to-act.
 
-1. **Catalog** — the library of progressive-disclosure skills (`SKILL.md` + `advanced/` +
-   `examples/` + `references/` + `scripts/`), authored via the `skill-architect` /
-   `skill-template` pattern and validated by `validator.py`. Machine index:
-   [`catalog/index.json`](./catalog/index.json).
-2. **Mandatory eval suite** — every skill ships a baseline eval suite before it is
-   `usable` (quality proof, not just an I/O contract).
-3. **Usage telemetry** — every real skill invocation is recorded (local
-   `execution_ledger.jsonl` buffer + `lskills.telemetry` via
-   [`lib/skill_runtime`](./lib/skill_runtime)).
-4. **Librarian curation** — skill-side instructions live in `skills/self-improvement`;
-   the runnable agent is `LiNKplatform/packages/librarian-runner`.
+## Start here (source of truth)
 
-> **Scope boundary (important).** LiNKskills does **not** own governance or
-> permission-to-act. It has no entitlements, leases, kill-switches, financial ledger, or
-> per-tenant policy. Permission-to-act lives in **each Program's own Program Ledger** and
-> in **`platform.capabilities` / `platform.capability_grants`** (the LiNKplatform repo).
-> The earlier "Logic Engine" control-plane that added that machinery here has been retired
-> — see [`docs/adr/0001-retire-logic-engine-governance-layer.md`](./docs/adr/0001-retire-logic-engine-governance-layer.md)
-> and the archived subsystem under [`archive/logic-engine-2026-07-14/`](./archive/logic-engine-2026-07-14/).
+These documents are the current, authoritative description of this Program. If anything elsewhere in this repo (including older docs under `docs/archive/`) disagrees with them, **these win**:
 
-## Source of Truth Documents
+- **[`docs/LINKSKILLS-INTENT.md`](docs/LINKSKILLS-INTENT.md)** — why LiNKskills exists, who it's for, scope, and what "done" means.
+- **[`docs/LINKSKILLS-TECHNICAL-PRD.md`](docs/LINKSKILLS-TECHNICAL-PRD.md)** — the exhaustive technical reference: architecture, authoring/validation, eval suites, telemetry, consumer load path, Librarian split, and what is / isn't built.
+- **[`docs/LINKSKILLS-OPERATIONS-MANUAL.md`](docs/LINKSKILLS-OPERATIONS-MANUAL.md)** — a plain-English handbook for the Principal: what your role is and what isn't fully live yet.
+- **[`docs/OPEN-ISSUES.md`](docs/OPEN-ISSUES.md)** — append-only engineering build log and open/deferred items.
 
-- Catalog / eval / telemetry design: [`docs/specs/catalog-eval-telemetry-spec.md`](./docs/specs/catalog-eval-telemetry-spec.md)
-- Consumer load path: [`docs/CONSUMER-SKILL-LOAD-PATH.md`](./docs/CONSUMER-SKILL-LOAD-PATH.md)
-- Shared foundation (cross-Program substrate): `LiNKplatform/docs/specs/shared-foundation-spec.md` (§3, §7)
-- ADR — retiring the Logic Engine: [`docs/adr/0001-retire-logic-engine-governance-layer.md`](./docs/adr/0001-retire-logic-engine-governance-layer.md)
-- Original PRD (MVO): [`260319 LiNKskills PRD.md`](./260319%20LiNKskills%20PRD.md)
-- Master SOP: [`SOP.md`](./SOP.md)
+Still-live supporting docs (not archived):
 
-## Skill Catalog
+- [`docs/adr/0001-retire-logic-engine-governance-layer.md`](docs/adr/0001-retire-logic-engine-governance-layer.md) — permanent scope boundary (no entitlements/leases/kill-switches here).
+- [`docs/runbooks/PRODUCTION_OPERATIONS.md`](docs/runbooks/PRODUCTION_OPERATIONS.md) — VPS/host checkout bootstrap.
 
-- Machine index: [`catalog/index.json`](./catalog/index.json) (regenerate with
-  `python3 scripts/build-catalog-index.py`)
-- Catalogue index: [`SKILLS_CATALOGUE.md`](./SKILLS_CATALOGUE.md)
-- Manifest: [`manifest.json`](./manifest.json)
-- Skills live under [`skills/`](./skills); authoring meta-skills:
-  [`skill-architect`](./skills/skill-architect), [`skill-template`](./skills/skill-template),
-  [`tool-architect`](./skills/tool-architect).
-- Curation skill instructions: [`self-improvement`](./skills/self-improvement).
+## Scope boundary (important)
+
+LiNKskills does **not** own governance or permission-to-act. It has no entitlements, leases, kill-switches, financial ledger, or per-tenant policy. Permission-to-act lives in **each Program's own Program Ledger** and in **`platform.capabilities` / `platform.capability_grants`** (LiNKplatform). The earlier Logic Engine control plane is retired — see ADR 0001 and [`archive/logic-engine-2026-07-14/`](archive/logic-engine-2026-07-14/).
+
+## Layout
+
+- `skills/` — progressive-disclosure skill packages (`SKILL.md` + `advanced/` / `examples/` / `references/` / `scripts/`). Authoring meta-skills: `skill-architect`, `skill-template`, `tool-architect`. Librarian instructions: `self-improvement`.
+- `catalog/index.json` — machine discovery index (regenerate with `python3 scripts/build-catalog-index.py`).
+- `lib/skill_runtime/` — consumer Python package (catalog, loader, telemetry).
+- `validator.py` — structural Golden Template + eval-suite gate (CI).
+- `supabase/migrations/` — `lskills.catalog` / `telemetry` / `eval_runs`.
+- `tools/` — global CLI tool packages (`gws`, `ltr`, …).
+- `docs/archive/` — superseded documentation retained for history.
+- `archive/logic-engine-2026-07-14/` — retired governance subsystem (do not deploy).
 
 ## Consumer runtime
 
-Programs load skills from a git checkout of this repo (not a LiNKskills API):
+Programs load skills from a **git checkout** of this repo (not a LiNKskills API):
 
-- Python package: [`lib/skill_runtime`](./lib/skill_runtime)
-- Docs: [`docs/CONSUMER-SKILL-LOAD-PATH.md`](./docs/CONSUMER-SKILL-LOAD-PATH.md)
-- Host bootstrap: [`deploy/vps/`](./deploy/vps) +
-  [`docs/runbooks/PRODUCTION_OPERATIONS.md`](./docs/runbooks/PRODUCTION_OPERATIONS.md)
+```python
+from lib.skill_runtime import load_skill, record_invocation, InvocationEvent
 
-## Google CLI Operating Model (Launch)
+bundle = load_skill("git-safeguard", repo_root="/opt/linkskills", require_usable=False)
+# ... use bundle.skill_md ...
+record_invocation(InvocationEvent(skill=bundle.skill_id, status="completed", summary="..."), repo_root="/opt/linkskills")
+```
 
-- `gws` is the primary Workspace CLI (pinned runtime in [`tools/gws`](./tools/gws)).
-- `ltr` replaces legacy `gw` for non-Workspace Google, non-Google, and local runtime controls (in [`tools/ltr`](./tools/ltr)).
-- Service ownership source of truth: [`configs/service_ownership.json`](./configs/service_ownership.json).
-- Ownership validation gate: `python3 scripts/check-service-ownership.py`.
+Full load-path, telemetry flush, and Librarian relationship: Technical PRD §§5–7.
 
-## Core Commands
+## Core commands
 
-- Full repo validation:
-  - `python3 validator.py --repo-root . --scan-all`
-- Catalog index:
-  - `python3 scripts/build-catalog-index.py`
-  - `python3 scripts/build-catalog-index.py --check`
-- Skill runtime unit tests:
-  - `python3 -m unittest discover -s tests/skill_runtime -v`
-- Telemetry flush to Supabase:
-  - `python3 scripts/flush-telemetry.py`
-- Telemetry aggregation report:
-  - `python3 global_evaluator.py`
+```bash
+python3 validator.py --repo-root . --scan-all
+python3 scripts/build-catalog-index.py
+python3 scripts/build-catalog-index.py --check
+python3 -m unittest discover -s tests/skill_runtime -v
+python3 scripts/flush-telemetry.py
+python3 scripts/check-service-ownership.py
+```
 
-## Documentation Map
+## Status
 
-- [Docs Index](./docs/README.md)
-- [Consumer skill load path](./docs/CONSUMER-SKILL-LOAD-PATH.md)
-- [Branching and Deployment Policy](./docs/BRANCHING_AND_DEPLOYMENT_POLICY.md)
-- [Documentation Governance](./docs/DOCUMENTATION_GOVERNANCE.md)
-- [Architecture Decision Records](./docs/adr/)
-- [Archive](./archive/) — retired subsystems retained for traceability
+**Catalog + consumer runtime structurally complete as of 2026-07-19.** All skills ship baseline eval-suite YAML; CI runs validator, catalog freshness, unit tests, and ownership gates. Live promotion of every skill to `usable` via the Librarian against applied `lskills` schema remains an operational milestone — see Technical PRD §10 and Operations Manual "Current status."
+
+The runnable Librarian worker lives in **`LiNKplatform/packages/librarian-runner`** (this repo holds the skill-side instructions and the schema gates only).
