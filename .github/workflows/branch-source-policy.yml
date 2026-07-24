@@ -9,6 +9,7 @@ permissions:
 
 jobs:
   branch-source-policy:
+    name: Enforce allowed PR source branches
     runs-on: ubuntu-latest
     steps:
       - name: Enforce promotion branch flow
@@ -21,13 +22,29 @@ jobs:
           echo "PR target: ${BASE_BRANCH}"
           case "${BASE_BRANCH}" in
             main)
-              if [ "${HEAD_BRANCH}" != "staging" ]; then echo "Only staging may be merged into main."; exit 1; fi
+              if [ "${HEAD_BRANCH}" != "staging" ]; then
+                echo "Only staging may be merged into main."
+                exit 1
+              fi
               ;;
             staging)
-              if [ "${HEAD_BRANCH}" != "development" ]; then echo "Only development may be merged into staging."; exit 1; fi
+              if [ "${HEAD_BRANCH}" != "development" ]; then
+                echo "Only development may be merged into staging."
+                exit 1
+              fi
               ;;
             development)
-              case "${HEAD_BRANCH}" in dev/*|issue/*|feature/*|fix/*|chore/*|codex/*|cursor/*|antigravity/*|dependabot/*) ;; *) echo "Only short-lived work branches may be merged into development."; exit 1 ;; esac
+              case "${HEAD_BRANCH}" in
+                dev/*|issue/*|feature/*|fix/*|chore/*|codex/*|cursor/*|antigravity/*|dependabot/*)
+                  ;;
+                *)
+                  echo "Only short-lived work branches may be merged into development."
+                  exit 1
+                  ;;
+              esac
               ;;
-            *) echo "Unhandled base branch: ${BASE_BRANCH}"; exit 1 ;;
+            *)
+              echo "Unhandled base branch: ${BASE_BRANCH}"
+              exit 1
+              ;;
           esac
