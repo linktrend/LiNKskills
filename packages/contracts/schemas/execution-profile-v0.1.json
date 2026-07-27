@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://linktrend.dev/schemas/linkskills/execution-profile-v0.1.json",
+  "title": "LiNKskills Execution Profile v0.1",
+  "description": "Certification unit: skill bundle + eval suite + toolchain + adapter + runtime profile.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "execution_profile_id",
+    "skill_id",
+    "skill_version",
+    "skill_bundle_hash",
+    "eval_suite_hash",
+    "toolchain",
+    "adapter",
+    "runtime_profile_id",
+    "lifecycle_state"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "0.1"
+    },
+    "execution_profile_id": { "type": "string", "minLength": 1 },
+    "skill_id": { "type": "string", "minLength": 1 },
+    "skill_version": { "type": "string", "minLength": 1 },
+    "skill_bundle_hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "eval_suite_id": { "type": "string" },
+    "eval_suite_hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "toolchain": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["tool_id", "version", "bundle_hash"],
+        "properties": {
+          "tool_id": { "type": "string", "minLength": 1 },
+          "version": { "type": "string", "minLength": 1 },
+          "bundle_hash": {
+            "type": "string",
+            "pattern": "^sha256:[a-f0-9]{64}$"
+          },
+          "placement": {
+            "type": "string",
+            "enum": ["actor_host", "server_adapter"]
+          }
+        }
+      },
+      "default": []
+    },
+    "adapter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version_range"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "version_range": { "type": "string", "minLength": 1 }
+      }
+    },
+    "runtime_profile_id": { "type": "string", "minLength": 1 },
+    "model_capability_tier": {
+      "type": "string",
+      "enum": ["low", "balanced", "high", "frontier"]
+    },
+    "lifecycle_state": {
+      "type": "string",
+      "enum": ["draft", "eval_pending", "usable", "deprecated", "retired"]
+    },
+    "profile_hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "Deterministic hash of this execution-profile identity."
+    },
+    "certification": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["uncertified", "certified", "refused", "expired"]
+        },
+        "evidence_hash": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "certified_at": { "type": "string", "format": "date-time" },
+        "refusal_reason": { "type": "string" }
+      }
+    }
+  }
+}

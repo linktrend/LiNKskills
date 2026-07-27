@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://linktrend.dev/schemas/linkskills/runtime-profile-v0.1.json",
+  "title": "LiNKskills Runtime Profile v0.1",
+  "description": "Bounded actor runtime capability profile used for selection and certification.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "profile_id",
+    "display_name",
+    "actor_kind",
+    "platform",
+    "capabilities",
+    "adapter"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "0.1"
+    },
+    "profile_id": {
+      "type": "string",
+      "minLength": 1,
+      "examples": ["cursor-macos", "codex-macos", "openclaw-lisa"]
+    },
+    "display_name": { "type": "string", "minLength": 1 },
+    "actor_kind": {
+      "type": "string",
+      "enum": ["cursor", "codex", "openclaw", "program_executor", "service", "other"]
+    },
+    "platform": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["os"],
+      "properties": {
+        "os": {
+          "type": "string",
+          "enum": ["macos", "linux", "windows", "any"]
+        },
+        "arch": {
+          "type": "string",
+          "enum": ["arm64", "x86_64", "any"]
+        }
+      }
+    },
+    "capabilities": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "filesystem_read",
+          "filesystem_write",
+          "shell_exec",
+          "browser",
+          "network",
+          "repository_access",
+          "display",
+          "mcp_client"
+        ]
+      },
+      "uniqueItems": true,
+      "minItems": 1
+    },
+    "adapter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "minLength": 1 },
+        "version_range": { "type": "string" }
+      }
+    },
+    "model_capability_tier": {
+      "type": "string",
+      "enum": ["low", "balanced", "high", "frontier"]
+    },
+    "notes": { "type": "string" }
+  }
+}

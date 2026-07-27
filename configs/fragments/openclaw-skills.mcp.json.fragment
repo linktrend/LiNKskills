@@ -1,0 +1,43 @@
+{
+  "contract_version": "0.1",
+  "fragment_id": "openclaw-skills-mcp",
+  "owner": "OpenClaw Prime (host application); LiNKskills authors contract only",
+  "purpose": "Contract fragment describing the Skills MCP surface for OpenClaw integration. Fake/conformance only in this repo — no OpenClaw mutation.",
+  "mcp": {
+    "server_name": "linkskills",
+    "transport": "stdio",
+    "command": "python3",
+    "args": ["-m", "linkskills_mcp.server"],
+    "env": {
+      "PYTHONPATH": "packages/gateway:packages/mcp_server:packages/client:packages/librarian_domain:packages/eval_runner:packages/contracts:.",
+      "GATEWAY_URL": "http://127.0.0.1:8787"
+    }
+  },
+  "operations": [
+    "skills_list",
+    "skills_search",
+    "skills_describe",
+    "skills_fragment_get",
+    "skills_release_get",
+    "skills_run_start",
+    "skills_run_update",
+    "skills_run_complete",
+    "skills_run_fail",
+    "skills_tool_resolve",
+    "skills_tool_invoke",
+    "skills_input_validate",
+    "skills_output_validate",
+    "skills_feedback_submit",
+    "skills_trace_candidate_submit"
+  ],
+  "auth": {
+    "issuer": "LiNKplatform",
+    "required_claims": ["actor_id", "actor_kind", "org_id", "scopes", "exp"],
+    "required_scopes_any_of": ["skills:read", "skills:write"],
+    "secrets": "none_in_fragment"
+  },
+  "conformance": {
+    "fake_stage_proven_in_linkskills": true,
+    "live_openclaw_mutation": false
+  }
+}

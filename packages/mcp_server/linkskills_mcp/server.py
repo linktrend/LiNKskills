@@ -1,0 +1,253 @@
+"""LiNKskills MCP adapter — JSON-RPC tools over SkillsGatewayService.
+
+No duplicated business logic: every tool call routes to the shared gateway
+service used by the HTTP API (in-process import of linkskills_gateway.service).
+"""
+
+from __future__ import annotations
+
+import json
+import sys
+import uuid
+from typing import Any, Dict, List, Mapping, Optional, TextIO
+
+from linkskills_gateway.auth import (
+    ActorClaims,
+    AuthError,
+    FakePlatformClaimsVerifier,
+    mint_fake_token,
+)
+from linkskills_gateway.service import (
+    OPERATIONS,
+    ServiceError,
+    SkillsGatewayService,
+)
+
+
+PROTOCOL_VERSION = "2024-11-05"
+SERVER_NAME = "linkskills-mcp"
+SERVER_VERSION = "0.1.0"
+
+
+def _tool_schema(operation: str) -> Dict[str, Any]:
+    return {
+        "name": operation,
+        "description": f"LiNKskills domain operation {operation}",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "params": {"type": "object"},
+                "idempotency_key": {"type": "string"},
+                "request_id": {"type": "string"},
+            },
+            "additionalProperties": True,
+        },
+    }
+
+
+class SkillsMcpServer:
+    """Minimal JSON-RPC MCP server facade for skills_* tools."""
+
+    def __init__(
+        self,
+        service: Optional[SkillsGatewayService] = None,
+        verifier: Optional[FakePlatformClaimsVerifier] = None,
+        *,
+        default_actor: Optional[ActorClaims] = None,
+    ) -> None:
+        self.service = service or SkillsGatewayService()
+        self.verifier = verifier or FakePlatformClaimsVerifier()
+        self.default_actor = default_actor
+        self._initialized = False
+
+    def list_tools(self) -> List[Dict[str, Any]]:
+        return [_tool_schema(op) for op in OPERATIONS]
+
+    def call_tool(
+        self,
+        name: str,
+        arguments: Optional[Mapping[str, Any]] = None,
+        *,
+        authorization: Optional[str] = None,
+        actor_claims: Optional[Mapping[str, Any]] = None,
+    ) -> Dict[str, Any]:
+        if name not in OPERATIONS:
+            raise ServiceError("unknown_operation", f"Unknown tool: {name}", http_status=404)
+
+        args = dict(arguments or {})
+        if "params" in args and isinstance(args["params"], dict):
+            params = dict(args["params"])
+        else:
+            params = {
+                k: v
+                for k, v in args.items()
+                if k
+                not in {
+                    "params",
+                    "idempotency_key",
+                    "request_id",
+                    "authorization",
+                    "actor_claims",
+                }
+            }
+
+        # Build verification payload including any spoof vectors.
+        verify_payload: Dict[str, Any] = dict(args)
+        if actor_claims:
+            verify_payload["actor_claims"] = dict(actor_claims)
+            verify_payload["claims"] = dict(actor_claims)
+
+        actor = self._resolve_actor(
+            authorization=authorization or args.get("authorization"),
+            actor_claims=actor_claims or args.get("actor_claims"),
+            request_payload=verify_payload,
+        )
+        return self.service.dispatch(
+            name,
+            params,
+            actor=actor,
+            request_id=str(args.get("request_id") or uuid.uuid4()),
+            idempotency_key=args.get("idempotency_key"),
+        )
+
+    def _resolve_actor(
+        self,
+        *,
+        authorization: Optional[str],
+        actor_claims: Optional[Mapping[str, Any]],
+        request_payload: Mapping[str, Any],
+    ) -> ActorClaims:
+        if authorization:
+            return self.verifier.verify(
+                authorization
+                if authorization.lower().startswith("bearer ")
+                else f"Bearer {authorization}",
+                request_payload=request_payload,
+            )
+        if actor_claims is not None:
+            # Mint a transient fake token from provided claims, then verify so
+            # spoof checks still run against the full request payload.
+            token = mint_fake_token(actor_claims)
+            return self.verifier.verify(
+                f"Bearer {token}",
+                request_payload=request_payload,
+            )
+        if self.default_actor is not None:
+            # Still reject spoofed identity keys in the payload.
+            self.verifier._reject_spoof(self.default_actor, request_payload)
+            return self.default_actor
+        raise AuthError("auth_missing", "Authorization or actor_claims required")
+
+    def handle_rpc(self, message: Mapping[str, Any]) -> Optional[Dict[str, Any]]:
+        """Handle one JSON-RPC request; notifications return None."""
+        method = message.get("method")
+        req_id = message.get("id", None)
+        params = message.get("params") or {}
+
+        def result(payload: Any) -> Dict[str, Any]:
+            return {"jsonrpc": "2.0", "id": req_id, "result": payload}
+
+        def error(code: int, msg: str, data: Any = None) -> Dict[str, Any]:
+            err: Dict[str, Any] = {"code": code, "message": msg}
+            if data is not None:
+                err["data"] = data
+            return {"jsonrpc": "2.0", "id": req_id, "error": err}
+
+        try:
+            if method == "initialize":
+                self._initialized = True
+                return result(
+                    {
+                        "protocolVersion": PROTOCOL_VERSION,
+                        "capabilities": {"tools": {}},
+                        "serverInfo": {
+                            "name": SERVER_NAME,
+                            "version": SERVER_VERSION,
+                        },
+                    }
+                )
+            if method == "notifications/initialized":
+                return None
+            if method == "ping":
+                return result({})
+            if method == "tools/list":
+                return result({"tools": self.list_tools()})
+            if method == "tools/call":
+                name = str(params.get("name") or "")
+                arguments = params.get("arguments") or {}
+                meta = params.get("_meta") or {}
+                authorization = meta.get("authorization") or params.get("authorization")
+                actor_claims = meta.get("actor_claims") or params.get("actor_claims")
+                envelope = self.call_tool(
+                    name,
+                    arguments if isinstance(arguments, Mapping) else {},
+                    authorization=authorization,
+                    actor_claims=actor_claims if isinstance(actor_claims, Mapping) else None,
+                )
+                return result(
+                    {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": json.dumps(envelope, sort_keys=True),
+                            }
+                        ],
+                        "structuredContent": envelope,
+                        "isError": envelope.get("error") is not None,
+                    }
+                )
+            if req_id is None:
+                return None
+            return error(-32601, f"Method not found: {method}")
+        except AuthError as exc:
+            if req_id is None:
+                return None
+            return error(-32001, exc.message, {"code": exc.code})
+        except ServiceError as exc:
+            if req_id is None:
+                return None
+            return error(-32000, exc.message, {"code": exc.code})
+        except Exception as exc:  # noqa: BLE001 — boundary
+            if req_id is None:
+                return None
+            return error(-32603, f"Internal error: {exc}")
+
+    def serve_stdio(
+        self,
+        stdin: Optional[TextIO] = None,
+        stdout: Optional[TextIO] = None,
+    ) -> None:
+        """Newline-delimited JSON-RPC over stdio (test/dev convenience)."""
+        inn = stdin or sys.stdin
+        out = stdout or sys.stdout
+        for line in inn:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                message = json.loads(line)
+            except json.JSONDecodeError:
+                out.write(
+                    json.dumps(
+                        {
+                            "jsonrpc": "2.0",
+                            "id": None,
+                            "error": {"code": -32700, "message": "Parse error"},
+                        }
+                    )
+                    + "\n"
+                )
+                out.flush()
+                continue
+            response = self.handle_rpc(message)
+            if response is not None:
+                out.write(json.dumps(response, sort_keys=True) + "\n")
+                out.flush()
+
+
+def main() -> None:
+    SkillsMcpServer().serve_stdio()
+
+
+if __name__ == "__main__":
+    main()

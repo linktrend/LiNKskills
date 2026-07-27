@@ -1,0 +1,20 @@
+# Independently named LiNKskills MCP fragment for Codex host handoff.
+# Owner of shared Codex config.toml: LiNKbrain (default). LiNKskills authors
+# this fragment only — do not paste secrets; do not edit shared host files here.
+
+[mcp_servers.linkskills_skills]
+enabled = true
+command = "python3"
+args = ["-m", "linkskills_mcp.server"]
+cwd = "/ABS/PATH/TO/LiNKskills"
+startup_timeout_sec = 15
+
+[mcp_servers.linkskills_skills.env]
+PYTHONPATH = "packages/gateway:packages/mcp_server:packages/client:packages/librarian_domain:packages/eval_runner:packages/contracts:."
+GATEWAY_URL = "http://127.0.0.1:8787"
+LINKSKILLS_CODEX_FRAGMENT = "1"
+
+# Notes for LiNKbrain owner:
+# - Keep this server name distinct from Brain MCP entries.
+# - Apply only when ready; validate with LiNKskills conformance tests.
+# - No credentials belong in this fragment.

@@ -4,17 +4,21 @@
 
 **What this is:** a plain-English handbook for what LiNKskills is *today*, and what your role in it is. It is not a technical design document.
 
-**Honesty rule:** everything below describes what is actually built right now. Where something is planned but not fully live yet, it is labeled under [Current status](#current-status-what-is-not-fully-live-yet).
+**Honesty rule:** everything below describes what is actually built or packaged right now under the **approved internal-launch plan**. Where something is planned but not fully live yet, it is labeled under [Current status](#current-status-what-is-not-fully-live-yet). This handbook does **not** claim stage/production health.
+
+**Approved plan:** `docs/LINKSKILLS-INTERNAL-LAUNCH-DETAILED-DEVELOPMENT-PLAN.md` (SHA-256 `31a6cc70bb778ce1dff236819e4bf600b0495dbb06c95bac55bcb2b0b2f5fe88`). ADRs 0001–0008 accepted.
 
 ---
 
 ## What LiNKskills is
 
-LiNKskills is the studio’s shared **skill library**. Think of it as a carefully curated bookshelf of reusable AI work instructions that every Program’s agents can pull from — market research, git safety checks, QA patterns, skill-authoring templates, and dozens more.
+LiNKskills is the studio’s shared **skill library and procedural-capability platform**. Think of it as a carefully curated bookshelf of reusable AI work instructions that every Program’s agents can pull from — market research, git safety checks, QA patterns, skill-authoring templates, and dozens more.
 
-Each skill is a folder of instructions and supporting files (not a mysterious cloud API). Agents load those files from a pinned copy of this library. Every skill is supposed to prove its quality with a baseline test suite, and every real use is recorded so the library can improve over time.
+Each skill is a folder of instructions and supporting files in Git. For ordinary use, agents are meant to discover and load **published, certified** versions through a LiNKskills Gateway (the same way you would ask a librarian for the current approved procedure — not rummage through the author’s desk drafts). Every skill is supposed to prove its quality with a real baseline eval run, and every real use is recorded so the library can improve over time.
 
-**What it is not:** LiNKskills does **not** decide whether a Program is allowed to send an email, charge a card, deploy something, or act on a customer’s behalf. That permission lives in each Program’s own ledger and in LiNKplatform’s capability registry. An earlier attempt to put that control plane here was retired on purpose.
+**What it is not:** LiNKskills does **not** decide whether a Program is allowed to send an email, charge a card, deploy something, or act on a customer’s behalf. That permission lives in each Program’s own ledger and in LiNKplatform’s capability registry. An earlier attempt to put that control plane here was retired on purpose (ADR 0001 — permanent).
+
+**Separate from LiNKbrain:** Brain stores institutional knowledge and memory. Skills stores procedures. They stay separate services.
 
 ---
 
@@ -22,46 +26,50 @@ Each skill is a folder of instructions and supporting files (not a mysterious cl
 
 ### Day to day
 
-Most of the time you do **not** need to touch this repository. Agents author and refine skills; automated checks catch broken structure; consumer Programs load what they need.
+Most of the time you do **not** need to touch this repository. Agents author and refine skills; automated checks catch broken structure; consumer Programs load what they need through the Gateway (or, during migration, from a pinned library checkout).
 
 ### Moments when a human decision may be required
 
 | When | What you are asked | What happens if you say no / wait |
 | --- | --- | --- |
-| Librarian escalation | Review a proposed skill upgrade when the automatic “this version is clearly better” bar is not met | The candidate stays uncertified (`eval_pending`); agents can still load draft instructions if Programs allow it, but it is not marked `usable` |
-| Release promotion | Approve promoting library changes `development` → `staging` → `main` when release owners route that through you | Production checkouts stay on the previous pinned version |
+| Librarian escalation | Review a proposed skill upgrade when the automatic “this version is clearly better” bar is not met | The candidate stays uncertified (`eval_pending`); agents can still load draft/compatibility instructions if Programs allow it, but it is not marked certified/`usable` |
+| Release promotion | Approve promoting library changes `development` → `staging` → `main` when release owners route that through you | Production source pins stay on the previous version |
+| Cross-repo launch gates | Confirm direction when Platform migration apply, real auth, or actor integrations are blocked outside this repo’s ownership | Work waits on the owning repository; Skills does not seize shared surfaces |
 | Exceptional failure | Briefing when validation, telemetry, or curation is stuck beyond agent repair | Technical helpers investigate; you decide direction, not commands |
 
 ### What you do **not** need to do
 
 - Write or edit `SKILL.md` files
 - Run Python validators or unit tests
-- Manage Supabase or VPS day to day
+- Apply shared Supabase migrations yourself (LiNKplatform owns live apply)
+- Manage VPS day to day
 - Approve every skill invocation across Programs
 - Revive or operate the retired Logic Engine
+- Apply Codex/OpenClaw host configuration from this repo (fragments are handed off to the owners)
 
 ---
 
-## The four jobs of this library (plain names)
+## The jobs of this library (plain names)
 
 | # | Plain-English job | What it means |
 | --- | --- | --- |
 | 1 | Keep the catalog | A versioned set of skills with a clear folder shape and a machine index so Programs can find them |
-| 2 | Require a quality test | Every skill ships a baseline eval suite before it can be treated as certified/`usable` |
-| 3 | Record real usage | When a skill is used, that fact is logged (locally always; into the shared database when connected) |
-| 4 | Curate over time | The Librarian reads usage + eval results and proposes versioned upgrades — automatically when the evidence is clean, escalated to you when it is not |
+| 2 | Require a quality test | Every skill ships a baseline eval suite; a **real** eval runner must execute evidence before certification — prompt-only scoring does not count |
+| 3 | Publish safely | Git holds editable drafts; published releases are immutable bundles served through the Gateway |
+| 4 | Record real usage | When a skill is used, that fact is logged (locally always during migration; through the Gateway and shared database when connected) |
+| 5 | Curate over time | The Librarian reads usage + eval results and proposes versioned upgrades — automatically when the evidence is clean, escalated to you when it is not |
 
 ---
 
-## Walkthrough: how a skill gets used (as things work today)
+## Walkthrough: how a skill gets used (target path)
 
-### 1. A Program needs a capability
+### 1. A Program or actor needs a capability
 
-An agent in LiNKsites, LiNKdeveloper, or another Program decides it needs a skill (for example, a pre-push git safety checklist).
+An agent in Cursor, Codex, OpenClaw/Lisa, LiNKsites, or another Program decides it needs a skill (for example, a pre-push git safety checklist).
 
-### 2. It loads instructions from a checkout
+### 2. It asks the LiNKskills Gateway
 
-The Program host keeps a copy of this repository (or the `skills/` + `catalog/` parts), pinned to a known version from `main`. It reads the skill’s instructions from files. There is no “call LiNKskills API for the prompt text” step.
+The actor uses the `skills_*` tools (MCP) or the HTTP API to search, describe, and load progressive fragments of a **published** skill — not a free-form “dump the whole library into context” call.
 
 ### 3. It does the work under its own Program rules
 
@@ -69,23 +77,30 @@ Whether the agent is *allowed* to push, send, or deploy is decided by that Progr
 
 ### 4. It records that the skill ran
 
-A short usage record is appended (skill name, status, summary, optional timing/cost notes). That feeds later curation. Recording usage is **observation**, not approval.
+Run lifecycle and feedback are observed by the Gateway (plus local buffers if offline). Recording usage is **observation**, not approval.
 
 ### 5. The Librarian improves the shelf (on a schedule)
 
-On a schedule (not in the middle of your other work), the Librarian reviews noisy/failing/high-cost skills, re-runs quality suites, and either promotes a better version or queues a short review for you when the evidence is ambiguous.
+On a schedule (not in the middle of your other work), the Librarian reviews noisy/failing/high-cost skills, requires real eval evidence, and either promotes a better version or queues a short review for you when the evidence is ambiguous.
+
+---
+
+## Walkthrough: compatibility path still in use during migration
+
+Some Programs still load skill files from a **pinned checkout** of this repository (the older helper path). That still works and is supported on purpose while consumers migrate. It is **not** the final sole way the studio is meant to load skills. Think of it as reading last week’s printed copy while the new published shelf comes online.
 
 ---
 
 ## Walkthrough: how a new or improved skill lands
 
-1. An authoring agent uses the skill-architect / skill-template pattern to create or refine a skill folder.
+1. An authoring agent uses the skill-architect / skill-template pattern to create or refine a skill folder in Git.
 2. Automated validation checks structure, required files, and the baseline eval suite file.
-3. The machine catalog index is regenerated so consumers can discover the skill.
-4. Changes merge through the normal studio branch path into `development`, then promote to `staging` and `main`.
-5. Production hosts that pin `main` pick up the new SHA/tag on their next sync.
+3. The publisher builds an immutable bundle; the real eval runner must produce executable evidence before certification.
+4. The machine catalog index stays current for source discovery; published registry rows are advanced when Platform-backed publication runs.
+5. Changes merge through the normal studio branch path into `development`, then promote to `staging` and `main`.
+6. Actors on the Gateway pick up published releases; checkout-based hosts pick up the new SHA/tag on their next sync.
 
-You are not asked to click through each of those engineering steps. You care that releases are deliberate and that broken skills do not silently become “certified.”
+You are not asked to click through each of those engineering steps. You care that releases are deliberate and that broken or “prompt-only” skills do not silently become “certified.”
 
 ---
 
@@ -95,10 +110,12 @@ The system is designed to **stop** rather than pretend:
 
 - Broken skill structure fails the validator — it should not merge cleanly through CI.
 - A skill missing its baseline eval suite fails validation.
-- If someone asks a consumer to hard-require `usable` certification before the Librarian has certified anything, loads fail closed instead of inventing a pass.
-- Telemetry write failures to the database do not erase the local usage log — the local buffer remains.
+- Prompt-only or fake-judge “evals” are rejected for certification.
+- If someone asks a consumer to hard-require `usable` certification before anything is certified, loads fail closed instead of inventing a pass.
+- Telemetry write failures to the database do not erase local usage logs — buffers remain.
 - The Librarian does not auto-promote on vibes; weak or regressing evidence stays pending or demotes a previously usable version.
 - The retired Logic Engine paths are archived and must not be started.
+- This repo does not apply live shared database migrations; if apply is blocked, that is a Platform-owned gate — not a Skills override.
 
 So a failure is usually: “checks failed, usage was still recorded locally, certification did not advance” — not “the library silently granted permission to act.”
 
@@ -109,10 +126,18 @@ So a failure is usually: “checks failed, usage was still recorded locally, cer
 | Topic | Status today |
 | --- | --- |
 | Shared skill catalog on disk + validator + CI | **Built.** Dozens of skills, each with a baseline eval suite file. |
-| Consumer load helper (`lib/skill_runtime`) | **Built** and unit-tested. |
-| Database schema for catalog / telemetry / eval runs | **Written** as migrations. Confirm applied on each environment with your technical helpers. |
-| Every skill marked certified/`usable` | **Not yet.** Catalog index still treats skills as draft until Librarian certification against real eval runs. Programs load instructions with the soft gate today. |
-| Librarian automatic nightly curation in production | **Runner exists in LiNKplatform**; treat first live passes as supervised (`dry run` first). |
+| Internal-launch domain packages (`packages/*`) | **In-repo / being implemented** under the approved plan (contracts, core, publisher, eval runner, tool runtime, gateway, MCP, client, librarian domain). |
+| `skills_*` MCP / HTTP Gateway (stdlib) | **Exists in-repo.** Local process health endpoints are not a claim of studio stage/prod readiness. |
+| Live Platform authentication | **Fakes in-repo** until LiNKplatform publishes real claims. |
+| Real Eval Runner rejecting prompt-only certification | **Built in-repo.** |
+| Additive registry migration `20260727_000005` | **Packaged** here. **LiNKplatform alone applies** live. |
+| Compatibility load helper (`lib/skill_runtime`) | **Still present** for migration; not the final sole load path. |
+| Every skill marked certified/`usable` | **Not yet.** Draft until real eval evidence and publication/certification advance. |
+| Cursor product canary | **Project-scoped only** (example fragment + notes). |
+| Codex / OpenClaw wiring | **Fragments handed off** — not applied from this repo. |
+| Librarian automatic nightly curation in production | **Host exists in LiNKplatform**; domain worker package in Skills; treat first live passes as supervised. |
+| Independent Codex verification of this plan’s implementation | **Still required / open** — Grok reports are provisional until checked. |
+| Live stage/prod internal-launch readiness | **Not claimed.** Blocked on Platform apply, real auth, supervised ops, and verification outside full Skills ownership. |
 | Phone dashboard for skill approvals | **Not built.** Escalations come as briefings / queued review items. |
 
 ---
@@ -125,25 +150,28 @@ No. Your role is direction and escalated judgment. Technical helpers and agents 
 **Does LiNKskills control what my Programs are allowed to do?**  
 No. That was tried earlier and reversed. Permission-to-act lives in each Program’s ledger and LiNKplatform’s capability grants.
 
+**Is this the same system as LiNKbrain?**  
+No. Brain = knowledge/memory. Skills = procedures. Separate services on purpose.
+
 **How do I know the library is healthy?**  
-Ask for the latest CI status on `main`, whether validators pass, and whether usage/telemetry and Librarian passes are flowing. Prefer short status briefings over raw logs.
+Ask for a short status briefing covering: CI on `main`, whether validators pass, whether the registry migration was applied by Platform, whether real auth replaced fakes, whether Gateway consumers are on published releases, and whether Librarian passes are flowing under supervision. Prefer briefings over raw logs. Do not treat a developer laptop `/health` check as production readiness.
 
 **What if I don’t like a proposed skill upgrade?**  
-Leave it uncertified / reject the escalation. Agents should not treat it as `usable` until a clean pass lands.
+Leave it uncertified / reject the escalation. Agents should not treat it as certified/`usable` until a clean pass lands.
 
 **Is the old Logic Engine still running?**  
 No. It is archived for history and must not be deployed.
 
 **Where do the “official” explanations live now?**  
-Three documents plus the open-issues log: Intent, Technical PRD, this Operations Manual, and `docs/OPEN-ISSUES.md`. Older scattered docs under `docs/archive/` are history only.
+Intent, Technical PRD, this Operations Manual, OPEN-ISSUES, the approved internal-launch plan, and ADRs 0001–0008. Older scattered docs under `docs/archive/` are history only.
 
 ---
 
 ## One-page reminder
 
-1. LiNKskills is the shared skill bookshelf for every Program’s agents.  
-2. Skills are files + quality suites + usage logs — not a permission system.  
-3. Programs load pinned copies; they do not depend on a LiNKskills “action API.”  
+1. LiNKskills is the shared skill bookshelf and procedure platform for every Program’s agents.  
+2. Skills are files + real quality suites + published releases + usage logs — not a permission system.  
+3. Steady-state delivery is the Gateway (`skills_*`); git checkout loading is a migration bridge.  
 4. The Librarian improves the shelf on a schedule and escalates ambiguous upgrades to you.  
 5. You do not need to run technical commands; you decide direction and escalations.  
-6. Certification of every skill to `usable` and fully unsupervised production Librarian passes are still ahead — the handbook above already says so honestly.
+6. Live stage/prod readiness, live migration apply, real Platform auth, and independent Codex verification are still ahead — and this handbook says so honestly.

@@ -1,0 +1,157 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://linktrend.dev/schemas/linkskills/dependency-types-v0.1.json",
+  "title": "LiNKskills Dependency Types v0.1",
+  "description": "Typed dependency buckets for Skill Packs. Replaces untyped dependencies[] lists.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "skill_dependencies",
+    "packaged_tools",
+    "host_capabilities",
+    "external_services",
+    "library_assets",
+    "runtime_requirements",
+    "optional_dependencies"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "0.1"
+    },
+    "skill_dependencies": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/namedRef" },
+      "default": []
+    },
+    "packaged_tools": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/versionedRef" },
+      "default": []
+    },
+    "host_capabilities": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "filesystem_read",
+          "filesystem_write",
+          "shell_exec",
+          "browser",
+          "network",
+          "repository_access",
+          "display"
+        ]
+      },
+      "uniqueItems": true,
+      "default": []
+    },
+    "external_services": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/namedRef" },
+      "default": []
+    },
+    "library_assets": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/namedRef" },
+      "description": "References into LiNKlibraries assets.",
+      "default": []
+    },
+    "runtime_requirements": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/runtimeRequirement" },
+      "default": []
+    },
+    "optional_dependencies": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/optionalDependency" },
+      "default": []
+    },
+    "certified_alternatives": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/certifiedAlternative" },
+      "default": []
+    }
+  },
+  "$defs": {
+    "namedRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "version_range": { "type": "string" },
+        "reason": { "type": "string" }
+      }
+    },
+    "versionedRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "minLength": 1 },
+        "bundle_hash": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "required": { "type": "boolean", "default": true }
+      }
+    },
+    "runtimeRequirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "value"],
+      "properties": {
+        "key": {
+          "type": "string",
+          "enum": [
+            "min_reasoning_tier",
+            "preferred_model",
+            "context_required",
+            "min_adapter_version",
+            "os",
+            "arch"
+          ]
+        },
+        "value": {
+          "type": ["string", "integer", "number", "boolean"]
+        }
+      }
+    },
+    "optionalDependency": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bucket", "id"],
+      "properties": {
+        "bucket": {
+          "type": "string",
+          "enum": [
+            "skill_dependencies",
+            "packaged_tools",
+            "external_services",
+            "library_assets"
+          ]
+        },
+        "id": { "type": "string", "minLength": 1 },
+        "version_range": { "type": "string" },
+        "reason": { "type": "string" }
+      }
+    },
+    "certifiedAlternative": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["for_id", "alternative_id"],
+      "properties": {
+        "for_id": { "type": "string", "minLength": 1 },
+        "alternative_id": { "type": "string", "minLength": 1 },
+        "bucket": {
+          "type": "string",
+          "enum": ["packaged_tools", "external_services", "skill_dependencies"]
+        },
+        "notes": { "type": "string" }
+      }
+    }
+  }
+}

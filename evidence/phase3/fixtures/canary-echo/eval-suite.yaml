@@ -1,0 +1,51 @@
+# Phase 3 canary: deterministic echo suite with observed_output.
+# Prompt-only scenarios are intentionally absent so certification can pass.
+schema_version: "0.1"
+suite_id: canary-echo-suite
+skill_id: canary-echo
+suite_version: 0.1.0
+skill_version_range: ">=0.1.0"
+pass_threshold: 0.8
+rubric:
+  - dimension: correctness
+    weight: 1.0
+    hard_fail_below: 0.5
+cases:
+  - id: echo-hello
+    case_type: golden
+    input: |
+      Echo the token HELLO_CANARY exactly once.
+    expected:
+      criteria:
+        - "output contains HELLO_CANARY"
+    expected_criteria:
+      - "output contains HELLO_CANARY"
+    observed_output: |
+      HELLO_CANARY
+    assertions:
+      must_contain:
+        - "HELLO_CANARY"
+      must_not_contain:
+        - "PROMPT_ONLY"
+  - id: echo-json
+    case_type: golden
+    input: |
+      Return a small JSON object acknowledging the echo.
+    expected_criteria:
+      - "json ok field is true"
+    observed_output: '{"ok": true, "echo": "ping"}'
+    assertions:
+      must_contain:
+        - '"ok": true'
+      json_schema_fields:
+        - ok
+        - echo
+evidence_policy:
+  retain:
+    - outputs
+    - assertion_results
+  redact:
+    - secrets
+isolation:
+  requires_clean_workspace: true
+  cleanup_required: true

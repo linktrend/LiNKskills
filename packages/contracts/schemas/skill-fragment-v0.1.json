@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://linktrend.dev/schemas/linkskills/skill-fragment-v0.1.json",
+  "title": "LiNKskills Skill Fragment v0.1",
+  "description": "Addressable progressive-disclosure fragment for a Skill Pack.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "skill_id",
+    "skill_version",
+    "fragment_id",
+    "disclosure_level",
+    "title",
+    "content_media_type",
+    "content",
+    "content_hash"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "0.1"
+    },
+    "skill_id": { "type": "string", "minLength": 1 },
+    "skill_version": { "type": "string", "minLength": 1 },
+    "release_hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "fragment_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Stable fragment identifier within the skill version."
+    },
+    "disclosure_level": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 6,
+      "description": "0=index, 1=routing, 2=summary, 3=procedure, 4=verification, 5=examples/schemas, 6=full pack."
+    },
+    "title": { "type": "string", "minLength": 1 },
+    "content_media_type": {
+      "type": "string",
+      "enum": ["text/markdown", "application/json", "text/plain"]
+    },
+    "content": { "type": "string" },
+    "content_hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "parent_fragment_id": { "type": "string" },
+    "next_recommended_fragment_ids": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "default": []
+    }
+  }
+}

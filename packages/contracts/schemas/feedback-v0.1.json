@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://linktrend.dev/schemas/linkskills/feedback-v0.1.json",
+  "title": "LiNKskills Feedback v0.1",
+  "description": "Actor feedback and trace-to-eval candidate submission.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "feedback_id",
+    "kind",
+    "submitted_at",
+    "summary"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "0.1"
+    },
+    "feedback_id": { "type": "string", "minLength": 1 },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "correction",
+        "rating",
+        "friction",
+        "missing_step",
+        "outcome",
+        "trace_candidate"
+      ]
+    },
+    "submitted_at": { "type": "string", "format": "date-time" },
+    "actor_id": { "type": "string" },
+    "run_id": { "type": "string" },
+    "skill_id": { "type": "string" },
+    "skill_release_hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "execution_profile_hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "rating": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 5
+    },
+    "summary": { "type": "string", "minLength": 1 },
+    "details": { "type": "string" },
+    "corrected_output_ref": { "type": "string" },
+    "trace_candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "proposed_case_type": {
+          "type": "string",
+          "enum": [
+            "golden",
+            "edge",
+            "negative",
+            "adversarial",
+            "regression",
+            "routing",
+            "tool_failure",
+            "compatibility",
+            "efficiency",
+            "side_effect_safety"
+          ]
+        },
+        "reason": { "type": "string" },
+        "evidence_refs": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "idempotency_key": { "type": "string" }
+  }
+}

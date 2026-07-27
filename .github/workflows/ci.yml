@@ -29,8 +29,22 @@ jobs:
           python3 scripts/build-catalog-index.py
           python3 scripts/build-catalog-index.py --check
 
+      - name: Install test dependencies
+        run: pip install pyyaml pytest
+
       - name: Unit tests (skill runtime)
         run: python3 -m unittest discover -s tests/skill_runtime -v
+
+      - name: Unit tests (internal-launch packages)
+        env:
+          PYTHONPATH: packages/contracts:packages/core:packages/publisher:packages/eval_runner:packages/tool_runtime:packages/gateway:packages/mcp_server:packages/client:packages/librarian_domain:.
+        run: >
+          python3 -m pytest
+          tests/contracts tests/core tests/publisher
+          tests/eval_runner tests/tool_runtime
+          tests/gateway tests/mcp_server tests/client
+          tests/librarian_domain
+          -q
 
       - name: Service ownership gate
         run: python3 scripts/check-service-ownership.py

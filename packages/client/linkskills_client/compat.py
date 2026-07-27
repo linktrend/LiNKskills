@@ -1,0 +1,111 @@
+"""Compatibility wrappers for lib.skill_runtime → Gateway migration.
+
+When ``GATEWAY_URL`` is set, ``load_skill`` / ``record_invocation`` style calls
+route through the HTTP gateway. Otherwise they fall back to the existing
+``lib.skill_runtime`` implementation so current Python consumers keep working.
+"""
+
+from __future__ import annotations
+
+import os
+from pathlib import Path
+from typing import Any, Dict, Mapping, Optional
+
+from .client import SkillsGatewayClient
+
+
+def _gateway_url() -> Optional[str]:
+    value = (os.environ.get("GATEWAY_URL") or "").strip()
+    return value or None
+
+
+def load_skill(
+    skill_id: str,
+    *,
+    repo_root: Optional[Path] = None,
+    require_usable: bool = False,
+    authorization: Optional[str] = None,
+    client: Optional[SkillsGatewayClient] = None,
+) -> Any:
+    """Load skill metadata/bundle via Gateway when configured, else lib.skill_runtime."""
+    if _gateway_url():
+        gw = client or SkillsGatewayClient(
+            base_url=_gateway_url(),
+            authorization=authorization or os.environ.get("GATEWAY_TOKEN"),
+        )
+        describe = gw.call("skills_describe", {"skill_id": skill_id})
+        data = describe.get("data") or {}
+        if require_usable and data.get("certification_state") != "usable":
+            raise PermissionError(
+                f"Skill '{skill_id}' certification_state is "
+                f"'{data.get('certification_state')}', not 'usable'."
+            )
+        # Progressive disclosure starts at level 2 (summary) unless caller goes deeper.
+        fragment = gw.call(
+            "skills_fragment_get",
+            {"skill_id": skill_id, "disclosure_level": 2},
+        )
+        return {
+            "source": "gateway",
+            "skill_id": skill_id,
+            "describe": data,
+            "fragment": (fragment.get("data") or {}),
+            "envelope": describe,
+        }
+
+    from lib.skill_runtime import load_skill as _load_skill
+
+    return _load_skill(skill_id, repo_root=repo_root, require_usable=require_usable)
+
+
+def record_invocation(
+    event: Any,
+    *,
+    repo_root: Optional[Path] = None,
+    authorization: Optional[str] = None,
+    client: Optional[SkillsGatewayClient] = None,
+    write_supabase: bool = True,
+) -> Dict[str, Any]:
+    """Record an invocation via Gateway feedback/run path or local skill_runtime."""
+    if _gateway_url():
+        gw = client or SkillsGatewayClient(
+            base_url=_gateway_url(),
+            authorization=authorization or os.environ.get("GATEWAY_TOKEN"),
+        )
+        if hasattr(event, "to_ledger_dict"):
+            payload = event.to_ledger_dict()
+        elif isinstance(event, Mapping):
+            payload = dict(event)
+        else:
+            payload = {
+                "skill_id": getattr(event, "skill", None),
+                "status": getattr(event, "status", None),
+                "summary": getattr(event, "summary", None),
+            }
+        try:
+            result = gw.call(
+                "skills_feedback_submit",
+                {
+                    "skill_id": payload.get("skill") or payload.get("skill_id"),
+                    "kind": "invocation",
+                    "outcome": payload.get("status"),
+                    "notes": payload.get("summary"),
+                    "run_id": payload.get("run_ref") or payload.get("run_id"),
+                },
+            )
+            return {"source": "gateway", "result": result}
+        except Exception as exc:  # noqa: BLE001 — buffer offline
+            buffered = gw.buffer_event("skills_feedback_submit", payload)
+            return {
+                "source": "gateway_buffered",
+                "event_id": buffered.event_id,
+                "error": str(exc),
+            }
+
+    from lib.skill_runtime import record_invocation as _record_invocation
+
+    return _record_invocation(
+        event,
+        repo_root=repo_root,
+        write_supabase=write_supabase,
+    )

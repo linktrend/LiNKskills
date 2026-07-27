@@ -1,0 +1,15 @@
+{
+  "stage_completed": 1,
+  "stages": {
+    "1_fake_contract": "proven via gateway/mcp unit tests + configs/fragments/cursor-skills-canary.mcp.json.example",
+    "2_symlink_inspect": "documented in docs/integrations/cursor/CANARY.md; no shared .cursor mutation",
+    "3_stage_readonly_discovery": "blocked — requires Platform stage readiness + applied migration",
+    "4_stage_run_telemetry": "blocked — same",
+    "5_packaged_tool_artifact": "local dry-run only",
+    "6_failure_feedback_offline": "local buffer smoke in evidence/phase5",
+    "7_librarian_dry_run": "domain worker conformance local only; host integration is LiNKplatform",
+    "8_multi_day_real_use": "not started"
+  },
+  "global_cursor_mutation": false,
+  "evidence_tier": "local/fake"
+}
