@@ -52,6 +52,8 @@ def _cmd_run(args: argparse.Namespace) -> int:
         "certified": decision.certified,
         "certify_reason": decision.reason,
         "profile_hash": decision.profile_hash,
+        "receipt_hashes": decision.receipt_hashes,
+        "execution_receipts": result.execution_receipts,
         "reasons": result.reasons,
         "toolchain": result.toolchain,
         "cases": [
@@ -60,8 +62,10 @@ def _cmd_run(args: argparse.Namespace) -> int:
                 "status": c.status.value,
                 "reason": c.reason,
                 "has_observed_evidence": c.has_observed_evidence,
+                "evidence_source": c.evidence_source,
                 "case_score": c.case_score,
                 "judge_scores": c.judge_scores,
+                "execution_receipt": c.execution_receipt,
                 "assertions": [
                     {
                         "name": a.name,

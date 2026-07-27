@@ -15,8 +15,14 @@ from .assertions import (
     parse_assertion_spec,
     run_assertions,
 )
+from .executor import (
+    case_has_execute_block,
+    case_has_suite_authored_output,
+    execute_case,
+)
 from .judge import IndependentDeterministicJudge, QualitativeJudge
 from .models import (
+    AssertionResult,
     CaseResult,
     CaseStatus,
     EvalCase,
@@ -238,19 +244,25 @@ def _as_str(value: Any) -> Optional[str]:
 
 def _parse_case(raw: dict[str, Any], suite_dir: Path) -> EvalCase:
     case_id = str(raw.get("id") or raw.get("case_id") or "unnamed")
-    observed = _as_str(raw.get("observed_output"))
+    # Suite-authored observed_output / fixture_output are golden/expected only.
+    golden: Optional[str] = None
+    suite_authored = False
+    if raw.get("observed_output") is not None:
+        golden = _as_str(raw.get("observed_output"))
+        suite_authored = True
     fixture_raw = raw.get("fixture_output")
-    fixture_output: Optional[str] = None
     if fixture_raw is not None:
+        suite_authored = True
         if isinstance(fixture_raw, str):
-            # Treat as relative file path when it points at an existing file; else inline text.
             candidate = (suite_dir / fixture_raw).resolve()
             if candidate.is_file():
-                fixture_output = candidate.read_text(encoding="utf-8")
+                golden = candidate.read_text(encoding="utf-8")
             else:
-                fixture_output = fixture_raw
+                golden = fixture_raw
         else:
-            fixture_output = _as_str(fixture_raw)
+            golden = _as_str(fixture_raw)
+    if raw.get("expected_output") is not None and golden is None:
+        golden = _as_str(raw.get("expected_output"))
 
     criteria = raw.get("expected_criteria")
     if criteria is None:
@@ -271,18 +283,22 @@ def _parse_case(raw: dict[str, Any], suite_dir: Path) -> EvalCase:
     except AssertionHardFail:
         raise
 
-    exit_observed = raw.get("observed_exit_code")
-    if exit_observed is not None:
-        exit_observed = int(exit_observed)
+    # If golden exact text is provided, surface it as exact_output when unset.
+    if golden is not None and assertions.exact_output is None and raw.get("assert_exact_golden"):
+        assertions.exact_output = golden
+
+    has_execute = isinstance(raw.get("execute"), dict) and bool(
+        (raw.get("execute") or {}).get("kind")
+    )
 
     return EvalCase(
         id=case_id,
         input=str(raw.get("input") or ""),
         expected_criteria=[str(c) for c in criteria],
         assertions=assertions,
-        observed_output=observed,
-        fixture_output=fixture_output,
-        observed_exit_code=exit_observed,
+        golden_output=golden,
+        suite_authored_output=suite_authored,
+        has_execute=has_execute,
         raw=dict(raw),
     )
 
@@ -397,46 +413,126 @@ def run_case(
     suite: EvalSuite,
     judge: QualitativeJudge,
     workspace: EvalWorkspace,
+    toolchain: Optional[dict[str, Any]] = None,
+    repo_root: Optional[Path] = None,
+    skill_dir: Optional[Path] = None,
+    skill_release_hash: Optional[str] = None,
 ) -> CaseResult:
-    """Execute one case deterministically when outputs exist; else mark prompt-only."""
-    if not case.is_executable:
+    """Execute one case through the real executor; never trust suite-authored outputs."""
+    if not case_has_execute_block(case):
+        if case_has_suite_authored_output(case) or case.suite_authored_output:
+            return CaseResult(
+                case_id=case.id,
+                status=CaseStatus.INVALID_EMBEDDED_OUTPUT,
+                observed_output=None,
+                reason=(
+                    "suite-authored observed_output/fixture_output cannot count as "
+                    "execution evidence; declare execute{kind:...} instead"
+                ),
+                evidence_meta={
+                    "executable": False,
+                    "suite_authored_output": True,
+                    "evidence_source": "suite_authored",
+                },
+                evidence_source="suite_authored",
+            )
         return CaseResult(
             case_id=case.id,
             status=CaseStatus.NOT_EXECUTABLE_PROMPT_ONLY,
             observed_output=None,
-            reason=(
-                "legacy scenario lacks observed_output/fixture_output; "
-                "not executable for certification"
-            ),
+            reason="case lacks execute block; not executable for certification",
             evidence_meta={"executable": False, "input_present": bool(case.input)},
+            evidence_source="none",
         )
 
-    observed = case.resolved_output()
-    assert observed is not None
+    capture = execute_case(
+        case,
+        suite=suite,
+        workspace=workspace,
+        toolchain=toolchain,
+        repo_root=repo_root,
+        skill_dir=skill_dir,
+        skill_release_hash=skill_release_hash,
+    )
+    if capture.receipt is None:
+        return CaseResult(
+            case_id=case.id,
+            status=CaseStatus.INFRASTRUCTURE_ERROR,
+            observed_output=capture.stdout or None,
+            reason=capture.error or "executor produced no receipt",
+            evidence_meta={
+                "executable": True,
+                "executor_error": capture.error,
+                "evidence_source": "executor_failed",
+            },
+            evidence_source="executor_failed",
+        )
+
+    observed = capture.stdout
     output_path = workspace.write_output(case.id, observed)
     assertion_results = run_assertions(
         observed,
         case.assertions,
-        observed_exit_code=case.observed_exit_code,
+        observed_exit_code=capture.exit_code,
         workspace_root=case.workspace_root or workspace.root,
     )
+    # Optional golden comparison: suite-authored expected text is a fixture only.
+    if case.golden_output is not None and case.raw.get("compare_to_golden"):
+        if observed.strip() != case.golden_output.strip():
+            assertion_results.append(
+                AssertionResult(
+                    name="compare_to_golden",
+                    passed=False,
+                    detail="executed stdout did not match golden fixture",
+                    hard_fail=True,
+                )
+            )
+
     judge_scores = judge.score(case, observed, suite.rubric, assertion_results)
     case_score, hard_fail_dims = weighted_score(judge_scores, suite.rubric)
 
     artifact = EvidenceArtifact(
-        name=f"{case.id}.output",
-        kind="observed_output",
+        name=f"{case.id}.stdout",
+        kind="executed_stdout",
         path=str(output_path),
         content_hash=workspace.file_hash(output_path),
-        metadata={"case_id": case.id},
+        metadata={"case_id": case.id, "evidence_source": "executor"},
+    )
+    receipt_artifact = EvidenceArtifact(
+        name=f"{case.id}.receipt",
+        kind="execution_receipt",
+        path=str(workspace.evidence_dir / f"{case.id}.receipt.json"),
+        content_hash=capture.receipt.receipt_hash,
+        metadata={"case_id": case.id, "evidence_source": "executor"},
     )
     evidence_meta = {
         "executable": True,
+        "evidence_source": "executor",
         "output_path": str(output_path),
         "output_sha256": artifact.content_hash,
+        "receipt_hash": capture.receipt.receipt_hash,
+        "exit_code": capture.exit_code,
+        "tool_calls": [tc.to_dict() for tc in capture.tool_calls],
         "case_score": case_score,
         "assertions_passed": assertions_passed(assertion_results),
+        "suite_authored_output_ignored": case.suite_authored_output,
     }
+    receipt_dict = capture.receipt.to_dict()
+
+    if capture.error or (capture.exit_code is None and any(tc.timed_out for tc in capture.tool_calls)):
+        return CaseResult(
+            case_id=case.id,
+            status=CaseStatus.INFRASTRUCTURE_ERROR,
+            observed_output=observed,
+            assertion_results=assertion_results,
+            judge_scores=judge_scores,
+            case_score=case_score,
+            evidence=[artifact, receipt_artifact],
+            evidence_meta=evidence_meta,
+            reason=capture.error or "executor infrastructure failure",
+            execution_receipt=receipt_dict,
+            evidence_source="executor",
+        )
 
     if assertions_hard_failed(assertion_results):
         return CaseResult(
@@ -446,9 +542,11 @@ def run_case(
             assertion_results=assertion_results,
             judge_scores=judge_scores,
             case_score=case_score,
-            evidence=[artifact],
+            evidence=[artifact, receipt_artifact],
             evidence_meta=evidence_meta,
             reason="hard-fail deterministic assertion",
+            execution_receipt=receipt_dict,
+            evidence_source="executor",
         )
 
     if hard_fail_dims:
@@ -459,9 +557,11 @@ def run_case(
             assertion_results=assertion_results,
             judge_scores=judge_scores,
             case_score=case_score,
-            evidence=[artifact],
+            evidence=[artifact, receipt_artifact],
             evidence_meta=evidence_meta,
             reason=f"hard_fail_below on dimension(s) {', '.join(hard_fail_dims)!r}",
+            execution_receipt=receipt_dict,
+            evidence_source="executor",
         )
 
     if not assertions_passed(assertion_results):
@@ -472,9 +572,11 @@ def run_case(
             assertion_results=assertion_results,
             judge_scores=judge_scores,
             case_score=case_score,
-            evidence=[artifact],
+            evidence=[artifact, receipt_artifact],
             evidence_meta=evidence_meta,
             reason="deterministic assertions failed",
+            execution_receipt=receipt_dict,
+            evidence_source="executor",
         )
 
     return CaseResult(
@@ -484,9 +586,11 @@ def run_case(
         assertion_results=assertion_results,
         judge_scores=judge_scores,
         case_score=case_score,
-        evidence=[artifact],
+        evidence=[artifact, receipt_artifact],
         evidence_meta=evidence_meta,
-        reason="passed deterministic checks",
+        reason="passed executed deterministic checks",
+        execution_receipt=receipt_dict,
+        evidence_source="executor",
     )
 
 
@@ -496,33 +600,55 @@ def run_suite(
     judge: Optional[QualitativeJudge] = None,
     toolchain: Optional[dict[str, Any]] = None,
     workspace: Optional[EvalWorkspace] = None,
+    repo_root: Optional[Path] = None,
+    skill_dir: Optional[Path] = None,
+    skill_release_hash: Optional[str] = None,
 ) -> SuiteResult:
-    """Run all cases in *suite* and aggregate a SuiteResult."""
+    """Run all cases in *suite* through the real executor and aggregate results."""
     active_judge: QualitativeJudge = judge or IndependentDeterministicJudge()
     owns_workspace = workspace is None
     ws = workspace or EvalWorkspace()
     case_results: list[CaseResult] = []
     reasons: list[str] = []
     evidence: list[EvidenceArtifact] = []
+    execution_receipts: list[dict[str, Any]] = []
+    root = Path(repo_root) if repo_root else Path(__file__).resolve().parents[3]
 
     try:
         for case in suite.cases:
-            result = run_case(case, suite=suite, judge=active_judge, workspace=ws)
+            result = run_case(
+                case,
+                suite=suite,
+                judge=active_judge,
+                workspace=ws,
+                toolchain=toolchain,
+                repo_root=root,
+                skill_dir=skill_dir,
+                skill_release_hash=skill_release_hash,
+            )
             case_results.append(result)
             evidence.extend(result.evidence)
+            if result.execution_receipt:
+                execution_receipts.append(result.execution_receipt)
             if result.status == CaseStatus.NOT_EXECUTABLE_PROMPT_ONLY:
                 reasons.append(f"{case.id}: not_executable_prompt_only")
+            if result.status == CaseStatus.INVALID_EMBEDDED_OUTPUT:
+                reasons.append(f"{case.id}: invalid_embedded_output")
 
         dimension_scores = _aggregate_dimension_scores(case_results, suite.rubric)
         weighted, hard_dims = weighted_score(dimension_scores, suite.rubric)
 
-        # Prefer mean of per-case weighted scores when available.
         scored = [c for c in case_results if c.case_score is not None]
         if scored:
             weighted = sum(float(c.case_score or 0.0) for c in scored) / len(scored)
 
-        has_prompt_only = any(
-            c.status == CaseStatus.NOT_EXECUTABLE_PROMPT_ONLY for c in case_results
+        has_blocked = any(
+            c.status
+            in {
+                CaseStatus.NOT_EXECUTABLE_PROMPT_ONLY,
+                CaseStatus.INVALID_EMBEDDED_OUTPUT,
+            }
+            for c in case_results
         )
         any_failed = any(
             c.status
@@ -535,25 +661,32 @@ def run_suite(
         )
         all_executable_passed = (
             bool(case_results)
-            and not has_prompt_only
+            and not has_blocked
             and not any_failed
             and all(c.status == CaseStatus.PASSED for c in case_results)
+            and all(c.evidence_source == "executor" for c in case_results)
+            and all(c.execution_receipt for c in case_results)
         )
         passed = (
             all_executable_passed
             and weighted >= suite.pass_threshold
             and not hard_dims
         )
-        certifiable = passed and not has_prompt_only
+        certifiable = passed and not has_blocked
 
-        if has_prompt_only:
-            reasons.append("suite contains prompt-only (non-executable) cases; cannot certify")
+        if has_blocked:
+            reasons.append(
+                "suite contains non-executable or suite-authored-output cases; cannot certify"
+            )
             certifiable = False
         if hard_dims:
             reasons.append(f"hard_fail_below dimensions: {', '.join(hard_dims)}")
             certifiable = False
         if not case_results:
             reasons.append("suite has no cases")
+            certifiable = False
+        if any(not c.execution_receipt for c in case_results):
+            reasons.append("missing immutable execution receipt(s)")
             certifiable = False
 
         receipt = ws.receipt()
@@ -573,6 +706,7 @@ def run_suite(
             reasons=reasons,
             workspace_receipt=receipt,
             evidence=evidence,
+            execution_receipts=execution_receipts,
         )
     finally:
         if owns_workspace:

@@ -376,14 +376,17 @@ class SkillsGatewayService:
         request_id = request_id or str(uuid.uuid4())
         idempotency_key = idempotency_key or params.pop("idempotency_key", None)
 
-        if operation in WRITE_OPERATIONS and not (
-            actor.has_scope("skills:write") or actor.has_scope("*")
-        ):
+        if operation in WRITE_OPERATIONS and not actor.may_write():
             # Allow run lifecycle with skills:run as a narrower write scope.
-            if operation.startswith("skills_run_") and actor.has_scope("skills:run"):
+            if operation.startswith("skills_run_") and (
+                "skills:run" in actor.permitted_operations or actor.has_scope("skills:run")
+            ):
                 pass
             elif operation in {"skills_feedback_submit", "skills_trace_candidate_submit"} and (
-                actor.has_scope("skills:feedback") or actor.has_scope("skills:run")
+                "skills:feedback" in actor.permitted_operations
+                or "skills:run" in actor.permitted_operations
+                or actor.has_scope("skills:feedback")
+                or actor.has_scope("skills:run")
             ):
                 pass
             else:
@@ -857,26 +860,135 @@ class SkillsGatewayService:
         idempotency_key: Optional[str],
     ) -> Dict[str, Any]:
         del idempotency_key
-        skill = self._get_skill(str(params.get("skill_id") or ""))
-        tool_id = str(params.get("tool_id") or "")
-        tool = next((t for t in skill.tools if t["tool_id"] == tool_id), None)
-        if not tool:
-            raise ServiceError("not_found", f"Unknown tool_id: {tool_id}", http_status=404)
-        payload = params.get("input") or {}
-        # Dry-run is the default; live side effects require dry_run=false.
+        tool_id = str(params.get("tool_id") or "").strip()
+        if not tool_id:
+            raise ServiceError("invalid_argument", "tool_id is required", http_status=400)
+
+        # Prefer packaged tools under tools/<id>; skill catalog bindings are advisory.
+        skill_id = str(params.get("skill_id") or "").strip()
+        skill = self._get_skill(skill_id) if skill_id else None
+        tool_dir = self.repo_root / "tools" / tool_id
+        if not tool_dir.is_dir():
+            raise ServiceError("not_found", f"Unknown packaged tool_id: {tool_id}", http_status=404)
+
         dry_run = True if "dry_run" not in params else bool(params.get("dry_run"))
-        result = {
-            "tool_id": tool_id,
-            "version": tool["version"],
-            "descriptor_hash": tool["descriptor_hash"],
-            "dry_run": dry_run,
-            "output": {
-                "echo": payload,
-                "invoked_by": actor.actor_id,
-                "mode": "dry_run" if dry_run else "live_echo",
-            },
-            "side_effects": "none",
-        }
+        version = params.get("version")
+        tool_hash = params.get("tool_hash") or params.get("bundle_hash") or params.get("source_hash")
+        argv = params.get("argv") or []
+        if not isinstance(argv, list):
+            raise ServiceError("invalid_argument", "argv must be a list", http_status=400)
+        stdin = params.get("stdin")
+        if stdin is not None:
+            stdin = str(stdin)
+        input_payload = params.get("input")
+
+        try:
+            from linkskills_tool_runtime.descriptor import load_tool_descriptor
+            from linkskills_tool_runtime.invoke import invoke_tool
+            from linkskills_tool_runtime.resolve import ResolutionError, resolve_tool
+        except ImportError as exc:
+            raise ServiceError(
+                "tool_runtime_unavailable",
+                f"tool runtime import failed: {exc}",
+                http_status=500,
+            ) from exc
+
+        try:
+            if dry_run:
+                resolved = resolve_tool(
+                    tool_dir,
+                    tool_id=tool_id,
+                    version=str(version) if version is not None else None,
+                    bundle_hash=str(tool_hash) if params.get("bundle_hash") is not None else None,
+                    source_hash=str(tool_hash)
+                    if params.get("source_hash") is not None and params.get("bundle_hash") is None
+                    else None,
+                )
+                result = {
+                    "tool_id": resolved.tool_id,
+                    "version": resolved.version,
+                    "descriptor_hash": resolved.descriptor.source_hash,
+                    "source_hash": resolved.descriptor.source_hash,
+                    "bundle_hash": resolved.bundle_hash,
+                    "dry_run": True,
+                    "output": {
+                        "resolved": True,
+                        "argv": argv,
+                        "input": input_payload,
+                        "invoked_by": actor.actor_id,
+                        "mode": "dry_run",
+                    },
+                    "side_effects": "none",
+                }
+                warnings = ["tool_invoke_dry_run"]
+            else:
+                # Fail closed: live invocation requires exact version + hash pin.
+                if not version or not tool_hash:
+                    raise ServiceError(
+                        "tool_hash_required",
+                        "dry_run=false requires exact version and tool_hash/source_hash/bundle_hash",
+                        http_status=400,
+                    )
+                if not actor.may_write():
+                    raise ServiceError(
+                        "auth_forbidden",
+                        "live tool invocation requires write/execute permission",
+                        http_status=403,
+                    )
+                # Prefer source_hash pin (always computed); accept bundle_hash alias.
+                source_hash = params.get("source_hash")
+                bundle_hash = params.get("bundle_hash")
+                if source_hash is None and bundle_hash is None:
+                    source_hash = tool_hash
+                invocation = invoke_tool(
+                    tool_dir,
+                    tool_id=tool_id,
+                    version=str(version),
+                    bundle_hash=str(bundle_hash) if bundle_hash is not None else None,
+                    source_hash=str(source_hash) if source_hash is not None else None,
+                    argv=[str(a) for a in argv] or None,
+                    cwd=tool_dir,
+                    input_text=stdin,
+                    adapter=str(params.get("adapter") or "local"),
+                )
+                if not invocation.ok:
+                    raise ServiceError(
+                        "tool_invoke_failed",
+                        invocation.error or "packaged tool invocation failed",
+                        http_status=502,
+                    )
+                result = {
+                    "tool_id": invocation.tool_id,
+                    "version": invocation.version,
+                    "descriptor_hash": (
+                        invocation.bundle_hash
+                        or (
+                            invocation.resolved.descriptor.source_hash
+                            if invocation.resolved
+                            else None
+                        )
+                    ),
+                    "source_hash": (
+                        invocation.resolved.descriptor.source_hash
+                        if invocation.resolved
+                        else None
+                    ),
+                    "bundle_hash": invocation.bundle_hash,
+                    "dry_run": False,
+                    "output": {
+                        "exit_code": invocation.exit_code,
+                        "stdout": invocation.stdout,
+                        "stderr": invocation.stderr,
+                        "adapter_kind": invocation.adapter_kind,
+                        "invoked_by": actor.actor_id,
+                        "mode": "live_adapter",
+                    },
+                    "side_effects": load_tool_descriptor(tool_dir).side_effect_class,
+                }
+                warnings = []
+        except ResolutionError as exc:
+            raise ServiceError("tool_resolve_failed", str(exc), http_status=409) from exc
+
         self._events.append(
             {
                 "type": "tool_invocation",
@@ -886,11 +998,10 @@ class SkillsGatewayService:
                 "at": _utc_now(),
             }
         )
-        warnings = ["tool_invoke_dry_run"] if dry_run else []
         return {
             "data": result,
-            "release_hash": skill.release_hash,
-            "profile_hash": skill.profile_hash,
+            "release_hash": skill.release_hash if skill else "",
+            "profile_hash": skill.profile_hash if skill else "",
             "warnings": warnings,
         }
 

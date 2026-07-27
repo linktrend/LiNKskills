@@ -87,6 +87,20 @@ class CertificationTests(unittest.TestCase):
         self.assertFalse(decision.allowed)
         self.assertIn("executed case outputs", decision.reason)
 
+    def test_refuses_suite_authored_observed_output_alone(self) -> None:
+        decision = evaluate_certification_evidence(
+            {
+                "cases": [
+                    {
+                        "case_id": "c1",
+                        "observed_output": "HELLO_CANARY",
+                        "fixture_output": "HELLO_CANARY",
+                    }
+                ]
+            }
+        )
+        self.assertFalse(decision.allowed)
+
     def test_accepts_executed_outputs(self) -> None:
         decision = evaluate_certification_evidence(
             {

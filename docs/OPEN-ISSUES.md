@@ -10,9 +10,10 @@ Append-only engineering build log for this repository. Prefer this file over sta
 
 ### 1. Live certification of skills to `usable` / certified profiles
 
-**Status:** Open (operational).  
-Filesystem catalog + eval-suite YAML exist for all 34 skills; generated `catalog/index.json` still defaults `certification_state` to `draft`. Real Eval Runner in-repo **rejects prompt-only certification**, but studio-wide promotion of published certified profiles still depends on executed evidence + publication + (when applicable) applied schema. Consumers on the compatibility path correctly use `require_usable=False` until overlays/publication catch up.  
-**Blocked on:** applied `lskills` schema (including registry foundation) on target Supabase + real eval evidence + supervised/live librarian passes.
+**Status:** Open (operational) — certification path corrected 2026-07-28.  
+Filesystem catalog + eval-suite YAML exist for all 34 skills; generated `catalog/index.json` still defaults `certification_state` to `draft`. Eval Runner now requires **sealed executor receipts** from real isolated execution; suite-authored `observed_output`/`fixture_output` cannot certify. Local canary-echo is receipt-bound only. Studio-wide promotion of published certified profiles still depends on executed evidence + publication + (when applicable) applied schema.  
+**Blocked on:** applied `lskills` schema (including registry foundation) on target Supabase + real eval evidence + supervised/live librarian passes.  
+**Do not** start multi-day Cursor canary until certification + Platform gates pass independent verification.
 
 ### 2. Confirm `lskills` migrations applied per environment (Platform-owned live apply)
 
@@ -26,10 +27,12 @@ Migrations `20260715_000002`, `000003` seed, `20260718_000004` PostgREST exposur
 Runnable generic host: `LiNKplatform/packages/librarian-runner`. Skills domain worker package: `packages/librarian_domain`. First production passes should stay dry-run / supervised until trusted.  
 **Remaining:** stage→prod confidence, monitoring, escalation briefing path for the Principal.
 
-### 4. Live Platform authentication replacing Gateway fakes
+### 4. Live Platform authentication issuer (claims shape consumed)
 
-**Status:** Open (blocked on LiNKplatform publish).  
-In-repo Gateway/MCP use `FakePlatformClaimsVerifier` / mint-fake-token helpers until Platform publishes the real actor/auth claims contract. Spoofed body identity is already rejected.
+**Status:** Partially done / still blocked on live issuer.  
+Gateway/MCP non-test paths consume canonical Platform AuthClaims (`claimContractVersion`, camelCase) via `PlatformClaimsVerifier` and vendored fixtures under `packages/contracts/fixtures/platform-claims/`. Competing `fake.*` tokens are rejected outside `linkskills_gateway.auth_testing`. **Live Platform token issuance / stage auth** remains a Platform gate.  
+Spoofed body identity is rejected.  
+**Correction (2026-07-28):** prior fake-shape acceptance on production verifier path is removed.
 
 ### 5. Live stage/prod internal-launch readiness
 

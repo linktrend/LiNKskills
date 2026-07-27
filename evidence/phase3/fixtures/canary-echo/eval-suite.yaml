@@ -1,9 +1,10 @@
-# Phase 3 canary: deterministic echo suite with observed_output.
-# Prompt-only scenarios are intentionally absent so certification can pass.
+# Phase 3 canary: genuinely executed packaged-tool suite.
+# Suite-authored observed_output/fixture_output are intentionally absent.
+# Certification requires immutable executor receipts from real invocations.
 schema_version: "0.1"
 suite_id: canary-echo-suite
 skill_id: canary-echo
-suite_version: 0.1.0
+suite_version: 0.2.0
 skill_version_range: ">=0.1.0"
 pass_threshold: 0.8
 rubric:
@@ -14,36 +15,49 @@ cases:
   - id: echo-hello
     case_type: golden
     input: |
-      Echo the token HELLO_CANARY exactly once.
-    expected:
-      criteria:
-        - "output contains HELLO_CANARY"
+      Echo the token HELLO_CANARY exactly once via packaged text-echo.
     expected_criteria:
       - "output contains HELLO_CANARY"
-    observed_output: |
-      HELLO_CANARY
+    execute:
+      kind: packaged_tool
+      tool_id: text-echo
+      tool_dir: tools/text-echo
+      version: "1.0.0"
+      argv:
+        - HELLO_CANARY
     assertions:
       must_contain:
         - "HELLO_CANARY"
       must_not_contain:
         - "PROMPT_ONLY"
+      exit_code: 0
   - id: echo-json
     case_type: golden
     input: |
-      Return a small JSON object acknowledging the echo.
+      Return JSON acknowledging the echo via packaged text-echo --json.
     expected_criteria:
-      - "json ok field is true"
-    observed_output: '{"ok": true, "echo": "ping"}'
+      - "json ok/status field present"
+    execute:
+      kind: packaged_tool
+      tool_id: text-echo
+      tool_dir: tools/text-echo
+      version: "1.0.0"
+      argv:
+        - "--json"
+        - "ping"
     assertions:
       must_contain:
-        - '"ok": true'
+        - '"status": "ok"'
+        - '"echo": "ping"'
       json_schema_fields:
-        - ok
+        - status
         - echo
+      exit_code: 0
 evidence_policy:
   retain:
     - outputs
     - assertion_results
+    - execution_receipts
   redact:
     - secrets
 isolation:

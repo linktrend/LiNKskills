@@ -18,7 +18,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any, Dict, Optional, Tuple, Type
 from urllib.parse import urlparse
 
-from .auth import AuthError, FakePlatformClaimsVerifier
+from .auth import AuthError, PlatformClaimsVerifier
 from .service import OPERATIONS, ServiceError, SkillsGatewayService
 
 
@@ -28,9 +28,9 @@ def _json_bytes(payload: Dict[str, Any]) -> bytes:
 
 def make_handler(
     service: SkillsGatewayService,
-    verifier: Optional[FakePlatformClaimsVerifier] = None,
+    verifier: Optional[PlatformClaimsVerifier] = None,
 ) -> Type[BaseHTTPRequestHandler]:
-    auth = verifier or FakePlatformClaimsVerifier()
+    auth = verifier or PlatformClaimsVerifier()
 
     class LiNKskillsGateway(BaseHTTPRequestHandler):
         server_version = "LiNKskillsGateway/0.1"
@@ -222,7 +222,7 @@ def create_server(
     port: int = 8787,
     *,
     service: Optional[SkillsGatewayService] = None,
-    verifier: Optional[FakePlatformClaimsVerifier] = None,
+    verifier: Optional[PlatformClaimsVerifier] = None,
 ) -> ThreadingHTTPServer:
     svc = service or SkillsGatewayService()
     handler = make_handler(svc, verifier=verifier)

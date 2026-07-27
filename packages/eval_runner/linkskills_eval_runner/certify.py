@@ -1,4 +1,4 @@
-"""Certification gate: require observed evidence; reject prompt-only / fake judges."""
+"""Certification gate: require immutable executor receipts; reject suite-authored outputs."""
 
 from __future__ import annotations
 
@@ -22,18 +22,23 @@ class CertificationDecision:
     weighted_score: Optional[float] = None
     hard_fail_dimensions: list[str] = field(default_factory=list)
     evidence: dict[str, Any] = field(default_factory=dict)
+    receipt_hashes: list[str] = field(default_factory=list)
 
 
 def _profile_hash(run: SuiteResult) -> str:
     payload = {
+        "case_ids": [c.case_id for c in run.case_results],
+        "judge_kind": run.judge_kind,
+        "receipt_hashes": sorted(
+            (c.execution_receipt or {}).get("receipt_hash") or ""
+            for c in run.case_results
+        ),
         "skill_id": run.skill_id,
+        "statuses": [c.status.value for c in run.case_results],
+        "suite_hash": run.suite_hash,
         "suite_id": run.suite_id,
         "suite_version": run.suite_version,
-        "suite_hash": run.suite_hash,
-        "judge_kind": run.judge_kind,
         "toolchain": run.toolchain,
-        "case_ids": [c.case_id for c in run.case_results],
-        "statuses": [c.status.value for c in run.case_results],
     }
     blob = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
     return hashlib.sha256(blob).hexdigest()
@@ -49,7 +54,6 @@ def compute_suite_scores(
         for name in sorted({k for c in run.case_results for k in c.judge_scores})
     ]
     if not dims:
-        # Fall back to recorded suite score.
         return float(run.weighted_score or 0.0), list(run.hard_fail_dimensions), dict(run.dimension_scores)
 
     totals = {d.dimension: 0.0 for d in dims}
@@ -69,6 +73,68 @@ def compute_suite_scores(
     return score, hard_dims, dimension_scores
 
 
+def _receipt_valid(receipt: Any) -> bool:
+    if not isinstance(receipt, dict):
+        return False
+    required = (
+        "receipt_hash",
+        "case_id",
+        "skill_id",
+        "suite_hash",
+        "skill_release_hash",
+        "execution_profile_hash",
+        "stdout_hash",
+        "stderr_hash",
+        "tool_calls",
+        "environment",
+        "evidence_source",
+        "executor_version",
+    )
+    if any(not receipt.get(key) and receipt.get(key) != 0 for key in required):
+        # exit_code may be 0; evidence_source must be executor
+        pass
+    for key in required:
+        if key not in receipt:
+            return False
+    if receipt.get("evidence_source") != "executor":
+        return False
+    if not receipt.get("receipt_hash"):
+        return False
+    # Recompute integrity from sealed payload fields.
+    from .receipt import ExecutionReceipt, ToolCallRecord
+
+    try:
+        tool_calls = [
+            ToolCallRecord(**tc) if isinstance(tc, dict) else tc
+            for tc in (receipt.get("tool_calls") or [])
+        ]
+        rebuilt = ExecutionReceipt(
+            receipt_id=str(receipt["receipt_id"]),
+            case_id=str(receipt["case_id"]),
+            skill_id=str(receipt["skill_id"]),
+            suite_id=str(receipt.get("suite_id") or ""),
+            suite_hash=str(receipt["suite_hash"]),
+            skill_release_hash=str(receipt["skill_release_hash"]),
+            execution_profile_hash=str(receipt["execution_profile_hash"]),
+            environment=dict(receipt.get("environment") or {}),
+            toolchain=dict(receipt.get("toolchain") or {}),
+            tool_calls=tool_calls,
+            exit_code=receipt.get("exit_code"),
+            stdout_hash=str(receipt["stdout_hash"]),
+            stderr_hash=str(receipt["stderr_hash"]),
+            artifact_hashes=list(receipt.get("artifact_hashes") or []),
+            started_at=str(receipt.get("started_at") or ""),
+            finished_at=str(receipt.get("finished_at") or ""),
+            executor_version=str(receipt.get("executor_version") or ""),
+            evidence_source=str(receipt.get("evidence_source") or ""),
+            receipt_hash="",
+        )
+        rebuilt.seal()
+        return rebuilt.receipt_hash == receipt.get("receipt_hash")
+    except Exception:  # noqa: BLE001
+        return False
+
+
 def certify_run(
     run: SuiteResult,
     judge: Any = None,
@@ -79,11 +145,11 @@ def certify_run(
     """Decide whether *run* may produce a certification for its execution profile.
 
     Hard rejects:
-    - FakeJudge / PromptOnlyJudge (by type or kind)
-    - any case with status not_executable_prompt_only
-    - missing case results / missing observed evidence
+    - FakeJudge / PromptOnlyJudge
+    - prompt-only or suite-authored-output cases
+    - missing/invalid immutable execution receipts
+    - evidence_source other than executor
     - failed / hard-fail / infrastructure cases
-    - hard_fail_below dimension floors
     """
     score, hard_dims, dimension_scores = compute_suite_scores(run, rubric=rubric)
     evidence: dict[str, Any] = {
@@ -96,6 +162,7 @@ def certify_run(
         "weighted_score": score,
         "dimension_scores": dimension_scores,
         "hard_fail_dimensions": hard_dims,
+        "execution_receipt_count": len(run.execution_receipts),
     }
 
     if judge is not None and judge_is_rejected(judge):
@@ -126,24 +193,44 @@ def certify_run(
             evidence=evidence,
         )
 
-    if run.has_prompt_only_cases:
-        prompt_only_ids = [
-            c.case_id
+    blocked_ids = [
+        c.case_id
+        for c in run.case_results
+        if c.status
+        in {
+            CaseStatus.NOT_EXECUTABLE_PROMPT_ONLY,
+            CaseStatus.INVALID_EMBEDDED_OUTPUT,
+        }
+    ]
+    if blocked_ids:
+        evidence["blocked_case_ids"] = blocked_ids
+        statuses = {
+            c.case_id: c.status.value
             for c in run.case_results
-            if c.status == CaseStatus.NOT_EXECUTABLE_PROMPT_ONLY
-        ]
-        evidence["prompt_only_case_ids"] = prompt_only_ids
+            if c.case_id in blocked_ids
+        }
+        # Preserve legacy token for prompt-only rejection assertions.
+        prompt_token = (
+            "not_executable_prompt_only"
+            if any(
+                c.status == CaseStatus.NOT_EXECUTABLE_PROMPT_ONLY
+                for c in run.case_results
+                if c.case_id in blocked_ids
+            )
+            else "suite_authored_or_non_executable"
+        )
         return CertificationDecision(
             certified=False,
             reason=(
-                "cannot certify: suite contains not_executable_prompt_only cases "
-                f"({', '.join(prompt_only_ids)})"
+                f"cannot certify: {prompt_token} cases "
+                f"({', '.join(f'{cid}={statuses[cid]}' for cid in blocked_ids)})"
             ),
             weighted_score=score,
             hard_fail_dimensions=hard_dims,
             evidence=evidence,
         )
 
+    receipt_hashes: list[str] = []
     for case in run.case_results:
         if case.status in {
             CaseStatus.FAILED,
@@ -157,22 +244,48 @@ def certify_run(
                 hard_fail_dimensions=hard_dims,
                 evidence=evidence,
             )
+        if case.evidence_source != "executor":
+            return CertificationDecision(
+                certified=False,
+                reason=(
+                    f"cannot certify: case {case.case_id!r} evidence_source="
+                    f"{case.evidence_source!r} (executor required)"
+                ),
+                weighted_score=score,
+                hard_fail_dimensions=hard_dims,
+                evidence=evidence,
+            )
+        if case.evidence_meta.get("suite_authored_output_used_as_evidence"):
+            return CertificationDecision(
+                certified=False,
+                reason=(
+                    f"cannot certify: case {case.case_id!r} used suite-authored "
+                    "output as evidence"
+                ),
+                weighted_score=score,
+                hard_fail_dimensions=hard_dims,
+                evidence=evidence,
+            )
         if not case.has_observed_evidence:
             return CertificationDecision(
                 certified=False,
-                reason=f"cannot certify: case {case.case_id!r} lacks observed output evidence",
+                reason=f"cannot certify: case {case.case_id!r} lacks executor evidence",
                 weighted_score=score,
                 hard_fail_dimensions=hard_dims,
                 evidence=evidence,
             )
-        if not case.evidence and not case.evidence_meta:
+        if not _receipt_valid(case.execution_receipt):
             return CertificationDecision(
                 certified=False,
-                reason=f"cannot certify: case {case.case_id!r} missing evidence artifacts",
+                reason=(
+                    f"cannot certify: case {case.case_id!r} missing/invalid "
+                    "immutable execution receipt"
+                ),
                 weighted_score=score,
                 hard_fail_dimensions=hard_dims,
                 evidence=evidence,
             )
+        receipt_hashes.append(str(case.execution_receipt.get("receipt_hash")))
 
     if hard_dims:
         return CertificationDecision(
@@ -181,11 +294,11 @@ def certify_run(
             weighted_score=score,
             hard_fail_dimensions=hard_dims,
             evidence=evidence,
+            receipt_hashes=receipt_hashes,
         )
 
     threshold = pass_threshold
     if threshold is None:
-        # Use runner's pass flag when threshold not supplied.
         if not run.passed:
             return CertificationDecision(
                 certified=False,
@@ -193,6 +306,7 @@ def certify_run(
                 weighted_score=score,
                 hard_fail_dimensions=hard_dims,
                 evidence=evidence,
+                receipt_hashes=receipt_hashes,
             )
     elif score < threshold:
         return CertificationDecision(
@@ -201,18 +315,21 @@ def certify_run(
             weighted_score=score,
             hard_fail_dimensions=hard_dims,
             evidence=evidence,
+            receipt_hashes=receipt_hashes,
         )
 
     profile = _profile_hash(run)
     evidence["profile_hash"] = profile
+    evidence["receipt_hashes"] = receipt_hashes
     return CertificationDecision(
         certified=True,
         reason=(
-            "certified: observed outputs, deterministic checks, "
-            "and independent judge evidence present"
+            "certified: executor receipts bind case, release, tool, profile, "
+            "environment/toolchain, and collected evidence"
         ),
         profile_hash=profile,
         weighted_score=score,
         hard_fail_dimensions=hard_dims,
         evidence=evidence,
+        receipt_hashes=receipt_hashes,
     )

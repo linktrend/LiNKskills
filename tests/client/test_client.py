@@ -26,7 +26,7 @@ for path in (
 
 from linkskills_client.client import LocalEventBuffer, SkillsGatewayClient  # noqa: E402
 from linkskills_client.compat import load_skill, record_invocation  # noqa: E402
-from linkskills_gateway.auth import mint_fake_token  # noqa: E402
+from linkskills_gateway.auth_testing import mint_test_bearer  # noqa: E402
 from linkskills_gateway.server import create_server  # noqa: E402
 from linkskills_gateway.service import SkillsGatewayService  # noqa: E402
 from lib.skill_runtime.loader import SkillBundle  # noqa: E402
@@ -65,7 +65,7 @@ class CompatTests(unittest.TestCase):
         port = httpd.server_address[1]
         thread = threading.Thread(target=httpd.serve_forever, daemon=True)
         thread.start()
-        token = mint_fake_token(_claims())
+        token = mint_test_bearer(_claims())
         os.environ["GATEWAY_URL"] = f"http://127.0.0.1:{port}"
         try:
             client = SkillsGatewayClient(
@@ -89,7 +89,7 @@ class CompatTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             client = SkillsGatewayClient(
                 base_url=os.environ["GATEWAY_URL"],
-                authorization=f"Bearer {mint_fake_token(_claims())}",
+                authorization=f"Bearer {mint_test_bearer(_claims())}",
                 event_buffer=LocalEventBuffer(Path(tmp) / "buf.jsonl"),
                 timeout_s=0.2,
             )

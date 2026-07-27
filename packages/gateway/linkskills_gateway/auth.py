@@ -1,8 +1,12 @@
-"""Platform actor claim verification (fake/conformance until live Platform).
+"""Platform actor claim verification for LiNKskills Gateway.
 
-LiNKplatform remains the canonical identity issuer. This module accepts the
-shared claim shape for local/fake tests and rejects any attempt by a caller to
-spoof identity fields that must be server-derived from verified claims.
+Consumes the canonical LiNKplatform AuthClaims shape
+(`packages/contracts/src/claims.ts` / fixtures under
+`packages/contracts/fixtures/claims/`).
+
+Non-test Gateway paths use :class:`PlatformClaimsVerifier` only.
+The legacy ``fake.<b64>`` snake_case shape is confined to
+:mod:`linkskills_gateway.auth_testing` for unit tests.
 """
 
 from __future__ import annotations
@@ -11,7 +15,9 @@ import base64
 import json
 import time
 from dataclasses import dataclass, field
-from typing import Any, Dict, Iterable, Mapping, Optional, Sequence, Set
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any, Dict, Iterable, Mapping, Optional, Sequence, Set, Union
 
 
 class AuthError(Exception):
@@ -31,53 +37,97 @@ class ActorClaims:
     actor_kind: str
     org_id: str
     scopes: frozenset[str] = field(default_factory=frozenset)
+    permitted_operations: frozenset[str] = field(default_factory=frozenset)
     exp: int = 0
     credential_id: str = ""
+    runtime_binding_id: str = ""
+    claim_contract_version: str = ""
+    issuer: str = ""
+    audience: frozenset[str] = field(default_factory=frozenset)
+    internal: bool = False
+    correlation_id: str = ""
+    raw: Mapping[str, Any] = field(default_factory=dict)
 
     def has_scope(self, scope: str) -> bool:
         return scope in self.scopes or "*" in self.scopes
 
+    def may_read(self) -> bool:
+        return (
+            self.has_scope("lskills")
+            or "read" in self.permitted_operations
+            or "skills:read" in self.permitted_operations
+            or "*" in self.permitted_operations
+        )
 
-# Identity fields that must never be accepted from an untrusted request body
-# when they conflict with verified claims.
+    def may_write(self) -> bool:
+        return (
+            self.has_scope("lskills")
+            and (
+                "execute" in self.permitted_operations
+                or "skills:write" in self.permitted_operations
+                or "*" in self.permitted_operations
+            )
+        ) or ("skills:write" in self.permitted_operations)
+
+
 _PROTECTED_IDENTITY_KEYS = frozenset(
     {
+        "actorId",
         "actor_id",
-        "actor_kind",
-        "org_id",
-        "scopes",
-        "exp",
-        "credential_id",
         "platform_actor_id",
+        "actorKind",
+        "actor_kind",
+        "orgId",
+        "org_id",
+        "credentialId",
+        "credential_id",
+        "runtimeBindingId",
+        "serviceScopes",
+        "scopes",
+        "permittedOperations",
+        "expiresAt",
+        "exp",
     }
 )
 
+CLAIM_FIXTURES_DIR = (
+    Path(__file__).resolve().parents[2] / "contracts" / "fixtures" / "platform-claims"
+)
 
-class FakePlatformClaimsVerifier:
-    """Verify fake platform tokens / claim dicts for Gateway conformance.
 
-    Token formats accepted:
-    - ``fake.<base64url(json claims)>``
-    - raw JSON object string (test convenience)
-    - already-decoded mapping (in-process callers)
+def _parse_iso8601_to_epoch(value: Any) -> int:
+    if isinstance(value, (int, float)):
+        return int(value)
+    text = str(value).strip()
+    if text.endswith("Z"):
+        text = text[:-1] + "+00:00"
+    try:
+        return int(datetime.fromisoformat(text).timestamp())
+    except ValueError as exc:
+        raise AuthError("auth_invalid", f"expiresAt/issuedAt not ISO-8601: {value!r}") from exc
 
-    Spoof rejection: if a request payload supplies protected identity keys that
-    differ from the verified claims, verification fails closed.
+
+class PlatformClaimsVerifier:
+    """Verify canonical Platform AuthClaims for Gateway requests.
+
+    Accepted token formats:
+    - ``platform.<base64url(json AuthClaims)>``
+    - raw JSON object string (AuthClaims camelCase)
+    - already-decoded mapping
     """
 
     def __init__(
         self,
         *,
         now_fn=None,
-        required_scopes: Optional[Sequence[str]] = None,
-        require_any_scope: bool = True,
+        expected_audience: str = "lskills-api",
+        required_service: str = "lskills",
+        require_internal: Optional[bool] = None,
     ) -> None:
         self._now = now_fn or time.time
-        # Default: accept tokens that carry skills:read OR skills:write.
-        self._required_scopes = tuple(
-            required_scopes if required_scopes is not None else ("skills:read", "skills:write")
-        )
-        self._require_any_scope = require_any_scope
+        self.expected_audience = expected_audience
+        self.required_service = required_service
+        self.require_internal = require_internal
 
     def verify(
         self,
@@ -85,6 +135,7 @@ class FakePlatformClaimsVerifier:
         *,
         request_payload: Optional[Mapping[str, Any]] = None,
         request_headers: Optional[Mapping[str, Any]] = None,
+        required_operation: Optional[str] = None,
     ) -> ActorClaims:
         if not authorization:
             raise AuthError("auth_missing", "Authorization required")
@@ -93,22 +144,167 @@ class FakePlatformClaimsVerifier:
         if token.lower().startswith("bearer "):
             token = token[7:].strip()
 
+        # Refuse the retired competing fake shape on the production verifier path.
+        if token.startswith("fake."):
+            raise AuthError(
+                "auth_unsupported",
+                "Competing fake.* claim tokens are not accepted on PlatformClaimsVerifier; "
+                "use platform.<base64url(AuthClaims)> or test helpers in auth_testing",
+            )
+
         raw = self._decode_token(token)
         claims = self._normalize_claims(raw)
-        self._check_expiry(claims)
-        self._check_scopes(claims)
+        self._check_lifecycle(claims, required_operation=required_operation)
         self._reject_spoof(claims, request_payload)
         self._reject_override_headers(request_headers)
         return claims
+
+    def _decode_token(self, token: str) -> Dict[str, Any]:
+        if token.startswith("platform."):
+            encoded = token[len("platform.") :]
+            pad = "=" * (-len(encoded) % 4)
+            try:
+                decoded = base64.urlsafe_b64decode(encoded + pad)
+                data = json.loads(decoded.decode("utf-8"))
+            except (ValueError, json.JSONDecodeError) as exc:
+                raise AuthError("auth_malformed", "Malformed platform token") from exc
+            if not isinstance(data, dict):
+                raise AuthError("auth_malformed", "Platform token payload must be an object")
+            return data
+
+        if token.startswith("{"):
+            try:
+                data = json.loads(token)
+            except json.JSONDecodeError as exc:
+                raise AuthError("auth_malformed", "Malformed JSON token") from exc
+            if not isinstance(data, dict):
+                raise AuthError("auth_malformed", "JSON token must be an object")
+            return data
+
+        raise AuthError(
+            "auth_unsupported",
+            "Unsupported token format; use platform.<base64url(AuthClaims JSON)>",
+        )
+
+    def _normalize_claims(self, raw: Mapping[str, Any]) -> ActorClaims:
+        # Canonical camelCase fields from Platform AuthClaims.
+        actor_id = str(
+            raw.get("actorId") or raw.get("platform_actor_id") or raw.get("actor_id") or ""
+        ).strip()
+        actor_kind = str(raw.get("actorKind") or raw.get("actor_kind") or "").strip()
+        org_id = str(raw.get("orgId") or raw.get("org_id") or "").strip()
+        credential_id = str(raw.get("credentialId") or raw.get("credential_id") or "").strip()
+        runtime_binding_id = str(
+            raw.get("runtimeBindingId") or raw.get("runtime_binding_id") or ""
+        ).strip()
+        claim_version = str(
+            raw.get("claimContractVersion") or raw.get("claim_schema_version") or ""
+        ).strip()
+        issuer = str(raw.get("issuer") or "").strip()
+        correlation_id = str(raw.get("correlationId") or raw.get("correlation_id") or "").strip()
+        internal = bool(raw.get("internal")) if "internal" in raw else bool(raw.get("internal_status"))
+
+        scopes_raw = raw.get("serviceScopes") or raw.get("scopes") or []
+        ops_raw = raw.get("permittedOperations") or []
+        audience_raw = raw.get("audience") or []
+
+        expires_at = raw.get("expiresAt") or raw.get("exp")
+        if not actor_id:
+            raise AuthError("auth_invalid", "actorId is required")
+        if not actor_kind:
+            raise AuthError("auth_invalid", "actorKind is required")
+        if not claim_version:
+            raise AuthError("auth_invalid", "claimContractVersion is required")
+        if not credential_id:
+            raise AuthError("auth_invalid", "credentialId is required")
+        if expires_at is None:
+            raise AuthError("auth_invalid", "expiresAt is required")
+        if not issuer:
+            raise AuthError("auth_invalid", "issuer is required")
+
+        exp = _parse_iso8601_to_epoch(expires_at)
+
+        def _as_set(value: Any, *, field_name: str) -> Set[str]:
+            if isinstance(value, str):
+                return {value}
+            if isinstance(value, Iterable):
+                return {str(s) for s in value}
+            raise AuthError("auth_invalid", f"{field_name} must be a list of strings")
+
+        scopes = _as_set(scopes_raw, field_name="serviceScopes")
+        ops = _as_set(ops_raw, field_name="permittedOperations")
+        audience = _as_set(audience_raw, field_name="audience")
+
+        return ActorClaims(
+            actor_id=actor_id,
+            actor_kind=actor_kind,
+            org_id=org_id,
+            scopes=frozenset(scopes),
+            permitted_operations=frozenset(ops),
+            exp=exp,
+            credential_id=credential_id,
+            runtime_binding_id=runtime_binding_id,
+            claim_contract_version=claim_version,
+            issuer=issuer,
+            audience=frozenset(audience),
+            internal=internal,
+            correlation_id=correlation_id,
+            raw=dict(raw),
+        )
+
+    def _check_lifecycle(
+        self,
+        claims: ActorClaims,
+        *,
+        required_operation: Optional[str],
+    ) -> None:
+        now = int(self._now())
+        if claims.exp <= now:
+            raise AuthError("auth_expired", "Claims expired")
+
+        issued_at = claims.raw.get("issuedAt")
+        if issued_at is not None:
+            try:
+                issued_epoch = _parse_iso8601_to_epoch(issued_at)
+            except AuthError:
+                raise
+            if now < issued_epoch:
+                raise AuthError("auth_not_yet_valid", "Claims not yet valid")
+
+        if self.required_service not in claims.scopes and "*" not in claims.scopes:
+            raise AuthError(
+                "auth_forbidden",
+                f"Missing required service scope: {self.required_service}",
+            )
+        if (
+            self.expected_audience not in claims.audience
+            and "*" not in claims.audience
+        ):
+            raise AuthError(
+                "auth_forbidden",
+                f"Missing required audience: {self.expected_audience}",
+            )
+        if self.require_internal is True and not claims.internal:
+            raise AuthError("auth_forbidden", "Internal actor required")
+        if required_operation and required_operation not in claims.permitted_operations:
+            # Allow coarse read/execute aliases.
+            aliases = {
+                "skills:read": {"read", "skills:read"},
+                "skills:write": {"execute", "skills:write"},
+            }
+            allowed = aliases.get(required_operation, {required_operation})
+            if not (allowed & set(claims.permitted_operations)) and "*" not in claims.permitted_operations:
+                raise AuthError(
+                    "auth_forbidden",
+                    f"Operation not permitted: {required_operation}",
+                )
 
     def _reject_override_headers(
         self,
         request_headers: Optional[Mapping[str, Any]],
     ) -> None:
-        """Never treat client-supplied actor override headers as authority."""
         if not request_headers:
             return
-        # Normalize header names to lowercase for comparison.
         normalized = {str(k).lower(): v for k, v in request_headers.items()}
         forbidden = (
             "x-actor-id",
@@ -129,95 +325,6 @@ class FakePlatformClaimsVerifier:
                 + ", ".join(present),
             )
 
-    def _decode_token(self, token: str) -> Dict[str, Any]:
-        if token.startswith("fake."):
-            encoded = token[len("fake.") :]
-            pad = "=" * (-len(encoded) % 4)
-            try:
-                decoded = base64.urlsafe_b64decode(encoded + pad)
-                data = json.loads(decoded.decode("utf-8"))
-            except (ValueError, json.JSONDecodeError) as exc:
-                raise AuthError("auth_malformed", "Malformed fake token") from exc
-            if not isinstance(data, dict):
-                raise AuthError("auth_malformed", "Fake token payload must be an object")
-            return data
-
-        if token.startswith("{"):
-            try:
-                data = json.loads(token)
-            except json.JSONDecodeError as exc:
-                raise AuthError("auth_malformed", "Malformed JSON token") from exc
-            if not isinstance(data, dict):
-                raise AuthError("auth_malformed", "JSON token must be an object")
-            return data
-
-        raise AuthError(
-            "auth_unsupported",
-            "Unsupported token format; use fake.<base64url(json)> for FakePlatformClaimsVerifier",
-        )
-
-    def _normalize_claims(self, raw: Mapping[str, Any]) -> ActorClaims:
-        actor_id = str(raw.get("actor_id") or raw.get("platform_actor_id") or "").strip()
-        actor_kind = str(raw.get("actor_kind") or "").strip()
-        org_id = str(raw.get("org_id") or "").strip()
-        exp_raw = raw.get("exp")
-        scopes_raw = raw.get("scopes") or []
-
-        if not actor_id:
-            raise AuthError("auth_invalid", "actor_id is required")
-        if not actor_kind:
-            raise AuthError("auth_invalid", "actor_kind is required")
-        if not org_id:
-            raise AuthError("auth_invalid", "org_id is required")
-        if exp_raw is None:
-            raise AuthError("auth_invalid", "exp is required")
-
-        try:
-            exp = int(exp_raw)
-        except (TypeError, ValueError) as exc:
-            raise AuthError("auth_invalid", "exp must be an integer unix timestamp") from exc
-
-        if isinstance(scopes_raw, str):
-            scopes: Set[str] = {scopes_raw}
-        elif isinstance(scopes_raw, Iterable):
-            scopes = {str(s) for s in scopes_raw}
-        else:
-            raise AuthError("auth_invalid", "scopes must be a list of strings")
-
-        return ActorClaims(
-            actor_id=actor_id,
-            actor_kind=actor_kind,
-            org_id=org_id,
-            scopes=frozenset(scopes),
-            exp=exp,
-            credential_id=str(raw.get("credential_id") or ""),
-        )
-
-    def _check_expiry(self, claims: ActorClaims) -> None:
-        now = int(self._now())
-        if claims.exp <= now:
-            raise AuthError("auth_expired", "Claims expired")
-
-    def _check_scopes(self, claims: ActorClaims) -> None:
-        if "*" in claims.scopes:
-            return
-        if not self._required_scopes:
-            return
-        if self._require_any_scope:
-            if any(scope in claims.scopes for scope in self._required_scopes):
-                return
-            raise AuthError(
-                "auth_forbidden",
-                "Missing required scopes: need one of "
-                + ", ".join(self._required_scopes),
-            )
-        missing = [s for s in self._required_scopes if s not in claims.scopes]
-        if missing:
-            raise AuthError(
-                "auth_forbidden",
-                f"Missing required scopes: {', '.join(missing)}",
-            )
-
     def _reject_spoof(
         self,
         claims: ActorClaims,
@@ -225,8 +332,6 @@ class FakePlatformClaimsVerifier:
     ) -> None:
         if not request_payload:
             return
-
-        # Nested identity bags (common spoof vector).
         candidates: list[Mapping[str, Any]] = [request_payload]
         for key in ("actor", "identity", "claims", "platform_claims"):
             nested = request_payload.get(key)
@@ -234,49 +339,26 @@ class FakePlatformClaimsVerifier:
                 candidates.append(nested)
 
         expected = {
+            "actorId": claims.actor_id,
             "actor_id": claims.actor_id,
             "platform_actor_id": claims.actor_id,
+            "actorKind": claims.actor_kind,
             "actor_kind": claims.actor_kind,
+            "orgId": claims.org_id,
             "org_id": claims.org_id,
-            "exp": claims.exp,
+            "credentialId": claims.credential_id,
             "credential_id": claims.credential_id,
         }
-
         for bag in candidates:
             for key in _PROTECTED_IDENTITY_KEYS:
                 if key not in bag:
                     continue
                 provided = bag[key]
-                if key == "scopes":
-                    if isinstance(provided, str):
-                        provided_set = {provided}
-                    elif isinstance(provided, Iterable):
-                        provided_set = {str(s) for s in provided}
-                    else:
-                        raise AuthError(
-                            "auth_spoof_rejected",
-                            "Spoofed identity rejected: invalid scopes type",
-                        )
-                    if provided_set != set(claims.scopes):
-                        raise AuthError(
-                            "auth_spoof_rejected",
-                            "Spoofed identity rejected: scopes mismatch",
-                        )
+                if key in {"serviceScopes", "scopes", "permittedOperations", "audience"}:
                     continue
-
                 expected_value = expected.get(key)
-                if expected_value == "":
-                    # credential_id optional on claim side; still reject mismatch
-                    # when both sides present and differ.
-                    if str(provided) and str(provided) != str(expected_value):
-                        # If verifier claim has empty credential_id, any provided
-                        # value is treated as spoof attempt to inject identity.
-                        raise AuthError(
-                            "auth_spoof_rejected",
-                            f"Spoofed identity rejected: {key} must not be supplied",
-                        )
+                if expected_value is None:
                     continue
-
                 if str(provided) != str(expected_value):
                     raise AuthError(
                         "auth_spoof_rejected",
@@ -284,8 +366,22 @@ class FakePlatformClaimsVerifier:
                     )
 
 
-def mint_fake_token(claims: Mapping[str, Any]) -> str:
-    """Helper for tests: mint a ``fake.<b64>`` bearer token."""
+def mint_platform_token(claims: Mapping[str, Any]) -> str:
+    """Helper: mint a ``platform.<b64>`` bearer token from AuthClaims JSON."""
     payload = json.dumps(claims, separators=(",", ":"), sort_keys=True).encode("utf-8")
     encoded = base64.urlsafe_b64encode(payload).decode("ascii").rstrip("=")
-    return f"fake.{encoded}"
+    return f"platform.{encoded}"
+
+
+def load_platform_claim_fixture(name: str) -> Dict[str, Any]:
+    """Load a vendored Platform claims fixture by file stem."""
+    path = CLAIM_FIXTURES_DIR / f"{name}.json"
+    if not path.is_file():
+        raise FileNotFoundError(f"platform claim fixture not found: {path}")
+    data = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(data, dict):
+        raise ValueError(f"fixture must be an object: {path}")
+    return data
+
+
+# Backward-compatible name used by older imports in tests — points at Platform verifier.

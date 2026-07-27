@@ -14,9 +14,10 @@ from typing import Any, Dict, List, Mapping, Optional, TextIO
 from linkskills_gateway.auth import (
     ActorClaims,
     AuthError,
-    FakePlatformClaimsVerifier,
-    mint_fake_token,
+    PlatformClaimsVerifier,
+    mint_platform_token,
 )
+from linkskills_gateway.auth_testing import snake_claims_to_platform_claims
 from linkskills_gateway.service import (
     OPERATIONS,
     ServiceError,
@@ -51,12 +52,12 @@ class SkillsMcpServer:
     def __init__(
         self,
         service: Optional[SkillsGatewayService] = None,
-        verifier: Optional[FakePlatformClaimsVerifier] = None,
+        verifier: Optional[PlatformClaimsVerifier] = None,
         *,
         default_actor: Optional[ActorClaims] = None,
     ) -> None:
         self.service = service or SkillsGatewayService()
-        self.verifier = verifier or FakePlatformClaimsVerifier()
+        self.verifier = verifier or PlatformClaimsVerifier()
         self.default_actor = default_actor
         self._initialized = False
 
@@ -125,9 +126,13 @@ class SkillsMcpServer:
                 request_payload=request_payload,
             )
         if actor_claims is not None:
-            # Mint a transient fake token from provided claims, then verify so
-            # spoof checks still run against the full request payload.
-            token = mint_fake_token(actor_claims)
+            # Accept either canonical AuthClaims or legacy snake_case test claims.
+            claims = dict(actor_claims)
+            if "actorId" not in claims and "actor_id" in claims:
+                claims = snake_claims_to_platform_claims(claims)
+            elif "claimContractVersion" not in claims:
+                claims = snake_claims_to_platform_claims(claims)
+            token = mint_platform_token(claims)
             return self.verifier.verify(
                 f"Bearer {token}",
                 request_payload=request_payload,

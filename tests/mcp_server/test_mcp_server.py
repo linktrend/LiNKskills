@@ -20,7 +20,7 @@ for path in (
 ):
     sys.path.insert(0, str(path))
 
-from linkskills_gateway.auth import mint_fake_token  # noqa: E402
+from linkskills_gateway.auth_testing import mint_test_bearer  # noqa: E402
 from linkskills_gateway.service import SkillsGatewayService  # noqa: E402
 from linkskills_mcp.server import SkillsMcpServer  # noqa: E402
 
@@ -39,7 +39,7 @@ class McpParityTests(unittest.TestCase):
     def setUp(self) -> None:
         self.service = SkillsGatewayService(repo_root=REPO_ROOT)
         self.mcp = SkillsMcpServer(service=self.service)
-        self.token = mint_fake_token(_claims())
+        self.token = mint_test_bearer(_claims())
 
     def test_tools_list_includes_skills_operations(self) -> None:
         tools = {t["name"] for t in self.mcp.list_tools()}
@@ -48,9 +48,9 @@ class McpParityTests(unittest.TestCase):
         self.assertIn("skills_trace_candidate_submit", tools)
 
     def test_skills_list_mcp_http_parity(self) -> None:
-        from linkskills_gateway.auth import FakePlatformClaimsVerifier
+        from linkskills_gateway.auth import PlatformClaimsVerifier
 
-        actor = FakePlatformClaimsVerifier().verify(f"Bearer {self.token}")
+        actor = PlatformClaimsVerifier().verify(f"Bearer {self.token}")
         http_env = self.service.dispatch("skills_list", {}, actor=actor)
         mcp_env = self.mcp.call_tool(
             "skills_list",

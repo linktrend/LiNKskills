@@ -38,3 +38,12 @@
 2. Stdlib HTTP gateway (no FastAPI) to avoid new paid/major dependency.
 3. Prompt-only eval suites marked non-certifiable; canary-echo proves deterministic certification path.
 4. All new Task subagents must use `cursor-grok-4.5-high` per Principal instruction 2026-07-27.
+
+
+## Closed 2026-07-28 Asia/Taipei
+
+- Certification path correction completed (executor receipts, Platform claims, live_adapter invoke, adversarial tests, migration package tests).
+- Invalid prior canary certification withdrawn; genuine canary evidence regenerated.
+- Correction handoff: `docs/handoffs/2026-07-28-grok-certification-path-correction.md`.
+- PR #22 updated; **not merged**. Multi-day Cursor canary **not started**.
+- Session moved to `completed/`.

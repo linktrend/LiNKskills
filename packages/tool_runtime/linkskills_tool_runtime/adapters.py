@@ -52,21 +52,29 @@ class LocalProcessAdapter:
                 error="descriptor entrypoint.command is missing",
             )
 
-        workdir = Path(cwd or entry.get("working_directory") or resolved.tool_dir).resolve()
+        workdir_raw = cwd or entry.get("working_directory") or resolved.tool_dir
+        workdir = Path(workdir_raw)
+        if not workdir.is_absolute():
+            workdir = (resolved.tool_dir / workdir).resolve()
+        else:
+            workdir = workdir.resolve()
         # Sandbox: cwd must remain under the resolved tool dir or an explicit caller cwd.
         sandbox_root = resolved.tool_dir.resolve()
         if cwd is None and not str(workdir).startswith(str(sandbox_root)):
             workdir = sandbox_root
 
+        base_args = entry.get("args") or entry.get("argv") or []
+        if not isinstance(base_args, list):
+            base_args = []
         cmd: list[str]
         if argv:
-            cmd = [str(command), *[str(a) for a in argv]]
+            cmd = [str(command), *[str(a) for a in base_args], *[str(a) for a in argv]]
         else:
             # Allow command to be a full shell-ish string only when no argv provided.
-            if isinstance(command, str) and " " in command:
+            if isinstance(command, str) and " " in command and not base_args:
                 cmd = ["bash", "-lc", command]
             else:
-                cmd = [str(command)]
+                cmd = [str(command), *[str(a) for a in base_args]]
 
         timeout = timeout_seconds
         if timeout is None:

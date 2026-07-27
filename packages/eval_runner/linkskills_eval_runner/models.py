@@ -14,6 +14,7 @@ class CaseStatus(str, Enum):
     FAILED = "failed"
     HARD_FAIL = "hard_fail"
     NOT_EXECUTABLE_PROMPT_ONLY = "not_executable_prompt_only"
+    INVALID_EMBEDDED_OUTPUT = "invalid_embedded_output"
     INFRASTRUCTURE_ERROR = "infrastructure_error"
 
 
@@ -40,14 +41,19 @@ class RubricDimension:
 
 @dataclass
 class EvalCase:
-    """One executable or legacy prompt-only eval case."""
+    """One eval case.
+
+    Suite-authored ``observed_output`` / ``fixture_output`` are golden/expected
+    fixtures only. A case is executable only when it declares an ``execute`` block.
+    """
 
     id: str
     input: str = ""
     expected_criteria: list[str] = field(default_factory=list)
     assertions: AssertionSpec = field(default_factory=AssertionSpec)
-    observed_output: Optional[str] = None
-    fixture_output: Optional[str] = None
+    golden_output: Optional[str] = None
+    suite_authored_output: bool = False
+    has_execute: bool = False
     observed_exit_code: Optional[int] = None
     workspace_root: Optional[str] = None
     raw: dict[str, Any] = field(default_factory=dict)
@@ -58,14 +64,18 @@ class EvalCase:
 
     @property
     def is_executable(self) -> bool:
-        """True when the case carries observed or fixture output for deterministic checks."""
-        return self.observed_output is not None or self.fixture_output is not None
+        """True only when the case declares a real execute boundary."""
+        return self.has_execute
 
-    def resolved_output(self) -> Optional[str]:
-        """Prefer explicit observed_output; fall back to fixture_output."""
-        if self.observed_output is not None:
-            return self.observed_output
-        return self.fixture_output
+    # Backward-compat aliases intentionally do NOT treat suite-authored outputs
+    # as executable evidence.
+    @property
+    def observed_output(self) -> Optional[str]:
+        return None
+
+    @property
+    def fixture_output(self) -> Optional[str]:
+        return self.golden_output
 
 
 @dataclass
@@ -118,12 +128,20 @@ class CaseResult:
     evidence: list[EvidenceArtifact] = field(default_factory=list)
     evidence_meta: dict[str, Any] = field(default_factory=dict)
     reason: str = ""
+    execution_receipt: Optional[dict[str, Any]] = None
+    evidence_source: str = "none"
 
     @property
     def has_observed_evidence(self) -> bool:
         return (
-            self.observed_output is not None
-            and self.status != CaseStatus.NOT_EXECUTABLE_PROMPT_ONLY
+            self.evidence_source == "executor"
+            and self.observed_output is not None
+            and self.execution_receipt is not None
+            and self.status
+            not in {
+                CaseStatus.NOT_EXECUTABLE_PROMPT_ONLY,
+                CaseStatus.INVALID_EMBEDDED_OUTPUT,
+            }
         )
 
 
@@ -146,11 +164,17 @@ class SuiteResult:
     reasons: list[str] = field(default_factory=list)
     workspace_receipt: dict[str, Any] = field(default_factory=dict)
     evidence: list[EvidenceArtifact] = field(default_factory=list)
+    execution_receipts: list[dict[str, Any]] = field(default_factory=list)
 
     @property
     def has_prompt_only_cases(self) -> bool:
         return any(
-            cr.status == CaseStatus.NOT_EXECUTABLE_PROMPT_ONLY for cr in self.case_results
+            cr.status
+            in {
+                CaseStatus.NOT_EXECUTABLE_PROMPT_ONLY,
+                CaseStatus.INVALID_EMBEDDED_OUTPUT,
+            }
+            for cr in self.case_results
         )
 
 

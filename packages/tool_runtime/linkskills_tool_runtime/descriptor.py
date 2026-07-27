@@ -7,6 +7,7 @@ import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Optional, Union
+import hashlib
 
 
 @dataclass
@@ -114,6 +115,21 @@ def _infer_entrypoint(tool_dir: Path, tool_id: str) -> dict[str, Any]:
     }
 
 
+def _hash_tree(root: Path) -> str:
+    digest = hashlib.sha256()
+    for path in sorted(p for p in root.rglob("*") if p.is_file()):
+        # Skip caches / bytecode.
+        if "__pycache__" in path.parts or path.suffix == ".pyc":
+            continue
+        rel = path.relative_to(root).as_posix().encode("utf-8")
+        digest.update(rel)
+        digest.update(b"\0")
+        file_digest = hashlib.sha256(path.read_bytes()).hexdigest().encode("ascii")
+        digest.update(file_digest)
+        digest.update(b"\0")
+    return digest.hexdigest()
+
+
 def _normalize(raw: dict[str, Any], *, tool_dir: Path, synthesized: bool = False) -> ToolDescriptor:
     tool_id = str(raw.get("tool_id") or tool_dir.name)
     version = str(raw.get("version") or "0.0.0-draft")
@@ -126,6 +142,7 @@ def _normalize(raw: dict[str, Any], *, tool_dir: Path, synthesized: bool = False
         platforms = [platforms]
     side_effect = str(raw.get("side_effect_class") or "unknown")
     lifecycle = str(raw.get("lifecycle_state") or ("draft" if synthesized else "draft"))
+    source_hash = raw.get("source_hash") or _hash_tree(tool_dir)
     return ToolDescriptor(
         tool_id=tool_id,
         version=version,
@@ -136,7 +153,7 @@ def _normalize(raw: dict[str, Any], *, tool_dir: Path, synthesized: bool = False
         lifecycle_state=lifecycle,
         schema_version=str(raw.get("schema_version") or "0.1"),
         source_path=str(raw.get("source_path") or tool_dir),
-        source_hash=raw.get("source_hash"),
+        source_hash=str(source_hash),
         bundle_hash=raw.get("bundle_hash"),
         display_name=raw.get("display_name"),
         input_schema=dict(raw.get("input_schema") or {}),

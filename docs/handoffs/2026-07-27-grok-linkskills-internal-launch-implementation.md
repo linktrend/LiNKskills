@@ -123,3 +123,18 @@ python3 validator.py --repo-root . --scan-all
 ## Ask of Principal
 
 Return to the **LiNKskills Codex planning/verifier agent** for independent verification. Do not declare the four-repository program complete from this handoff alone.
+
+---
+
+## Amendment 2026-07-28 — certification path withdrawn / replaced
+
+**Supersession:** The Phase 3 canary certification claim in this handoff (`profile_hash` `70b6cc98…053d`, suite-authored `observed_output` as evidence, Gateway `live_echo`) is **invalid and withdrawn**.
+
+See correction handoff: `docs/handoffs/2026-07-28-grok-certification-path-correction.md`.
+
+Replacement canary (executor receipts required):
+- `suite_hash` `a564173690b0745271d34991c69c8234039305501a4fccedaadf0954ac71a50a`
+- `profile_hash` `67f17eb8a5c2301b709385c5897fca0367e290d4d6327508c1acd52527668a32`
+- receipts `121d8ef6…bcc8a1`, `fbb425a5…8009a`
+
+Do not begin the multi-day Cursor canary until certification + Platform gates pass independent Codex re-verification.

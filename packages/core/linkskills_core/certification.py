@@ -1,4 +1,4 @@
-"""Certification evidence policy: refuse prompt-only scoring."""
+"""Certification evidence policy: refuse prompt-only and suite-authored fixtures."""
 
 from __future__ import annotations
 
@@ -16,13 +16,31 @@ class CertificationDecision:
         return not self.allowed
 
 
+# Suite-authored fixture keys — never sufficient as executed evidence alone.
+_SUITE_AUTHORED_ONLY = frozenset(
+    {
+        "observed_output",
+        "fixture_output",
+        "expected_output",
+        "golden_output",
+    }
+)
+
+
 def _case_has_executed_output(case: Mapping[str, Any]) -> bool:
-    """True when a case record includes executed outputs (not prompt/rubric-only)."""
+    """True when a case record includes real executed evidence (not suite fixtures)."""
+    # Explicit executor receipt / evidence_source is authoritative.
+    if case.get("evidence_source") == "executor" and case.get("execution_receipt"):
+        return True
+    receipt = case.get("execution_receipt")
+    if isinstance(receipt, Mapping) and receipt.get("receipt_hash"):
+        if receipt.get("evidence_source") == "executor" or case.get("evidence_source") == "executor":
+            return True
+
     for key in (
         "executed_output",
         "output",
         "outputs",
-        "observed_output",
         "case_output",
         "artifact_refs",
         "tool_results",
@@ -37,9 +55,18 @@ def _case_has_executed_output(case: Mapping[str, Any]) -> bool:
             return True
         if isinstance(value, (list, tuple, dict)) and len(value) > 0:
             return True
+
+    # Suite-authored observed/fixture/expected/golden alone never count.
+    for key in _SUITE_AUTHORED_ONLY:
+        if key in case and case[key] not in (None, "", [], {}):
+            # Present but insufficient without executor evidence above.
+            pass
+
     evidence = case.get("evidence")
     if isinstance(evidence, Mapping):
-        for key in ("output", "outputs", "artifacts", "tool_traces"):
+        if evidence.get("evidence_source") == "executor" and evidence.get("execution_receipt"):
+            return True
+        for key in ("output", "outputs", "artifacts", "tool_traces", "executed_output"):
             value = evidence.get(key)
             if isinstance(value, str) and value.strip():
                 return True
@@ -48,17 +75,28 @@ def _case_has_executed_output(case: Mapping[str, Any]) -> bool:
     return False
 
 
+def evidence_is_executed(evidence: Mapping[str, Any]) -> bool:
+    """Return True only when evidence includes executed (non-fixture) case outputs."""
+    return evaluate_certification_evidence(evidence).allowed
+
+
 def evaluate_certification_evidence(evidence: Mapping[str, Any] | None) -> CertificationDecision:
     """Refuse certification when evidence lacks executed case outputs.
 
-    Prompt-only payloads (suite ids, rubric names, thresholds, model scores without
-    executed outputs) cannot certify an execution profile.
+    Prompt-only payloads and suite-authored observed_output/fixture_output
+    alone cannot certify an execution profile.
     """
     if not evidence:
         return CertificationDecision(False, "missing certification evidence")
 
     if evidence.get("prompt_only") is True:
         return CertificationDecision(False, "prompt-only scoring cannot certify")
+
+    if evidence.get("suite_authored_as_evidence") is True:
+        return CertificationDecision(
+            False,
+            "suite-authored outputs cannot authorize certification",
+        )
 
     cases: Sequence[Any] | None = None
     for key in ("cases", "case_results", "executed_cases"):
