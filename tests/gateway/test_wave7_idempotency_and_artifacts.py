@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Wave-7 idempotency concurrency/lease and launch-target artifact tests."""
+"""Wave-7/8 idempotency concurrency/lease and launch-target artifact tests."""
 
 from __future__ import annotations
 
@@ -8,7 +8,6 @@ import os
 import sys
 import tempfile
 import threading
-import time
 import unittest
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -51,8 +50,8 @@ class IdempotencyConcurrencyTests(unittest.TestCase):
 
         def worker() -> None:
             barrier.wait()
-            outcome, _ = store.reserve_idempotency("a", "skills_run_update", "k1", "hash-same")
-            outcomes.append(outcome)
+            reserved = store.reserve_idempotency("a", "skills_run_update", "k1", "hash-same")
+            outcomes.append(reserved.outcome)
 
         with ThreadPoolExecutor(max_workers=8) as pool:
             list(pool.map(lambda _: worker(), range(8)))
@@ -98,10 +97,10 @@ class IdempotencyConcurrencyTests(unittest.TestCase):
                 "params": params,
             }
         )
-        outcome, _ = service._store.reserve_idempotency(
+        reserved = service._store.reserve_idempotency(
             actor.actor_id, "skills_run_update", "upd-w7", request_hash
         )
-        self.assertEqual(outcome, "reserved")
+        self.assertEqual(reserved.outcome, "reserved")
         with self.assertRaises(ServiceError) as ctx:
             service.dispatch(
                 "skills_run_update",
@@ -113,26 +112,29 @@ class IdempotencyConcurrencyTests(unittest.TestCase):
 
     def test_stale_lease_reclaim_same_hash(self) -> None:
         store = InMemoryGatewayStore()
-        outcome, _ = store.reserve_idempotency("a", "op", "k", "h1")
-        self.assertEqual(outcome, "reserved")
+        first = store.reserve_idempotency("a", "op", "k", "h1")
+        self.assertEqual(first.outcome, "reserved")
         key = store._idempotency_key("a", "op", "k")
         store._idempotency[key]["lease_expires_at"] = "2000-01-01T00:00:00Z"
-        outcome2, _ = store.reserve_idempotency("a", "op", "k", "h1")
-        self.assertEqual(outcome2, "reserved")
+        second = store.reserve_idempotency("a", "op", "k", "h1")
+        self.assertEqual(second.outcome, "reserved")
+        self.assertNotEqual(first.fence_token, second.fence_token)
 
     def test_same_hash_replay_after_complete(self) -> None:
         store = InMemoryGatewayStore()
-        store.reserve_idempotency("a", "op", "k", "h1")
-        store.complete_idempotency("a", "op", "k", "h1", {"ok": True})
-        outcome, cached = store.reserve_idempotency("a", "op", "k", "h1")
-        self.assertEqual(outcome, "replay")
-        self.assertEqual(cached, {"ok": True})
+        reserved = store.reserve_idempotency("a", "op", "k", "h1")
+        store.complete_idempotency(
+            "a", "op", "k", "h1", {"ok": True}, fence_token=reserved.fence_token or ""
+        )
+        replay = store.reserve_idempotency("a", "op", "k", "h1")
+        self.assertEqual(replay.outcome, "replay")
+        self.assertEqual(replay.envelope, {"ok": True})
 
     def test_different_hash_conflict(self) -> None:
         store = InMemoryGatewayStore()
         store.reserve_idempotency("a", "op", "k", "h1")
-        outcome, _ = store.reserve_idempotency("a", "op", "k", "h2")
-        self.assertEqual(outcome, "conflict")
+        conflict = store.reserve_idempotency("a", "op", "k", "h2")
+        self.assertEqual(conflict.outcome, "conflict")
 
     def test_sqlite_concurrent_reserve_and_stale_lease(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -142,8 +144,8 @@ class IdempotencyConcurrencyTests(unittest.TestCase):
 
             def worker() -> None:
                 barrier.wait()
-                outcome, _ = store.reserve_idempotency("a", "op", "sqlite-k", "hash")
-                outcomes.append(outcome)
+                reserved = store.reserve_idempotency("a", "op", "sqlite-k", "hash")
+                outcomes.append(reserved.outcome)
 
             with ThreadPoolExecutor(max_workers=6) as pool:
                 list(pool.map(lambda _: worker(), range(6)))
@@ -155,12 +157,19 @@ class IdempotencyConcurrencyTests(unittest.TestCase):
                 "update idempotency set lease_expires_at = '2000-01-01T00:00:00Z'"
             )
             store._conn.commit()
-            outcome, _ = store.reserve_idempotency("a", "op", "sqlite-k", "hash")
-            self.assertEqual(outcome, "reserved")
-            store.complete_idempotency("a", "op", "sqlite-k", "hash", {"done": True})
-            outcome2, cached = store.reserve_idempotency("a", "op", "sqlite-k", "hash")
-            self.assertEqual(outcome2, "replay")
-            self.assertEqual(cached, {"done": True})
+            reclaimed = store.reserve_idempotency("a", "op", "sqlite-k", "hash")
+            self.assertEqual(reclaimed.outcome, "reserved")
+            store.complete_idempotency(
+                "a",
+                "op",
+                "sqlite-k",
+                "hash",
+                {"done": True},
+                fence_token=reclaimed.fence_token or "",
+            )
+            replay = store.reserve_idempotency("a", "op", "sqlite-k", "hash")
+            self.assertEqual(replay.outcome, "replay")
+            self.assertEqual(replay.envelope, {"done": True})
             store.close()
 
 

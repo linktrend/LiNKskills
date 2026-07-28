@@ -5,6 +5,15 @@ from .certification import (
     evaluate_certification_evidence,
     sealed_executor_receipt,
 )
+from .hashing import (
+    build_skill_bundle_manifest,
+    content_hash_for_directory,
+    eval_suite_file_hash,
+    execution_profile_identity_hash,
+    skill_release_hash,
+    stamp_execution_profile,
+    verify_execution_profile_hashes,
+)
 from .lifecycle import (
     CERTIFICATION_STATES,
     CertificationState,
@@ -31,14 +40,21 @@ __all__ = [
     "allowlist_and_redact",
     "assert_transition",
     "allowed_transitions",
+    "build_skill_bundle_manifest",
     "can_transition",
+    "content_hash_for_directory",
+    "eval_suite_file_hash",
     "evaluate_certification_evidence",
+    "execution_profile_identity_hash",
     "filter_compatible_usable_releases",
     "prepare_feedback_params",
     "prepare_trace_params",
     "redact_payload",
     "sealed_executor_receipt",
     "should_redact_key",
+    "skill_release_hash",
+    "stamp_execution_profile",
+    "verify_execution_profile_hashes",
 ]
 
 __version__ = "0.1.0"

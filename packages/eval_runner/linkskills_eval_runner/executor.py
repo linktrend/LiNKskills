@@ -27,6 +27,23 @@ from .receipt import (
 )
 from .workspace import EvalWorkspace
 
+try:
+    from linkskills_core.hashing import (
+        UNSET_SKILL_RELEASE_HASH,
+        canonical_json as _shared_canonical_json,
+        skill_release_hash as _shared_skill_release_hash,
+    )
+except ImportError:  # pragma: no cover - path bootstrap for ad-hoc runs
+    UNSET_SKILL_RELEASE_HASH = "skill-release:unset"
+
+    def _shared_skill_release_hash(skill_dir: Optional[Path]) -> str:
+        if skill_dir is None or not Path(skill_dir).is_dir():
+            return UNSET_SKILL_RELEASE_HASH
+        return f"skill-release:unavailable"
+
+    def _shared_canonical_json(payload: Mapping[str, Any]) -> str:
+        return json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+
 
 def _utc_now() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
@@ -66,18 +83,6 @@ def _file_hash(path: Path) -> str:
     return digest.hexdigest()
 
 
-def _hash_tree(root: Path) -> str:
-    digest = hashlib.sha256()
-    for path in sorted(p for p in root.rglob("*") if p.is_file()):
-        rel = path.relative_to(root).as_posix().encode("utf-8")
-        digest.update(rel)
-        digest.update(b"\0")
-        digest.update(_file_hash(path).encode("ascii"))
-        digest.update(b"\0")
-    return digest.hexdigest()
-
-
-UNSET_SKILL_RELEASE_HASH = "skill-release:unset"
 UNSET_SKILL_RELEASE_MARKERS = frozenset(
     {
         "",
@@ -102,14 +107,8 @@ def is_unset_skill_release_hash(value: Optional[str]) -> bool:
 
 
 def compute_skill_release_hash(skill_dir: Optional[Path]) -> str:
-    """Hash an immutable skill-release directory tree.
-
-    Missing directories yield the explicit unset marker. Certification must reject
-    that marker — callers that intend to certify must supply a real release.
-    """
-    if skill_dir is None or not skill_dir.is_dir():
-        return UNSET_SKILL_RELEASE_HASH
-    return f"skill-release:{_hash_tree(skill_dir)}"
+    """Hash an immutable skill-release directory tree via shared hashing."""
+    return _shared_skill_release_hash(skill_dir)
 
 
 def _stable_execute_spec(raw: Mapping[str, Any]) -> dict[str, Any]:
@@ -172,7 +171,7 @@ def compute_execution_profile_hash(
         "suite_version": suite.suite_version,
         "toolchain": dict(toolchain),
     }
-    return sha256_text(json.dumps(payload, sort_keys=True, separators=(",", ":")))
+    return sha256_text(_shared_canonical_json(payload))
 
 
 def case_has_suite_authored_output(case: EvalCase) -> bool:

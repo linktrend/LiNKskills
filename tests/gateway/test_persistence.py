@@ -56,18 +56,21 @@ class GatewayPersistenceTests(unittest.TestCase):
 
     def test_atomic_reserve_binds_request_hash(self) -> None:
         store = InMemoryGatewayStore()
-        outcome, cached = store.reserve_idempotency("a", "op", "k", "hash-1")
-        self.assertEqual(outcome, "reserved")
-        self.assertIsNone(cached)
+        reserved = store.reserve_idempotency("a", "op", "k", "hash-1")
+        self.assertEqual(reserved.outcome, "reserved")
+        self.assertIsNone(reserved.envelope)
+        self.assertIsNotNone(reserved.fence_token)
         # Second reserve while in-flight must not execute again.
-        outcome_busy, _ = store.reserve_idempotency("a", "op", "k", "hash-1")
-        self.assertEqual(outcome_busy, "in_progress")
-        store.complete_idempotency("a", "op", "k", "hash-1", {"ok": True})
-        outcome2, cached2 = store.reserve_idempotency("a", "op", "k", "hash-1")
-        self.assertEqual(outcome2, "replay")
-        self.assertEqual(cached2, {"ok": True})
-        outcome3, _ = store.reserve_idempotency("a", "op", "k", "hash-2")
-        self.assertEqual(outcome3, "conflict")
+        busy = store.reserve_idempotency("a", "op", "k", "hash-1")
+        self.assertEqual(busy.outcome, "in_progress")
+        store.complete_idempotency(
+            "a", "op", "k", "hash-1", {"ok": True}, fence_token=reserved.fence_token or ""
+        )
+        replay = store.reserve_idempotency("a", "op", "k", "hash-1")
+        self.assertEqual(replay.outcome, "replay")
+        self.assertEqual(replay.envelope, {"ok": True})
+        conflict = store.reserve_idempotency("a", "op", "k", "hash-2")
+        self.assertEqual(conflict.outcome, "conflict")
 
     def test_run_roundtrip(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

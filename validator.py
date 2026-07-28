@@ -1109,6 +1109,7 @@ def validate_launch_target_canonical_artifacts(
     """Require schema-valid canonical v0.1 JSON for launch-target skills.
 
     Legacy YAML eval suites alone cannot establish launch readiness.
+    Recalculates and compares cross-artifact hashes via shared hashing.
     """
     errors: List[str] = []
     skill_id = skill_path.name
@@ -1124,6 +1125,16 @@ def validate_launch_target_canonical_artifacts(
             )
             continue
         errors.extend(validate_json_against_schema(candidate, schema_name))
+    profile_path = skill_path / "references" / "execution-profile.json"
+    if profile_path.is_file():
+        try:
+            from linkskills_core.hashing import verify_execution_profile_hashes
+        except ImportError:
+            core = Path(__file__).resolve().parent / "packages" / "core"
+            if str(core) not in sys.path:
+                sys.path.insert(0, str(core))
+            from linkskills_core.hashing import verify_execution_profile_hashes
+        errors.extend(verify_execution_profile_hashes(skill_path))
     return len(errors) == 0, errors
 
 

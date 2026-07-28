@@ -1,7 +1,7 @@
 {
-  "note": "Classification ledger updated in wave 7 — canonical v0.1 artifacts required for launch targets; not a live usable/certified promotion.",
+  "note": "Classification ledger updated in wave 8 — shared canonical hashing + mutation-safe idempotency fencing; not a live usable/certified promotion.",
   "as_of": "2026-07-29",
-  "wave": 7,
+  "wave": 8,
   "launch_target_source": "evidence/phase1/canary-set.json",
   "launch_targets_with_canonical_v01_artifacts": [
     "git-safeguard",
@@ -20,6 +20,22 @@
     "references/eval-suite.json",
     "references/execution-profile.json"
   ],
+  "hashing": {
+    "shared_module": "packages/core/linkskills_core/hashing.py",
+    "consumers": [
+      "publisher",
+      "validator",
+      "eval_runner.skill_release_hash",
+      "execution-profile stamping"
+    ],
+    "profiles_regenerated_via": "stamp_execution_profile",
+    "validator_recalculates_cross_artifact_hashes": true
+  },
+  "idempotency": {
+    "fence_token": true,
+    "db_owned_atomic_reserve_mutate_complete": true,
+    "external_side_effects": "at_least_once_with_intent_result_reconciliation"
+  },
   "usable_candidates_after_real_eval": [
     "git-safeguard",
     "citation-enforcer",
@@ -37,5 +53,5 @@
   "deprecated_or_retired": [],
   "all_34_default_catalog_state": "draft",
   "live_certification": "not performed",
-  "legacy_yaml_note": "Legacy references/eval-suite.yaml alone cannot establish launch readiness; validator requires schema-valid canonical JSON for launch targets."
+  "legacy_yaml_note": "Legacy references/eval-suite.yaml alone cannot establish launch readiness; validator requires schema-valid canonical JSON for launch targets and recalculated hash agreement."
 }
