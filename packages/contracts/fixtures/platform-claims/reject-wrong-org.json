@@ -1,21 +1,29 @@
 {
   "name": "claims-reject-wrong-org",
   "expect": "reject",
-  "reasons": ["wrong_org"],
+  "reasons": [
+    "wrong_org"
+  ],
   "claims": {
-    "claimContractVersion": "platform.auth-claims/1.0.0",
+    "claimContractVersion": "platform.auth-claims/1.1.0",
     "actorId": "actor-codex",
     "actorKind": "adapter",
     "runtimeBindingId": "bind-codex-1",
     "credentialId": "cred-2",
     "orgId": "org-other",
     "internal": false,
-    "serviceScopes": ["lskills"],
-    "permittedOperations": ["read"],
+    "serviceScopes": [
+      "lskills"
+    ],
+    "permittedOperations": [
+      "read"
+    ],
     "issuedAt": "2026-07-27T00:00:00.000Z",
     "expiresAt": "2026-07-27T12:00:00.000Z",
     "issuer": "linkplatform-issuer",
-    "audience": ["lskills-api"],
+    "audience": [
+      "lskills-api"
+    ],
     "correlationId": "corr-wrong-org"
   },
   "context": {

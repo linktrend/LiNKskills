@@ -1,9 +1,16 @@
-"""Immutable execution receipts for certification."""
+"""Immutable execution receipts for certification.
+
+Wave 5: receipts are sealed with a content hash AND an Eval Runner issuer
+HMAC (``LINKSKILLS_EVAL_RUNNER_ISSUER_KEY``). Self-hashed-only receipts are
+insufficient for certification — see ``linkskills_core.certification``.
+"""
 
 from __future__ import annotations
 
 import hashlib
+import hmac
 import json
+import os
 import platform
 import sys
 import uuid
@@ -12,7 +19,9 @@ from datetime import datetime, timezone
 from typing import Any, Mapping, Optional, Sequence
 
 
-EXECUTOR_VERSION = "linkskills-eval-executor/0.2.0"
+EXECUTOR_VERSION = "linkskills-eval-executor/0.3.0"
+PROVENANCE_KIND = "eval_runner_hmac_v1"
+DEFAULT_ISSUER_ID = "linkskills-eval-runner"
 
 
 def _utc_now() -> str:
@@ -25,6 +34,41 @@ def sha256_text(text: str) -> str:
 
 def canonical_json(payload: Mapping[str, Any]) -> str:
     return json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+
+
+def issuer_signing_key() -> Optional[bytes]:
+    raw = os.environ.get("LINKSKILLS_EVAL_RUNNER_ISSUER_KEY", "").strip()
+    if not raw:
+        return None
+    return raw.encode("utf-8")
+
+
+def issuer_id() -> str:
+    return (
+        os.environ.get("LINKSKILLS_EVAL_RUNNER_ISSUER_ID", "").strip() or DEFAULT_ISSUER_ID
+    )
+
+
+def sign_receipt_hash(receipt_hash: str, *, key: Optional[bytes] = None) -> str:
+    material = key if key is not None else issuer_signing_key()
+    if not material:
+        raise RuntimeError(
+            "LINKSKILLS_EVAL_RUNNER_ISSUER_KEY is required to seal trusted receipts"
+        )
+    return hmac.new(material, receipt_hash.encode("utf-8"), hashlib.sha256).hexdigest()
+
+
+def verify_issuer_signature(
+    receipt_hash: str,
+    signature: str,
+    *,
+    key: Optional[bytes] = None,
+) -> bool:
+    material = key if key is not None else issuer_signing_key()
+    if not material or not signature:
+        return False
+    expected = sign_receipt_hash(receipt_hash, key=material)
+    return hmac.compare_digest(expected, signature)
 
 
 @dataclass
@@ -48,12 +92,7 @@ class ToolCallRecord:
 
 @dataclass
 class ExecutionReceipt:
-    """Immutable binding of case execution evidence for certification.
-
-    Suite-authored ``observed_output`` / ``fixture_output`` values are never
-    sufficient to mint a receipt. Only the executor may create receipts after a
-    real workspace invocation.
-    """
+    """Immutable binding of case execution evidence for certification."""
 
     receipt_id: str
     case_id: str
@@ -74,6 +113,9 @@ class ExecutionReceipt:
     executor_version: str = EXECUTOR_VERSION
     evidence_source: str = "executor"
     receipt_hash: str = ""
+    provenance_kind: str = PROVENANCE_KIND
+    issuer_id: str = ""
+    issuer_signature: str = ""
 
     def payload_for_hash(self) -> dict[str, Any]:
         return {
@@ -85,6 +127,8 @@ class ExecutionReceipt:
             "executor_version": self.executor_version,
             "exit_code": self.exit_code,
             "finished_at": self.finished_at,
+            "issuer_id": self.issuer_id,
+            "provenance_kind": self.provenance_kind,
             "receipt_id": self.receipt_id,
             "skill_id": self.skill_id,
             "skill_release_hash": self.skill_release_hash,
@@ -97,20 +141,31 @@ class ExecutionReceipt:
             "toolchain": dict(self.toolchain),
         }
 
-    def seal(self) -> "ExecutionReceipt":
-        """Compute and attach the immutable receipt_hash."""
+    def seal(self, *, signing_key: Optional[bytes] = None) -> "ExecutionReceipt":
+        """Attach content hash + Eval Runner issuer HMAC provenance."""
+        if not self.issuer_id:
+            self.issuer_id = issuer_id()
+        self.provenance_kind = PROVENANCE_KIND
         self.receipt_hash = sha256_text(canonical_json(self.payload_for_hash()))
+        self.issuer_signature = sign_receipt_hash(
+            self.receipt_hash, key=signing_key
+        )
         return self
 
     def to_dict(self) -> dict[str, Any]:
         payload = self.payload_for_hash()
         payload["receipt_hash"] = self.receipt_hash
+        payload["issuer_signature"] = self.issuer_signature
         return payload
 
-    def verify_integrity(self) -> bool:
-        if not self.receipt_hash:
+    def verify_integrity(self, *, signing_key: Optional[bytes] = None) -> bool:
+        if not self.receipt_hash or not self.issuer_signature:
             return False
-        return self.receipt_hash == sha256_text(canonical_json(self.payload_for_hash()))
+        if self.receipt_hash != sha256_text(canonical_json(self.payload_for_hash())):
+            return False
+        return verify_issuer_signature(
+            self.receipt_hash, self.issuer_signature, key=signing_key
+        )
 
 
 def default_environment() -> dict[str, Any]:
@@ -140,8 +195,9 @@ def build_execution_receipt(
     started_at: Optional[str] = None,
     finished_at: Optional[str] = None,
     environment: Optional[Mapping[str, Any]] = None,
+    signing_key: Optional[bytes] = None,
 ) -> ExecutionReceipt:
-    """Mint a sealed receipt from executor-collected evidence."""
+    """Mint a sealed, issuer-signed receipt from executor-collected evidence."""
     started = started_at or _utc_now()
     finished = finished_at or _utc_now()
     receipt = ExecutionReceipt(
@@ -161,5 +217,6 @@ def build_execution_receipt(
         artifact_hashes=sorted(str(h) for h in artifact_hashes),
         started_at=started,
         finished_at=finished,
+        issuer_id=issuer_id(),
     )
-    return receipt.seal()
+    return receipt.seal(signing_key=signing_key)

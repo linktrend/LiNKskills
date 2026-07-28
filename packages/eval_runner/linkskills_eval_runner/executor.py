@@ -11,7 +11,6 @@ import hashlib
 import json
 import os
 import shutil
-import subprocess
 import sys
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -283,42 +282,42 @@ def _execute_command(
     case: EvalCase,
     workspace: EvalWorkspace,
 ) -> tuple[int | None, str, str, ToolCallRecord, list[Path]]:
+    from linkskills_tool_runtime.confined_exec import (
+        ConfinedExecutionError,
+        run_confined,
+    )
+
     argv = [str(a) for a in (spec.get("argv") or [])]
     if not argv:
         raise ValueError("execute.command requires non-empty argv")
     if spec.get("append_input_argv") and case.input:
         argv = [*argv, case.input.strip()]
     timeout = float(spec.get("timeout_seconds") or 30)
-    cwd = workspace.root
+    cwd: Path | str = workspace.root
     if spec.get("cwd"):
-        cwd = (workspace.root / str(spec["cwd"])).resolve()
-        if not str(cwd).startswith(str(workspace.root.resolve())):
-            raise ValueError("execute.command cwd escapes workspace")
-    env = os.environ.copy()
-    for key, value in dict(spec.get("env") or {}).items():
-        env[str(key)] = str(value)
+        cwd = workspace.root / str(spec["cwd"])
     try:
-        completed = subprocess.run(
+        confined = run_confined(
             argv,
-            cwd=str(cwd),
-            env=env,
-            input=str(spec["stdin"]) if spec.get("stdin") is not None else None,
-            capture_output=True,
-            text=True,
-            timeout=timeout,
-            check=False,
+            workspace=workspace.root,
+            cwd=cwd,
+            env={str(k): str(v) for k, v in dict(spec.get("env") or {}).items()},
+            timeout_seconds=timeout,
+            input_text=str(spec["stdin"]) if spec.get("stdin") is not None else None,
         )
-        exit_code = completed.returncode
-        stdout = completed.stdout or ""
-        stderr = completed.stderr or ""
-        timed_out = False
-        error = None
-    except subprocess.TimeoutExpired as exc:
+        exit_code = confined.exit_code
+        stdout = confined.stdout
+        stderr = confined.stderr
+        timed_out = confined.timed_out
+        error = confined.error
+        network_isolation = confined.network_isolation
+    except ConfinedExecutionError as exc:
         exit_code = None
-        stdout = (exc.stdout or "") if isinstance(exc.stdout, str) else ""
-        stderr = (exc.stderr or "") if isinstance(exc.stderr, str) else ""
-        timed_out = True
-        error = f"timed out after {timeout}s"
+        stdout = ""
+        stderr = ""
+        timed_out = False
+        error = str(exc)
+        network_isolation = "unavailable"
 
     stdout_path = workspace.write_output(f"{case.id}.stdout", stdout)
     stderr_path = workspace.outputs_dir / f"{case.id}.stderr.txt"
@@ -327,7 +326,7 @@ def _execute_command(
         tool_id=str(spec.get("name") or argv[0]),
         version=str(spec.get("version") or "command"),
         tool_hash=sha256_text("\0".join(argv)),
-        adapter_kind="local_command",
+        adapter_kind="confined_command",
         argv=argv,
         exit_code=exit_code,
         stdout_hash=sha256_text(stdout),
@@ -335,6 +334,21 @@ def _execute_command(
         timed_out=timed_out,
         error=error,
     )
+    # Stash isolation evidence on the call via tool_hash-adjacent env later on receipt.
+    call.error = error
+    if network_isolation != "denied" and error is None:
+        # Surface unproven network as executor error for certification fail-closed.
+        if os.environ.get("LINKSKILLS_EXECUTOR_NETWORK_ISOLATION", "required").strip().lower() in {
+            "allow_unproven",
+            "unproven",
+            "0",
+            "false",
+            "off",
+            "soft",
+        }:
+            pass
+        else:
+            call.error = f"network_isolation={network_isolation}"
     return exit_code, stdout, stderr, call, [stdout_path, stderr_path]
 
 

@@ -1,21 +1,29 @@
 {
   "name": "claims-reject-wrong-service",
   "expect": "reject",
-  "reasons": ["wrong_service"],
+  "reasons": [
+    "wrong_service"
+  ],
   "claims": {
-    "claimContractVersion": "platform.auth-claims/1.0.0",
+    "claimContractVersion": "platform.auth-claims/1.1.0",
     "actorId": "actor-skills-worker",
     "actorKind": "service",
     "runtimeBindingId": "bind-skills-worker-1",
     "credentialId": "cred-5",
     "orgId": "org-internal",
     "internal": true,
-    "serviceScopes": ["lskills"],
-    "permittedOperations": ["execute"],
+    "serviceScopes": [
+      "lskills"
+    ],
+    "permittedOperations": [
+      "execute"
+    ],
     "issuedAt": "2026-07-27T00:00:00.000Z",
     "expiresAt": "2026-07-27T12:00:00.000Z",
     "issuer": "linkplatform-issuer",
-    "audience": ["lbrain-api"],
+    "audience": [
+      "lbrain-api"
+    ],
     "correlationId": "corr-wrong-service"
   },
   "context": {

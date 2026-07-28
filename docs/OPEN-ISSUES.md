@@ -10,65 +10,66 @@ Append-only engineering build log for this repository. Prefer this file over sta
 
 ### 1. Live certification of skills to `usable` / certified profiles
 
-**Status:** Open (operational) — certification path corrected 2026-07-28.  
-Filesystem catalog + eval-suite YAML exist for all 34 skills; generated `catalog/index.json` still defaults `certification_state` to `draft`. Eval Runner now requires **sealed executor receipts** from real isolated execution; suite-authored `observed_output`/`fixture_output` cannot certify. Local canary-echo is receipt-bound only. Studio-wide promotion of published certified profiles still depends on executed evidence + publication + (when applicable) applied schema.  
-**Blocked on:** applied `lskills` schema (including registry foundation) on target Supabase + real eval evidence + supervised/live librarian passes.  
+**Status:** Open (operational) — certification path corrected 2026-07-28.
+Filesystem catalog + eval-suite YAML exist for all 34 skills; generated `catalog/index.json` still defaults `certification_state` to `draft`. Eval Runner now requires **sealed executor receipts** from real isolated execution; suite-authored `observed_output`/`fixture_output` cannot certify. Local canary-echo is receipt-bound only. Studio-wide promotion of published certified profiles still depends on executed evidence + publication + (when applicable) applied schema.
+**Blocked on:** applied `lskills` schema (including registry foundation) on target Supabase + real eval evidence + supervised/live librarian passes.
 **Do not** start multi-day Cursor canary until certification + Platform gates pass independent verification.
 
 ### 2. Confirm `lskills` migrations applied per environment (Platform-owned live apply)
 
-**Status:** Open (ops verify; **outside full LiNKskills ownership**).  
-Migrations `20260715_000002`, `000003` seed, `20260718_000004` PostgREST exposure, and additive **`20260727_000005` registry foundation** are **packaged in this repo**. **LiNKplatform alone applies live.** Runbook still expects `select count(*) from lskills.catalog` ≥ 34 when seeded; registry tables require `000005` apply confirmation.  
+**Status:** Open (ops verify; **outside full LiNKskills ownership**).
+Migrations `20260715_000002`, `000003` seed, `20260718_000004` PostgREST exposure, and additive **`20260727_000005` registry foundation** are **packaged in this repo**. **LiNKplatform alone applies live.** Runbook still expects `select count(*) from lskills.catalog` ≥ 34 when seeded; registry tables require `000005` apply confirmation.
 **Do not claim** every env is applied without Platform confirmation.
 
 ### 3. Unsupervised production Librarian schedule
 
-**Status:** Partially done.  
-Runnable generic host: `LiNKplatform/packages/librarian-runner`. Skills domain worker package: `packages/librarian_domain`. First production passes should stay dry-run / supervised until trusted.  
+**Status:** Partially done.
+Runnable generic host: `LiNKplatform/packages/librarian-runner`. Skills domain worker package: `packages/librarian_domain`. First production passes should stay dry-run / supervised until trusted.
 **Remaining:** stage→prod confidence, monitoring, escalation briefing path for the Principal.
 
 ### 4. Live Platform authentication issuer (claims shape consumed)
 
-**Status:** Partially done / still blocked on live issuer.  
-Gateway/MCP production paths consume canonical Platform AuthClaims via `PlatformClaimsVerifier` **with a Platform-approved cryptographic authenticator**. Unsigned `platform.<base64url(JSON)>` is confined to `LocalUnsignedClaimsVerifier` under explicit `LINKSKILLS_AUTH_MODE=local-test`. Competing `fake.*` tokens are rejected. Gateway/MCP startup fails closed without production authenticator config. **Live Platform token issuance / stage auth / signing keys** remain a Platform gate.  
-Spoofed body identity is rejected.  
-**Correction (2026-07-28):** prior fake-shape acceptance on production verifier path is removed.  
-**Wave 2 (2026-07-28):** consumes frozen `platform.auth-claims/1.0.0` (`@linktrend/platform-contracts@0.2.1`) with exact schema/content hashes; rejects snake_case, unknown fields, and `actorKind: agent`. See `docs/contracts/frozen/platform-auth-claims-v1.0.0.CONSUMER-PIN.md`.  
+**Status:** Partially done / still blocked on live issuer.
+Gateway/MCP production paths consume canonical Platform AuthClaims via `PlatformClaimsVerifier` **with a Platform-approved cryptographic authenticator**. Unsigned `platform.<base64url(JSON)>` is confined to `LocalUnsignedClaimsVerifier` under explicit `LINKSKILLS_AUTH_MODE=local-test`. Competing `fake.*` tokens are rejected. Gateway/MCP startup fails closed without production authenticator config. **Live Platform token issuance / stage auth / signing keys** remain a Platform gate.
+Spoofed body identity is rejected.
+**Correction (2026-07-28):** prior fake-shape acceptance on production verifier path is removed.
+**Wave 2 (2026-07-28):** consumes frozen `platform.auth-claims/1.0.0` (`@linktrend/platform-contracts@0.2.1`) with exact schema/content hashes; rejects snake_case, unknown fields, and `actorKind: agent`. See `docs/contracts/frozen/platform-auth-claims-v1.0.0.CONSUMER-PIN.md`.
 **Wave 4 (2026-07-28):** unsigned production default removed; cryptographic authenticity required outside local-test. See `docs/handoffs/2026-07-28-grok-certification-correction-wave4.md`.
+**Wave 5 (2026-07-28):** consumer repinned to `platform.auth-claims/1.1.0` (`orgId` null only for `actorKind: service`); exact `permittedOperations` enforcement. See `docs/contracts/frozen/platform-auth-claims-v1.1.0.CONSUMER-PIN.md` and `docs/handoffs/2026-07-28-grok-certification-correction-wave5.md`.
 
 ### 5. Live stage/prod internal-launch readiness
 
-**Status:** Open / **not claimed**.  
+**Status:** Open / **not claimed**.
 In-repo packages, local Gateway `/health`/`/ready`, and unit tests are **not** evidence of shared stage/prod readiness. Remains blocked on Platform migration apply, real auth, supervised ops, actor integration owners, and independent verification.
 
 ### 6. Independent Codex verification of issue #21 / plan execution
 
-**Status:** Open (required).  
+**Status:** Open (required).
 Grok/Cursor implementation reports are provisional until the LiNKskills Codex verifier checks actual implementation and evidence against the approved plan hash. Coordinating cross-repo verification remains outside a single Skills-only claim.
 
 ### 7. Actor integration apply beyond Skills-owned canary
 
-**Status:** Partially done / handed off.  
+**Status:** Partially done / handed off.
 Cursor product canary is **project-scoped only** (example fragment + notes). Codex and OpenClaw configuration **fragments are handed off** (`configs/fragments/`, `docs/integrations/*/HANDOFF.md`) and **must not be applied from this repo** to shared Codex host config or OpenClaw internals.
 
 ### 8. Org-scoped RLS on nullable `lskills.catalog.org_id`
 
-**Status:** Deliberately deferred.  
+**Status:** Deliberately deferred.
 Column is future-proofing only; no authorization semantics today (ADR 0001).
 
 ### 9. Root-level historical PRD / SOP / operator briefing docs
 
-**Status:** Noted, not archived this pass (2026-07-19 judgment; still accurate).  
+**Status:** Noted, not archived this pass (2026-07-19 judgment; still accurate).
 Files such as `SOP.md`, `OPERATOR_BRIEFING.md`, `260319 LiNKskills PRD.md`, and the Phase 0–3 dossier remain at repo root. They contain stale MAS / pre-ADR framing. They are **not** source of truth; a later cleanup may `git mv` them into `docs/archive/` once no external runbook depends on their paths.
 
 ### 10. Dollar-cost accounting dashboard
 
-**Status:** Deliberately deferred.  
+**Status:** Deliberately deferred.
 Telemetry may carry observational `cost` jsonb; no billing ledger in this Program.
 
 ### 11. Compatibility git-checkout consumer path retirement
 
-**Status:** Open (migration window).  
+**Status:** Open (migration window).
 `lib/skill_runtime` remains supported during migration. Steady-state delivery is Gateway + published releases (ADR 0002/0003). Do not remove the compatibility path until consumers have migrated and Principal/release owners agree.
 
 ---

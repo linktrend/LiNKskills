@@ -1,7 +1,7 @@
 """Platform AuthClaims verification for LiNKskills Gateway.
 
-Consumes the frozen contract ``platform.auth-claims/1.0.0`` from
-``@linktrend/platform-contracts@0.2.1``.
+Consumes the frozen contract ``platform.auth-claims/1.1.0`` from
+LiNKplatform (vendored schema bytes pin).
 
 Authenticity rules (wave 4):
 - Production ``PlatformClaimsVerifier`` never accepts unsigned
@@ -11,6 +11,9 @@ Authenticity rules (wave 4):
   permitted solely when ``LINKSKILLS_AUTH_MODE=local-test`` or an explicit
   local-test verifier is injected.
 - Claim-field shape remains frozen camelCase AuthClaims (no renaming).
+
+Wave 5: pin ``1.1.0`` (orgId null only when actorKind is service) and enforce
+exact ``permittedOperations`` for Gateway/MCP reads and mutations.
 """
 
 from __future__ import annotations
@@ -27,7 +30,7 @@ from pathlib import Path
 from typing import Any, Callable, Dict, Mapping, Optional, Protocol, Set
 
 
-CLAIM_CONTRACT_VERSION = "platform.auth-claims/1.0.0"
+CLAIM_CONTRACT_VERSION = "platform.auth-claims/1.1.0"
 PLATFORM_CONTRACTS_PACKAGE = "0.2.1"
 AUTH_MODE_PRODUCTION = "production"
 AUTH_MODE_LOCAL_TEST = "local-test"
@@ -77,17 +80,40 @@ SCHEMA_PATH = (
     Path(__file__).resolve().parents[2]
     / "contracts"
     / "schemas"
-    / "platform-auth-claims.v1.0.0.json"
+    / "platform-auth-claims.v1.1.0.json"
 )
 CLAIM_FIXTURES_DIR = (
     Path(__file__).resolve().parents[2] / "contracts" / "fixtures" / "platform-claims"
 )
 EXPECTED_SCHEMA_BYTES_SHA256 = (
-    "b0397cdf34e76ab0986c6d223ecb6c3c66d619ea59557f78cd45c0c015ff50fb"
+    "c2e8bc68b3feb9a3dacc497f5a5d497b466c400804fb4f9e41734c10772ddfa1"
 )
 EXPECTED_SCHEMA_CONTENT_HASH = (
-    "6bf49618d846662976886f57d5d468f73a08ab1a6574968f68833d82429db251"
+    "fb518834be897c32574df5f7235704fdb0de708bd3da1b48fc448246e3eca567"
 )
+
+# Gateway operation -> accepted permittedOperations tokens (exact membership).
+OPERATION_PERMISSIONS: Dict[str, frozenset[str]] = {
+    "skills_list": frozenset({"read", "skills:read"}),
+    "skills_search": frozenset({"read", "skills:read"}),
+    "skills_describe": frozenset({"read", "skills:read"}),
+    "skills_fragment_get": frozenset({"read", "skills:read"}),
+    "skills_release_get": frozenset({"read", "skills:read"}),
+    "skills_tool_resolve": frozenset({"read", "skills:read", "execute", "skills:write"}),
+    "skills_input_validate": frozenset({"read", "skills:read", "execute", "skills:write"}),
+    "skills_output_validate": frozenset({"read", "skills:read", "execute", "skills:write"}),
+    "skills_run_start": frozenset({"execute", "skills:write", "skills:run"}),
+    "skills_run_update": frozenset({"execute", "skills:write", "skills:run"}),
+    "skills_run_complete": frozenset({"execute", "skills:write", "skills:run"}),
+    "skills_run_fail": frozenset({"execute", "skills:write", "skills:run"}),
+    "skills_tool_invoke": frozenset({"execute", "skills:write"}),
+    "skills_feedback_submit": frozenset(
+        {"skills:feedback", "execute", "skills:write", "skills:run"}
+    ),
+    "skills_trace_candidate_submit": frozenset(
+        {"skills:feedback", "execute", "skills:write", "skills:run"}
+    ),
+}
 
 _PROTECTED_IDENTITY_KEYS = frozenset(
     {
@@ -149,23 +175,27 @@ class ActorClaims:
     def has_scope(self, scope: str) -> bool:
         return scope in self.scopes or "*" in self.scopes
 
+    def permits(self, *candidates: str) -> bool:
+        """True when any candidate is present in permittedOperations (or ``*``)."""
+        if "*" in self.permitted_operations:
+            return True
+        return bool(self.permitted_operations.intersection(candidates))
+
+    def may_perform(self, operation: str) -> bool:
+        allowed = OPERATION_PERMISSIONS.get(operation)
+        if allowed is None:
+            return False
+        if not self.permitted_operations:
+            return False
+        return self.permits(*allowed)
+
     def may_read(self) -> bool:
-        return (
-            self.has_scope("lskills")
-            or "read" in self.permitted_operations
-            or "skills:read" in self.permitted_operations
-            or "*" in self.permitted_operations
-        )
+        return self.has_scope("lskills") and self.permits("read", "skills:read")
 
     def may_write(self) -> bool:
-        return (
-            self.has_scope("lskills")
-            and (
-                "execute" in self.permitted_operations
-                or "skills:write" in self.permitted_operations
-                or "*" in self.permitted_operations
-            )
-        ) or ("skills:write" in self.permitted_operations)
+        return self.has_scope("lskills") and self.permits(
+            "execute", "skills:write", "skills:run", "skills:feedback"
+        )
 
 
 @dataclass(frozen=True)
@@ -309,6 +339,11 @@ class _AuthClaimsPolicy:
 
         org_raw = raw["orgId"]
         if org_raw is None:
+            if actor_kind != "service":
+                raise AuthError(
+                    "auth_invalid",
+                    "orgId may be null only when actorKind is service",
+                )
             org_id: Optional[str] = None
         else:
             org_id = str(org_raw).strip()

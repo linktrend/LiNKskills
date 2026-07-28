@@ -63,3 +63,7 @@ python3 scripts/check-service-ownership.py
 ## Return path
 
 Return this wave-4 correction handoff to the **LiNKskills Codex verifier** for independent re-verification. Keep PR #22 open and unmerged until that pass.
+
+## Amendment (2026-07-28) — superseded by wave 5 for AuthClaims pin + remaining Codex findings
+
+Wave 4 authenticity claims remain. Wave 5 continues from tip `30de5607bfe073ef72f0c11c0bb0813ed57a9e2b` and addresses confined executor, ServerAdapter disable, exact permittedOperations, durable idempotency, payload allowlisting, feedback/trace binding, issuer-signed receipts, actor/org RLS, persistence, meta-skill validator migration, pytest archive exclusion, and AuthClaims **1.1.0** pin. See `docs/handoffs/2026-07-28-grok-certification-correction-wave5.md`. Still provisional — do not merge or start the multi-day Cursor canary.

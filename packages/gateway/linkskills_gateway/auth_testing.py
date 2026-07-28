@@ -62,13 +62,25 @@ def snake_claims_to_platform_claims(claims: Mapping[str, Any]) -> dict[str, Any]
     if "skills:read" in scopes or "read" in scopes:
         ops.extend(["read", "skills:read"])
     if "skills:write" in scopes or "execute" in scopes:
-        ops.extend(["execute", "skills:write"])
+        ops.extend(["execute", "skills:write", "skills:run", "skills:feedback"])
     if not ops:
-        ops = ["read", "execute", "skills:read", "skills:write"]
+        ops = [
+            "read",
+            "execute",
+            "skills:read",
+            "skills:write",
+            "skills:run",
+            "skills:feedback",
+        ]
 
     actor_kind = str(claims.get("actor_kind") or claims.get("actorKind") or "service")
     if actor_kind == "agent":
         actor_kind = "service"
+
+    if "permittedOperations" in claims:
+        permitted = list(claims["permittedOperations"] or [])
+    else:
+        permitted = sorted(set(ops))
 
     return {
         "claimContractVersion": CLAIM_CONTRACT_VERSION,
@@ -83,9 +95,7 @@ def snake_claims_to_platform_claims(claims: Mapping[str, Any]) -> dict[str, Any]
         "orgId": claims.get("org_id") or claims.get("orgId") or "org-internal",
         "internal": True,
         "serviceScopes": list(claims.get("serviceScopes") or ["lskills", "linkplatform"]),
-        "permittedOperations": list(
-            claims.get("permittedOperations") or sorted(set(ops))
-        ),
+        "permittedOperations": permitted,
         "issuedAt": claims.get("issuedAt")
         or time.strftime("%Y-%m-%dT%H:%M:%S.000Z", time.gmtime(issued)),
         "expiresAt": claims.get("expiresAt")

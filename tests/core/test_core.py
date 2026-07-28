@@ -5,9 +5,15 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import sys
 import unittest
 from pathlib import Path
+
+os.environ.setdefault(
+    "LINKSKILLS_EVAL_RUNNER_ISSUER_KEY",
+    "linkskills-local-eval-runner-issuer-key-not-for-production",
+)
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT / "packages" / "core"))
@@ -27,6 +33,9 @@ from linkskills_core.selection import filter_compatible_usable_releases  # noqa:
 
 def _seal_receipt(**overrides):
     """Build a sealed executor receipt matching core/eval seal contract."""
+    import hmac
+    import os
+
     base = {
         "receipt_id": "rcpt-1",
         "case_id": "c1",
@@ -44,8 +53,10 @@ def _seal_receipt(**overrides):
         "artifact_hashes": [],
         "started_at": "2026-07-28T00:00:00Z",
         "finished_at": "2026-07-28T00:00:01Z",
-        "executor_version": "linkskills-eval-executor/0.2.0",
+        "executor_version": "linkskills-eval-executor/0.3.0",
         "evidence_source": "executor",
+        "provenance_kind": "eval_runner_hmac_v1",
+        "issuer_id": "linkskills-eval-runner-test",
     }
     base.update(overrides)
     payload = {
@@ -57,6 +68,8 @@ def _seal_receipt(**overrides):
         "executor_version": base["executor_version"],
         "exit_code": base.get("exit_code"),
         "finished_at": base["finished_at"],
+        "issuer_id": base["issuer_id"],
+        "provenance_kind": base["provenance_kind"],
         "receipt_id": base["receipt_id"],
         "skill_id": base["skill_id"],
         "skill_release_hash": base["skill_release_hash"],
@@ -74,6 +87,11 @@ def _seal_receipt(**overrides):
         )
     ).hexdigest()
     base["receipt_hash"] = digest
+    key = os.environ.get(
+        "LINKSKILLS_EVAL_RUNNER_ISSUER_KEY",
+        "linkskills-local-eval-runner-issuer-key-not-for-production",
+    ).encode("utf-8")
+    base["issuer_signature"] = hmac.new(key, digest.encode("utf-8"), hashlib.sha256).hexdigest()
     return base
 
 
@@ -142,7 +160,7 @@ class CertificationTests(unittest.TestCase):
             }
         )
         self.assertFalse(decision.allowed)
-        self.assertIn("sealed executor receipts", decision.reason)
+        self.assertIn("receipt", decision.reason.lower())
 
     def test_refuses_suite_authored_observed_output_alone(self) -> None:
         decision = evaluate_certification_evidence(

@@ -143,6 +143,12 @@ class RegistryMigrationPackageTests(unittest.TestCase):
                 f"missing create policy on lskills.{table}",
             )
 
+    def test_no_stub_using_true_policies(self) -> None:
+        self.assertNotIn("using (true)", self.registry_code)
+        self.assertNotIn("with check (true)", self.registry_code)
+        self.assertIn("require_org_context()", self.registry_code)
+        self.assertIn("org_matches(", self.registry_code)
+
     def test_grants_mention_service_or_svc_roles(self) -> None:
         grant_blob = "\n".join(
             line for line in self.registry_code.splitlines() if "grant " in line

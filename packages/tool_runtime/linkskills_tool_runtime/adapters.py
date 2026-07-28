@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-import subprocess
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Mapping, Optional, Sequence, Union
 
+from .confined_exec import ConfinedExecutionError, assert_within_boundary, run_confined
 from .resolve import ResolvedTool
 
 
@@ -24,7 +24,7 @@ class AdapterResult:
 
 
 class LocalProcessAdapter:
-    """Run a tool as a local subprocess with timeout and cwd sandbox."""
+    """Run a tool as a confined local subprocess (no shell, bounded, fail-closed)."""
 
     kind = "local_process"
 
@@ -51,30 +51,38 @@ class LocalProcessAdapter:
                 stderr="",
                 error="descriptor entrypoint.command is missing",
             )
+        if isinstance(command, str) and (" " in command.strip()):
+            return AdapterResult(
+                ok=False,
+                exit_code=None,
+                stdout="",
+                stderr="",
+                error=(
+                    "entrypoint.command must be a single executable path; "
+                    "shell strings and bash -lc are forbidden"
+                ),
+            )
 
-        workdir_raw = cwd or entry.get("working_directory") or resolved.tool_dir
-        workdir = Path(workdir_raw)
-        if not workdir.is_absolute():
-            workdir = (resolved.tool_dir / workdir).resolve()
-        else:
-            workdir = workdir.resolve()
-        # Sandbox: cwd must remain under the resolved tool dir or an explicit caller cwd.
-        sandbox_root = resolved.tool_dir.resolve()
-        if cwd is None and not str(workdir).startswith(str(sandbox_root)):
-            workdir = sandbox_root
+        sandbox_root = Path(resolved.tool_dir).resolve()
+        workdir_raw = cwd or entry.get("working_directory") or sandbox_root
+        try:
+            workdir = assert_within_boundary(workdir_raw, sandbox_root)
+        except ConfinedExecutionError as exc:
+            return AdapterResult(
+                ok=False,
+                exit_code=None,
+                stdout="",
+                stderr="",
+                error=str(exc),
+                metadata={"cwd": str(workdir_raw), "boundary": str(sandbox_root)},
+            )
 
         base_args = entry.get("args") or entry.get("argv") or []
         if not isinstance(base_args, list):
             base_args = []
-        cmd: list[str]
+        cmd = [str(command), *[str(a) for a in base_args]]
         if argv:
-            cmd = [str(command), *[str(a) for a in base_args], *[str(a) for a in argv]]
-        else:
-            # Allow command to be a full shell-ish string only when no argv provided.
-            if isinstance(command, str) and " " in command and not base_args:
-                cmd = ["bash", "-lc", command]
-            else:
-                cmd = [str(command), *[str(a) for a in base_args]]
+            cmd.extend(str(a) for a in argv)
 
         timeout = timeout_seconds
         if timeout is None:
@@ -83,57 +91,55 @@ class LocalProcessAdapter:
             timeout = self.default_timeout_seconds
 
         try:
-            completed = subprocess.run(
+            result = run_confined(
                 cmd,
-                cwd=str(workdir),
-                env=dict(env) if env is not None else None,
-                input=input_text,
-                capture_output=True,
-                text=True,
-                timeout=float(timeout),
-                check=False,
+                workspace=sandbox_root,
+                cwd=workdir,
+                env=env,
+                timeout_seconds=float(timeout),
+                input_text=input_text,
             )
-        except subprocess.TimeoutExpired as exc:
-            stdout = exc.stdout or ""
-            stderr = exc.stderr or ""
-            if isinstance(stdout, bytes):
-                stdout = stdout.decode("utf-8", errors="replace")
-            if isinstance(stderr, bytes):
-                stderr = stderr.decode("utf-8", errors="replace")
-            return AdapterResult(
-                ok=False,
-                exit_code=None,
-                stdout=stdout,
-                stderr=stderr,
-                timed_out=True,
-                error=f"timed out after {timeout}s",
-                metadata={"cwd": str(workdir), "cmd": cmd},
-            )
-        except OSError as exc:
+        except ConfinedExecutionError as exc:
             return AdapterResult(
                 ok=False,
                 exit_code=None,
                 stdout="",
                 stderr="",
                 error=str(exc),
-                metadata={"cwd": str(workdir), "cmd": cmd},
+                metadata={"cwd": str(workdir), "cmd": cmd, "boundary": str(sandbox_root)},
             )
 
         return AdapterResult(
-            ok=completed.returncode == 0,
-            exit_code=completed.returncode,
-            stdout=completed.stdout or "",
-            stderr=completed.stderr or "",
-            metadata={"cwd": str(workdir), "cmd": cmd},
+            ok=result.exit_code == 0 and not result.timed_out and result.error is None,
+            exit_code=result.exit_code,
+            stdout=result.stdout,
+            stderr=result.stderr,
+            timed_out=result.timed_out,
+            error=result.error,
+            metadata={
+                **result.metadata,
+                "network_isolation": result.network_isolation,
+            },
         )
 
 
 class ServerAdapter:
-    """Stub for live remote/server-side tool execution."""
+    """Remote/server-side tool profile — explicitly disabled until implemented."""
 
     kind = "server"
+    ENABLED = False
+    DISABLED_REASON = (
+        "ServerAdapter profile is disabled until live remote invocation is implemented "
+        "(wave-5: unsupported profile fail-closed)"
+    )
 
     def invoke(self, *args: Any, **kwargs: Any) -> AdapterResult:
-        raise NotImplementedError(
-            "ServerAdapter live remote invocation is not implemented in Phase 3"
+        del args, kwargs
+        return AdapterResult(
+            ok=False,
+            exit_code=None,
+            stdout="",
+            stderr="",
+            error=self.DISABLED_REASON,
+            metadata={"adapter": self.kind, "enabled": False},
         )

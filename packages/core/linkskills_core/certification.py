@@ -1,16 +1,19 @@
 """Certification evidence policy: refuse prompt-only and suite-authored fixtures.
 
 Executed evidence must be receipt-bound: sealed executor ``execution_receipt``
-objects with ``evidence_source == "executor"``. Bare output strings, artifacts,
+objects with ``evidence_source == "executor"`` AND trusted Eval Runner issuer
+provenance (HMAC). Bare output strings, artifacts, self-hashed-only receipts,
 or tool traces without executor provenance never certify.
 """
 
 from __future__ import annotations
 
 import hashlib
+import hmac
 import json
+import os
 from dataclasses import dataclass
-from typing import Any, Mapping, Sequence
+from typing import Any, Mapping, Optional, Sequence
 
 
 @dataclass(frozen=True)
@@ -48,7 +51,12 @@ _RECEIPT_REQUIRED_KEYS = (
     "environment",
     "evidence_source",
     "executor_version",
+    "provenance_kind",
+    "issuer_id",
+    "issuer_signature",
 )
+
+_TRUSTED_PROVENANCE = frozenset({"eval_runner_hmac_v1"})
 
 
 def _canonical_json(payload: Mapping[str, Any]) -> str:
@@ -57,6 +65,30 @@ def _canonical_json(payload: Mapping[str, Any]) -> str:
 
 def _sha256_text(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+def _trusted_issuer_keys() -> list[bytes]:
+    keys: list[bytes] = []
+    primary = os.environ.get("LINKSKILLS_EVAL_RUNNER_ISSUER_KEY", "").strip()
+    if primary:
+        keys.append(primary.encode("utf-8"))
+    extra = os.environ.get("LINKSKILLS_EVAL_RUNNER_TRUSTED_KEYS", "").strip()
+    if extra:
+        for part in extra.split(","):
+            part = part.strip()
+            if part:
+                keys.append(part.encode("utf-8"))
+    return keys
+
+
+def _verify_issuer_signature(receipt_hash: str, signature: str) -> bool:
+    if not receipt_hash or not signature:
+        return False
+    for key in _trusted_issuer_keys():
+        expected = hmac.new(key, receipt_hash.encode("utf-8"), hashlib.sha256).hexdigest()
+        if hmac.compare_digest(expected, signature):
+            return True
+    return False
 
 
 def _receipt_payload_for_hash(receipt: Mapping[str, Any]) -> dict[str, Any]:
@@ -77,6 +109,8 @@ def _receipt_payload_for_hash(receipt: Mapping[str, Any]) -> dict[str, Any]:
         "executor_version": receipt.get("executor_version"),
         "exit_code": receipt.get("exit_code"),
         "finished_at": receipt.get("finished_at"),
+        "issuer_id": receipt.get("issuer_id"),
+        "provenance_kind": receipt.get("provenance_kind"),
         "receipt_id": receipt.get("receipt_id"),
         "skill_id": receipt.get("skill_id"),
         "skill_release_hash": receipt.get("skill_release_hash"),
@@ -91,13 +125,17 @@ def _receipt_payload_for_hash(receipt: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def sealed_executor_receipt(receipt: Any) -> bool:
-    """True only for a sealed executor receipt with matching receipt_hash."""
+    """True only for a sealed, issuer-signed executor receipt."""
     if not isinstance(receipt, Mapping):
         return False
     for key in _RECEIPT_REQUIRED_KEYS:
         if key not in receipt:
             return False
     if receipt.get("evidence_source") != "executor":
+        return False
+    if str(receipt.get("provenance_kind") or "") not in _TRUSTED_PROVENANCE:
+        return False
+    if not str(receipt.get("issuer_id") or "").strip():
         return False
     claimed = str(receipt.get("receipt_hash") or "")
     if not claimed:
@@ -106,7 +144,9 @@ def sealed_executor_receipt(receipt: Any) -> bool:
     if not release or release in {"skill-release:unset", "unset", "placeholder"}:
         return False
     expected = _sha256_text(_canonical_json(_receipt_payload_for_hash(receipt)))
-    return claimed == expected
+    if claimed != expected:
+        return False
+    return _verify_issuer_signature(claimed, str(receipt.get("issuer_signature") or ""))
 
 
 def _case_has_executed_output(case: Mapping[str, Any]) -> bool:
@@ -126,7 +166,6 @@ def _case_has_executed_output(case: Mapping[str, Any]) -> bool:
     if not sealed_executor_receipt(receipt):
         return False
 
-    # Suite-authored fields never substitute for a receipt.
     for key in _SUITE_AUTHORED_ONLY:
         if key in case and case[key] not in (None, "", [], {}):
             pass
@@ -139,12 +178,7 @@ def evidence_is_executed(evidence: Mapping[str, Any]) -> bool:
 
 
 def evaluate_certification_evidence(evidence: Mapping[str, Any] | None) -> CertificationDecision:
-    """Refuse certification when evidence lacks sealed executor receipts.
-
-    Prompt-only payloads, suite-authored observed_output/fixture_output, bare
-    ``output`` / ``tool_traces`` / artifacts without executor provenance cannot
-    certify an execution profile.
-    """
+    """Refuse certification when evidence lacks trusted executor receipts."""
     if not evidence:
         return CertificationDecision(False, "missing certification evidence")
 
@@ -155,6 +189,13 @@ def evaluate_certification_evidence(evidence: Mapping[str, Any] | None) -> Certi
         return CertificationDecision(
             False,
             "suite-authored outputs cannot authorize certification",
+        )
+
+    if not _trusted_issuer_keys():
+        return CertificationDecision(
+            False,
+            "no trusted Eval Runner issuer key configured "
+            "(LINKSKILLS_EVAL_RUNNER_ISSUER_KEY)",
         )
 
     cases: Sequence[Any] | None = None
@@ -178,16 +219,16 @@ def evaluate_certification_evidence(evidence: Mapping[str, Any] | None) -> Certi
     if executed == 0:
         return CertificationDecision(
             False,
-            "evidence lacks sealed executor receipts (receipt-bound rejection)",
+            "evidence lacks trusted Eval Runner issuer-signed receipts",
         )
 
     if executed < len([c for c in cases if isinstance(c, Mapping)]):
         return CertificationDecision(
             False,
-            "evidence includes cases without sealed executor receipts",
+            "evidence includes cases without trusted issuer-signed receipts",
         )
 
     return CertificationDecision(
         True,
-        f"accepted: {executed} sealed executor receipt(s) present",
+        f"accepted: {executed} trusted Eval Runner receipt(s) present",
     )

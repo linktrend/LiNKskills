@@ -12,6 +12,12 @@ import unittest
 from http.client import HTTPConnection
 from pathlib import Path
 
+os.environ.setdefault(
+    "LINKSKILLS_EVAL_RUNNER_ISSUER_KEY",
+    "linkskills-local-eval-runner-issuer-key-not-for-production",
+)
+os.environ.setdefault("LINKSKILLS_EXECUTOR_NETWORK_ISOLATION", "allow_unproven")
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 PACKAGE_PATHS = [
     REPO_ROOT / "packages" / "gateway",
@@ -20,6 +26,7 @@ PACKAGE_PATHS = [
     REPO_ROOT / "packages" / "librarian_domain",
     REPO_ROOT / "packages" / "eval_runner",
     REPO_ROOT / "packages" / "tool_runtime",
+    REPO_ROOT / "packages" / "core",
     REPO_ROOT / "packages" / "contracts",
     REPO_ROOT,
 ]
@@ -254,8 +261,13 @@ class ProductionCryptoAuthTests(unittest.TestCase):
 
     def test_tampered_signature_rejected(self) -> None:
         token = self.hmac.mint(_platform_claims())
-        # Flip last character of MAC segment.
-        bad = token[:-1] + ("A" if token[-1] != "A" else "B")
+        parts = token.rsplit(".", 1)
+        self.assertEqual(len(parts), 2)
+        # Replace MAC with a same-length invalid digest (base64url of zeros).
+        bad_mac = "A" * len(parts[1])
+        if bad_mac == parts[1]:
+            bad_mac = "B" * len(parts[1])
+        bad = f"{parts[0]}.{bad_mac}"
         with self.assertRaises(AuthError) as ctx:
             self.verifier.verify(f"Bearer {bad}")
         self.assertIn(ctx.exception.code, {"auth_signature_invalid", "auth_malformed"})

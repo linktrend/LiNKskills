@@ -14,7 +14,8 @@ Apply only after platform foundation + prior lskills catalog migrations are pres
 | 1 (prerequisite, already landed) | `supabase/migrations/20260715_000002_lskills_catalog_core.sql` | `4991dd628cc501a1013a4d7c3d8f859274e62ff847e768f106b0e3c2b89d8414` |
 | 2 (prerequisite, already landed) | `supabase/migrations/20260715_000003_lskills_catalog_seed.sql` | `5e8f58a7159ad09f0c6389e12060c6a9cc76ff73dcfc2397ddea256d47a75e82` |
 | 3 (prerequisite, already landed) | `supabase/migrations/20260718_000004_lskills_postgrest_exposure.sql` | `4220d70b626313f572a38720958fb78550b3b89c0efab5366a449d33c0b22ca0` |
-| 4 (**this package**) | `supabase/migrations/20260727_000005_lskills_registry_foundation.sql` | `aff99da2751ab26fd96a13ed03880bea674e5955533c0df4fae8b418de7ab623` |
+| 4 (**this package**) | `supabase/migrations/20260727_000005_lskills_registry_foundation.sql` | `36081765032f21dfd2dcca223035555e1e54b71298874235def8e0362c55c4ed` |
+| 5 (RLS upgrade) | `supabase/migrations/20260728_000006_lskills_rls_actor_org_scope.sql` | `12c2e45e94fd9216a5857ce53ce299a953dc2ee869f89bcdb392857133df763d` |
 
 Also requires LiNKplatform `platform` foundation (`platform.organizations`, roles helpers) already applied on the shared database.
 

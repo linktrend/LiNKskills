@@ -66,6 +66,22 @@ def invoke_tool(
         source_hash=source_hash,
     )
 
+    if adapter in {"server", "remote"}:
+        disabled = ServerAdapter()
+        return ToolInvocationResult(
+            ok=False,
+            tool_id=resolved.tool_id,
+            version=resolved.version,
+            bundle_hash=resolved.bundle_hash,
+            exit_code=None,
+            stdout="",
+            stderr="",
+            adapter_kind=disabled.kind,
+            error=ServerAdapter.DISABLED_REASON,
+            resolved=resolved,
+            metadata={"enabled": False},
+        )
+
     if adapter in {"local", "local_process"}:
         runner = LocalProcessAdapter()
         result: AdapterResult = runner.invoke(
@@ -77,31 +93,6 @@ def invoke_tool(
             input_text=input_text,
         )
         adapter_kind = runner.kind
-    elif adapter in {"server", "remote"}:
-        runner_server = ServerAdapter()
-        try:
-            result = runner_server.invoke(
-                resolved,
-                argv=argv,
-                cwd=cwd,
-                env=env,
-                timeout_seconds=timeout_seconds,
-                input_text=input_text,
-            )
-        except NotImplementedError as exc:
-            return ToolInvocationResult(
-                ok=False,
-                tool_id=resolved.tool_id,
-                version=resolved.version,
-                bundle_hash=resolved.bundle_hash,
-                exit_code=None,
-                stdout="",
-                stderr="",
-                adapter_kind=runner_server.kind,
-                error=str(exc),
-                resolved=resolved,
-            )
-        adapter_kind = runner_server.kind
     else:
         return ToolInvocationResult(
             ok=False,

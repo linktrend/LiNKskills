@@ -9,6 +9,7 @@ from __future__ import annotations
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional
 
 from linkskills_core.certification import evaluate_certification_evidence
@@ -18,6 +19,7 @@ from .policies import (
     first_blocking,
     refuse_protected_branch_push,
 )
+from .store import ReviewQueueStore, open_review_queue_store
 
 
 WORKER_VERSION = "0.1"
@@ -35,6 +37,12 @@ class DomainWorker:
     version: str = WORKER_VERSION
     domain_key: str = DOMAIN_KEY
     review_queue: List[Dict[str, Any]] = field(default_factory=list)
+    store: Optional[ReviewQueueStore] = None
+    store_path: Optional[str] = None
+
+    def __post_init__(self) -> None:
+        if self.store is None and self.store_path:
+            self.store = open_review_queue_store(store_path=Path(self.store_path))
 
     def intake_normalize(self, payload: Mapping[str, Any]) -> Dict[str, Any]:
         skill_ref = str(payload.get("skill_ref") or payload.get("skill_id") or "")
@@ -218,10 +226,12 @@ class DomainWorker:
             "at": _utc_now(),
         }
         self.review_queue.append(item)
+        if self.store is not None:
+            self.store.enqueue(item)
         return {
             "worker_version": self.version,
             "operation": "enqueue_review",
             "item": item,
-            "queue_depth": len(self.review_queue),
+            "queue_depth": self.store.depth() if self.store is not None else len(self.review_queue),
             "at": _utc_now(),
         }

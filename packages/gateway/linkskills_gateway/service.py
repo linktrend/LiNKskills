@@ -18,6 +18,20 @@ from pathlib import Path
 from typing import Any, Callable, Dict, List, Mapping, Optional, Sequence, Tuple
 
 from .auth import ActorClaims
+from .persistence import GatewayStore, InMemoryGatewayStore, open_gateway_store, resolve_state_dir
+
+try:
+    from linkskills_core.payload_guard import (
+        PayloadValidationError,
+        prepare_feedback_params,
+        prepare_run_mutation_params,
+        prepare_trace_params,
+    )
+except ImportError:  # pragma: no cover - path wiring in tests
+    PayloadValidationError = None  # type: ignore[misc, assignment]
+    prepare_feedback_params = None  # type: ignore[misc, assignment]
+    prepare_run_mutation_params = None  # type: ignore[misc, assignment]
+    prepare_trace_params = None  # type: ignore[misc, assignment]
 
 
 CONTRACT_VERSION = "skills.api.v0.1"
@@ -139,9 +153,18 @@ class SkillsGatewayService:
         repo_root: Optional[Path] = None,
         catalog_index: Optional[Mapping[str, Any]] = None,
         clock: Optional[Callable[[], float]] = None,
+        state_dir: Optional[Path] = None,
+        store: Optional[GatewayStore] = None,
     ) -> None:
         self.repo_root = Path(repo_root) if repo_root else _repo_root_from_here()
         self._clock = clock or time.time
+        self._state_dir = resolve_state_dir(repo_root=self.repo_root, state_dir=state_dir)
+        self._store = open_gateway_store(
+            repo_root=self.repo_root,
+            state_dir=state_dir,
+            store=store,
+        )
+        self._durable = not isinstance(self._store, InMemoryGatewayStore)
         self._skills: Dict[str, SkillRecord] = {}
         self._runs: Dict[str, SkillRun] = {}
         self._idempotency: Dict[str, Dict[str, Any]] = {}
@@ -388,31 +411,23 @@ class SkillsGatewayService:
         request_id = request_id or str(uuid.uuid4())
         idempotency_key = idempotency_key or params.pop("idempotency_key", None)
 
-        if operation in WRITE_OPERATIONS and not actor.may_write():
-            # Allow run lifecycle with skills:run as a narrower write scope.
-            if operation.startswith("skills_run_") and (
-                "skills:run" in actor.permitted_operations or actor.has_scope("skills:run")
-            ):
-                pass
-            elif operation in {"skills_feedback_submit", "skills_trace_candidate_submit"} and (
-                "skills:feedback" in actor.permitted_operations
-                or "skills:run" in actor.permitted_operations
-                or actor.has_scope("skills:feedback")
-                or actor.has_scope("skills:run")
-            ):
-                pass
-            else:
-                raise ServiceError(
-                    "auth_forbidden",
-                    f"Scope insufficient for {operation}",
-                    http_status=403,
-                )
+        # Exact permittedOperations enforcement for every read and mutation.
+        if not actor.has_scope("lskills") and "*" not in actor.scopes:
+            raise ServiceError(
+                "auth_forbidden",
+                "Missing required service scope: lskills",
+                http_status=403,
+            )
+        if not actor.may_perform(operation):
+            raise ServiceError(
+                "auth_forbidden",
+                f"permittedOperations insufficient for {operation}",
+                http_status=403,
+            )
 
-        if operation == "skills_run_start" and idempotency_key:
-            cache_key = f"{actor.actor_id}:{operation}:{idempotency_key}"
-            cached = self._idempotency.get(cache_key)
+        if operation in WRITE_OPERATIONS and idempotency_key:
+            cached = self._store.get_idempotent(actor.actor_id, operation, idempotency_key)
             if cached is not None:
-                # Return prior envelope with fresh request/server metadata.
                 replay = dict(cached)
                 replay["request_id"] = request_id
                 replay["server_time"] = _utc_now()
@@ -436,9 +451,19 @@ class SkillsGatewayService:
             run_id=result.get("run_id"),
         )
 
-        if operation == "skills_run_start" and idempotency_key:
-            cache_key = f"{actor.actor_id}:{operation}:{idempotency_key}"
-            self._idempotency[cache_key] = dict(env)
+        if operation in WRITE_OPERATIONS and idempotency_key:
+            stored = self._store.put_idempotent(
+                actor.actor_id, operation, idempotency_key, dict(env)
+            )
+            # Collision-safe: if another writer won the race, return their envelope.
+            if stored.get("request_id") != env.get("request_id"):
+                replay = dict(stored)
+                replay["request_id"] = request_id
+                replay["server_time"] = _utc_now()
+                replay["warnings"] = list(replay.get("warnings") or []) + [
+                    "idempotent_replay"
+                ]
+                return replay
         return env
 
     # -------------------------------------------------------------- helpers
@@ -449,16 +474,52 @@ class SkillsGatewayService:
         return skill
 
     def _get_run(self, run_id: str, actor: ActorClaims) -> SkillRun:
-        run = self._runs.get(run_id)
-        if not run:
-            raise ServiceError("not_found", f"Unknown run_id: {run_id}", http_status=404)
-        if run.actor_id != actor.actor_id or run.org_id != actor.org_id:
+        if run_id in self._runs:
+            run = self._runs[run_id]
+        else:
+            stored = self._store.get_run(run_id)
+            if stored is None:
+                raise ServiceError("not_found", f"Unknown run_id: {run_id}", http_status=404)
+            run = SkillRun(
+                run_id=str(stored["run_id"]),
+                skill_id=str(stored["skill_id"]),
+                version=str(stored["version"]),
+                release_hash=str(stored.get("release_hash") or ""),
+                profile_hash=str(stored.get("profile_hash") or ""),
+                actor_id=str(stored["actor_id"]),
+                org_id=str(stored["org_id"]),
+                status=str(stored["status"]),
+                created_at=str(stored["created_at"]),
+                updated_at=str(stored["updated_at"]),
+                events=list(stored.get("events") or []),
+                feedback=list(stored.get("feedback") or []),
+                outcome=stored.get("outcome"),
+                idempotency_key=stored.get("idempotency_key"),
+            )
+            self._runs[run_id] = run
+        if run.actor_id != actor.actor_id or (run.org_id or "") != (actor.org_id or ""):
             raise ServiceError(
                 "auth_forbidden",
                 "Run belongs to another actor/org",
                 http_status=403,
             )
         return run
+
+    def _guard_params(self, preparer: Any, params: Mapping[str, Any]) -> Dict[str, Any]:
+        if preparer is None:
+            return dict(params)
+        try:
+            return preparer(params)
+        except PayloadValidationError as exc:  # type: ignore[misc]
+            raise ServiceError(exc.code, exc.message, http_status=400) from exc
+        except Exception as exc:
+            if PayloadValidationError is not None and isinstance(exc, PayloadValidationError):
+                raise ServiceError(exc.code, exc.message, http_status=400) from exc
+            raise
+
+    def _persist_run(self, run: SkillRun) -> None:
+        self._runs[run.run_id] = run
+        self._store.save_run(run)
 
     def _assert_skill_runnable(
         self,
@@ -792,7 +853,7 @@ class SkillsGatewayService:
             release_hash=skill.release_hash,
             profile_hash=skill.profile_hash,
             actor_id=actor.actor_id,
-            org_id=actor.org_id,
+            org_id=actor.org_id or "",
             status="started",
             created_at=now,
             updated_at=now,
@@ -800,7 +861,8 @@ class SkillsGatewayService:
             idempotency_key=idempotency_key,
         )
         self._runs[run_id] = run
-        self._events.append(
+        self._persist_run(run)
+        self._store.append_event(
             {
                 "type": "run_started",
                 "run_id": run_id,
@@ -831,20 +893,22 @@ class SkillsGatewayService:
         idempotency_key: Optional[str],
     ) -> Dict[str, Any]:
         del idempotency_key
-        run = self._get_run(str(params.get("run_id") or ""), actor)
+        clean = self._guard_params(prepare_run_mutation_params, params)
+        run = self._get_run(str(clean.get("run_id") or ""), actor)
         if run.status in {"completed", "failed"}:
             raise ServiceError("run_closed", f"Run already {run.status}")
         event = {
             "type": "run_update",
             "at": _utc_now(),
-            "progress": params.get("progress"),
-            "disclosure": params.get("disclosure"),
-            "validation": params.get("validation"),
-            "artifact_refs": params.get("artifact_refs") or [],
+            "progress": clean.get("progress"),
+            "disclosure": clean.get("disclosure"),
+            "validation": clean.get("validation"),
+            "artifact_refs": clean.get("artifact_refs") or [],
         }
         run.events.append(event)
         run.updated_at = event["at"]
         run.status = "in_progress"
+        self._persist_run(run)
         return {
             "data": {"run_id": run.run_id, "status": run.status, "event": event},
             "run_id": run.run_id,
@@ -861,21 +925,23 @@ class SkillsGatewayService:
         idempotency_key: Optional[str],
     ) -> Dict[str, Any]:
         del idempotency_key
-        run = self._get_run(str(params.get("run_id") or ""), actor)
+        clean = self._guard_params(prepare_run_mutation_params, params)
+        run = self._get_run(str(clean.get("run_id") or ""), actor)
         if run.status in {"completed", "failed"}:
             raise ServiceError("run_closed", f"Run already {run.status}")
         now = _utc_now()
         outcome = {
-            "classification": params.get("classification") or "success",
-            "output": params.get("output"),
-            "evidence": params.get("evidence") or {},
-            "feedback": params.get("feedback"),
+            "classification": clean.get("classification") or "success",
+            "output": clean.get("output"),
+            "evidence": clean.get("evidence") or {},
+            "feedback": clean.get("feedback"),
             "closed_at": now,
         }
         run.outcome = outcome
         run.status = "completed"
         run.updated_at = now
         run.events.append({"type": "run_completed", "at": now, "outcome": outcome})
+        self._persist_run(run)
         return {
             "data": {"run_id": run.run_id, "status": run.status, "outcome": outcome},
             "run_id": run.run_id,
@@ -892,21 +958,23 @@ class SkillsGatewayService:
         idempotency_key: Optional[str],
     ) -> Dict[str, Any]:
         del idempotency_key
-        run = self._get_run(str(params.get("run_id") or ""), actor)
+        clean = self._guard_params(prepare_run_mutation_params, params)
+        run = self._get_run(str(clean.get("run_id") or ""), actor)
         if run.status in {"completed", "failed"}:
             raise ServiceError("run_closed", f"Run already {run.status}")
         now = _utc_now()
         failure = {
-            "error_class": params.get("error_class") or "unspecified",
-            "message": params.get("message") or "run failed",
-            "trace_to_eval_eligible": bool(params.get("trace_to_eval_eligible", True)),
-            "details": params.get("details") or {},
+            "error_class": clean.get("error_class") or "unspecified",
+            "message": clean.get("message") or "run failed",
+            "trace_to_eval_eligible": bool(clean.get("trace_to_eval_eligible", True)),
+            "details": clean.get("details") or {},
             "closed_at": now,
         }
         run.outcome = failure
         run.status = "failed"
         run.updated_at = now
         run.events.append({"type": "run_failed", "at": now, "failure": failure})
+        self._persist_run(run)
         return {
             "data": {"run_id": run.run_id, "status": run.status, "failure": failure},
             "run_id": run.run_id,
@@ -1151,28 +1219,32 @@ class SkillsGatewayService:
         idempotency_key: Optional[str],
     ) -> Dict[str, Any]:
         del idempotency_key
-        run_id = params.get("run_id")
-        run: Optional[SkillRun] = None
-        if run_id:
-            # Enforce the same actor/org ownership binding as other run ops.
-            run = self._get_run(str(run_id), actor)
+        clean = self._guard_params(prepare_feedback_params, params)
+        run = self._get_run(str(clean["run_id"]), actor)
+        if clean.get("skill_id") and str(clean["skill_id"]) != run.skill_id:
+            raise ServiceError(
+                "auth_forbidden",
+                "feedback skill_id does not match accessible run",
+                http_status=403,
+            )
         record = {
             "feedback_id": str(uuid.uuid4()),
             "actor_id": actor.actor_id,
-            "org_id": actor.org_id,
-            "skill_id": params.get("skill_id"),
-            "run_id": run_id,
-            "kind": params.get("kind") or "correction",
-            "rating": params.get("rating"),
-            "friction": params.get("friction"),
-            "missing_step": params.get("missing_step"),
-            "outcome": params.get("outcome"),
-            "notes": params.get("notes"),
+            "org_id": actor.org_id or "",
+            "skill_id": clean.get("skill_id") or run.skill_id,
+            "run_id": run.run_id,
+            "kind": clean.get("kind") or "correction",
+            "rating": clean.get("rating"),
+            "friction": clean.get("friction"),
+            "missing_step": clean.get("missing_step"),
+            "outcome": clean.get("outcome"),
+            "notes": clean.get("notes"),
             "at": _utc_now(),
         }
         self._feedback.append(record)
-        if run is not None:
-            run.feedback.append(record)
+        self._store.append_feedback(record)
+        run.feedback.append(record)
+        self._persist_run(run)
         return {
             "data": record,
             "recommended_next": None,
@@ -1186,38 +1258,56 @@ class SkillsGatewayService:
         idempotency_key: Optional[str],
     ) -> Dict[str, Any]:
         del idempotency_key
-        # Deduplicate by (skill_id, run_id, fingerprint)
+        clean = self._guard_params(prepare_trace_params, params)
+        run = self._get_run(str(clean["run_id"]), actor)
+        if clean.get("skill_id") and str(clean["skill_id"]) != run.skill_id:
+            raise ServiceError(
+                "auth_forbidden",
+                "trace skill_id does not match accessible run",
+                http_status=403,
+            )
         fingerprint = str(
-            params.get("fingerprint")
+            clean.get("fingerprint")
             or self._stable_hash(
                 json.dumps(
                     {
-                        "skill_id": params.get("skill_id"),
-                        "run_id": params.get("run_id"),
-                        "summary": params.get("summary"),
+                        "skill_id": clean.get("skill_id") or run.skill_id,
+                        "run_id": run.run_id,
+                        "summary": clean.get("summary"),
+                        "actor_id": actor.actor_id,
+                        "org_id": actor.org_id or "",
                     },
                     sort_keys=True,
                 )
             )
         )
-        for existing in self._trace_candidates:
-            if existing.get("fingerprint") == fingerprint:
-                return {
-                    "data": {**existing, "deduplicated": True},
-                    "warnings": ["duplicate_trace_candidate"],
-                }
+        existing = self._store.find_trace_by_fingerprint(fingerprint)
+        if existing is not None:
+            if existing.get("actor_id") != actor.actor_id or (existing.get("org_id") or "") != (
+                actor.org_id or ""
+            ):
+                raise ServiceError(
+                    "auth_forbidden",
+                    "trace candidate belongs to another actor/org",
+                    http_status=403,
+                )
+            return {
+                "data": {**existing, "deduplicated": True},
+                "warnings": ["duplicate_trace_candidate"],
+            }
         record = {
             "candidate_id": str(uuid.uuid4()),
             "fingerprint": fingerprint,
             "actor_id": actor.actor_id,
-            "org_id": actor.org_id,
-            "skill_id": params.get("skill_id"),
-            "run_id": params.get("run_id"),
-            "summary": params.get("summary"),
-            "observed": params.get("observed") or {},
+            "org_id": actor.org_id or "",
+            "skill_id": clean.get("skill_id") or run.skill_id,
+            "run_id": run.run_id,
+            "summary": clean.get("summary"),
+            "observed": clean.get("observed") or {},
             "status": "queued",
             "at": _utc_now(),
             "deduplicated": False,
         }
         self._trace_candidates.append(record)
+        self._store.append_trace(record)
         return {"data": record, "recommended_next": "enqueue_review"}

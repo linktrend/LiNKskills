@@ -69,14 +69,9 @@ python3 validator.py --repo-root . --scan-all
 python3 scripts/build-catalog-index.py
 python3 scripts/build-catalog-index.py --check
 python3 -m unittest discover -s tests/skill_runtime -v
-# Internal-launch packages (same suite set CI runs under pytest):
+# Internal-launch packages (pytest discovers tests/; archive/ excluded via pytest.ini):
 PYTHONPATH="packages/contracts:packages/core:packages/publisher:packages/eval_runner:packages/tool_runtime:packages/gateway:packages/mcp_server:packages/client:packages/librarian_domain:." \
-  python3 -m pytest \
-  tests/contracts tests/core tests/publisher \
-  tests/eval_runner tests/tool_runtime \
-  tests/gateway tests/mcp_server tests/client \
-  tests/librarian_domain tests/migrations \
-  -q
+  python3 -m pytest -q
 python3 scripts/flush-telemetry.py
 python3 scripts/check-service-ownership.py
 ```
