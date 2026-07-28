@@ -250,5 +250,114 @@ class HttpTests(unittest.TestCase):
         conn.close()
 
 
+class RunLifecycleGateTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.catalog = {
+            "skills": [
+                {
+                    "skill_id": "usable-demo",
+                    "version": "1.0.0",
+                    "description": "usable demo",
+                    "format_profile": "heavy",
+                    "eval_suite_ref": "",
+                    "certification_state": "usable",
+                    "release_hash": "release-usable-1",
+                    "profile_hash": "profile-usable-1",
+                    "compatible_runtime_profiles": ["cursor-macos"],
+                },
+                {
+                    "skill_id": "draft-demo",
+                    "version": "0.0.1",
+                    "description": "draft demo",
+                    "format_profile": "heavy",
+                    "eval_suite_ref": "",
+                    "certification_state": "draft",
+                    "compatible_runtime_profiles": ["cursor-macos"],
+                },
+            ]
+        }
+        self.service = SkillsGatewayService(
+            repo_root=REPO_ROOT,
+            catalog_index=self.catalog,
+        )
+        self.owner = PlatformClaimsVerifier().verify(
+            f"Bearer {mint_test_bearer({'actor_id': 'owner', 'org_id': 'org-a'})}"
+        )
+        self.intruder = PlatformClaimsVerifier().verify(
+            f"Bearer {mint_test_bearer({'actor_id': 'intruder', 'org_id': 'org-b'})}"
+        )
+
+    def test_rejects_draft_run_start(self) -> None:
+        with self.assertRaises(ServiceError) as ctx:
+            self.service.dispatch(
+                "skills_run_start",
+                {"skill_id": "draft-demo"},
+                actor=self.owner,
+            )
+        self.assertEqual(ctx.exception.code, "skill_not_runnable")
+
+    def test_rejects_release_hash_mismatch(self) -> None:
+        with self.assertRaises(ServiceError) as ctx:
+            self.service.dispatch(
+                "skills_run_start",
+                {
+                    "skill_id": "usable-demo",
+                    "release_hash": "wrong-release",
+                    "runtime_profile_tags": ["cursor-macos"],
+                },
+                actor=self.owner,
+            )
+        self.assertEqual(ctx.exception.code, "release_hash_mismatch")
+
+    def test_rejects_incompatible_profile(self) -> None:
+        with self.assertRaises(ServiceError) as ctx:
+            self.service.dispatch(
+                "skills_run_start",
+                {
+                    "skill_id": "usable-demo",
+                    "runtime_profile_tags": ["codex-linux"],
+                },
+                actor=self.owner,
+            )
+        self.assertEqual(ctx.exception.code, "profile_incompatible")
+
+    def test_usable_run_start_ok(self) -> None:
+        env = self.service.dispatch(
+            "skills_run_start",
+            {
+                "skill_id": "usable-demo",
+                "release_hash": "release-usable-1",
+                "profile_hash": "profile-usable-1",
+                "runtime_profile_tags": ["cursor-macos"],
+            },
+            actor=self.owner,
+        )
+        self.assertIsNone(env["error"])
+        self.assertEqual(env["data"]["skill_id"], "usable-demo")
+
+    def test_feedback_rejects_wrong_owner(self) -> None:
+        started = self.service.dispatch(
+            "skills_run_start",
+            {
+                "skill_id": "usable-demo",
+                "runtime_profile_tags": ["cursor-macos"],
+            },
+            actor=self.owner,
+        )
+        run_id = started["run_id"]
+        with self.assertRaises(ServiceError) as ctx:
+            self.service.dispatch(
+                "skills_feedback_submit",
+                {
+                    "skill_id": "usable-demo",
+                    "run_id": run_id,
+                    "kind": "correction",
+                    "notes": "stolen",
+                },
+                actor=self.intruder,
+            )
+        self.assertEqual(ctx.exception.code, "auth_forbidden")
+
+
 if __name__ == "__main__":
     unittest.main()

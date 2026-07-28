@@ -187,13 +187,9 @@ class SkillsGatewayClient:
                 raw = response.read().decode("utf-8")
                 return json.loads(raw) if raw else {}
         except HTTPError as exc:
+            # HTTP 4xx/5xx must fail flush/call paths — never treat error bodies
+            # as successful responses (would drop buffered events as "written").
             detail = exc.read().decode("utf-8", errors="replace")
-            try:
-                parsed = json.loads(detail) if detail else {}
-            except json.JSONDecodeError:
-                parsed = {"error": {"code": "http_error", "message": detail}}
-            if isinstance(parsed, dict) and parsed:
-                return parsed
             raise RuntimeError(f"gateway HTTP {exc.code}: {detail}") from exc
         except URLError as exc:
             raise RuntimeError(f"gateway unreachable: {exc}") from exc

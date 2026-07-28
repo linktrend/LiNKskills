@@ -7,12 +7,13 @@
         "linkskills_mcp.server"
       ],
       "env": {
-        "PYTHONPATH": "packages/gateway:packages/mcp_server:packages/client:packages/librarian_domain:packages/eval_runner:packages/contracts:.",
+        "PYTHONPATH": "packages/gateway:packages/mcp_server:packages/client:packages/librarian_domain:packages/eval_runner:packages/tool_runtime:packages/contracts:packages/core:.",
         "GATEWAY_URL": "http://127.0.0.1:8787",
-        "LINKSKILLS_CANARY": "1"
+        "LINKSKILLS_CANARY": "1",
+        "LINKSKILLS_CANARY_AUTHORIZATION": "REPLACE_WITH_PLATFORM_VERIFIABLE_BEARER"
       },
       "disabled": false
     }
   },
-  "_comment": "Project-scoped Cursor MCP fragment for LiNKskills canary. NO secrets. Point GATEWAY_URL at a local gateway. Do not merge into ~/.cursor/mcp.json without the coordinated Cursor maintenance gate."
+  "_comment": "Project-scoped Cursor MCP fragment for LiNKskills canary. NO secrets. LINKSKILLS_CANARY requires a Platform-verifiable bearer in LINKSKILLS_CANARY_AUTHORIZATION (or GATEWAY_TOKEN) — never caller-minted actor_claims. Point GATEWAY_URL at a local gateway. Do not merge into ~/.cursor/mcp.json without the coordinated Cursor maintenance gate. Do not start the multi-day canary from this fragment alone."
 }

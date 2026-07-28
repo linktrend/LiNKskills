@@ -1,6 +1,10 @@
 """LiNKskills pure core policies: lifecycle, selection, retention, certification."""
 
-from .certification import CertificationDecision, evaluate_certification_evidence
+from .certification import (
+    CertificationDecision,
+    evaluate_certification_evidence,
+    sealed_executor_receipt,
+)
 from .lifecycle import (
     CERTIFICATION_STATES,
     CertificationState,
@@ -23,6 +27,7 @@ __all__ = [
     "evaluate_certification_evidence",
     "filter_compatible_usable_releases",
     "redact_payload",
+    "sealed_executor_receipt",
     "should_redact_key",
 ]
 

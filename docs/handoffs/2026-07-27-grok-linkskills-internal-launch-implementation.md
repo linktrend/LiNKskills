@@ -138,3 +138,9 @@ Replacement canary (executor receipts required):
 - receipts `121d8ef6…bcc8a1`, `fbb425a5…8009a`
 
 Do not begin the multi-day Cursor canary until certification + Platform gates pass independent Codex re-verification.
+
+## Amendment 2026-07-28 — wave 2 / wave 3
+
+Wave-1 replacement profile/receipts above were **again withdrawn** in wave 2 (non-deterministic profile / unset release). Current sealed canary identity is in `docs/handoffs/2026-07-28-grok-certification-correction-wave2.md`.
+
+Wave 3 (`docs/handoffs/2026-07-28-grok-certification-correction-wave3.md`) addresses all remaining actionable PR #22 review threads (buffer/flush, librarian/core receipt-bound cert, MCP identity, run-start gates, fragments, README). Still provisional — return to Codex; do not merge PR #22; do not start multi-day Cursor canary.

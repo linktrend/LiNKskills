@@ -11,6 +11,8 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Mapping, Optional
 
+from linkskills_core.certification import evaluate_certification_evidence
+
 from .policies import (
     evaluate_proposal,
     first_blocking,
@@ -137,25 +139,32 @@ class DomainWorker:
         }
 
     def interpret_eval_evidence(self, payload: Mapping[str, Any]) -> Dict[str, Any]:
-        evidence = payload.get("evidence") or {}
-        has_cases = bool(evidence.get("case_results") or evidence.get("executed_cases"))
-        prompt_only = bool(payload.get("prompt_only") or evidence.get("prompt_only"))
-        if prompt_only or not has_cases:
+        """Interpret eval evidence using the same receipt-bound rules as Eval Runner.
+
+        Non-empty ``case_results`` alone never certifies — sealed executor
+        receipts are required via ``evaluate_certification_evidence``.
+        """
+        evidence = dict(payload.get("evidence") or {})
+        if payload.get("prompt_only"):
+            evidence["prompt_only"] = True
+        decision = evaluate_certification_evidence(evidence)
+        if not decision.allowed:
             return {
                 "worker_version": self.version,
                 "operation": "interpret_eval_evidence",
                 "certifying": False,
                 "recommendation": "hold_eval_pending",
-                "reason": "prompt_only_or_missing_executed_cases",
+                "reason": decision.reason,
                 "at": _utc_now(),
             }
         passed = bool(evidence.get("passed"))
         return {
             "worker_version": self.version,
             "operation": "interpret_eval_evidence",
-            "certifying": True,
+            "certifying": bool(passed),
             "recommendation": "promote" if passed else "demote_or_hold",
             "passed": passed,
+            "evidence_decision": decision.reason,
             "at": _utc_now(),
         }
 

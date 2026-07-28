@@ -73,29 +73,29 @@ def record_invocation(
             authorization=authorization or os.environ.get("GATEWAY_TOKEN"),
         )
         if hasattr(event, "to_ledger_dict"):
-            payload = event.to_ledger_dict()
+            raw = event.to_ledger_dict()
         elif isinstance(event, Mapping):
-            payload = dict(event)
+            raw = dict(event)
         else:
-            payload = {
-                "skill_id": getattr(event, "skill", None),
+            raw = {
+                "skill": getattr(event, "skill", None),
                 "status": getattr(event, "status", None),
                 "summary": getattr(event, "summary", None),
             }
+        # Always buffer/submit the mapped skills_feedback_submit shape — never
+        # the legacy invocation ledger keys (skill/status/summary) alone.
+        mapped = {
+            "skill_id": raw.get("skill_id") or raw.get("skill"),
+            "kind": raw.get("kind") or "invocation",
+            "outcome": raw.get("outcome") if "outcome" in raw else raw.get("status"),
+            "notes": raw.get("notes") if "notes" in raw else raw.get("summary"),
+            "run_id": raw.get("run_id") or raw.get("run_ref"),
+        }
         try:
-            result = gw.call(
-                "skills_feedback_submit",
-                {
-                    "skill_id": payload.get("skill") or payload.get("skill_id"),
-                    "kind": "invocation",
-                    "outcome": payload.get("status"),
-                    "notes": payload.get("summary"),
-                    "run_id": payload.get("run_ref") or payload.get("run_id"),
-                },
-            )
+            result = gw.call("skills_feedback_submit", mapped)
             return {"source": "gateway", "result": result}
         except Exception as exc:  # noqa: BLE001 — buffer offline
-            buffered = gw.buffer_event("skills_feedback_submit", payload)
+            buffered = gw.buffer_event("skills_feedback_submit", mapped)
             return {
                 "source": "gateway_buffered",
                 "event_id": buffered.event_id,

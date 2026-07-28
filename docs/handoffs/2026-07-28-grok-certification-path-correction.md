@@ -78,3 +78,7 @@ Return this correction handoff to the **LiNKskills Codex verifier** for independ
 ## Amendment 2026-07-28 — wave 2 supersession
 
 Wave 1 profile/receipt claims are **withdrawn**. See `docs/handoffs/2026-07-28-grok-certification-correction-wave2.md` for frozen AuthClaims pin, immutable skill-release binding, and deterministic profile hashes.
+
+## Amendment 2026-07-28 — wave 3 supersession
+
+Additional fail-closed corrections for buffer/flush, librarian/core receipt-bound certification, MCP identity minting, run-start gates, fragments, and README CI commands. See `docs/handoffs/2026-07-28-grok-certification-correction-wave3.md`. Still provisional — do not merge PR #22; do not start the multi-day Cursor canary; return to Codex verification.

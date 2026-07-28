@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
 import sys
 import unittest
 from pathlib import Path
@@ -10,7 +12,10 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT / "packages" / "core"))
 
-from linkskills_core.certification import evaluate_certification_evidence  # noqa: E402
+from linkskills_core.certification import (  # noqa: E402
+    evaluate_certification_evidence,
+    sealed_executor_receipt,
+)
 from linkskills_core.lifecycle import (  # noqa: E402
     TransitionError,
     assert_transition,
@@ -18,6 +23,58 @@ from linkskills_core.lifecycle import (  # noqa: E402
 )
 from linkskills_core.retention import REDACTED, redact_payload, should_redact_key  # noqa: E402
 from linkskills_core.selection import filter_compatible_usable_releases  # noqa: E402
+
+
+def _seal_receipt(**overrides):
+    """Build a sealed executor receipt matching core/eval seal contract."""
+    base = {
+        "receipt_id": "rcpt-1",
+        "case_id": "c1",
+        "skill_id": "demo",
+        "suite_id": "suite-1",
+        "suite_hash": "suitehash",
+        "skill_release_hash": "skill-release:abc123",
+        "execution_profile_hash": "profilehash",
+        "environment": {"python_version": "3.11"},
+        "toolchain": {"kind": "test"},
+        "tool_calls": [],
+        "exit_code": 0,
+        "stdout_hash": "stdout",
+        "stderr_hash": "stderr",
+        "artifact_hashes": [],
+        "started_at": "2026-07-28T00:00:00Z",
+        "finished_at": "2026-07-28T00:00:01Z",
+        "executor_version": "linkskills-eval-executor/0.2.0",
+        "evidence_source": "executor",
+    }
+    base.update(overrides)
+    payload = {
+        "artifact_hashes": list(base.get("artifact_hashes") or []),
+        "case_id": base["case_id"],
+        "environment": dict(base.get("environment") or {}),
+        "evidence_source": base["evidence_source"],
+        "execution_profile_hash": base["execution_profile_hash"],
+        "executor_version": base["executor_version"],
+        "exit_code": base.get("exit_code"),
+        "finished_at": base["finished_at"],
+        "receipt_id": base["receipt_id"],
+        "skill_id": base["skill_id"],
+        "skill_release_hash": base["skill_release_hash"],
+        "started_at": base["started_at"],
+        "stderr_hash": base["stderr_hash"],
+        "stdout_hash": base["stdout_hash"],
+        "suite_hash": base["suite_hash"],
+        "suite_id": base["suite_id"],
+        "tool_calls": list(base.get("tool_calls") or []),
+        "toolchain": dict(base.get("toolchain") or {}),
+    }
+    digest = hashlib.sha256(
+        json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode(
+            "utf-8"
+        )
+    ).hexdigest()
+    base["receipt_hash"] = digest
+    return base
 
 
 class LifecycleTests(unittest.TestCase):
@@ -85,7 +142,7 @@ class CertificationTests(unittest.TestCase):
             }
         )
         self.assertFalse(decision.allowed)
-        self.assertIn("executed case outputs", decision.reason)
+        self.assertIn("sealed executor receipts", decision.reason)
 
     def test_refuses_suite_authored_observed_output_alone(self) -> None:
         decision = evaluate_certification_evidence(
@@ -101,14 +158,50 @@ class CertificationTests(unittest.TestCase):
         )
         self.assertFalse(decision.allowed)
 
-    def test_accepts_executed_outputs(self) -> None:
+    def test_refuses_bare_output_and_tool_traces(self) -> None:
         decision = evaluate_certification_evidence(
             {
                 "cases": [
                     {
                         "case_id": "c1",
                         "executed_output": "observed result text",
+                        "output": "bare string",
                         "tool_traces": [{"tool_id": "gws", "status": "ok"}],
+                        "artifact_refs": ["a1"],
+                    }
+                ]
+            }
+        )
+        self.assertFalse(decision.allowed)
+        self.assertIn("receipt", decision.reason)
+
+    def test_refuses_fabricated_receipt_hash(self) -> None:
+        receipt = _seal_receipt()
+        receipt["receipt_hash"] = "0" * 64
+        self.assertFalse(sealed_executor_receipt(receipt))
+        decision = evaluate_certification_evidence(
+            {
+                "cases": [
+                    {
+                        "case_id": "c1",
+                        "evidence_source": "executor",
+                        "execution_receipt": receipt,
+                    }
+                ]
+            }
+        )
+        self.assertFalse(decision.allowed)
+
+    def test_accepts_sealed_executor_receipt(self) -> None:
+        receipt = _seal_receipt()
+        self.assertTrue(sealed_executor_receipt(receipt))
+        decision = evaluate_certification_evidence(
+            {
+                "cases": [
+                    {
+                        "case_id": "c1",
+                        "evidence_source": "executor",
+                        "execution_receipt": receipt,
                     }
                 ]
             }

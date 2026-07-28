@@ -76,6 +76,7 @@ class SkillRecord:
     category: str = "general"
     release_hash: str = ""
     profile_hash: str = ""
+    compatible_runtime_profiles: List[str] = field(default_factory=list)
     fragments: Dict[str, str] = field(default_factory=dict)
     tools: List[Dict[str, Any]] = field(default_factory=list)
     input_schema: Dict[str, Any] = field(default_factory=dict)
@@ -176,6 +177,16 @@ class SkillsGatewayService:
                 category=category,
                 skill_root=skill_root,
             )
+            compatible_profiles = raw.get("compatible_runtime_profiles") or raw.get(
+                "runtime_profile_tags"
+            ) or []
+            if isinstance(compatible_profiles, str):
+                compatible_profiles = [compatible_profiles]
+            # Allow catalog override of stable hashes when provided (tests / pinned releases).
+            if raw.get("release_hash"):
+                release_hash = str(raw["release_hash"])
+            if raw.get("profile_hash"):
+                profile_hash = str(raw["profile_hash"])
             record = SkillRecord(
                 skill_id=skill_id,
                 version=version,
@@ -189,6 +200,7 @@ class SkillsGatewayService:
                 category=category,
                 release_hash=release_hash,
                 profile_hash=profile_hash,
+                compatible_runtime_profiles=[str(p) for p in compatible_profiles],
                 fragments=fragments,
                 tools=[
                     {
@@ -448,6 +460,80 @@ class SkillsGatewayService:
             )
         return run
 
+    def _assert_skill_runnable(
+        self,
+        skill: SkillRecord,
+        params: Mapping[str, Any],
+    ) -> None:
+        """Reject draft / uncertified / hash-mismatched / incompatible-profile starts."""
+        state = (skill.certification_state or "").strip()
+        if state != "usable":
+            raise ServiceError(
+                "skill_not_runnable",
+                (
+                    f"Skill {skill.skill_id!r} certification_state={state!r} "
+                    "is not usable (draft/uncertified skills cannot start runs)"
+                ),
+                http_status=409,
+            )
+
+        requested_release = params.get("release_hash") or params.get("skill_release_hash")
+        if requested_release is not None and str(requested_release) != skill.release_hash:
+            raise ServiceError(
+                "release_hash_mismatch",
+                (
+                    f"Requested release_hash {requested_release!r} != "
+                    f"published {skill.release_hash!r}"
+                ),
+                http_status=409,
+            )
+
+        requested_profile = params.get("profile_hash") or params.get("execution_profile_hash")
+        if requested_profile is not None and str(requested_profile) != skill.profile_hash:
+            raise ServiceError(
+                "profile_hash_mismatch",
+                (
+                    f"Requested profile_hash {requested_profile!r} != "
+                    f"published {skill.profile_hash!r}"
+                ),
+                http_status=409,
+            )
+
+        runtime_tags = (
+            params.get("runtime_profile_tags")
+            or params.get("compatible_runtime_profiles")
+            or params.get("execution_profile")
+        )
+        if runtime_tags is None:
+            return
+        if isinstance(runtime_tags, str):
+            wanted = {runtime_tags}
+        elif isinstance(runtime_tags, Mapping):
+            wanted = {str(v) for v in runtime_tags.values() if v is not None}
+        else:
+            wanted = {str(v) for v in runtime_tags if v is not None}
+        declared = set(skill.compatible_runtime_profiles)
+        if not declared:
+            raise ServiceError(
+                "profile_incompatible",
+                (
+                    f"Skill {skill.skill_id!r} declares no compatible runtime profiles "
+                    "(fail closed)"
+                ),
+                http_status=409,
+            )
+        if declared & {"*", "any"}:
+            return
+        if not (declared & wanted):
+            raise ServiceError(
+                "profile_incompatible",
+                (
+                    f"Skill {skill.skill_id!r} profiles {sorted(declared)} "
+                    f"incompatible with requested {sorted(wanted)}"
+                ),
+                http_status=409,
+            )
+
     def health(self) -> Dict[str, Any]:
         return {
             "status": "ok",
@@ -696,6 +782,7 @@ class SkillsGatewayService:
                 "version_mismatch",
                 f"Requested version {version} != published {skill.version}",
             )
+        self._assert_skill_runnable(skill, params)
         now = _utc_now()
         run_id = str(uuid.uuid4())
         run = SkillRun(
@@ -1064,12 +1151,17 @@ class SkillsGatewayService:
         idempotency_key: Optional[str],
     ) -> Dict[str, Any]:
         del idempotency_key
+        run_id = params.get("run_id")
+        run: Optional[SkillRun] = None
+        if run_id:
+            # Enforce the same actor/org ownership binding as other run ops.
+            run = self._get_run(str(run_id), actor)
         record = {
             "feedback_id": str(uuid.uuid4()),
             "actor_id": actor.actor_id,
             "org_id": actor.org_id,
             "skill_id": params.get("skill_id"),
-            "run_id": params.get("run_id"),
+            "run_id": run_id,
             "kind": params.get("kind") or "correction",
             "rating": params.get("rating"),
             "friction": params.get("friction"),
@@ -1079,8 +1171,8 @@ class SkillsGatewayService:
             "at": _utc_now(),
         }
         self._feedback.append(record)
-        if record.get("run_id") and record["run_id"] in self._runs:
-            self._runs[str(record["run_id"])].feedback.append(record)
+        if run is not None:
+            run.feedback.append(record)
         return {
             "data": record,
             "recommended_next": None,

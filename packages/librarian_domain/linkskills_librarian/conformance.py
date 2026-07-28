@@ -81,6 +81,7 @@ DEFAULT_FIXTURES: Dict[str, Dict[str, Any]] = {
     "interpret_eval_evidence": {
         "method": "interpret_eval_evidence",
         "payload": {
+            # Intentionally thin — must NOT certify without sealed executor receipts.
             "evidence": {
                 "passed": True,
                 "case_results": [{"id": "c1", "passed": True}],

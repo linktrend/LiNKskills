@@ -78,6 +78,10 @@ LiNKskills will not edit OpenClaw/Lisa internals.
 - Live Platform migration apply / live issuer
 - Self-certification of this handoff
 
+## Amendment 2026-07-28 — wave 3
+
+Wave 2 AuthClaims/profile claims remain. Wave 3 adds buffer/flush fail-closed behavior, receipt-bound librarian/core certification, MCP identity hardening, run-start gates, fragment PYTHONPATH, and README CI command alignment. See `docs/handoffs/2026-07-28-grok-certification-correction-wave3.md`. Still provisional for Codex re-verification — do not merge or start the multi-day Cursor canary.
+
 ## Ask
 
 Return to the **LiNKskills Codex verifier** for independent re-verification against plan hash `31a6cc70bb778ce1dff236819e4bf600b0495dbb06c95bac55bcb2b0b2f5fe88` and Platform freeze record.

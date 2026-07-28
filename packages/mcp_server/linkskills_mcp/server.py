@@ -2,11 +2,17 @@
 
 No duplicated business logic: every tool call routes to the shared gateway
 service used by the HTTP API (in-process import of linkskills_gateway.service).
+
+Authentication accepts only:
+- Platform-verifiable ``Authorization`` bearers, or
+- an explicitly injected test/canary ``default_actor`` (never caller-minted
+  claims from the tool body).
 """
 
 from __future__ import annotations
 
 import json
+import os
 import sys
 import uuid
 from typing import Any, Dict, List, Mapping, Optional, TextIO
@@ -15,9 +21,7 @@ from linkskills_gateway.auth import (
     ActorClaims,
     AuthError,
     PlatformClaimsVerifier,
-    mint_platform_token,
 )
-from linkskills_gateway.auth_testing import snake_claims_to_platform_claims
 from linkskills_gateway.service import (
     OPERATIONS,
     ServiceError,
@@ -46,6 +50,34 @@ def _tool_schema(operation: str) -> Dict[str, Any]:
     }
 
 
+def resolve_canary_default_actor(
+    *,
+    environ: Optional[Mapping[str, str]] = None,
+    verifier: Optional[PlatformClaimsVerifier] = None,
+) -> Optional[ActorClaims]:
+    """When LINKSKILLS_CANARY is set, require a Platform-verifiable injected bearer.
+
+    Never mints identity from caller-supplied claims. The host must inject
+    ``LINKSKILLS_CANARY_AUTHORIZATION`` or ``GATEWAY_TOKEN`` containing a
+    Platform AuthClaims bearer that verifies under ``PlatformClaimsVerifier``.
+    """
+    env = environ if environ is not None else os.environ
+    flag = str(env.get("LINKSKILLS_CANARY") or "").strip().lower()
+    if flag not in {"1", "true", "yes"}:
+        return None
+    token = (
+        str(env.get("LINKSKILLS_CANARY_AUTHORIZATION") or "").strip()
+        or str(env.get("GATEWAY_TOKEN") or "").strip()
+    )
+    if not token:
+        raise SystemExit(
+            "LINKSKILLS_CANARY requires LINKSKILLS_CANARY_AUTHORIZATION or "
+            "GATEWAY_TOKEN (Platform-verifiable bearer); refusing caller-minted identity"
+        )
+    auth = token if token.lower().startswith("bearer ") else f"Bearer {token}"
+    return (verifier or PlatformClaimsVerifier()).verify(auth)
+
+
 class SkillsMcpServer:
     """Minimal JSON-RPC MCP server facade for skills_* tools."""
 
@@ -70,7 +102,6 @@ class SkillsMcpServer:
         arguments: Optional[Mapping[str, Any]] = None,
         *,
         authorization: Optional[str] = None,
-        actor_claims: Optional[Mapping[str, Any]] = None,
     ) -> Dict[str, Any]:
         if name not in OPERATIONS:
             raise ServiceError("unknown_operation", f"Unknown tool: {name}", http_status=404)
@@ -92,15 +123,11 @@ class SkillsMcpServer:
                 }
             }
 
-        # Build verification payload including any spoof vectors.
+        # Build verification payload including any spoof vectors (rejected).
         verify_payload: Dict[str, Any] = dict(args)
-        if actor_claims:
-            verify_payload["actor_claims"] = dict(actor_claims)
-            verify_payload["claims"] = dict(actor_claims)
 
         actor = self._resolve_actor(
             authorization=authorization or args.get("authorization"),
-            actor_claims=actor_claims or args.get("actor_claims"),
             request_payload=verify_payload,
         )
         return self.service.dispatch(
@@ -115,7 +142,6 @@ class SkillsMcpServer:
         self,
         *,
         authorization: Optional[str],
-        actor_claims: Optional[Mapping[str, Any]],
         request_payload: Mapping[str, Any],
     ) -> ActorClaims:
         if authorization:
@@ -125,23 +151,23 @@ class SkillsMcpServer:
                 else f"Bearer {authorization}",
                 request_payload=request_payload,
             )
-        if actor_claims is not None:
-            # Accept either canonical AuthClaims or legacy snake_case test claims.
-            claims = dict(actor_claims)
-            if "actorId" not in claims and "actor_id" in claims:
-                claims = snake_claims_to_platform_claims(claims)
-            elif "claimContractVersion" not in claims:
-                claims = snake_claims_to_platform_claims(claims)
-            token = mint_platform_token(claims)
-            return self.verifier.verify(
-                f"Bearer {token}",
-                request_payload=request_payload,
-            )
         if self.default_actor is not None:
-            # Still reject spoofed identity keys in the payload.
+            # Explicitly injected test/canary identity only — still reject spoof keys.
             self.verifier._reject_spoof(self.default_actor, request_payload)
             return self.default_actor
-        raise AuthError("auth_missing", "Authorization or actor_claims required")
+        # Caller-supplied actor_claims must never mint Platform identity.
+        if isinstance(request_payload.get("actor_claims"), Mapping) or isinstance(
+            request_payload.get("claims"), Mapping
+        ):
+            raise AuthError(
+                "auth_claims_mint_forbidden",
+                "Caller-supplied actor_claims cannot mint Platform identity; "
+                "provide Authorization or use an injected default_actor",
+            )
+        raise AuthError(
+            "auth_missing",
+            "Authorization required (Platform-verifiable bearer)",
+        )
 
     def handle_rpc(self, message: Mapping[str, Any]) -> Optional[Dict[str, Any]]:
         """Handle one JSON-RPC request; notifications return None."""
@@ -182,12 +208,11 @@ class SkillsMcpServer:
                 arguments = params.get("arguments") or {}
                 meta = params.get("_meta") or {}
                 authorization = meta.get("authorization") or params.get("authorization")
-                actor_claims = meta.get("actor_claims") or params.get("actor_claims")
+                # Ignore meta/params actor_claims — never mint identity from them.
                 envelope = self.call_tool(
                     name,
                     arguments if isinstance(arguments, Mapping) else {},
                     authorization=authorization,
-                    actor_claims=actor_claims if isinstance(actor_claims, Mapping) else None,
                 )
                 return result(
                     {
@@ -251,7 +276,8 @@ class SkillsMcpServer:
 
 
 def main() -> None:
-    SkillsMcpServer().serve_stdio()
+    default_actor = resolve_canary_default_actor()
+    SkillsMcpServer(default_actor=default_actor).serve_stdio()
 
 
 if __name__ == "__main__":
