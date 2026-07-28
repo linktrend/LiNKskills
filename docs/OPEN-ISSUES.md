@@ -33,6 +33,7 @@ Runnable generic host: `LiNKplatform/packages/librarian-runner`. Skills domain w
 Gateway/MCP non-test paths consume canonical Platform AuthClaims (`claimContractVersion`, camelCase) via `PlatformClaimsVerifier` and vendored fixtures under `packages/contracts/fixtures/platform-claims/`. Competing `fake.*` tokens are rejected outside `linkskills_gateway.auth_testing`. **Live Platform token issuance / stage auth** remains a Platform gate.  
 Spoofed body identity is rejected.  
 **Correction (2026-07-28):** prior fake-shape acceptance on production verifier path is removed.
+**Wave 2 (2026-07-28):** consumes frozen `platform.auth-claims/1.0.0` (`@linktrend/platform-contracts@0.2.1`) with exact schema/content hashes; rejects snake_case, unknown fields, and `actorKind: agent`. See `docs/contracts/frozen/platform-auth-claims-v1.0.0.CONSUMER-PIN.md`.
 
 ### 5. Live stage/prod internal-launch readiness
 

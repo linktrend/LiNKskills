@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Gateway unit tests: Platform claims, spoof rejection, tool invoke fail-closed."""
+"""Gateway unit tests: frozen Platform claims, spoof rejection, tool invoke fail-closed."""
 
 from __future__ import annotations
 
@@ -26,9 +26,12 @@ for path in PACKAGE_PATHS:
     sys.path.insert(0, str(path))
 
 from linkskills_gateway.auth import (  # noqa: E402
+    CLAIM_CONTRACT_VERSION,
     AuthError,
     PlatformClaimsVerifier,
+    load_platform_claim_fixture,
     mint_platform_token,
+    verify_frozen_auth_claims_schema,
 )
 from linkskills_gateway.auth_testing import mint_test_bearer  # noqa: E402
 from linkskills_gateway.server import create_server  # noqa: E402
@@ -39,9 +42,9 @@ from linkskills_tool_runtime.descriptor import load_tool_descriptor  # noqa: E40
 def _platform_claims(**overrides):
     now = int(time.time())
     base = {
-        "claimContractVersion": "1.0.0",
+        "claimContractVersion": CLAIM_CONTRACT_VERSION,
         "actorId": "actor-1",
-        "actorKind": "agent",
+        "actorKind": "service",
         "runtimeBindingId": "bind-1",
         "credentialId": "cred-1",
         "orgId": "org-1",
@@ -62,11 +65,43 @@ class AuthTests(unittest.TestCase):
     def setUp(self) -> None:
         self.verifier = PlatformClaimsVerifier()
 
+    def test_frozen_schema_hashes(self) -> None:
+        meta = verify_frozen_auth_claims_schema()
+        self.assertEqual(meta["contract"], CLAIM_CONTRACT_VERSION)
+        self.assertEqual(meta["package"], "0.2.1")
+
     def test_valid_platform_token_accepted(self) -> None:
         token = mint_platform_token(_platform_claims())
         claims = self.verifier.verify(f"Bearer {token}")
         self.assertEqual(claims.actor_id, "actor-1")
+        self.assertEqual(claims.actor_kind, "service")
         self.assertTrue(claims.may_write())
+
+    def test_actor_kind_agent_rejected(self) -> None:
+        token = mint_platform_token(_platform_claims(actorKind="agent"))
+        with self.assertRaises(AuthError) as ctx:
+            self.verifier.verify(f"Bearer {token}")
+        self.assertEqual(ctx.exception.code, "auth_invalid")
+
+    def test_snake_case_fields_rejected(self) -> None:
+        claims = _platform_claims()
+        claims["actor_id"] = claims.pop("actorId")
+        token = mint_platform_token(claims)
+        with self.assertRaises(AuthError) as ctx:
+            self.verifier.verify(f"Bearer {token}")
+        self.assertEqual(ctx.exception.code, "auth_invalid")
+
+    def test_unknown_fields_rejected(self) -> None:
+        token = mint_platform_token(_platform_claims(extraField="nope"))
+        with self.assertRaises(AuthError) as ctx:
+            self.verifier.verify(f"Bearer {token}")
+        self.assertEqual(ctx.exception.code, "auth_invalid")
+
+    def test_wrong_contract_version_rejected(self) -> None:
+        token = mint_platform_token(_platform_claims(claimContractVersion="1.0.0"))
+        with self.assertRaises(AuthError) as ctx:
+            self.verifier.verify(f"Bearer {token}")
+        self.assertEqual(ctx.exception.code, "auth_contract_mismatch")
 
     def test_fake_token_rejected_on_non_test_path(self) -> None:
         with self.assertRaises(AuthError) as ctx:
@@ -96,22 +131,26 @@ class AuthTests(unittest.TestCase):
             )
         self.assertEqual(ctx.exception.code, "auth_spoof_rejected")
 
-    def test_expired_rejected(self) -> None:
-        claims = _platform_claims(
-            expiresAt=time.strftime("%Y-%m-%dT%H:%M:%S.000Z", time.gmtime(time.time() - 10))
+    def test_expired_fixture_with_injected_clock(self) -> None:
+        fixture = load_platform_claim_fixture("reject-expired")
+        token = mint_platform_token(fixture["claims"])
+        verifier = PlatformClaimsVerifier(
+            expected_audience=fixture["context"]["expectedAudience"],
+            required_service=fixture["context"]["requiredService"],
         )
-        token = mint_platform_token(claims)
         with self.assertRaises(AuthError) as ctx:
-            self.verifier.verify(f"Bearer {token}")
+            verifier.verify(f"Bearer {token}", now=fixture["context"]["now"])
         self.assertEqual(ctx.exception.code, "auth_expired")
 
-    def test_vendored_lskills_fixture_accepted(self) -> None:
-        from linkskills_gateway.auth import load_platform_claim_fixture
-
+    def test_vendored_lskills_fixture_accepted_with_fixture_now(self) -> None:
         fixture = load_platform_claim_fixture("accept-valid-lskills")
         token = mint_platform_token(fixture["claims"])
-        claims = self.verifier.verify(f"Bearer {token}")
+        claims = self.verifier.verify(
+            f"Bearer {token}",
+            now=fixture["context"]["now"],
+        )
         self.assertEqual(claims.actor_id, fixture["claims"]["actorId"])
+        self.assertEqual(claims.claim_contract_version, CLAIM_CONTRACT_VERSION)
 
 
 class ServiceTests(unittest.TestCase):

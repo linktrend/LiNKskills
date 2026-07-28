@@ -72,3 +72,9 @@ export PYTHONPATH="packages/contracts:packages/core:packages/publisher:packages/
 ## Ask of Principal / Codex
 
 Return this correction handoff to the **LiNKskills Codex verifier** for independent re-verification against plan hash `31a6cc70bb778ce1dff236819e4bf600b0495dbb06c95bac55bcb2b0b2f5fe88`. Keep PR #22 open and unmerged until that pass.
+
+---
+
+## Amendment 2026-07-28 — wave 2 supersession
+
+Wave 1 profile/receipt claims are **withdrawn**. See `docs/handoffs/2026-07-28-grok-certification-correction-wave2.md` for frozen AuthClaims pin, immutable skill-release binding, and deterministic profile hashes.

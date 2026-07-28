@@ -2,11 +2,10 @@
 
 from __future__ import annotations
 
-import hashlib
-import json
 from dataclasses import dataclass, field
 from typing import Any, Optional
 
+from .executor import is_unset_skill_release_hash
 from .judge import judge_is_rejected
 from .models import CaseStatus, RubricDimension, SuiteResult
 from .runner import weighted_score
@@ -19,29 +18,11 @@ class CertificationDecision:
     certified: bool
     reason: str
     profile_hash: Optional[str] = None
+    skill_release_hash: Optional[str] = None
     weighted_score: Optional[float] = None
     hard_fail_dimensions: list[str] = field(default_factory=list)
     evidence: dict[str, Any] = field(default_factory=dict)
     receipt_hashes: list[str] = field(default_factory=list)
-
-
-def _profile_hash(run: SuiteResult) -> str:
-    payload = {
-        "case_ids": [c.case_id for c in run.case_results],
-        "judge_kind": run.judge_kind,
-        "receipt_hashes": sorted(
-            (c.execution_receipt or {}).get("receipt_hash") or ""
-            for c in run.case_results
-        ),
-        "skill_id": run.skill_id,
-        "statuses": [c.status.value for c in run.case_results],
-        "suite_hash": run.suite_hash,
-        "suite_id": run.suite_id,
-        "suite_version": run.suite_version,
-        "toolchain": run.toolchain,
-    }
-    blob = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
-    return hashlib.sha256(blob).hexdigest()
 
 
 def compute_suite_scores(
@@ -54,7 +35,11 @@ def compute_suite_scores(
         for name in sorted({k for c in run.case_results for k in c.judge_scores})
     ]
     if not dims:
-        return float(run.weighted_score or 0.0), list(run.hard_fail_dimensions), dict(run.dimension_scores)
+        return (
+            float(run.weighted_score or 0.0),
+            list(run.hard_fail_dimensions),
+            dict(run.dimension_scores),
+        )
 
     totals = {d.dimension: 0.0 for d in dims}
     counts = {d.dimension: 0 for d in dims}
@@ -90,9 +75,6 @@ def _receipt_valid(receipt: Any) -> bool:
         "evidence_source",
         "executor_version",
     )
-    if any(not receipt.get(key) and receipt.get(key) != 0 for key in required):
-        # exit_code may be 0; evidence_source must be executor
-        pass
     for key in required:
         if key not in receipt:
             return False
@@ -100,7 +82,8 @@ def _receipt_valid(receipt: Any) -> bool:
         return False
     if not receipt.get("receipt_hash"):
         return False
-    # Recompute integrity from sealed payload fields.
+    if is_unset_skill_release_hash(str(receipt.get("skill_release_hash") or "")):
+        return False
     from .receipt import ExecutionReceipt, ToolCallRecord
 
     try:
@@ -141,16 +124,9 @@ def certify_run(
     *,
     rubric: Optional[list[RubricDimension]] = None,
     pass_threshold: Optional[float] = None,
+    expected_skill_release_hash: Optional[str] = None,
 ) -> CertificationDecision:
-    """Decide whether *run* may produce a certification for its execution profile.
-
-    Hard rejects:
-    - FakeJudge / PromptOnlyJudge
-    - prompt-only or suite-authored-output cases
-    - missing/invalid immutable execution receipts
-    - evidence_source other than executor
-    - failed / hard-fail / infrastructure cases
-    """
+    """Decide whether *run* may produce a certification for its execution profile."""
     score, hard_dims, dimension_scores = compute_suite_scores(run, rubric=rubric)
     evidence: dict[str, Any] = {
         "skill_id": run.skill_id,
@@ -209,7 +185,6 @@ def certify_run(
             for c in run.case_results
             if c.case_id in blocked_ids
         }
-        # Preserve legacy token for prompt-only rejection assertions.
         prompt_token = (
             "not_executable_prompt_only"
             if any(
@@ -231,6 +206,10 @@ def certify_run(
         )
 
     receipt_hashes: list[str] = []
+    release_hashes: set[str] = set()
+    profile_hashes: set[str] = set()
+    suite_hashes: set[str] = set()
+
     for case in run.case_results:
         if case.status in {
             CaseStatus.FAILED,
@@ -274,7 +253,20 @@ def certify_run(
                 hard_fail_dimensions=hard_dims,
                 evidence=evidence,
             )
-        if not _receipt_valid(case.execution_receipt):
+        receipt = case.execution_receipt or {}
+        release = str(receipt.get("skill_release_hash") or "")
+        if is_unset_skill_release_hash(release):
+            return CertificationDecision(
+                certified=False,
+                reason=(
+                    f"cannot certify: case {case.case_id!r} skill_release_hash is "
+                    "unset/placeholder (skill-release:unset cannot certify)"
+                ),
+                weighted_score=score,
+                hard_fail_dimensions=hard_dims,
+                evidence=evidence,
+            )
+        if not _receipt_valid(receipt):
             return CertificationDecision(
                 certified=False,
                 reason=(
@@ -285,7 +277,72 @@ def certify_run(
                 hard_fail_dimensions=hard_dims,
                 evidence=evidence,
             )
-        receipt_hashes.append(str(case.execution_receipt.get("receipt_hash")))
+        receipt_hashes.append(str(receipt.get("receipt_hash")))
+        release_hashes.add(release)
+        profile_hashes.add(str(receipt.get("execution_profile_hash") or ""))
+        suite_hashes.add(str(receipt.get("suite_hash") or ""))
+
+    if len(release_hashes) != 1:
+        return CertificationDecision(
+            certified=False,
+            reason="cannot certify: skill_release_hash is not identical across cases",
+            weighted_score=score,
+            hard_fail_dimensions=hard_dims,
+            evidence=evidence,
+            receipt_hashes=receipt_hashes,
+        )
+    release_hash = next(iter(release_hashes))
+    evidence["skill_release_hash"] = release_hash
+
+    if expected_skill_release_hash is not None:
+        expected = str(expected_skill_release_hash).strip()
+        if is_unset_skill_release_hash(expected):
+            return CertificationDecision(
+                certified=False,
+                reason="cannot certify: expected_skill_release_hash is unset/placeholder",
+                weighted_score=score,
+                hard_fail_dimensions=hard_dims,
+                evidence=evidence,
+                receipt_hashes=receipt_hashes,
+                skill_release_hash=release_hash,
+            )
+        if release_hash != expected:
+            return CertificationDecision(
+                certified=False,
+                reason=(
+                    "cannot certify: skill_release_hash mismatch "
+                    f"(receipt={release_hash!r} expected={expected!r})"
+                ),
+                weighted_score=score,
+                hard_fail_dimensions=hard_dims,
+                evidence=evidence,
+                receipt_hashes=receipt_hashes,
+                skill_release_hash=release_hash,
+            )
+
+    if len(profile_hashes) != 1 or not next(iter(profile_hashes)):
+        return CertificationDecision(
+            certified=False,
+            reason="cannot certify: execution_profile_hash missing or inconsistent across cases",
+            weighted_score=score,
+            hard_fail_dimensions=hard_dims,
+            evidence=evidence,
+            receipt_hashes=receipt_hashes,
+            skill_release_hash=release_hash,
+        )
+    profile_hash = next(iter(profile_hashes))
+
+    if len(suite_hashes) != 1 or next(iter(suite_hashes)) != run.suite_hash:
+        return CertificationDecision(
+            certified=False,
+            reason="cannot certify: suite_hash mismatch between run and receipts",
+            weighted_score=score,
+            hard_fail_dimensions=hard_dims,
+            evidence=evidence,
+            receipt_hashes=receipt_hashes,
+            skill_release_hash=release_hash,
+            profile_hash=profile_hash,
+        )
 
     if hard_dims:
         return CertificationDecision(
@@ -295,6 +352,8 @@ def certify_run(
             hard_fail_dimensions=hard_dims,
             evidence=evidence,
             receipt_hashes=receipt_hashes,
+            skill_release_hash=release_hash,
+            profile_hash=profile_hash,
         )
 
     threshold = pass_threshold
@@ -307,6 +366,8 @@ def certify_run(
                 hard_fail_dimensions=hard_dims,
                 evidence=evidence,
                 receipt_hashes=receipt_hashes,
+                skill_release_hash=release_hash,
+                profile_hash=profile_hash,
             )
     elif score < threshold:
         return CertificationDecision(
@@ -316,18 +377,20 @@ def certify_run(
             hard_fail_dimensions=hard_dims,
             evidence=evidence,
             receipt_hashes=receipt_hashes,
+            skill_release_hash=release_hash,
+            profile_hash=profile_hash,
         )
 
-    profile = _profile_hash(run)
-    evidence["profile_hash"] = profile
+    evidence["profile_hash"] = profile_hash
     evidence["receipt_hashes"] = receipt_hashes
     return CertificationDecision(
         certified=True,
         reason=(
-            "certified: executor receipts bind case, release, tool, profile, "
-            "environment/toolchain, and collected evidence"
+            "certified: executor receipts bind case, immutable skill release, "
+            "deterministic execution profile, toolchain, and collected evidence"
         ),
-        profile_hash=profile,
+        profile_hash=profile_hash,
+        skill_release_hash=release_hash,
         weighted_score=score,
         hard_fail_dimensions=hard_dims,
         evidence=evidence,

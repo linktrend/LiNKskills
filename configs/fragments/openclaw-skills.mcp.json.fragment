@@ -1,8 +1,8 @@
 {
-  "contract_version": "0.1",
+  "contract_version": "0.2",
   "fragment_id": "openclaw-skills-mcp",
   "owner": "OpenClaw Prime (host application); LiNKskills authors contract only",
-  "purpose": "Contract fragment describing the Skills MCP surface for OpenClaw integration. Fake/conformance only in this repo — no OpenClaw mutation.",
+  "purpose": "Contract fragment describing the Skills MCP surface for OpenClaw integration. Conformance only in this repo — no OpenClaw mutation.",
   "mcp": {
     "server_name": "linkskills",
     "transport": "stdio",
@@ -32,12 +32,37 @@
   ],
   "auth": {
     "issuer": "LiNKplatform",
-    "required_claims": ["actor_id", "actor_kind", "org_id", "scopes", "exp"],
-    "required_scopes_any_of": ["skills:read", "skills:write"],
-    "secrets": "none_in_fragment"
+    "claim_contract": "platform.auth-claims/1.0.0",
+    "platform_contracts_package": "0.2.1",
+    "schema_bytes_sha256": "b0397cdf34e76ab0986c6d223ecb6c3c66d619ea59557f78cd45c0c015ff50fb",
+    "content_hash": "6bf49618d846662976886f57d5d468f73a08ab1a6574968f68833d82429db251",
+    "token_format": "platform.<base64url(AuthClaims JSON)>",
+    "required_claim_fields": [
+      "claimContractVersion",
+      "actorId",
+      "actorKind",
+      "runtimeBindingId",
+      "credentialId",
+      "orgId",
+      "internal",
+      "serviceScopes",
+      "permittedOperations",
+      "issuedAt",
+      "expiresAt",
+      "issuer",
+      "audience",
+      "correlationId"
+    ],
+    "actor_kinds": ["human", "persona", "service", "adapter", "program_executor"],
+    "required_service_scope": "lskills",
+    "required_audience": "lskills-api",
+    "rejected": ["fake.* tokens", "snake_case aliases", "unknown fields", "actorKind agent"],
+    "secrets": "none_in_fragment",
+    "consumer_pin": "docs/contracts/frozen/platform-auth-claims-v1.0.0.CONSUMER-PIN.md"
   },
   "conformance": {
-    "fake_stage_proven_in_linkskills": true,
-    "live_openclaw_mutation": false
+    "platform_claims_consumer_proven_in_linkskills": true,
+    "live_openclaw_mutation": false,
+    "awaiting_openclaw_repin_countersign": true
   }
 }

@@ -78,20 +78,85 @@ def _hash_tree(root: Path) -> str:
     return digest.hexdigest()
 
 
+UNSET_SKILL_RELEASE_HASH = "skill-release:unset"
+UNSET_SKILL_RELEASE_MARKERS = frozenset(
+    {
+        "",
+        UNSET_SKILL_RELEASE_HASH,
+        "unset",
+        "placeholder",
+        "TODO",
+        "null",
+        "none",
+        "skill-release:placeholder",
+    }
+)
+
+
+def is_unset_skill_release_hash(value: Optional[str]) -> bool:
+    if value is None:
+        return True
+    text = str(value).strip()
+    if not text:
+        return True
+    return text.lower() in {m.lower() for m in UNSET_SKILL_RELEASE_MARKERS}
+
+
 def compute_skill_release_hash(skill_dir: Optional[Path]) -> str:
+    """Hash an immutable skill-release directory tree.
+
+    Missing directories yield the explicit unset marker. Certification must reject
+    that marker — callers that intend to certify must supply a real release.
+    """
     if skill_dir is None or not skill_dir.is_dir():
-        return "skill-release:unset"
+        return UNSET_SKILL_RELEASE_HASH
     return f"skill-release:{_hash_tree(skill_dir)}"
+
+
+def _stable_execute_spec(raw: Mapping[str, Any]) -> dict[str, Any]:
+    """Normalize execute blocks for profile identity (no absolute/temp paths)."""
+    execute = dict(raw.get("execute") or {})
+    if not execute:
+        return {}
+    stable: dict[str, Any] = {}
+    for key in sorted(execute.keys()):
+        if key in {"cwd", "workspace", "workdir", "env", "env_vars"}:
+            continue
+        value = execute[key]
+        if key in {"tool_dir", "command"} and isinstance(value, str):
+            # Keep relative identity only; strip absolute repo/tmp prefixes.
+            path = Path(value)
+            stable[key] = path.as_posix() if not path.is_absolute() else path.name
+        else:
+            stable[key] = value
+    return stable
 
 
 def compute_execution_profile_hash(
     *,
     suite: EvalSuite,
     toolchain: Mapping[str, Any],
-    environment: Mapping[str, Any],
+    skill_release_hash: str,
 ) -> str:
+    """Deterministic execution-profile identity.
+
+    Excludes volatile temporary workspace paths, absolute repository paths,
+    timestamps, UUIDs, and machine-specific environment details. Those may
+    still appear on individual execution receipts.
+    """
+    cases = []
+    for case in suite.cases:
+        cases.append(
+            {
+                "assertions": case.raw.get("assertions") or {},
+                "expected_criteria": list(case.expected_criteria),
+                "execute": _stable_execute_spec(case.raw),
+                "id": case.id,
+                "input": case.input,
+            }
+        )
     payload = {
-        "environment": dict(environment),
+        "cases": cases,
         "pass_threshold": suite.pass_threshold,
         "rubric": [
             {
@@ -101,8 +166,11 @@ def compute_execution_profile_hash(
             }
             for d in suite.rubric
         ],
+        "skill_id": suite.skill_id,
+        "skill_release_hash": skill_release_hash,
         "suite_hash": suite.suite_hash,
         "suite_id": suite.suite_id,
+        "suite_version": suite.suite_version,
         "toolchain": dict(toolchain),
     }
     return sha256_text(json.dumps(payload, sort_keys=True, separators=(",", ":")))
@@ -344,13 +412,18 @@ def execute_case(
 
     finished = _utc_now()
     artifact_hashes = [_file_hash(path) for path in artifacts if path.is_file()]
-    release_hash = skill_release_hash or compute_skill_release_hash(
-        Path(skill_dir) if skill_dir else None
-    )
+    if skill_release_hash is not None:
+        release_hash = str(skill_release_hash).strip()
+    else:
+        release_hash = compute_skill_release_hash(
+            Path(skill_dir) if skill_dir else None
+        )
+    # Profile identity is deterministic across machines/runs; keep volatile
+    # workspace/repo paths only on the individual receipt environment.
     profile_hash = compute_execution_profile_hash(
         suite=suite,
         toolchain=toolchain_map,
-        environment=environment,
+        skill_release_hash=release_hash,
     )
     receipt = build_execution_receipt(
         case_id=case.id,

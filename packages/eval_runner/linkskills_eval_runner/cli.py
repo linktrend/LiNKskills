@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Optional, Sequence
 
 from .certify import certify_run
+from .executor import compute_skill_release_hash
 from .judge import FakeJudge, IndependentDeterministicJudge, PromptOnlyJudge
 from .runner import YamlDependencyError, load_eval_suite, run_suite
 
@@ -31,18 +32,30 @@ def _cmd_run(args: argparse.Namespace) -> int:
     toolchain = {}
     if args.toolchain_json:
         toolchain = json.loads(Path(args.toolchain_json).read_text(encoding="utf-8"))
-    result = run_suite(suite, judge=judge, toolchain=toolchain)
+    skill_dir = Path(args.skill_dir).resolve() if args.skill_dir else None
+    skill_release_hash = args.skill_release_hash
+    if skill_release_hash is None and skill_dir is not None:
+        skill_release_hash = compute_skill_release_hash(skill_dir)
+    result = run_suite(
+        suite,
+        judge=judge,
+        toolchain=toolchain,
+        skill_dir=skill_dir,
+        skill_release_hash=skill_release_hash,
+    )
     decision = certify_run(
         result,
         judge=judge,
         rubric=suite.rubric,
         pass_threshold=suite.pass_threshold,
+        expected_skill_release_hash=skill_release_hash,
     )
     payload = {
         "skill_id": result.skill_id,
         "suite_id": result.suite_id,
         "suite_version": result.suite_version,
         "suite_hash": result.suite_hash,
+        "skill_release_hash": decision.skill_release_hash or skill_release_hash,
         "judge_kind": result.judge_kind,
         "weighted_score": decision.weighted_score if decision.weighted_score is not None else result.weighted_score,
         "dimension_scores": result.dimension_scores,
@@ -102,6 +115,16 @@ def build_parser() -> argparse.ArgumentParser:
         help="Judge adapter kind (fake/prompt_only are rejected by certifier)",
     )
     run_p.add_argument("--toolchain-json", default=None, help="Optional toolchain lock JSON")
+    run_p.add_argument(
+        "--skill-dir",
+        default=None,
+        help="Immutable skill-release directory used to compute skill_release_hash",
+    )
+    run_p.add_argument(
+        "--skill-release-hash",
+        default=None,
+        help="Explicit skill_release_hash pin (overrides --skill-dir hash)",
+    )
     run_p.add_argument("--output", "-o", default=None, help="Write JSON result to path")
     run_p.add_argument(
         "--allow-uncertified",

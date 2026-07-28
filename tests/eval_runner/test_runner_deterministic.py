@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from linkskills_eval_runner.certify import certify_run
+from linkskills_eval_runner.executor import compute_skill_release_hash
 from linkskills_eval_runner.judge import IndependentDeterministicJudge
 from linkskills_eval_runner.models import CaseStatus
 from linkskills_eval_runner.runner import load_eval_suite, run_suite
@@ -13,14 +14,17 @@ from linkskills_eval_runner.workspace import create_workspace
 
 ROOT = Path(__file__).resolve().parents[2]
 CANARY_SUITE = ROOT / "evidence" / "phase3" / "fixtures" / "canary-echo" / "eval-suite.yaml"
+SKILL_RELEASE = ROOT / "evidence/phase3/fixtures/canary-echo/skill-release"
 
 
 def test_canary_suite_executes_and_certifies():
     assert CANARY_SUITE.is_file(), f"missing canary suite: {CANARY_SUITE}"
+    assert SKILL_RELEASE.is_dir(), f"missing skill release: {SKILL_RELEASE}"
     suite = load_eval_suite(CANARY_SUITE)
     assert suite.cases, "canary suite must define cases"
     assert all(c.is_executable for c in suite.cases)
     assert all(not c.suite_authored_output for c in suite.cases)
+    release_hash = compute_skill_release_hash(SKILL_RELEASE)
 
     with create_workspace(fixture_dir=CANARY_SUITE.parent) as ws:
         result = run_suite(
@@ -29,20 +33,27 @@ def test_canary_suite_executes_and_certifies():
             toolchain={"tools": [{"tool_id": "text-echo", "version": "1.0.0"}]},
             workspace=ws,
             repo_root=ROOT,
+            skill_dir=SKILL_RELEASE,
         )
         assert result.passed is True, result.reasons
         assert result.certifiable is True
         assert all(c.status == CaseStatus.PASSED for c in result.case_results)
         assert all(c.evidence_source == "executor" for c in result.case_results)
         assert all(c.execution_receipt for c in result.case_results)
+        assert all(
+            (c.execution_receipt or {}).get("skill_release_hash") == release_hash
+            for c in result.case_results
+        )
         decision = certify_run(
             result,
             judge=IndependentDeterministicJudge(),
             rubric=suite.rubric,
             pass_threshold=suite.pass_threshold,
+            expected_skill_release_hash=release_hash,
         )
         assert decision.certified is True, decision.reason
         assert decision.profile_hash
+        assert decision.skill_release_hash == release_hash
         assert decision.receipt_hashes
 
 
