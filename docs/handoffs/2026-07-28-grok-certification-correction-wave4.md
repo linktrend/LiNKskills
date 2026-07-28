@@ -38,9 +38,17 @@ Production `PlatformClaimsVerifier` previously accepted unsigned `platform.<base
 
 ```bash
 export PYTHONPATH="packages/contracts:packages/core:packages/publisher:packages/eval_runner:packages/tool_runtime:packages/gateway:packages/mcp_server:packages/client:packages/librarian_domain:."
-# focused
-pytest tests/gateway tests/mcp_server tests/client -q
-# full CI-equivalent suite + gates (see commit evidence)
+.venv/bin/python -m unittest discover -s tests/skill_runtime -v
+# 6 passed
+.venv/bin/python -m pytest \
+  tests/contracts tests/core tests/publisher \
+  tests/eval_runner tests/tool_runtime \
+  tests/gateway tests/mcp_server tests/client \
+  tests/librarian_domain tests/migrations -q
+# 111 passed
+python3 validator.py --repo-root . --scan-all
+python3 scripts/build-catalog-index.py --check
+python3 scripts/check-service-ownership.py
 ```
 
 ## Intentionally not done

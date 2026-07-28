@@ -36,7 +36,7 @@
     "platform_contracts_package": "0.2.1",
     "schema_bytes_sha256": "b0397cdf34e76ab0986c6d223ecb6c3c66d619ea59557f78cd45c0c015ff50fb",
     "content_hash": "6bf49618d846662976886f57d5d468f73a08ab1a6574968f68833d82429db251",
-    "token_format": "platform.<base64url(AuthClaims JSON)>",
+    "token_format": "Platform-signed bearer verified by Platform-approved cryptographic authenticator (unsigned platform.<base64url(JSON)> local-test only)",
     "required_claim_fields": [
       "claimContractVersion",
       "actorId",
@@ -56,7 +56,15 @@
     "actor_kinds": ["human", "persona", "service", "adapter", "program_executor"],
     "required_service_scope": "lskills",
     "required_audience": "lskills-api",
-    "rejected": ["fake.* tokens", "snake_case aliases", "unknown fields", "actorKind agent"],
+    "production_authenticator_env": "LINKSKILLS_PLATFORM_AUTHENTICATOR",
+    "rejected": [
+      "fake.* tokens",
+      "snake_case aliases",
+      "unknown fields",
+      "actorKind agent",
+      "unsigned platform.<base64url(JSON)> outside local-test",
+      "caller-minted actor_claims"
+    ],
     "secrets": "none_in_fragment",
     "consumer_pin": "docs/contracts/frozen/platform-auth-claims-v1.0.0.CONSUMER-PIN.md"
   },
