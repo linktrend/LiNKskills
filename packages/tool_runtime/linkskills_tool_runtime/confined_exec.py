@@ -1,15 +1,15 @@
 """Fail-closed confined subprocess execution.
 
-Guarantees (wave 5 + wave 6):
+Guarantees (waves 5–7):
 - sanitized allowlisted environment (no caller ambient env passthrough);
 - canonical realpath filesystem boundary with symlink-escape rejection;
 - argv-only execution (no shell / no ``bash -lc``);
-- network denial when an OS isolator can prove it, otherwise refuse unless
-  an explicit unproven-network escape hatch is set (certification rejects
-  unproven receipts — see ADR 0009);
-- filesystem confidentiality: no global host file-read; only explicit
-  workspace + runtime dependency realpaths are readable;
+- network + filesystem isolation only when an OS isolator can **prove** both;
+- certifiable ``network_isolation="denied"`` requires genuine path-allowlisted
+  FS confidentiality (never a global file-read + short deny list);
 - bounded CPU/time/output/process behavior.
+
+See ADR 0009.
 """
 
 from __future__ import annotations
@@ -66,15 +66,8 @@ _DARWIN_RUNTIME_ROOTS = (
     "/opt/local",
     "/usr/local",
     "/dev",
-)
-
-# Host trees that must never be world-readable inside the sandbox. The workspace
-# realpath (and explicit EXTRA_RO paths) are re-allowed after these denies.
-_DARWIN_DENY_READ_ROOTS = (
-    "/Users",
-    "/home",
-    "/Volumes",
-    "/private/var/root",
+    "/private/var/db/dyld",
+    "/var/db/dyld",
 )
 
 _LINUX_RUNTIME_ROOTS = (
@@ -289,13 +282,99 @@ def _is_under(path: Path, root: Path) -> bool:
         return False
 
 
+def _profile_uses_global_file_read(profile: str) -> bool:
+    """True when a Seatbelt profile grants unrestricted file-read*."""
+    # Bare ``(allow file-read*)`` with no path filter is global host read.
+    for line in profile.splitlines():
+        stripped = line.strip()
+        if stripped == "(allow file-read*)":
+            return True
+    return False
+
+
+def _darwin_allowlist_profile(
+    *,
+    workspace: Path,
+    read_paths: Sequence[Path],
+) -> str:
+    """Pure path-allowlisted Seatbelt profile (no global file-read*)."""
+    clauses: list[str] = []
+    seen: set[str] = set()
+    for path in [workspace, *read_paths]:
+        if not path.exists():
+            continue
+        key = str(path)
+        if key in seen:
+            continue
+        seen.add(key)
+        if path.is_dir():
+            clauses.append(f'  (subpath "{_sb_escape(str(path))}")')
+        else:
+            clauses.append(f'  (literal "{_sb_escape(str(path))}")')
+    allow_block = "\n".join(clauses)
+    return f"""(version 1)
+(deny default)
+(allow process*)
+(allow sysctl-read)
+(allow mach*)
+(allow file-read-metadata)
+(allow file-read*
+{allow_block}
+)
+(allow file-write*
+  (subpath "{_sb_escape(str(workspace))}")
+)
+(deny network*)
+"""
+
+
+def _darwin_allowlist_boots(
+    sandbox: str,
+    profile_path: Path,
+    argv: Sequence[str],
+    *,
+    workspace: Path,
+    env: Mapping[str, str],
+) -> bool:
+    """Return True only when the allowlisted profile can start the interpreter."""
+    probe_argv = [str(a) for a in argv]
+    # Prefer a tiny Python probe when argv is python*; otherwise probe the binary.
+    exe_name = Path(probe_argv[0]).name
+    if exe_name.startswith("python"):
+        probe_cmd = [sandbox, "-f", str(profile_path), probe_argv[0], "-c", "print('BOOT_OK')"]
+    else:
+        probe_cmd = [sandbox, "-f", str(profile_path), probe_argv[0], "--version"]
+    try:
+        completed = subprocess.run(
+            probe_cmd,
+            cwd=str(workspace),
+            env=dict(env),
+            capture_output=True,
+            text=True,
+            timeout=8,
+            check=False,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return False
+    if completed.returncode != 0:
+        return False
+    if exe_name.startswith("python"):
+        return "BOOT_OK" in (completed.stdout or "")
+    return True
+
+
 def _wrap_with_network_deny(
     argv: Sequence[str],
     *,
     workspace: Path,
     env: Optional[Mapping[str, str]] = None,
 ) -> tuple[list[str], str]:
-    """Prefer an OS isolator with path-scoped FS + network deny; return (argv, status)."""
+    """Prefer an OS isolator with proven path-scoped FS + network deny.
+
+    Returns ``(argv, status)`` where status is:
+    - ``denied`` — FS confidentiality + network denial are actually enforced
+    - ``unavailable`` — no proven isolator (caller may stamp ``unproven``)
+    """
     cmd = [str(a) for a in argv]
     system = sys.platform
     read_paths = collect_runtime_read_paths(cmd, workspace=workspace, env=env)
@@ -303,59 +382,23 @@ def _wrap_with_network_deny(
     if system == "darwin":
         sandbox = shutil.which("sandbox-exec")
         if sandbox:
-            # macOS dyld/shared-cache needs broad system reads; pure allowlists abort
-            # (-6) before Python starts. Confidentiality is enforced by denying
-            # user-home / volume trees, then re-allowing only canonical workspace
-            # and explicit EXTRA_RO realpaths (never a host-wide unrestricted policy).
-            deny_roots = "\n".join(
-                f'  (subpath "{_sb_escape(root)}")' for root in _DARWIN_DENY_READ_ROOTS
-            )
-            reallow = [workspace]
-            for path in read_paths:
-                if any(_is_under(path, Path(root)) for root in _DARWIN_DENY_READ_ROOTS):
-                    reallow.append(path)
-            # De-dupe while preserving order.
-            seen: set[str] = set()
-            reallow_paths: list[Path] = []
-            for path in reallow:
-                key = str(path)
-                if key in seen:
-                    continue
-                seen.add(key)
-                reallow_paths.append(path)
-            reallow_clause = "\n".join(
-                (
-                    f'  (subpath "{_sb_escape(str(p))}")'
-                    if p.is_dir()
-                    else f'  (literal "{_sb_escape(str(p))}")'
-                )
-                for p in reallow_paths
-                if p.exists()
-            )
-            profile = f"""(version 1)
-(deny default)
-(allow process*)
-(allow sysctl-read)
-(allow mach*)
-(allow file-read-metadata)
-(allow file-read*)
-(deny file-read*
-{deny_roots}
-)
-(allow file-read*
-{reallow_clause}
-)
-(allow file-write*
-  (subpath "{_sb_escape(str(workspace))}")
-  (subpath "/private/tmp")
-  (subpath "/tmp")
-)
-(deny network*)
-"""
-            profile_path = workspace / "tmp" / "network-deny.sb"
+            # Wave 7: only claim ``denied`` for a genuine path allowlist.
+            # Global ``(allow file-read*)`` + short deny list leaks /var/folders
+            # and must never produce a certifiable receipt.
+            profile = _darwin_allowlist_profile(workspace=workspace, read_paths=read_paths)
+            if _profile_uses_global_file_read(profile):
+                return cmd, "unavailable"
+            profile_path = workspace / "tmp" / "fs-allowlist.sb"
             profile_path.parent.mkdir(parents=True, exist_ok=True)
             profile_path.write_text(profile, encoding="utf-8")
-            return [sandbox, "-f", str(profile_path), *cmd], "denied"
+            probe_env = dict(env or sanitize_env(workspace=workspace))
+            if _darwin_allowlist_boots(
+                sandbox, profile_path, cmd, workspace=workspace, env=probe_env
+            ):
+                return [sandbox, "-f", str(profile_path), *cmd], "denied"
+            # dyld/shared-cache typically aborts (-6) under pure allowlists on
+            # current macOS — refuse to claim denied; caller marks unproven.
+            return cmd, "unavailable"
 
     if system.startswith("linux"):
         bwrap = shutil.which("bwrap")
@@ -394,7 +437,6 @@ def _wrap_with_network_deny(
             )
             return wrapped, "denied"
         # unshare --net alone does not provide filesystem confidentiality.
-        # Do not claim denied isolation when host FS remains world-readable.
 
     return cmd, "unavailable"
 
@@ -444,7 +486,8 @@ def run_confined(
         if _network_isolation_mode() == "required":
             raise ConfinedExecutionError(
                 "network/filesystem isolation unavailable; refusing execution "
-                "(install sandbox-exec/bwrap with path-scoped binds or see ADR 0009; "
+                "(install bwrap with path-scoped binds, a bootable path-allowlist "
+                "sandbox, or a container/VM isolator — see ADR 0009; "
                 "set LINKSKILLS_EXECUTOR_NETWORK_ISOLATION=allow_unproven only for local tests)"
             )
         # Local-test escape hatch — never certifiable.
@@ -482,7 +525,12 @@ def run_confined(
                 "cwd": str(workdir),
                 "cmd": list(wrapped),
                 "boundary": str(boundary),
-                "read_allowlist": [str(p) for p in collect_runtime_read_paths(argv, workspace=boundary, env=clean_env)],
+                "read_allowlist": [
+                    str(p)
+                    for p in collect_runtime_read_paths(
+                        argv, workspace=boundary, env=clean_env
+                    )
+                ],
             },
         )
     except subprocess.TimeoutExpired as exc:

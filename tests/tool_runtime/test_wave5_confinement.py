@@ -67,7 +67,10 @@ class ConfinedExecTests(unittest.TestCase):
         self.assertIn(result.network_isolation, {"denied", "unproven"})
 
     def test_sandbox_profile_does_not_allow_global_file_read(self) -> None:
-        from linkskills_tool_runtime.confined_exec import _wrap_with_network_deny
+        from linkskills_tool_runtime.confined_exec import (
+            _profile_uses_global_file_read,
+            _wrap_with_network_deny,
+        )
 
         wrapped, status = _wrap_with_network_deny(
             ["python3", "-c", "print(1)"],
@@ -75,18 +78,23 @@ class ConfinedExecTests(unittest.TestCase):
         )
         joined = " ".join(wrapped)
         if status == "denied" and "sandbox-exec" in joined:
-            profile = (self.workspace / "tmp" / "network-deny.sb").read_text(encoding="utf-8")
-            # Must deny user-home trees (not wave-5 unrestricted host read alone).
-            self.assertIn('(subpath "/Users")', profile)
-            self.assertIn("deny file-read*", profile)
+            profile_path = self.workspace / "tmp" / "fs-allowlist.sb"
+            self.assertTrue(profile_path.is_file())
+            profile = profile_path.read_text(encoding="utf-8")
+            self.assertFalse(_profile_uses_global_file_read(profile))
             self.assertIn(self.workspace.name, profile)
+            self.assertIn("deny network*", profile)
         if status == "denied" and "bwrap" in joined:
             self.assertNotIn("--ro-bind / /", joined)
             self.assertIn("--tmpfs /", joined)
+        # Wave 7: macOS deny-list/global-read must never report denied.
+        if "sandbox-exec" in joined and status == "denied":
+            profile = (self.workspace / "tmp" / "fs-allowlist.sb").read_text(encoding="utf-8")
+            self.assertNotIn("(allow file-read*)\n(deny file-read*", profile)
 
     def test_confined_cannot_read_outside_workspace_home_file(self) -> None:
         """When isolation is denied, host home files outside workspace are unreadable."""
-        outside_dir = Path.home() / ".cache" / "linkskills-w6-confine-test"
+        outside_dir = Path.home() / ".cache" / "linkskills-w7-confine-test"
         outside_dir.mkdir(parents=True, exist_ok=True)
         secret = outside_dir / f"secret-{os.getpid()}.txt"
         secret.write_text("TOPSECRET", encoding="utf-8")
@@ -96,7 +104,7 @@ class ConfinedExecTests(unittest.TestCase):
                 workspace=self.workspace,
             )
             if result.network_isolation != "denied":
-                self.skipTest("OS isolator unavailable in this environment")
+                self.skipTest("proven OS isolator unavailable in this environment")
             self.assertNotIn("TOPSECRET", result.stdout)
             self.assertNotEqual(result.exit_code, 0)
         finally:
@@ -104,6 +112,60 @@ class ConfinedExecTests(unittest.TestCase):
                 secret.unlink()
             except OSError:
                 pass
+
+    def test_adversarial_var_folders_and_cache_reads(self) -> None:
+        """Denied isolation must block /var/folders and user cache secrets."""
+        import tempfile
+
+        secrets = []
+        try:
+            tmp_secret = Path(tempfile.gettempdir()) / f"linkskills-w7-tmp-{os.getpid()}.txt"
+            tmp_secret.write_text("TMP_SECRET_VALUE", encoding="utf-8")
+            secrets.append(tmp_secret)
+            cache_dir = Path.home() / "Library" / "Caches" / "linkskills-w7-confine"
+            cache_dir.mkdir(parents=True, exist_ok=True)
+            cache_secret = cache_dir / f"secret-{os.getpid()}.txt"
+            cache_secret.write_text("CACHE_SECRET_VALUE", encoding="utf-8")
+            secrets.append(cache_secret)
+
+            for secret in secrets:
+                result = run_confined(
+                    ["python3", "-c", f"print(open({str(secret)!r}).read())"],
+                    workspace=self.workspace,
+                )
+                if result.network_isolation == "denied":
+                    self.assertNotIn(secret.read_text(encoding="utf-8"), result.stdout)
+                    self.assertNotEqual(result.exit_code, 0)
+                else:
+                    # Unproven/unavailable must never be treated as certifiable denial.
+                    self.assertIn(result.network_isolation, {"unproven", "unavailable"})
+        finally:
+            for secret in secrets:
+                try:
+                    secret.unlink()
+                except OSError:
+                    pass
+
+    def test_macos_does_not_claim_denied_with_global_file_read(self) -> None:
+        import sys
+
+        if sys.platform != "darwin":
+            self.skipTest("macOS-only confidentiality regression")
+        from linkskills_tool_runtime.confined_exec import _wrap_with_network_deny
+
+        _wrapped, status = _wrap_with_network_deny(
+            ["python3", "-c", "print(1)"],
+            workspace=self.workspace,
+        )
+        # Current dyld typically cannot boot a pure allowlist; status must not be
+        # denied via a leaky global-read profile.
+        profile = self.workspace / "tmp" / "fs-allowlist.sb"
+        if status == "denied":
+            self.assertTrue(profile.is_file())
+            text = profile.read_text(encoding="utf-8")
+            self.assertNotRegex(text, r"(?m)^\(allow file-read\*\)$")
+        else:
+            self.assertEqual(status, "unavailable")
 
     def test_required_network_isolation_fails_closed_without_wrapper(self) -> None:
         prev = os.environ.get("LINKSKILLS_EXECUTOR_NETWORK_ISOLATION")
@@ -122,7 +184,7 @@ class ConfinedExecTests(unittest.TestCase):
             except ConfinedExecutionError as exc:
                 result_or_err = exc
             if isinstance(result_or_err, ConfinedExecutionError):
-                self.assertIn("network isolation", str(result_or_err).lower())
+                self.assertIn("isolation", str(result_or_err).lower())
             else:
                 self.assertEqual(result_or_err.network_isolation, "denied")
         finally:

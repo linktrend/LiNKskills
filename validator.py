@@ -13,7 +13,7 @@ import re
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 TASK_ID_REGEX_DEFAULT = r"^\d{8}-\d{4}-[A-Z0-9]+-\d{6}$"
 
@@ -1069,11 +1069,62 @@ _CANONICAL_SKILL_ARTIFACTS = (
     ("references/execution-profile.json", "execution-profile"),
 )
 
+_REQUIRED_LAUNCH_TARGET_ARTIFACTS = (
+    ("references/skill-pack.json", "skill-pack", "Skill Pack"),
+    ("references/eval-suite.json", "eval-suite", "eval-suite"),
+    ("references/execution-profile.json", "execution-profile", "execution-profile"),
+)
+
 _CANONICAL_TOOL_ARTIFACTS = (
     ("tool-descriptor.json", "tool-descriptor"),
     ("descriptor.json", "tool-descriptor"),
     ("references/tool-descriptor.json", "tool-descriptor"),
 )
+
+
+def load_launch_target_skill_ids(repo_root: Path) -> List[str]:
+    """Return skill_ids from the Phase-1 canary / launch-target set."""
+    path = repo_root / "evidence" / "phase1" / "canary-set.json"
+    if not path.is_file():
+        return []
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return []
+    skills = payload.get("skills") if isinstance(payload, dict) else None
+    if not isinstance(skills, list):
+        return []
+    ids: List[str] = []
+    for item in skills:
+        if isinstance(item, dict) and isinstance(item.get("skill_id"), str):
+            ids.append(item["skill_id"])
+    return ids
+
+
+def validate_launch_target_canonical_artifacts(
+    skill_path: Path,
+    *,
+    launch_target_ids: Optional[Sequence[str]] = None,
+) -> Tuple[bool, List[str]]:
+    """Require schema-valid canonical v0.1 JSON for launch-target skills.
+
+    Legacy YAML eval suites alone cannot establish launch readiness.
+    """
+    errors: List[str] = []
+    skill_id = skill_path.name
+    targets = set(launch_target_ids or ())
+    if skill_id not in targets:
+        return True, errors
+    for rel, schema_name, label in _REQUIRED_LAUNCH_TARGET_ARTIFACTS:
+        candidate = skill_path / rel
+        if not candidate.is_file():
+            errors.append(
+                f"{skill_id}: launch-target skill missing canonical {label} at {rel} "
+                "(legacy YAML regex validation is insufficient for launch readiness)"
+            )
+            continue
+        errors.extend(validate_json_against_schema(candidate, schema_name))
+    return len(errors) == 0, errors
 
 
 def validate_json_against_schema(
@@ -1273,6 +1324,12 @@ def validate_single_skill(
 
     _, schema_art_errors = validate_canonical_v01_skill_artifacts(skill_path)
     all_errors.extend(schema_art_errors)
+
+    launch_ids = load_launch_target_skill_ids(repo_root)
+    _, launch_errors = validate_launch_target_canonical_artifacts(
+        skill_path, launch_target_ids=launch_ids
+    )
+    all_errors.extend(launch_errors)
 
     schema_doc, errors = load_schemas(skill_path, profile)
     all_errors.extend(errors)

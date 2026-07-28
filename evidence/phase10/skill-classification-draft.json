@@ -1,6 +1,25 @@
 {
-  "note": "Deliberate classification draft for general internal launch — not a live usable promotion.",
-  "as_of": "2026-07-27",
+  "note": "Classification ledger updated in wave 7 — canonical v0.1 artifacts required for launch targets; not a live usable/certified promotion.",
+  "as_of": "2026-07-29",
+  "wave": 7,
+  "launch_target_source": "evidence/phase1/canary-set.json",
+  "launch_targets_with_canonical_v01_artifacts": [
+    "git-safeguard",
+    "citation-enforcer",
+    "skill-template",
+    "tool-architect",
+    "skill-architect",
+    "self-improvement",
+    "repository-manager",
+    "audit-protocol",
+    "search-strategy",
+    "compliance-guardian"
+  ],
+  "required_canonical_artifacts": [
+    "references/skill-pack.json",
+    "references/eval-suite.json",
+    "references/execution-profile.json"
+  ],
   "usable_candidates_after_real_eval": [
     "git-safeguard",
     "citation-enforcer",
@@ -17,5 +36,6 @@
   ],
   "deprecated_or_retired": [],
   "all_34_default_catalog_state": "draft",
-  "live_certification": "not performed"
+  "live_certification": "not performed",
+  "legacy_yaml_note": "Legacy references/eval-suite.yaml alone cannot establish launch readiness; validator requires schema-valid canonical JSON for launch targets."
 }

@@ -449,6 +449,12 @@ class SkillsGatewayService:
                     "idempotency key already bound to a different request payload",
                     http_status=409,
                 )
+            if outcome == "in_progress":
+                raise ServiceError(
+                    "idempotency_in_progress",
+                    "idempotency key is reserved by an in-flight request; retry later",
+                    http_status=409,
+                )
             if outcome == "replay" and cached is not None:
                 replay = dict(cached)
                 replay["request_id"] = request_id
@@ -461,19 +467,24 @@ class SkillsGatewayService:
             request_hash = None
 
         handler = getattr(self, f"op_{operation}")
-        result = handler(actor=actor, params=params, idempotency_key=idempotency_key)
-        env = self.envelope(
-            actor=actor,
-            operation=operation,
-            request_id=request_id,
-            idempotency_id=idempotency_key,
-            data=result.get("data"),
-            warnings=result.get("warnings"),
-            recommended_next=result.get("recommended_next"),
-            release_hash=result.get("release_hash"),
-            profile_hash=result.get("profile_hash"),
-            run_id=result.get("run_id"),
-        )
+        try:
+            result = handler(actor=actor, params=params, idempotency_key=idempotency_key)
+            env = self.envelope(
+                actor=actor,
+                operation=operation,
+                request_id=request_id,
+                idempotency_id=idempotency_key,
+                data=result.get("data"),
+                warnings=result.get("warnings"),
+                recommended_next=result.get("recommended_next"),
+                release_hash=result.get("release_hash"),
+                profile_hash=result.get("profile_hash"),
+                run_id=result.get("run_id"),
+            )
+        except Exception:
+            # Leave reservation leased until expiry so crash/retry can reclaim;
+            # do not execute a second mutation while the lease is live.
+            raise
 
         if operation in WRITE_OPERATIONS and idempotency_key and request_hash:
             self._store.complete_idempotency(

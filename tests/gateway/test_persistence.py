@@ -59,6 +59,9 @@ class GatewayPersistenceTests(unittest.TestCase):
         outcome, cached = store.reserve_idempotency("a", "op", "k", "hash-1")
         self.assertEqual(outcome, "reserved")
         self.assertIsNone(cached)
+        # Second reserve while in-flight must not execute again.
+        outcome_busy, _ = store.reserve_idempotency("a", "op", "k", "hash-1")
+        self.assertEqual(outcome_busy, "in_progress")
         store.complete_idempotency("a", "op", "k", "hash-1", {"ok": True})
         outcome2, cached2 = store.reserve_idempotency("a", "op", "k", "hash-1")
         self.assertEqual(outcome2, "replay")

@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import os
 
-
 # Trusted Eval Runner issuer material for unit/integration proof only.
 os.environ.setdefault(
     "LINKSKILLS_EVAL_RUNNER_ISSUER_KEY",

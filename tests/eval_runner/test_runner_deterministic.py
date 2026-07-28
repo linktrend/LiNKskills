@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path
+
+import pytest
 
 from linkskills_eval_runner.certify import certify_run
 from linkskills_eval_runner.executor import compute_skill_release_hash
@@ -13,6 +16,9 @@ from linkskills_eval_runner.workspace import create_workspace
 
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "tests"))
+from isolation_probe import proven_executor_isolation_available  # noqa: E402
+
 CANARY_SUITE = ROOT / "evidence" / "phase3" / "fixtures" / "canary-echo" / "eval-suite.yaml"
 SKILL_RELEASE = ROOT / "evidence/phase3/fixtures/canary-echo/skill-release"
 
@@ -36,7 +42,6 @@ def test_canary_suite_executes_and_certifies():
             skill_dir=SKILL_RELEASE,
         )
         assert result.passed is True, result.reasons
-        assert result.certifiable is True
         assert all(c.status == CaseStatus.PASSED for c in result.case_results)
         assert all(c.evidence_source == "executor" for c in result.case_results)
         assert all(c.execution_receipt for c in result.case_results)
@@ -44,6 +49,25 @@ def test_canary_suite_executes_and_certifies():
             (c.execution_receipt or {}).get("skill_release_hash") == release_hash
             for c in result.case_results
         )
+        isolations = {
+            (c.execution_receipt or {}).get("network_isolation")
+            for c in result.case_results
+        }
+        if not proven_executor_isolation_available() or isolations != {"denied"}:
+            # Wave 7 honesty: unproven macOS isolation must not certify.
+            decision = certify_run(
+                result,
+                judge=IndependentDeterministicJudge(),
+                rubric=suite.rubric,
+                pass_threshold=suite.pass_threshold,
+                expected_skill_release_hash=release_hash,
+            )
+            assert decision.certified is False
+            assert "receipt" in decision.reason.lower()
+            pytest.skip(
+                "execution succeeded with unproven isolation; certification correctly refused"
+            )
+        assert result.certifiable is True
         decision = certify_run(
             result,
             judge=IndependentDeterministicJudge(),

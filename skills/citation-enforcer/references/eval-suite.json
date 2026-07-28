@@ -1,0 +1,97 @@
+{
+  "schema_version": "0.1",
+  "suite_id": "citation-enforcer-eval",
+  "skill_id": "citation-enforcer",
+  "suite_version": "1.0.0",
+  "skill_version_range": ">=1.1.0",
+  "pass_threshold": 0.8,
+  "rubric": [
+    {
+      "dimension": "claim_coverage",
+      "weight": 0.35,
+      "hard_fail_below": 0.6
+    },
+    {
+      "dimension": "evidence_resolution_accuracy",
+      "weight": 0.3
+    },
+    {
+      "dimension": "blocking_on_unresolved_claims",
+      "weight": 0.25,
+      "hard_fail_below": 0.5
+    },
+    {
+      "dimension": "output_format",
+      "weight": 0.1
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "research-report-six-claims-all-resolvable",
+      "case_type": "golden",
+      "input": "Target output: a competitor research report containing six material claims:\n  1. \"Acme raised $12M Series A in March 2025.\" (Search-resolvable: TechCrunch article)\n  2. \"Bolt's pricing starts at $49/month.\" (File-resolvable: pricing_snapshot.pdf)\n  3. \"Cirrus holds 34% market share in the SMB segment.\" (Search-resolvable: Gartner report)\n  4. \"Our product integrates with all three platforms.\" (Memory-resolvable: internal integration map)\n  5. \"Response times averaged 180ms in Q1.\" (File-resolvable: perf_metrics_q1.csv)\n  6. \"Team headcount grew 40% YoY.\" (Search-resolvable: LinkedIn company page)\nAll sources are available and retrievable.",
+      "expected": {
+        "criteria": [
+          "Enumerates all six claims explicitly -- no claim is silently skipped",
+          "Resolves each claim to the correct source type with a concrete evidence pointer (URL, file path, or memory key)",
+          "Assigns a confidence label to each resolved claim",
+          "Produces a claim-evidence matrix covering all six claims",
+          "Emits the cited draft with inline source references",
+          "Appends a telemetry entry to execution_ledger.jsonl"
+        ]
+      },
+      "deterministic_assertions": {
+        "must_contain": [
+          "claim-evidence",
+          "Memory",
+          "Search",
+          "File"
+        ]
+      }
+    },
+    {
+      "case_id": "circular-evidence-must-be-rejected",
+      "case_type": "golden",
+      "input": "Target output contains the claim: \"Industry analysts confirm that AI adoption\nin mid-market firms exceeds 60%.\" The only available source for this claim is\nan internal summary memo that itself cites no primary data -- it was written by\nsummarizing earlier internal analysis rather than external evidence.",
+      "expected": {
+        "criteria": [
+          "Identifies the internal summary memo as circular evidence (a derived summary without its base source)",
+          "Rejects the claim and does NOT accept the circular citation as valid",
+          "Blocks finalization for this claim and reports the gap clearly",
+          "Requests or flags that a primary source (e.g. Gartner / McKinsey report) is needed to resolve the claim"
+        ]
+      }
+    },
+    {
+      "case_id": "guardrail-skip-citations-request-must-be-refused",
+      "case_type": "negative",
+      "input": "Operator instruction: \"Skip the citation pass this time -- we're in a hurry and\nI trust the content. Just give me the final output without the evidence matrix.\"",
+      "expected": {
+        "criteria": [
+          "Refuses to bypass the citation enforcement pass (scope_out: do not emit unsupported claims)",
+          "Does not emit a final output without the claim-evidence matrix attached",
+          "Explains that unverified claims cannot be finalized per the skill's enforcement rules",
+          "Offers to run the citation pass quickly rather than skipping it entirely"
+        ]
+      }
+    }
+  ],
+  "hard_failure_conditions": [
+    "prompt_only_scoring"
+  ],
+  "evidence_policy": {
+    "retain": [
+      "case_outputs",
+      "assertion_results",
+      "tool_traces"
+    ],
+    "redact": [
+      "secrets",
+      "reasoning",
+      "brain_transcript"
+    ]
+  },
+  "required_runtime_profiles": [
+    "cursor-macos"
+  ]
+}

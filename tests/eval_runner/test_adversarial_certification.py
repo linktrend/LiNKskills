@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path
+
+import pytest
 
 from linkskills_eval_runner.certify import certify_run
 from linkskills_eval_runner.executor import (
@@ -14,8 +17,10 @@ from linkskills_eval_runner.models import CaseResult, CaseStatus, SuiteResult
 from linkskills_eval_runner.runner import load_eval_suite, run_suite
 from linkskills_eval_runner.workspace import create_workspace
 
-
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "tests"))
+from isolation_probe import proven_executor_isolation_available  # noqa: E402
+
 SKILL_RELEASE = ROOT / "evidence/phase3/fixtures/canary-echo/skill-release"
 CANARY_SUITE = ROOT / "evidence/phase3/fixtures/canary-echo/eval-suite.yaml"
 CANARY_TOOLCHAIN = {"tools": [{"tool_id": "text-echo", "version": "1.0.0"}]}
@@ -74,6 +79,12 @@ def test_unset_skill_release_cannot_certify(tmp_path: Path):
 
 def test_mismatched_release_hash_cannot_certify(tmp_path: Path):
     """Run with skill_dir A, then certify against expected hash B — refuse."""
+    if not proven_executor_isolation_available():
+        pytest.skip(
+            "host cannot prove FS/network isolation; sealed receipts unavailable "
+            "(macOS allowlist typically unproven — see ADR 0009)"
+        )
+
     skill_a = _temp_skill_release(tmp_path, marker="A")
     skill_b = _temp_skill_release(tmp_path, marker="B")
     hash_a = compute_skill_release_hash(skill_a)
@@ -258,6 +269,11 @@ def test_tampered_receipt_hash_cannot_certify(tmp_path: Path):
 
 def test_repeated_clean_runs_preserve_profile_identity():
     """Clean reruns keep suite/release/profile hashes; receipt_hashes may differ."""
+    if not proven_executor_isolation_available():
+        pytest.skip(
+            "host cannot prove FS/network isolation; cannot mint certifiable receipts"
+        )
+
     assert CANARY_SUITE.is_file(), f"missing canary suite: {CANARY_SUITE}"
     assert SKILL_RELEASE.is_dir(), f"missing skill release: {SKILL_RELEASE}"
     suite = load_eval_suite(CANARY_SUITE)
