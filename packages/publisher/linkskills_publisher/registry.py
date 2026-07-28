@@ -113,6 +113,35 @@ class PublisherRegistry:
         meta = dict(metadata or {})
 
         def _write() -> PublishedRelease:
+            existing = self._conn.execute(
+                """
+                select release_hash, bundle_hash, channel, published_at, metadata_json
+                from releases
+                where skill_id = ? and version = ?
+                """,
+                (skill_id, version),
+            ).fetchone()
+            if existing is not None:
+                if (
+                    str(existing["bundle_hash"]) == bundle_hash
+                    and str(existing["release_hash"]) == release_hash
+                ):
+                    # Exact-content replay is idempotent.
+                    return PublishedRelease(
+                        skill_id=skill_id,
+                        version=version,
+                        release_hash=str(existing["release_hash"]),
+                        bundle_hash=str(existing["bundle_hash"]),
+                        channel=str(existing["channel"]),
+                        published_at=str(existing["published_at"]),
+                        manifest=manifest,
+                    )
+                raise ValueError(
+                    f"immutable publish conflict: ({skill_id}, {version}) already "
+                    f"published with different content "
+                    f"(existing_bundle={existing['bundle_hash']}, new_bundle={bundle_hash})"
+                )
+
             self._conn.execute(
                 """
                 insert into bundles (
@@ -134,12 +163,6 @@ class PublisherRegistry:
                 insert into releases (
                   skill_id, version, release_hash, bundle_hash, channel, published_at, metadata_json
                 ) values (?, ?, ?, ?, ?, ?, ?)
-                on conflict(skill_id, version) do update set
-                  release_hash = excluded.release_hash,
-                  bundle_hash = excluded.bundle_hash,
-                  channel = excluded.channel,
-                  published_at = excluded.published_at,
-                  metadata_json = excluded.metadata_json
                 """,
                 (
                     skill_id,

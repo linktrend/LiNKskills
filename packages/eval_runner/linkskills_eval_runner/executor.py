@@ -203,7 +203,7 @@ def _execute_packaged_tool(
     case: EvalCase,
     workspace: EvalWorkspace,
     repo_root: Path,
-) -> tuple[int | None, str, str, ToolCallRecord, list[Path]]:
+) -> tuple[int | None, str, str, ToolCallRecord, list[Path], str]:
     # Import lazily so eval_runner remains usable without tool_runtime on PYTHONPATH
     # in narrow unit tests — but certification canaries always include it.
     from linkskills_tool_runtime.invoke import invoke_tool
@@ -273,7 +273,15 @@ def _execute_packaged_tool(
         timed_out=result.timed_out,
         error=result.error,
     )
-    return result.exit_code, result.stdout or "", result.stderr or "", call, [stdout_path, stderr_path]
+    isolation = str((result.metadata or {}).get("network_isolation") or "unavailable")
+    return (
+        result.exit_code,
+        result.stdout or "",
+        result.stderr or "",
+        call,
+        [stdout_path, stderr_path],
+        isolation,
+    )
 
 
 def _execute_command(
@@ -281,7 +289,7 @@ def _execute_command(
     *,
     case: EvalCase,
     workspace: EvalWorkspace,
-) -> tuple[int | None, str, str, ToolCallRecord, list[Path]]:
+) -> tuple[int | None, str, str, ToolCallRecord, list[Path], str]:
     from linkskills_tool_runtime.confined_exec import (
         ConfinedExecutionError,
         run_confined,
@@ -334,22 +342,7 @@ def _execute_command(
         timed_out=timed_out,
         error=error,
     )
-    # Stash isolation evidence on the call via tool_hash-adjacent env later on receipt.
-    call.error = error
-    if network_isolation != "denied" and error is None:
-        # Surface unproven network as executor error for certification fail-closed.
-        if os.environ.get("LINKSKILLS_EXECUTOR_NETWORK_ISOLATION", "required").strip().lower() in {
-            "allow_unproven",
-            "unproven",
-            "0",
-            "false",
-            "off",
-            "soft",
-        }:
-            pass
-        else:
-            call.error = f"network_isolation={network_isolation}"
-    return exit_code, stdout, stderr, call, [stdout_path, stderr_path]
+    return exit_code, stdout, stderr, call, [stdout_path, stderr_path], network_isolation
 
 
 def execute_case(
@@ -387,16 +380,17 @@ def execute_case(
 
     execute = dict(case.raw.get("execute") or {})
     kind = str(execute.get("kind") or "").strip()
+    network_isolation = "unavailable"
     try:
         if kind == "packaged_tool":
-            exit_code, stdout, stderr, call, artifacts = _execute_packaged_tool(
+            exit_code, stdout, stderr, call, artifacts, network_isolation = _execute_packaged_tool(
                 execute,
                 case=case,
                 workspace=workspace,
                 repo_root=root,
             )
         elif kind == "command":
-            exit_code, stdout, stderr, call, artifacts = _execute_command(
+            exit_code, stdout, stderr, call, artifacts, network_isolation = _execute_command(
                 execute,
                 case=case,
                 workspace=workspace,
@@ -439,6 +433,7 @@ def execute_case(
         toolchain=toolchain_map,
         skill_release_hash=release_hash,
     )
+    environment["network_isolation"] = network_isolation
     receipt = build_execution_receipt(
         case_id=case.id,
         skill_id=suite.skill_id,
@@ -455,6 +450,7 @@ def execute_case(
         started_at=started,
         finished_at=finished,
         environment=environment,
+        network_isolation=network_isolation,
     )
     # Persist receipt into workspace evidence.
     receipt_path = workspace.evidence_dir / f"{case.id}.receipt.json"

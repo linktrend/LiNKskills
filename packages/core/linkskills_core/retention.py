@@ -7,11 +7,13 @@ from typing import Any
 
 _REDACT_KEY_RE = re.compile(
     r"("
-    r"secret|password|passwd|token|api[_-]?key|authorization|credential|"
-    r"private[_-]?key|access[_-]?key|"
+    r"secret|password|passwd|token|api[_-]?key|authorization|credential|auth|"
+    r"bearer|cookie|oauth|private[_-]?key|access[_-]?key|session[_-]?token|"
     r"reasoning|hidden[_-]?reasoning|chain[_-]?of[_-]?thought|"
-    r"brain[_-]?transcript|brain[_-]?memory|private[_-]?transcript|"
-    r"conversation[_-]?transcript"
+    r"brain([_-]?data|[_-]?transcript|[_-]?memory)?|private[_-]?transcript|"
+    r"conversation([_-]?transcript)?|messages|chat[_-]?history|"
+    r"prompt|raw[_-]?prompt|system[_-]?prompt|"
+    r"(^|[_-])input($|[_-])|(^|[_-])output($|[_-])|completion"
     r")",
     re.IGNORECASE,
 )
@@ -24,7 +26,7 @@ def should_redact_key(key: str) -> bool:
 
 
 def redact_payload(value: Any) -> Any:
-    """Recursively strip/redact keys matching secret/reasoning/brain_transcript patterns."""
+    """Recursively strip/redact keys matching secret/privacy category patterns."""
     if isinstance(value, dict):
         redacted: dict[Any, Any] = {}
         for key, child in value.items():

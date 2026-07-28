@@ -1,12 +1,14 @@
 """Fail-closed confined subprocess execution.
 
-Guarantees (wave 5):
+Guarantees (wave 5 + wave 6):
 - sanitized allowlisted environment (no caller ambient env passthrough);
 - canonical realpath filesystem boundary with symlink-escape rejection;
 - argv-only execution (no shell / no ``bash -lc``);
 - network denial when an OS isolator can prove it, otherwise refuse unless
   an explicit unproven-network escape hatch is set (certification rejects
   unproven receipts — see ADR 0009);
+- filesystem confidentiality: no global host file-read; only explicit
+  workspace + runtime dependency realpaths are readable;
 - bounded CPU/time/output/process behavior.
 """
 
@@ -55,6 +57,39 @@ ALLOWED_ENV_KEYS = frozenset(
 
 # Minimal PATH for confined runs (no ambient user PATH).
 _SAFE_PATH = "/usr/bin:/bin:/usr/sbin:/sbin"
+
+_DARWIN_RUNTIME_ROOTS = (
+    "/usr",
+    "/System",
+    "/Library",
+    "/opt/homebrew",
+    "/opt/local",
+    "/usr/local",
+    "/dev",
+)
+
+# Host trees that must never be world-readable inside the sandbox. The workspace
+# realpath (and explicit EXTRA_RO paths) are re-allowed after these denies.
+_DARWIN_DENY_READ_ROOTS = (
+    "/Users",
+    "/home",
+    "/Volumes",
+    "/private/var/root",
+)
+
+_LINUX_RUNTIME_ROOTS = (
+    "/usr",
+    "/lib",
+    "/lib64",
+    "/bin",
+    "/sbin",
+    "/etc/ld.so.cache",
+    "/etc/ssl",
+    "/etc/pki",
+    "/etc/passwd",
+    "/etc/group",
+    "/etc/nsswitch.conf",
+)
 
 
 class ConfinedExecutionError(RuntimeError):
@@ -184,23 +219,137 @@ def _network_isolation_mode() -> str:
     return "required"
 
 
-def _wrap_with_network_deny(argv: Sequence[str], *, workspace: Path) -> tuple[list[str], str]:
-    """Prefer an OS network-deny wrapper; return (argv, status)."""
+def _sb_escape(path: str) -> str:
+    return path.replace("\\", "\\\\").replace('"', '\\"')
+
+
+def collect_runtime_read_paths(
+    argv: Sequence[str],
+    *,
+    workspace: Path,
+    env: Optional[Mapping[str, str]] = None,
+) -> list[Path]:
+    """Canonical realpaths the confined process may read (no host-wide /)."""
+    roots: list[Path] = []
+    seen: set[str] = set()
+
+    def add(raw: Union[str, Path, None]) -> None:
+        if raw is None:
+            return
+        path = Path(raw)
+        if not path.is_absolute():
+            # Relative paths are not host roots; skip unless they exist under cwd later.
+            return
+        if not path.exists():
+            return
+        resolved = _realpath(path)
+        key = str(resolved)
+        if key in seen:
+            return
+        seen.add(key)
+        roots.append(resolved)
+
+    add(workspace)
+    exe = str(argv[0])
+    resolved_exe = shutil.which(exe) if not os.path.isabs(exe) else exe
+    if resolved_exe:
+        add(resolved_exe)
+        add(Path(resolved_exe).parent)
+    for prefix in (sys.prefix, getattr(sys, "base_prefix", sys.prefix), sys.exec_prefix):
+        add(prefix)
+    if sys.platform == "darwin":
+        for root in _DARWIN_RUNTIME_ROOTS:
+            add(root)
+    else:
+        for root in _LINUX_RUNTIME_ROOTS:
+            add(root)
+    for key in ("SSL_CERT_FILE", "SSL_CERT_DIR", "REQUESTS_CA_BUNDLE", "CURL_CA_BUNDLE"):
+        add(os.environ.get(key))
+    if env:
+        for key in ("SSL_CERT_FILE", "SSL_CERT_DIR", "PYTHONHOME", "VIRTUAL_ENV"):
+            add(env.get(key))
+        pythonpath = env.get("PYTHONPATH") or ""
+        for part in pythonpath.split(os.pathsep):
+            part = part.strip()
+            if part:
+                add(part)
+    extra = os.environ.get("LINKSKILLS_EXECUTOR_EXTRA_RO_PATHS", "")
+    for part in extra.split(os.pathsep):
+        part = part.strip()
+        if part:
+            add(part)
+    return roots
+
+
+def _is_under(path: Path, root: Path) -> bool:
+    try:
+        path.relative_to(root)
+        return True
+    except ValueError:
+        return False
+
+
+def _wrap_with_network_deny(
+    argv: Sequence[str],
+    *,
+    workspace: Path,
+    env: Optional[Mapping[str, str]] = None,
+) -> tuple[list[str], str]:
+    """Prefer an OS isolator with path-scoped FS + network deny; return (argv, status)."""
     cmd = [str(a) for a in argv]
     system = sys.platform
+    read_paths = collect_runtime_read_paths(cmd, workspace=workspace, env=env)
 
     if system == "darwin":
         sandbox = shutil.which("sandbox-exec")
         if sandbox:
+            # macOS dyld/shared-cache needs broad system reads; pure allowlists abort
+            # (-6) before Python starts. Confidentiality is enforced by denying
+            # user-home / volume trees, then re-allowing only canonical workspace
+            # and explicit EXTRA_RO realpaths (never a host-wide unrestricted policy).
+            deny_roots = "\n".join(
+                f'  (subpath "{_sb_escape(root)}")' for root in _DARWIN_DENY_READ_ROOTS
+            )
+            reallow = [workspace]
+            for path in read_paths:
+                if any(_is_under(path, Path(root)) for root in _DARWIN_DENY_READ_ROOTS):
+                    reallow.append(path)
+            # De-dupe while preserving order.
+            seen: set[str] = set()
+            reallow_paths: list[Path] = []
+            for path in reallow:
+                key = str(path)
+                if key in seen:
+                    continue
+                seen.add(key)
+                reallow_paths.append(path)
+            reallow_clause = "\n".join(
+                (
+                    f'  (subpath "{_sb_escape(str(p))}")'
+                    if p.is_dir()
+                    else f'  (literal "{_sb_escape(str(p))}")'
+                )
+                for p in reallow_paths
+                if p.exists()
+            )
             profile = f"""(version 1)
 (deny default)
 (allow process*)
 (allow sysctl-read)
 (allow mach*)
+(allow file-read-metadata)
 (allow file-read*)
-(allow file-write* (subpath "{workspace}"))
-(allow file-write* (subpath "/private/tmp"))
-(allow file-write* (subpath "/tmp"))
+(deny file-read*
+{deny_roots}
+)
+(allow file-read*
+{reallow_clause}
+)
+(allow file-write*
+  (subpath "{_sb_escape(str(workspace))}")
+  (subpath "/private/tmp")
+  (subpath "/tmp")
+)
 (deny network*)
 """
             profile_path = workspace / "tmp" / "network-deny.sb"
@@ -211,29 +360,41 @@ def _wrap_with_network_deny(argv: Sequence[str], *, workspace: Path) -> tuple[li
     if system.startswith("linux"):
         bwrap = shutil.which("bwrap")
         if bwrap:
-            return [
+            wrapped = [
                 bwrap,
                 "--unshare-net",
                 "--die-with-parent",
-                "--ro-bind",
+                "--tmpfs",
                 "/",
-                "/",
-                "--bind",
-                str(workspace),
-                str(workspace),
                 "--dev",
                 "/dev",
                 "--proc",
                 "/proc",
                 "--tmpfs",
                 "/tmp",
-                "--chdir",
-                str(workspace),
-                *cmd,
-            ], "denied"
-        unshare = shutil.which("unshare")
-        if unshare:
-            return [unshare, "--net", "--map-root-user", *cmd], "denied"
+            ]
+            for path in read_paths:
+                if path == workspace or _is_under(path, workspace):
+                    continue
+                if not path.exists():
+                    continue
+                # Never re-introduce a host-wide root bind.
+                if str(path) == "/":
+                    continue
+                wrapped.extend(["--ro-bind", str(path), str(path)])
+            wrapped.extend(
+                [
+                    "--bind",
+                    str(workspace),
+                    str(workspace),
+                    "--chdir",
+                    str(workspace),
+                    *cmd,
+                ]
+            )
+            return wrapped, "denied"
+        # unshare --net alone does not provide filesystem confidentiality.
+        # Do not claim denied isolation when host FS remains world-readable.
 
     return cmd, "unavailable"
 
@@ -276,13 +437,18 @@ def run_confined(
     if timeout <= 0 or timeout > 600:
         raise ConfinedExecutionError("timeout_seconds must be in (0, 600]")
 
-    wrapped, isolation = _wrap_with_network_deny([str(a) for a in argv], workspace=boundary)
-    if isolation != "denied" and _network_isolation_mode() == "required":
-        raise ConfinedExecutionError(
-            "network isolation unavailable; refusing execution "
-            "(install sandbox-exec/bwrap or see ADR 0009; "
-            "set LINKSKILLS_EXECUTOR_NETWORK_ISOLATION=allow_unproven only for local tests)"
-        )
+    wrapped, isolation = _wrap_with_network_deny(
+        [str(a) for a in argv], workspace=boundary, env=clean_env
+    )
+    if isolation != "denied":
+        if _network_isolation_mode() == "required":
+            raise ConfinedExecutionError(
+                "network/filesystem isolation unavailable; refusing execution "
+                "(install sandbox-exec/bwrap with path-scoped binds or see ADR 0009; "
+                "set LINKSKILLS_EXECUTOR_NETWORK_ISOLATION=allow_unproven only for local tests)"
+            )
+        # Local-test escape hatch — never certifiable.
+        isolation = "unproven"
 
     try:
         completed = subprocess.run(
@@ -316,6 +482,7 @@ def run_confined(
                 "cwd": str(workdir),
                 "cmd": list(wrapped),
                 "boundary": str(boundary),
+                "read_allowlist": [str(p) for p in collect_runtime_read_paths(argv, workspace=boundary, env=clean_env)],
             },
         )
     except subprocess.TimeoutExpired as exc:

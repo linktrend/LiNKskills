@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 """Ephemeral Postgres tests for actor/org RLS on registry tables.
 
-Runs only when explicitly enabled:
-- ``LINKSKILLS_TEST_PG_DSN`` set to a writable Postgres, or
-- ``LINKSKILLS_TEST_PG_DOCKER=1`` and Docker available (spins postgres:16-alpine).
+Enabled when:
+- ``LINKSKILLS_TEST_PG_DSN`` is set, or
+- ``LINKSKILLS_TEST_PG_DOCKER=1`` (force docker), or
+- Docker is available and ``LINKSKILLS_TEST_PG_DOCKER`` is not ``0``/``skip``
+  (wave-6 default: run when Docker can prove policies).
 
-Default ``pytest`` skips this module so local proof stays deterministic.
+Set ``LINKSKILLS_TEST_PG_DOCKER=0`` to skip when Docker exists but should not
+be used (recorded external/policy blocker).
 """
 
 from __future__ import annotations
@@ -62,25 +65,91 @@ def _import_psycopg():
         return None
 
 
+def _docker_available() -> bool:
+    return shutil.which("docker") is not None
+
+
 def _explicitly_enabled() -> bool:
     if os.environ.get("LINKSKILLS_TEST_PG_DSN", "").strip():
         return True
-    if os.environ.get("LINKSKILLS_TEST_PG_DOCKER", "").strip() in {"1", "true", "yes"}:
+    flag = os.environ.get("LINKSKILLS_TEST_PG_DOCKER", "").strip().lower()
+    if flag in {"0", "false", "no", "skip", "off"}:
+        return False
+    if flag in {"1", "true", "yes"}:
         return _docker_available()
-    return False
-
-
-def _docker_available() -> bool:
-    return shutil.which("docker") is not None
+    # Default (unset): run when Docker is present so policies are not left skipped.
+    return _docker_available()
 
 
 def _resolve_dsn() -> str | None:
     env = os.environ.get("LINKSKILLS_TEST_PG_DSN", "").strip()
     if env:
         return env
-    if os.environ.get("LINKSKILLS_TEST_PG_DOCKER", "").strip() in {"1", "true", "yes"}:
-        return "postgresql://postgres:postgres@127.0.0.1:54329/linkskills_rls_test"
     return None
+
+
+def _should_use_docker() -> bool:
+    return _resolve_dsn() is None and _explicitly_enabled() and _docker_available()
+
+
+def _free_host_port() -> int:
+    import socket
+
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        sock.bind(("127.0.0.1", 0))
+        return int(sock.getsockname()[1])
+
+
+def _start_docker_postgres() -> tuple[str, str]:
+    """Return (dsn, container_id) or raise SkipTest."""
+    container_id = f"linkskills-rls-{uuid.uuid4().hex[:8]}"
+    host_port = _free_host_port()
+    dsn = f"postgresql://postgres:postgres@127.0.0.1:{host_port}/linkskills_rls_test"
+    started = subprocess.run(
+        [
+            "docker",
+            "run",
+            "-d",
+            "--rm",
+            "--name",
+            container_id,
+            "-e",
+            "POSTGRES_PASSWORD=postgres",
+            "-e",
+            "POSTGRES_DB=linkskills_rls_test",
+            "-p",
+            f"{host_port}:5432",
+            "postgres:16-alpine",
+        ],
+        capture_output=True,
+        text=True,
+    )
+    if started.returncode != 0:
+        raise unittest.SkipTest(
+            "docker postgres failed to start: "
+            + (started.stderr or started.stdout or "unknown error")
+        )
+    psycopg = _import_psycopg()
+    if psycopg is None:
+        subprocess.run(["docker", "rm", "-f", container_id], check=False)
+        raise unittest.SkipTest("psycopg required for ephemeral RLS tests")
+    last_err: Exception | None = None
+    for _ in range(60):
+        probe = subprocess.run(
+            ["docker", "exec", container_id, "pg_isready", "-U", "postgres"],
+            capture_output=True,
+        )
+        if probe.returncode == 0:
+            try:
+                with psycopg.connect(dsn, autocommit=True) as conn:
+                    with conn.cursor() as cur:
+                        cur.execute("select 1")
+                return dsn, container_id
+            except Exception as exc:  # noqa: BLE001 — wait for accept
+                last_err = exc
+        time.sleep(0.5)
+    subprocess.run(["docker", "rm", "-f", container_id], check=False)
+    raise unittest.SkipTest(f"docker postgres failed to become ready: {last_err}")
 
 
 class _PgClient:
@@ -149,46 +218,23 @@ class _PgClient:
         return _Ctx(self)
 
 
-@unittest.skipUnless(_explicitly_enabled(), "set LINKSKILLS_TEST_PG_DSN or LINKSKILLS_TEST_PG_DOCKER=1")
+@unittest.skipUnless(
+    _explicitly_enabled(),
+    "Postgres DSN unset and Docker unavailable/disabled (set LINKSKILLS_TEST_PG_DSN "
+    "or enable Docker; LINKSKILLS_TEST_PG_DOCKER=0 skips)",
+)
 class RlsActorOrgEphemeralTests(unittest.TestCase):
     _container_id: str | None = None
 
     @classmethod
     def setUpClass(cls) -> None:
-        cls.dsn = _resolve_dsn()
-        if not cls.dsn:
+        cls._container_id = None
+        dsn = _resolve_dsn()
+        if dsn is None and _should_use_docker():
+            dsn, cls._container_id = _start_docker_postgres()
+        if not dsn:
             raise unittest.SkipTest("no postgres DSN")
-        if not os.environ.get("LINKSKILLS_TEST_PG_DSN", "").strip():
-            cls._container_id = f"linkskills-rls-{uuid.uuid4().hex[:8]}"
-            subprocess.run(
-                [
-                    "docker",
-                    "run",
-                    "-d",
-                    "--rm",
-                    "--name",
-                    cls._container_id,
-                    "-e",
-                    "POSTGRES_PASSWORD=postgres",
-                    "-e",
-                    "POSTGRES_DB=linkskills_rls_test",
-                    "-p",
-                    "54329:5432",
-                    "postgres:16-alpine",
-                ],
-                check=True,
-                capture_output=True,
-            )
-            for _ in range(40):
-                probe = subprocess.run(
-                    ["docker", "exec", cls._container_id, "pg_isready", "-U", "postgres"],
-                    capture_output=True,
-                )
-                if probe.returncode == 0:
-                    break
-                time.sleep(0.5)
-            else:
-                raise unittest.SkipTest("docker postgres failed to become ready")
+        cls.dsn = dsn
         cls.client = _PgClient(cls.dsn)
 
     @classmethod

@@ -64,7 +64,46 @@ class ConfinedExecTests(unittest.TestCase):
             workspace=self.workspace,
         )
         self.assertIn("confined-ok", result.stdout)
-        self.assertIn(result.network_isolation, {"denied", "unavailable"})
+        self.assertIn(result.network_isolation, {"denied", "unproven"})
+
+    def test_sandbox_profile_does_not_allow_global_file_read(self) -> None:
+        from linkskills_tool_runtime.confined_exec import _wrap_with_network_deny
+
+        wrapped, status = _wrap_with_network_deny(
+            ["python3", "-c", "print(1)"],
+            workspace=self.workspace,
+        )
+        joined = " ".join(wrapped)
+        if status == "denied" and "sandbox-exec" in joined:
+            profile = (self.workspace / "tmp" / "network-deny.sb").read_text(encoding="utf-8")
+            # Must deny user-home trees (not wave-5 unrestricted host read alone).
+            self.assertIn('(subpath "/Users")', profile)
+            self.assertIn("deny file-read*", profile)
+            self.assertIn(self.workspace.name, profile)
+        if status == "denied" and "bwrap" in joined:
+            self.assertNotIn("--ro-bind / /", joined)
+            self.assertIn("--tmpfs /", joined)
+
+    def test_confined_cannot_read_outside_workspace_home_file(self) -> None:
+        """When isolation is denied, host home files outside workspace are unreadable."""
+        outside_dir = Path.home() / ".cache" / "linkskills-w6-confine-test"
+        outside_dir.mkdir(parents=True, exist_ok=True)
+        secret = outside_dir / f"secret-{os.getpid()}.txt"
+        secret.write_text("TOPSECRET", encoding="utf-8")
+        try:
+            result = run_confined(
+                ["python3", "-c", f"print(open({str(secret)!r}).read())"],
+                workspace=self.workspace,
+            )
+            if result.network_isolation != "denied":
+                self.skipTest("OS isolator unavailable in this environment")
+            self.assertNotIn("TOPSECRET", result.stdout)
+            self.assertNotEqual(result.exit_code, 0)
+        finally:
+            try:
+                secret.unlink()
+            except OSError:
+                pass
 
     def test_required_network_isolation_fails_closed_without_wrapper(self) -> None:
         prev = os.environ.get("LINKSKILLS_EXECUTOR_NETWORK_ISOLATION")
@@ -218,20 +257,46 @@ class FeedbackTraceBindingTests(unittest.TestCase):
             idempotency_key="start-1",
         )
         run_id = started["run_id"]
+        payload = {"run_id": run_id, "progress": {"step": 1}}
         a = self.service.dispatch(
             "skills_run_update",
-            {"run_id": run_id, "progress": {"step": 1}},
+            payload,
             actor=self.actor,
             idempotency_key="upd-1",
         )
         b = self.service.dispatch(
             "skills_run_update",
-            {"run_id": run_id, "progress": {"step": 99}},
+            payload,
             actor=self.actor,
             idempotency_key="upd-1",
         )
         self.assertIn("idempotent_replay", b.get("warnings") or [])
         self.assertEqual(a["data"]["event"]["progress"], b["data"]["event"]["progress"])
+
+    def test_idempotency_key_payload_mismatch_conflicts(self) -> None:
+        started = self.service.dispatch(
+            "skills_run_start",
+            {
+                "skill_id": "usable-demo",
+                "runtime_profile_tags": ["cursor-macos"],
+            },
+            actor=self.actor,
+        )
+        run_id = started["run_id"]
+        self.service.dispatch(
+            "skills_run_update",
+            {"run_id": run_id, "progress": {"step": 1}},
+            actor=self.actor,
+            idempotency_key="upd-conflict",
+        )
+        with self.assertRaises(ServiceError) as ctx:
+            self.service.dispatch(
+                "skills_run_update",
+                {"run_id": run_id, "progress": {"step": 99}},
+                actor=self.actor,
+                idempotency_key="upd-conflict",
+            )
+        self.assertEqual(ctx.exception.code, "idempotency_conflict")
 
 
 if __name__ == "__main__":

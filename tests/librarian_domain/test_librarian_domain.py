@@ -55,8 +55,9 @@ def _seal_receipt(**overrides):
         "artifact_hashes": [],
         "started_at": "2026-07-28T00:00:00Z",
         "finished_at": "2026-07-28T00:00:01Z",
-        "executor_version": "linkskills-eval-executor/0.3.0",
+        "executor_version": "linkskills-eval-executor/0.4.0",
         "evidence_source": "executor",
+        "network_isolation": "denied",
         "provenance_kind": "eval_runner_hmac_v1",
         "issuer_id": "linkskills-eval-runner-test",
     }
@@ -71,6 +72,7 @@ def _seal_receipt(**overrides):
         "exit_code": base.get("exit_code"),
         "finished_at": base["finished_at"],
         "issuer_id": base["issuer_id"],
+        "network_isolation": base["network_isolation"],
         "provenance_kind": base["provenance_kind"],
         "receipt_id": base["receipt_id"],
         "skill_id": base["skill_id"],

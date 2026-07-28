@@ -51,12 +51,14 @@ _RECEIPT_REQUIRED_KEYS = (
     "environment",
     "evidence_source",
     "executor_version",
+    "network_isolation",
     "provenance_kind",
     "issuer_id",
     "issuer_signature",
 )
 
 _TRUSTED_PROVENANCE = frozenset({"eval_runner_hmac_v1"})
+_CERTIFIABLE_NETWORK_ISOLATION = "denied"
 
 
 def _canonical_json(payload: Mapping[str, Any]) -> str:
@@ -110,6 +112,7 @@ def _receipt_payload_for_hash(receipt: Mapping[str, Any]) -> dict[str, Any]:
         "exit_code": receipt.get("exit_code"),
         "finished_at": receipt.get("finished_at"),
         "issuer_id": receipt.get("issuer_id"),
+        "network_isolation": receipt.get("network_isolation"),
         "provenance_kind": receipt.get("provenance_kind"),
         "receipt_id": receipt.get("receipt_id"),
         "skill_id": receipt.get("skill_id"),
@@ -125,7 +128,11 @@ def _receipt_payload_for_hash(receipt: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def sealed_executor_receipt(receipt: Any) -> bool:
-    """True only for a sealed, issuer-signed executor receipt."""
+    """True only for a sealed, issuer-signed, isolation-proven executor receipt.
+
+    ``allow_unproven`` local runs may mint receipts with
+    ``network_isolation="unproven"``; those must never certify.
+    """
     if not isinstance(receipt, Mapping):
         return False
     for key in _RECEIPT_REQUIRED_KEYS:
@@ -136,6 +143,8 @@ def sealed_executor_receipt(receipt: Any) -> bool:
     if str(receipt.get("provenance_kind") or "") not in _TRUSTED_PROVENANCE:
         return False
     if not str(receipt.get("issuer_id") or "").strip():
+        return False
+    if str(receipt.get("network_isolation") or "") != _CERTIFIABLE_NETWORK_ISOLATION:
         return False
     claimed = str(receipt.get("receipt_hash") or "")
     if not claimed:

@@ -19,9 +19,11 @@ from datetime import datetime, timezone
 from typing import Any, Mapping, Optional, Sequence
 
 
-EXECUTOR_VERSION = "linkskills-eval-executor/0.3.0"
+EXECUTOR_VERSION = "linkskills-eval-executor/0.4.0"
 PROVENANCE_KIND = "eval_runner_hmac_v1"
 DEFAULT_ISSUER_ID = "linkskills-eval-runner"
+# Receipts with any value other than "denied" are not certifiable.
+CERTIFIABLE_NETWORK_ISOLATION = "denied"
 
 
 def _utc_now() -> str:
@@ -112,6 +114,7 @@ class ExecutionReceipt:
     finished_at: str
     executor_version: str = EXECUTOR_VERSION
     evidence_source: str = "executor"
+    network_isolation: str = "unavailable"
     receipt_hash: str = ""
     provenance_kind: str = PROVENANCE_KIND
     issuer_id: str = ""
@@ -128,6 +131,7 @@ class ExecutionReceipt:
             "exit_code": self.exit_code,
             "finished_at": self.finished_at,
             "issuer_id": self.issuer_id,
+            "network_isolation": self.network_isolation,
             "provenance_kind": self.provenance_kind,
             "receipt_id": self.receipt_id,
             "skill_id": self.skill_id,
@@ -195,11 +199,13 @@ def build_execution_receipt(
     started_at: Optional[str] = None,
     finished_at: Optional[str] = None,
     environment: Optional[Mapping[str, Any]] = None,
+    network_isolation: str = "unavailable",
     signing_key: Optional[bytes] = None,
 ) -> ExecutionReceipt:
     """Mint a sealed, issuer-signed receipt from executor-collected evidence."""
     started = started_at or _utc_now()
     finished = finished_at or _utc_now()
+    isolation = str(network_isolation or "unavailable").strip() or "unavailable"
     receipt = ExecutionReceipt(
         receipt_id=str(uuid.uuid4()),
         case_id=case_id,
@@ -217,6 +223,7 @@ def build_execution_receipt(
         artifact_hashes=sorted(str(h) for h in artifact_hashes),
         started_at=started,
         finished_at=finished,
+        network_isolation=isolation,
         issuer_id=issuer_id(),
     )
     return receipt.seal(signing_key=signing_key)

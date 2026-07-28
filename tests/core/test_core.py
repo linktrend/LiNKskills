@@ -53,8 +53,9 @@ def _seal_receipt(**overrides):
         "artifact_hashes": [],
         "started_at": "2026-07-28T00:00:00Z",
         "finished_at": "2026-07-28T00:00:01Z",
-        "executor_version": "linkskills-eval-executor/0.3.0",
+        "executor_version": "linkskills-eval-executor/0.4.0",
         "evidence_source": "executor",
+        "network_isolation": "denied",
         "provenance_kind": "eval_runner_hmac_v1",
         "issuer_id": "linkskills-eval-runner-test",
     }
@@ -69,6 +70,7 @@ def _seal_receipt(**overrides):
         "exit_code": base.get("exit_code"),
         "finished_at": base["finished_at"],
         "issuer_id": base["issuer_id"],
+        "network_isolation": base["network_isolation"],
         "provenance_kind": base["provenance_kind"],
         "receipt_id": base["receipt_id"],
         "skill_id": base["skill_id"],
@@ -196,6 +198,22 @@ class CertificationTests(unittest.TestCase):
     def test_refuses_fabricated_receipt_hash(self) -> None:
         receipt = _seal_receipt()
         receipt["receipt_hash"] = "0" * 64
+        self.assertFalse(sealed_executor_receipt(receipt))
+        decision = evaluate_certification_evidence(
+            {
+                "cases": [
+                    {
+                        "case_id": "c1",
+                        "evidence_source": "executor",
+                        "execution_receipt": receipt,
+                    }
+                ]
+            }
+        )
+        self.assertFalse(decision.allowed)
+
+    def test_refuses_unproven_network_isolation(self) -> None:
+        receipt = _seal_receipt(network_isolation="unproven")
         self.assertFalse(sealed_executor_receipt(receipt))
         decision = evaluate_certification_evidence(
             {

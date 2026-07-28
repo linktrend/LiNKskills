@@ -18,7 +18,13 @@ from pathlib import Path
 from typing import Any, Callable, Dict, List, Mapping, Optional, Sequence, Tuple
 
 from .auth import ActorClaims
-from .persistence import GatewayStore, InMemoryGatewayStore, open_gateway_store, resolve_state_dir
+from .persistence import (
+    GatewayStore,
+    InMemoryGatewayStore,
+    canonical_request_hash,
+    open_gateway_store,
+    resolve_state_dir,
+)
 
 try:
     from linkskills_core.payload_guard import (
@@ -426,8 +432,24 @@ class SkillsGatewayService:
             )
 
         if operation in WRITE_OPERATIONS and idempotency_key:
-            cached = self._store.get_idempotent(actor.actor_id, operation, idempotency_key)
-            if cached is not None:
+            request_hash = canonical_request_hash(
+                {
+                    "actor_id": actor.actor_id,
+                    "org_id": actor.org_id,
+                    "operation": operation,
+                    "params": params,
+                }
+            )
+            outcome, cached = self._store.reserve_idempotency(
+                actor.actor_id, operation, idempotency_key, request_hash
+            )
+            if outcome == "conflict":
+                raise ServiceError(
+                    "idempotency_conflict",
+                    "idempotency key already bound to a different request payload",
+                    http_status=409,
+                )
+            if outcome == "replay" and cached is not None:
                 replay = dict(cached)
                 replay["request_id"] = request_id
                 replay["server_time"] = _utc_now()
@@ -435,6 +457,8 @@ class SkillsGatewayService:
                     "idempotent_replay"
                 ]
                 return replay
+        else:
+            request_hash = None
 
         handler = getattr(self, f"op_{operation}")
         result = handler(actor=actor, params=params, idempotency_key=idempotency_key)
@@ -451,19 +475,14 @@ class SkillsGatewayService:
             run_id=result.get("run_id"),
         )
 
-        if operation in WRITE_OPERATIONS and idempotency_key:
-            stored = self._store.put_idempotent(
-                actor.actor_id, operation, idempotency_key, dict(env)
+        if operation in WRITE_OPERATIONS and idempotency_key and request_hash:
+            self._store.complete_idempotency(
+                actor.actor_id,
+                operation,
+                idempotency_key,
+                request_hash,
+                dict(env),
             )
-            # Collision-safe: if another writer won the race, return their envelope.
-            if stored.get("request_id") != env.get("request_id"):
-                replay = dict(stored)
-                replay["request_id"] = request_id
-                replay["server_time"] = _utc_now()
-                replay["warnings"] = list(replay.get("warnings") or []) + [
-                    "idempotent_replay"
-                ]
-                return replay
         return env
 
     # -------------------------------------------------------------- helpers

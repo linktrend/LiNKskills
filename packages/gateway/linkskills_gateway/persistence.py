@@ -2,16 +2,19 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import sqlite3
 from dataclasses import asdict, is_dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Mapping, Optional, Protocol, runtime_checkable
+from typing import Any, Dict, List, Literal, Mapping, Optional, Protocol, Tuple, runtime_checkable
 
 
 DEFAULT_STATE_DIRNAME = ".linkskills-state"
 GATEWAY_DB_NAME = "gateway.sqlite"
+
+IdempotencyOutcome = Literal["reserved", "replay", "conflict"]
 
 
 def resolve_state_dir(
@@ -46,9 +49,34 @@ def durable_enabled(
     return resolved.exists() and (resolved / GATEWAY_DB_NAME).is_file()
 
 
+def canonical_request_hash(payload: Mapping[str, Any]) -> str:
+    """Stable SHA-256 of a canonical JSON request binding."""
+    material = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+    return hashlib.sha256(material.encode("utf-8")).hexdigest()
+
+
 @runtime_checkable
 class GatewayStore(Protocol):
     """Durable or in-memory persistence contract for SkillsGatewayService."""
+
+    def reserve_idempotency(
+        self,
+        actor_id: str,
+        operation: str,
+        key: str,
+        request_hash: str,
+    ) -> Tuple[IdempotencyOutcome, Optional[Dict[str, Any]]]:
+        ...
+
+    def complete_idempotency(
+        self,
+        actor_id: str,
+        operation: str,
+        key: str,
+        request_hash: str,
+        envelope: Mapping[str, Any],
+    ) -> None:
+        ...
 
     def get_idempotent(self, actor_id: str, operation: str, key: str) -> Optional[Dict[str, Any]]:
         ...
@@ -95,8 +123,56 @@ class InMemoryGatewayStore:
     def _idempotency_key(actor_id: str, operation: str, key: str) -> str:
         return f"{actor_id}:{operation}:{key}"
 
+    def reserve_idempotency(
+        self,
+        actor_id: str,
+        operation: str,
+        key: str,
+        request_hash: str,
+    ) -> Tuple[IdempotencyOutcome, Optional[Dict[str, Any]]]:
+        cache_key = self._idempotency_key(actor_id, operation, key)
+        existing = self._idempotency.get(cache_key)
+        if existing is None:
+            self._idempotency[cache_key] = {
+                "request_hash": request_hash,
+                "status": "reserved",
+                "envelope": None,
+            }
+            return "reserved", None
+        if str(existing.get("request_hash") or "") != request_hash:
+            return "conflict", None
+        if existing.get("status") == "completed" and existing.get("envelope") is not None:
+            return "replay", dict(existing["envelope"])
+        # Same hash, still reserved (or incomplete) — allow caller to proceed/retry.
+        return "reserved", None
+
+    def complete_idempotency(
+        self,
+        actor_id: str,
+        operation: str,
+        key: str,
+        request_hash: str,
+        envelope: Mapping[str, Any],
+    ) -> None:
+        cache_key = self._idempotency_key(actor_id, operation, key)
+        existing = self._idempotency.get(cache_key)
+        if existing is None:
+            self._idempotency[cache_key] = {
+                "request_hash": request_hash,
+                "status": "completed",
+                "envelope": dict(envelope),
+            }
+            return
+        if str(existing.get("request_hash") or "") != request_hash:
+            raise ValueError("idempotency request_hash mismatch on complete")
+        existing["status"] = "completed"
+        existing["envelope"] = dict(envelope)
+
     def get_idempotent(self, actor_id: str, operation: str, key: str) -> Optional[Dict[str, Any]]:
-        return self._idempotency.get(self._idempotency_key(actor_id, operation, key))
+        row = self._idempotency.get(self._idempotency_key(actor_id, operation, key))
+        if row is None or row.get("status") != "completed" or row.get("envelope") is None:
+            return None
+        return dict(row["envelope"])
 
     def put_idempotent(
         self,
@@ -105,13 +181,15 @@ class InMemoryGatewayStore:
         key: str,
         envelope: Mapping[str, Any],
     ) -> Dict[str, Any]:
-        cache_key = self._idempotency_key(actor_id, operation, key)
-        existing = self._idempotency.get(cache_key)
-        if existing is not None:
-            return dict(existing)
-        stored = dict(envelope)
-        self._idempotency[cache_key] = stored
-        return stored
+        # Legacy helper — binds hash to envelope body for callers that skip reserve.
+        request_hash = canonical_request_hash({"envelope": dict(envelope)})
+        outcome, cached = self.reserve_idempotency(actor_id, operation, key, request_hash)
+        if outcome == "conflict":
+            raise ValueError("idempotency conflict: same key, different request hash")
+        if outcome == "replay" and cached is not None:
+            return cached
+        self.complete_idempotency(actor_id, operation, key, request_hash, envelope)
+        return dict(envelope)
 
     def save_run(self, run: Any) -> None:
         payload = _run_to_dict(run)
@@ -158,7 +236,9 @@ class SqliteGatewayStore:
               actor_id text not null,
               operation text not null,
               idempotency_key text not null,
-              envelope_json text not null,
+              request_hash text not null default '',
+              status text not null default 'completed',
+              envelope_json text,
               created_at text not null default (strftime('%Y-%m-%dT%H:%M:%SZ', 'now')),
               primary key (actor_id, operation, idempotency_key)
             );
@@ -206,17 +286,97 @@ class SqliteGatewayStore:
             );
             """
         )
+        cols = {
+            row["name"]
+            for row in self._conn.execute("pragma table_info(idempotency)").fetchall()
+        }
+        if "request_hash" not in cols:
+            self._conn.execute(
+                "alter table idempotency add column request_hash text not null default ''"
+            )
+        if "status" not in cols:
+            self._conn.execute(
+                "alter table idempotency add column status text not null default 'completed'"
+            )
+        # Older rows stored envelope_json NOT NULL; allow null for reservations.
+        self._conn.commit()
+
+    def reserve_idempotency(
+        self,
+        actor_id: str,
+        operation: str,
+        key: str,
+        request_hash: str,
+    ) -> Tuple[IdempotencyOutcome, Optional[Dict[str, Any]]]:
+        try:
+            self._conn.execute(
+                """
+                insert into idempotency (
+                  actor_id, operation, idempotency_key, request_hash, status, envelope_json
+                ) values (?, ?, ?, ?, 'reserved', null)
+                """,
+                (actor_id, operation, key, request_hash),
+            )
+            self._conn.commit()
+            return "reserved", None
+        except sqlite3.IntegrityError:
+            row = self._conn.execute(
+                """
+                select request_hash, status, envelope_json from idempotency
+                where actor_id = ? and operation = ? and idempotency_key = ?
+                """,
+                (actor_id, operation, key),
+            ).fetchone()
+            if row is None:
+                raise
+            if str(row["request_hash"] or "") != request_hash:
+                return "conflict", None
+            if row["status"] == "completed" and row["envelope_json"]:
+                return "replay", json.loads(row["envelope_json"])
+            return "reserved", None
+
+    def complete_idempotency(
+        self,
+        actor_id: str,
+        operation: str,
+        key: str,
+        request_hash: str,
+        envelope: Mapping[str, Any],
+    ) -> None:
+        payload = json.dumps(dict(envelope), sort_keys=True)
+        cur = self._conn.execute(
+            """
+            update idempotency
+            set status = 'completed', envelope_json = ?
+            where actor_id = ? and operation = ? and idempotency_key = ?
+              and request_hash = ?
+            """,
+            (payload, actor_id, operation, key, request_hash),
+        )
+        if cur.rowcount == 0:
+            # Insert completed row if reserve was skipped.
+            try:
+                self._conn.execute(
+                    """
+                    insert into idempotency (
+                      actor_id, operation, idempotency_key, request_hash, status, envelope_json
+                    ) values (?, ?, ?, ?, 'completed', ?)
+                    """,
+                    (actor_id, operation, key, request_hash, payload),
+                )
+            except sqlite3.IntegrityError as exc:
+                raise ValueError("idempotency request_hash mismatch on complete") from exc
         self._conn.commit()
 
     def get_idempotent(self, actor_id: str, operation: str, key: str) -> Optional[Dict[str, Any]]:
         row = self._conn.execute(
             """
-            select envelope_json from idempotency
+            select envelope_json, status from idempotency
             where actor_id = ? and operation = ? and idempotency_key = ?
             """,
             (actor_id, operation, key),
         ).fetchone()
-        if row is None:
+        if row is None or row["status"] != "completed" or not row["envelope_json"]:
             return None
         return json.loads(row["envelope_json"])
 
@@ -227,24 +387,13 @@ class SqliteGatewayStore:
         key: str,
         envelope: Mapping[str, Any],
     ) -> Dict[str, Any]:
-        existing = self.get_idempotent(actor_id, operation, key)
-        if existing is not None:
-            return existing
-        payload = json.dumps(dict(envelope), sort_keys=True)
-        try:
-            self._conn.execute(
-                """
-                insert into idempotency (actor_id, operation, idempotency_key, envelope_json)
-                values (?, ?, ?, ?)
-                """,
-                (actor_id, operation, key, payload),
-            )
-            self._conn.commit()
-        except sqlite3.IntegrityError:
-            existing = self.get_idempotent(actor_id, operation, key)
-            if existing is None:
-                raise
-            return existing
+        request_hash = canonical_request_hash({"envelope": dict(envelope)})
+        outcome, cached = self.reserve_idempotency(actor_id, operation, key, request_hash)
+        if outcome == "conflict":
+            raise ValueError("idempotency conflict: same key, different request hash")
+        if outcome == "replay" and cached is not None:
+            return cached
+        self.complete_idempotency(actor_id, operation, key, request_hash, envelope)
         return dict(envelope)
 
     def save_run(self, run: Any) -> None:

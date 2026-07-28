@@ -31,10 +31,40 @@ class GatewayPersistenceTests(unittest.TestCase):
                 "actor-1",
                 "skills_run_start",
                 "key-1",
-                {"operation": "skills_run_start", "data": {"run_id": "r2"}},
+                first,
             )
             self.assertEqual(second["data"]["run_id"], "r1")
             store.close()
+
+    def test_idempotency_different_payload_conflicts(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            store = SqliteGatewayStore(gateway_db_path(Path(tmp)))
+            store.put_idempotent(
+                "actor-1",
+                "skills_run_start",
+                "key-1",
+                {"operation": "skills_run_start", "data": {"run_id": "r1"}},
+            )
+            with self.assertRaises(ValueError):
+                store.put_idempotent(
+                    "actor-1",
+                    "skills_run_start",
+                    "key-1",
+                    {"operation": "skills_run_start", "data": {"run_id": "r2"}},
+                )
+            store.close()
+
+    def test_atomic_reserve_binds_request_hash(self) -> None:
+        store = InMemoryGatewayStore()
+        outcome, cached = store.reserve_idempotency("a", "op", "k", "hash-1")
+        self.assertEqual(outcome, "reserved")
+        self.assertIsNone(cached)
+        store.complete_idempotency("a", "op", "k", "hash-1", {"ok": True})
+        outcome2, cached2 = store.reserve_idempotency("a", "op", "k", "hash-1")
+        self.assertEqual(outcome2, "replay")
+        self.assertEqual(cached2, {"ok": True})
+        outcome3, _ = store.reserve_idempotency("a", "op", "k", "hash-2")
+        self.assertEqual(outcome3, "conflict")
 
     def test_run_roundtrip(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

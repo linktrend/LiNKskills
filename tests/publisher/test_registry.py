@@ -39,6 +39,24 @@ class PublisherRegistryTests(unittest.TestCase):
             self.assertIsNotNone(loaded)
             assert loaded is not None
             self.assertEqual(loaded.bundle_hash, published.bundle_hash)
+            # Exact-content replay is idempotent.
+            again = registry.publish_release(skill, channel="internal", transactional=True)
+            self.assertEqual(again.bundle_hash, published.bundle_hash)
+            registry.close()
+
+    def test_publish_same_version_different_content_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            skill = self._write_skill(root)
+            registry = PublisherRegistry(publisher_db_path(root / "state"))
+            registry.publish_release(skill, channel="internal", transactional=True)
+            (skill / "SKILL.md").write_text(
+                "---\nname: demo-skill\nversion: 2.0.0\ndescription: changed\n---\n# changed\n",
+                encoding="utf-8",
+            )
+            with self.assertRaises(ValueError) as ctx:
+                registry.publish_release(skill, channel="internal", transactional=True)
+            self.assertIn("immutable", str(ctx.exception).lower())
             registry.close()
 
     def test_backfill_from_manifests(self) -> None:

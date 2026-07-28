@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """
-Automated validator for skill compliance with the Golden Template.
+Automated validator for skill compliance with the Golden Template and
+canonical LiNKskills v0.1 schemas (Skill Pack, eval suite, tool descriptor,
+execution profile) via linkskills_contracts — not regex-only wrapping.
 Enforces frontmatter compliance, naming conventions, file integrity,
 contract integrity, persistence/resumability rules, line budgets,
 and global tool package compliance under /tools.
@@ -612,6 +614,9 @@ def validate_tool_structure(tool_path: Path) -> Tuple[bool, List[str]]:
     _, interface_errors = validate_tool_interface_json(tool_path)
     errors.extend(interface_errors)
 
+    _, descriptor_errors = validate_canonical_v01_tool_artifacts(tool_path)
+    errors.extend(descriptor_errors)
+
     bin_dir = tool_path / "bin"
     if bin_dir.exists():
         executables = [p for p in bin_dir.iterdir() if p.is_file()]
@@ -999,6 +1004,9 @@ def validate_eval_suite(skill_path: Path) -> Tuple[bool, List[str]]:
     Uses structural checks (not full YAML parse) because eval suites contain nested
     lists the repo's frontmatter-oriented parser does not support; the Librarian
     runner loads the full YAML with a real parser when judging.
+
+    When a JSON eval-suite artifact is present, it is validated against the
+    canonical eval-suite-v0.1 schema via linkskills_contracts.
     """
     errors: List[str] = []
     suite_path = skill_path / "references" / "eval-suite.yaml"
@@ -1033,6 +1041,100 @@ def validate_eval_suite(skill_path: Path) -> Tuple[bool, List[str]]:
     elif re.search(r"(?m)^\s*-\s+id:\s*", text) is None:
         errors.append("references/eval-suite.yaml scenarios must include at least one scenario id")
 
+    return len(errors) == 0, errors
+
+
+def _contracts_validate():
+    """Import linkskills_contracts validate_instance (stdlib; no jsonschema dep)."""
+    try:
+        from linkskills_contracts.validate import validate_instance
+
+        return validate_instance
+    except ImportError:
+        repo = Path(__file__).resolve().parent
+        sys.path.insert(0, str(repo / "packages" / "contracts"))
+        from linkskills_contracts.validate import validate_instance
+
+        return validate_instance
+
+
+_CANONICAL_SKILL_ARTIFACTS = (
+    ("skill-pack.json", "skill-pack"),
+    ("pack.json", "skill-pack"),
+    ("references/skill-pack.json", "skill-pack"),
+    ("references/skill-pack.v0.1.json", "skill-pack"),
+    ("eval-suite.json", "eval-suite"),
+    ("references/eval-suite.json", "eval-suite"),
+    ("execution-profile.json", "execution-profile"),
+    ("references/execution-profile.json", "execution-profile"),
+)
+
+_CANONICAL_TOOL_ARTIFACTS = (
+    ("tool-descriptor.json", "tool-descriptor"),
+    ("descriptor.json", "tool-descriptor"),
+    ("references/tool-descriptor.json", "tool-descriptor"),
+)
+
+
+def validate_json_against_schema(
+    path: Path,
+    schema_name: str,
+) -> List[str]:
+    """Validate one JSON document against a canonical v0.1 schema."""
+    errors: List[str] = []
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        return [f"{path.name}: invalid JSON ({exc})"]
+    validate_instance = _contracts_validate()
+    result = validate_instance(payload, schema_name)
+    if not result.ok:
+        for err in result.errors:
+            errors.append(f"{path.name}: {err}")
+    return errors
+
+
+def validate_canonical_v01_skill_artifacts(skill_path: Path) -> Tuple[bool, List[str]]:
+    """Validate present Skill Pack / eval / execution-profile JSON against v0.1 schemas."""
+    errors: List[str] = []
+    for rel, schema_name in _CANONICAL_SKILL_ARTIFACTS:
+        candidate = skill_path / rel
+        if candidate.is_file():
+            errors.extend(validate_json_against_schema(candidate, schema_name))
+    return len(errors) == 0, errors
+
+
+def validate_canonical_v01_tool_artifacts(tool_path: Path) -> Tuple[bool, List[str]]:
+    """Validate present tool-descriptor JSON against tool-descriptor-v0.1."""
+    errors: List[str] = []
+    for rel, schema_name in _CANONICAL_TOOL_ARTIFACTS:
+        candidate = tool_path / rel
+        if candidate.is_file():
+            errors.extend(validate_json_against_schema(candidate, schema_name))
+    return len(errors) == 0, errors
+
+
+def validate_contract_fixtures(repo_root: Path) -> Tuple[bool, List[str]]:
+    """Prove validator routes through canonical schemas using packaged fixtures."""
+    errors: List[str] = []
+    fixtures_root = repo_root / "packages" / "contracts" / "fixtures"
+    expectations = (
+        ("skill-pack/valid-minimal.json", "skill-pack", True),
+        ("skill-pack/invalid-missing-telemetry.json", "skill-pack", False),
+        ("eval-suite/valid-minimal.json", "eval-suite", True),
+        ("eval-suite/invalid-empty-cases.json", "eval-suite", False),
+    )
+    for rel, schema_name, expect_ok in expectations:
+        path = fixtures_root / rel
+        if not path.is_file():
+            errors.append(f"missing contract fixture: {rel}")
+            continue
+        fixture_errors = validate_json_against_schema(path, schema_name)
+        ok = len(fixture_errors) == 0
+        if expect_ok and not ok:
+            errors.extend([f"fixture {rel} should validate: {e}" for e in fixture_errors])
+        if not expect_ok and ok:
+            errors.append(f"fixture {rel} should fail {schema_name} validation but passed")
     return len(errors) == 0, errors
 
 
@@ -1169,6 +1271,9 @@ def validate_single_skill(
     _, eval_errors = validate_eval_suite(skill_path)
     all_errors.extend(eval_errors)
 
+    _, schema_art_errors = validate_canonical_v01_skill_artifacts(skill_path)
+    all_errors.extend(schema_art_errors)
+
     schema_doc, errors = load_schemas(skill_path, profile)
     all_errors.extend(errors)
 
@@ -1244,6 +1349,10 @@ def main() -> None:
 
     all_errors: List[str] = []
     all_warnings: List[str] = list(config_warnings)
+
+    # Always exercise canonical v0.1 schema routing (not regex-only).
+    _, fixture_errors = validate_contract_fixtures(repo_root)
+    all_errors.extend(fixture_errors)
 
     processed_labels: List[str] = []
     if args.scan_all:
