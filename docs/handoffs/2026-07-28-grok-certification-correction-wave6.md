@@ -8,7 +8,7 @@
 **PR:** https://github.com/linktrend/LiNKskills/pull/22  
 **Branch:** `issue/21-linkskillsdevelopmentplan01`  
 **Base head for this wave:** `f780161cee8415bd35d7d8250f52c35e2655bbab`  
-**Wave-6 tip:** *(exact SHA after this handoff push — see git log tip)*  
+**Wave-6 tip (exact clean pushed head):** `4b768b2d6c8d0f998cd3af1e9698c1cd668b8e92`  
 **Plan hash:** `31a6cc70bb778ce1dff236819e4bf600b0495dbb06c95bac55bcb2b0b2f5fe88`
 
 ## Wave 6 corrections (Codex findings)
