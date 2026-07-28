@@ -27,6 +27,7 @@ for path in (
 
 from linkskills_client.client import LocalEventBuffer, SkillsGatewayClient  # noqa: E402
 from linkskills_client.compat import load_skill, record_invocation  # noqa: E402
+from linkskills_gateway.auth import LocalUnsignedClaimsVerifier  # noqa: E402
 from linkskills_gateway.auth_testing import mint_test_bearer  # noqa: E402
 from linkskills_gateway.server import create_server  # noqa: E402
 from linkskills_gateway.service import SkillsGatewayService  # noqa: E402
@@ -62,7 +63,12 @@ class CompatTests(unittest.TestCase):
 
     def test_load_skill_via_gateway_when_configured(self) -> None:
         service = SkillsGatewayService(repo_root=REPO_ROOT)
-        httpd = create_server("127.0.0.1", 0, service=service)
+        httpd = create_server(
+            "127.0.0.1",
+            0,
+            service=service,
+            verifier=LocalUnsignedClaimsVerifier(),
+        )
         port = httpd.server_address[1]
         thread = threading.Thread(target=httpd.serve_forever, daemon=True)
         thread.start()

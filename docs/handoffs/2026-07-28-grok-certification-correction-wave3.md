@@ -62,3 +62,7 @@ python3 scripts/check-service-ownership.py
 ## Return path
 
 Return this wave-3 correction handoff to the **LiNKskills Codex verifier** for independent re-verification. Keep PR #22 open and unmerged until that pass.
+
+## Amendment 2026-07-28 — wave 4
+
+Superseded on authenticity: unsigned production AuthClaims decoding is withdrawn. See `docs/handoffs/2026-07-28-grok-certification-correction-wave4.md`.

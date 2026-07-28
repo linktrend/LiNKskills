@@ -82,6 +82,10 @@ LiNKskills will not edit OpenClaw/Lisa internals.
 
 Wave 2 AuthClaims/profile claims remain. Wave 3 adds buffer/flush fail-closed behavior, receipt-bound librarian/core certification, MCP identity hardening, run-start gates, fragment PYTHONPATH, and README CI command alignment. See `docs/handoffs/2026-07-28-grok-certification-correction-wave3.md`. Still provisional for Codex re-verification — do not merge or start the multi-day Cursor canary.
 
+## Amendment 2026-07-28 — wave 4
+
+Wave 4 replaces the unsigned production verifier default with fail-closed cryptographic authenticity. See `docs/handoffs/2026-07-28-grok-certification-correction-wave4.md`. Still provisional — do not merge PR #22; do not start canary; return to Codex.
+
 ## Ask
 
 Return to the **LiNKskills Codex verifier** for independent re-verification against plan hash `31a6cc70bb778ce1dff236819e4bf600b0495dbb06c95bac55bcb2b0b2f5fe88` and Platform freeze record.

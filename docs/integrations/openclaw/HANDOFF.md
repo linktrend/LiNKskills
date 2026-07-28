@@ -24,7 +24,10 @@ Consume exact frozen Platform contract:
 
 LiNKskills consumer pin: `docs/contracts/frozen/platform-auth-claims-v1.0.0.CONSUMER-PIN.md`  
 Vendored fixtures: `packages/contracts/fixtures/platform-claims/`  
-Verifier: `packages/gateway/linkskills_gateway/auth.py` (`PlatformClaimsVerifier`)
+Verifier: `packages/gateway/linkskills_gateway/auth.py`
+- Production: `PlatformClaimsVerifier` + Platform-approved cryptographic authenticator (`LINKSKILLS_PLATFORM_AUTHENTICATOR`)
+- Local-test only: `LocalUnsignedClaimsVerifier` (`LINKSKILLS_AUTH_MODE=local-test`)
+- Canary must not use unsigned/local-test mode
 
 Rules OpenClaw must mirror when presenting tokens to Skills:
 
@@ -56,4 +59,4 @@ Not proven / not performed here:
 3. Wire host-side MCP only under OpenClaw ownership.
 4. Do not ask LiNKskills agents to edit OpenClaw/Lisa internals.
 
-Correction evidence: `docs/handoffs/2026-07-28-grok-certification-correction-wave2.md`.
+Correction evidence: `docs/handoffs/2026-07-28-grok-certification-correction-wave2.md`, `docs/handoffs/2026-07-28-grok-certification-correction-wave4.md`.

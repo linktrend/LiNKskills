@@ -144,3 +144,7 @@ Do not begin the multi-day Cursor canary until certification + Platform gates pa
 Wave-1 replacement profile/receipts above were **again withdrawn** in wave 2 (non-deterministic profile / unset release). Current sealed canary identity is in `docs/handoffs/2026-07-28-grok-certification-correction-wave2.md`.
 
 Wave 3 (`docs/handoffs/2026-07-28-grok-certification-correction-wave3.md`) addresses all remaining actionable PR #22 review threads (buffer/flush, librarian/core receipt-bound cert, MCP identity, run-start gates, fragments, README). Still provisional — return to Codex; do not merge PR #22; do not start multi-day Cursor canary.
+
+## Amendment 2026-07-28 — wave 4
+
+Unsigned production verifier path withdrawn. See `docs/handoffs/2026-07-28-grok-certification-correction-wave4.md`. Still provisional for Codex; do not merge/deploy/canary.

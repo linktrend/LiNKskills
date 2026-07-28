@@ -21,14 +21,20 @@
 |---|---|
 | JSON Schema | `packages/contracts/schemas/platform-auth-claims.v1.0.0.json` |
 | Fixtures | `packages/contracts/fixtures/platform-claims/` |
-| Verifier | `packages/gateway/linkskills_gateway/auth.py` (`PlatformClaimsVerifier`) |
+| Production verifier | `packages/gateway/linkskills_gateway/auth.py` (`PlatformClaimsVerifier`) |
+| Local-test unsigned decoder | `packages/gateway/linkskills_gateway/auth.py` (`LocalUnsignedClaimsVerifier`) |
+| Test-only mint helpers | `packages/gateway/linkskills_gateway/auth_testing.py` |
 
 ## Consumer rules
 
 - Require `claimContractVersion === "platform.auth-claims/1.0.0"`.
 - CamelCase only; `additionalProperties` rejected.
 - `actorKind` enum only: `human` \| `persona` \| `service` \| `adapter` \| `program_executor`.
-- Reject `actorKind: "agent"`, snake_case aliases, unknown fields, and `fake.*` tokens on non-test paths.
-- Expired-fixture proofs use an injected evaluation clock (`now=` / `now_fn`), never permanently valid credentials.
+- Reject `actorKind: "agent"`, snake_case aliases, unknown fields, and `fake.*` tokens.
+- **Authenticity (wave 4):** production `PlatformClaimsVerifier` requires an injected Platform-approved cryptographic authenticator (`LINKSKILLS_PLATFORM_AUTHENTICATOR=module:attr`). Unsigned `platform.<base64url(JSON)>` is rejected outside `LINKSKILLS_AUTH_MODE=local-test`.
+- Gateway/MCP startup fails closed when production authenticator/config is unavailable — no fallback to the unsigned decoder.
+- `LINKSKILLS_CANARY` cannot use local-test/unsigned auth.
+- `mint_platform_token` is test-only (`auth_testing`); not a package-root export.
+- Expired/revoked/rotated credential proofs use injected evaluation clock and credential status; claim-field names remain frozen.
 
 Authority: LiNKplatform `docs/contracts/frozen/platform-auth-claims-v1.0.0.FROZEN.md`.

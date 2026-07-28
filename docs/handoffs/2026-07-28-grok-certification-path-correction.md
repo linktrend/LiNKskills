@@ -82,3 +82,7 @@ Wave 1 profile/receipt claims are **withdrawn**. See `docs/handoffs/2026-07-28-g
 ## Amendment 2026-07-28 — wave 3 supersession
 
 Additional fail-closed corrections for buffer/flush, librarian/core receipt-bound certification, MCP identity minting, run-start gates, fragments, and README CI commands. See `docs/handoffs/2026-07-28-grok-certification-correction-wave3.md`. Still provisional — do not merge PR #22; do not start the multi-day Cursor canary; return to Codex verification.
+
+## Amendment 2026-07-28 — wave 4 supersession
+
+Unsigned production AuthClaims decoding is withdrawn. Production requires Platform-approved cryptographic authenticator injection; local-test unsigned path is explicit only. See `docs/handoffs/2026-07-28-grok-certification-correction-wave4.md`.

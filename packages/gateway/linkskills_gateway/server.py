@@ -13,12 +13,17 @@ gateway without an immediate cutover.
 from __future__ import annotations
 
 import json
+import sys
 import uuid
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any, Dict, Optional, Tuple, Type
 from urllib.parse import urlparse
 
-from .auth import AuthError, PlatformClaimsVerifier
+from .auth import (
+    AuthConfigurationError,
+    AuthError,
+    resolve_claims_verifier,
+)
 from .service import OPERATIONS, ServiceError, SkillsGatewayService
 
 
@@ -28,9 +33,10 @@ def _json_bytes(payload: Dict[str, Any]) -> bytes:
 
 def make_handler(
     service: SkillsGatewayService,
-    verifier: Optional[PlatformClaimsVerifier] = None,
+    verifier: Optional[Any] = None,
 ) -> Type[BaseHTTPRequestHandler]:
-    auth = verifier or PlatformClaimsVerifier()
+    # Never default to unsigned decoding. Missing production authenticator fails closed.
+    auth = resolve_claims_verifier(verifier=verifier)
 
     class LiNKskillsGateway(BaseHTTPRequestHandler):
         server_version = "LiNKskillsGateway/0.1"
@@ -70,7 +76,14 @@ def make_handler(
                 self._send(200, service.health())
                 return
             if path == "/ready":
-                ready = service.ready()
+                ready = dict(service.ready())
+                ready["auth_configured"] = True
+                ready["auth_mode"] = (
+                    "local-test"
+                    if getattr(auth, "local_test_only", False)
+                    else "production"
+                )
+                # Auth is resolved at process start; if we are serving, auth is configured.
                 self._send(200 if ready.get("ready") else 503, ready)
                 return
             self._send(
@@ -182,7 +195,12 @@ def make_handler(
                 self._send(200, envelope)
             except AuthError as exc:
                 status = 401
-                if exc.code in {"auth_forbidden", "auth_spoof_rejected"}:
+                if exc.code in {
+                    "auth_forbidden",
+                    "auth_spoof_rejected",
+                    "auth_revoked",
+                    "auth_unsigned_rejected",
+                }:
                     status = 403
                 self._send(
                     status,
@@ -222,7 +240,7 @@ def create_server(
     port: int = 8787,
     *,
     service: Optional[SkillsGatewayService] = None,
-    verifier: Optional[PlatformClaimsVerifier] = None,
+    verifier: Optional[Any] = None,
 ) -> ThreadingHTTPServer:
     svc = service or SkillsGatewayService()
     handler = make_handler(svc, verifier=verifier)
@@ -236,7 +254,12 @@ def main() -> None:
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8787)
     args = parser.parse_args()
-    httpd = create_server(args.host, args.port)
+    try:
+        verifier = resolve_claims_verifier()
+    except AuthConfigurationError as exc:
+        print(f"linkskills-gateway auth fail-closed: {exc.message}", file=sys.stderr)
+        raise SystemExit(2) from exc
+    httpd = create_server(args.host, args.port, verifier=verifier)
     print(f"linkskills-gateway listening on http://{args.host}:{args.port}")
     try:
         httpd.serve_forever()

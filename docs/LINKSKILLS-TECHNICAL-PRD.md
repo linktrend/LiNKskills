@@ -431,7 +431,7 @@ Independently named `skills_*` operations (HTTP `/v1/{operation}` and MCP tools 
 - Tools / validation: `skills_tool_resolve`, `skills_tool_invoke`, `skills_input_validate`, `skills_output_validate`
 - Feedback: `skills_feedback_submit`, `skills_trace_candidate_submit`
 
-Auth today: non-test paths use `PlatformClaimsVerifier` against canonical Platform AuthClaims (`platform.<base64url(JSON)>`). Competing `fake.*` tokens are rejected outside `linkskills_gateway.auth_testing`. Live Platform issuer remains a Platform gate. Spoofed identity keys in request bodies are rejected.
+Auth today: production paths use `PlatformClaimsVerifier` with an injected Platform-approved cryptographic authenticator (`LINKSKILLS_PLATFORM_AUTHENTICATOR`). Unsigned `platform.<base64url(JSON)>` is accepted only by `LocalUnsignedClaimsVerifier` under explicit `LINKSKILLS_AUTH_MODE=local-test` (or an injected local-test verifier). Gateway/MCP startup fails closed when production authenticator/config is missing. Competing `fake.*` tokens are rejected. Live Platform issuer and signing keys remain a Platform gate. Spoofed identity keys in request bodies are rejected.
 
 ---
 

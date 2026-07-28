@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Gateway unit tests: frozen Platform claims, spoof rejection, tool invoke fail-closed."""
+"""Gateway unit tests: frozen claims, crypto authenticity, unsigned isolation."""
 
 from __future__ import annotations
 
 import json
+import os
 import sys
 import threading
 import time
@@ -27,13 +28,21 @@ for path in PACKAGE_PATHS:
 
 from linkskills_gateway.auth import (  # noqa: E402
     CLAIM_CONTRACT_VERSION,
+    AuthConfigurationError,
     AuthError,
+    LocalUnsignedClaimsVerifier,
     PlatformClaimsVerifier,
     load_platform_claim_fixture,
-    mint_platform_token,
+    resolve_claims_verifier,
     verify_frozen_auth_claims_schema,
 )
-from linkskills_gateway.auth_testing import mint_test_bearer  # noqa: E402
+from linkskills_gateway.auth_testing import (  # noqa: E402
+    LocalTestHmacAuthenticator,
+    mint_fake_token,
+    mint_platform_token,
+    mint_test_bearer,
+    production_test_verifier,
+)
 from linkskills_gateway.server import create_server  # noqa: E402
 from linkskills_gateway.service import ServiceError, SkillsGatewayService  # noqa: E402
 from linkskills_tool_runtime.descriptor import load_tool_descriptor  # noqa: E402
@@ -61,16 +70,16 @@ def _platform_claims(**overrides):
     return base
 
 
-class AuthTests(unittest.TestCase):
+class LocalUnsignedAuthTests(unittest.TestCase):
     def setUp(self) -> None:
-        self.verifier = PlatformClaimsVerifier()
+        self.verifier = LocalUnsignedClaimsVerifier()
 
     def test_frozen_schema_hashes(self) -> None:
         meta = verify_frozen_auth_claims_schema()
         self.assertEqual(meta["contract"], CLAIM_CONTRACT_VERSION)
         self.assertEqual(meta["package"], "0.2.1")
 
-    def test_valid_platform_token_accepted(self) -> None:
+    def test_valid_unsigned_token_accepted_in_local_test(self) -> None:
         token = mint_platform_token(_platform_claims())
         claims = self.verifier.verify(f"Bearer {token}")
         self.assertEqual(claims.actor_id, "actor-1")
@@ -103,7 +112,7 @@ class AuthTests(unittest.TestCase):
             self.verifier.verify(f"Bearer {token}")
         self.assertEqual(ctx.exception.code, "auth_contract_mismatch")
 
-    def test_fake_token_rejected_on_non_test_path(self) -> None:
+    def test_fake_token_rejected(self) -> None:
         with self.assertRaises(AuthError) as ctx:
             self.verifier.verify("Bearer fake.abc")
         self.assertEqual(ctx.exception.code, "auth_unsupported")
@@ -134,12 +143,16 @@ class AuthTests(unittest.TestCase):
     def test_expired_fixture_with_injected_clock(self) -> None:
         fixture = load_platform_claim_fixture("reject-expired")
         token = mint_platform_token(fixture["claims"])
-        verifier = PlatformClaimsVerifier(
+        verifier = LocalUnsignedClaimsVerifier(
             expected_audience=fixture["context"]["expectedAudience"],
             required_service=fixture["context"]["requiredService"],
         )
         with self.assertRaises(AuthError) as ctx:
-            verifier.verify(f"Bearer {token}", now=fixture["context"]["now"])
+            verifier.verify(
+                f"Bearer {token}",
+                now=fixture["context"]["now"],
+                credential_status=fixture["context"]["credentialStatus"],
+            )
         self.assertEqual(ctx.exception.code, "auth_expired")
 
     def test_vendored_lskills_fixture_accepted_with_fixture_now(self) -> None:
@@ -153,10 +166,110 @@ class AuthTests(unittest.TestCase):
         self.assertEqual(claims.claim_contract_version, CLAIM_CONTRACT_VERSION)
 
 
+class ProductionCryptoAuthTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.hmac = LocalTestHmacAuthenticator()
+        self.verifier = production_test_verifier(authenticator=self.hmac)
+
+    def test_construction_without_authenticator_fails_closed(self) -> None:
+        with self.assertRaises(AuthConfigurationError):
+            PlatformClaimsVerifier()
+
+    def test_resolve_production_without_env_fails_closed(self) -> None:
+        env = {k: v for k, v in os.environ.items() if k != "LINKSKILLS_PLATFORM_AUTHENTICATOR"}
+        env["LINKSKILLS_AUTH_MODE"] = "production"
+        env.pop("LINKSKILLS_PLATFORM_AUTHENTICATOR", None)
+        with self.assertRaises(AuthConfigurationError):
+            resolve_claims_verifier(environ=env)
+
+    def test_signed_token_accepted(self) -> None:
+        token = self.hmac.mint(_platform_claims())
+        claims = self.verifier.verify(f"Bearer {token}")
+        self.assertEqual(claims.actor_id, "actor-1")
+
+    def test_self_minted_unsigned_canonical_bearer_rejected(self) -> None:
+        unsigned = mint_platform_token(_platform_claims())
+        with self.assertRaises(AuthError) as ctx:
+            self.verifier.verify(f"Bearer {unsigned}")
+        self.assertEqual(ctx.exception.code, "auth_unsigned_rejected")
+
+    def test_raw_json_bearer_rejected(self) -> None:
+        raw = json.dumps(_platform_claims(), separators=(",", ":"), sort_keys=True)
+        with self.assertRaises(AuthError) as ctx:
+            self.verifier.verify(f"Bearer {raw}")
+        self.assertEqual(ctx.exception.code, "auth_unsigned_rejected")
+
+    def test_fake_token_rejected(self) -> None:
+        with self.assertRaises(AuthError) as ctx:
+            self.verifier.verify(f"Bearer {mint_fake_token({'actorId': 'x'})}")
+        self.assertEqual(ctx.exception.code, "auth_unsupported")
+
+    def test_wrong_issuer_rejected(self) -> None:
+        token = self.hmac.mint(_platform_claims(issuer="evil-issuer"))
+        with self.assertRaises(AuthError) as ctx:
+            self.verifier.verify(f"Bearer {token}")
+        self.assertEqual(ctx.exception.code, "auth_forbidden")
+        self.assertIn("issuer", ctx.exception.message.lower())
+
+    def test_wrong_audience_rejected(self) -> None:
+        token = self.hmac.mint(_platform_claims(audience=["other-api"]))
+        with self.assertRaises(AuthError) as ctx:
+            self.verifier.verify(f"Bearer {token}")
+        self.assertEqual(ctx.exception.code, "auth_forbidden")
+        self.assertIn("audience", ctx.exception.message.lower())
+
+    def test_expired_token_rejected(self) -> None:
+        now = int(time.time())
+        token = self.hmac.mint(
+            _platform_claims(
+                issuedAt=time.strftime("%Y-%m-%dT%H:%M:%S.000Z", time.gmtime(now - 7200)),
+                expiresAt=time.strftime("%Y-%m-%dT%H:%M:%S.000Z", time.gmtime(now - 3600)),
+            )
+        )
+        with self.assertRaises(AuthError) as ctx:
+            self.verifier.verify(f"Bearer {token}")
+        self.assertEqual(ctx.exception.code, "auth_expired")
+
+    def test_revoked_token_rejected(self) -> None:
+        hmac_auth = LocalTestHmacAuthenticator(
+            credential_status_by_id={"cred-revoked": "revoked"}
+        )
+        verifier = production_test_verifier(authenticator=hmac_auth)
+        token = hmac_auth.mint(_platform_claims(credentialId="cred-revoked"))
+        with self.assertRaises(AuthError) as ctx:
+            verifier.verify(f"Bearer {token}")
+        self.assertEqual(ctx.exception.code, "auth_revoked")
+
+    def test_wrong_operation_rejected(self) -> None:
+        token = self.hmac.mint(
+            _platform_claims(permittedOperations=["read", "skills:read"])
+        )
+        with self.assertRaises(AuthError) as ctx:
+            self.verifier.verify(
+                f"Bearer {token}",
+                required_operation="skills:write",
+            )
+        self.assertEqual(ctx.exception.code, "auth_forbidden")
+        self.assertIn("not permitted", ctx.exception.message.lower())
+
+    def test_tampered_signature_rejected(self) -> None:
+        token = self.hmac.mint(_platform_claims())
+        # Flip last character of MAC segment.
+        bad = token[:-1] + ("A" if token[-1] != "A" else "B")
+        with self.assertRaises(AuthError) as ctx:
+            self.verifier.verify(f"Bearer {bad}")
+        self.assertIn(ctx.exception.code, {"auth_signature_invalid", "auth_malformed"})
+
+    def test_mint_platform_token_not_exported_from_package_root(self) -> None:
+        import linkskills_gateway as gw
+
+        self.assertFalse(hasattr(gw, "mint_platform_token"))
+
+
 class ServiceTests(unittest.TestCase):
     def setUp(self) -> None:
         self.service = SkillsGatewayService(repo_root=REPO_ROOT)
-        self.actor = PlatformClaimsVerifier().verify(f"Bearer {mint_test_bearer()}")
+        self.actor = LocalUnsignedClaimsVerifier().verify(f"Bearer {mint_test_bearer()}")
 
     def test_skills_list(self) -> None:
         env = self.service.dispatch("skills_list", {}, actor=self.actor)
@@ -212,7 +325,7 @@ class HttpTests(unittest.TestCase):
             "127.0.0.1",
             0,
             service=SkillsGatewayService(repo_root=REPO_ROOT),
-            verifier=PlatformClaimsVerifier(),
+            verifier=LocalUnsignedClaimsVerifier(),
         )
         self.port = self.httpd.server_address[1]
         self.thread = threading.Thread(target=self.httpd.serve_forever, daemon=True)
@@ -280,10 +393,10 @@ class RunLifecycleGateTests(unittest.TestCase):
             repo_root=REPO_ROOT,
             catalog_index=self.catalog,
         )
-        self.owner = PlatformClaimsVerifier().verify(
+        self.owner = LocalUnsignedClaimsVerifier().verify(
             f"Bearer {mint_test_bearer({'actor_id': 'owner', 'org_id': 'org-a'})}"
         )
-        self.intruder = PlatformClaimsVerifier().verify(
+        self.intruder = LocalUnsignedClaimsVerifier().verify(
             f"Bearer {mint_test_bearer({'actor_id': 'intruder', 'org_id': 'org-b'})}"
         )
 

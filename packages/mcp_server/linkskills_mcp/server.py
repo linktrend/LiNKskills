@@ -4,9 +4,12 @@ No duplicated business logic: every tool call routes to the shared gateway
 service used by the HTTP API (in-process import of linkskills_gateway.service).
 
 Authentication accepts only:
-- Platform-verifiable ``Authorization`` bearers, or
+- Platform-cryptographically verified ``Authorization`` bearers (production), or
 - an explicitly injected test/canary ``default_actor`` (never caller-minted
   claims from the tool body).
+
+Unsigned ``platform.<base64url(JSON)>`` decoding is never the default and is
+unavailable to ``LINKSKILLS_CANARY``.
 """
 
 from __future__ import annotations
@@ -19,8 +22,11 @@ from typing import Any, Dict, List, Mapping, Optional, TextIO
 
 from linkskills_gateway.auth import (
     ActorClaims,
+    AuthConfigurationError,
     AuthError,
-    PlatformClaimsVerifier,
+    resolve_auth_mode,
+    resolve_claims_verifier,
+    AUTH_MODE_LOCAL_TEST,
 )
 from linkskills_gateway.service import (
     OPERATIONS,
@@ -53,18 +59,25 @@ def _tool_schema(operation: str) -> Dict[str, Any]:
 def resolve_canary_default_actor(
     *,
     environ: Optional[Mapping[str, str]] = None,
-    verifier: Optional[PlatformClaimsVerifier] = None,
+    verifier: Optional[Any] = None,
 ) -> Optional[ActorClaims]:
-    """When LINKSKILLS_CANARY is set, require a Platform-verifiable injected bearer.
+    """When LINKSKILLS_CANARY is set, require a cryptographically verified bearer.
 
-    Never mints identity from caller-supplied claims. The host must inject
-    ``LINKSKILLS_CANARY_AUTHORIZATION`` or ``GATEWAY_TOKEN`` containing a
-    Platform AuthClaims bearer that verifies under ``PlatformClaimsVerifier``.
+    Never uses the unsigned local-test verifier. The host must inject
+    ``LINKSKILLS_CANARY_AUTHORIZATION`` / ``GATEWAY_TOKEN`` that verifies under
+    a production ``PlatformClaimsVerifier`` (Platform-approved authenticator).
     """
     env = environ if environ is not None else os.environ
     flag = str(env.get("LINKSKILLS_CANARY") or "").strip().lower()
     if flag not in {"1", "true", "yes"}:
         return None
+
+    if resolve_auth_mode(env) == AUTH_MODE_LOCAL_TEST:
+        raise SystemExit(
+            "LINKSKILLS_CANARY cannot use LINKSKILLS_AUTH_MODE=local-test "
+            "(unsigned verifier forbidden for canary)"
+        )
+
     token = (
         str(env.get("LINKSKILLS_CANARY_AUTHORIZATION") or "").strip()
         or str(env.get("GATEWAY_TOKEN") or "").strip()
@@ -72,10 +85,20 @@ def resolve_canary_default_actor(
     if not token:
         raise SystemExit(
             "LINKSKILLS_CANARY requires LINKSKILLS_CANARY_AUTHORIZATION or "
-            "GATEWAY_TOKEN (Platform-verifiable bearer); refusing caller-minted identity"
+            "GATEWAY_TOKEN (Platform-cryptographically verifiable bearer)"
         )
     auth = token if token.lower().startswith("bearer ") else f"Bearer {token}"
-    return (verifier or PlatformClaimsVerifier()).verify(auth)
+    try:
+        claims_verifier = resolve_claims_verifier(
+            verifier=verifier,
+            environ=env,
+            allow_local_test=False,
+        )
+    except AuthConfigurationError as exc:
+        raise SystemExit(
+            f"LINKSKILLS_CANARY auth fail-closed: {exc.message}"
+        ) from exc
+    return claims_verifier.verify(auth)
 
 
 class SkillsMcpServer:
@@ -84,12 +107,13 @@ class SkillsMcpServer:
     def __init__(
         self,
         service: Optional[SkillsGatewayService] = None,
-        verifier: Optional[PlatformClaimsVerifier] = None,
+        verifier: Optional[Any] = None,
         *,
         default_actor: Optional[ActorClaims] = None,
     ) -> None:
         self.service = service or SkillsGatewayService()
-        self.verifier = verifier or PlatformClaimsVerifier()
+        # Fail closed when production authenticator/config is missing.
+        self.verifier = resolve_claims_verifier(verifier=verifier)
         self.default_actor = default_actor
         self._initialized = False
 
@@ -276,8 +300,12 @@ class SkillsMcpServer:
 
 
 def main() -> None:
-    default_actor = resolve_canary_default_actor()
-    SkillsMcpServer(default_actor=default_actor).serve_stdio()
+    try:
+        default_actor = resolve_canary_default_actor()
+        SkillsMcpServer(default_actor=default_actor).serve_stdio()
+    except AuthConfigurationError as exc:
+        print(f"linkskills-mcp auth fail-closed: {exc.message}", file=sys.stderr)
+        raise SystemExit(2) from exc
 
 
 if __name__ == "__main__":

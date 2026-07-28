@@ -3,27 +3,34 @@
 Consumes the frozen contract ``platform.auth-claims/1.0.0`` from
 ``@linktrend/platform-contracts@0.2.1``.
 
-Production verifier rules:
-- exact ``claimContractVersion == "platform.auth-claims/1.0.0"``
-- camelCase fields only; unknown keys rejected
-- no snake_case aliases, no ``fake.*`` tokens, no actorKind ``agent``
-- actorKind enum: human | persona | service | adapter | program_executor
+Authenticity rules (wave 4):
+- Production ``PlatformClaimsVerifier`` never accepts unsigned
+  ``platform.<base64url(JSON)>`` tokens. It requires an injected
+  Platform-approved cryptographic authenticator (signature + issuer trust).
+- Unsigned decoding lives only on ``LocalUnsignedClaimsVerifier`` and is
+  permitted solely when ``LINKSKILLS_AUTH_MODE=local-test`` or an explicit
+  local-test verifier is injected.
+- Claim-field shape remains frozen camelCase AuthClaims (no renaming).
 """
 
 from __future__ import annotations
 
 import base64
 import hashlib
+import importlib
 import json
+import os
 import time
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import datetime
 from pathlib import Path
-from typing import Any, Callable, Dict, Mapping, Optional, Set
+from typing import Any, Callable, Dict, Mapping, Optional, Protocol, Set
 
 
 CLAIM_CONTRACT_VERSION = "platform.auth-claims/1.0.0"
 PLATFORM_CONTRACTS_PACKAGE = "0.2.1"
+AUTH_MODE_PRODUCTION = "production"
+AUTH_MODE_LOCAL_TEST = "local-test"
 ACTOR_KINDS = frozenset(
     {"human", "persona", "service", "adapter", "program_executor"}
 )
@@ -112,6 +119,14 @@ class AuthError(Exception):
         self.message = message
 
 
+class AuthConfigurationError(Exception):
+    """Raised when production auth cannot start fail-closed (missing verifier/keys)."""
+
+    def __init__(self, message: str) -> None:
+        super().__init__(message)
+        self.message = message
+
+
 @dataclass(frozen=True)
 class ActorClaims:
     """Verified platform actor claims consumed by LiNKskills Gateway."""
@@ -151,6 +166,28 @@ class ActorClaims:
                 or "*" in self.permitted_operations
             )
         ) or ("skills:write" in self.permitted_operations)
+
+
+@dataclass(frozen=True)
+class AuthenticatedToken:
+    """Cryptographically authenticated AuthClaims plus Platform trust context."""
+
+    claims: Mapping[str, Any]
+    credential_status: str = "active"
+    actor_lifecycle_state: str = "active"
+    binding_state: str = "active"
+
+
+class PlatformTokenAuthenticator(Protocol):
+    """Platform-approved cryptographic token authenticator.
+
+    Implementations must verify signature (or equivalent Platform trust proof),
+    issuer key material, and return the frozen AuthClaims payload. They must
+    never accept unsigned ``platform.<base64url(JSON)>`` tokens.
+    """
+
+    def authenticate(self, token: str) -> AuthenticatedToken:
+        """Verify authenticity and return AuthClaims + credential/binding status."""
 
 
 def _canonicalize_json(value: Any) -> str:
@@ -206,8 +243,21 @@ def _parse_iso8601_to_epoch(value: Any) -> int:
         raise AuthError("auth_invalid", f"expiresAt/issuedAt not ISO-8601: {value!r}") from exc
 
 
-class PlatformClaimsVerifier:
-    """Verify frozen ``platform.auth-claims/1.0.0`` AuthClaims."""
+def resolve_auth_mode(environ: Optional[Mapping[str, str]] = None) -> str:
+    """Return normalized auth mode (``production`` or ``local-test``)."""
+    env = environ if environ is not None else os.environ
+    raw = str(env.get("LINKSKILLS_AUTH_MODE") or AUTH_MODE_PRODUCTION).strip().lower()
+    if raw in {"local-test", "test", "local_test"}:
+        return AUTH_MODE_LOCAL_TEST
+    if raw in {"production", "prod", ""}:
+        return AUTH_MODE_PRODUCTION
+    raise AuthConfigurationError(
+        f"Unknown LINKSKILLS_AUTH_MODE={raw!r}; expected 'production' or 'local-test'"
+    )
+
+
+class _AuthClaimsPolicy:
+    """Shared frozen AuthClaims shape + lifecycle policy (not authenticity)."""
 
     def __init__(
         self,
@@ -217,70 +267,16 @@ class PlatformClaimsVerifier:
         required_service: str = "lskills",
         require_internal: Optional[bool] = None,
         expected_org_id: Optional[str] = None,
+        expected_issuer: Optional[str] = "linkplatform-issuer",
     ) -> None:
         self._now = now_fn or time.time
         self.expected_audience = expected_audience
         self.required_service = required_service
         self.require_internal = require_internal
         self.expected_org_id = expected_org_id
+        self.expected_issuer = expected_issuer
 
-    def verify(
-        self,
-        authorization: Optional[str],
-        *,
-        request_payload: Optional[Mapping[str, Any]] = None,
-        request_headers: Optional[Mapping[str, Any]] = None,
-        required_operation: Optional[str] = None,
-        now: Optional[Any] = None,
-    ) -> ActorClaims:
-        if not authorization:
-            raise AuthError("auth_missing", "Authorization required")
-
-        token = authorization.strip()
-        if token.lower().startswith("bearer "):
-            token = token[7:].strip()
-
-        if token.startswith("fake."):
-            raise AuthError(
-                "auth_unsupported",
-                "fake.* claim tokens are not accepted; use platform.<base64url(AuthClaims)>",
-            )
-
-        raw = self._decode_token(token)
-        claims = self._normalize_claims(raw)
-        self._check_lifecycle(claims, required_operation=required_operation, now=now)
-        self._reject_spoof(claims, request_payload)
-        self._reject_override_headers(request_headers)
-        return claims
-
-    def _decode_token(self, token: str) -> Dict[str, Any]:
-        if token.startswith("platform."):
-            encoded = token[len("platform.") :]
-            pad = "=" * (-len(encoded) % 4)
-            try:
-                decoded = base64.urlsafe_b64decode(encoded + pad)
-                data = json.loads(decoded.decode("utf-8"))
-            except (ValueError, json.JSONDecodeError) as exc:
-                raise AuthError("auth_malformed", "Malformed platform token") from exc
-            if not isinstance(data, dict):
-                raise AuthError("auth_malformed", "Platform token payload must be an object")
-            return data
-
-        if token.startswith("{"):
-            try:
-                data = json.loads(token)
-            except json.JSONDecodeError as exc:
-                raise AuthError("auth_malformed", "Malformed JSON token") from exc
-            if not isinstance(data, dict):
-                raise AuthError("auth_malformed", "JSON token must be an object")
-            return data
-
-        raise AuthError(
-            "auth_unsupported",
-            "Unsupported token format; use platform.<base64url(AuthClaims JSON)>",
-        )
-
-    def _normalize_claims(self, raw: Mapping[str, Any]) -> ActorClaims:
+    def normalize_claims(self, raw: Mapping[str, Any]) -> ActorClaims:
         unknown = sorted(set(raw.keys()) - ALLOWED_CLAIM_KEYS)
         if unknown:
             raise AuthError(
@@ -387,13 +383,38 @@ class PlatformClaimsVerifier:
             return int(now)
         return _parse_iso8601_to_epoch(now)
 
-    def _check_lifecycle(
+    def check_lifecycle(
         self,
         claims: ActorClaims,
         *,
         required_operation: Optional[str],
         now: Optional[Any],
+        credential_status: str = "active",
+        actor_lifecycle_state: str = "active",
+        binding_state: str = "active",
     ) -> None:
+        status = (credential_status or "active").strip().lower()
+        if status in {"revoked", "rotated"}:
+            raise AuthError("auth_revoked", f"Credential status rejected: {status}")
+        if status == "expired":
+            raise AuthError("auth_expired", "Credential status expired")
+        if status != "active":
+            raise AuthError(
+                "auth_forbidden",
+                f"Unsupported credential status: {status}",
+            )
+
+        if (actor_lifecycle_state or "active").strip().lower() != "active":
+            raise AuthError(
+                "auth_forbidden",
+                f"Actor lifecycle not active: {actor_lifecycle_state}",
+            )
+        if (binding_state or "active").strip().lower() != "active":
+            raise AuthError(
+                "auth_forbidden",
+                f"Runtime binding not active: {binding_state}",
+            )
+
         now_epoch = self._resolve_now(now)
         if claims.exp <= now_epoch:
             raise AuthError("auth_expired", "Claims expired")
@@ -401,6 +422,12 @@ class PlatformClaimsVerifier:
         issued_epoch = _parse_iso8601_to_epoch(claims.raw["issuedAt"])
         if now_epoch < issued_epoch:
             raise AuthError("auth_not_yet_valid", "Claims not yet valid")
+
+        if self.expected_issuer is not None and claims.issuer != self.expected_issuer:
+            raise AuthError(
+                "auth_forbidden",
+                f"Wrong issuer: expected {self.expected_issuer!r}, got {claims.issuer!r}",
+            )
 
         if self.required_service not in claims.scopes and "*" not in claims.scopes:
             raise AuthError(
@@ -419,19 +446,24 @@ class PlatformClaimsVerifier:
             raise AuthError("auth_forbidden", "Internal actor required")
         if self.expected_org_id is not None and claims.org_id != self.expected_org_id:
             raise AuthError("auth_forbidden", "wrong_org")
-        if required_operation and required_operation not in claims.permitted_operations:
+        if required_operation:
             aliases = {
                 "skills:read": {"read", "skills:read"},
                 "skills:write": {"execute", "skills:write"},
+                "read": {"read", "skills:read"},
+                "execute": {"execute", "skills:write"},
             }
             allowed = aliases.get(required_operation, {required_operation})
-            if not (allowed & set(claims.permitted_operations)) and "*" not in claims.permitted_operations:
+            if (
+                not (allowed & set(claims.permitted_operations))
+                and "*" not in claims.permitted_operations
+            ):
                 raise AuthError(
                     "auth_forbidden",
                     f"Operation not permitted: {required_operation}",
                 )
 
-    def _reject_override_headers(
+    def reject_override_headers(
         self,
         request_headers: Optional[Mapping[str, Any]],
     ) -> None:
@@ -457,7 +489,7 @@ class PlatformClaimsVerifier:
                 + ", ".join(present),
             )
 
-    def _reject_spoof(
+    def reject_spoof(
         self,
         claims: ActorClaims,
         request_payload: Optional[Mapping[str, Any]],
@@ -465,7 +497,7 @@ class PlatformClaimsVerifier:
         if not request_payload:
             return
         candidates: list[Mapping[str, Any]] = [request_payload]
-        for key in ("actor", "identity", "claims", "platform_claims"):
+        for key in ("actor", "identity", "claims", "platform_claims", "actor_claims"):
             nested = request_payload.get(key)
             if isinstance(nested, Mapping):
                 candidates.append(nested)
@@ -499,11 +531,260 @@ class PlatformClaimsVerifier:
                     )
 
 
-def mint_platform_token(claims: Mapping[str, Any]) -> str:
-    """Mint a ``platform.<b64>`` bearer token from canonical AuthClaims JSON."""
-    payload = json.dumps(claims, separators=(",", ":"), sort_keys=True).encode("utf-8")
-    encoded = base64.urlsafe_b64encode(payload).decode("ascii").rstrip("=")
-    return f"platform.{encoded}"
+def decode_unsigned_platform_token(token: str) -> Dict[str, Any]:
+    """Decode unsigned ``platform.<base64url(JSON)>`` — local-test use only."""
+    if not token.startswith("platform."):
+        raise AuthError(
+            "auth_unsupported",
+            "Unsigned decoder accepts only platform.<base64url(AuthClaims JSON)>",
+        )
+    if token.startswith("platform.sig."):
+        raise AuthError(
+            "auth_unsupported",
+            "Signed platform.sig.* tokens are not handled by the unsigned decoder",
+        )
+    encoded = token[len("platform.") :]
+    pad = "=" * (-len(encoded) % 4)
+    try:
+        decoded = base64.urlsafe_b64decode(encoded + pad)
+        data = json.loads(decoded.decode("utf-8"))
+    except (ValueError, json.JSONDecodeError) as exc:
+        raise AuthError("auth_malformed", "Malformed platform token") from exc
+    if not isinstance(data, dict):
+        raise AuthError("auth_malformed", "Platform token payload must be an object")
+    return data
+
+
+class LocalUnsignedClaimsVerifier(_AuthClaimsPolicy):
+    """Local-test-only verifier for unsigned ``platform.<base64url(JSON)>`` tokens.
+
+    Must never be the default production Gateway/MCP verifier.
+    """
+
+    local_test_only = True
+
+    def verify(
+        self,
+        authorization: Optional[str],
+        *,
+        request_payload: Optional[Mapping[str, Any]] = None,
+        request_headers: Optional[Mapping[str, Any]] = None,
+        required_operation: Optional[str] = None,
+        now: Optional[Any] = None,
+        credential_status: str = "active",
+        actor_lifecycle_state: str = "active",
+        binding_state: str = "active",
+    ) -> ActorClaims:
+        if not authorization:
+            raise AuthError("auth_missing", "Authorization required")
+
+        token = authorization.strip()
+        if token.lower().startswith("bearer "):
+            token = token[7:].strip()
+
+        if token.startswith("fake."):
+            raise AuthError(
+                "auth_unsupported",
+                "fake.* claim tokens are not accepted",
+            )
+
+        if token.startswith("{"):
+            try:
+                raw = json.loads(token)
+            except json.JSONDecodeError as exc:
+                raise AuthError("auth_malformed", "Malformed JSON token") from exc
+            if not isinstance(raw, dict):
+                raise AuthError("auth_malformed", "JSON token must be an object")
+        else:
+            raw = decode_unsigned_platform_token(token)
+
+        claims = self.normalize_claims(raw)
+        self.check_lifecycle(
+            claims,
+            required_operation=required_operation,
+            now=now,
+            credential_status=credential_status,
+            actor_lifecycle_state=actor_lifecycle_state,
+            binding_state=binding_state,
+        )
+        self.reject_spoof(claims, request_payload)
+        self.reject_override_headers(request_headers)
+        return claims
+
+    # Backward-compatible private aliases used by MCP spoof checks.
+    def _reject_spoof(
+        self,
+        claims: ActorClaims,
+        request_payload: Optional[Mapping[str, Any]],
+    ) -> None:
+        self.reject_spoof(claims, request_payload)
+
+
+class PlatformClaimsVerifier(_AuthClaimsPolicy):
+    """Production verifier: Platform-approved cryptographic authenticity required.
+
+    Never decodes unsigned ``platform.<base64url(JSON)>`` tokens. Construction
+    without a ``PlatformTokenAuthenticator`` is a configuration error.
+    """
+
+    local_test_only = False
+
+    def __init__(
+        self,
+        authenticator: Optional[PlatformTokenAuthenticator] = None,
+        *,
+        now_fn: Optional[Callable[[], float]] = None,
+        expected_audience: str = "lskills-api",
+        required_service: str = "lskills",
+        require_internal: Optional[bool] = None,
+        expected_org_id: Optional[str] = None,
+        expected_issuer: Optional[str] = "linkplatform-issuer",
+        allow_missing_authenticator: bool = False,
+    ) -> None:
+        super().__init__(
+            now_fn=now_fn,
+            expected_audience=expected_audience,
+            required_service=required_service,
+            require_internal=require_internal,
+            expected_org_id=expected_org_id,
+            expected_issuer=expected_issuer,
+        )
+        if authenticator is None and not allow_missing_authenticator:
+            raise AuthConfigurationError(
+                "PlatformClaimsVerifier requires an injected Platform-approved "
+                "cryptographic authenticator; unsigned platform.<base64url(JSON)> "
+                "tokens are not accepted outside LINKSKILLS_AUTH_MODE=local-test"
+            )
+        self.authenticator = authenticator
+
+    def verify(
+        self,
+        authorization: Optional[str],
+        *,
+        request_payload: Optional[Mapping[str, Any]] = None,
+        request_headers: Optional[Mapping[str, Any]] = None,
+        required_operation: Optional[str] = None,
+        now: Optional[Any] = None,
+        credential_status: Optional[str] = None,
+        actor_lifecycle_state: Optional[str] = None,
+        binding_state: Optional[str] = None,
+    ) -> ActorClaims:
+        if self.authenticator is None:
+            raise AuthConfigurationError(
+                "PlatformClaimsVerifier has no cryptographic authenticator configured"
+            )
+        if not authorization:
+            raise AuthError("auth_missing", "Authorization required")
+
+        token = authorization.strip()
+        if token.lower().startswith("bearer "):
+            token = token[7:].strip()
+
+        if token.startswith("fake."):
+            raise AuthError(
+                "auth_unsupported",
+                "fake.* claim tokens are not accepted on the production verifier",
+            )
+
+        # Explicitly refuse the unsigned local-test formats.
+        if token.startswith("{") or (
+            token.startswith("platform.") and not token.startswith("platform.sig.")
+        ):
+            raise AuthError(
+                "auth_unsigned_rejected",
+                "Unsigned platform.<base64url(JSON)> / raw JSON bearers are not "
+                "accepted outside local-test mode",
+            )
+
+        authenticated = self.authenticator.authenticate(token)
+        claims = self.normalize_claims(authenticated.claims)
+        self.check_lifecycle(
+            claims,
+            required_operation=required_operation,
+            now=now,
+            credential_status=credential_status or authenticated.credential_status,
+            actor_lifecycle_state=actor_lifecycle_state
+            or authenticated.actor_lifecycle_state,
+            binding_state=binding_state or authenticated.binding_state,
+        )
+        self.reject_spoof(claims, request_payload)
+        self.reject_override_headers(request_headers)
+        return claims
+
+    def _reject_spoof(
+        self,
+        claims: ActorClaims,
+        request_payload: Optional[Mapping[str, Any]],
+    ) -> None:
+        self.reject_spoof(claims, request_payload)
+
+
+def load_platform_authenticator_from_environ(
+    environ: Optional[Mapping[str, str]] = None,
+) -> PlatformTokenAuthenticator:
+    """Load a Platform-approved authenticator from env; fail closed if absent.
+
+    Expected: ``LINKSKILLS_PLATFORM_AUTHENTICATOR=package.module:factory_or_class``
+    The object must be a ``PlatformTokenAuthenticator`` instance or a zero-arg
+    callable returning one. LiNKskills does not ship Platform signing keys.
+    """
+    env = environ if environ is not None else os.environ
+    ref = str(env.get("LINKSKILLS_PLATFORM_AUTHENTICATOR") or "").strip()
+    if not ref:
+        raise AuthConfigurationError(
+            "Production auth requires LINKSKILLS_PLATFORM_AUTHENTICATOR="
+            "module.path:attr (Platform-approved cryptographic verifier). "
+            "Unsigned decoding is disabled outside LINKSKILLS_AUTH_MODE=local-test."
+        )
+    if ":" not in ref:
+        raise AuthConfigurationError(
+            "LINKSKILLS_PLATFORM_AUTHENTICATOR must be 'module.path:attr'"
+        )
+    module_name, attr_name = ref.split(":", 1)
+    try:
+        module = importlib.import_module(module_name)
+        target = getattr(module, attr_name)
+    except Exception as exc:  # noqa: BLE001 — configuration boundary
+        raise AuthConfigurationError(
+            f"Failed to load Platform authenticator {ref!r}: {exc}"
+        ) from exc
+    authenticator = target() if callable(target) and not hasattr(target, "authenticate") else target
+    if not hasattr(authenticator, "authenticate"):
+        raise AuthConfigurationError(
+            f"Authenticator {ref!r} does not provide authenticate()"
+        )
+    return authenticator  # type: ignore[no-any-return]
+
+
+def resolve_claims_verifier(
+    *,
+    verifier: Optional[Any] = None,
+    authenticator: Optional[PlatformTokenAuthenticator] = None,
+    environ: Optional[Mapping[str, str]] = None,
+    allow_local_test: bool = True,
+    **policy_kwargs: Any,
+) -> Any:
+    """Resolve the Gateway/MCP claims verifier fail-closed.
+
+    - Explicit ``verifier`` wins (caller-injected).
+    - ``LINKSKILLS_AUTH_MODE=local-test`` → ``LocalUnsignedClaimsVerifier``
+      (unless ``allow_local_test=False``, e.g. canary).
+    - Otherwise production cryptographic verifier; missing authenticator/config
+      raises ``AuthConfigurationError`` (never falls back to unsigned).
+    """
+    if verifier is not None:
+        return verifier
+
+    mode = resolve_auth_mode(environ)
+    if mode == AUTH_MODE_LOCAL_TEST:
+        if not allow_local_test:
+            raise AuthConfigurationError(
+                "local-test unsigned auth is not permitted in this context"
+            )
+        return LocalUnsignedClaimsVerifier(**policy_kwargs)
+
+    auth = authenticator or load_platform_authenticator_from_environ(environ)
+    return PlatformClaimsVerifier(authenticator=auth, **policy_kwargs)
 
 
 def load_platform_claim_fixture(name: str) -> Dict[str, Any]:
