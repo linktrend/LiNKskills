@@ -1,7 +1,7 @@
 {
-  "note": "Classification ledger updated in wave 8 — shared canonical hashing + mutation-safe idempotency fencing; not a live usable/certified promotion.",
+  "note": "Classification ledger updated in wave 9 — service-state atomicity + external fencing/downstream keys; not a live usable/certified promotion.",
   "as_of": "2026-07-29",
-  "wave": 8,
+  "wave": 9,
   "launch_target_source": "evidence/phase1/canary-set.json",
   "launch_targets_with_canonical_v01_artifacts": [
     "git-safeguard",
@@ -22,18 +22,17 @@
   ],
   "hashing": {
     "shared_module": "packages/core/linkskills_core/hashing.py",
-    "consumers": [
-      "publisher",
-      "validator",
-      "eval_runner.skill_release_hash",
-      "execution-profile stamping"
-    ],
-    "profiles_regenerated_via": "stamp_execution_profile",
+    "status": "verified_wave_8",
     "validator_recalculates_cross_artifact_hashes": true
   },
   "idempotency": {
     "fence_token": true,
     "db_owned_atomic_reserve_mutate_complete": true,
+    "service_mutation_batch_defers_cache_publish": true,
+    "crash_injection_after_mutation": true,
+    "external_side_effect_complete_checks_reservation_fence": true,
+    "downstream_key_stable_not_fence_derived": true,
+    "reclaim_preserves_durable_side_effect_result": true,
     "external_side_effects": "at_least_once_with_intent_result_reconciliation"
   },
   "usable_candidates_after_real_eval": [

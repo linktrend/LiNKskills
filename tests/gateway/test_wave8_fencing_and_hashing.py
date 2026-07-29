@@ -206,8 +206,16 @@ class MutationSafeIdempotencyTests(unittest.TestCase):
         store = InMemoryGatewayStore()
         reserved = store.reserve_idempotency("a", "skills_tool_invoke", "ext-1", "h-ext")
         assert reserved.fence_token is not None
-        downstream = f"a:skills_tool_invoke:ext-1:{reserved.fence_token}"
-        store.record_side_effect_intent(
+        from linkskills_gateway.persistence import stable_downstream_idempotency_key
+
+        downstream = stable_downstream_idempotency_key(
+            actor_id="a",
+            org_id="org",
+            operation="skills_tool_invoke",
+            idempotency_key="ext-1",
+            request_hash="h-ext",
+        )
+        intent = store.record_side_effect_intent(
             "a",
             "skills_tool_invoke",
             "ext-1",
@@ -215,6 +223,7 @@ class MutationSafeIdempotencyTests(unittest.TestCase):
             downstream_key=downstream,
             request_hash="h-ext",
         )
+        self.assertEqual(intent["status"], "intent")
         store.complete_side_effect_intent(
             "a",
             "skills_tool_invoke",
@@ -222,14 +231,13 @@ class MutationSafeIdempotencyTests(unittest.TestCase):
             fence_token=reserved.fence_token,
             result={"tool": "ok"},
         )
-        intent = store.get_side_effect_intent("a", "skills_tool_invoke", "ext-1")
-        assert intent is not None
-        self.assertEqual(intent["status"], "result")
-        self.assertEqual(intent["downstream_key"], downstream)
+        saved = store.get_side_effect_intent("a", "skills_tool_invoke", "ext-1")
+        assert saved is not None
+        self.assertEqual(saved["status"], "result")
+        self.assertEqual(saved["downstream_key"], downstream)
         # Stale fence cannot complete after reclaim.
         key = store._idempotency_key("a", "skills_tool_invoke", "ext-1")
         store._idempotency[key]["lease_expires_at"] = "2000-01-01T00:00:00Z"
-        # Leave status reserved so reclaim works (simulate crash before complete).
         store._idempotency[key]["status"] = "reserved"
         store._idempotency[key]["envelope"] = None
         reclaimed = store.reserve_idempotency("a", "skills_tool_invoke", "ext-1", "h-ext")
@@ -242,6 +250,25 @@ class MutationSafeIdempotencyTests(unittest.TestCase):
                 {"late": True},
                 fence_token=reserved.fence_token,
             )
+        with self.assertRaises(ValueError):
+            store.complete_side_effect_intent(
+                "a",
+                "skills_tool_invoke",
+                "ext-1",
+                fence_token=reserved.fence_token,
+                result={"late": True},
+            )
+        # Reclaim preserves durable result.
+        preserved = store.record_side_effect_intent(
+            "a",
+            "skills_tool_invoke",
+            "ext-1",
+            fence_token=reclaimed.fence_token or "",
+            downstream_key=downstream,
+            request_hash="h-ext",
+        )
+        self.assertEqual(preserved["status"], "result")
+        self.assertEqual(preserved["result"], {"tool": "ok"})
         self.assertIsNotNone(reclaimed.fence_token)
 
 

@@ -133,6 +133,40 @@ def canonical_request_hash(payload: Mapping[str, Any]) -> str:
     return _shared_request_hash(payload)
 
 
+def stable_downstream_idempotency_key(
+    *,
+    actor_id: str,
+    org_id: Optional[str],
+    operation: str,
+    idempotency_key: str,
+    request_hash: str,
+) -> str:
+    """Stable downstream key — independent of renewable fence tokens."""
+    digest = canonical_request_hash(
+        {
+            "actor_id": actor_id,
+            "org_id": org_id or "",
+            "operation": operation,
+            "idempotency_key": idempotency_key,
+            "request_hash": request_hash,
+        }
+    )
+    return f"lskills-downstream:{digest}"
+
+
+def _crash_after_mutation_requested(store: Any) -> bool:
+    """One-shot store flag or env injection after domain mutation, before complete."""
+    flag = getattr(store, "_crash_after_mutation", False)
+    if flag:
+        store._crash_after_mutation = False
+        return True
+    return os.environ.get("LINKSKILLS_IDEMPOTENCY_CRASH_AFTER_MUTATION", "").strip().lower() in {
+        "1",
+        "true",
+        "yes",
+    }
+
+
 @runtime_checkable
 class GatewayStore(Protocol):
     """Durable or in-memory persistence contract for SkillsGatewayService."""
@@ -177,7 +211,7 @@ class GatewayStore(Protocol):
         fence_token: str,
         downstream_key: str,
         request_hash: str,
-    ) -> None:
+    ) -> Dict[str, Any]:
         ...
 
     def complete_side_effect_intent(
@@ -241,6 +275,7 @@ class InMemoryGatewayStore:
         self._traces: List[Dict[str, Any]] = []
         self._events: List[Dict[str, Any]] = []
         self._side_effects: Dict[str, Dict[str, Any]] = {}
+        self._crash_after_mutation = False
 
     @staticmethod
     def _idempotency_key(actor_id: str, operation: str, key: str) -> str:
@@ -328,6 +363,10 @@ class InMemoryGatewayStore:
             events_len = len(self._events)
             try:
                 envelope = dict(mutator())
+                if _crash_after_mutation_requested(self):
+                    raise RuntimeError(
+                        "injected crash after mutation before idempotency complete"
+                    )
                 self.complete_idempotency(
                     actor_id,
                     operation,
@@ -354,19 +393,34 @@ class InMemoryGatewayStore:
         fence_token: str,
         downstream_key: str,
         request_hash: str,
-    ) -> None:
+    ) -> Dict[str, Any]:
         with self._lock:
             cache_key = self._idempotency_key(actor_id, operation, key)
             row = self._idempotency.get(cache_key)
             if row is None or str(row.get("fence_token") or "") != fence_token:
                 raise ValueError("idempotency fence rejected for side-effect intent")
-            self._side_effects[cache_key] = {
+            if str(row.get("status") or "") != "reserved":
+                raise ValueError("idempotency fence rejected: reservation not active")
+            existing = self._side_effects.get(cache_key)
+            if (
+                existing
+                and existing.get("status") == "result"
+                and existing.get("result") is not None
+            ):
+                # Preserve durable result across reclaim; refresh ownership metadata only.
+                existing["fence_token"] = fence_token
+                existing["downstream_key"] = downstream_key
+                existing["request_hash"] = request_hash
+                return dict(existing)
+            record = {
                 "status": "intent",
                 "fence_token": fence_token,
                 "downstream_key": downstream_key,
                 "request_hash": request_hash,
                 "result": None,
             }
+            self._side_effects[cache_key] = record
+            return dict(record)
 
     def complete_side_effect_intent(
         self,
@@ -379,11 +433,25 @@ class InMemoryGatewayStore:
     ) -> None:
         with self._lock:
             cache_key = self._idempotency_key(actor_id, operation, key)
+            reservation = self._idempotency.get(cache_key)
+            if reservation is None:
+                raise ValueError("idempotency fence rejected: no reservation")
+            if str(reservation.get("status") or "") != "reserved":
+                raise ValueError("idempotency fence rejected: reservation not active")
+            if str(reservation.get("fence_token") or "") != str(fence_token):
+                raise ValueError(
+                    "idempotency fence rejected: stale or displaced worker (reservation)"
+                )
             intent = self._side_effects.get(cache_key)
-            if intent is None or str(intent.get("fence_token") or "") != fence_token:
-                raise ValueError("idempotency fence rejected for side-effect result")
+            if intent is None:
+                raise ValueError("idempotency fence rejected: missing side-effect intent")
+            if str(intent.get("request_hash") or "") != str(
+                reservation.get("request_hash") or ""
+            ):
+                raise ValueError("idempotency fence rejected: intent request_hash mismatch")
             intent["status"] = "result"
             intent["result"] = dict(result)
+            intent["fence_token"] = fence_token
 
     def get_side_effect_intent(
         self,
@@ -464,6 +532,7 @@ class SqliteGatewayStore:
         self._conn.row_factory = sqlite3.Row
         # >0 while inside run_atomic_idempotent so nested writers defer commit.
         self._atomic_depth = 0
+        self._crash_after_mutation = False
         self._ensure_schema()
 
     def close(self) -> None:
@@ -739,6 +808,10 @@ class SqliteGatewayStore:
                         (lease, request_hash, fence, generation, actor_id, operation, key),
                     )
                 envelope = dict(mutator())
+                if _crash_after_mutation_requested(self):
+                    raise RuntimeError(
+                        "injected crash after mutation before idempotency complete"
+                    )
                 payload = json.dumps(envelope, sort_keys=True)
                 cur = self._conn.execute(
                     """
@@ -772,34 +845,87 @@ class SqliteGatewayStore:
         fence_token: str,
         downstream_key: str,
         request_hash: str,
-    ) -> None:
+    ) -> Dict[str, Any]:
         with self._lock:
-            row = self._conn.execute(
-                """
-                select fence_token from idempotency
-                where actor_id = ? and operation = ? and idempotency_key = ?
-                """,
-                (actor_id, operation, key),
-            ).fetchone()
-            if row is None or str(row["fence_token"] or "") != fence_token:
-                raise ValueError("idempotency fence rejected for side-effect intent")
-            self._conn.execute(
-                """
-                insert into side_effect_intents (
-                  actor_id, operation, idempotency_key, fence_token, request_hash,
-                  downstream_key, status, result_json
-                ) values (?, ?, ?, ?, ?, ?, 'intent', null)
-                on conflict(actor_id, operation, idempotency_key) do update set
-                  fence_token = excluded.fence_token,
-                  request_hash = excluded.request_hash,
-                  downstream_key = excluded.downstream_key,
-                  status = 'intent',
-                  result_json = null,
-                  updated_at = strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
-                """,
-                (actor_id, operation, key, fence_token, request_hash, downstream_key),
-            )
-            self._conn.commit()
+            self._conn.execute("begin immediate")
+            try:
+                row = self._conn.execute(
+                    """
+                    select fence_token, status, request_hash from idempotency
+                    where actor_id = ? and operation = ? and idempotency_key = ?
+                    """,
+                    (actor_id, operation, key),
+                ).fetchone()
+                if (
+                    row is None
+                    or str(row["fence_token"] or "") != fence_token
+                    or str(row["status"] or "") != "reserved"
+                ):
+                    self._conn.rollback()
+                    raise ValueError("idempotency fence rejected for side-effect intent")
+                existing = self._conn.execute(
+                    """
+                    select status, fence_token, request_hash, downstream_key, result_json
+                    from side_effect_intents
+                    where actor_id = ? and operation = ? and idempotency_key = ?
+                    """,
+                    (actor_id, operation, key),
+                ).fetchone()
+                if (
+                    existing is not None
+                    and str(existing["status"] or "") == "result"
+                    and existing["result_json"]
+                ):
+                    # Preserve durable result; refresh fence ownership metadata only.
+                    self._conn.execute(
+                        """
+                        update side_effect_intents
+                        set fence_token = ?,
+                            request_hash = ?,
+                            downstream_key = ?,
+                            updated_at = strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
+                        where actor_id = ? and operation = ? and idempotency_key = ?
+                        """,
+                        (fence_token, request_hash, downstream_key, actor_id, operation, key),
+                    )
+                    self._conn.commit()
+                    return {
+                        "status": "result",
+                        "fence_token": fence_token,
+                        "request_hash": request_hash,
+                        "downstream_key": downstream_key,
+                        "result": json.loads(existing["result_json"]),
+                    }
+                self._conn.execute(
+                    """
+                    insert into side_effect_intents (
+                      actor_id, operation, idempotency_key, fence_token, request_hash,
+                      downstream_key, status, result_json
+                    ) values (?, ?, ?, ?, ?, ?, 'intent', null)
+                    on conflict(actor_id, operation, idempotency_key) do update set
+                      fence_token = excluded.fence_token,
+                      request_hash = excluded.request_hash,
+                      downstream_key = excluded.downstream_key,
+                      status = 'intent',
+                      result_json = null,
+                      updated_at = strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
+                    """,
+                    (actor_id, operation, key, fence_token, request_hash, downstream_key),
+                )
+                self._conn.commit()
+                return {
+                    "status": "intent",
+                    "fence_token": fence_token,
+                    "request_hash": request_hash,
+                    "downstream_key": downstream_key,
+                    "result": None,
+                }
+            except Exception:
+                try:
+                    self._conn.rollback()
+                except sqlite3.Error:
+                    pass
+                raise
 
     def complete_side_effect_intent(
         self,
@@ -812,20 +938,60 @@ class SqliteGatewayStore:
     ) -> None:
         payload = json.dumps(dict(result), sort_keys=True)
         with self._lock:
-            cur = self._conn.execute(
-                """
-                update side_effect_intents
-                set status = 'result',
-                    result_json = ?,
-                    updated_at = strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
-                where actor_id = ? and operation = ? and idempotency_key = ?
-                  and fence_token = ?
-                """,
-                (payload, actor_id, operation, key, fence_token),
-            )
-            if cur.rowcount == 0:
-                raise ValueError("idempotency fence rejected for side-effect result")
-            self._conn.commit()
+            self._conn.execute("begin immediate")
+            try:
+                reservation = self._conn.execute(
+                    """
+                    select fence_token, status, request_hash from idempotency
+                    where actor_id = ? and operation = ? and idempotency_key = ?
+                    """,
+                    (actor_id, operation, key),
+                ).fetchone()
+                if (
+                    reservation is None
+                    or str(reservation["status"] or "") != "reserved"
+                    or str(reservation["fence_token"] or "") != fence_token
+                ):
+                    self._conn.rollback()
+                    raise ValueError(
+                        "idempotency fence rejected: stale or displaced worker (reservation)"
+                    )
+                intent = self._conn.execute(
+                    """
+                    select request_hash from side_effect_intents
+                    where actor_id = ? and operation = ? and idempotency_key = ?
+                    """,
+                    (actor_id, operation, key),
+                ).fetchone()
+                if intent is None:
+                    self._conn.rollback()
+                    raise ValueError("idempotency fence rejected: missing side-effect intent")
+                if str(intent["request_hash"] or "") != str(reservation["request_hash"] or ""):
+                    self._conn.rollback()
+                    raise ValueError(
+                        "idempotency fence rejected: intent request_hash mismatch"
+                    )
+                cur = self._conn.execute(
+                    """
+                    update side_effect_intents
+                    set status = 'result',
+                        result_json = ?,
+                        fence_token = ?,
+                        updated_at = strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
+                    where actor_id = ? and operation = ? and idempotency_key = ?
+                    """,
+                    (payload, fence_token, actor_id, operation, key),
+                )
+                if cur.rowcount != 1:
+                    self._conn.rollback()
+                    raise ValueError("idempotency fence rejected for side-effect result")
+                self._conn.commit()
+            except Exception:
+                try:
+                    self._conn.rollback()
+                except sqlite3.Error:
+                    pass
+                raise
 
     def get_side_effect_intent(
         self,

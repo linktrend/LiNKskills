@@ -56,6 +56,7 @@ def invoke_tool(
     timeout_seconds: Optional[float] = None,
     input_text: Optional[str] = None,
     adapter: str = "local",
+    downstream_idempotency_key: Optional[str] = None,
 ) -> ToolInvocationResult:
     """Resolve a tool exactly, then invoke via the selected adapter."""
     resolved = resolve_tool(
@@ -65,6 +66,12 @@ def invoke_tool(
         bundle_hash=bundle_hash,
         source_hash=source_hash,
     )
+
+    merged_env = dict(env or {})
+    if downstream_idempotency_key:
+        merged_env["LINKSKILLS_DOWNSTREAM_IDEMPOTENCY_KEY"] = str(
+            downstream_idempotency_key
+        )
 
     if adapter in {"server", "remote"}:
         disabled = ServerAdapter()
@@ -79,7 +86,10 @@ def invoke_tool(
             adapter_kind=disabled.kind,
             error=ServerAdapter.DISABLED_REASON,
             resolved=resolved,
-            metadata={"enabled": False},
+            metadata={
+                "enabled": False,
+                "downstream_idempotency_key": downstream_idempotency_key,
+            },
         )
 
     if adapter in {"local", "local_process"}:
@@ -88,7 +98,7 @@ def invoke_tool(
             resolved,
             argv=argv,
             cwd=cwd,
-            env=env,
+            env=merged_env or None,
             timeout_seconds=timeout_seconds,
             input_text=input_text,
         )
@@ -105,7 +115,14 @@ def invoke_tool(
             adapter_kind=adapter,
             error=f"unknown adapter: {adapter!r}",
             resolved=resolved,
+            metadata={"downstream_idempotency_key": downstream_idempotency_key},
         )
+
+    metadata = dict(result.metadata)
+    if downstream_idempotency_key:
+        metadata["downstream_idempotency_key"] = downstream_idempotency_key
+        # Propagation only — local process adapters do not prove exactly-once.
+        metadata.setdefault("downstream_idempotency_exactly_once", False)
 
     return ToolInvocationResult(
         ok=result.ok,
@@ -119,5 +136,5 @@ def invoke_tool(
         timed_out=result.timed_out,
         error=result.error,
         resolved=resolved,
-        metadata=dict(result.metadata),
+        metadata=metadata,
     )

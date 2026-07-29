@@ -7,6 +7,7 @@ logic is duplicated in MCP or HTTP layers — both call this service.
 
 from __future__ import annotations
 
+import copy
 import hashlib
 import json
 import re
@@ -24,6 +25,7 @@ from .persistence import (
     canonical_request_hash,
     open_gateway_store,
     resolve_state_dir,
+    stable_downstream_idempotency_key,
 )
 
 try:
@@ -86,6 +88,16 @@ DB_OWNED_WRITE_OPERATIONS = frozenset(
 
 # External side effects — fence + durable intent/result; at-least-once with downstream key.
 EXTERNAL_SIDE_EFFECT_OPERATIONS = frozenset({"skills_tool_invoke"})
+
+
+@dataclass
+class _MutationBatch:
+    """Deferred service-visible publishes until durable transaction commits."""
+
+    runs: Dict[str, "SkillRun"] = field(default_factory=dict)
+    feedback: List[Dict[str, Any]] = field(default_factory=list)
+    traces: List[Dict[str, Any]] = field(default_factory=list)
+    events: List[Dict[str, Any]] = field(default_factory=list)
 
 
 def _utc_now() -> str:
@@ -192,6 +204,7 @@ class SkillsGatewayService:
         self._feedback: List[Dict[str, Any]] = []
         self._trace_candidates: List[Dict[str, Any]] = []
         self._events: List[Dict[str, Any]] = []
+        self._mutation_batch: Optional[_MutationBatch] = None
         self._ready = True
         self._load_catalog(catalog_index)
 
@@ -475,35 +488,48 @@ class SkillsGatewayService:
                         run_id=result.get("run_id"),
                     )
 
-                reserved = self._store.run_atomic_idempotent(
-                    actor.actor_id,
-                    operation,
-                    idempotency_key,
-                    request_hash,
-                    mutator,
-                )
-                if reserved.outcome == "conflict":
-                    raise ServiceError(
-                        "idempotency_conflict",
-                        "idempotency key already bound to a different request payload",
-                        http_status=409,
+                self._begin_mutation_batch()
+                try:
+                    reserved = self._store.run_atomic_idempotent(
+                        actor.actor_id,
+                        operation,
+                        idempotency_key,
+                        request_hash,
+                        mutator,
                     )
-                if reserved.outcome == "in_progress":
-                    raise ServiceError(
-                        "idempotency_in_progress",
-                        "idempotency key is reserved by an in-flight request; retry later",
-                        http_status=409,
-                    )
-                assert reserved.envelope is not None
-                env = dict(reserved.envelope)
-                env["request_id"] = request_id
-                env["server_time"] = _utc_now()
-                # Prior completion has no fence; fresh atomic completion includes one.
-                if reserved.fence_token is None:
-                    env["warnings"] = list(env.get("warnings") or []) + [
-                        "idempotent_replay"
-                    ]
-                return env
+                    if reserved.outcome == "conflict":
+                        self._abort_mutation_batch()
+                        raise ServiceError(
+                            "idempotency_conflict",
+                            "idempotency key already bound to a different request payload",
+                            http_status=409,
+                        )
+                    if reserved.outcome == "in_progress":
+                        self._abort_mutation_batch()
+                        raise ServiceError(
+                            "idempotency_in_progress",
+                            "idempotency key is reserved by an in-flight request; retry later",
+                            http_status=409,
+                        )
+                    assert reserved.envelope is not None
+                    # Fresh atomic completion carries a fence; publish deferred caches.
+                    if reserved.fence_token is not None:
+                        self._commit_mutation_batch()
+                    else:
+                        self._abort_mutation_batch()
+                    env = dict(reserved.envelope)
+                    env["request_id"] = request_id
+                    env["server_time"] = _utc_now()
+                    if reserved.fence_token is None:
+                        env["warnings"] = list(env.get("warnings") or []) + [
+                            "idempotent_replay"
+                        ]
+                    return env
+                except ServiceError:
+                    raise
+                except Exception:
+                    self._abort_mutation_batch()
+                    raise
 
             # External side-effect path: fence + durable intent/result reconciliation.
             reserved = self._store.reserve_idempotency(
@@ -531,23 +557,39 @@ class SkillsGatewayService:
                 return replay
             assert reserved.fence_token is not None
             fence_token = reserved.fence_token
-            downstream_key = f"{actor.actor_id}:{operation}:{idempotency_key}:{fence_token}"
-            prior = self._store.get_side_effect_intent(
-                actor.actor_id, operation, idempotency_key
+            downstream_key = stable_downstream_idempotency_key(
+                actor_id=actor.actor_id,
+                org_id=actor.org_id,
+                operation=operation,
+                idempotency_key=idempotency_key,
+                request_hash=request_hash,
             )
-            if (
-                prior
-                and prior.get("status") == "result"
-                and prior.get("result") is not None
-                and str(prior.get("fence_token") or "") == fence_token
-            ):
+            try:
+                intent = self._store.record_side_effect_intent(
+                    actor.actor_id,
+                    operation,
+                    idempotency_key,
+                    fence_token=fence_token,
+                    downstream_key=downstream_key,
+                    request_hash=request_hash,
+                )
+            except ValueError as exc:
+                raise ServiceError(
+                    "idempotency_fence_rejected",
+                    str(exc),
+                    http_status=409,
+                ) from exc
+            if intent.get("status") == "result" and intent.get("result") is not None:
                 env = self.envelope(
                     actor=actor,
                     operation=operation,
                     request_id=request_id,
                     idempotency_id=idempotency_key,
-                    data=prior["result"],
-                    warnings=["side_effect_reconciled"],
+                    data=intent["result"],
+                    warnings=[
+                        "side_effect_reconciled",
+                        "external_side_effect_at_least_once",
+                    ],
                 )
                 try:
                     self._store.complete_idempotency(
@@ -565,14 +607,6 @@ class SkillsGatewayService:
                         http_status=409,
                     ) from exc
                 return env
-            self._store.record_side_effect_intent(
-                actor.actor_id,
-                operation,
-                idempotency_key,
-                fence_token=fence_token,
-                downstream_key=downstream_key,
-                request_hash=request_hash,
-            )
             handler = getattr(self, f"op_{operation}")
             try:
                 result = handler(
@@ -644,8 +678,16 @@ class SkillsGatewayService:
         return skill
 
     def _get_run(self, run_id: str, actor: ActorClaims) -> SkillRun:
-        if run_id in self._runs:
-            run = self._runs[run_id]
+        if self._mutation_batch is not None and run_id in self._mutation_batch.runs:
+            run = self._mutation_batch.runs[run_id]
+        elif run_id in self._runs:
+            cached = self._runs[run_id]
+            if self._mutation_batch is not None:
+                # Copy-on-write so rollbacks cannot leave published cache dirty.
+                run = copy.deepcopy(cached)
+                self._mutation_batch.runs[run_id] = run
+            else:
+                run = cached
         else:
             stored = self._store.get_run(run_id)
             if stored is None:
@@ -666,7 +708,10 @@ class SkillsGatewayService:
                 outcome=stored.get("outcome"),
                 idempotency_key=stored.get("idempotency_key"),
             )
-            self._runs[run_id] = run
+            if self._mutation_batch is not None:
+                self._mutation_batch.runs[run_id] = run
+            else:
+                self._runs[run_id] = run
         if run.actor_id != actor.actor_id or (run.org_id or "") != (actor.org_id or ""):
             raise ServiceError(
                 "auth_forbidden",
@@ -687,9 +732,54 @@ class SkillsGatewayService:
                 raise ServiceError(exc.code, exc.message, http_status=400) from exc
             raise
 
+    def _begin_mutation_batch(self) -> None:
+        self._mutation_batch = _MutationBatch()
+
+    def _abort_mutation_batch(self) -> None:
+        self._mutation_batch = None
+
+    def _commit_mutation_batch(self) -> None:
+        batch = self._mutation_batch
+        self._mutation_batch = None
+        if batch is None:
+            return
+        for run_id, run in batch.runs.items():
+            self._runs[run_id] = run
+        self._feedback.extend(batch.feedback)
+        self._trace_candidates.extend(batch.traces)
+        self._events.extend(batch.events)
+
     def _persist_run(self, run: SkillRun) -> None:
-        self._runs[run.run_id] = run
+        """Persist run to store first; publish to service cache only when not batched."""
         self._store.save_run(run)
+        if self._mutation_batch is not None:
+            self._mutation_batch.runs[run.run_id] = run
+        else:
+            self._runs[run.run_id] = run
+
+    def _record_local_event(self, event: Mapping[str, Any]) -> None:
+        payload = dict(event)
+        self._store.append_event(payload)
+        if self._mutation_batch is not None:
+            self._mutation_batch.events.append(payload)
+        else:
+            self._events.append(payload)
+
+    def _record_feedback(self, record: Mapping[str, Any]) -> None:
+        payload = dict(record)
+        self._store.append_feedback(payload)
+        if self._mutation_batch is not None:
+            self._mutation_batch.feedback.append(payload)
+        else:
+            self._feedback.append(payload)
+
+    def _record_trace(self, record: Mapping[str, Any]) -> None:
+        payload = dict(record)
+        self._store.append_trace(payload)
+        if self._mutation_batch is not None:
+            self._mutation_batch.traces.append(payload)
+        else:
+            self._trace_candidates.append(payload)
 
     def _assert_skill_runnable(
         self,
@@ -953,7 +1043,7 @@ class SkillsGatewayService:
                 "full_pack": 6,
             }.get(fragment_id, 1)
         )
-        self._events.append(
+        self._record_local_event(
             {
                 "type": "fragment_disclosure",
                 "skill_id": skill.skill_id,
@@ -1030,9 +1120,8 @@ class SkillsGatewayService:
             events=[{"type": "run_started", "at": now}],
             idempotency_key=idempotency_key,
         )
-        self._runs[run_id] = run
         self._persist_run(run)
-        self._store.append_event(
+        self._record_local_event(
             {
                 "type": "run_started",
                 "run_id": run_id,
@@ -1236,12 +1325,16 @@ class SkillsGatewayService:
                     "source_hash": resolved.descriptor.source_hash,
                     "bundle_hash": resolved.bundle_hash,
                     "dry_run": True,
+                    "downstream_idempotency_key": params.get("downstream_idempotency_key"),
                     "output": {
                         "resolved": True,
                         "argv": argv,
                         "input": input_payload,
                         "invoked_by": actor.actor_id,
                         "mode": "dry_run",
+                        "downstream_idempotency_key": params.get(
+                            "downstream_idempotency_key"
+                        ),
                     },
                     "side_effects": "none",
                 }
@@ -1275,6 +1368,11 @@ class SkillsGatewayService:
                     cwd=tool_dir,
                     input_text=stdin,
                     adapter=str(params.get("adapter") or "local"),
+                    downstream_idempotency_key=(
+                        str(params["downstream_idempotency_key"])
+                        if params.get("downstream_idempotency_key") is not None
+                        else None
+                    ),
                 )
                 if not invocation.ok:
                     raise ServiceError(
@@ -1300,6 +1398,7 @@ class SkillsGatewayService:
                     ),
                     "bundle_hash": invocation.bundle_hash,
                     "dry_run": False,
+                    "downstream_idempotency_key": params.get("downstream_idempotency_key"),
                     "output": {
                         "exit_code": invocation.exit_code,
                         "stdout": invocation.stdout,
@@ -1307,6 +1406,14 @@ class SkillsGatewayService:
                         "adapter_kind": invocation.adapter_kind,
                         "invoked_by": actor.actor_id,
                         "mode": "live_adapter",
+                        "downstream_idempotency_key": params.get(
+                            "downstream_idempotency_key"
+                        ),
+                        "downstream_idempotency_honored": bool(
+                            (invocation.metadata or {}).get(
+                                "downstream_idempotency_key"
+                            )
+                        ),
                     },
                     "side_effects": load_tool_descriptor(tool_dir).side_effect_class,
                 }
@@ -1314,12 +1421,13 @@ class SkillsGatewayService:
         except ResolutionError as exc:
             raise ServiceError("tool_resolve_failed", str(exc), http_status=409) from exc
 
-        self._events.append(
+        self._record_local_event(
             {
                 "type": "tool_invocation",
                 "tool_id": tool_id,
                 "actor_id": actor.actor_id,
                 "dry_run": dry_run,
+                "downstream_idempotency_key": params.get("downstream_idempotency_key"),
                 "at": _utc_now(),
             }
         )
@@ -1411,8 +1519,7 @@ class SkillsGatewayService:
             "notes": clean.get("notes"),
             "at": _utc_now(),
         }
-        self._feedback.append(record)
-        self._store.append_feedback(record)
+        self._record_feedback(record)
         run.feedback.append(record)
         self._persist_run(run)
         return {
@@ -1478,6 +1585,5 @@ class SkillsGatewayService:
             "at": _utc_now(),
             "deduplicated": False,
         }
-        self._trace_candidates.append(record)
-        self._store.append_trace(record)
+        self._record_trace(record)
         return {"data": record, "recommended_next": "enqueue_review"}
