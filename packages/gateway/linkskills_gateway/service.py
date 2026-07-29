@@ -8,6 +8,7 @@ logic is duplicated in MCP or HTTP layers — both call this service.
 from __future__ import annotations
 
 import copy
+import contextvars
 import hashlib
 import json
 import re
@@ -98,6 +99,13 @@ class _MutationBatch:
     feedback: List[Dict[str, Any]] = field(default_factory=list)
     traces: List[Dict[str, Any]] = field(default_factory=list)
     events: List[Dict[str, Any]] = field(default_factory=list)
+
+
+# Request/task-local — never a shared service-instance field.
+_mutation_batch_var: contextvars.ContextVar[Optional[_MutationBatch]] = contextvars.ContextVar(
+    "linkskills_gateway_mutation_batch",
+    default=None,
+)
 
 
 def _utc_now() -> str:
@@ -204,7 +212,6 @@ class SkillsGatewayService:
         self._feedback: List[Dict[str, Any]] = []
         self._trace_candidates: List[Dict[str, Any]] = []
         self._events: List[Dict[str, Any]] = []
-        self._mutation_batch: Optional[_MutationBatch] = None
         self._ready = True
         self._load_catalog(catalog_index)
 
@@ -488,7 +495,8 @@ class SkillsGatewayService:
                         run_id=result.get("run_id"),
                     )
 
-                self._begin_mutation_batch()
+                batch_token = self._begin_mutation_batch()
+                publish_batch = False
                 try:
                     reserved = self._store.run_atomic_idempotent(
                         actor.actor_id,
@@ -498,14 +506,12 @@ class SkillsGatewayService:
                         mutator,
                     )
                     if reserved.outcome == "conflict":
-                        self._abort_mutation_batch()
                         raise ServiceError(
                             "idempotency_conflict",
                             "idempotency key already bound to a different request payload",
                             http_status=409,
                         )
                     if reserved.outcome == "in_progress":
-                        self._abort_mutation_batch()
                         raise ServiceError(
                             "idempotency_in_progress",
                             "idempotency key is reserved by an in-flight request; retry later",
@@ -514,9 +520,7 @@ class SkillsGatewayService:
                     assert reserved.envelope is not None
                     # Fresh atomic completion carries a fence; publish deferred caches.
                     if reserved.fence_token is not None:
-                        self._commit_mutation_batch()
-                    else:
-                        self._abort_mutation_batch()
+                        publish_batch = True
                     env = dict(reserved.envelope)
                     env["request_id"] = request_id
                     env["server_time"] = _utc_now()
@@ -525,11 +529,8 @@ class SkillsGatewayService:
                             "idempotent_replay"
                         ]
                     return env
-                except ServiceError:
-                    raise
-                except Exception:
-                    self._abort_mutation_batch()
-                    raise
+                finally:
+                    self._end_mutation_batch(batch_token, publish=publish_batch)
 
             # External side-effect path: fence + durable intent/result reconciliation.
             reserved = self._store.reserve_idempotency(
@@ -614,14 +615,27 @@ class SkillsGatewayService:
                     params={**params, "downstream_idempotency_key": downstream_key},
                     idempotency_key=idempotency_key,
                 )
+                warnings = list(result.get("warnings") or [])
+                data = dict(result.get("data") or {})
+                output = dict(data.get("output") or {})
+                downstream_ack = (
+                    data.get("downstream_idempotency_honored") is True
+                    or data.get("downstream_idempotency_exactly_once") is True
+                    or output.get("downstream_idempotency_honored") is True
+                    or output.get("downstream_idempotency_exactly_once") is True
+                )
+                if (
+                    not downstream_ack
+                    and "external_side_effect_at_least_once" not in warnings
+                ):
+                    warnings.append("external_side_effect_at_least_once")
                 env = self.envelope(
                     actor=actor,
                     operation=operation,
                     request_id=request_id,
                     idempotency_id=idempotency_key,
-                    data=result.get("data"),
-                    warnings=list(result.get("warnings") or [])
-                    + ["external_side_effect_at_least_once"],
+                    data=data,
+                    warnings=warnings,
                     recommended_next=result.get("recommended_next"),
                     release_hash=result.get("release_hash"),
                     profile_hash=result.get("profile_hash"),
@@ -632,7 +646,7 @@ class SkillsGatewayService:
                     operation,
                     idempotency_key,
                     fence_token=fence_token,
-                    result=dict(result.get("data") or {}),
+                    result=data,
                 )
                 self._store.complete_idempotency(
                     actor.actor_id,
@@ -678,14 +692,15 @@ class SkillsGatewayService:
         return skill
 
     def _get_run(self, run_id: str, actor: ActorClaims) -> SkillRun:
-        if self._mutation_batch is not None and run_id in self._mutation_batch.runs:
-            run = self._mutation_batch.runs[run_id]
+        batch = _mutation_batch_var.get()
+        if batch is not None and run_id in batch.runs:
+            run = batch.runs[run_id]
         elif run_id in self._runs:
             cached = self._runs[run_id]
-            if self._mutation_batch is not None:
+            if batch is not None:
                 # Copy-on-write so rollbacks cannot leave published cache dirty.
                 run = copy.deepcopy(cached)
-                self._mutation_batch.runs[run_id] = run
+                batch.runs[run_id] = run
             else:
                 run = cached
         else:
@@ -708,8 +723,8 @@ class SkillsGatewayService:
                 outcome=stored.get("outcome"),
                 idempotency_key=stored.get("idempotency_key"),
             )
-            if self._mutation_batch is not None:
-                self._mutation_batch.runs[run_id] = run
+            if batch is not None:
+                batch.runs[run_id] = run
             else:
                 self._runs[run_id] = run
         if run.actor_id != actor.actor_id or (run.org_id or "") != (actor.org_id or ""):
@@ -732,16 +747,15 @@ class SkillsGatewayService:
                 raise ServiceError(exc.code, exc.message, http_status=400) from exc
             raise
 
-    def _begin_mutation_batch(self) -> None:
-        self._mutation_batch = _MutationBatch()
+    def _begin_mutation_batch(self) -> contextvars.Token:
+        """Bind a request-local mutation batch; caller must restore via token."""
+        return _mutation_batch_var.set(_MutationBatch())
 
-    def _abort_mutation_batch(self) -> None:
-        self._mutation_batch = None
-
-    def _commit_mutation_batch(self) -> None:
-        batch = self._mutation_batch
-        self._mutation_batch = None
-        if batch is None:
+    def _end_mutation_batch(self, token: contextvars.Token, *, publish: bool) -> None:
+        """Restore prior context; optionally publish only this request's pending mutations."""
+        batch = _mutation_batch_var.get()
+        _mutation_batch_var.reset(token)
+        if not publish or batch is None:
             return
         for run_id, run in batch.runs.items():
             self._runs[run_id] = run
@@ -752,32 +766,36 @@ class SkillsGatewayService:
     def _persist_run(self, run: SkillRun) -> None:
         """Persist run to store first; publish to service cache only when not batched."""
         self._store.save_run(run)
-        if self._mutation_batch is not None:
-            self._mutation_batch.runs[run.run_id] = run
+        batch = _mutation_batch_var.get()
+        if batch is not None:
+            batch.runs[run.run_id] = run
         else:
             self._runs[run.run_id] = run
 
     def _record_local_event(self, event: Mapping[str, Any]) -> None:
         payload = dict(event)
         self._store.append_event(payload)
-        if self._mutation_batch is not None:
-            self._mutation_batch.events.append(payload)
+        batch = _mutation_batch_var.get()
+        if batch is not None:
+            batch.events.append(payload)
         else:
             self._events.append(payload)
 
     def _record_feedback(self, record: Mapping[str, Any]) -> None:
         payload = dict(record)
         self._store.append_feedback(payload)
-        if self._mutation_batch is not None:
-            self._mutation_batch.feedback.append(payload)
+        batch = _mutation_batch_var.get()
+        if batch is not None:
+            batch.feedback.append(payload)
         else:
             self._feedback.append(payload)
 
     def _record_trace(self, record: Mapping[str, Any]) -> None:
         payload = dict(record)
         self._store.append_trace(payload)
-        if self._mutation_batch is not None:
-            self._mutation_batch.traces.append(payload)
+        batch = _mutation_batch_var.get()
+        if batch is not None:
+            batch.traces.append(payload)
         else:
             self._trace_candidates.append(payload)
 
@@ -1326,6 +1344,9 @@ class SkillsGatewayService:
                     "bundle_hash": resolved.bundle_hash,
                     "dry_run": True,
                     "downstream_idempotency_key": params.get("downstream_idempotency_key"),
+                    "downstream_idempotency_propagated": bool(
+                        params.get("downstream_idempotency_key")
+                    ),
                     "output": {
                         "resolved": True,
                         "argv": argv,
@@ -1334,6 +1355,9 @@ class SkillsGatewayService:
                         "mode": "dry_run",
                         "downstream_idempotency_key": params.get(
                             "downstream_idempotency_key"
+                        ),
+                        "downstream_idempotency_propagated": bool(
+                            params.get("downstream_idempotency_key")
                         ),
                     },
                     "side_effects": "none",
@@ -1380,6 +1404,13 @@ class SkillsGatewayService:
                         invocation.error or "packaged tool invocation failed",
                         http_status=502,
                     )
+                meta = dict(invocation.metadata or {})
+                # Honored/exactly-once only when the adapter returns an explicit True.
+                honored = meta.get("downstream_idempotency_honored") is True
+                exactly_once = meta.get("downstream_idempotency_exactly_once") is True
+                propagated = bool(params.get("downstream_idempotency_key")) or (
+                    meta.get("downstream_idempotency_propagated") is True
+                )
                 result = {
                     "tool_id": invocation.tool_id,
                     "version": invocation.version,
@@ -1399,6 +1430,8 @@ class SkillsGatewayService:
                     "bundle_hash": invocation.bundle_hash,
                     "dry_run": False,
                     "downstream_idempotency_key": params.get("downstream_idempotency_key"),
+                    "downstream_idempotency_propagated": propagated,
+                    "downstream_idempotency_honored": honored,
                     "output": {
                         "exit_code": invocation.exit_code,
                         "stdout": invocation.stdout,
@@ -1409,15 +1442,16 @@ class SkillsGatewayService:
                         "downstream_idempotency_key": params.get(
                             "downstream_idempotency_key"
                         ),
-                        "downstream_idempotency_honored": bool(
-                            (invocation.metadata or {}).get(
-                                "downstream_idempotency_key"
-                            )
-                        ),
+                        "downstream_idempotency_propagated": propagated,
+                        "downstream_idempotency_honored": honored,
+                        "downstream_idempotency_exactly_once": exactly_once,
                     },
                     "side_effects": load_tool_descriptor(tool_dir).side_effect_class,
                 }
                 warnings = []
+                if not (honored or exactly_once):
+                    # Local adapters propagate keys but do not prove exactly-once.
+                    warnings.append("external_side_effect_at_least_once")
         except ResolutionError as exc:
             raise ServiceError("tool_resolve_failed", str(exc), http_status=409) from exc
 

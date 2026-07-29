@@ -154,8 +154,12 @@ def stable_downstream_idempotency_key(
     return f"lskills-downstream:{digest}"
 
 
-def _crash_after_mutation_requested(store: Any) -> bool:
-    """One-shot store flag or env injection after domain mutation, before complete."""
+def _crash_after_mutation_requested(store: Any, *, key: Optional[str] = None) -> bool:
+    """One-shot store flag, per-key set, or env injection after mutation before complete."""
+    keys = getattr(store, "_crash_after_mutation_keys", None)
+    if isinstance(keys, set) and key is not None and key in keys:
+        keys.discard(key)
+        return True
     flag = getattr(store, "_crash_after_mutation", False)
     if flag:
         store._crash_after_mutation = False
@@ -165,6 +169,13 @@ def _crash_after_mutation_requested(store: Any) -> bool:
         "true",
         "yes",
     }
+
+
+def _before_atomic_wait(store: Any, *, key: str) -> None:
+    """Optional test hook invoked before acquiring the atomic write lock."""
+    wait = getattr(store, "_before_atomic_wait", None)
+    if callable(wait):
+        wait(key)
 
 
 @runtime_checkable
@@ -352,6 +363,7 @@ class InMemoryGatewayStore:
         request_hash: str,
         mutator: Callable[[], Mapping[str, Any]],
     ) -> IdempotencyReserveResult:
+        _before_atomic_wait(self, key=key)
         with self._lock:
             reserved = self.reserve_idempotency(actor_id, operation, key, request_hash)
             if reserved.outcome != "reserved":
@@ -363,7 +375,7 @@ class InMemoryGatewayStore:
             events_len = len(self._events)
             try:
                 envelope = dict(mutator())
-                if _crash_after_mutation_requested(self):
+                if _crash_after_mutation_requested(self, key=key):
                     raise RuntimeError(
                         "injected crash after mutation before idempotency complete"
                     )
@@ -756,6 +768,7 @@ class SqliteGatewayStore:
         mutator: Callable[[], Mapping[str, Any]],
     ) -> IdempotencyReserveResult:
         """Reserve, mutate, and complete under one SQLite write transaction."""
+        _before_atomic_wait(self, key=key)
         lease = _lease_expiry_iso()
         fence = _new_fence_token()
         with self._lock:
@@ -808,7 +821,7 @@ class SqliteGatewayStore:
                         (lease, request_hash, fence, generation, actor_id, operation, key),
                     )
                 envelope = dict(mutator())
-                if _crash_after_mutation_requested(self):
+                if _crash_after_mutation_requested(self, key=key):
                     raise RuntimeError(
                         "injected crash after mutation before idempotency complete"
                     )

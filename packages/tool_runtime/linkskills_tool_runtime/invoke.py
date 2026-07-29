@@ -89,6 +89,7 @@ def invoke_tool(
             metadata={
                 "enabled": False,
                 "downstream_idempotency_key": downstream_idempotency_key,
+                "downstream_idempotency_propagated": bool(downstream_idempotency_key),
             },
         )
 
@@ -115,14 +116,17 @@ def invoke_tool(
             adapter_kind=adapter,
             error=f"unknown adapter: {adapter!r}",
             resolved=resolved,
-            metadata={"downstream_idempotency_key": downstream_idempotency_key},
+            metadata={
+                "downstream_idempotency_key": downstream_idempotency_key,
+                "downstream_idempotency_propagated": bool(downstream_idempotency_key),
+            },
         )
 
     metadata = dict(result.metadata)
     if downstream_idempotency_key:
+        # Propagation receipt only — never invent honored/exactly-once here.
         metadata["downstream_idempotency_key"] = downstream_idempotency_key
-        # Propagation only — local process adapters do not prove exactly-once.
-        metadata.setdefault("downstream_idempotency_exactly_once", False)
+        metadata["downstream_idempotency_propagated"] = True
 
     return ToolInvocationResult(
         ok=result.ok,

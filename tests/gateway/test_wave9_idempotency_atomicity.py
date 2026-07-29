@@ -341,7 +341,9 @@ class DownstreamKeyStabilityTests(unittest.TestCase):
             result.metadata.get("downstream_idempotency_key"),
             "lskills-downstream:abc",
         )
-        self.assertFalse(result.metadata.get("downstream_idempotency_exactly_once"))
+        self.assertTrue(result.metadata.get("downstream_idempotency_propagated"))
+        self.assertNotIn("downstream_idempotency_exactly_once", result.metadata)
+        self.assertNotIn("downstream_idempotency_honored", result.metadata)
 
 
 class ConcurrentIdempotencyTests(unittest.TestCase):

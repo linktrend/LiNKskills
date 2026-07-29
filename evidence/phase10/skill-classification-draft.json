@@ -1,7 +1,7 @@
 {
-  "note": "Classification ledger updated in wave 9 — service-state atomicity + external fencing/downstream keys; not a live usable/certified promotion.",
+  "note": "Classification ledger updated in wave 10 — request-local mutation batches + honest downstream acknowledgment; not a live usable/certified promotion.",
   "as_of": "2026-07-29",
-  "wave": 9,
+  "wave": 10,
   "launch_target_source": "evidence/phase1/canary-set.json",
   "launch_targets_with_canonical_v01_artifacts": [
     "git-safeguard",
@@ -28,10 +28,11 @@
   "idempotency": {
     "fence_token": true,
     "db_owned_atomic_reserve_mutate_complete": true,
-    "service_mutation_batch_defers_cache_publish": true,
+    "mutation_batch_request_local_contextvar": true,
     "crash_injection_after_mutation": true,
     "external_side_effect_complete_checks_reservation_fence": true,
     "downstream_key_stable_not_fence_derived": true,
+    "downstream_idempotency_propagated_not_implicit_honored": true,
     "reclaim_preserves_durable_side_effect_result": true,
     "external_side_effects": "at_least_once_with_intent_result_reconciliation"
   },
