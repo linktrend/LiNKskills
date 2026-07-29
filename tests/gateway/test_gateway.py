@@ -295,6 +295,7 @@ class ServiceTests(unittest.TestCase):
             "skills_tool_invoke",
             {"tool_id": "text-echo", "dry_run": True, "argv": ["hi"]},
             actor=self.actor,
+            idempotency_key="tool-dry-1",
         )
         self.assertIsNone(env["error"])
         self.assertTrue(env["data"]["dry_run"])
@@ -307,6 +308,7 @@ class ServiceTests(unittest.TestCase):
                 "skills_tool_invoke",
                 {"tool_id": "text-echo", "dry_run": False, "version": "1.0.0", "argv": ["hi"]},
                 actor=self.actor,
+                idempotency_key="tool-live-nohash",
             )
         self.assertEqual(ctx.exception.code, "tool_hash_required")
         self.assertNotIn("live_echo", ctx.exception.message)
@@ -323,6 +325,7 @@ class ServiceTests(unittest.TestCase):
                 "argv": ["HELLO_LIVE"],
             },
             actor=self.actor,
+            idempotency_key="tool-live-adapter",
         )
         self.assertIsNone(env["error"], env)
         self.assertFalse(env["data"]["dry_run"])
@@ -418,6 +421,7 @@ class RunLifecycleGateTests(unittest.TestCase):
                 "skills_run_start",
                 {"skill_id": "draft-demo"},
                 actor=self.owner,
+                idempotency_key="draft-reject-1",
             )
         self.assertEqual(ctx.exception.code, "skill_not_runnable")
 
@@ -431,6 +435,7 @@ class RunLifecycleGateTests(unittest.TestCase):
                     "runtime_profile_tags": ["cursor-macos"],
                 },
                 actor=self.owner,
+                idempotency_key="release-mismatch-1",
             )
         self.assertEqual(ctx.exception.code, "release_hash_mismatch")
 
@@ -443,6 +448,7 @@ class RunLifecycleGateTests(unittest.TestCase):
                     "runtime_profile_tags": ["codex-linux"],
                 },
                 actor=self.owner,
+                idempotency_key="profile-incompat-1",
             )
         self.assertEqual(ctx.exception.code, "profile_incompatible")
 
@@ -456,6 +462,7 @@ class RunLifecycleGateTests(unittest.TestCase):
                 "runtime_profile_tags": ["cursor-macos"],
             },
             actor=self.owner,
+            idempotency_key="usable-start-1",
         )
         self.assertIsNone(env["error"])
         self.assertEqual(env["data"]["skill_id"], "usable-demo")
@@ -468,6 +475,7 @@ class RunLifecycleGateTests(unittest.TestCase):
                 "runtime_profile_tags": ["cursor-macos"],
             },
             actor=self.owner,
+            idempotency_key="feedback-owner-start",
         )
         run_id = started["run_id"]
         with self.assertRaises(ServiceError) as ctx:
@@ -480,6 +488,7 @@ class RunLifecycleGateTests(unittest.TestCase):
                     "notes": "stolen",
                 },
                 actor=self.intruder,
+                idempotency_key="feedback-stolen-1",
             )
         self.assertEqual(ctx.exception.code, "auth_forbidden")
 

@@ -89,6 +89,51 @@ DB_OWNED_WRITE_OPERATIONS = frozenset(
 # External side effects — fence + durable intent/result; at-least-once with downstream key.
 EXTERNAL_SIDE_EFFECT_OPERATIONS = frozenset({"skills_tool_invoke"})
 
+# Fail-closed write idempotency key contract (validated before any write path).
+IDEMPOTENCY_KEY_MAX_CHARS = 128
+_IDEMPOTENCY_KEY_RE = re.compile(r"^[A-Za-z0-9._:-]+$")
+
+
+def normalize_idempotency_key(raw: Any) -> str:
+    """Return a validated idempotency key or raise ServiceError (fail closed)."""
+    if raw is None:
+        raise ServiceError(
+            "idempotency_key_required",
+            "WRITE_OPERATIONS require a non-empty idempotency key",
+            http_status=400,
+        )
+    if not isinstance(raw, str):
+        raise ServiceError(
+            "idempotency_key_invalid",
+            "idempotency key must be a string",
+            http_status=400,
+        )
+    if raw == "" or raw.strip() == "":
+        raise ServiceError(
+            "idempotency_key_required",
+            "WRITE_OPERATIONS require a non-empty idempotency key",
+            http_status=400,
+        )
+    if raw != raw.strip():
+        raise ServiceError(
+            "idempotency_key_invalid",
+            "idempotency key must not include leading or trailing whitespace",
+            http_status=400,
+        )
+    if len(raw) > IDEMPOTENCY_KEY_MAX_CHARS:
+        raise ServiceError(
+            "idempotency_key_invalid",
+            f"idempotency key exceeds max length ({IDEMPOTENCY_KEY_MAX_CHARS})",
+            http_status=400,
+        )
+    if not _IDEMPOTENCY_KEY_RE.fullmatch(raw):
+        raise ServiceError(
+            "idempotency_key_invalid",
+            "idempotency key may only contain [A-Za-z0-9._:-]",
+            http_status=400,
+        )
+    return raw
+
 
 @dataclass
 class MutationContext:
@@ -472,7 +517,10 @@ class SkillsGatewayService:
 
         params = dict(params or {})
         request_id = request_id or str(uuid.uuid4())
-        idempotency_key = idempotency_key or params.pop("idempotency_key", None)
+        if idempotency_key is None:
+            idempotency_key = params.pop("idempotency_key", None)
+        else:
+            params.pop("idempotency_key", None)
 
         # Exact permittedOperations enforcement for every read and mutation.
         if not actor.has_scope("lskills") and "*" not in actor.scopes:
@@ -488,7 +536,9 @@ class SkillsGatewayService:
                 http_status=403,
             )
 
-        if operation in WRITE_OPERATIONS and idempotency_key:
+        if operation in WRITE_OPERATIONS:
+            # Fail closed before DB/external branching, handlers, intents, or mutation.
+            idempotency_key = normalize_idempotency_key(idempotency_key)
             request_hash = canonical_request_hash(
                 {
                     "actor_id": actor.actor_id,
@@ -576,67 +626,123 @@ class SkillsGatewayService:
                             mutation.discard()
                         raise
 
-            # External side-effect path: fence + durable intent/result reconciliation.
-            reserved = self._store.reserve_idempotency(
-                actor.actor_id, operation, idempotency_key, request_hash
-            )
-            if reserved.outcome == "conflict":
-                raise ServiceError(
-                    "idempotency_conflict",
-                    "idempotency key already bound to a different request payload",
-                    http_status=409,
+            if operation in EXTERNAL_SIDE_EFFECT_OPERATIONS:
+                # External side-effect path: fence + durable intent/result reconciliation.
+                reserved = self._store.reserve_idempotency(
+                    actor.actor_id, operation, idempotency_key, request_hash
                 )
-            if reserved.outcome == "in_progress":
-                raise ServiceError(
-                    "idempotency_in_progress",
-                    "idempotency key is reserved by an in-flight request; retry later",
-                    http_status=409,
-                )
-            if reserved.outcome == "replay" and reserved.envelope is not None:
-                replay = dict(reserved.envelope)
-                replay["request_id"] = request_id
-                replay["server_time"] = _utc_now()
-                replay["warnings"] = list(replay.get("warnings") or []) + [
-                    "idempotent_replay"
-                ]
-                return replay
-            assert reserved.fence_token is not None
-            fence_token = reserved.fence_token
-            downstream_key = stable_downstream_idempotency_key(
-                actor_id=actor.actor_id,
-                org_id=actor.org_id,
-                operation=operation,
-                idempotency_key=idempotency_key,
-                request_hash=request_hash,
-            )
-            try:
-                intent = self._store.record_side_effect_intent(
-                    actor.actor_id,
-                    operation,
-                    idempotency_key,
-                    fence_token=fence_token,
-                    downstream_key=downstream_key,
+                if reserved.outcome == "conflict":
+                    raise ServiceError(
+                        "idempotency_conflict",
+                        "idempotency key already bound to a different request payload",
+                        http_status=409,
+                    )
+                if reserved.outcome == "in_progress":
+                    raise ServiceError(
+                        "idempotency_in_progress",
+                        "idempotency key is reserved by an in-flight request; retry later",
+                        http_status=409,
+                    )
+                if reserved.outcome == "replay" and reserved.envelope is not None:
+                    replay = dict(reserved.envelope)
+                    replay["request_id"] = request_id
+                    replay["server_time"] = _utc_now()
+                    replay["warnings"] = list(replay.get("warnings") or []) + [
+                        "idempotent_replay"
+                    ]
+                    return replay
+                assert reserved.fence_token is not None
+                fence_token = reserved.fence_token
+                downstream_key = stable_downstream_idempotency_key(
+                    actor_id=actor.actor_id,
+                    org_id=actor.org_id,
+                    operation=operation,
+                    idempotency_key=idempotency_key,
                     request_hash=request_hash,
                 )
-            except ValueError as exc:
-                raise ServiceError(
-                    "idempotency_fence_rejected",
-                    str(exc),
-                    http_status=409,
-                ) from exc
-            if intent.get("status") == "result" and intent.get("result") is not None:
-                env = self.envelope(
-                    actor=actor,
-                    operation=operation,
-                    request_id=request_id,
-                    idempotency_id=idempotency_key,
-                    data=intent["result"],
-                    warnings=[
-                        "side_effect_reconciled",
-                        "external_side_effect_at_least_once",
-                    ],
-                )
                 try:
+                    intent = self._store.record_side_effect_intent(
+                        actor.actor_id,
+                        operation,
+                        idempotency_key,
+                        fence_token=fence_token,
+                        downstream_key=downstream_key,
+                        request_hash=request_hash,
+                    )
+                except ValueError as exc:
+                    raise ServiceError(
+                        "idempotency_fence_rejected",
+                        str(exc),
+                        http_status=409,
+                    ) from exc
+                if intent.get("status") == "result" and intent.get("result") is not None:
+                    env = self.envelope(
+                        actor=actor,
+                        operation=operation,
+                        request_id=request_id,
+                        idempotency_id=idempotency_key,
+                        data=intent["result"],
+                        warnings=[
+                            "side_effect_reconciled",
+                            "external_side_effect_at_least_once",
+                        ],
+                    )
+                    try:
+                        self._store.complete_idempotency(
+                            actor.actor_id,
+                            operation,
+                            idempotency_key,
+                            request_hash,
+                            dict(env),
+                            fence_token=fence_token,
+                        )
+                    except ValueError as exc:
+                        raise ServiceError(
+                            "idempotency_fence_rejected",
+                            str(exc),
+                            http_status=409,
+                        ) from exc
+                    return env
+                handler = getattr(self, f"op_{operation}")
+                try:
+                    result = handler(
+                        actor=actor,
+                        params={**params, "downstream_idempotency_key": downstream_key},
+                        idempotency_key=idempotency_key,
+                    )
+                    warnings = list(result.get("warnings") or [])
+                    data = dict(result.get("data") or {})
+                    output = dict(data.get("output") or {})
+                    downstream_ack = (
+                        data.get("downstream_idempotency_honored") is True
+                        or data.get("downstream_idempotency_exactly_once") is True
+                        or output.get("downstream_idempotency_honored") is True
+                        or output.get("downstream_idempotency_exactly_once") is True
+                    )
+                    if (
+                        not downstream_ack
+                        and "external_side_effect_at_least_once" not in warnings
+                    ):
+                        warnings.append("external_side_effect_at_least_once")
+                    env = self.envelope(
+                        actor=actor,
+                        operation=operation,
+                        request_id=request_id,
+                        idempotency_id=idempotency_key,
+                        data=data,
+                        warnings=warnings,
+                        recommended_next=result.get("recommended_next"),
+                        release_hash=result.get("release_hash"),
+                        profile_hash=result.get("profile_hash"),
+                        run_id=result.get("run_id"),
+                    )
+                    self._store.complete_side_effect_intent(
+                        actor.actor_id,
+                        operation,
+                        idempotency_key,
+                        fence_token=fence_token,
+                        result=data,
+                    )
                     self._store.complete_idempotency(
                         actor.actor_id,
                         operation,
@@ -645,81 +751,33 @@ class SkillsGatewayService:
                         dict(env),
                         fence_token=fence_token,
                     )
+                    return env
+                except ServiceError:
+                    raise
                 except ValueError as exc:
                     raise ServiceError(
                         "idempotency_fence_rejected",
                         str(exc),
                         http_status=409,
                     ) from exc
-                return env
-            handler = getattr(self, f"op_{operation}")
-            try:
-                result = handler(
-                    actor=actor,
-                    params={**params, "downstream_idempotency_key": downstream_key},
-                    idempotency_key=idempotency_key,
-                )
-                warnings = list(result.get("warnings") or [])
-                data = dict(result.get("data") or {})
-                output = dict(data.get("output") or {})
-                downstream_ack = (
-                    data.get("downstream_idempotency_honored") is True
-                    or data.get("downstream_idempotency_exactly_once") is True
-                    or output.get("downstream_idempotency_honored") is True
-                    or output.get("downstream_idempotency_exactly_once") is True
-                )
-                if (
-                    not downstream_ack
-                    and "external_side_effect_at_least_once" not in warnings
-                ):
-                    warnings.append("external_side_effect_at_least_once")
-                env = self.envelope(
-                    actor=actor,
-                    operation=operation,
-                    request_id=request_id,
-                    idempotency_id=idempotency_key,
-                    data=data,
-                    warnings=warnings,
-                    recommended_next=result.get("recommended_next"),
-                    release_hash=result.get("release_hash"),
-                    profile_hash=result.get("profile_hash"),
-                    run_id=result.get("run_id"),
-                )
-                self._store.complete_side_effect_intent(
-                    actor.actor_id,
-                    operation,
-                    idempotency_key,
-                    fence_token=fence_token,
-                    result=data,
-                )
-                self._store.complete_idempotency(
-                    actor.actor_id,
-                    operation,
-                    idempotency_key,
-                    request_hash,
-                    dict(env),
-                    fence_token=fence_token,
-                )
-                return env
-            except ServiceError:
-                raise
-            except ValueError as exc:
-                raise ServiceError(
-                    "idempotency_fence_rejected",
-                    str(exc),
-                    http_status=409,
-                ) from exc
-            except Exception:
-                # Leave reservation leased; fence rejects late displaced completion.
-                raise
+                except Exception:
+                    # Leave reservation leased; fence rejects late displaced completion.
+                    raise
 
+            raise ServiceError(
+                "unsupported_write_operation",
+                f"Write operation {operation} has no idempotent handler path",
+                http_status=500,
+            )
+
+        # Read-only operations: idempotency key is optional and not required.
         handler = getattr(self, f"op_{operation}")
         result = handler(actor=actor, params=params, idempotency_key=idempotency_key)
         return self.envelope(
             actor=actor,
             operation=operation,
             request_id=request_id,
-            idempotency_id=idempotency_key,
+            idempotency_id=idempotency_key if isinstance(idempotency_key, str) else None,
             data=result.get("data"),
             warnings=result.get("warnings"),
             recommended_next=result.get("recommended_next"),

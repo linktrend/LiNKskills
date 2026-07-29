@@ -147,10 +147,14 @@ def make_handler(
                 or body.get("request_id")
                 or uuid.uuid4()
             )
-            # Idempotency-Key header is authoritative for run_start retries.
-            idempotency_key = self.headers.get("Idempotency-Key") or body.get(
-                "idempotency_key"
-            )
+            # Header is authoritative when present; otherwise body field (any JSON type).
+            # Do not coerce/truthiness-strip — service fail-closed validation owns the contract.
+            if "Idempotency-Key" in self.headers:
+                idempotency_key: Any = self.headers.get("Idempotency-Key")
+            elif "idempotency_key" in body:
+                idempotency_key = body.get("idempotency_key")
+            else:
+                idempotency_key = None
             params = body.get("params") if isinstance(body.get("params"), dict) else body
 
             # Strip envelope-only keys when body is used as params.
@@ -177,6 +181,9 @@ def make_handler(
                 }
 
             authorization = self.headers.get("Authorization")
+            idempotency_id = (
+                idempotency_key if isinstance(idempotency_key, str) else None
+            )
             try:
                 # Pass original body + headers so spoofed identity is visible.
                 # Never accept X-Actor-* override headers as authority.
@@ -190,7 +197,7 @@ def make_handler(
                     params,
                     actor=actor,
                     request_id=request_id,
-                    idempotency_key=str(idempotency_key) if idempotency_key else None,
+                    idempotency_key=idempotency_key,
                 )
                 self._send(200, envelope)
             except AuthError as exc:
@@ -208,7 +215,7 @@ def make_handler(
                         actor=None,
                         operation=operation,
                         request_id=request_id,
-                        idempotency_id=str(idempotency_key) if idempotency_key else None,
+                        idempotency_id=idempotency_id,
                         error={
                             "code": exc.code,
                             "message": exc.message,
@@ -223,7 +230,7 @@ def make_handler(
                         actor=None,
                         operation=operation,
                         request_id=request_id,
-                        idempotency_id=str(idempotency_key) if idempotency_key else None,
+                        idempotency_id=idempotency_id,
                         error={
                             "code": exc.code,
                             "message": exc.message,

@@ -247,6 +247,7 @@ class ExactPermissionsTests(unittest.TestCase):
                     "runtime_profile_tags": ["cursor-macos"],
                 },
                 actor=actor,
+                idempotency_key="auth-ro-start",
             )
         self.assertEqual(ctx.exception.code, "auth_forbidden")
 
@@ -283,6 +284,7 @@ class FeedbackTraceBindingTests(unittest.TestCase):
                     "notes": "x",
                 },
                 actor=self.actor,
+                idempotency_key="feedback-missing-run",
             )
         self.assertEqual(ctx.exception.code, "not_found")
 
@@ -294,6 +296,7 @@ class FeedbackTraceBindingTests(unittest.TestCase):
                 "runtime_profile_tags": ["cursor-macos"],
             },
             actor=self.actor,
+            idempotency_key="feedback-secret-start",
         )
         with self.assertRaises(ServiceError) as ctx:
             self.service.dispatch(
@@ -305,6 +308,7 @@ class FeedbackTraceBindingTests(unittest.TestCase):
                     "notes": "x",
                 },
                 actor=self.actor,
+                idempotency_key="feedback-secret-1",
             )
         self.assertIn(ctx.exception.code, {"payload_forbidden_field", "payload_unexpected_field"})
 
@@ -343,6 +347,7 @@ class FeedbackTraceBindingTests(unittest.TestCase):
                 "runtime_profile_tags": ["cursor-macos"],
             },
             actor=self.actor,
+            idempotency_key="conflict-start",
         )
         run_id = started["run_id"]
         self.service.dispatch(

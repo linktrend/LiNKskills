@@ -52,6 +52,8 @@ ALLOWED_ENV_KEYS = frozenset(
         "REQUESTS_CA_BUNDLE",
         "CURL_CA_BUNDLE",
         "SYSTEMROOT",  # Windows-safe no-op on Unix
+        # Stable downstream idempotency propagation (wave 9/10); not a secret.
+        "LINKSKILLS_DOWNSTREAM_IDEMPOTENCY_KEY",
     }
 )
 
