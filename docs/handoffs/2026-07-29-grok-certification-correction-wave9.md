@@ -8,7 +8,7 @@
 **PR:** https://github.com/linktrend/LiNKskills/pull/22  
 **Branch:** `issue/21-linkskillsdevelopmentplan01`  
 **Base head for this wave:** `409a24dbcf7ef30173022c2557ccd985ad0739ab`  
-**Wave-9 code tip (exact clean pushed head before handoff pin):** _filled after code commit_  
+**Wave-9 code tip (exact clean pushed head before handoff pin):** `8742bf79f4c6013abf9bcd07a27286ce905b17cb`  
 **Plan hash:** `31a6cc70bb778ce1dff236819e4bf600b0495dbb06c95bac55bcb2b0b2f5fe88`
 
 ## Wave 9 corrections (Codex findings)
