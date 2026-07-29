@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Wave-10: request-local mutation batches + honest downstream acknowledgment."""
+"""Wave-10: request-local mutation batches + honest downstream acknowledgment.
+
+Wave-11 replaced ContextVar ownership with explicit MutationContext + per-service
+serialization; this file keeps the isolation and ack proofs under that model.
+"""
 
 from __future__ import annotations
 
@@ -31,10 +35,7 @@ for path in (
 from linkskills_gateway.auth import LocalUnsignedClaimsVerifier  # noqa: E402
 from linkskills_gateway.auth_testing import mint_test_bearer  # noqa: E402
 from linkskills_gateway.persistence import SqliteGatewayStore  # noqa: E402
-from linkskills_gateway.service import (  # noqa: E402
-    SkillsGatewayService,
-    _mutation_batch_var,
-)
+from linkskills_gateway.service import SkillsGatewayService  # noqa: E402
 
 
 def _usable_catalog() -> dict:
@@ -63,7 +64,7 @@ def _actor():
 
 class RequestLocalMutationBatchTests(unittest.TestCase):
     def test_two_thread_commit_and_crash_isolated_batches(self) -> None:
-        """Both requests reach atomic entry before lock; one commits, one crashes."""
+        """Different-key concurrent commit/crash under per-service serialization."""
         with tempfile.TemporaryDirectory() as tmp:
             service = SkillsGatewayService(
                 repo_root=REPO_ROOT,
@@ -74,8 +75,6 @@ class RequestLocalMutationBatchTests(unittest.TestCase):
             store = service._store
             assert isinstance(store, SqliteGatewayStore)
 
-            pre_tx = threading.Barrier(2)
-            store._before_atomic_wait = lambda key: pre_tx.wait()
             store._crash_after_mutation_keys = {"key-crash"}
 
             outcomes: dict[str, str] = {}
@@ -111,8 +110,6 @@ class RequestLocalMutationBatchTests(unittest.TestCase):
             self.assertTrue(outcomes["key-crash"].startswith("crash:"), msg=outcomes)
             ok_run_id = outcomes["key-ok"].split(":", 1)[1]
 
-            # Request-local context must be cleared after both requests.
-            self.assertIsNone(_mutation_batch_var.get())
             self.assertFalse(hasattr(service, "_mutation_batch"))
 
             # Committed request visible in DB and service cache.
@@ -131,7 +128,6 @@ class RequestLocalMutationBatchTests(unittest.TestCase):
             self.assertEqual(int(events["c"]), 1)
 
             # Retry crashed key → exactly one additional logical mutation.
-            store._before_atomic_wait = None
             retry = service.dispatch(
                 "skills_run_start",
                 {
@@ -148,7 +144,6 @@ class RequestLocalMutationBatchTests(unittest.TestCase):
             self.assertEqual(int(rows["c"]), 2)
             self.assertEqual(len(service._runs), 2)
             self.assertEqual(set(service._runs.keys()), {ok_run_id, str(crash_run_id)})
-            # DB and service-visible state remain identical.
             for rid in (ok_run_id, str(crash_run_id)):
                 loaded = store.get_run(rid)
                 assert loaded is not None

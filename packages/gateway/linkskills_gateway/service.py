@@ -7,11 +7,10 @@ logic is duplicated in MCP or HTTP layers — both call this service.
 
 from __future__ import annotations
 
-import copy
-import contextvars
 import hashlib
 import json
 import re
+import threading
 import time
 import uuid
 from dataclasses import dataclass, field
@@ -92,20 +91,40 @@ EXTERNAL_SIDE_EFFECT_OPERATIONS = frozenset({"skills_tool_invoke"})
 
 
 @dataclass
-class _MutationBatch:
-    """Deferred service-visible publishes until durable transaction commits."""
+class MutationContext:
+    """Request-owned mutation batch — never joined across services or expired tasks.
 
+    Explicitly passed through the DB-owned write call chain. Store is authoritative
+    while active; service caches are refreshed only on successful publish.
+    """
+
+    service_id: int
+    request_id: str
+    generation: int
+    active: bool = True
+    published: bool = False
     runs: Dict[str, "SkillRun"] = field(default_factory=dict)
     feedback: List[Dict[str, Any]] = field(default_factory=list)
     traces: List[Dict[str, Any]] = field(default_factory=list)
     events: List[Dict[str, Any]] = field(default_factory=list)
 
+    def assert_writable(self, service: "SkillsGatewayService") -> None:
+        if id(service) != self.service_id:
+            raise RuntimeError(
+                "mutation context belongs to another SkillsGatewayService instance"
+            )
+        if self.published or not self.active:
+            raise RuntimeError(
+                "mutation context is expired or already published; fail closed"
+            )
 
-# Request/task-local — never a shared service-instance field.
-_mutation_batch_var: contextvars.ContextVar[Optional[_MutationBatch]] = contextvars.ContextVar(
-    "linkskills_gateway_mutation_batch",
-    default=None,
-)
+    def discard(self) -> None:
+        self.active = False
+        self.published = False
+        self.runs.clear()
+        self.feedback.clear()
+        self.traces.clear()
+        self.events.clear()
 
 
 def _utc_now() -> str:
@@ -212,6 +231,9 @@ class SkillsGatewayService:
         self._feedback: List[Dict[str, Any]] = []
         self._trace_candidates: List[Dict[str, Any]] = []
         self._events: List[Dict[str, Any]] = []
+        # Serializes DB-owned mutation from reservation through cache publication.
+        self._mutation_gate = threading.RLock()
+        self._mutation_generation = 0
         self._ready = True
         self._load_catalog(catalog_index)
 
@@ -477,60 +499,82 @@ class SkillsGatewayService:
             )
             if operation in DB_OWNED_WRITE_OPERATIONS:
                 handler = getattr(self, f"op_{operation}")
-
-                def mutator() -> Dict[str, Any]:
-                    result = handler(
-                        actor=actor, params=params, idempotency_key=idempotency_key
-                    )
-                    return self.envelope(
-                        actor=actor,
-                        operation=operation,
+                # Hold per-service gate from reservation through cache publish so a
+                # peer cannot read/overwrite stale cache between commit and publish.
+                with self._mutation_gate:
+                    self._mutation_generation += 1
+                    mutation = MutationContext(
+                        service_id=id(self),
                         request_id=request_id,
-                        idempotency_id=idempotency_key,
-                        data=result.get("data"),
-                        warnings=result.get("warnings"),
-                        recommended_next=result.get("recommended_next"),
-                        release_hash=result.get("release_hash"),
-                        profile_hash=result.get("profile_hash"),
-                        run_id=result.get("run_id"),
+                        generation=self._mutation_generation,
                     )
 
-                batch_token = self._begin_mutation_batch()
-                publish_batch = False
-                try:
-                    reserved = self._store.run_atomic_idempotent(
-                        actor.actor_id,
-                        operation,
-                        idempotency_key,
-                        request_hash,
-                        mutator,
-                    )
-                    if reserved.outcome == "conflict":
-                        raise ServiceError(
-                            "idempotency_conflict",
-                            "idempotency key already bound to a different request payload",
-                            http_status=409,
+                    def mutator() -> Dict[str, Any]:
+                        result = handler(
+                            actor=actor,
+                            params=params,
+                            idempotency_key=idempotency_key,
+                            mutation=mutation,
                         )
-                    if reserved.outcome == "in_progress":
-                        raise ServiceError(
-                            "idempotency_in_progress",
-                            "idempotency key is reserved by an in-flight request; retry later",
-                            http_status=409,
+                        return self.envelope(
+                            actor=actor,
+                            operation=operation,
+                            request_id=request_id,
+                            idempotency_id=idempotency_key,
+                            data=result.get("data"),
+                            warnings=result.get("warnings"),
+                            recommended_next=result.get("recommended_next"),
+                            release_hash=result.get("release_hash"),
+                            profile_hash=result.get("profile_hash"),
+                            run_id=result.get("run_id"),
                         )
-                    assert reserved.envelope is not None
-                    # Fresh atomic completion carries a fence; publish deferred caches.
-                    if reserved.fence_token is not None:
-                        publish_batch = True
-                    env = dict(reserved.envelope)
-                    env["request_id"] = request_id
-                    env["server_time"] = _utc_now()
-                    if reserved.fence_token is None:
-                        env["warnings"] = list(env.get("warnings") or []) + [
-                            "idempotent_replay"
-                        ]
-                    return env
-                finally:
-                    self._end_mutation_batch(batch_token, publish=publish_batch)
+
+                    published = False
+                    try:
+                        reserved = self._store.run_atomic_idempotent(
+                            actor.actor_id,
+                            operation,
+                            idempotency_key,
+                            request_hash,
+                            mutator,
+                        )
+                        if reserved.outcome == "conflict":
+                            mutation.discard()
+                            raise ServiceError(
+                                "idempotency_conflict",
+                                "idempotency key already bound to a different request payload",
+                                http_status=409,
+                            )
+                        if reserved.outcome == "in_progress":
+                            mutation.discard()
+                            raise ServiceError(
+                                "idempotency_in_progress",
+                                "idempotency key is reserved by an in-flight request; retry later",
+                                http_status=409,
+                            )
+                        assert reserved.envelope is not None
+                        if reserved.fence_token is not None:
+                            pause = getattr(
+                                self, "_after_commit_before_publish_wait", None
+                            )
+                            if callable(pause):
+                                pause(mutation)
+                            self._publish_mutation_context(mutation)
+                            published = True
+                        else:
+                            mutation.discard()
+                        env = dict(reserved.envelope)
+                        env["request_id"] = request_id
+                        env["server_time"] = _utc_now()
+                        if reserved.fence_token is None:
+                            env["warnings"] = list(env.get("warnings") or []) + [
+                                "idempotent_replay"
+                            ]
+                        return env
+                    except Exception:
+                        if not published:
+                            mutation.discard()
+                        raise
 
             # External side-effect path: fence + durable intent/result reconciliation.
             reserved = self._store.reserve_idempotency(
@@ -691,42 +735,55 @@ class SkillsGatewayService:
             raise ServiceError("not_found", f"Unknown skill_id: {skill_id}", http_status=404)
         return skill
 
-    def _get_run(self, run_id: str, actor: ActorClaims) -> SkillRun:
-        batch = _mutation_batch_var.get()
-        if batch is not None and run_id in batch.runs:
-            run = batch.runs[run_id]
-        elif run_id in self._runs:
-            cached = self._runs[run_id]
-            if batch is not None:
-                # Copy-on-write so rollbacks cannot leave published cache dirty.
-                run = copy.deepcopy(cached)
-                batch.runs[run_id] = run
+    def _run_from_stored(self, stored: Mapping[str, Any]) -> SkillRun:
+        return SkillRun(
+            run_id=str(stored["run_id"]),
+            skill_id=str(stored["skill_id"]),
+            version=str(stored["version"]),
+            release_hash=str(stored.get("release_hash") or ""),
+            profile_hash=str(stored.get("profile_hash") or ""),
+            actor_id=str(stored["actor_id"]),
+            org_id=str(stored["org_id"]),
+            status=str(stored["status"]),
+            created_at=str(stored["created_at"]),
+            updated_at=str(stored["updated_at"]),
+            events=list(stored.get("events") or []),
+            feedback=list(stored.get("feedback") or []),
+            outcome=stored.get("outcome"),
+            idempotency_key=stored.get("idempotency_key"),
+        )
+
+    def _get_run(
+        self,
+        run_id: str,
+        actor: ActorClaims,
+        *,
+        mutation: Optional[MutationContext] = None,
+    ) -> SkillRun:
+        if mutation is not None:
+            mutation.assert_writable(self)
+            if run_id in mutation.runs:
+                run = mutation.runs[run_id]
             else:
-                run = cached
+                # Inside the mutation boundary the store is authoritative — never
+                # copy from a possibly stale service cache between peer publishes.
+                stored = self._store.get_run(run_id)
+                if stored is None:
+                    raise ServiceError(
+                        "not_found", f"Unknown run_id: {run_id}", http_status=404
+                    )
+                run = self._run_from_stored(stored)
+                mutation.runs[run_id] = run
+        elif run_id in self._runs:
+            run = self._runs[run_id]
         else:
             stored = self._store.get_run(run_id)
             if stored is None:
-                raise ServiceError("not_found", f"Unknown run_id: {run_id}", http_status=404)
-            run = SkillRun(
-                run_id=str(stored["run_id"]),
-                skill_id=str(stored["skill_id"]),
-                version=str(stored["version"]),
-                release_hash=str(stored.get("release_hash") or ""),
-                profile_hash=str(stored.get("profile_hash") or ""),
-                actor_id=str(stored["actor_id"]),
-                org_id=str(stored["org_id"]),
-                status=str(stored["status"]),
-                created_at=str(stored["created_at"]),
-                updated_at=str(stored["updated_at"]),
-                events=list(stored.get("events") or []),
-                feedback=list(stored.get("feedback") or []),
-                outcome=stored.get("outcome"),
-                idempotency_key=stored.get("idempotency_key"),
-            )
-            if batch is not None:
-                batch.runs[run_id] = run
-            else:
-                self._runs[run_id] = run
+                raise ServiceError(
+                    "not_found", f"Unknown run_id: {run_id}", http_status=404
+                )
+            run = self._run_from_stored(stored)
+            self._runs[run_id] = run
         if run.actor_id != actor.actor_id or (run.org_id or "") != (actor.org_id or ""):
             raise ServiceError(
                 "auth_forbidden",
@@ -747,55 +804,74 @@ class SkillsGatewayService:
                 raise ServiceError(exc.code, exc.message, http_status=400) from exc
             raise
 
-    def _begin_mutation_batch(self) -> contextvars.Token:
-        """Bind a request-local mutation batch; caller must restore via token."""
-        return _mutation_batch_var.set(_MutationBatch())
-
-    def _end_mutation_batch(self, token: contextvars.Token, *, publish: bool) -> None:
-        """Restore prior context; optionally publish only this request's pending mutations."""
-        batch = _mutation_batch_var.get()
-        _mutation_batch_var.reset(token)
-        if not publish or batch is None:
-            return
-        for run_id, run in batch.runs.items():
+    def _publish_mutation_context(self, mutation: MutationContext) -> None:
+        """Publish pending mutations only after DB commit; marks context expired."""
+        mutation.assert_writable(self)
+        for run_id, run in mutation.runs.items():
             self._runs[run_id] = run
-        self._feedback.extend(batch.feedback)
-        self._trace_candidates.extend(batch.traces)
-        self._events.extend(batch.events)
+        self._feedback.extend(mutation.feedback)
+        self._trace_candidates.extend(mutation.traces)
+        self._events.extend(mutation.events)
+        mutation.published = True
+        mutation.active = False
 
-    def _persist_run(self, run: SkillRun) -> None:
-        """Persist run to store first; publish to service cache only when not batched."""
+    def _persist_run(
+        self,
+        run: SkillRun,
+        *,
+        mutation: Optional[MutationContext] = None,
+    ) -> None:
+        """Persist run to store first; cache only when not inside a mutation batch."""
+        if mutation is not None:
+            mutation.assert_writable(self)
         self._store.save_run(run)
-        batch = _mutation_batch_var.get()
-        if batch is not None:
-            batch.runs[run.run_id] = run
+        if mutation is not None:
+            mutation.runs[run.run_id] = run
         else:
             self._runs[run.run_id] = run
 
-    def _record_local_event(self, event: Mapping[str, Any]) -> None:
+    def _record_local_event(
+        self,
+        event: Mapping[str, Any],
+        *,
+        mutation: Optional[MutationContext] = None,
+    ) -> None:
+        if mutation is not None:
+            mutation.assert_writable(self)
         payload = dict(event)
         self._store.append_event(payload)
-        batch = _mutation_batch_var.get()
-        if batch is not None:
-            batch.events.append(payload)
+        if mutation is not None:
+            mutation.events.append(payload)
         else:
             self._events.append(payload)
 
-    def _record_feedback(self, record: Mapping[str, Any]) -> None:
+    def _record_feedback(
+        self,
+        record: Mapping[str, Any],
+        *,
+        mutation: Optional[MutationContext] = None,
+    ) -> None:
+        if mutation is not None:
+            mutation.assert_writable(self)
         payload = dict(record)
         self._store.append_feedback(payload)
-        batch = _mutation_batch_var.get()
-        if batch is not None:
-            batch.feedback.append(payload)
+        if mutation is not None:
+            mutation.feedback.append(payload)
         else:
             self._feedback.append(payload)
 
-    def _record_trace(self, record: Mapping[str, Any]) -> None:
+    def _record_trace(
+        self,
+        record: Mapping[str, Any],
+        *,
+        mutation: Optional[MutationContext] = None,
+    ) -> None:
+        if mutation is not None:
+            mutation.assert_writable(self)
         payload = dict(record)
         self._store.append_trace(payload)
-        batch = _mutation_batch_var.get()
-        if batch is not None:
-            batch.traces.append(payload)
+        if mutation is not None:
+            mutation.traces.append(payload)
         else:
             self._trace_candidates.append(payload)
 
@@ -1113,6 +1189,7 @@ class SkillsGatewayService:
         actor: ActorClaims,
         params: Mapping[str, Any],
         idempotency_key: Optional[str],
+        mutation: Optional[MutationContext] = None,
     ) -> Dict[str, Any]:
         skill = self._get_skill(str(params.get("skill_id") or ""))
         version = str(params.get("version") or skill.version)
@@ -1138,7 +1215,7 @@ class SkillsGatewayService:
             events=[{"type": "run_started", "at": now}],
             idempotency_key=idempotency_key,
         )
-        self._persist_run(run)
+        self._persist_run(run, mutation=mutation)
         self._record_local_event(
             {
                 "type": "run_started",
@@ -1146,7 +1223,8 @@ class SkillsGatewayService:
                 "skill_id": skill.skill_id,
                 "actor_id": actor.actor_id,
                 "at": now,
-            }
+            },
+            mutation=mutation,
         )
         return {
             "data": {
@@ -1168,10 +1246,11 @@ class SkillsGatewayService:
         actor: ActorClaims,
         params: Mapping[str, Any],
         idempotency_key: Optional[str],
+        mutation: Optional[MutationContext] = None,
     ) -> Dict[str, Any]:
         del idempotency_key
         clean = self._guard_params(prepare_run_mutation_params, params)
-        run = self._get_run(str(clean.get("run_id") or ""), actor)
+        run = self._get_run(str(clean.get("run_id") or ""), actor, mutation=mutation)
         if run.status in {"completed", "failed"}:
             raise ServiceError("run_closed", f"Run already {run.status}")
         event = {
@@ -1185,7 +1264,7 @@ class SkillsGatewayService:
         run.events.append(event)
         run.updated_at = event["at"]
         run.status = "in_progress"
-        self._persist_run(run)
+        self._persist_run(run, mutation=mutation)
         return {
             "data": {"run_id": run.run_id, "status": run.status, "event": event},
             "run_id": run.run_id,
@@ -1200,10 +1279,11 @@ class SkillsGatewayService:
         actor: ActorClaims,
         params: Mapping[str, Any],
         idempotency_key: Optional[str],
+        mutation: Optional[MutationContext] = None,
     ) -> Dict[str, Any]:
         del idempotency_key
         clean = self._guard_params(prepare_run_mutation_params, params)
-        run = self._get_run(str(clean.get("run_id") or ""), actor)
+        run = self._get_run(str(clean.get("run_id") or ""), actor, mutation=mutation)
         if run.status in {"completed", "failed"}:
             raise ServiceError("run_closed", f"Run already {run.status}")
         now = _utc_now()
@@ -1218,7 +1298,7 @@ class SkillsGatewayService:
         run.status = "completed"
         run.updated_at = now
         run.events.append({"type": "run_completed", "at": now, "outcome": outcome})
-        self._persist_run(run)
+        self._persist_run(run, mutation=mutation)
         return {
             "data": {"run_id": run.run_id, "status": run.status, "outcome": outcome},
             "run_id": run.run_id,
@@ -1233,10 +1313,11 @@ class SkillsGatewayService:
         actor: ActorClaims,
         params: Mapping[str, Any],
         idempotency_key: Optional[str],
+        mutation: Optional[MutationContext] = None,
     ) -> Dict[str, Any]:
         del idempotency_key
         clean = self._guard_params(prepare_run_mutation_params, params)
-        run = self._get_run(str(clean.get("run_id") or ""), actor)
+        run = self._get_run(str(clean.get("run_id") or ""), actor, mutation=mutation)
         if run.status in {"completed", "failed"}:
             raise ServiceError("run_closed", f"Run already {run.status}")
         now = _utc_now()
@@ -1251,7 +1332,7 @@ class SkillsGatewayService:
         run.status = "failed"
         run.updated_at = now
         run.events.append({"type": "run_failed", "at": now, "failure": failure})
-        self._persist_run(run)
+        self._persist_run(run, mutation=mutation)
         return {
             "data": {"run_id": run.run_id, "status": run.status, "failure": failure},
             "run_id": run.run_id,
@@ -1529,10 +1610,11 @@ class SkillsGatewayService:
         actor: ActorClaims,
         params: Mapping[str, Any],
         idempotency_key: Optional[str],
+        mutation: Optional[MutationContext] = None,
     ) -> Dict[str, Any]:
         del idempotency_key
         clean = self._guard_params(prepare_feedback_params, params)
-        run = self._get_run(str(clean["run_id"]), actor)
+        run = self._get_run(str(clean["run_id"]), actor, mutation=mutation)
         if clean.get("skill_id") and str(clean["skill_id"]) != run.skill_id:
             raise ServiceError(
                 "auth_forbidden",
@@ -1553,9 +1635,9 @@ class SkillsGatewayService:
             "notes": clean.get("notes"),
             "at": _utc_now(),
         }
-        self._record_feedback(record)
+        self._record_feedback(record, mutation=mutation)
         run.feedback.append(record)
-        self._persist_run(run)
+        self._persist_run(run, mutation=mutation)
         return {
             "data": record,
             "recommended_next": None,
@@ -1567,10 +1649,11 @@ class SkillsGatewayService:
         actor: ActorClaims,
         params: Mapping[str, Any],
         idempotency_key: Optional[str],
+        mutation: Optional[MutationContext] = None,
     ) -> Dict[str, Any]:
         del idempotency_key
         clean = self._guard_params(prepare_trace_params, params)
-        run = self._get_run(str(clean["run_id"]), actor)
+        run = self._get_run(str(clean["run_id"]), actor, mutation=mutation)
         if clean.get("skill_id") and str(clean["skill_id"]) != run.skill_id:
             raise ServiceError(
                 "auth_forbidden",
@@ -1619,5 +1702,5 @@ class SkillsGatewayService:
             "at": _utc_now(),
             "deduplicated": False,
         }
-        self._record_trace(record)
+        self._record_trace(record, mutation=mutation)
         return {"data": record, "recommended_next": "enqueue_review"}

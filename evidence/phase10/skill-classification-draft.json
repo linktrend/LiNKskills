@@ -1,7 +1,7 @@
 {
-  "note": "Classification ledger updated in wave 10 — request-local mutation batches + honest downstream acknowledgment; not a live usable/certified promotion.",
+  "note": "Classification ledger updated in wave 11 — per-service mutation serialization through cache publish + explicit MutationContext; not a live usable/certified promotion.",
   "as_of": "2026-07-29",
-  "wave": 10,
+  "wave": 11,
   "launch_target_source": "evidence/phase1/canary-set.json",
   "launch_targets_with_canonical_v01_artifacts": [
     "git-safeguard",
@@ -28,7 +28,9 @@
   "idempotency": {
     "fence_token": true,
     "db_owned_atomic_reserve_mutate_complete": true,
-    "mutation_batch_request_local_contextvar": true,
+    "mutation_context_explicit_request_owned": true,
+    "mutation_gate_serialize_commit_through_publish": true,
+    "mutation_reads_store_not_stale_cache": true,
     "crash_injection_after_mutation": true,
     "external_side_effect_complete_checks_reservation_fence": true,
     "downstream_key_stable_not_fence_derived": true,
