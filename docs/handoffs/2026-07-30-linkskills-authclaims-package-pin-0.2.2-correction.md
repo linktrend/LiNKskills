@@ -58,4 +58,4 @@ Result: **18 tests OK** (no CI poll; no merge).
 
 ## Exact clean HEAD
 
-**Exact clean HEAD:** `f136bab9b270ab29c7f09dc1f0fa64cabf051f98`
+**Exact clean HEAD:** `706d05269228727c9cfdf134a60f3866801bf715`
