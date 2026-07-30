@@ -15,7 +15,7 @@
 | Exact start HEAD | `4c8fd17267c45e2c0139d52d5317044ae6668628` |
 | Wave-3 Exact clean HEAD (corrected evidence) | `4c8fd17267c45e2c0139d52d5317044ae6668628` |
 | Implementation commit (Wave 4) | `9cdbc1242bd8b656a664112ea57d2a145e57bd11` |
-| Exact clean pushed HEAD | reported by agent after push |
+| Exact clean pushed HEAD | `51d006fc7d33d949c7859ab8fdfa3ad43d6f6f7d` |
 
 ## Corrected evidence
 
