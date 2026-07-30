@@ -1,7 +1,7 @@
 # Classification honesty rules (LiNKskills)
 
-**Authority:** ADR 0006 (execution-profile certification), ADR 0009 (confined executor isolation), `packages/core/linkskills_core/certification.py`  
-**Ledger:** `evidence/phase10/skill-classification-draft.json`  
+**Authority:** ADR 0006 (execution-profile certification), ADR 0009 (confined executor isolation), `packages/core/linkskills_core/certification.py`
+**Ledger:** `evidence/phase10/skill-classification-draft.json`
 **Updated:** 2026-07-30
 
 ## Purpose

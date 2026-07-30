@@ -28,18 +28,14 @@ from .persistence import (
     stable_downstream_idempotency_key,
 )
 
-try:
-    from linkskills_core.payload_guard import (
-        PayloadValidationError,
-        prepare_feedback_params,
-        prepare_run_mutation_params,
-        prepare_trace_params,
-    )
-except ImportError:  # pragma: no cover - path wiring in tests
-    PayloadValidationError = None  # type: ignore[misc, assignment]
-    prepare_feedback_params = None  # type: ignore[misc, assignment]
-    prepare_run_mutation_params = None  # type: ignore[misc, assignment]
-    prepare_trace_params = None  # type: ignore[misc, assignment]
+# Privacy/validation is mandatory — never soft-disable on ImportError.
+# Missing linkskills-core / payload_guard must fail import (and therefore startup).
+from linkskills_core.payload_guard import (
+    PayloadValidationError,
+    prepare_feedback_params,
+    prepare_run_mutation_params,
+    prepare_trace_params,
+)
 
 
 CONTRACT_VERSION = "skills.api.v0.1"
@@ -880,15 +876,15 @@ class SkillsGatewayService:
 
     def _guard_params(self, preparer: Any, params: Mapping[str, Any]) -> Dict[str, Any]:
         if preparer is None:
-            return dict(params)
+            raise ServiceError(
+                "privacy_unavailable",
+                "payload privacy/validation preparer is unavailable; refuse request",
+                http_status=500,
+            )
         try:
             return preparer(params)
-        except PayloadValidationError as exc:  # type: ignore[misc]
+        except PayloadValidationError as exc:
             raise ServiceError(exc.code, exc.message, http_status=400) from exc
-        except Exception as exc:
-            if PayloadValidationError is not None and isinstance(exc, PayloadValidationError):
-                raise ServiceError(exc.code, exc.message, http_status=400) from exc
-            raise
 
     def _publish_mutation_context(self, mutation: MutationContext) -> None:
         """Publish pending mutations only after DB commit; marks context expired."""

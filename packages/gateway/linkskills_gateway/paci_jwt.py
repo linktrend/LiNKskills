@@ -1,7 +1,7 @@
 """PACI compact JWS (ES256) verification and AuthClaims extraction.
 
-**Evidence class:** implemented but not proven against frozen Platform PACI
-service (envelope ``platform.auth-token-envelope/0.1.3-draft``).
+**Evidence class:** local/fake conformance against frozen
+``platform.auth-token-envelope/0.1.0``; not live-proven against Platform PACI.
 
 Uses ``cryptography`` for ES256 — no PyJWT/jose dependency.
 """
@@ -11,6 +11,7 @@ from __future__ import annotations
 import base64
 import json
 import time
+import uuid
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any, Callable, Dict, Mapping, Optional, Sequence, Set
@@ -27,6 +28,7 @@ from .paci_types import (
     CLOCK_SKEW_SECONDS,
     FORBIDDEN_ALGS,
     FORBIDDEN_HEADER_KEY_PARAMS,
+    MAX_ACCESS_TOKEN_TTL_SECONDS,
     PACI_ALG,
     PACI_CLAIMS_NAMESPACE,
     PACI_TOKEN_TYP,
@@ -199,28 +201,51 @@ def verify_es256_signature(
         raise AuthError("auth_signature_invalid", f"ES256 verify error: {exc}") from exc
 
 
-def _as_string_set(value: Any, *, field: str) -> Set[str]:
+def _as_aud_set(value: Any) -> Set[str]:
+    """Require ``aud`` as a non-empty JSON array (string form rejected)."""
     if isinstance(value, str):
-        # JWT aud may be a single string per RFC 7519; treat as singleton set.
-        text = value.strip()
-        if not text:
-            raise AuthError("auth_invalid", f"{field} must be non-empty")
-        return {text}
+        raise AuthError(
+            "auth_invalid",
+            "JWT aud must be a non-empty array (string audience rejected)",
+        )
     if not isinstance(value, list) or not value:
-        raise AuthError("auth_invalid", f"{field} must be a non-empty array (or string)")
-    out = {str(item).strip() for item in value}
-    if "" in out or len(out) != len(value):
-        # Reject empty entries; allow set semantics for equality later.
-        if "" in out:
-            raise AuthError("auth_invalid", f"{field} entries must be non-empty")
+        raise AuthError("auth_invalid", "JWT aud must be a non-empty array")
+    out: Set[str] = set()
+    for item in value:
+        if not isinstance(item, str) or not item.strip():
+            raise AuthError("auth_invalid", "JWT aud entries must be non-empty strings")
+        text = item.strip()
+        if text in out:
+            raise AuthError("auth_invalid", "JWT aud entries must be unique")
+        out.add(text)
     return out
 
 
 def _require_numeric_date(payload: Mapping[str, Any], name: str) -> int:
+    """Require whole-second NumericDate (JSON integer; reject bool/float)."""
     value = payload.get(name)
-    if isinstance(value, bool) or not isinstance(value, (int, float)):
-        raise AuthError("auth_invalid", f"JWT claim {name} must be NumericDate (number)")
-    return int(value)
+    if isinstance(value, bool) or not isinstance(value, int):
+        raise AuthError(
+            "auth_invalid",
+            f"JWT claim {name} must be whole-second NumericDate (integer)",
+        )
+    if value < 0:
+        raise AuthError("auth_invalid", f"JWT claim {name} must be >= 0")
+    return value
+
+
+def _require_uuid_jti(value: Any) -> str:
+    if not isinstance(value, str) or not value.strip():
+        raise AuthError("auth_invalid", "JWT jti is required")
+    text = value.strip()
+    try:
+        parsed = uuid.UUID(text)
+    except ValueError as exc:
+        raise AuthError("auth_invalid", "JWT jti must be an RFC 4122 UUID") from exc
+    # Reject non-canonical forms (urn:uuid:, braces) — UUID() accepts them.
+    if text.lower() != str(parsed):
+        raise AuthError("auth_invalid", "JWT jti must be a canonical UUID string")
+    return str(parsed)
 
 
 def validate_registered_claims(
@@ -230,6 +255,7 @@ def validate_registered_claims(
     expected_audiences: Sequence[str],
     now: Optional[float] = None,
     skew_seconds: int = CLOCK_SKEW_SECONDS,
+    check_temporal: bool = True,
 ) -> Dict[str, Any]:
     """Validate iss/aud/sub/iat/exp/nbf/jti with zero skew (default)."""
     if skew_seconds != 0:
@@ -237,18 +263,25 @@ def validate_registered_claims(
             "auth_config",
             "PACI Phase-1 clock skew must be 0 (AuthClaims contract)",
         )
-    iss = str(payload.get("iss") or "").strip()
-    if not iss:
+    iss = payload.get("iss")
+    if not isinstance(iss, str) or not iss.strip():
         raise AuthError("auth_invalid", "JWT iss is required")
+    iss = iss.strip()
+    if iss.endswith("/"):
+        raise AuthError(
+            "auth_invalid",
+            "JWT iss must not end with '/' (Phase-1 root issuer rule)",
+        )
     if iss != expected_issuer:
         raise AuthError(
             "auth_forbidden",
             f"Wrong issuer: expected {expected_issuer!r}, got {iss!r}",
         )
-    sub = str(payload.get("sub") or "").strip()
-    if not sub:
+    sub = payload.get("sub")
+    if not isinstance(sub, str) or not sub.strip():
         raise AuthError("auth_invalid", "JWT sub is required")
-    aud = _as_string_set(payload.get("aud"), field="aud")
+    sub = sub.strip()
+    aud = _as_aud_set(payload.get("aud"))
     expected = {str(a).strip() for a in expected_audiences if str(a).strip()}
     if not expected:
         raise AuthError("auth_config", "expected audiences must be non-empty")
@@ -260,23 +293,30 @@ def validate_registered_claims(
     iat = _require_numeric_date(payload, "iat")
     exp = _require_numeric_date(payload, "exp")
     nbf = _require_numeric_date(payload, "nbf")
-    jti = str(payload.get("jti") or "").strip()
-    if not jti:
-        raise AuthError("auth_invalid", "JWT jti is required")
+    jti = _require_uuid_jti(payload.get("jti"))
 
-    now_epoch = int(time.time() if now is None else now)
-    # Zero skew: reject if now < nbf/iat; reject if now >= exp.
-    if now_epoch < nbf:
-        raise AuthError("auth_not_yet_valid", "JWT nbf not yet valid")
-    if now_epoch < iat:
-        raise AuthError("auth_not_yet_valid", "JWT iat not yet valid")
-    if now_epoch >= exp:
-        raise AuthError("auth_expired", "JWT expired")
     if nbf != iat:
         # Phase-1 mint rule: nbf === iat
         raise AuthError("auth_invalid", "Phase-1 PACI requires nbf == iat")
     if exp <= iat:
         raise AuthError("auth_invalid", "JWT exp must be greater than iat")
+    lifetime = exp - iat
+    if lifetime > MAX_ACCESS_TOKEN_TTL_SECONDS:
+        raise AuthError(
+            "auth_ttl_rejected",
+            f"Access token lifetime {lifetime}s exceeds max "
+            f"{MAX_ACCESS_TOKEN_TTL_SECONDS}s (reject including 3600)",
+        )
+
+    if check_temporal:
+        now_epoch = int(time.time() if now is None else now)
+        # Zero skew: reject if now < nbf/iat; reject if now >= exp.
+        if now_epoch < nbf:
+            raise AuthError("auth_not_yet_valid", "JWT nbf not yet valid")
+        if now_epoch < iat:
+            raise AuthError("auth_not_yet_valid", "JWT iat not yet valid")
+        if now_epoch >= exp:
+            raise AuthError("auth_expired", "JWT expired")
 
     return {
         "iss": iss,
@@ -396,6 +436,42 @@ class VerifiedPaciToken:
     raw_token: str
 
 
+def validate_envelope_payload_shape(
+    payload: Mapping[str, Any],
+    *,
+    expected_issuer: Optional[str] = None,
+    expected_audiences: Optional[Sequence[str]] = None,
+    now: Optional[float] = None,
+    check_temporal: bool = False,
+) -> Dict[str, Any]:
+    """Validate frozen envelope payload shape (unsigned fixtures / pre-crypto).
+
+    Defaults ``expected_issuer`` / ``expected_audiences`` from the payload itself
+    so Platform fixtures (any audience) can be exercised without Skills pins.
+    Temporal checks default off for fixed-clock fixture payloads.
+    """
+    claims = extract_auth_claims(payload)
+    issuer = expected_issuer or str(payload.get("iss") or "").strip()
+    audiences: Sequence[str]
+    if expected_audiences is not None:
+        audiences = expected_audiences
+    else:
+        aud_raw = payload.get("aud")
+        if not isinstance(aud_raw, list):
+            raise AuthError("auth_invalid", "JWT aud must be a non-empty array")
+        audiences = [str(a) for a in aud_raw]
+    registered = validate_registered_claims(
+        payload,
+        expected_issuer=issuer,
+        expected_audiences=audiences,
+        now=now,
+        skew_seconds=CLOCK_SKEW_SECONDS,
+        check_temporal=check_temporal,
+    )
+    assert_cross_field_equality(payload, claims, registered=registered)
+    return {"registered": registered, "claims": claims}
+
+
 class PaciJwtVerifier:
     """Verify PACI compact JWS and return frozen AuthClaims payload."""
 
@@ -432,6 +508,7 @@ class PaciJwtVerifier:
             expected_audiences=self.audiences,
             now=self._now(),
             skew_seconds=CLOCK_SKEW_SECONDS,
+            check_temporal=True,
         )
         claims = extract_auth_claims(parsed.payload)
         assert_cross_field_equality(parsed.payload, claims, registered=registered)

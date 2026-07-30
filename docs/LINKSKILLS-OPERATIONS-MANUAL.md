@@ -144,34 +144,34 @@ So a failure is usually: “checks failed, usage was still recorded locally, cer
 
 ## FAQ
 
-**Do I need to understand Python or git to use this?**  
+**Do I need to understand Python or git to use this?**
 No. Your role is direction and escalated judgment. Technical helpers and agents handle the mechanics.
 
-**Does LiNKskills control what my Programs are allowed to do?**  
+**Does LiNKskills control what my Programs are allowed to do?**
 No. That was tried earlier and reversed. Permission-to-act lives in each Program’s ledger and LiNKplatform’s capability grants.
 
-**Is this the same system as LiNKbrain?**  
+**Is this the same system as LiNKbrain?**
 No. Brain = knowledge/memory. Skills = procedures. Separate services on purpose.
 
-**How do I know the library is healthy?**  
+**How do I know the library is healthy?**
 Ask for a short status briefing covering: CI on `main`, whether validators pass, whether the registry migration was applied by Platform, whether real auth replaced fakes, whether Gateway consumers are on published releases, and whether Librarian passes are flowing under supervision. Prefer briefings over raw logs. Do not treat a developer laptop `/health` check as production readiness.
 
-**What if I don’t like a proposed skill upgrade?**  
+**What if I don’t like a proposed skill upgrade?**
 Leave it uncertified / reject the escalation. Agents should not treat it as certified/`usable` until a clean pass lands.
 
-**Is the old Logic Engine still running?**  
+**Is the old Logic Engine still running?**
 No. It is archived for history and must not be deployed.
 
-**Where do the “official” explanations live now?**  
+**Where do the “official” explanations live now?**
 Intent, Technical PRD, this Operations Manual, OPEN-ISSUES, the approved internal-launch plan, and ADRs 0001–0008. Older scattered docs under `docs/archive/` are history only.
 
 ---
 
 ## One-page reminder
 
-1. LiNKskills is the shared skill bookshelf and procedure platform for every Program’s agents.  
-2. Skills are files + real quality suites + published releases + usage logs — not a permission system.  
-3. Steady-state delivery is the Gateway (`skills_*`); git checkout loading is a migration bridge.  
-4. The Librarian improves the shelf on a schedule and escalates ambiguous upgrades to you.  
-5. You do not need to run technical commands; you decide direction and escalations.  
+1. LiNKskills is the shared skill bookshelf and procedure platform for every Program’s agents.
+2. Skills are files + real quality suites + published releases + usage logs — not a permission system.
+3. Steady-state delivery is the Gateway (`skills_*`); git checkout loading is a migration bridge.
+4. The Librarian improves the shelf on a schedule and escalates ambiguous upgrades to you.
+5. You do not need to run technical commands; you decide direction and escalations.
 6. Live stage/prod readiness, live migration apply, real Platform auth, and independent Codex verification are still ahead — and this handbook says so honestly.

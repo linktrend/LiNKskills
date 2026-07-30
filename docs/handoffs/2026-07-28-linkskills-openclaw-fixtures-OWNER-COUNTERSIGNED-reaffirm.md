@@ -1,8 +1,8 @@
 # LiNKskills OWNER_COUNTERSIGNED reaffirmation — OpenClaw Skills fixtures
 
-**Status:** `OWNER_COUNTERSIGNED` (reaffirmation)  
-**Scope:** Lightweight domain-owner reaffirmation only. **Not** a new full review of changed Skills content (none found). **Not** Codex certification. **Not** merge authority.  
-**Date / time:** 2026-07-28 12:58 Asia/Taipei  
+**Status:** `OWNER_COUNTERSIGNED` (reaffirmation)
+**Scope:** Lightweight domain-owner reaffirmation only. **Not** a new full review of changed Skills content (none found). **Not** Codex certification. **Not** merge authority.
+**Date / time:** 2026-07-28 12:58 Asia/Taipei
 
 ## Reviewer / session identity
 

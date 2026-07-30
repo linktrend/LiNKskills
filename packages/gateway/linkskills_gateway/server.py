@@ -12,16 +12,21 @@ Routes:
 Compatibility note: ``packages/client/linkskills_client/compat.py`` wraps
 ``lib.skill_runtime`` so existing Python consumers can migrate toward this
 gateway without an immediate cutover.
+
+Signals: ``SIGTERM`` / ``SIGINT`` stop intake (drain), wait boundedly for
+in-flight work, persist/close the store, then exit with an honest code.
 """
 
 from __future__ import annotations
 
 import json
 import os
+import signal
 import sys
+import threading
 import uuid
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from typing import Any, Dict, Mapping, Optional, Tuple, Type
+from typing import Any, Callable, Dict, Mapping, Optional, Tuple, Type
 from urllib.parse import urlparse
 
 from .auth import (
@@ -32,8 +37,11 @@ from .auth import (
 from .ops import (
     DrainState,
     GatewayMetrics,
+    ShutdownResult,
     auth_config_present,
     drain_from_environ,
+    run_graceful_shutdown,
+    shutdown_timeout_s,
     store_probe_configured,
 )
 from .service import OPERATIONS, ServiceError, SkillsGatewayService
@@ -384,7 +392,90 @@ def create_server(
         drain=drain,
         environ=environ,
     )
-    return ThreadingHTTPServer((host, port), handler)
+    httpd = ThreadingHTTPServer((host, port), handler)
+    # Attach runtime handles for signal/drain shutdown (tests may override).
+    httpd.linkskills_service = svc  # type: ignore[attr-defined]
+    httpd.linkskills_metrics = metrics  # type: ignore[attr-defined]
+    httpd.linkskills_drain = drain  # type: ignore[attr-defined]
+    return httpd
+
+
+def _store_from_service(service: Any) -> Any:
+    """Best-effort store handle for shutdown close (private attr by design)."""
+    return getattr(service, "_store", None)
+
+
+def install_shutdown_signals(
+    httpd: ThreadingHTTPServer,
+    *,
+    drain: DrainState,
+    reason_prefix: str = "signal",
+) -> Callable[[], None]:
+    """Install SIGTERM/SIGINT handlers that enable drain and stop the HTTP loop.
+
+    ``httpd.shutdown()`` must not run on the serve thread; we dispatch it on a
+    daemon helper thread. Returns an uninstall callable for tests.
+    """
+    once = threading.Event()
+
+    def _request_stop(signum: int, _frame: Any = None) -> None:
+        if once.is_set():
+            return
+        once.set()
+        drain.enable(reason=f"{reason_prefix}:{signum}")
+        # Wake serve_forever from another thread (stdlib contract).
+        stopper = threading.Thread(
+            target=httpd.shutdown,
+            name="linkskills-gateway-shutdown",
+            daemon=True,
+        )
+        stopper.start()
+
+    previous_term = signal.signal(signal.SIGTERM, _request_stop)
+    previous_int = signal.signal(signal.SIGINT, _request_stop)
+
+    def uninstall() -> None:
+        signal.signal(signal.SIGTERM, previous_term)
+        signal.signal(signal.SIGINT, previous_int)
+
+    # Expose for unit tests that invoke the handler without OS signals.
+    httpd.linkskills_request_stop = _request_stop  # type: ignore[attr-defined]
+    return uninstall
+
+
+def serve_until_shutdown(
+    httpd: ThreadingHTTPServer,
+    *,
+    drain: DrainState,
+    metrics: GatewayMetrics,
+    store: Any = None,
+    timeout_s: Optional[float] = None,
+    install_signals: bool = True,
+) -> ShutdownResult:
+    """Serve forever until SIGTERM/SIGINT/KeyboardInterrupt, then graceful exit."""
+    uninstall: Optional[Callable[[], None]] = None
+    if install_signals:
+        uninstall = install_shutdown_signals(httpd, drain=drain)
+    try:
+        try:
+            httpd.serve_forever()
+        except KeyboardInterrupt:
+            drain.enable(reason="signal:KeyboardInterrupt")
+    finally:
+        if uninstall is not None:
+            uninstall()
+        result = run_graceful_shutdown(
+            drain=drain,
+            metrics=metrics,
+            store=store,
+            reason=drain.snapshot()[1] or "shutdown",
+            timeout_s=timeout_s,
+        )
+        try:
+            httpd.server_close()
+        except Exception:  # noqa: BLE001 — exit path must remain honest
+            pass
+    return result
 
 
 def main() -> None:
@@ -405,20 +496,37 @@ def main() -> None:
         raise SystemExit(2) from exc
     metrics = GatewayMetrics()
     drain = drain_from_environ()
+    service = SkillsGatewayService()
     httpd = create_server(
         args.host,
         args.port,
+        service=service,
         verifier=verifier,
         metrics=metrics,
         drain=drain,
     )
+    timeout = shutdown_timeout_s()
     print(f"linkskills-gateway listening on http://{args.host}:{args.port}")
-    try:
-        httpd.serve_forever()
-    except KeyboardInterrupt:
-        pass
-    finally:
-        httpd.server_close()
+    result = serve_until_shutdown(
+        httpd,
+        drain=drain,
+        metrics=metrics,
+        store=_store_from_service(service),
+        timeout_s=timeout,
+    )
+    if result.timed_out:
+        print(
+            "linkskills-gateway shutdown timed out with "
+            f"in_flight={result.in_flight_remaining}",
+            file=sys.stderr,
+        )
+    else:
+        print(
+            "linkskills-gateway shutdown clean "
+            f"(store_closed={result.store_closed})",
+            file=sys.stderr,
+        )
+    raise SystemExit(result.exit_code)
 
 
 if __name__ == "__main__":

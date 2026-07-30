@@ -60,7 +60,8 @@ Platform-consumable env/ports/health contract:
 1. Clone `linktrend/LiNKskills` and check out a pinned tag/SHA.
 2. Install Python 3.11+ and the editable packages above.
 3. Copy `deploy/vps/.env.example` → `deploy/vps/.env`. Fill **names only**
-   (no secret values in git). Prefer GSM SecretRef *names*.
+   (no secret values in git). Prefer GSM SecretRef *names* rendered to local
+   file paths for `LINKSKILLS_PACI_CLIENT_PRIVATE_KEY_FILE`.
 4. Render runtime secrets when GSM is available:
 
 ```bash
@@ -92,20 +93,30 @@ not by the retired compose file.
 
 Never commit secret values. `.env` holds placeholders and `*_SECRET_NAME`
 keys; `render-env-from-gsm.sh` writes `.env.runtime` (mode `600`, gitignored).
+Private key material reaches the PACI client only as a **file path** via
+`LINKSKILLS_PACI_CLIENT_PRIVATE_KEY_FILE` (never CLI args, never logs).
 
 | Concern | Env / SecretRef name pattern | Notes |
 |---|---|---|
 | Platform authenticator module | `LINKSKILLS_PLATFORM_AUTHENTICATOR` | `module.path:attr` — not a secret |
-| PACI issuer / JWKS / audience | `LINKSKILLS_PACI_*` | URLs + audience `lskills-api`; no keys in repo |
-| Client assertion / private key | `LINKSKILLS_PACI_CLIENT_ASSERTION_KEY_SECRET_NAME` | GSM name only |
-| Canary bearer | `LINKSKILLS_CANARY_AUTHORIZATION_SECRET_NAME` | Optional; Platform-issued |
+| PACI issuer | `LINKSKILLS_PACI_ISSUER` | Public URL |
+| PACI JWKS | `LINKSKILLS_PACI_JWKS_URI` | Same origin as issuer |
+| PACI audience | `LINKSKILLS_PACI_AUDIENCE` | Default `lskills-api` |
+| Required service scopes | `LINKSKILLS_PACI_REQUIRED_SERVICE_SCOPES` | CSV; default `lskills` |
+| Introspection | `LINKSKILLS_PACI_INTROSPECTION_URL` / `LINKSKILLS_PACI_INTROSPECTION_CLIENT_ID` | High-risk writes |
+| Token mint | `LINKSKILLS_PACI_TOKEN_ENDPOINT` / `LINKSKILLS_PACI_CLIENT_ID` | Client credentials |
+| Client private key file | `LINKSKILLS_PACI_CLIENT_PRIVATE_KEY_FILE` | Absolute SecretRef path to ES256 PEM |
+| Client assertion kid | `LINKSKILLS_PACI_CLIENT_KID` | Optional JOSE `kid` |
+| Mint scope / resource audience | `LINKSKILLS_PACI_SCOPE` / `LINKSKILLS_PACI_RESOURCE_AUDIENCE` | Optional Skills-pinned |
+| Auth mode | `LINKSKILLS_AUTH_MODE` | `production` or `local-test` |
+| Canary bearer | `LINKSKILLS_CANARY_AUTHORIZATION_SECRET_NAME` | Optional; local-test legacy |
 | Supabase (ops flush / librarian) | `LINKTREND_PLATFORM_*_SUPABASE_*_SECRET_NAME` | Existing VPS pattern |
 | Eval receipt issuer | `LINKSKILLS_EVAL_RUNNER_ISSUER_KEY_SECRET_NAME` | Sealing key via GSM |
 
 Ready probes check authenticator **env presence** in production; they do
 **not** load GSM secrets or import the authenticator module.
 
-## Health, ready, metrics, drain
+## Health, ready, metrics, drain, signals
 
 | Path | Meaning | Success |
 |---|---|---|
@@ -117,6 +128,12 @@ Ready probes check authenticator **env presence** in production; they do
 | `POST /drain/cancel` | Clear drain flag | `200` |
 
 Also: `LINKSKILLS_DRAIN=1` starts the process already draining.
+
+**Process signals:** `SIGTERM` / `SIGINT` enable drain, wait up to
+`LINKSKILLS_SHUTDOWN_TIMEOUT_S` (default `30`) for in-flight work to finish,
+persist/close the durable store when present, then exit `0` (clean) or `1`
+(timeout with remaining work — honest incomplete exit). Supervisors should
+prefer `SIGTERM` over `SIGKILL` so drain can complete.
 
 Do **not** expose `/drain` on a public ingress without host network policy.
 `/health` must not be treated as studio stage/prod readiness evidence.
@@ -135,6 +152,7 @@ Optional store probe when any of:
 | Catalog empty / missing index | `/ready` → `503` (`catalog_loaded=false`) | Restore checkout + rebuild `catalog/index.json` |
 | Store unreachable (probe on) | `/ready` → `503` (`store_reachable=false`) | Repair durable store / DSN; in-memory mode skips probe |
 | Draining | New `/v1/*` → `503` `draining`; health/metrics stay up | Finish cutover; `POST /drain/cancel` or restart without `LINKSKILLS_DRAIN` |
+| Shutdown timeout | Exit code `1`; remaining in-flight not guaranteed finished | Investigate stuck work; restart; do not claim clean drain |
 | Downstream DB / PostgREST unavailable | Gateway may still serve catalog reads from local index; telemetry flush / librarian writes buffer or fail closed per adapter | Platform restores shared DB; flush buffers |
 | MCP host down | HTTP Gateway can continue independently | Restart MCP under consumer host |
 
@@ -143,8 +161,8 @@ No silent fallback to unsigned Platform claims outside
 
 ## Rollback
 
-1. **Drain**: `POST /drain` (or set `LINKSKILLS_DRAIN=1` and restart).
-2. Wait for `/drain` → `in_flight: 0` (and no new consumer traffic).
+1. **Drain**: `POST /drain` (or set `LINKSKILLS_DRAIN=1` and restart), or send `SIGTERM` and let bounded shutdown run.
+2. Wait for `/drain` → `in_flight: 0` (and no new consumer traffic), or confirm clean exit code `0`.
 3. Stop Gateway/MCP processes (host supervisor / systemd — Platform-owned units).
 4. Check out previous known-good tag/SHA.
 5. Re-install editable packages at that SHA if needed.

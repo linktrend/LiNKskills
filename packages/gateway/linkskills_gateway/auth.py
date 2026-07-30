@@ -95,8 +95,9 @@ EXPECTED_SCHEMA_CONTENT_HASH = (
 # High-risk mutating writes that require PACI RFC 7662 introspection when the
 # PACI authenticator is configured (envelope §7.4 / §8 step 6). Matches Skills
 # Gateway WRITE_OPERATIONS (durable mutations + external side effects).
-# Evidence: implemented but not proven against frozen Platform PACI service
-# (platform.auth-token-envelope/0.1.3-draft).
+# PACI envelope pin: platform.auth-token-envelope/0.1.0 /
+# @linktrend/platform-contracts@0.3.0 (AuthClaims claim-shape package remains
+# 0.2.2 historically; PACI adoption uses 0.3.0 — see paci_types.py).
 HIGH_RISK_WRITE_OPERATIONS: frozenset[str] = frozenset(
     {
         "skills_run_start",

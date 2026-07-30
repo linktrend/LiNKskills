@@ -40,10 +40,12 @@ logger = logging.getLogger(__name__)
 CLIENT_ASSERTION_TYPE = "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"
 ASSERTION_LIFETIME_MAX_S = 300  # §6.2 exp ≤ 5 minutes
 EXPECTED_ACCESS_TTL_S = 900  # §6.4 phase-1: 15 minutes
+MAX_ACCESS_TTL_S = 900  # frozen envelope: reject mint expires_in above this
 EARLY_RENEWAL_FRACTION = 0.20
 DEFAULT_MAX_RETRIES = 3
 DEFAULT_BACKOFF_BASE_S = 0.25
 DEFAULT_TIMEOUT_S = 15.0
+GATEWAY_401_RETRY_MAX = 1  # invalidate + remint once on resource-server 401
 
 # Env SecretRef / config keys (no secret values)
 ENV_CLIENT_ID = "LINKSKILLS_PACI_CLIENT_ID"
@@ -122,16 +124,50 @@ def _assert_skills_pinned(label: str, value: str) -> None:
         )
 
 
-def _validate_token_endpoint(token_endpoint: str) -> str:
+def is_loopback_host(hostname: Optional[str]) -> bool:
+    if not hostname:
+        return False
+    host = hostname.strip().lower().strip("[]")
+    return host in {"127.0.0.1", "localhost", "::1"}
+
+
+def require_https_outside_local_test(
+    url: str,
+    *,
+    auth_mode: str,
+    label: str,
+) -> str:
+    """Enforce https for PACI/Gateway URLs outside local-test loopback.
+
+    Coordinated gate (L1/L2): ``LINKSKILLS_AUTH_MODE=local-test`` plus a
+    loopback host may use http; all other modes require https.
+    """
+    value = url.strip()
+    parsed = urlparse(value)
+    if parsed.scheme not in {"http", "https"} or not parsed.netloc:
+        raise PaciConfigError(f"{label} must be an absolute http(s) URI")
+    if parsed.scheme == "https":
+        return value
+    if auth_mode == AUTH_MODE_LOCAL_TEST and is_loopback_host(parsed.hostname):
+        return value
+    raise PaciConfigError(
+        f"{label} must be https outside LINKSKILLS_AUTH_MODE=local-test "
+        f"loopback (got scheme={parsed.scheme!r})"
+    )
+
+
+def _validate_token_endpoint(
+    token_endpoint: str,
+    *,
+    auth_mode: str = AUTH_MODE_PRODUCTION,
+) -> str:
     endpoint = token_endpoint.strip()
     _assert_skills_pinned("token_endpoint", endpoint)
-    parsed = urlparse(endpoint)
-    if parsed.scheme not in {"http", "https"} or not parsed.netloc:
-        raise PaciConfigError(
-            "token_endpoint must be an absolute http(s) URI (Skills-pinned)"
-        )
-    # Local/fake tests may use http://127.0.0.1; production expects https.
-    return endpoint
+    return require_https_outside_local_test(
+        endpoint,
+        auth_mode=auth_mode,
+        label="token_endpoint",
+    )
 
 
 @dataclass(frozen=True)
@@ -151,18 +187,35 @@ class PaciClientConfig:
     backoff_base_s: float = DEFAULT_BACKOFF_BASE_S
     timeout_s: float = DEFAULT_TIMEOUT_S
     domain: str = "skills"
+    auth_mode: str = AUTH_MODE_PRODUCTION
 
     def __post_init__(self) -> None:
         if self.domain != "skills":
             refuse_brain_openclaw_reuse(purpose=f"PaciClientConfig(domain={self.domain!r})")
         if not self.client_id.strip():
             raise PaciConfigError("client_id is required")
-        object.__setattr__(self, "token_endpoint", _validate_token_endpoint(self.token_endpoint))
+        mode = str(self.auth_mode or AUTH_MODE_PRODUCTION).strip().lower()
+        if mode not in {AUTH_MODE_PRODUCTION, AUTH_MODE_LOCAL_TEST}:
+            raise PaciConfigError(
+                f"Unknown auth_mode={self.auth_mode!r}; expected "
+                f"'{AUTH_MODE_PRODUCTION}' or '{AUTH_MODE_LOCAL_TEST}'"
+            )
+        object.__setattr__(self, "auth_mode", mode)
+        object.__setattr__(
+            self,
+            "token_endpoint",
+            _validate_token_endpoint(self.token_endpoint, auth_mode=mode),
+        )
         if self.resource_audience is not None:
             _assert_skills_pinned("resource_audience", self.resource_audience)
         if self.assertion_lifetime_s < 1 or self.assertion_lifetime_s > ASSERTION_LIFETIME_MAX_S:
             raise PaciConfigError(
                 f"assertion_lifetime_s must be 1..{ASSERTION_LIFETIME_MAX_S} (contract §6.2)"
+            )
+        if self.expected_access_ttl_s < 1 or self.expected_access_ttl_s > MAX_ACCESS_TTL_S:
+            raise PaciConfigError(
+                f"expected_access_ttl_s must be 1..{MAX_ACCESS_TTL_S} "
+                "(frozen access-token lifetime cap)"
             )
         if self.early_renewal_fraction <= 0 or self.early_renewal_fraction >= 1:
             raise PaciConfigError("early_renewal_fraction must be in (0, 1)")
@@ -235,6 +288,7 @@ class PaciTokenClient:
         kid = str(env.get(ENV_KID) or "").strip() or None
         scope = str(env.get(ENV_SCOPE) or "").strip() or None
         audience = str(env.get(ENV_RESOURCE_AUDIENCE) or "").strip() or None
+        mode = resolve_auth_mode(env)
         config = PaciClientConfig(
             client_id=client_id,
             token_endpoint=token_endpoint,
@@ -242,6 +296,7 @@ class PaciTokenClient:
             kid=kid,
             scope=scope,
             resource_audience=audience,
+            auth_mode=mode,
         )
         client = cls(config=config)
         if urlopen_impl is not None:
@@ -268,6 +323,10 @@ class PaciTokenClient:
             "live_proven": False,
             "note": "Skills-owned PACI client implemented locally; Platform PACI issuer absent",
         }
+
+    def invalidate(self) -> None:
+        """Drop cached access token (e.g. after resource-server HTTP 401)."""
+        self._cached = None
 
     def get_access_token(self, *, force_refresh: bool = False) -> str:
         """Return a usable access token, renewing early when TTL < 20% remaining."""
@@ -438,6 +497,11 @@ class PaciTokenClient:
                 raise PaciAuthError("PACI mint expires_in must be an integer") from exc
         if expires_in < 1:
             raise PaciAuthError("PACI mint expires_in must be positive")
+        if expires_in > MAX_ACCESS_TTL_S:
+            # Fail closed — never accept AS lifetime above frozen 900s cap.
+            raise PaciAuthError(
+                f"PACI mint expires_in={expires_in} exceeds max {MAX_ACCESS_TTL_S}s"
+            )
 
         now = time.time()
         self._cached = _CachedAccessToken(

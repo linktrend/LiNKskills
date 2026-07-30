@@ -24,3 +24,10 @@
 ## Hard stops
 
 No merge, CI poll, live migrate, deploy, canary, sibling edits, cost, self-certify. Stop for Codex re-verification.
+
+
+## Closed 2026-07-30 Asia/Taipei
+
+- Independent-verification correction packet completed and pushed on draft PR #22.
+- Stop for LiNKskills Codex re-verification (do not self-certify).
+- Handoff: `docs/handoffs/2026-07-30-linkskills-production-iv-correction.md`.

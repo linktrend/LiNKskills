@@ -17,6 +17,7 @@ Apply only after platform foundation + prior lskills catalog migrations are pres
 | 4 (**this package**) | `supabase/migrations/20260727_000005_lskills_registry_foundation.sql` | `36081765032f21dfd2dcca223035555e1e54b71298874235def8e0362c55c4ed` |
 | 5 (RLS upgrade) | `supabase/migrations/20260728_000006_lskills_rls_actor_org_scope.sql` | `12c2e45e94fd9216a5857ce53ce299a953dc2ee869f89bcdb392857133df763d` |
 | 6 (gateway persistence) | `supabase/migrations/20260730_000007_lskills_gateway_persistence.sql` | `c26d1c55d9f87e242fe1e225fd4240cd911a5e0315d88500417d491689596222` |
+| 7 (librarian review_queue) | `supabase/migrations/20260730_000008_lskills_review_queue.sql` | `0d5cf1f6abf62bddffc2e494bd8fb7faabe5aceb44266d446bb71f1209f43bab` |
 
 Also requires LiNKplatform `platform` foundation (`platform.organizations`, roles helpers) already applied on the shared database.
 
@@ -25,12 +26,15 @@ Also requires LiNKplatform `platform` foundation (`platform.organizations`, role
 - `lskills` schema exists with `catalog`, `telemetry`, `eval_runs`.
 - Roles `svc_lskills_runtime`, `svc_lskills_librarian`, `svc_observer` exist (created by catalog_core; re-created idempotently if missing).
 - Enum `lskills.certification_state` already exists (referenced by `lskills.certifications`).
+- Gateway helpers from 000006 (`lskills.org_matches` / `lskills.actor_matches`) and 000007 tables present before 000008.
 
 ## What this migration adds (additive only)
 
 Tables: `releases`, `bundles`, `fragments`, `tools`, `execution_profiles`, `certifications`, `skill_runs`, `run_events`, `feedback`, `trace_to_eval_candidates`.
 
 Gateway persistence add-on (000007): `idempotency`, `side_effect_intents`, `gateway_events`, plus additive `events_json` / `feedback_json` columns on `skill_runs`.
+
+Librarian review queue (000008): `lskills.review_queue` + enum `lskills.review_queue_status` with tenant/actor RLS, idempotency keys, provenance, retry/dead-letter, retention, and indexes.
 
 Does **not** drop or alter existing `catalog` / `telemetry` / `eval_runs` tables.
 
@@ -48,7 +52,8 @@ where table_schema = 'lskills'
   and table_name in (
     'releases', 'bundles', 'fragments', 'tools', 'execution_profiles',
     'certifications', 'skill_runs', 'run_events', 'feedback',
-    'trace_to_eval_candidates'
+    'trace_to_eval_candidates', 'idempotency', 'side_effect_intents',
+    'gateway_events', 'review_queue'
   )
 order by table_name;
 
@@ -60,7 +65,7 @@ where n.nspname = 'lskills'
   and c.relname in (
     'releases', 'bundles', 'fragments', 'tools', 'execution_profiles',
     'certifications', 'skill_runs', 'run_events', 'feedback',
-    'trace_to_eval_candidates'
+    'trace_to_eval_candidates', 'review_queue'
   )
 order by 1;
 
@@ -71,7 +76,7 @@ where table_schema = 'lskills'
   and table_name in ('catalog', 'telemetry', 'eval_runs');
 ```
 
-Expected: 10 registry tables with RLS enabled; `core_tables = 3`.
+Expected: registry + gateway + `review_queue` with RLS enabled; `core_tables = 3`.
 
 ## Explicit apply rule
 

@@ -168,14 +168,15 @@ class McpParityTests(unittest.TestCase):
             else:
                 os.environ["LINKSKILLS_AUTH_MODE"] = old_mode
 
-    def test_canary_requires_platform_bearer(self) -> None:
-        with self.assertRaises(SystemExit):
+    def test_canary_requires_paci_proxy_path(self) -> None:
+        with self.assertRaises(SystemExit) as ctx:
             resolve_canary_default_actor(
                 environ={
                     "LINKSKILLS_CANARY": "1",
                     "LINKSKILLS_AUTH_MODE": "production",
                 }
             )
+        self.assertIn("PACI", str(ctx.exception))
 
     def test_canary_rejects_local_test_mode(self) -> None:
         with self.assertRaises(SystemExit) as ctx:
@@ -188,30 +189,54 @@ class McpParityTests(unittest.TestCase):
             )
         self.assertIn("local-test", str(ctx.exception))
 
-    def test_canary_accepts_signed_bearer_with_production_verifier(self) -> None:
+    def test_canary_refuses_static_bearer(self) -> None:
         signed = mint_signed_test_bearer(_claims())
-        verifier = production_test_verifier()
-        actor = resolve_canary_default_actor(
-            environ={
-                "LINKSKILLS_CANARY": "1",
-                "LINKSKILLS_AUTH_MODE": "production",
-                "LINKSKILLS_CANARY_AUTHORIZATION": f"Bearer {signed}",
-            },
-            verifier=verifier,
-        )
-        assert actor is not None
-        self.assertEqual(actor.actor_id, "actor-mcp")
-
-    def test_canary_rejects_unsigned_bearer_even_if_injected(self) -> None:
-        verifier = production_test_verifier()
-        with self.assertRaises(AuthError) as ctx:
+        with self.assertRaises(SystemExit) as ctx:
             resolve_canary_default_actor(
                 environ={
                     "LINKSKILLS_CANARY": "1",
                     "LINKSKILLS_AUTH_MODE": "production",
-                    "LINKSKILLS_CANARY_AUTHORIZATION": f"Bearer {self.token}",
+                    "LINKSKILLS_CANARY_AUTHORIZATION": f"Bearer {signed}",
                 },
-                verifier=verifier,
+                verifier=production_test_verifier(),
+            )
+        self.assertIn("static bearer", str(ctx.exception).lower())
+
+    def test_canary_refuses_gateway_token_static(self) -> None:
+        with self.assertRaises(SystemExit) as ctx:
+            resolve_canary_default_actor(
+                environ={
+                    "LINKSKILLS_CANARY": "1",
+                    "LINKSKILLS_AUTH_MODE": "production",
+                    "GATEWAY_TOKEN": f"Bearer {self.token}",
+                },
+                verifier=production_test_verifier(),
+            )
+        self.assertIn("static bearer", str(ctx.exception).lower())
+
+    def test_signed_bearer_still_works_when_injected_as_authorization(self) -> None:
+        """Crypto path remains via per-call Authorization (PACI proxy injects)."""
+        signed = mint_signed_test_bearer(_claims())
+        verifier = production_test_verifier()
+        mcp = SkillsMcpServer(
+            service=self.service,
+            verifier=verifier,
+        )
+        env = mcp.call_tool(
+            "skills_list",
+            {"params": {}},
+            authorization=f"Bearer {signed}",
+        )
+        self.assertGreater(env["data"]["count"], 0)
+
+    def test_unsigned_bearer_rejected_by_production_verifier(self) -> None:
+        verifier = production_test_verifier()
+        mcp = SkillsMcpServer(service=self.service, verifier=verifier)
+        with self.assertRaises(AuthError) as ctx:
+            mcp.call_tool(
+                "skills_list",
+                {"params": {}},
+                authorization=f"Bearer {self.token}",
             )
         self.assertEqual(ctx.exception.code, "auth_unsigned_rejected")
 

@@ -8,9 +8,15 @@ from .auth import (
     PlatformClaimsVerifier,
     resolve_claims_verifier,
 )
-from .ops import DrainState, GatewayMetrics, auth_config_present
+from .ops import (
+    DrainState,
+    GatewayMetrics,
+    ShutdownResult,
+    auth_config_present,
+    run_graceful_shutdown,
+)
 from .service import SkillsGatewayService, OPERATIONS
-from .server import create_server, make_handler
+from .server import create_server, make_handler, serve_until_shutdown
 
 __all__ = [
     "ActorClaims",
@@ -20,8 +26,11 @@ __all__ = [
     "GatewayMetrics",
     "LocalUnsignedClaimsVerifier",
     "PlatformClaimsVerifier",
+    "ShutdownResult",
     "auth_config_present",
     "resolve_claims_verifier",
+    "run_graceful_shutdown",
+    "serve_until_shutdown",
     "SkillsGatewayService",
     "OPERATIONS",
     "create_server",

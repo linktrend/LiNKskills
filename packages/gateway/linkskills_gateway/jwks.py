@@ -1,7 +1,7 @@
 """Same-origin, no-redirect JWKS client for PACI ES256 verification.
 
-**Evidence class:** implemented but not proven against frozen Platform PACI
-service (envelope ``platform.auth-token-envelope/0.1.3-draft``).
+**Evidence class:** local/fake conformance against frozen
+``platform.auth-token-envelope/0.1.0``; not live-proven against Platform PACI.
 """
 
 from __future__ import annotations
@@ -15,7 +15,12 @@ from typing import Any, Callable, Dict, List, Mapping, Optional, Protocol
 from urllib.parse import urlparse
 
 from .auth import AuthError
-from .paci_types import JWKS_CACHE_TTL_SECONDS, PACI_ALG
+from .paci_types import (
+    AUTH_MODE_LOCAL_TEST,
+    JWKS_CACHE_TTL_SECONDS,
+    LOCAL_TEST_LOOPBACK_HOSTS,
+    PACI_ALG,
+)
 
 
 FetchFn = Callable[[str], bytes]
@@ -32,6 +37,32 @@ class JwksKeyProvider(Protocol):
 
     def purge_all(self) -> None:
         """Drop the entire JWKS cache."""
+
+
+def assert_https_transport(
+    url: str,
+    *,
+    label: str,
+    auth_mode: str = "production",
+) -> None:
+    """Require HTTPS except explicit local-test loopback HTTP."""
+    parsed = urlparse(str(url).strip())
+    scheme = (parsed.scheme or "").lower()
+    host = (parsed.hostname or "").lower()
+    if scheme == "https":
+        return
+    if (
+        scheme == "http"
+        and auth_mode == AUTH_MODE_LOCAL_TEST
+        and host in LOCAL_TEST_LOOPBACK_HOSTS
+    ):
+        return
+    raise AuthError(
+        "auth_https_required",
+        f"{label} must use HTTPS in non-test environments "
+        f"(got {scheme!r}://{host or ''}); "
+        f"HTTP only when LINKSKILLS_AUTH_MODE=local-test AND loopback host",
+    )
 
 
 def assert_same_origin(issuer: str, jwks_uri: str) -> None:
@@ -62,7 +93,11 @@ def assert_same_origin(issuer: str, jwks_uri: str) -> None:
         )
 
 
-def validate_issuer_identifier(issuer: str) -> None:
+def validate_issuer_identifier(
+    issuer: str,
+    *,
+    auth_mode: str = "production",
+) -> None:
     """Phase-1: issuer must be absolute URI, no trailing slash, no path."""
     text = str(issuer).strip()
     if not text:
@@ -80,6 +115,7 @@ def validate_issuer_identifier(issuer: str) -> None:
             "auth_config",
             "PACI Phase-1 issuer must not contain a non-empty path",
         )
+    assert_https_transport(text, label="PACI issuer", auth_mode=auth_mode)
 
 
 def _validate_ec_p256_jwk(jwk: Mapping[str, Any], *, kid: str) -> None:
@@ -204,8 +240,10 @@ class CachedJwksClient:
         cache_ttl_seconds: float = JWKS_CACHE_TTL_SECONDS,
         now_fn: Optional[Callable[[], float]] = None,
         initial_document: Optional[Mapping[str, Any]] = None,
+        auth_mode: str = "production",
     ) -> None:
-        validate_issuer_identifier(issuer)
+        validate_issuer_identifier(issuer, auth_mode=auth_mode)
+        assert_https_transport(jwks_uri, label="PACI jwks_uri", auth_mode=auth_mode)
         assert_same_origin(issuer, jwks_uri)
         if cache_ttl_seconds <= 0 or cache_ttl_seconds > JWKS_CACHE_TTL_SECONDS:
             # Allow shorter TTL in tests; never exceed envelope bound.

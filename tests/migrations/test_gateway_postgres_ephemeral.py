@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Ephemeral Postgres proofs for GatewayStore Postgres adapter + RLS.
+"""Ephemeral Postgres proofs for GatewayStore + review_queue RLS.
 
 Enabled when:
 - ``LINKSKILLS_EPHEMERAL_PG_URL`` or ``LINKSKILLS_TEST_PG_DSN`` is set, or
@@ -14,9 +14,11 @@ import os
 import shutil
 import subprocess
 import sys
+import threading
 import time
 import unittest
 import uuid
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -28,7 +30,7 @@ MIGRATIONS = REPO_ROOT / "supabase" / "migrations"
 FOUNDATION_SQL = MIGRATIONS / "20260727_000005_lskills_registry_foundation.sql"
 UPGRADE_SQL = MIGRATIONS / "20260728_000006_lskills_rls_actor_org_scope.sql"
 GATEWAY_SQL = MIGRATIONS / "20260730_000007_lskills_gateway_persistence.sql"
-REVIEW_QUEUE_DDL = REPO_ROOT / "tests" / "helpers" / "ephemeral_review_queue_ddl.sql"
+REVIEW_QUEUE_SQL = MIGRATIONS / "20260730_000008_lskills_review_queue.sql"
 
 BOOTSTRAP_SQL = """
 create extension if not exists "pgcrypto";
@@ -190,16 +192,53 @@ class GatewayPostgresEphemeralTests(unittest.TestCase):
         if cls._container_id:
             subprocess.run(["docker", "rm", "-f", cls._container_id], check=False)
 
-    def setUp(self) -> None:
+    def _apply_through(self, *paths: Path) -> None:
         with self.psycopg.connect(self.dsn, autocommit=True) as conn:  # type: ignore[attr-defined]
             with conn.cursor() as cur:
                 cur.execute("drop schema if exists lskills cascade;")
                 cur.execute(BOOTSTRAP_SQL)
-                for path in (FOUNDATION_SQL, UPGRADE_SQL, GATEWAY_SQL):
+                for path in paths:
                     cur.execute(_strip_verification(path.read_text(encoding="utf-8")))
-                # Allow tests to SET ROLE to service roles.
                 cur.execute("grant svc_lskills_runtime to postgres;")
                 cur.execute("grant svc_lskills_librarian to postgres;")
+                cur.execute("grant svc_observer to postgres;")
+
+    def setUp(self) -> None:
+        self._apply_through(FOUNDATION_SQL, UPGRADE_SQL, GATEWAY_SQL, REVIEW_QUEUE_SQL)
+
+    def test_fresh_and_upgrade_paths(self) -> None:
+        # Fresh: all four migrations applied in setUp — review_queue present.
+        with self.psycopg.connect(self.dsn, autocommit=True) as conn:  # type: ignore[attr-defined]
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    select 1 from information_schema.tables
+                    where table_schema = 'lskills' and table_name = 'review_queue'
+                    """
+                )
+                self.assertIsNotNone(cur.fetchone())
+
+        # Upgrade path: stop after 000007, then apply 000008 alone.
+        self._apply_through(FOUNDATION_SQL, UPGRADE_SQL, GATEWAY_SQL)
+        with self.psycopg.connect(self.dsn, autocommit=True) as conn:  # type: ignore[attr-defined]
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    select 1 from information_schema.tables
+                    where table_schema = 'lskills' and table_name = 'review_queue'
+                    """
+                )
+                self.assertIsNone(cur.fetchone())
+                cur.execute(_strip_verification(REVIEW_QUEUE_SQL.read_text(encoding="utf-8")))
+                cur.execute(
+                    """
+                    select 1 from information_schema.tables
+                    where table_schema = 'lskills' and table_name = 'review_queue'
+                    """
+                )
+                self.assertIsNotNone(cur.fetchone())
+                # Re-apply is idempotent.
+                cur.execute(_strip_verification(REVIEW_QUEUE_SQL.read_text(encoding="utf-8")))
 
     def test_idempotency_reserve_complete_replay(self) -> None:
         from linkskills_gateway.postgres_store import PostgresGatewayStore
@@ -290,26 +329,184 @@ class GatewayPostgresEphemeralTests(unittest.TestCase):
         finally:
             store.close()
 
-    def test_librarian_review_queue_ephemeral_ddl(self) -> None:
+    def test_gateway_schema_probe(self) -> None:
+        from linkskills_gateway.postgres_store import PostgresGatewayStore
+
+        store = PostgresGatewayStore(self.dsn, rls=False)
+        try:
+            self.assertTrue(store.probe_reachable())
+            self.assertTrue(store.probe_schema_ready())
+        finally:
+            store.close()
+
+    def test_review_queue_rls_wrong_actor_org_denied(self) -> None:
         from linkskills_librarian.postgres_store import PostgresReviewQueueStore
 
-        with self.psycopg.connect(self.dsn, autocommit=True) as conn:  # type: ignore[attr-defined]
-            with conn.cursor() as cur:
-                cur.execute(REVIEW_QUEUE_DDL.read_text(encoding="utf-8"))
-
-        store = PostgresReviewQueueStore(self.dsn)
+        store = PostgresReviewQueueStore(self.dsn, rls=True)
         try:
-            item = {
-                "review_id": "rev-1",
-                "kind": "proposal",
-                "status": "queued",
-                "at": "2026-07-30T00:00:00Z",
-            }
-            store.enqueue(item)
-            self.assertEqual(store.depth(), 1)
-            queued = store.list_queue(status="queued")
-            self.assertEqual(len(queued), 1)
-            self.assertEqual(queued[0]["review_id"], "rev-1")
+            with store.identity("actor-a", "org-a"):
+                item = store.enqueue(
+                    {
+                        "review_id": "rev-a1",
+                        "kind": "proposal",
+                        "status": "queued",
+                        "actor_id": "actor-a",
+                        "org_id": "org-a",
+                        "provenance": {"source": "ephemeral"},
+                        "at": "2026-07-30T00:00:00Z",
+                    }
+                )
+                self.assertEqual(item["review_id"], "rev-a1")
+                self.assertEqual(store.depth(), 1)
+
+            # Wrong actor, same org — librarian is org-scoped, so still visible.
+            with store.identity("actor-b", "org-a"):
+                listed = store.list_queue(status="queued")
+                self.assertEqual(len(listed), 1)
+
+            # Wrong org — denied.
+            with store.identity("actor-a", "org-b"):
+                denied = store.list_queue()
+                self.assertEqual(denied, [])
+                self.assertEqual(store.depth(), 0)
+        finally:
+            store.close()
+
+    def test_review_queue_transaction_context_non_leak(self) -> None:
+        from linkskills_librarian.postgres_store import PostgresReviewQueueStore
+
+        store = PostgresReviewQueueStore(self.dsn, rls=True)
+        try:
+            with store.identity("actor-a", "org-a"):
+                store.enqueue(
+                    {
+                        "review_id": "rev-ctx-a",
+                        "kind": "general",
+                        "status": "queued",
+                        "actor_id": "actor-a",
+                        "org_id": "org-a",
+                        "provenance": {"source": "a"},
+                    }
+                )
+            # New identity must not see prior org via leaked GUC.
+            with store.identity("actor-z", "org-z"):
+                self.assertEqual(store.list_queue(), [])
+                store.enqueue(
+                    {
+                        "review_id": "rev-ctx-z",
+                        "kind": "general",
+                        "status": "queued",
+                        "actor_id": "actor-z",
+                        "org_id": "org-z",
+                        "provenance": {"source": "z"},
+                    }
+                )
+                self.assertEqual(len(store.list_queue()), 1)
+                self.assertEqual(store.list_queue()[0]["review_id"], "rev-ctx-z")
+            with store.identity("actor-a", "org-a"):
+                rows = store.list_queue()
+                self.assertEqual(len(rows), 1)
+                self.assertEqual(rows[0]["review_id"], "rev-ctx-a")
+        finally:
+            store.close()
+
+    def test_review_queue_idempotency_and_concurrency(self) -> None:
+        from linkskills_librarian.postgres_store import PostgresReviewQueueStore
+
+        store = PostgresReviewQueueStore(self.dsn, rls=True)
+        errors: list[BaseException] = []
+        barrier = threading.Barrier(4)
+
+        def worker(idx: int) -> None:
+            try:
+                barrier.wait(timeout=10)
+                with store.identity("actor-a", "org-a"):
+                    store.enqueue(
+                        {
+                            "review_id": f"rev-conc-{idx}",
+                            "kind": "general",
+                            "status": "queued",
+                            "actor_id": "actor-a",
+                            "org_id": "org-a",
+                            "idempotency_key": "same-key",
+                            "provenance": {"n": idx},
+                        }
+                    )
+            except BaseException as exc:  # noqa: BLE001
+                errors.append(exc)
+
+        try:
+            with ThreadPoolExecutor(max_workers=4) as pool:
+                list(pool.map(worker, range(4)))
+            self.assertEqual(errors, [])
+            with store.identity("actor-a", "org-a"):
+                rows = store.list_queue()
+                # Exactly one row for the shared idempotency key.
+                keyed = [r for r in rows if r.get("idempotency_key") == "same-key"]
+                self.assertEqual(len(keyed), 1)
+        finally:
+            store.close()
+
+    def test_review_queue_rollback_and_recovery(self) -> None:
+        from linkskills_librarian.postgres_store import PostgresReviewQueueStore
+
+        store = PostgresReviewQueueStore(self.dsn, rls=True)
+        try:
+            with store.identity("actor-a", "org-a"):
+                store.enqueue(
+                    {
+                        "review_id": "rev-fail-1",
+                        "kind": "general",
+                        "status": "queued",
+                        "actor_id": "actor-a",
+                        "org_id": "org-a",
+                        "provenance": {},
+                    }
+                )
+                # Force claim lease then expire for recovery.
+                with self.psycopg.connect(self.dsn, autocommit=True) as conn:  # type: ignore[attr-defined]
+                    with conn.cursor() as cur:
+                        cur.execute(
+                            """
+                            update lskills.review_queue
+                            set status = 'claimed'::lskills.review_queue_status,
+                                claimed_by = 'worker-1',
+                                claimed_at = now() - interval '1 hour',
+                                lease_expires_at = now() - interval '1 minute'
+                            where review_id = 'rev-fail-1'
+                            """
+                        )
+                recovered = store.recover_expired_leases()
+                self.assertGreaterEqual(recovered, 1)
+                queued = store.list_queue(status="queued")
+                self.assertTrue(any(r["review_id"] == "rev-fail-1" for r in queued))
+
+                # Retry until dead-letter.
+                for _ in range(5):
+                    store.mark_failed("rev-fail-1", error="boom")
+                dead = store.list_queue(status="dead_letter")
+                self.assertTrue(any(r["review_id"] == "rev-fail-1" for r in dead))
+        finally:
+            store.close()
+
+    def test_review_queue_enqueue_rollback_on_error(self) -> None:
+        from linkskills_librarian.postgres_store import PostgresReviewQueueStore
+
+        store = PostgresReviewQueueStore(self.dsn, rls=True)
+        try:
+            with store.identity("actor-a", "org-a"):
+                with self.assertRaises(Exception):
+                    store.enqueue(
+                        {
+                            "review_id": "rev-bad-status",
+                            "kind": "general",
+                            "status": "not_a_real_status",
+                            "actor_id": "actor-a",
+                            "org_id": "org-a",
+                            "provenance": {},
+                        }
+                    )
+                self.assertEqual(store.list_queue(), [])
         finally:
             store.close()
 

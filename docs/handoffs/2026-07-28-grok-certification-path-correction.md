@@ -2,13 +2,13 @@
 
 **Status:** Provisional Grok correction report for independent Codex re-verification. **Do not merge PR #22 from this handoff alone.** Do **not** begin the multi-day Cursor canary until certification + Platform gates pass.
 
-**Date:** 2026-07-28  
-**Executor:** Cursor Local Agent (Grok 4.5 High) — original issue/21 implementation owner  
-**Issue:** https://github.com/linktrend/LiNKskills/issues/21  
-**PR (do not merge):** https://github.com/linktrend/LiNKskills/pull/22  
-**Branch:** `issue/21-linkskillsdevelopmentplan01`  
-**Repo:** `/Users/linktrend/Projects/LiNKskills`  
-**Prior provisional handoff:** `docs/handoffs/2026-07-27-grok-linkskills-internal-launch-implementation.md` (**superseded on certification/auth claims**)  
+**Date:** 2026-07-28
+**Executor:** Cursor Local Agent (Grok 4.5 High) — original issue/21 implementation owner
+**Issue:** https://github.com/linktrend/LiNKskills/issues/21
+**PR (do not merge):** https://github.com/linktrend/LiNKskills/pull/22
+**Branch:** `issue/21-linkskillsdevelopmentplan01`
+**Repo:** `/Users/linktrend/Projects/LiNKskills`
+**Prior provisional handoff:** `docs/handoffs/2026-07-27-grok-linkskills-internal-launch-implementation.md` (**superseded on certification/auth claims**)
 **Closed session:** `docs/agent-sessions/completed/20260727-cursor-grok-issue21-linkskillsdevelopmentplan01.md`
 
 ## Why this correction exists
@@ -37,7 +37,7 @@ The 2026-07-27 canary certification was **invalid**: suite-authored `observed_ou
 | certify_reason | certified: executor receipts bind case, release, tool, profile, environment/toolchain, and collected evidence |
 | evidence JSON SHA-256 | `554289972ab6b0dcf6e1decd7c7ee1e304bfae26f414e449ebb27a4a2698eb85` |
 
-Human summary: `evidence/phase3/canary-echo-cli.txt`  
+Human summary: `evidence/phase3/canary-echo-cli.txt`
 Machine evidence: `evidence/phase3/canary-echo-cli.json`
 
 **Invalid prior claim (do not trust):** previous `profile_hash` `70b6cc98…053d` / suite-authored observed_output path. Treat as withdrawn.

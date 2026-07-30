@@ -129,6 +129,16 @@ def open_review_queue_store(
     store_path: Optional[Path] = None,
 ) -> ReviewQueueStore:
     backend = os.environ.get("LINKSKILLS_LIBRARIAN_STORE", "").strip().lower()
+    env_name = os.environ.get("LINKSKILLS_ENV", "").strip().lower()
+    production_like = env_name in {"stage", "staging", "production", "prod"}
+    if production_like:
+        if backend in {"memory", "sqlite"}:
+            raise ValueError(
+                "production/stage Librarian forbids "
+                f"LINKSKILLS_LIBRARIAN_STORE={backend}; "
+                "set LINKSKILLS_LIBRARIAN_STORE=postgres with a valid DSN"
+            )
+        backend = backend or "postgres"
     if backend == "postgres":
         from .postgres_store import open_postgres_review_queue_store
 

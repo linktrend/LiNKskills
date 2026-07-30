@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import hashlib
 import json
 import os
 import sqlite3
@@ -13,12 +12,8 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterator, List, Literal, Mapping, Optional, Protocol, Tuple, runtime_checkable
 
-try:
-    from linkskills_core.hashing import request_hash as _shared_request_hash
-except ImportError:  # pragma: no cover
-    def _shared_request_hash(payload: Mapping[str, Any]) -> str:
-        material = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
-        return hashlib.sha256(material.encode("utf-8")).hexdigest()
+# Core hashing is mandatory with the gateway package dependency on linkskills-core.
+from linkskills_core.hashing import request_hash as _shared_request_hash
 
 
 DEFAULT_STATE_DIRNAME = ".linkskills-state"
@@ -1183,40 +1178,143 @@ class SqliteGatewayStore:
         self._maybe_commit()
 
 
+PRODUCTION_LIKE_ENVS = frozenset({"stage", "staging", "production", "prod"})
+LOCAL_STORE_MODES = frozenset({"memory", "sqlite"})
+GATEWAY_STORE_MODES = frozenset({"postgres", "memory", "sqlite"})
+
+
+def is_production_like_env(environ: Optional[Mapping[str, str]] = None) -> bool:
+    """True when LINKSKILLS_ENV names a stage/production deployment."""
+    env = environ if environ is not None else os.environ
+    return str(env.get("LINKSKILLS_ENV") or "").strip().lower() in PRODUCTION_LIKE_ENVS
+
+
+def resolve_database_dsn(environ: Optional[Mapping[str, str]] = None) -> Optional[str]:
+    """Resolve Postgres DSN / SecretRef-rendered URL from known env keys.
+
+    Values may be literal DSNs or operator-rendered SecretRef material; this
+    helper never fetches secrets itself.
+    """
+    env = environ if environ is not None else os.environ
+    for key in (
+        "LINKSKILLS_DATABASE_URL",
+        "DATABASE_URL",
+        "LINKSKILLS_STORE_URL",
+        "LINKSKILLS_POSTGRES_URL",
+        "LINKSKILLS_EPHEMERAL_PG_URL",
+    ):
+        value = str(env.get(key) or "").strip()
+        if value:
+            return value
+    return None
+
+
+def resolve_gateway_store_mode(
+    environ: Optional[Mapping[str, str]] = None,
+    *,
+    state_dir: Optional[Path] = None,
+) -> str:
+    """Resolve gateway store backend with production fail-closed rules.
+
+    Rules:
+    - ``LINKSKILLS_ENV`` in {stage, staging, production, prod} implies
+      ``postgres``. Explicit ``memory`` / ``sqlite`` is rejected.
+    - Explicit ``LINKSKILLS_GATEWAY_STORE=postgres`` selects postgres.
+    - ``memory`` / ``sqlite`` are allowed only for non-production envs, when
+      set explicitly or via local-test / durable defaults.
+    - Never silently default to memory/sqlite in production-like envs.
+    """
+    env = environ if environ is not None else os.environ
+    explicit = str(env.get("LINKSKILLS_GATEWAY_STORE") or "").strip().lower()
+    production_like = is_production_like_env(env)
+    auth_mode = str(env.get("LINKSKILLS_AUTH_MODE") or "").strip().lower()
+
+    if explicit and explicit not in GATEWAY_STORE_MODES:
+        raise ValueError(
+            f"unsupported LINKSKILLS_GATEWAY_STORE={explicit!r}; "
+            f"expected one of {sorted(GATEWAY_STORE_MODES)}"
+        )
+
+    if production_like:
+        if explicit in LOCAL_STORE_MODES:
+            raise ValueError(
+                "production/stage Gateway forbids "
+                f"LINKSKILLS_GATEWAY_STORE={explicit}; "
+                "set LINKSKILLS_GATEWAY_STORE=postgres with a valid DSN"
+            )
+        if explicit and explicit != "postgres":
+            raise ValueError(
+                f"production/stage Gateway requires postgres store, got {explicit!r}"
+            )
+        return "postgres"
+
+    if explicit:
+        return explicit
+
+    # Non-production defaults: local-test / unset → memory unless durable SQLite.
+    use_durable = state_dir is not None or str(
+        env.get("LINKSKILLS_GATEWAY_DURABLE") or ""
+    ).strip().lower() in {"1", "true", "yes", "on"}
+    if use_durable:
+        return "sqlite"
+    if auth_mode == "local-test" or not auth_mode or auth_mode == "production":
+        # Unset LINKSKILLS_ENV + no explicit store → in-memory for unit/local.
+        return "memory"
+    return "memory"
+
+
 def open_gateway_store(
     *,
     repo_root: Optional[Path] = None,
     state_dir: Optional[Path] = None,
     store: Optional[GatewayStore] = None,
+    environ: Optional[Mapping[str, str]] = None,
+    probe: bool = True,
 ) -> GatewayStore:
-    """Open store backend: postgres (env), SQLite (durable), or in-memory.
+    """Open store backend with production fail-closed Postgres selection.
 
-    Postgres is selected when ``LINKSKILLS_GATEWAY_STORE=postgres`` and a DSN is
-    present in ``LINKSKILLS_DATABASE_URL`` or ``DATABASE_URL``. SQLite/memory
-    remain the default for local and unit tests.
+    Production/stage (``LINKSKILLS_ENV`` in stage/prod family, or explicit
+    ``LINKSKILLS_GATEWAY_STORE=postgres``) requires a valid DSN and a reachable
+    Postgres adapter with migration readiness probe. In-memory/SQLite are
+    local/test only and never the silent default in production-like envs.
     """
     if store is not None:
         return store
-    backend = os.environ.get("LINKSKILLS_GATEWAY_STORE", "").strip().lower()
-    if backend == "postgres":
-        dsn = (
-            os.environ.get("LINKSKILLS_DATABASE_URL", "").strip()
-            or os.environ.get("DATABASE_URL", "").strip()
-            or os.environ.get("LINKSKILLS_EPHEMERAL_PG_URL", "").strip()
-        )
+    env = environ if environ is not None else os.environ
+    mode = resolve_gateway_store_mode(env, state_dir=state_dir)
+
+    if mode == "postgres":
+        dsn = resolve_database_dsn(env)
         if not dsn:
             raise ValueError(
-                "LINKSKILLS_GATEWAY_STORE=postgres requires "
-                "LINKSKILLS_DATABASE_URL or DATABASE_URL"
+                "Gateway postgres store requires LINKSKILLS_DATABASE_URL, "
+                "DATABASE_URL, LINKSKILLS_STORE_URL, or LINKSKILLS_POSTGRES_URL "
+                "(SecretRef must be rendered before process start)"
             )
         from .postgres_store import PostgresGatewayStore
 
-        return PostgresGatewayStore(dsn)
-    use_durable = state_dir is not None or os.environ.get(
-        "LINKSKILLS_GATEWAY_DURABLE", ""
-    ).strip() in {"1", "true", "yes"}
-    if not use_durable:
+        pg_store = PostgresGatewayStore(dsn)
+        if probe:
+            try:
+                if not pg_store.probe_reachable():
+                    raise RuntimeError("Gateway postgres store probe failed: not reachable")
+                if not pg_store.probe_schema_ready():
+                    raise RuntimeError(
+                        "Gateway postgres store probe failed: required "
+                        "lskills migration tables missing (apply 000007+)"
+                    )
+            except Exception:
+                try:
+                    pg_store.close()
+                except Exception:  # pragma: no cover
+                    pass
+                raise
+        return pg_store
+
+    if mode == "memory":
         return InMemoryGatewayStore()
+
+    # sqlite
     resolved = resolve_state_dir(repo_root=repo_root, state_dir=state_dir)
     return SqliteGatewayStore(gateway_db_path(resolved))
 

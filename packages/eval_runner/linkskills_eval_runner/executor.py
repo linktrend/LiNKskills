@@ -27,22 +27,12 @@ from .receipt import (
 )
 from .workspace import EvalWorkspace
 
-try:
-    from linkskills_core.hashing import (
-        UNSET_SKILL_RELEASE_HASH,
-        canonical_json as _shared_canonical_json,
-        skill_release_hash as _shared_skill_release_hash,
-    )
-except ImportError:  # pragma: no cover - path bootstrap for ad-hoc runs
-    UNSET_SKILL_RELEASE_HASH = "skill-release:unset"
-
-    def _shared_skill_release_hash(skill_dir: Optional[Path]) -> str:
-        if skill_dir is None or not Path(skill_dir).is_dir():
-            return UNSET_SKILL_RELEASE_HASH
-        return f"skill-release:unavailable"
-
-    def _shared_canonical_json(payload: Mapping[str, Any]) -> str:
-        return json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+# linkskills-core is a declared package dependency — fail closed if unavailable.
+from linkskills_core.hashing import (
+    UNSET_SKILL_RELEASE_HASH,
+    canonical_json as _shared_canonical_json,
+    skill_release_hash as _shared_skill_release_hash,
+)
 
 
 def _utc_now() -> str:

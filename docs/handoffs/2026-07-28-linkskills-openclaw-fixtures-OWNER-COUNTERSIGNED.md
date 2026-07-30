@@ -1,8 +1,8 @@
 # LiNKskills OWNER_COUNTERSIGNED — OpenClaw Skills fixtures
 
-**Status:** `OWNER_COUNTERSIGNED`  
-**Scope:** Domain-owner fixture approval only. **Not** independent Codex certification. **Not** merge authority for LiNKskills PR #22 or OpenClaw PRs.  
-**Date / time:** 2026-07-28 11:20 Asia/Taipei  
+**Status:** `OWNER_COUNTERSIGNED`
+**Scope:** Domain-owner fixture approval only. **Not** independent Codex certification. **Not** merge authority for LiNKskills PR #22 or OpenClaw PRs.
+**Date / time:** 2026-07-28 11:20 Asia/Taipei
 
 ## Reviewer / session identity
 

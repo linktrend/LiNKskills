@@ -1,8 +1,8 @@
 # LiNKskills AuthClaims package-pin correction — 0.2.2
 
-**Status:** `CORRECTION_COMPLETE` (Skills consumer pin only)  
-**Scope:** Align live AuthClaims package pin to `@linktrend/platform-contracts@0.2.2`. **Not** merge of PR #22. **Not** Platform migrate/deploy/canary. **Not** Codex certification. **Not** other-repo edits.  
-**Date / time:** 2026-07-30 Asia/Taipei  
+**Status:** `CORRECTION_COMPLETE` (Skills consumer pin only)
+**Scope:** Align live AuthClaims package pin to `@linktrend/platform-contracts@0.2.2`. **Not** merge of PR #22. **Not** Platform migrate/deploy/canary. **Not** Codex certification. **Not** other-repo edits.
+**Date / time:** 2026-07-30 Asia/Taipei
 
 ## Session identity
 
@@ -62,4 +62,3 @@ Result: **18 tests OK** (no CI poll; no merge).
 |---|---|
 | Package-pin correction commit | `3cf171fb537378080fe10aa517a8cc344f7f3f28` |
 | Exact clean branch tip | reported by agent after push (not embedded; avoids SHA self-reference) |
-

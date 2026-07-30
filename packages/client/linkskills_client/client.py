@@ -10,13 +10,17 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional, Sequence
 from urllib.error import HTTPError, URLError
+from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
 from .paci_token_client import (
     AUTH_MODE_LOCAL_TEST,
+    GATEWAY_401_RETRY_MAX,
     PaciConfigError,
     PaciTokenClient,
+    is_loopback_host,
     paci_env_configured,
+    require_https_outside_local_test,
     resolve_auth_mode,
 )
 
@@ -125,14 +129,35 @@ class SkillsGatewayClient:
         paci_client: Optional[PaciTokenClient] = None,
         timeout_s: float = 30.0,
         event_buffer: Optional[LocalEventBuffer] = None,
+        auth_mode: Optional[str] = None,
     ) -> None:
-        self.base_url = (base_url or os.environ.get("GATEWAY_URL") or "http://127.0.0.1:8787").rstrip(
+        raw_base = (base_url or os.environ.get("GATEWAY_URL") or "http://127.0.0.1:8787").rstrip(
             "/"
         )
+        if auth_mode is not None:
+            mode = str(auth_mode).strip().lower()
+        else:
+            env_mode = str(os.environ.get("LINKSKILLS_AUTH_MODE") or "").strip().lower()
+            if env_mode:
+                mode = env_mode
+            else:
+                # Direct construction (tests/compat): loopback http uses local-test gate.
+                # from_env always passes auth_mode explicitly.
+                parsed = urlparse(raw_base)
+                if parsed.scheme == "http" and is_loopback_host(parsed.hostname):
+                    mode = AUTH_MODE_LOCAL_TEST
+                else:
+                    mode = "production"
+        self.base_url = require_https_outside_local_test(
+            raw_base,
+            auth_mode=mode,
+            label="GATEWAY_URL",
+        ).rstrip("/")
         self.authorization = authorization
         self.paci_client = paci_client
         self.timeout_s = timeout_s
         self.event_buffer = event_buffer or LocalEventBuffer()
+        self.auth_mode = mode
 
     @classmethod
     def from_env(
@@ -183,6 +208,7 @@ class SkillsGatewayClient:
             paci_client=resolved_paci,
             timeout_s=timeout_s,
             event_buffer=event_buffer,
+            auth_mode=mode,
         )
 
     def health(self) -> Dict[str, Any]:
@@ -244,6 +270,18 @@ class SkillsGatewayClient:
             "remaining": len(remaining),
         }
 
+    def status(self) -> Dict[str, Any]:
+        """Safe diagnostics — never includes bearer tokens or key material."""
+        paci_status = self.paci_client.status() if self.paci_client is not None else None
+        return {
+            "base_url": self.base_url,
+            "auth_mode": self.auth_mode,
+            "paci_configured": self.paci_client is not None,
+            "static_authorization_configured": bool(self.authorization),
+            "paci": paci_status,
+            "live_proven": False,
+        }
+
     def _resolve_authorization(self, override: Optional[str] = None) -> Optional[str]:
         if override:
             return _format_authorization(override)
@@ -260,13 +298,15 @@ class SkillsGatewayClient:
         *,
         headers: Optional[Mapping[str, str]] = None,
         body: Optional[Mapping[str, Any]] = None,
+        _auth_retries: int = 0,
     ) -> Dict[str, Any]:
         data = None if body is None else json.dumps(body).encode("utf-8")
+        req_headers = dict(headers or {})
         req = Request(
             f"{self.base_url}{path}",
             data=data,
             method=method,
-            headers=dict(headers or {}),
+            headers=req_headers,
         )
         try:
             with urlopen(req, timeout=self.timeout_s) as response:
@@ -276,6 +316,24 @@ class SkillsGatewayClient:
             # HTTP 4xx/5xx must fail flush/call paths — never treat error bodies
             # as successful responses (would drop buffered events as "written").
             detail = exc.read().decode("utf-8", errors="replace")
+            if (
+                exc.code == 401
+                and self.paci_client is not None
+                and _auth_retries < GATEWAY_401_RETRY_MAX
+                and "Authorization" in req_headers
+            ):
+                # Invalidate cached PACI access token and remint once (bounded).
+                self.paci_client.invalidate()
+                refreshed = self.paci_client.authorization_header(force_refresh=True)
+                retry_headers = dict(req_headers)
+                retry_headers["Authorization"] = refreshed
+                return self._request(
+                    method,
+                    path,
+                    headers=retry_headers,
+                    body=body,
+                    _auth_retries=_auth_retries + 1,
+                )
             raise RuntimeError(f"gateway HTTP {exc.code}: {detail}") from exc
         except URLError as exc:
             raise RuntimeError(f"gateway unreachable: {exc}") from exc

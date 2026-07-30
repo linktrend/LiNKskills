@@ -26,6 +26,7 @@ from .payload_guard import (
     PayloadValidationError,
     allowlist_and_redact,
     prepare_feedback_params,
+    prepare_run_mutation_params,
     prepare_trace_params,
 )
 from .retention import redact_payload, should_redact_key
@@ -48,6 +49,7 @@ __all__ = [
     "execution_profile_identity_hash",
     "filter_compatible_usable_releases",
     "prepare_feedback_params",
+    "prepare_run_mutation_params",
     "prepare_trace_params",
     "redact_payload",
     "sealed_executor_receipt",

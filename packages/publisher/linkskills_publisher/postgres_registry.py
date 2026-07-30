@@ -44,8 +44,8 @@ def _require_psycopg() -> Any:
     if psycopg is None:
         raise ImportError(
             "psycopg (v3) is required for PostgresPublisherRegistry. "
-            "Install via: pip install 'psycopg[binary]>=3.1' "
-            "(listed as optional in requirements-dev.txt)."
+            "Install via: pip install -e packages/publisher "
+            "(declares psycopg[binary]>=3.1)."
         )
     return psycopg
 

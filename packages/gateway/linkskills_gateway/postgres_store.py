@@ -50,19 +50,33 @@ DEFAULT_RUNTIME_ROLE = "svc_lskills_runtime"
 
 def resolve_database_url() -> Optional[str]:
     """Return Postgres DSN from LiNKskills or generic env vars."""
-    for key in ("LINKSKILLS_DATABASE_URL", "DATABASE_URL", "LINKSKILLS_EPHEMERAL_PG_URL"):
+    for key in (
+        "LINKSKILLS_DATABASE_URL",
+        "DATABASE_URL",
+        "LINKSKILLS_STORE_URL",
+        "LINKSKILLS_POSTGRES_URL",
+        "LINKSKILLS_EPHEMERAL_PG_URL",
+    ):
         value = os.environ.get(key, "").strip()
         if value:
             return value
     return None
 
 
+REQUIRED_GATEWAY_TABLES = (
+    "idempotency",
+    "side_effect_intents",
+    "gateway_events",
+    "skill_runs",
+)
+
+
 def _require_psycopg() -> Any:
     if psycopg is None:
         raise ImportError(
             "psycopg (v3) is required for PostgresGatewayStore. "
-            "Install via: pip install 'psycopg[binary]>=3.1' "
-            "(listed as optional in requirements-dev.txt)."
+            "Install via: pip install 'linkskills-gateway[postgres]' "
+            "or pip install 'psycopg[binary]>=3.1'."
         )
     return psycopg
 
@@ -116,6 +130,36 @@ class PostgresGatewayStore:
     def close(self) -> None:
         with self._lock:
             self._conn.close()
+
+    def probe_reachable(self) -> bool:
+        """Cheap connectivity probe for /ready. Never returns secret material."""
+        with self._lock:
+            if not self._tx_idle():
+                self._conn.rollback()
+            with self._conn.cursor() as cur:
+                cur.execute("select 1")
+                cur.fetchone()
+            self._conn.commit()
+        return True
+
+    def probe_schema_ready(self) -> bool:
+        """True when gateway persistence migration tables exist (000007+)."""
+        with self._lock:
+            if not self._tx_idle():
+                self._conn.rollback()
+            with self._conn.cursor() as cur:
+                cur.execute(
+                    """
+                    select table_name
+                    from information_schema.tables
+                    where table_schema = 'lskills'
+                      and table_name = any(%s)
+                    """,
+                    (list(REQUIRED_GATEWAY_TABLES),),
+                )
+                found = {str(row["table_name"]) for row in cur.fetchall()}
+            self._conn.commit()
+        return set(REQUIRED_GATEWAY_TABLES).issubset(found)
 
     def bind_identity(self, actor_id: str, org_id: str) -> None:
         """Bind transaction-local RLS identity for subsequent operations."""

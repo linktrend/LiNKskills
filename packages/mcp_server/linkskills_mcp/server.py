@@ -61,12 +61,16 @@ def resolve_canary_default_actor(
     environ: Optional[Mapping[str, str]] = None,
     verifier: Optional[Any] = None,
 ) -> Optional[ActorClaims]:
-    """When LINKSKILLS_CANARY is set, require a cryptographically verified bearer.
+    """Canary identity is PACI-proxy injected; refuse static bearer paths.
 
-    Never uses the unsigned local-test verifier. The host must inject
-    ``LINKSKILLS_CANARY_AUTHORIZATION`` / ``GATEWAY_TOKEN`` that verifies under
-    a production ``PlatformClaimsVerifier`` (Platform-approved authenticator).
+    ``LINKSKILLS_CANARY`` must launch ``linkskills_mcp.paci_stdio_proxy`` so
+    short-lived PACI access tokens are minted and injected server-side.
+    Static ``LINKSKILLS_CANARY_AUTHORIZATION`` / ``GATEWAY_TOKEN`` is not a
+    canary path (local-test only elsewhere). This helper returns ``None`` when
+    canary is unset, and exits when canary is set so bare ``server.main``
+    cannot silently use a static bearer.
     """
+    del verifier  # retained for call-site compatibility; unused on PACI path
     env = environ if environ is not None else os.environ
     flag = str(env.get("LINKSKILLS_CANARY") or "").strip().lower()
     if flag not in {"1", "true", "yes"}:
@@ -78,27 +82,24 @@ def resolve_canary_default_actor(
             "(unsigned verifier forbidden for canary)"
         )
 
-    token = (
+    static = (
         str(env.get("LINKSKILLS_CANARY_AUTHORIZATION") or "").strip()
         or str(env.get("GATEWAY_TOKEN") or "").strip()
+        or str(env.get("LINKSKILLS_LOCAL_TEST_STATIC_BEARER") or "").strip()
     )
-    if not token:
+    if static:
         raise SystemExit(
-            "LINKSKILLS_CANARY requires LINKSKILLS_CANARY_AUTHORIZATION or "
-            "GATEWAY_TOKEN (Platform-cryptographically verifiable bearer)"
+            "LINKSKILLS_CANARY refuses static bearer env; launch "
+            "python -m linkskills_mcp.paci_stdio_proxy with LINKSKILLS_PACI_* "
+            "SecretRef env (PACI machine-token path)"
         )
-    auth = token if token.lower().startswith("bearer ") else f"Bearer {token}"
-    try:
-        claims_verifier = resolve_claims_verifier(
-            verifier=verifier,
-            environ=env,
-            allow_local_test=False,
-        )
-    except AuthConfigurationError as exc:
-        raise SystemExit(
-            f"LINKSKILLS_CANARY auth fail-closed: {exc.message}"
-        ) from exc
-    return claims_verifier.verify(auth)
+
+    # No default_actor — PACI proxy injects Authorization per tools/call.
+    raise SystemExit(
+        "LINKSKILLS_CANARY requires PACI machine-token path: "
+        "python -m linkskills_mcp.paci_stdio_proxy "
+        "(LINKSKILLS_PACI_CLIENT_ID / TOKEN_ENDPOINT / CLIENT_PRIVATE_KEY_FILE)"
+    )
 
 
 class SkillsMcpServer:
@@ -303,6 +304,14 @@ class SkillsMcpServer:
 
 
 def main() -> None:
+    # Canary / PACI Cursor path: always use the PACI stdio proxy.
+    flag = str(os.environ.get("LINKSKILLS_CANARY") or "").strip().lower()
+    if flag in {"1", "true", "yes"}:
+        # Lazy import: paci_stdio_proxy imports SkillsMcpServer from this module.
+        from .paci_stdio_proxy import main as paci_main
+
+        paci_main()
+        return
     try:
         default_actor = resolve_canary_default_actor()
         SkillsMcpServer(default_actor=default_actor).serve_stdio()

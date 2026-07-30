@@ -1,4 +1,4 @@
-"""Gateway process ops: metrics, drain, auth-config probe (no secret loading).
+"""Gateway process ops: metrics, drain, auth-config probe, graceful shutdown.
 
 Kept separate from auth/persistence core so packaging/ops lanes can evolve
 without colliding with PACI or store adapter work.
@@ -8,10 +8,15 @@ from __future__ import annotations
 
 import os
 import threading
+import time
 from dataclasses import dataclass, field
-from typing import Mapping, Optional, Tuple
+from typing import Any, Callable, Mapping, Optional, Tuple
 
 from .auth import AUTH_MODE_LOCAL_TEST, resolve_auth_mode
+
+# Operator-facing timeout for SIGTERM/SIGINT drain wait (seconds).
+ENV_SHUTDOWN_TIMEOUT_S = "LINKSKILLS_SHUTDOWN_TIMEOUT_S"
+DEFAULT_SHUTDOWN_TIMEOUT_S = 30.0
 
 
 def _truthy(raw: Optional[str]) -> bool:
@@ -44,6 +49,23 @@ class DrainState:
     def snapshot(self) -> Tuple[bool, str]:
         with self._lock:
             return self.enabled, self.reason
+
+
+@dataclass(frozen=True)
+class ShutdownResult:
+    """Honest outcome of a bounded graceful shutdown attempt."""
+
+    reason: str
+    drained: bool
+    timed_out: bool
+    in_flight_remaining: int
+    store_flushed: bool
+    store_closed: bool
+    exit_code: int
+
+    @property
+    def clean(self) -> bool:
+        return self.drained and not self.timed_out and self.exit_code == 0
 
 
 @dataclass
@@ -166,18 +188,142 @@ def auth_config_present(
 
 
 def store_probe_configured(environ: Optional[Mapping[str, str]] = None) -> bool:
-    """True when operators asked for a store reachability probe."""
+    """True when operators asked for a store reachability probe.
+
+    Production/stage postgres deployments always probe so /ready fails closed
+    when the DSN or migration surface is unreachable. Local memory/sqlite
+    stores only probe when explicitly requested.
+    """
     env = environ if environ is not None else os.environ
     if _truthy(env.get("LINKSKILLS_STORE_PROBE")):
         return True
     if _truthy(env.get("LINKSKILLS_GATEWAY_DURABLE")):
         return True
+    # Fail-closed readiness for production-like / explicit postgres store.
+    try:
+        from .persistence import is_production_like_env, resolve_gateway_store_mode
+
+        if is_production_like_env(env):
+            return True
+        if resolve_gateway_store_mode(env) == "postgres":
+            return True
+    except Exception:  # noqa: BLE001 — misconfig still probes when DSN present
+        pass
     # Explicit store URL / DSN name present (value may be a SecretRef name).
     for key in (
         "LINKSKILLS_STORE_URL",
         "LINKSKILLS_DATABASE_URL",
         "LINKSKILLS_POSTGRES_URL",
+        "LINKSKILLS_GATEWAY_STORE",
     ):
+        if key == "LINKSKILLS_GATEWAY_STORE":
+            if str(env.get(key) or "").strip().lower() == "postgres":
+                return True
+            continue
         if str(env.get(key) or "").strip():
             return True
     return False
+
+
+def shutdown_timeout_s(environ: Optional[Mapping[str, str]] = None) -> float:
+    """Bounded drain wait from ``LINKSKILLS_SHUTDOWN_TIMEOUT_S`` (default 30s)."""
+    env = environ if environ is not None else os.environ
+    raw = str(env.get(ENV_SHUTDOWN_TIMEOUT_S) or "").strip()
+    if not raw:
+        return DEFAULT_SHUTDOWN_TIMEOUT_S
+    try:
+        value = float(raw)
+    except ValueError:
+        return DEFAULT_SHUTDOWN_TIMEOUT_S
+    if value < 0:
+        return DEFAULT_SHUTDOWN_TIMEOUT_S
+    return value
+
+
+def wait_for_in_flight(
+    metrics: GatewayMetrics,
+    *,
+    timeout_s: float,
+    poll_interval_s: float = 0.05,
+    sleep_fn: Callable[[float], None] = time.sleep,
+    clock: Callable[[], float] = time.monotonic,
+) -> Tuple[bool, int]:
+    """Block until ``in_flight == 0`` or ``timeout_s`` elapses.
+
+    Returns ``(drained_clean, remaining_in_flight)``.
+    """
+    deadline = clock() + max(0.0, float(timeout_s))
+    while True:
+        remaining = int(metrics.snapshot()["in_flight"])
+        if remaining <= 0:
+            return True, 0
+        if clock() >= deadline:
+            return False, remaining
+        sleep_fn(max(0.0, min(poll_interval_s, deadline - clock())))
+
+
+def persist_and_close_store(store: Any) -> Tuple[bool, bool]:
+    """Best-effort flush then close a gateway store (no-op when unsupported).
+
+    Durable writes are already committed per request; this closes DB handles
+    honestly so supervisors can restart without leaked connections.
+    Returns ``(flushed, closed)``.
+    """
+    flushed = False
+    closed = False
+    if store is None:
+        return flushed, closed
+    for attr in ("flush", "checkpoint", "commit"):
+        hook = getattr(store, attr, None)
+        if callable(hook):
+            try:
+                hook()
+                flushed = True
+                break
+            except Exception:  # noqa: BLE001 — shutdown must continue to close
+                break
+    closer = getattr(store, "close", None)
+    if callable(closer):
+        closer()
+        closed = True
+    else:
+        # In-memory / protocol objects without close are treated as already closed.
+        closed = True
+    return flushed, closed
+
+
+def run_graceful_shutdown(
+    *,
+    drain: DrainState,
+    metrics: GatewayMetrics,
+    store: Any = None,
+    reason: str = "signal",
+    timeout_s: Optional[float] = None,
+    sleep_fn: Callable[[float], None] = time.sleep,
+    clock: Callable[[], float] = time.monotonic,
+) -> ShutdownResult:
+    """Stop intake, drain in-flight work boundedly, persist/close store, exit code.
+
+    Exit codes:
+      - ``0`` — drain completed (in-flight reached 0) and store closed
+      - ``1`` — drain timed out with work still in flight (honest incomplete exit)
+    """
+    drain.enable(reason=reason)
+    bound = DEFAULT_SHUTDOWN_TIMEOUT_S if timeout_s is None else float(timeout_s)
+    drained, remaining = wait_for_in_flight(
+        metrics,
+        timeout_s=bound,
+        sleep_fn=sleep_fn,
+        clock=clock,
+    )
+    flushed, closed = persist_and_close_store(store)
+    exit_code = 0 if drained else 1
+    return ShutdownResult(
+        reason=reason,
+        drained=drained,
+        timed_out=not drained,
+        in_flight_remaining=remaining,
+        store_flushed=flushed,
+        store_closed=closed,
+        exit_code=exit_code,
+    )

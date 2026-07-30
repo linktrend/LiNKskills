@@ -1,8 +1,8 @@
 # LiNKskills OWNER_COUNTERSIGNED — OpenClaw Skills fixtures (AuthClaims 1.1.0 / wave 8)
 
-**Status:** `OWNER_COUNTERSIGNED`  
-**Scope:** Domain-owner fixture countersign review only. **Not** independent Codex certification. **Not** merge authority for LiNKskills PR #22 or OpenClaw PRs. **Not** canary / deploy / Phase 14 authorization.  
-**Date / time:** 2026-07-30 07:05 Asia/Taipei  
+**Status:** `OWNER_COUNTERSIGNED`
+**Scope:** Domain-owner fixture countersign review only. **Not** independent Codex certification. **Not** merge authority for LiNKskills PR #22 or OpenClaw PRs. **Not** canary / deploy / Phase 14 authorization.
+**Date / time:** 2026-07-30 07:05 Asia/Taipei
 
 ## Reviewer / session identity
 

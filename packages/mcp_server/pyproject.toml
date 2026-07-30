@@ -10,10 +10,12 @@ requires-python = ">=3.11"
 license = { text = "Proprietary" }
 dependencies = [
   "linkskills-gateway>=0.1.0",
+  "linkskills-client>=0.1.0",
 ]
 
 [project.scripts]
-linkskills-mcp = "linkskills_mcp.server:main"
+linkskills-mcp = "linkskills_mcp.paci_stdio_proxy:main"
+linkskills-mcp-server = "linkskills_mcp.server:main"
 
 [tool.setuptools.packages.find]
 where = ["."]

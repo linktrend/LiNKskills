@@ -60,81 +60,10 @@ def compute_suite_scores(
 
 def _receipt_valid(receipt: Any) -> bool:
     """True only for sealed, issuer-signed, isolation-proven executor receipts."""
-    try:
-        from linkskills_core.certification import sealed_executor_receipt
+    # linkskills-core is a declared package dependency — fail closed if unavailable.
+    from linkskills_core.certification import sealed_executor_receipt
 
-        return sealed_executor_receipt(receipt)
-    except ImportError:
-        # Narrow fallback when core is unavailable — still require isolation + seal.
-        if not isinstance(receipt, dict):
-            return False
-        if str(receipt.get("network_isolation") or "") != "denied":
-            return False
-        required = (
-            "receipt_hash",
-            "case_id",
-            "skill_id",
-            "suite_hash",
-            "skill_release_hash",
-            "execution_profile_hash",
-            "stdout_hash",
-            "stderr_hash",
-            "tool_calls",
-            "environment",
-            "evidence_source",
-            "executor_version",
-            "network_isolation",
-            "provenance_kind",
-            "issuer_id",
-            "issuer_signature",
-        )
-        for key in required:
-            if key not in receipt:
-                return False
-        if receipt.get("evidence_source") != "executor":
-            return False
-        if not receipt.get("receipt_hash"):
-            return False
-        if is_unset_skill_release_hash(str(receipt.get("skill_release_hash") or "")):
-            return False
-        from .receipt import ExecutionReceipt, ToolCallRecord
-
-        try:
-            tool_calls = [
-                ToolCallRecord(**tc) if isinstance(tc, dict) else tc
-                for tc in (receipt.get("tool_calls") or [])
-            ]
-            rebuilt = ExecutionReceipt(
-                receipt_id=str(receipt["receipt_id"]),
-                case_id=str(receipt["case_id"]),
-                skill_id=str(receipt["skill_id"]),
-                suite_id=str(receipt.get("suite_id") or ""),
-                suite_hash=str(receipt["suite_hash"]),
-                skill_release_hash=str(receipt["skill_release_hash"]),
-                execution_profile_hash=str(receipt["execution_profile_hash"]),
-                environment=dict(receipt.get("environment") or {}),
-                toolchain=dict(receipt.get("toolchain") or {}),
-                tool_calls=tool_calls,
-                exit_code=receipt.get("exit_code"),
-                stdout_hash=str(receipt["stdout_hash"]),
-                stderr_hash=str(receipt["stderr_hash"]),
-                artifact_hashes=list(receipt.get("artifact_hashes") or []),
-                started_at=str(receipt.get("started_at") or ""),
-                finished_at=str(receipt.get("finished_at") or ""),
-                executor_version=str(receipt.get("executor_version") or ""),
-                evidence_source=str(receipt.get("evidence_source") or ""),
-                network_isolation=str(receipt.get("network_isolation") or ""),
-                issuer_id=str(receipt.get("issuer_id") or ""),
-                provenance_kind=str(receipt.get("provenance_kind") or ""),
-                receipt_hash="",
-            )
-            rebuilt.seal()
-            return (
-                rebuilt.receipt_hash == receipt.get("receipt_hash")
-                and rebuilt.issuer_signature == receipt.get("issuer_signature")
-            )
-        except Exception:  # noqa: BLE001
-            return False
+    return sealed_executor_receipt(receipt)
 
 
 def certify_run(

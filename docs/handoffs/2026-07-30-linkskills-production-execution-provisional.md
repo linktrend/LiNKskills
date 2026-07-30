@@ -1,12 +1,12 @@
 # LiNKskills production execution — provisional handoff (2026-07-30)
 
-**Status:** `PROVISIONAL` — LiNKskills-owned work complete for this packet; **not** merge/deploy/canary/Codex self-certification.  
-**Executor:** Cursor Local Agent (Grok 4.5 High) + parallel Grok 4.5 High subagents  
-**Date / time:** 2026-07-30 Asia/Taipei  
-**Branch:** `issue/21-linkskillsdevelopmentplan01`  
-**PR:** https://github.com/linktrend/LiNKskills/pull/22 (**draft; do not merge**)  
-**Issue:** https://github.com/linktrend/LiNKskills/issues/21  
-**Execution prompt:** `docs/CURSOR-GROK-PRODUCTION-EXECUTION-PROMPT-2026-07-30.md`  
+**Status:** `PROVISIONAL` — LiNKskills-owned work complete for this packet; **not** merge/deploy/canary/Codex self-certification.
+**Executor:** Cursor Local Agent (Grok 4.5 High) + parallel Grok 4.5 High subagents
+**Date / time:** 2026-07-30 Asia/Taipei
+**Branch:** `issue/21-linkskillsdevelopmentplan01`
+**PR:** https://github.com/linktrend/LiNKskills/pull/22 (**draft; do not merge**)
+**Issue:** https://github.com/linktrend/LiNKskills/issues/21
+**Execution prompt:** `docs/CURSOR-GROK-PRODUCTION-EXECUTION-PROMPT-2026-07-30.md`
 **Plan SHA-256 (verified):** `31a6cc70bb778ce1dff236819e4bf600b0495dbb06c95bac55bcb2b0b2f5fe88`
 
 ## Exact heads

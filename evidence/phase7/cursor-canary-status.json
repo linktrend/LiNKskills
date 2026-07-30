@@ -1,9 +1,9 @@
 {
   "stage_completed": 1,
   "stages": {
-    "1_fake_contract": "proven via gateway/mcp/client unit tests + configs/fragments/cursor-skills-canary.mcp.json.example (PACI placeholders) + packages/client/linkskills_client/paci_token_client.py local tests",
+    "1_fake_contract": "proven via gateway/mcp/client/paci-proxy unit tests + configs/fragments/cursor-skills-canary.mcp.json.example (PACI placeholders + paci_stdio_proxy entrypoint) + packages/client/linkskills_client/paci_token_client.py + packages/mcp_server/linkskills_mcp/paci_stdio_proxy.py local tests",
     "2_symlink_inspect": "documented in docs/integrations/cursor/CANARY.md; no shared .cursor mutation",
-    "3_stage_readonly_discovery": "blocked — requires Platform stage PACI issuer + Skills client credential (machine-token client implemented locally only; not live-proven)",
+    "3_stage_readonly_discovery": "blocked — requires Platform stage PACI issuer + Skills client credential (machine-token client + MCP proxy implemented locally only; not live-proven)",
     "4_stage_run_telemetry": "blocked — same Platform stage PACI gate",
     "5_packaged_tool_artifact": "local dry-run only; live stage blocked on Platform PACI",
     "6_failure_feedback_offline": "local buffer smoke in evidence/phase5; live Cursor blocked on Platform PACI",
@@ -14,13 +14,19 @@
     "implemented_locally": true,
     "live_proven": false,
     "module": "packages/client/linkskills_client/paci_token_client.py",
+    "mcp_proxy": "packages/mcp_server/linkskills_mcp/paci_stdio_proxy.py",
+    "fragment_entrypoint": "python3 -m linkskills_mcp.paci_stdio_proxy",
     "grant": "client_credentials + private_key_jwt (ES256)",
-    "primary_canary_path": "LINKSKILLS_PACI_* SecretRef file",
-    "static_bearer": "local-test only (retired as primary canary path)",
+    "access_ttl_max_s": 900,
+    "early_renewal_fraction": 0.2,
+    "gateway_401_invalidate_retry": true,
+    "https_outside_local_test_loopback": true,
+    "primary_canary_path": "LINKSKILLS_PACI_* SecretRef file via paci_stdio_proxy",
+    "static_bearer": "local-test only; refused for LINKSKILLS_CANARY",
     "handoff": "docs/integrations/cursor/PACI-CLIENT-APPLICATION-HANDOFF.md",
     "blocker": "Platform stage PACI issuer absent"
   },
   "global_cursor_mutation": false,
   "evidence_tier": "local/fake",
-  "mark": "Skills-owned Cursor path implemented locally; not live-proven (Platform PACI issuer absent)"
+  "mark": "Skills-owned Cursor PACI MCP proxy implemented locally; not live-proven (Platform PACI issuer absent)"
 }

@@ -4,16 +4,17 @@
       "command": "python3",
       "args": [
         "-m",
-        "linkskills_mcp.server"
+        "linkskills_mcp.paci_stdio_proxy"
       ],
       "env": {
         "PYTHONPATH": "packages/gateway:packages/mcp_server:packages/client:packages/librarian_domain:packages/eval_runner:packages/tool_runtime:packages/contracts:packages/core:.",
-        "GATEWAY_URL": "http://127.0.0.1:8787",
+        "GATEWAY_URL": "https://REPLACE_WITH_SKILLS_STAGE_GATEWAY_URL",
+        "LINKSKILLS_MCP_UPSTREAM": "in-process",
         "LINKSKILLS_CANARY": "1",
         "LINKSKILLS_AUTH_MODE": "production",
         "LINKSKILLS_PLATFORM_AUTHENTICATOR": "REPLACE_WITH_PLATFORM_APPROVED_AUTHENTICATOR_MODULE:factory",
         "LINKSKILLS_PACI_CLIENT_ID": "REPLACE_WITH_SKILLS_STAGE_CLIENT_ID",
-        "LINKSKILLS_PACI_TOKEN_ENDPOINT": "REPLACE_WITH_SKILLS_STAGE_PACI_TOKEN_ENDPOINT",
+        "LINKSKILLS_PACI_TOKEN_ENDPOINT": "https://REPLACE_WITH_SKILLS_STAGE_PACI_TOKEN_ENDPOINT",
         "LINKSKILLS_PACI_CLIENT_PRIVATE_KEY_FILE": "REPLACE_WITH_SECRETREF_FILE_PATH_TO_ES256_PRIVATE_KEY_PEM",
         "LINKSKILLS_PACI_CLIENT_KID": "REPLACE_WITH_CLIENT_JWKS_KID_UUID",
         "LINKSKILLS_PACI_SCOPE": "REPLACE_WITH_SKILLS_LEAST_PRIVILEGE_SCOPES",
@@ -23,10 +24,11 @@
       "disabled": false
     }
   },
-  "_comment": "Project-scoped Cursor MCP fragment for LiNKskills canary. NO secrets. Primary auth path is PACI client_credentials + private_key_jwt (ES256) via LINKSKILLS_PACI_* placeholders. Private key ONLY through SecretRef file path (LINKSKILLS_PACI_CLIENT_PRIVATE_KEY_FILE) — never CLI args, never inline PEM. Static bearer (LINKSKILLS_CANARY_AUTHORIZATION / GATEWAY_TOKEN / LINKSKILLS_LOCAL_TEST_STATIC_BEARER) is LOCAL-TEST ONLY when LINKSKILLS_AUTH_MODE=local-test and is retired as the primary canary path. LINKSKILLS_CANARY requires production cryptographic Gateway verification (Platform-approved authenticator). Do not merge into ~/.cursor/mcp.json without the coordinated Cursor maintenance gate. Do not start the multi-day canary from this fragment alone — Platform stage PACI issuer must exist first. Skills-owned path implemented locally; not live-proven.",
+  "_comment": "Project-scoped Cursor MCP fragment for LiNKskills canary. NO secrets. Entrypoint is linkskills_mcp.paci_stdio_proxy (PACI-aware stdio proxy): mints short-lived access tokens via client_credentials + private_key_jwt (ES256), injects Authorization server-side, never puts bearer in tool args/argv/logs/Git/global Cursor config. GATEWAY_URL and PACI token_endpoint must be https outside LINKSKILLS_AUTH_MODE=local-test loopback. Static bearer (LINKSKILLS_CANARY_AUTHORIZATION / GATEWAY_TOKEN / LINKSKILLS_LOCAL_TEST_STATIC_BEARER) is LOCAL-TEST ONLY and refused for LINKSKILLS_CANARY. Do not merge into ~/.cursor/mcp.json without the coordinated Cursor maintenance gate. Do not start the multi-day canary from this fragment alone — Platform stage PACI issuer must exist first. Skills-owned path implemented locally; not live-proven.",
   "_local_test_static_bearer_only": {
     "LINKSKILLS_AUTH_MODE": "local-test",
     "LINKSKILLS_LOCAL_TEST_STATIC_BEARER": "REPLACE_WITH_UNSIGNED_OR_TEST_BEARER_LOCAL_ONLY",
-    "note": "Forbidden for LINKSKILLS_CANARY=1 production canary. Use only for isolated local unit/integration tests."
+    "GATEWAY_URL": "http://127.0.0.1:8787",
+    "note": "Forbidden for LINKSKILLS_CANARY=1 production canary. Use only for isolated local unit/integration tests (http loopback allowed only with local-test)."
   }
 }

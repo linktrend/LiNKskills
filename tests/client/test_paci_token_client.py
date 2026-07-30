@@ -23,13 +23,16 @@ sys.path.insert(0, str(REPO_ROOT / "packages" / "client"))
 from linkskills_client.client import SkillsGatewayClient  # noqa: E402
 from linkskills_client.paci_token_client import (  # noqa: E402
     ASSERTION_LIFETIME_MAX_S,
+    AUTH_MODE_LOCAL_TEST,
     CLIENT_ASSERTION_TYPE,
+    MAX_ACCESS_TTL_S,
     PaciAuthError,
     PaciClientConfig,
     PaciConfigError,
     PaciTokenClient,
     PaciTransientError,
     refuse_brain_openclaw_reuse,
+    require_https_outside_local_test,
 )
 
 
@@ -139,6 +142,7 @@ class PaciTokenClientTests(unittest.TestCase):
             max_retries=kwargs.pop("max_retries", 3),
             backoff_base_s=kwargs.pop("backoff_base_s", 0.01),
             timeout_s=kwargs.pop("timeout_s", 5.0),
+            auth_mode=kwargs.pop("auth_mode", AUTH_MODE_LOCAL_TEST),
         )
         return PaciTokenClient(config=cfg)
 
@@ -233,6 +237,7 @@ class PaciTokenClientTests(unittest.TestCase):
                 token_endpoint=self.token_endpoint,
                 private_key_file=self.key_path,
                 resource_audience="linkbrain-api",
+                auth_mode=AUTH_MODE_LOCAL_TEST,
             )
         with self.assertRaises(PaciConfigError):
             refuse_brain_openclaw_reuse()
@@ -244,6 +249,7 @@ class PaciTokenClientTests(unittest.TestCase):
                 client_id="skills-stage-client",
                 token_endpoint=self.token_endpoint,
                 private_key_file=missing,
+                auth_mode=AUTH_MODE_LOCAL_TEST,
             )
 
     def test_from_env_and_gateway_client_paci_bearer(self) -> None:
@@ -252,7 +258,7 @@ class PaciTokenClientTests(unittest.TestCase):
             "LINKSKILLS_PACI_TOKEN_ENDPOINT": self.token_endpoint,
             "LINKSKILLS_PACI_CLIENT_PRIVATE_KEY_FILE": str(self.key_path),
             "LINKSKILLS_PACI_SCOPE": "skills:read",
-            "LINKSKILLS_AUTH_MODE": "production",
+            "LINKSKILLS_AUTH_MODE": "local-test",
             "GATEWAY_URL": "http://127.0.0.1:9",
         }
         paci = PaciTokenClient.from_env(env)
@@ -291,11 +297,112 @@ class PaciTokenClientTests(unittest.TestCase):
             gw.shutdown()
             gw.server_close()
 
+    def test_rejects_expires_in_above_900s(self) -> None:
+        self.state.body["expires_in"] = 3600
+        client = self._client()
+        with self.assertRaises(PaciAuthError) as ctx:
+            client.get_access_token()
+        self.assertIn(str(MAX_ACCESS_TTL_S), str(ctx.exception))
+
+    def test_expiry_forces_renewal(self) -> None:
+        client = self._client()
+        client.get_access_token()
+        assert client._cached is not None
+        client._cached.expires_at = time.time() - 1.0
+        self.state.body["access_token"] = "skills-access-token-expired-renewed"
+        renewed = client.get_access_token()
+        self.assertEqual(renewed, "skills-access-token-expired-renewed")
+        self.assertEqual(len(self.state.requests), 2)
+
+    def test_invalidate_clears_cache(self) -> None:
+        client = self._client()
+        client.get_access_token()
+        client.invalidate()
+        self.assertIsNone(client._cached)
+        self.state.body["access_token"] = "skills-access-token-after-invalidate"
+        token = client.get_access_token()
+        self.assertEqual(token, "skills-access-token-after-invalidate")
+        self.assertEqual(len(self.state.requests), 2)
+
+    def test_gateway_401_invalidates_and_retries_once(self) -> None:
+        env = {
+            "LINKSKILLS_PACI_CLIENT_ID": "skills-stage-client",
+            "LINKSKILLS_PACI_TOKEN_ENDPOINT": self.token_endpoint,
+            "LINKSKILLS_PACI_CLIENT_PRIVATE_KEY_FILE": str(self.key_path),
+            "LINKSKILLS_AUTH_MODE": "local-test",
+        }
+        paci = PaciTokenClient.from_env(env)
+        self.state.body["access_token"] = "token-v1"
+        hits: List[str] = []
+
+        class GwHandler(BaseHTTPRequestHandler):
+            def do_POST(self) -> None:  # noqa: N802
+                length = int(self.headers.get("Content-Length") or 0)
+                self.rfile.read(length)
+                auth = self.headers.get("Authorization") or ""
+                hits.append(auth)
+                if len(hits) == 1:
+                    body = b'{"error":"unauthorized"}'
+                    self.send_response(401)
+                else:
+                    body = b'{"ok":true,"data":{}}'
+                    self.send_response(200)
+                self.send_header("Content-Type", "application/json")
+                self.send_header("Content-Length", str(len(body)))
+                self.end_headers()
+                self.wfile.write(body)
+
+            def log_message(self, format: str, *args: Any) -> None:  # noqa: A003
+                return
+
+        gw = HTTPServer(("127.0.0.1", 0), GwHandler)
+        port = gw.server_address[1]
+        thread = threading.Thread(target=gw.serve_forever, daemon=True)
+        thread.start()
+        try:
+            # Second mint returns token-v2 after invalidate (on Gateway 401).
+            self.state.body["access_token"] = "token-v1"
+            original_mint = paci._mint_once
+
+            def mint_once_wrapper() -> None:
+                if len(self.state.requests) >= 1 and len(hits) >= 1:
+                    self.state.body["access_token"] = "token-v2"
+                original_mint()
+
+            paci._mint_once = mint_once_wrapper  # type: ignore[method-assign]
+            client = SkillsGatewayClient(
+                base_url=f"http://127.0.0.1:{port}",
+                paci_client=paci,
+                auth_mode="local-test",
+            )
+            result = client.call("skills_list", {})
+            self.assertEqual(result.get("ok"), True)
+            self.assertEqual(len(hits), 2)
+            self.assertEqual(hits[0], "Bearer token-v1")
+            self.assertEqual(hits[1], "Bearer token-v2")
+        finally:
+            gw.shutdown()
+            gw.server_close()
+
+    def test_https_required_outside_local_test(self) -> None:
+        with self.assertRaises(PaciConfigError):
+            require_https_outside_local_test(
+                "http://paci.example/oauth/token",
+                auth_mode="production",
+                label="token_endpoint",
+            )
+        # local-test loopback allowed
+        require_https_outside_local_test(
+            "http://127.0.0.1:9/oauth/token",
+            auth_mode="local-test",
+            label="token_endpoint",
+        )
+
     def test_from_env_rejects_static_bearer_outside_local_test(self) -> None:
         env = {
             "LINKSKILLS_AUTH_MODE": "production",
             "GATEWAY_TOKEN": "static-should-fail",
-            "GATEWAY_URL": "http://127.0.0.1:9",
+            "GATEWAY_URL": "https://gateway.example",
         }
         with self.assertRaises(PaciConfigError):
             SkillsGatewayClient.from_env(env)

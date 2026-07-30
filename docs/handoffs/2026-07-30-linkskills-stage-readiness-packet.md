@@ -1,17 +1,23 @@
 # LiNKskills stage readiness packet
 
-**Status:** Skills-owned packet prepared — **stage/prod blocked** until Platform supplies independently verified environment  
-**Date:** 2026-07-30 (Asia/Taipei)  
-**Evidence separation:** local/fake (proven in-repo) vs stage/prod (**not run; endpoints not invented**)  
+**Status:** Skills-owned packet prepared — **stage/prod blocked** until Platform supplies independently verified environment
+**Date:** 2026-07-30 (Asia/Taipei)
+**Evidence separation:** local/fake (proven in-repo) vs stage/prod (**not run; endpoints not invented**)
 **Related:** `docs/handoffs/2026-07-30-linkskills-librarian-stage-packet.md`, `evidence/phase10/CLASSIFICATION-HONESTY.md`, `evidence/phase7/cursor-canary-status.json`
 
-## 1. Evidence class matrix
+## 1. Evidence class matrix (atomic claims — do not merge classes)
+
+Each row is an **atomic** claim. Local implementation ≠ installable packaging ≠
+frozen-contract conformance ≠ stage ≠ canary ≠ production.
 
 | Class | What is allowed | Status in this packet |
 |---|---|---|
-| **local/fake** | Unit tests, FakeLibrarianHost, local-test AuthClaims, unsigned verifier under `LINKSKILLS_AUTH_MODE=local-test`, project-scoped Cursor fragment examples | **In-repo proofs exist** |
+| **local implementation** | In-repo code + unit/fake proofs (FakeLibrarianHost, local-test AuthClaims, unsigned verifier under `LINKSKILLS_AUTH_MODE=local-test`) | **In-repo proofs exist** |
+| **installable packaging** | Editable/wheel install of Gateway/MCP/client/librarian packages on a clean venv | Skills-owned packaging path; not a stage/prod claim |
+| **frozen-contract conformance** | Consumer pins / fixtures match frozen Platform AuthClaims + PACI envelope authority bytes | AuthClaims 1.1.0 pinned; envelope pin tracked separately — not live-proven |
 | **stage** | Authenticated Gateway/MCP against Platform stage PACI + applied migrations + separate Skills credentials | **BLOCKED** — no stage endpoint inventing |
-| **prod** | Same bar as stage with prod issuer/JWKS/credentials | **BLOCKED** |
+| **canary** | Supervised multi-day consumer canary (Cursor stages 3–8) against stage | **BLOCKED** — not started |
+| **production** | Same bar as stage with prod issuer/JWKS/credentials + production canary/general launch | **BLOCKED** |
 
 Do not begin multi-day canaries or claim general launch from this packet alone.
 
@@ -35,7 +41,7 @@ Fill SHA-256 at the Skills commit Platform consumes. Placeholders mark required 
 
 ## 3. Migration manifest pin
 
-**Authority:** LiNKplatform alone applies live.  
+**Authority:** LiNKplatform alone applies live.
 **Manifest:** `docs/migrations/MANIFEST-20260727-lskills-registry-v0.1.md`
 
 | Order | File | SHA-256 (verified 2026-07-30) |
@@ -45,8 +51,12 @@ Fill SHA-256 at the Skills commit Platform consumes. Placeholders mark required 
 | 3 | `supabase/migrations/20260718_000004_lskills_postgrest_exposure.sql` | `4220d70b626313f572a38720958fb78550b3b89c0efab5366a449d33c0b22ca0` |
 | 4 | `supabase/migrations/20260727_000005_lskills_registry_foundation.sql` | `36081765032f21dfd2dcca223035555e1e54b71298874235def8e0362c55c4ed` |
 | 5 | `supabase/migrations/20260728_000006_lskills_rls_actor_org_scope.sql` | `12c2e45e94fd9216a5857ce53ce299a953dc2ee869f89bcdb392857133df763d` |
+| 6 | `supabase/migrations/20260730_000007_lskills_gateway_persistence.sql` | `c26d1c55d9f87e242fe1e225fd4240cd911a5e0315d88500417d491689596222` |
+| 7 | `supabase/migrations/20260730_000008_lskills_review_queue.sql` | `_PLACEHOLDER_000008_REVIEW_QUEUE_SHA256_` (L3 additive review_queue; fill when file lands) |
 
-**Stage gate after apply (Platform evidence required):** `lskills.catalog` count ≥ 34; registry tables present with RLS; Platform foundation present.
+**Stage gate after apply (Platform evidence required):** `lskills.catalog` count ≥ 34; registry tables present with RLS; gateway persistence (`000007`) + review_queue (`000008`) present; Platform foundation present.
+
+Live apply remains **Platform-owned only**. Skills ships SQL + hashed manifest; this packet does not claim stage apply.
 
 ## 4. PACI verifier / client pins
 
@@ -63,7 +73,7 @@ Fill SHA-256 at the Skills commit Platform consumes. Placeholders mark required 
 | Service scope | `lskills` | must not reuse Brain/OpenClaw audiences |
 | Local-test mode | `LINKSKILLS_AUTH_MODE=local-test` + `LocalUnsignedClaimsVerifier` | **never** stage/prod / `LINKSKILLS_CANARY` |
 
-Consumer pin doc: `docs/contracts/frozen/platform-auth-claims-v1.1.0.CONSUMER-PIN.md`  
+Consumer pin doc: `docs/contracts/frozen/platform-auth-claims-v1.1.0.CONSUMER-PIN.md`
 Envelope constants: `packages/gateway/linkskills_gateway/paci_types.py`
 
 ## 5. Endpoint / audience / credential requirements
@@ -79,7 +89,7 @@ Envelope constants: `packages/gateway/linkskills_gateway/paci_types.py`
 |---|---|---|
 | Skills Gateway/MCP base URL | `_PLATFORM_SUPPLIED_STAGE_ENDPOINT_` | `_PLATFORM_SUPPLIED_PROD_ENDPOINT_` |
 | PACI issuer | `_PLATFORM_SUPPLIED_` | `_PLATFORM_SUPPLIED_` |
-| JWKS URL | `_PLATFORM_SUPPLIED_` | `_PLATFORM_SUPPLIED_` |
+| JWKS URI | `_PLATFORM_SUPPLIED_` | `_PLATFORM_SUPPLIED_` |
 | Introspection URL (high-risk writes) | `_PLATFORM_SUPPLIED_` | `_PLATFORM_SUPPLIED_` |
 | Audience | `lskills-api` (exact) | `lskills-api` (exact) |
 | Skills runtime credential | Platform-issued; name e.g. `svc_lskills_runtime` | separate from stage |
