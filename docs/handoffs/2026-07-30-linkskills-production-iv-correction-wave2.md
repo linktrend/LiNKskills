@@ -15,7 +15,14 @@
 | Exact start HEAD | `61850d942ac2bf053a8a464e199e1a2f72e6fa2a` |
 | Wave-2 prompt commit | `7f0ed47fdacbb1d819a74333d685a5527a127f29` |
 | Implementation commit | `354400e9ec7b7bcd29cfbb2e5ffd9cabaad55ad0` |
-| Exact clean pushed HEAD | reported by agent after push |
+| Exact clean pushed HEAD | `bae7c36d93b90d558f43ac0b8132ce84658fd443` |
+
+## Amendment 2026-07-30 (Wave 3)
+
+Wave-3 executor recorded the Exact clean pushed HEAD above as
+`bae7c36d93b90d558f43ac0b8132ce84658fd443` (branch tip that Wave 3 started
+from). See `docs/handoffs/2026-07-30-linkskills-production-iv-correction-wave3.md`
+for Wave-3 corrections. This amendment does not change Wave-2 scope or claims.
 
 ## Platform repin status
 
