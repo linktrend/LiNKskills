@@ -376,14 +376,20 @@ class IntrospectionClient:
         expected_iss: str,
         expected_aud: Sequence[str],
         expected_sub: str,
-        expected_client_id: str,
+        trusted_mint_client_ids: Sequence[str],
         expected_credential_id: str,
         expected_runtime_binding_id: str,
         expected_iat: int,
         expected_exp: int,
         required_scopes: Optional[Sequence[str]] = None,
     ) -> IntrospectionResult:
-        """High-risk gate: 200 + active:true with exact binding (no shortcuts)."""
+        """High-risk gate: 200 + active:true with exact binding (no shortcuts).
+
+        ``client_id`` on an active response is the **access-token mint** client
+        identity. It is validated against ``trusted_mint_client_ids``, never
+        against this client's private_key_jwt assertion ``client_id`` (RS
+        introspect caller identity).
+        """
         result = self.introspect(access_token, jti=jti)
 
         # Always require and exactly match — missing/empty already denied above.
@@ -403,10 +409,18 @@ class IntrospectionClient:
                 "auth_forbidden",
                 "Introspection sub mismatch vs JWT/AuthClaims",
             )
-        if result.client_id != expected_client_id:
+        allowed_mint_ids = frozenset(
+            str(c).strip() for c in trusted_mint_client_ids if str(c).strip()
+        )
+        if not allowed_mint_ids:
+            raise AuthError(
+                "auth_config",
+                "trusted mint client_id allow-list is empty; fail-closed",
+            )
+        if result.client_id not in allowed_mint_ids:
             raise AuthError(
                 "auth_forbidden",
-                "Introspection client_id mismatch",
+                "Introspection client_id not in trusted mint allow-list",
             )
         if result.credential_id != expected_credential_id:
             raise AuthError(

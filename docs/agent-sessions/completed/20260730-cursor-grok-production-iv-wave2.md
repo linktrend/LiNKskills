@@ -18,3 +18,10 @@
 | D | Platform certified tip wait/repin only if independently certified |
 
 Hard stop: no merge, migrate live, deploy, canary, CI poll, sibling edits, self-certify.
+
+
+## Closed 2026-07-30 Asia/Taipei
+
+- Wave 2 lanes A–C complete; Lane D AWAITING_CERTIFIED_PLATFORM_REPIN.
+- Handoff: `docs/handoffs/2026-07-30-linkskills-production-iv-correction-wave2.md`.
+- Stop for LiNKskills Codex re-verification.

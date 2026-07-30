@@ -50,7 +50,10 @@ ENV_PACI_JWKS_URI = "LINKSKILLS_PACI_JWKS_URI"
 ENV_PACI_AUDIENCE = "LINKSKILLS_PACI_AUDIENCE"
 ENV_PACI_REQUIRED_SERVICE_SCOPES = "LINKSKILLS_PACI_REQUIRED_SERVICE_SCOPES"
 ENV_PACI_INTROSPECTION_URL = "LINKSKILLS_PACI_INTROSPECTION_URL"
+# Resource-server private_key_jwt assertion identity (who calls introspect).
 ENV_PACI_INTROSPECTION_CLIENT_ID = "LINKSKILLS_PACI_INTROSPECTION_CLIENT_ID"
+# CSV allow-list of access-token mint client IDs permitted in active responses.
+ENV_PACI_TRUSTED_MINT_CLIENT_IDS = "LINKSKILLS_PACI_TRUSTED_MINT_CLIENT_IDS"
 ENV_PLATFORM_AUTHENTICATOR = "LINKSKILLS_PLATFORM_AUTHENTICATOR"
 
 DEFAULT_AUDIENCE = "lskills-api"
@@ -82,6 +85,7 @@ class PaciJwtAuthenticator:
         now_fn: Optional[Callable[[], float]] = None,
         high_risk_operations: Optional[frozenset[str]] = None,
         introspection_client_id: Optional[str] = None,
+        trusted_mint_client_ids: Optional[Sequence[str]] = None,
         auth_mode: str = "production",
     ) -> None:
         validate_issuer_identifier(issuer, auth_mode=auth_mode)
@@ -102,7 +106,11 @@ class PaciJwtAuthenticator:
         )
         self._introspection = introspection
         self._high_risk = high_risk_operations or HIGH_RISK_WRITE_OPERATIONS
+        # RS assertion identity (who calls introspect) — not mint binding.
         self._introspection_client_id = str(introspection_client_id or "").strip()
+        self._trusted_mint_client_ids = frozenset(
+            str(c).strip() for c in (trusted_mint_client_ids or ()) if str(c).strip()
+        )
         self._auth_mode = auth_mode
 
     def authenticate(self, token: str) -> AuthenticatedToken:
@@ -173,7 +181,14 @@ class PaciJwtAuthenticator:
         if not self._introspection_client_id:
             raise AuthError(
                 "auth_config",
-                f"Introspection client_id required ({ENV_PACI_INTROSPECTION_CLIENT_ID})",
+                "Introspection assertion client_id required "
+                f"({ENV_PACI_INTROSPECTION_CLIENT_ID})",
+            )
+        if not self._trusted_mint_client_ids:
+            raise AuthError(
+                "auth_config",
+                "Trusted mint client_id allow-list required "
+                f"({ENV_PACI_TRUSTED_MINT_CLIENT_IDS}); fail-closed on ambiguity",
             )
         if not expected_credential_id:
             raise AuthError(
@@ -191,7 +206,7 @@ class PaciJwtAuthenticator:
             expected_iss=expected_iss,
             expected_aud=expected_aud,
             expected_sub=expected_sub,
-            expected_client_id=self._introspection_client_id,
+            trusted_mint_client_ids=sorted(self._trusted_mint_client_ids),
             expected_credential_id=expected_credential_id,
             expected_runtime_binding_id=expected_runtime_binding_id,
             expected_iat=expected_iat,
@@ -239,13 +254,17 @@ def build_paci_authenticator_from_environ(
     Optional env:
       - ``LINKSKILLS_PACI_REQUIRED_SERVICE_SCOPES`` (default ``lskills``)
       - ``LINKSKILLS_PACI_INTROSPECTION_URL`` (required for high-risk writes)
-      - ``LINKSKILLS_PACI_INTROSPECTION_CLIENT_ID``
+      - ``LINKSKILLS_PACI_INTROSPECTION_CLIENT_ID`` (RS assertion client id)
+      - ``LINKSKILLS_PACI_TRUSTED_MINT_CLIENT_IDS`` (CSV mint client allow-list;
+        required outside local-test when introspection is configured)
       - ``LINKSKILLS_PACI_CLIENT_PRIVATE_KEY_FILE`` (required outside local-test
         when introspection is configured)
 
     Outside ``LINKSKILLS_AUTH_MODE=local-test``, a real SecretRef-backed
     ``private_key_jwt`` signer is mandatory whenever introspection is enabled.
     ``LocalTestClientAssertionSigner`` is forbidden on production/stage paths.
+    Missing ``LINKSKILLS_PACI_TRUSTED_MINT_CLIENT_IDS`` outside local-test also
+    fails closed when introspection is configured.
     """
     env = environ if environ is not None else os.environ
     try:
@@ -268,6 +287,9 @@ def build_paci_authenticator_from_environ(
     scopes = _split_csv(
         str(env.get(ENV_PACI_REQUIRED_SERVICE_SCOPES) or DEFAULT_SERVICE_SCOPE)
     )
+    trusted_mint_ids = _split_csv(
+        str(env.get(ENV_PACI_TRUSTED_MINT_CLIENT_IDS) or "")
+    )
 
     jwks_provider: JwksKeyProvider
     if jwks is not None:
@@ -282,12 +304,19 @@ def build_paci_authenticator_from_environ(
 
     introspect_client = introspection
     introspect_url = str(env.get(ENV_PACI_INTROSPECTION_URL) or "").strip()
-    client_id = str(env.get(ENV_PACI_INTROSPECTION_CLIENT_ID) or "").strip()
+    # RS private_key_jwt assertion client id (who calls introspect).
+    assertion_client_id = str(env.get(ENV_PACI_INTROSPECTION_CLIENT_ID) or "").strip()
     if introspect_client is None and introspect_url:
-        if not client_id:
+        if not assertion_client_id:
             raise AuthConfigurationError(
                 f"{ENV_PACI_INTROSPECTION_URL} set but "
                 f"{ENV_PACI_INTROSPECTION_CLIENT_ID} missing"
+            )
+        if auth_mode != AUTH_MODE_LOCAL_TEST and not trusted_mint_ids:
+            raise AuthConfigurationError(
+                f"{ENV_PACI_INTROSPECTION_URL} set but "
+                f"{ENV_PACI_TRUSTED_MINT_CLIENT_IDS} missing or empty "
+                "(fail-closed outside local-test)"
             )
         signer = assertion_signer
         if signer is None:
@@ -309,11 +338,21 @@ def build_paci_authenticator_from_environ(
                 )
         introspect_client = IntrospectionClient(
             introspection_url=introspect_url,
-            client_id=client_id,
+            client_id=assertion_client_id,
             assertion_signer=signer,
             now_fn=now_fn,
             auth_mode=auth_mode,
             required_scopes=scopes,
+        )
+    elif (
+        introspect_client is not None
+        and auth_mode != AUTH_MODE_LOCAL_TEST
+        and not trusted_mint_ids
+    ):
+        # Injected introspection client still needs mint allow-list outside local-test.
+        raise AuthConfigurationError(
+            f"{ENV_PACI_TRUSTED_MINT_CLIENT_IDS} missing or empty "
+            "(fail-closed outside local-test when introspection is configured)"
         )
 
     return PaciJwtAuthenticator(
@@ -323,6 +362,7 @@ def build_paci_authenticator_from_environ(
         introspection=introspect_client,
         required_service_scopes=scopes,
         now_fn=now_fn,
-        introspection_client_id=client_id or None,
+        introspection_client_id=assertion_client_id or None,
+        trusted_mint_client_ids=trusted_mint_ids or None,
         auth_mode=auth_mode,
     )

@@ -68,7 +68,12 @@ ISSUER = "https://auth.stage.linkplatform.linktrend.dev"
 JWKS_URI = f"{ISSUER}/.well-known/jwks.json"
 AUDIENCE = ["lskills-api"]
 INTROSPECT_URL = f"{ISSUER}/oauth/introspect"
-CLIENT_ID = "skills-gateway"
+# RS private_key_jwt assertion identity (who calls introspect).
+ASSERTION_CLIENT_ID = "skills-rs-assertion-client"
+# Access-token mint client identity returned in introspection active responses.
+MINT_CLIENT_ID = "cursor-mint-client"
+# Historical alias — must not be used as both assertion and mint identity.
+CLIENT_ID = ASSERTION_CLIENT_ID
 
 
 class PaciAdversarialTests(unittest.TestCase):
@@ -87,7 +92,7 @@ class PaciAdversarialTests(unittest.TestCase):
         self.introspect_backend = FakeIntrospectionBackend()
         self.introspection = IntrospectionClient(
             introspection_url=INTROSPECT_URL,
-            client_id=CLIENT_ID,
+            client_id=ASSERTION_CLIENT_ID,
             assertion_signer=LocalTestClientAssertionSigner(auth_mode="local-test"),
             fetch_fn=self.introspect_backend.fetch,
             now_fn=lambda: self.now,
@@ -100,7 +105,8 @@ class PaciAdversarialTests(unittest.TestCase):
             jwks=self.jwks,
             introspection=self.introspection,
             now_fn=lambda: self.now,
-            introspection_client_id=CLIENT_ID,
+            introspection_client_id=ASSERTION_CLIENT_ID,
+            trusted_mint_client_ids=[MINT_CLIENT_ID],
             auth_mode="local-test",
         )
 
@@ -120,7 +126,7 @@ class PaciAdversarialTests(unittest.TestCase):
             iss=ISSUER,
             sub=verified.sub,
             aud=sorted(verified.aud),
-            client_id=CLIENT_ID,
+            client_id=MINT_CLIENT_ID,
             credential_id=str(verified.claims.get("credentialId")),
             runtime_binding_id=str(verified.claims.get("runtimeBindingId")),
             iat=verified.iat,
@@ -402,7 +408,7 @@ class PaciAdversarialTests(unittest.TestCase):
             expected_iss=ISSUER,
             expected_aud=AUDIENCE,
             expected_sub=verified.sub,
-            expected_client_id=CLIENT_ID,
+            trusted_mint_client_ids=[MINT_CLIENT_ID],
             expected_credential_id="cred-skills-test-1",
             expected_runtime_binding_id="bind-skills-test-1",
             expected_iat=verified.iat,
@@ -416,7 +422,7 @@ class PaciAdversarialTests(unittest.TestCase):
             expected_iss=ISSUER,
             expected_aud=AUDIENCE,
             expected_sub=verified.sub,
-            expected_client_id=CLIENT_ID,
+            trusted_mint_client_ids=[MINT_CLIENT_ID],
             expected_credential_id="cred-skills-test-1",
             expected_runtime_binding_id="bind-skills-test-1",
             expected_iat=verified.iat,
@@ -430,7 +436,7 @@ class PaciAdversarialTests(unittest.TestCase):
             expected_iss=ISSUER,
             expected_aud=AUDIENCE,
             expected_sub=verified.sub,
-            expected_client_id=CLIENT_ID,
+            trusted_mint_client_ids=[MINT_CLIENT_ID],
             expected_credential_id="cred-skills-test-1",
             expected_runtime_binding_id="bind-skills-test-1",
             expected_iat=verified.iat,
@@ -586,7 +592,7 @@ class PaciAdversarialTests(unittest.TestCase):
         with self.assertRaises(AuthError):
             IntrospectionClient(
                 introspection_url=INTROSPECT_URL,
-                client_id=CLIENT_ID,
+                client_id=ASSERTION_CLIENT_ID,
                 assertion_signer=LocalTestClientAssertionSigner(auth_mode="local-test"),
                 auth_mode="production",
             )
@@ -598,10 +604,25 @@ class PaciAdversarialTests(unittest.TestCase):
             "LINKSKILLS_PACI_JWKS_URI": JWKS_URI,
             "LINKSKILLS_PACI_AUDIENCE": "lskills-api",
             "LINKSKILLS_PACI_INTROSPECTION_URL": INTROSPECT_URL,
-            "LINKSKILLS_PACI_INTROSPECTION_CLIENT_ID": CLIENT_ID,
+            "LINKSKILLS_PACI_INTROSPECTION_CLIENT_ID": ASSERTION_CLIENT_ID,
+            "LINKSKILLS_PACI_TRUSTED_MINT_CLIENT_IDS": MINT_CLIENT_ID,
         }
         with self.assertRaises(AuthConfigurationError):
             build_paci_authenticator_from_environ(env, jwks=self.jwks)
+
+    def test_production_factory_requires_trusted_mint_client_ids(self) -> None:
+        env = {
+            "LINKSKILLS_AUTH_MODE": "production",
+            "LINKSKILLS_PACI_ISSUER": ISSUER,
+            "LINKSKILLS_PACI_JWKS_URI": JWKS_URI,
+            "LINKSKILLS_PACI_AUDIENCE": "lskills-api",
+            "LINKSKILLS_PACI_INTROSPECTION_URL": INTROSPECT_URL,
+            "LINKSKILLS_PACI_INTROSPECTION_CLIENT_ID": ASSERTION_CLIENT_ID,
+            # Intentionally omit LINKSKILLS_PACI_TRUSTED_MINT_CLIENT_IDS.
+        }
+        with self.assertRaises(AuthConfigurationError) as ctx:
+            build_paci_authenticator_from_environ(env, jwks=self.jwks)
+        self.assertIn("TRUSTED_MINT_CLIENT_IDS", str(ctx.exception))
 
     def test_secretref_signer_and_assertion_replay(self) -> None:
         key, _jwk = generate_es256_keypair()
@@ -613,7 +634,7 @@ class PaciAdversarialTests(unittest.TestCase):
                 now_fn=lambda: self.now,
             )
             assertion = signer.mint_assertion(
-                audience=INTROSPECT_URL, client_id=CLIENT_ID
+                audience=INTROSPECT_URL, client_id=ASSERTION_CLIENT_ID
             )
             self.assertEqual(assertion.count("."), 2)
             # Simulate replay of a still-valid jti.

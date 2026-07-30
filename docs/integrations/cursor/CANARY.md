@@ -17,10 +17,11 @@
 
 | Mode | When | Mechanism |
 |---|---|---|
-| **PACI proxy (primary canary)** | `LINKSKILLS_CANARY=1` + `LINKSKILLS_AUTH_MODE=production` + `LINKSKILLS_PACI_*` | `paci_stdio_proxy` mints via `client_credentials` + `private_key_jwt` (ES256); injects `Authorization` server-side; access TTL ≤900s; early renew &lt;20%; 401 invalidation + bounded retry |
+| **PACI proxy + HTTP Gateway (primary canary)** | `LINKSKILLS_CANARY=1` + `LINKSKILLS_AUTH_MODE=production` + `LINKSKILLS_MCP_UPSTREAM=http` + https `GATEWAY_URL` + `LINKSKILLS_PACI_*` | `paci_stdio_proxy` mints via `client_credentials` + `private_key_jwt` (ES256); injects `Authorization` to the durable stage Gateway over HTTPS; access TTL ≤900s; early renew &lt;20%; 401 invalidation + bounded retry |
+| **PACI proxy in-process (opt-in only)** | Production only with `LINKSKILLS_MCP_ALLOW_INPROCESS_PRODUCTION=1` + `LINKSKILLS_ENV=stage\|production` + postgres store + DSN | Refused by default — never silently constructs an in-memory Gateway when ENV/store/DSN are missing |
 | **Static bearer (local-test only)** | Explicit `LINKSKILLS_AUTH_MODE=local-test` (never canary) | `LINKSKILLS_LOCAL_TEST_STATIC_BEARER` / `GATEWAY_TOKEN` — **refused for `LINKSKILLS_CANARY`** |
 
-HTTPS: `GATEWAY_URL` and PACI `token_endpoint` must be **https** outside `LINKSKILLS_AUTH_MODE=local-test` + loopback.
+HTTPS: `GATEWAY_URL` and PACI `token_endpoint` must be **https** outside `LINKSKILLS_AUTH_MODE=local-test` + loopback. Production canary fragment defaults to `LINKSKILLS_MCP_UPSTREAM=http`.
 
 See Platform frozen `platform.auth-token-envelope/0.1.0` §§6–7 for assertion claims, 15-minute access tokens, no refresh token, and early renewal (&lt;20% TTL remaining).
 

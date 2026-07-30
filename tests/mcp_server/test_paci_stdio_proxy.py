@@ -40,8 +40,14 @@ from linkskills_gateway.auth import AuthError, LocalUnsignedClaimsVerifier  # no
 from linkskills_gateway.auth_testing import mint_test_bearer  # noqa: E402
 from linkskills_gateway.service import SkillsGatewayService  # noqa: E402
 from linkskills_mcp.paci_stdio_proxy import (  # noqa: E402
+    ENV_ALLOW_INPROCESS_PRODUCTION,
+    ENV_UPSTREAM,
     PaciStdioMcpProxy,
+    UPSTREAM_HTTP,
+    UPSTREAM_IN_PROCESS,
+    _resolve_upstream,
     build_paci_client,
+    require_durable_inprocess_production,
 )
 from linkskills_mcp.server import SkillsMcpServer  # noqa: E402
 
@@ -355,6 +361,142 @@ class PaciStdioProxyTests(unittest.TestCase):
         self.assertIn("result", response)
         self.assertEqual(calls["n"], 2)
         self.assertGreaterEqual(len(self.state.requests), 2)
+
+    def test_production_defaults_upstream_to_http(self) -> None:
+        self.assertEqual(
+            _resolve_upstream({"LINKSKILLS_AUTH_MODE": "production"}),
+            UPSTREAM_HTTP,
+        )
+        self.assertEqual(
+            _resolve_upstream({"LINKSKILLS_CANARY": "1"}),
+            UPSTREAM_HTTP,
+        )
+
+    def test_local_test_defaults_upstream_to_in_process(self) -> None:
+        self.assertEqual(
+            _resolve_upstream({"LINKSKILLS_AUTH_MODE": "local-test"}),
+            UPSTREAM_IN_PROCESS,
+        )
+
+    def test_production_inprocess_without_allow_fails_closed(self) -> None:
+        with self.assertRaises(SystemExit) as ctx:
+            PaciStdioMcpProxy(
+                paci_client=self.paci,
+                upstream=UPSTREAM_IN_PROCESS,
+                mcp_server=self.mcp,
+                environ={
+                    "LINKSKILLS_AUTH_MODE": "production",
+                    "LINKSKILLS_CANARY": "1",
+                },
+            )
+        msg = str(ctx.exception).lower()
+        self.assertIn("refuses in-process", msg)
+        self.assertIn("in-memory", msg)
+
+    def test_production_inprocess_missing_env_fails_closed(self) -> None:
+        with self.assertRaises(SystemExit) as ctx:
+            require_durable_inprocess_production(
+                {
+                    ENV_ALLOW_INPROCESS_PRODUCTION: "1",
+                    "LINKSKILLS_AUTH_MODE": "production",
+                    "LINKSKILLS_GATEWAY_STORE": "postgres",
+                    "LINKSKILLS_DATABASE_URL": "postgresql://example/db",
+                }
+            )
+        self.assertIn("LINKSKILLS_ENV", str(ctx.exception))
+
+    def test_production_inprocess_missing_dsn_fails_closed(self) -> None:
+        with self.assertRaises(SystemExit) as ctx:
+            require_durable_inprocess_production(
+                {
+                    ENV_ALLOW_INPROCESS_PRODUCTION: "1",
+                    "LINKSKILLS_AUTH_MODE": "production",
+                    "LINKSKILLS_ENV": "stage",
+                    "LINKSKILLS_GATEWAY_STORE": "postgres",
+                }
+            )
+        msg = str(ctx.exception)
+        self.assertIn("DATABASE_URL", msg)
+        self.assertIn("in-memory", msg.lower())
+
+    def test_production_inprocess_allowed_with_postgres_proof(self) -> None:
+        # Gate only — do not open a real postgres connection here.
+        require_durable_inprocess_production(
+            {
+                ENV_ALLOW_INPROCESS_PRODUCTION: "1",
+                "LINKSKILLS_AUTH_MODE": "production",
+                "LINKSKILLS_ENV": "stage",
+                "LINKSKILLS_GATEWAY_STORE": "postgres",
+                "LINKSKILLS_DATABASE_URL": "postgresql://skills:skills@127.0.0.1:5432/skills",
+            }
+        )
+        proxy = PaciStdioMcpProxy(
+            paci_client=self.paci,
+            upstream=UPSTREAM_IN_PROCESS,
+            mcp_server=self.mcp,
+            environ={
+                ENV_ALLOW_INPROCESS_PRODUCTION: "1",
+                "LINKSKILLS_AUTH_MODE": "production",
+                "LINKSKILLS_ENV": "stage",
+                "LINKSKILLS_GATEWAY_STORE": "postgres",
+                "LINKSKILLS_DATABASE_URL": "postgresql://skills:skills@127.0.0.1:5432/skills",
+            },
+        )
+        self.assertEqual(proxy.upstream, UPSTREAM_IN_PROCESS)
+
+    def test_production_http_requires_https_gateway_url(self) -> None:
+        with self.assertRaises(SystemExit) as ctx:
+            PaciStdioMcpProxy(
+                paci_client=self.paci,
+                upstream=UPSTREAM_HTTP,
+                gateway_client=SkillsGatewayClient(
+                    base_url="http://127.0.0.1:9",
+                    paci_client=self.paci,
+                    auth_mode=AUTH_MODE_LOCAL_TEST,
+                ),
+                environ={
+                    "LINKSKILLS_AUTH_MODE": "production",
+                    "LINKSKILLS_CANARY": "1",
+                },
+            )
+        self.assertIn("GATEWAY_URL", str(ctx.exception))
+
+    def test_production_http_upstream_with_https_gateway(self) -> None:
+        gateway = SkillsGatewayClient(
+            base_url="https://skills-stage.example.invalid",
+            paci_client=self.paci,
+            auth_mode="production",
+        )
+        proxy = PaciStdioMcpProxy(
+            paci_client=self.paci,
+            upstream=UPSTREAM_HTTP,
+            gateway_client=gateway,
+            environ={
+                "LINKSKILLS_AUTH_MODE": "production",
+                "LINKSKILLS_CANARY": "1",
+                "GATEWAY_URL": "https://skills-stage.example.invalid",
+                ENV_UPSTREAM: UPSTREAM_HTTP,
+            },
+        )
+        self.assertEqual(proxy.upstream, UPSTREAM_HTTP)
+        status = proxy.status()
+        self.assertEqual(status["upstream"], UPSTREAM_HTTP)
+        self.assertEqual(status["auth_mode"], "production")
+
+    def test_local_test_inprocess_still_works(self) -> None:
+        proxy = self._proxy()
+        self.assertEqual(proxy.upstream, UPSTREAM_IN_PROCESS)
+        response = proxy.handle_rpc(
+            {
+                "jsonrpc": "2.0",
+                "id": 10,
+                "method": "tools/list",
+                "params": {},
+            }
+        )
+        assert response is not None
+        self.assertIn("result", response)
+        self.assertGreater(len(response["result"]["tools"]), 0)
 
 
 if __name__ == "__main__":

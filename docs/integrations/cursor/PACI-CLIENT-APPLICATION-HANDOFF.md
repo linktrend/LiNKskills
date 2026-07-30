@@ -36,7 +36,7 @@ Until those exist, keep the fragment placeholders and run only local/fake PACI c
 
    | Env | Replace with |
    |---|---|
-   | `GATEWAY_URL` | Skills stage Gateway base URL (**https**) |
+   | `GATEWAY_URL` | Skills stage Gateway base URL (**https**) — required for production HTTP upstream |
    | `LINKSKILLS_PACI_CLIENT_ID` | Skills stage `client_id` from Platform registration |
    | `LINKSKILLS_PACI_TOKEN_ENDPOINT` | Exact stage PACI token endpoint URI (Skills pin, **https**) |
    | `LINKSKILLS_PACI_CLIENT_PRIVATE_KEY_FILE` | Absolute path to SecretRef-injected ES256 private key PEM |
@@ -44,19 +44,20 @@ Until those exist, keep the fragment placeholders and run only local/fake PACI c
    | `LINKSKILLS_PACI_SCOPE` | Least-privilege Skills scopes |
    | `LINKSKILLS_PACI_RESOURCE_AUDIENCE` | Skills-only audience (refuse Brain/OpenClaw values) |
    | `LINKSKILLS_PLATFORM_AUTHENTICATOR` | Platform-approved Gateway authenticator module |
-   | `LINKSKILLS_MCP_UPSTREAM` | `in-process` (default) or `http` (Gateway HTTP) |
+   | `LINKSKILLS_MCP_UPSTREAM` | **`http`** (production/canary default — durable stage Gateway). `in-process` is refuse-by-default under production; requires `LINKSKILLS_MCP_ALLOW_INPROCESS_PRODUCTION=1` + `LINKSKILLS_ENV=stage\|production` + postgres store + DSN |
 
 5. **Private key custody**
    - File path only via `LINKSKILLS_PACI_CLIENT_PRIVATE_KEY_FILE`.
    - Never pass the key as a CLI arg, MCP `args` entry, chat paste, fixture, or log line.
    - Never commit the PEM; keep it outside the repo (approved secret store → host file).
 
-6. **Keep** `LINKSKILLS_AUTH_MODE=production` and `LINKSKILLS_CANARY=1` for the canary profile.
+6. **Keep** `LINKSKILLS_AUTH_MODE=production`, `LINKSKILLS_CANARY=1`, and `LINKSKILLS_MCP_UPSTREAM=http` for the canary profile (https `GATEWAY_URL` to durable stage Gateway).
 7. **Do not** set `LINKSKILLS_CANARY_AUTHORIZATION` / `GATEWAY_TOKEN` / `LINKSKILLS_LOCAL_TEST_STATIC_BEARER` on the canary profile. Static bearers are **local-test only** (`LINKSKILLS_AUTH_MODE=local-test`) and are **refused** when `LINKSKILLS_CANARY=1`.
 8. **HTTPS gate:** Outside local-test loopback, `GATEWAY_URL` and PACI endpoints must be https (coordinated with `LINKSKILLS_AUTH_MODE=local-test` + loopback for unit tests only).
-9. **Start Gateway** with Platform-approved production authenticator + PACI verification path when live; proxy injects short-lived bearer (TTL ≤900s, early renew &lt;20%, 401 invalidate + bounded retry).
-10. **Smoke (when Platform stage PACI exists):** project-scoped Cursor load → PACI mint → Gateway `skills_*` read-only discovery (Stage 3). Record evidence under `evidence/phase7/`.
-11. **If mint fails:** fail closed. Do not fall back to static bearer in production/canary. Check endpoint pin, `client_id`, key file readability, and assertion clock — without printing key material.
+9. **Refuse silent in-memory:** `LINKSKILLS_AUTH_MODE=production` never constructs an in-process in-memory Gateway because `LINKSKILLS_ENV`/store/DSN are missing — startup fails closed with an actionable error. In-process production is opt-in only (`LINKSKILLS_MCP_ALLOW_INPROCESS_PRODUCTION=1` + stage/prod env + postgres + DSN).
+10. **Start Gateway** with Platform-approved production authenticator + PACI verification path when live; proxy injects short-lived bearer (TTL ≤900s, early renew &lt;20%, 401 invalidate + bounded retry).
+11. **Smoke (when Platform stage PACI exists):** project-scoped Cursor load → PACI mint → Gateway `skills_*` read-only discovery (Stage 3). Record evidence under `evidence/phase7/`.
+12. **If mint fails:** fail closed. Do not fall back to static bearer in production/canary. Check endpoint pin, `client_id`, key file readability, and assertion clock — without printing key material.
 
 ## Local-test static bearer (explicit only)
 

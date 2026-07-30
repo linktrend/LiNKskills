@@ -31,6 +31,9 @@ FOUNDATION_SQL = MIGRATIONS / "20260727_000005_lskills_registry_foundation.sql"
 UPGRADE_SQL = MIGRATIONS / "20260728_000006_lskills_rls_actor_org_scope.sql"
 GATEWAY_SQL = MIGRATIONS / "20260730_000007_lskills_gateway_persistence.sql"
 REVIEW_QUEUE_SQL = MIGRATIONS / "20260730_000008_lskills_review_queue.sql"
+REVIEW_QUEUE_ACTOR_SQL = (
+    MIGRATIONS / "20260730_000009_lskills_review_queue_actor_isolation.sql"
+)
 
 BOOTSTRAP_SQL = """
 create extension if not exists "pgcrypto";
@@ -204,10 +207,16 @@ class GatewayPostgresEphemeralTests(unittest.TestCase):
                 cur.execute("grant svc_observer to postgres;")
 
     def setUp(self) -> None:
-        self._apply_through(FOUNDATION_SQL, UPGRADE_SQL, GATEWAY_SQL, REVIEW_QUEUE_SQL)
+        self._apply_through(
+            FOUNDATION_SQL,
+            UPGRADE_SQL,
+            GATEWAY_SQL,
+            REVIEW_QUEUE_SQL,
+            REVIEW_QUEUE_ACTOR_SQL,
+        )
 
     def test_fresh_and_upgrade_paths(self) -> None:
-        # Fresh: all four migrations applied in setUp — review_queue present.
+        # Fresh: all migrations through 000009 applied in setUp — review_queue + helper.
         with self.psycopg.connect(self.dsn, autocommit=True) as conn:  # type: ignore[attr-defined]
             with conn.cursor() as cur:
                 cur.execute(
@@ -217,8 +226,17 @@ class GatewayPostgresEphemeralTests(unittest.TestCase):
                     """
                 )
                 self.assertIsNotNone(cur.fetchone())
+                cur.execute(
+                    """
+                    select 1 from pg_proc p
+                    join pg_namespace n on n.oid = p.pronamespace
+                    where n.nspname = 'lskills'
+                      and p.proname = 'review_queue_librarian_visible'
+                    """
+                )
+                self.assertIsNotNone(cur.fetchone())
 
-        # Upgrade path: stop after 000007, then apply 000008 alone.
+        # Upgrade path: stop after 000007, apply 000008, then 000009 alone.
         self._apply_through(FOUNDATION_SQL, UPGRADE_SQL, GATEWAY_SQL)
         with self.psycopg.connect(self.dsn, autocommit=True) as conn:  # type: ignore[attr-defined]
             with conn.cursor() as cur:
@@ -237,8 +255,23 @@ class GatewayPostgresEphemeralTests(unittest.TestCase):
                     """
                 )
                 self.assertIsNotNone(cur.fetchone())
+                # Pre-000009 librarian policy is org-only; 000009 hardens to actor+org.
+                cur.execute(
+                    _strip_verification(REVIEW_QUEUE_ACTOR_SQL.read_text(encoding="utf-8"))
+                )
+                cur.execute(
+                    """
+                    select 1 from pg_proc p
+                    join pg_namespace n on n.oid = p.pronamespace
+                    where n.nspname = 'lskills'
+                      and p.proname = 'review_queue_librarian_visible'
+                    """
+                )
+                self.assertIsNotNone(cur.fetchone())
                 # Re-apply is idempotent.
-                cur.execute(_strip_verification(REVIEW_QUEUE_SQL.read_text(encoding="utf-8")))
+                cur.execute(
+                    _strip_verification(REVIEW_QUEUE_ACTOR_SQL.read_text(encoding="utf-8"))
+                )
 
     def test_idempotency_reserve_complete_replay(self) -> None:
         from linkskills_gateway.postgres_store import PostgresGatewayStore
@@ -342,7 +375,7 @@ class GatewayPostgresEphemeralTests(unittest.TestCase):
     def test_review_queue_rls_wrong_actor_org_denied(self) -> None:
         from linkskills_librarian.postgres_store import PostgresReviewQueueStore
 
-        store = PostgresReviewQueueStore(self.dsn, rls=True)
+        store = PostgresReviewQueueStore(self.dsn, rls=True, service_scope="actor")
         try:
             with store.identity("actor-a", "org-a"):
                 item = store.enqueue(
@@ -359,10 +392,11 @@ class GatewayPostgresEphemeralTests(unittest.TestCase):
                 self.assertEqual(item["review_id"], "rev-a1")
                 self.assertEqual(store.depth(), 1)
 
-            # Wrong actor, same org — librarian is org-scoped, so still visible.
+            # Wrong actor, same org — DENIED under 000009 actor+org isolation.
             with store.identity("actor-b", "org-a"):
                 listed = store.list_queue(status="queued")
-                self.assertEqual(len(listed), 1)
+                self.assertEqual(listed, [])
+                self.assertEqual(store.depth(), 0)
 
             # Wrong org — denied.
             with store.identity("actor-a", "org-b"):
@@ -371,6 +405,102 @@ class GatewayPostgresEphemeralTests(unittest.TestCase):
                 self.assertEqual(store.depth(), 0)
         finally:
             store.close()
+
+    def test_review_queue_rls_missing_guc_denied(self) -> None:
+        """Missing actor/org GUC must not expose review_queue rows."""
+        from linkskills_librarian.postgres_store import PostgresReviewQueueStore
+
+        store = PostgresReviewQueueStore(self.dsn, rls=True, service_scope="actor")
+        try:
+            with store.identity("actor-a", "org-a"):
+                store.enqueue(
+                    {
+                        "review_id": "rev-guc-1",
+                        "kind": "general",
+                        "status": "queued",
+                        "actor_id": "actor-a",
+                        "org_id": "org-a",
+                        "provenance": {},
+                    }
+                )
+        finally:
+            store.close()
+
+        with self.psycopg.connect(self.dsn) as conn:  # type: ignore[attr-defined]
+            conn.autocommit = False
+            with conn.cursor() as cur:
+                cur.execute("set local role svc_lskills_librarian")
+                # Intentionally omit app.current_actor_id / app.current_org_id.
+                cur.execute("select count(*)::int from lskills.review_queue")
+                count = cur.fetchone()[0]
+            conn.rollback()
+        self.assertEqual(count, 0)
+
+        # Org GUC alone (no actor) is still denied under actor isolation.
+        with self.psycopg.connect(self.dsn) as conn:  # type: ignore[attr-defined]
+            conn.autocommit = False
+            with conn.cursor() as cur:
+                cur.execute("set local role svc_lskills_librarian")
+                cur.execute(
+                    "select set_config('app.current_org_id', %s, true)",
+                    ("org-a",),
+                )
+                cur.execute("select count(*)::int from lskills.review_queue")
+                count_org_only = cur.fetchone()[0]
+            conn.rollback()
+        self.assertEqual(count_org_only, 0)
+
+    def test_review_queue_privileged_librarian_org_scope(self) -> None:
+        """Approved Librarian service_scope=org may see/claim across actors in org."""
+        from linkskills_librarian.postgres_store import PostgresReviewQueueStore
+
+        actor_store = PostgresReviewQueueStore(
+            self.dsn, rls=True, service_scope="actor"
+        )
+        try:
+            with actor_store.identity("actor-a", "org-a"):
+                actor_store.enqueue(
+                    {
+                        "review_id": "rev-priv-a",
+                        "kind": "general",
+                        "status": "queued",
+                        "actor_id": "actor-a",
+                        "org_id": "org-a",
+                        "provenance": {"owner": "a"},
+                    }
+                )
+            with actor_store.identity("actor-b", "org-a"):
+                actor_store.enqueue(
+                    {
+                        "review_id": "rev-priv-b",
+                        "kind": "general",
+                        "status": "queued",
+                        "actor_id": "actor-b",
+                        "org_id": "org-a",
+                        "provenance": {"owner": "b"},
+                    }
+                )
+                # Still denied without privileged scope.
+                self.assertEqual(
+                    [r["review_id"] for r in actor_store.list_queue()],
+                    ["rev-priv-b"],
+                )
+        finally:
+            actor_store.close()
+
+        privileged = PostgresReviewQueueStore(
+            self.dsn, rls=True, service_scope="org"
+        )
+        try:
+            with privileged.identity("svc-librarian", "org-a"):
+                ids = sorted(r["review_id"] for r in privileged.list_queue())
+                self.assertEqual(ids, ["rev-priv-a", "rev-priv-b"])
+                self.assertEqual(privileged.depth(), 2)
+            # Privileged still cannot cross org boundaries.
+            with privileged.identity("svc-librarian", "org-b"):
+                self.assertEqual(privileged.list_queue(), [])
+        finally:
+            privileged.close()
 
     def test_review_queue_transaction_context_non_leak(self) -> None:
         from linkskills_librarian.postgres_store import PostgresReviewQueueStore

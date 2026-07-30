@@ -50,8 +50,8 @@
 - Payload: `additionalProperties: false`; `aud` **must** be a JSON array; `jti` RFC 4122 UUID; `nbf === iat`; issuer no trailing slash.
 - Access-token lifetime `(exp - iat) ≤ 900` seconds; reject longer (including 3600). Never trust client `expires_in` above 900.
 - Cross-field equality with AuthClaims 1.1.0 at whole-second UTC boundaries; clock skew = 0.
-- Introspection `active:true`: require and exactly match `iss`, `aud` (set), `sub`, `client_id`, `credential_id`, `runtime_binding_id`, `jti`, `iat`, `exp`, `token_type=Bearer`, and required scope/ops. Missing field ⇒ deny.
-- Outside `LINKSKILLS_AUTH_MODE=local-test`: real SecretRef file signer (`LINKSKILLS_PACI_CLIENT_PRIVATE_KEY_FILE`); `LocalTestClientAssertionSigner` forbidden on production/stage construction.
+- Introspection `active:true`: require and exactly match `iss`, `aud` (set), `sub`, `credential_id`, `runtime_binding_id`, `jti`, `iat`, `exp`, `token_type=Bearer`, and required scope/ops. Response `client_id` must be a member of the trusted **mint** client allow-list (`LINKSKILLS_PACI_TRUSTED_MINT_CLIENT_IDS`), **not** the RS introspection assertion client id. Missing field or empty mint allow-list ⇒ deny.
+- Outside `LINKSKILLS_AUTH_MODE=local-test`: real SecretRef file signer (`LINKSKILLS_PACI_CLIENT_PRIVATE_KEY_FILE`); `LocalTestClientAssertionSigner` forbidden on production/stage construction; missing `LINKSKILLS_PACI_TRUSTED_MINT_CLIENT_IDS` when introspection is configured fails closed.
 - HTTPS required for issuer / JWKS / introspection (and client discovery/token) in non-test; HTTP only when local-test **and** loopback host.
 
 ## Wiring
@@ -63,7 +63,8 @@ LINKSKILLS_PACI_JWKS_URI=https://auth.stage.linkplatform.linktrend.dev/.well-kno
 LINKSKILLS_PACI_AUDIENCE=lskills-api
 LINKSKILLS_PACI_REQUIRED_SERVICE_SCOPES=lskills
 LINKSKILLS_PACI_INTROSPECTION_URL=https://auth.stage.linkplatform.linktrend.dev/oauth/introspect
-LINKSKILLS_PACI_INTROSPECTION_CLIENT_ID=<skills-introspection-client-id>
+LINKSKILLS_PACI_INTROSPECTION_CLIENT_ID=<skills-rs-assertion-client-id>
+LINKSKILLS_PACI_TRUSTED_MINT_CLIENT_IDS=<cursor-mint-client-id>[,...]
 LINKSKILLS_PACI_CLIENT_PRIVATE_KEY_FILE=<SecretRef-injected PEM path>
 ```
 

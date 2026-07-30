@@ -21,7 +21,8 @@
     "early_renewal_fraction": 0.2,
     "gateway_401_invalidate_retry": true,
     "https_outside_local_test_loopback": true,
-    "primary_canary_path": "LINKSKILLS_PACI_* SecretRef file via paci_stdio_proxy",
+    "primary_canary_path": "LINKSKILLS_MCP_UPSTREAM=http + https GATEWAY_URL + LINKSKILLS_PACI_* SecretRef via paci_stdio_proxy",
+    "inprocess_production": "refuse-by-default; requires LINKSKILLS_MCP_ALLOW_INPROCESS_PRODUCTION=1 + LINKSKILLS_ENV=stage|production + postgres + DSN (never silent in-memory)",
     "static_bearer": "local-test only; refused for LINKSKILLS_CANARY",
     "handoff": "docs/integrations/cursor/PACI-CLIENT-APPLICATION-HANDOFF.md",
     "blocker": "Platform stage PACI issuer absent"

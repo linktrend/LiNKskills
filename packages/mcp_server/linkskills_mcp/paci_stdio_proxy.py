@@ -12,8 +12,13 @@ The proxy:
 
 Modes (``LINKSKILLS_MCP_UPSTREAM``):
 
-- ``in-process`` (default): PACI bearer injected into in-process MCP tool calls.
-- ``http``: PACI bearer injected as HTTP ``Authorization`` via Gateway client.
+- ``http`` (production / canary default): PACI bearer injected as HTTP
+  ``Authorization`` via durable stage Gateway (``GATEWAY_URL`` https).
+- ``in-process``: PACI bearer injected into in-process MCP tool calls.
+  Production/canary in-process is refuse-by-default; requires
+  ``LINKSKILLS_MCP_ALLOW_INPROCESS_PRODUCTION=1`` plus
+  ``LINKSKILLS_ENV=stage|production``, postgres store, and DSN.
+  Local-test may use in-process without those gates.
 
 Static bearers are refused for canary / production; local-test static path is
 explicit ``LINKSKILLS_AUTH_MODE=local-test`` only (not canary).
@@ -40,6 +45,11 @@ from linkskills_client.paci_token_client import (
     resolve_auth_mode,
 )
 from linkskills_gateway.auth import AuthError
+from linkskills_gateway.persistence import (
+    resolve_database_dsn,
+    resolve_gateway_store_mode,
+    is_production_like_env,
+)
 from linkskills_gateway.service import OPERATIONS
 
 from .server import (
@@ -53,6 +63,7 @@ from .server import (
 logger = logging.getLogger(__name__)
 
 ENV_UPSTREAM = "LINKSKILLS_MCP_UPSTREAM"
+ENV_ALLOW_INPROCESS_PRODUCTION = "LINKSKILLS_MCP_ALLOW_INPROCESS_PRODUCTION"
 UPSTREAM_IN_PROCESS = "in-process"
 UPSTREAM_HTTP = "http"
 CANARY_ENV = "LINKSKILLS_CANARY"
@@ -76,6 +87,10 @@ def _canary_enabled(environ: Mapping[str, str]) -> bool:
     return flag in {"1", "true", "yes"}
 
 
+def _truthy(value: Optional[str]) -> bool:
+    return str(value or "").strip().lower() in {"1", "true", "yes", "on"}
+
+
 def _strip_auth_from_mapping(value: Any) -> Any:
     """Return a copy of mapping/list structures without auth/secret keys."""
     if isinstance(value, Mapping):
@@ -90,7 +105,14 @@ def _strip_auth_from_mapping(value: Any) -> Any:
 
 
 def _resolve_upstream(environ: Mapping[str, str]) -> str:
-    raw = str(environ.get(ENV_UPSTREAM) or UPSTREAM_IN_PROCESS).strip().lower()
+    """Resolve MCP upstream; production defaults to durable HTTP Gateway."""
+    raw = str(environ.get(ENV_UPSTREAM) or "").strip().lower()
+    if not raw:
+        # Prefer HTTP durable Gateway whenever auth is not explicit local-test.
+        # Avoids silent in-process + in-memory under LINKSKILLS_AUTH_MODE=production.
+        if resolve_auth_mode(environ) == AUTH_MODE_LOCAL_TEST:
+            return UPSTREAM_IN_PROCESS
+        return UPSTREAM_HTTP
     if raw in {UPSTREAM_IN_PROCESS, UPSTREAM_HTTP}:
         return raw
     raise PaciConfigError(
@@ -114,6 +136,70 @@ def _refuse_static_bearer_for_canary(environ: Mapping[str, str]) -> None:
             "(LINKSKILLS_CANARY_AUTHORIZATION / GATEWAY_TOKEN / "
             "LINKSKILLS_LOCAL_TEST_STATIC_BEARER); use PACI machine-token path "
             "via linkskills_mcp.paci_stdio_proxy"
+        )
+
+
+def require_durable_inprocess_production(environ: Mapping[str, str]) -> None:
+    """Fail closed: production in-process must not silently use in-memory store.
+
+    Requires all of:
+    - ``LINKSKILLS_MCP_ALLOW_INPROCESS_PRODUCTION=1``
+    - ``LINKSKILLS_ENV`` in stage/staging/production/prod
+    - Gateway store resolves to ``postgres``
+    - Postgres DSN present (``LINKSKILLS_DATABASE_URL`` / ``DATABASE_URL`` / …)
+
+    Prefer ``LINKSKILLS_MCP_UPSTREAM=http`` + https ``GATEWAY_URL`` instead.
+    """
+    if not _truthy(environ.get(ENV_ALLOW_INPROCESS_PRODUCTION)):
+        raise SystemExit(
+            "LINKSKILLS_AUTH_MODE=production refuses in-process MCP Gateway "
+            "(silent in-memory store is forbidden). Set "
+            f"{ENV_UPSTREAM}={UPSTREAM_HTTP} with https GATEWAY_URL to the "
+            "durable stage Gateway, or set "
+            f"{ENV_ALLOW_INPROCESS_PRODUCTION}=1 with "
+            "LINKSKILLS_ENV=stage|production, LINKSKILLS_GATEWAY_STORE=postgres, "
+            "and LINKSKILLS_DATABASE_URL (or DATABASE_URL)"
+        )
+    if not is_production_like_env(environ):
+        raise SystemExit(
+            "In-process production MCP requires "
+            "LINKSKILLS_ENV=stage|staging|production|prod "
+            "(missing or non-production); refusing silent in-memory Gateway. "
+            f"Prefer {ENV_UPSTREAM}={UPSTREAM_HTTP} with https GATEWAY_URL"
+        )
+    try:
+        mode = resolve_gateway_store_mode(environ)
+    except ValueError as exc:
+        raise SystemExit(
+            f"In-process production MCP store gate failed: {exc}"
+        ) from exc
+    if mode != "postgres":
+        raise SystemExit(
+            "In-process production MCP requires postgres store, "
+            f"got {mode!r}; refusing silent in-memory Gateway"
+        )
+    if not resolve_database_dsn(environ):
+        raise SystemExit(
+            "In-process production MCP requires LINKSKILLS_DATABASE_URL "
+            "(or DATABASE_URL / LINKSKILLS_STORE_URL / LINKSKILLS_POSTGRES_URL); "
+            "refusing silent in-memory Gateway because DSN is missing"
+        )
+
+
+def _require_production_http_gateway_url(environ: Mapping[str, str]) -> None:
+    """Production HTTP upstream must name an explicit https GATEWAY_URL."""
+    url = str(environ.get("GATEWAY_URL") or "").strip()
+    if not url:
+        raise SystemExit(
+            "LINKSKILLS_AUTH_MODE=production with "
+            f"{ENV_UPSTREAM}={UPSTREAM_HTTP} requires GATEWAY_URL "
+            "(https durable stage Gateway); refusing default loopback"
+        )
+    if not url.lower().startswith("https://"):
+        raise SystemExit(
+            "LINKSKILLS_AUTH_MODE=production GATEWAY_URL must be https "
+            f"(got non-https); refusing non-durable upstream. "
+            f"Use LINKSKILLS_AUTH_MODE=local-test only for http loopback"
         )
 
 
@@ -145,7 +231,7 @@ class PaciStdioMcpProxy:
         self,
         *,
         paci_client: PaciTokenClient,
-        upstream: str = UPSTREAM_IN_PROCESS,
+        upstream: str = UPSTREAM_HTTP,
         mcp_server: Optional[SkillsMcpServer] = None,
         gateway_client: Optional[SkillsGatewayClient] = None,
         environ: Optional[Mapping[str, str]] = None,
@@ -158,11 +244,16 @@ class PaciStdioMcpProxy:
         self._initialized = False
         self._auth_retries = 0
 
+        mode = resolve_auth_mode(self.environ)
         if upstream == UPSTREAM_IN_PROCESS:
+            # Production must never silently build an in-memory Gateway.
+            if mode != AUTH_MODE_LOCAL_TEST:
+                require_durable_inprocess_production(self.environ)
             if self._mcp is None:
-                # Production verifier from env; fail closed if misconfigured.
                 self._mcp = SkillsMcpServer(default_actor=None)
         elif upstream == UPSTREAM_HTTP:
+            if mode != AUTH_MODE_LOCAL_TEST:
+                _require_production_http_gateway_url(self.environ)
             if self._gateway is None:
                 self._gateway = SkillsGatewayClient.from_env(
                     self.environ,
@@ -185,6 +276,10 @@ class PaciStdioMcpProxy:
                 "Platform PACI issuer absent"
             ),
         }
+        if self.upstream == UPSTREAM_IN_PROCESS:
+            payload["inprocess_production_allowed"] = _truthy(
+                self.environ.get(ENV_ALLOW_INPROCESS_PRODUCTION)
+            )
         if self._gateway is not None:
             payload["gateway"] = self._gateway.status()
         return payload

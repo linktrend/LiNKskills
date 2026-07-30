@@ -239,7 +239,7 @@ class FakeIntrospectionBackend:
         iss: str,
         sub: str,
         aud: Optional[Sequence[str]] = None,
-        client_id: str = "skills-gateway",
+        client_id: str = "cursor-mint-client",
         credential_id: str = "cred-skills-test-1",
         runtime_binding_id: str = "bind-skills-test-1",
         iat: Optional[int] = None,

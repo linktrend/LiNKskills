@@ -18,6 +18,7 @@ Apply only after platform foundation + prior lskills catalog migrations are pres
 | 5 (RLS upgrade) | `supabase/migrations/20260728_000006_lskills_rls_actor_org_scope.sql` | `12c2e45e94fd9216a5857ce53ce299a953dc2ee869f89bcdb392857133df763d` |
 | 6 (gateway persistence) | `supabase/migrations/20260730_000007_lskills_gateway_persistence.sql` | `c26d1c55d9f87e242fe1e225fd4240cd911a5e0315d88500417d491689596222` |
 | 7 (librarian review_queue) | `supabase/migrations/20260730_000008_lskills_review_queue.sql` | `0d5cf1f6abf62bddffc2e494bd8fb7faabe5aceb44266d446bb71f1209f43bab` |
+| 8 (review_queue actor isolation) | `supabase/migrations/20260730_000009_lskills_review_queue_actor_isolation.sql` | `acd0a1dbf81697d4e278ed4cdfa11d4b410b383420e02e6105940f578b6b6467` |
 
 Also requires LiNKplatform `platform` foundation (`platform.organizations`, roles helpers) already applied on the shared database.
 
@@ -27,6 +28,7 @@ Also requires LiNKplatform `platform` foundation (`platform.organizations`, role
 - Roles `svc_lskills_runtime`, `svc_lskills_librarian`, `svc_observer` exist (created by catalog_core; re-created idempotently if missing).
 - Enum `lskills.certification_state` already exists (referenced by `lskills.certifications`).
 - Gateway helpers from 000006 (`lskills.org_matches` / `lskills.actor_matches`) and 000007 tables present before 000008.
+- Review queue table from 000008 present before 000009 actor-isolation upgrade.
 
 ## What this migration adds (additive only)
 
@@ -35,6 +37,8 @@ Tables: `releases`, `bundles`, `fragments`, `tools`, `execution_profiles`, `cert
 Gateway persistence add-on (000007): `idempotency`, `side_effect_intents`, `gateway_events`, plus additive `events_json` / `feedback_json` columns on `skill_runs`.
 
 Librarian review queue (000008): `lskills.review_queue` + enum `lskills.review_queue_status` with tenant/actor RLS, idempotency keys, provenance, retry/dead-letter, retention, and indexes.
+
+Review queue actor isolation (000009): replaces librarian org-only RLS with actor+org default; privileged cross-actor-within-org requires transaction-local `app.librarian_service_scope=org` for `svc_lskills_librarian`.
 
 Does **not** drop or alter existing `catalog` / `telemetry` / `eval_runs` tables.
 

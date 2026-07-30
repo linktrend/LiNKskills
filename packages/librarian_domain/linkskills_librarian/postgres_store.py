@@ -3,13 +3,21 @@
 Selected when ``LINKSKILLS_LIBRARIAN_STORE=postgres`` and a DSN is present
 (``LINKSKILLS_DATABASE_URL`` / ``DATABASE_URL`` / ``LINKSKILLS_EPHEMERAL_PG_URL``).
 
-Maps to ``lskills.review_queue`` from migration
-``20260730_000008_lskills_review_queue.sql`` (additive; LiNKplatform applies live).
+Maps to ``lskills.review_queue`` from migrations
+``20260730_000008_lskills_review_queue.sql`` +
+``20260730_000009_lskills_review_queue_actor_isolation.sql``
+(additive; LiNKplatform applies live).
 
 RLS identity is applied per transaction with:
   SET LOCAL ROLE svc_lskills_librarian;
   SET LOCAL via set_config('app.current_actor_id', ..., true);
   SET LOCAL via set_config('app.current_org_id', ..., true);
+
+Default service scope is ``actor`` (actor + org isolation). Privileged
+Librarian workers that must see/claim across actors within one org must
+pass ``service_scope="org"`` (or env ``LINKSKILLS_LIBRARIAN_SERVICE_SCOPE=org``),
+which sets transaction-local ``app.librarian_service_scope=org``. Runtime
+role never receives this privilege.
 """
 
 from __future__ import annotations
@@ -34,6 +42,30 @@ except ImportError:  # pragma: no cover
 REVIEW_QUEUE_TABLE = "lskills.review_queue"
 DEFAULT_LIBRARIAN_ROLE = "svc_lskills_librarian"
 ACTIVE_STATUSES = ("queued", "claimed", "in_progress", "failed")
+ALLOWED_SERVICE_SCOPES = frozenset({"actor", "org"})
+
+
+def resolve_librarian_service_scope(
+    explicit: Optional[str] = None,
+) -> str:
+    """Resolve Librarian RLS service scope (default actor isolation).
+
+    ``org`` is the explicit privileged cross-actor-within-org gate matching
+    migration 000009 ``app.librarian_service_scope=org``.
+    """
+    raw = (
+        explicit
+        if explicit is not None
+        else os.environ.get("LINKSKILLS_LIBRARIAN_SERVICE_SCOPE", "")
+    )
+    scope = str(raw or "actor").strip().lower() or "actor"
+    if scope not in ALLOWED_SERVICE_SCOPES:
+        raise ValueError(
+            "LINKSKILLS_LIBRARIAN_SERVICE_SCOPE / service_scope must be "
+            f"'actor' or 'org' (got {scope!r})"
+        )
+    return scope
+
 
 
 def resolve_database_url() -> Optional[str]:
@@ -99,7 +131,7 @@ def _payload_dict(row: Mapping[str, Any]) -> Dict[str, Any]:
 
 
 class PostgresReviewQueueStore:
-    """ReviewQueueStore adapter over ``lskills.review_queue`` (000008)."""
+    """ReviewQueueStore adapter over ``lskills.review_queue`` (000008+000009)."""
 
     def __init__(
         self,
@@ -108,19 +140,22 @@ class PostgresReviewQueueStore:
         require_table: bool = True,
         role: str = DEFAULT_LIBRARIAN_ROLE,
         rls: bool = True,
+        service_scope: Optional[str] = None,
     ) -> None:
         _require_psycopg()
         self.dsn = dsn
         self.role = role
         self.rls = rls
+        self.service_scope = resolve_librarian_service_scope(service_scope)
         self._lock = threading.RLock()
         self._conn = psycopg.connect(dsn, row_factory=dict_row, autocommit=False)
         self._identity = threading.local()
         if require_table and not self.table_exists():
             raise RuntimeError(
-                f"{REVIEW_QUEUE_TABLE} is not present. Apply additive migration "
-                "20260730_000008_lskills_review_queue.sql via LiNKplatform "
-                "(ephemeral proofs load that migration file directly)."
+                f"{REVIEW_QUEUE_TABLE} is not present. Apply additive migrations "
+                "20260730_000008_lskills_review_queue.sql and "
+                "20260730_000009_lskills_review_queue_actor_isolation.sql "
+                "via LiNKplatform (ephemeral proofs load those migration files)."
             )
 
     def close(self) -> None:
@@ -179,6 +214,13 @@ class PostgresReviewQueueStore:
         cur.execute(
             "select set_config('app.current_org_id', %s, true)",
             (org_id,),
+        )
+        # Privileged org-wide claim path is explicit and transaction-local.
+        # Default '' keeps actor+org isolation from migration 000009.
+        scope_value = "org" if self.service_scope == "org" else ""
+        cur.execute(
+            "select set_config('app.librarian_service_scope', %s, true)",
+            (scope_value,),
         )
 
     def _begin(self, *, actor_id: str, org_id: str) -> Any:
@@ -473,12 +515,23 @@ def open_postgres_review_queue_store(
     dsn: Optional[str] = None,
     require_table: bool = True,
     rls: bool = True,
+    service_scope: Optional[str] = None,
 ) -> PostgresReviewQueueStore:
-    """Open a Postgres review queue; raises if DSN or table is missing."""
+    """Open a Postgres review queue; raises if DSN or table is missing.
+
+    ``service_scope`` defaults to actor isolation. Pass ``\"org\"`` (or set
+    ``LINKSKILLS_LIBRARIAN_SERVICE_SCOPE=org``) only for approved Librarian
+    service workers that must process the org-wide queue.
+    """
     resolved = (dsn or resolve_database_url() or "").strip()
     if not resolved:
         raise ValueError(
             "Postgres review queue requires LINKSKILLS_DATABASE_URL, "
             "DATABASE_URL, or an explicit dsn="
         )
-    return PostgresReviewQueueStore(resolved, require_table=require_table, rls=rls)
+    return PostgresReviewQueueStore(
+        resolved,
+        require_table=require_table,
+        rls=rls,
+        service_scope=service_scope,
+    )
