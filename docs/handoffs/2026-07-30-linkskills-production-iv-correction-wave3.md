@@ -15,18 +15,25 @@
 | Exact start HEAD | `bae7c36d93b90d558f43ac0b8132ce84658fd443` |
 | Wave-3 prompt/session commit | `7b1908378b2794c63c4a547b7e2487bf48dd722c` |
 | Implementation commit | `3db896c084150734b5c134d172d6225432c6b80d` |
-| Exact clean pushed HEAD | `8497761f82ea6fa5f30059729de08532d6296a64` |
+| Exact clean pushed HEAD | `4c8fd17267c45e2c0139d52d5317044ae6668628` |
 
 Wave-2 Exact clean HEAD amendment: see dated amendment on
 `docs/handoffs/2026-07-30-linkskills-production-iv-correction-wave2.md`
 (`bae7c36d93b90d558f43ac0b8132ce84658fd443`).
+
+## Amendment 2026-07-30 (Wave 4 / evidence gate)
+
+Wave-4 corrected this handoff’s Exact clean pushed HEAD from the earlier docs tip
+`8497761f82ea6fa5f30059729de08532d6296a64` to the true Wave-3 clean tip
+`4c8fd17267c45e2c0139d52d5317044ae6668628`. Functional Wave-3 claims are unchanged.
+See `docs/handoffs/2026-07-30-linkskills-production-iv-correction-wave4.md`.
 
 ## Platform repin status (Lane C)
 
 | Field | Value |
 |---|---|
 | Status | **`AWAITING_CODEX_CERTIFIED_PLATFORM_REPIN`** |
-| Failed tip (do not consume) | `83501b11b78b0c5f46a5c5ef23f48de9f1317468` |
+| Failed tip (do not consume) | `83501b11…` (prior); Wave-4 records also `ca0274178cbba0dd07e665a4d66b4ceb92c0ac09` — see Wave-4 handoff |
 | Skills continues against | frozen `platform.auth-token-envelope/0.1.0` / `@linktrend/platform-contracts@0.3.0` (pin HEAD `0455846487d0b8c583859060ba8b4be70e7f0b48`) |
 | Packaged interoperability | **not run** (no Codex-certified tip) |
 | Prep note | `docs/contracts/LANE-C-PACKAGED-INTEROP-PREP-2026-07-30.md` (non-authoritative) |
