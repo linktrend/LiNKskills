@@ -58,4 +58,8 @@ Result: **18 tests OK** (no CI poll; no merge).
 
 ## Exact clean HEAD
 
-**Exact clean HEAD:** `706d05269228727c9cfdf134a60f3866801bf715`
+| Field | Value |
+|---|---|
+| Package-pin correction commit | `3cf171fb537378080fe10aa517a8cc344f7f3f28` |
+| Exact clean branch tip | reported by agent after push (not embedded; avoids SHA self-reference) |
+
