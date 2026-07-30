@@ -1,14 +1,14 @@
 # PROVISIONAL PREP ONLY — Lane C packaged interoperability (Wave 3)
 
-**Status:** `AWAITING_CODEX_CERTIFIED_PLATFORM_REPIN`  
-**Authority:** none — scout prep for Wave-3 handoff; not a consumer pin; not a freeze record.  
+**Status:** `AWAITING_CODEX_CERTIFIED_PLATFORM_REPIN`
+**Authority:** none — scout prep for Wave-3/4 handoff; not a consumer pin; not a freeze record.
 **Date:** 2026-07-30 (Asia/Taipei)
 
 ## Gate (do not skip)
 
 | Field | Value |
 |---|---|
-| Failed Platform tip (do **not** consume / do **not** repin) | `83501b11b78b0c5f46a5c5ef23f48de9f1317468` |
+| Failed Platform tip (do **not** consume / do **not** repin) | `83501b11b78b0c5f46a5c5ef23f48de9f1317468` (prior); `ca0274178cbba0dd07e665a4d66b4ceb92c0ac09` (current failed IV) |
 | Skills frozen envelope (unchanged) | `platform.auth-token-envelope/0.1.0` |
 | Skills PACI contracts package (unchanged) | `@linktrend/platform-contracts@0.3.0` |
 | Skills frozen Platform HEAD pin (unchanged) | `0455846487d0b8c583859060ba8b4be70e7f0b48` |
@@ -19,7 +19,10 @@ Do **not** invent a future SHA. Do **not** claim interop ran. Do **not** bump pa
 
 ## Observed local Platform checkout (report only)
 
-At scout time, `/Users/linktrend/Projects/LiNKplatform` HEAD was exactly the failed tip above (branch `issue/LP-01-linkplatformdevelopmentplan01`). That local HEAD is **not** Skills authority and must not trigger a repin.
+At Wave-4 evidence time, `/Users/linktrend/Projects/LiNKplatform` HEAD was
+`ca0274178cbba0dd07e665a4d66b4ceb92c0ac09` (branch `issue/LP-01-linkplatformdevelopmentplan01`).
+That local HEAD failed independent verification and is **not** Skills authority;
+do not repin to it.
 
 ## Packaged interoperability checklist (deferred until Codex-certified tip)
 
