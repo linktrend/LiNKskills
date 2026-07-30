@@ -13,7 +13,7 @@
 |---|---|
 | Exact start HEAD (IV correction) | `48fd7422f9fa14d39567190b54d15954b3384f8b` |
 | Platform pin (frozen PACI authority) | `0455846487d0b8c583859060ba8b4be70e7f0b48` |
-| Exact clean pushed HEAD | see agent response after push |
+| Exact clean pushed HEAD | `8303ed0be1f0cbc72084d3eb91c5bda5afa925bf` |
 
 ## Platform pins / hashes adopted
 
