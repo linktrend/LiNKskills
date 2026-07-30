@@ -29,8 +29,8 @@ Runnable generic host: `LiNKplatform/packages/librarian-runner`. Skills domain w
 
 ### 4. Live Platform authentication issuer (claims shape consumed)
 
-**Status:** Partially done / still blocked on live issuer.
-Gateway/MCP production paths consume canonical Platform AuthClaims via `PlatformClaimsVerifier` **with a Platform-approved cryptographic authenticator**. Unsigned `platform.<base64url(JSON)>` is confined to `LocalUnsignedClaimsVerifier` under explicit `LINKSKILLS_AUTH_MODE=local-test`. Competing `fake.*` tokens are rejected. Gateway/MCP startup fails closed without production authenticator config. **Live Platform token issuance / stage auth / signing keys** remain a Platform gate.
+**Status:** Partially done / still blocked on live issuer + frozen PACI envelope.
+Gateway/MCP consume AuthClaims `1.1.0` / `@linktrend/platform-contracts@0.2.2`. **2026-07-30 production packet:** Skills-owned PACI ES256/JWKS/introspection **consumer adapter** + Cursor `private_key_jwt` client landed locally and marked **implemented but not proven against frozen Platform PACI service** (envelope still `0.1.3-draft`). Live Platform token issuance / stage JWKS / introspection remain Platform gates.
 Spoofed body identity is rejected.
 **Correction (2026-07-28):** prior fake-shape acceptance on production verifier path is removed.
 **Wave 2 (2026-07-28):** historical consume of frozen `platform.auth-claims/1.0.0` (`@linktrend/platform-contracts@0.2.1`) — rejection-only / historical pin retained at `docs/contracts/frozen/platform-auth-claims-v1.0.0.CONSUMER-PIN.md`.
@@ -40,7 +40,7 @@ Spoofed body identity is rejected.
 ### 5. Live stage/prod internal-launch readiness
 
 **Status:** Open / **not claimed**.
-In-repo packages, local Gateway `/health`/`/ready`, and unit tests are **not** evidence of shared stage/prod readiness. Remains blocked on Platform migration apply, real auth, supervised ops, actor integration owners, and independent verification.
+In-repo packages, local Gateway `/health`/`/ready`/`/metrics`/`/drain`, Postgres adapters (env-selected), and unit/ephemeral proofs are **not** evidence of shared stage/prod readiness. Remains blocked on Platform migration apply, frozen+live PACI, supervised ops, actor integration owners, OpenClaw/Lisa Skills gate, and independent Codex verification.
 
 ### 6. Independent Codex verification of issue #21 / plan execution
 
@@ -75,6 +75,10 @@ Telemetry may carry observational `cost` jsonb; no billing ledger in this Progra
 ---
 
 ## Recently completed (selected)
+
+### Production packet (PACI adapter / Cursor client / Postgres / ops) — 2026-07-30
+
+Principal-authorized production execution from `docs/CURSOR-GROK-PRODUCTION-EXECUTION-PROMPT-2026-07-30.md`. Landed Skills-owned: PACI JWT/JWKS/introspection consumer adapter (DRAFT envelope; not live-proven), Cursor `client_credentials`+`private_key_jwt` client, Postgres gateway/librarian/publisher adapters + additive migration `000007`, installable packages, Gateway health/ready/metrics/drain, ops rewrite, classification honesty, librarian/stage readiness packets. **Hard stop** for Platform frozen PACI + live stage, OpenClaw Lisa gate, Codex verification, paid hosts. Handoff: `docs/handoffs/2026-07-30-linkskills-production-execution-provisional.md`.
 
 ### A. Catalog + eval + telemetry schema — 2026-07-15
 
