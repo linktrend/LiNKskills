@@ -12,10 +12,21 @@
         "LINKSKILLS_CANARY": "1",
         "LINKSKILLS_AUTH_MODE": "production",
         "LINKSKILLS_PLATFORM_AUTHENTICATOR": "REPLACE_WITH_PLATFORM_APPROVED_AUTHENTICATOR_MODULE:factory",
-        "LINKSKILLS_CANARY_AUTHORIZATION": "REPLACE_WITH_PLATFORM_SIGNED_BEARER"
+        "LINKSKILLS_PACI_CLIENT_ID": "REPLACE_WITH_SKILLS_STAGE_CLIENT_ID",
+        "LINKSKILLS_PACI_TOKEN_ENDPOINT": "REPLACE_WITH_SKILLS_STAGE_PACI_TOKEN_ENDPOINT",
+        "LINKSKILLS_PACI_CLIENT_PRIVATE_KEY_FILE": "REPLACE_WITH_SECRETREF_FILE_PATH_TO_ES256_PRIVATE_KEY_PEM",
+        "LINKSKILLS_PACI_CLIENT_KID": "REPLACE_WITH_CLIENT_JWKS_KID_UUID",
+        "LINKSKILLS_PACI_SCOPE": "REPLACE_WITH_SKILLS_LEAST_PRIVILEGE_SCOPES",
+        "LINKSKILLS_PACI_RESOURCE_AUDIENCE": "REPLACE_WITH_SKILLS_ONLY_RESOURCE_AUDIENCE",
+        "LINKSKILLS_PACI_JWKS_URI_NOTE": "Platform publishes issuer JWKS for Gateway verification; client holds only the assertion private key via SecretRef file — never paste JWKS private material here"
       },
       "disabled": false
     }
   },
-  "_comment": "Project-scoped Cursor MCP fragment for LiNKskills canary. NO secrets. LINKSKILLS_CANARY requires production cryptographic auth (Platform-approved authenticator via LINKSKILLS_PLATFORM_AUTHENTICATOR) and a signed bearer in LINKSKILLS_CANARY_AUTHORIZATION. Unsigned platform.<base64url(JSON)> and LINKSKILLS_AUTH_MODE=local-test are forbidden for canary. Do not merge into ~/.cursor/mcp.json without the coordinated Cursor maintenance gate. Do not start the multi-day canary from this fragment alone."
+  "_comment": "Project-scoped Cursor MCP fragment for LiNKskills canary. NO secrets. Primary auth path is PACI client_credentials + private_key_jwt (ES256) via LINKSKILLS_PACI_* placeholders. Private key ONLY through SecretRef file path (LINKSKILLS_PACI_CLIENT_PRIVATE_KEY_FILE) — never CLI args, never inline PEM. Static bearer (LINKSKILLS_CANARY_AUTHORIZATION / GATEWAY_TOKEN / LINKSKILLS_LOCAL_TEST_STATIC_BEARER) is LOCAL-TEST ONLY when LINKSKILLS_AUTH_MODE=local-test and is retired as the primary canary path. LINKSKILLS_CANARY requires production cryptographic Gateway verification (Platform-approved authenticator). Do not merge into ~/.cursor/mcp.json without the coordinated Cursor maintenance gate. Do not start the multi-day canary from this fragment alone — Platform stage PACI issuer must exist first. Skills-owned path implemented locally; not live-proven.",
+  "_local_test_static_bearer_only": {
+    "LINKSKILLS_AUTH_MODE": "local-test",
+    "LINKSKILLS_LOCAL_TEST_STATIC_BEARER": "REPLACE_WITH_UNSIGNED_OR_TEST_BEARER_LOCAL_ONLY",
+    "note": "Forbidden for LINKSKILLS_CANARY=1 production canary. Use only for isolated local unit/integration tests."
+  }
 }

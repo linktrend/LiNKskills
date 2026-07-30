@@ -12,6 +12,14 @@ from typing import Any, Dict, List, Mapping, Optional, Sequence
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
+from .paci_token_client import (
+    AUTH_MODE_LOCAL_TEST,
+    PaciConfigError,
+    PaciTokenClient,
+    paci_env_configured,
+    resolve_auth_mode,
+)
+
 
 @dataclass
 class BufferedEvent:
@@ -88,14 +96,33 @@ class LocalEventBuffer:
                 )
 
 
+def _format_authorization(token: str) -> str:
+    value = token.strip()
+    if value.lower().startswith("bearer "):
+        return value
+    return f"Bearer {value}"
+
+
 class SkillsGatewayClient:
-    """Thin HTTP client for POST /v1/{operation}."""
+    """Thin HTTP client for POST /v1/{operation}.
+
+    Authorization resolution order per request:
+
+    1. Explicit ``authorization=`` override on the call.
+    2. Injected ``paci_client`` (PACI ``client_credentials`` + ``private_key_jwt``).
+    3. Static ``authorization`` constructor arg (tests / local-test explicit mode).
+
+    Prefer :meth:`from_env` for Cursor/canary: PACI SecretRef env is primary;
+    static ``GATEWAY_TOKEN`` / ``LINKSKILLS_CANARY_AUTHORIZATION`` is allowed
+    only when ``LINKSKILLS_AUTH_MODE=local-test``.
+    """
 
     def __init__(
         self,
         base_url: Optional[str] = None,
         *,
         authorization: Optional[str] = None,
+        paci_client: Optional[PaciTokenClient] = None,
         timeout_s: float = 30.0,
         event_buffer: Optional[LocalEventBuffer] = None,
     ) -> None:
@@ -103,8 +130,60 @@ class SkillsGatewayClient:
             "/"
         )
         self.authorization = authorization
+        self.paci_client = paci_client
         self.timeout_s = timeout_s
         self.event_buffer = event_buffer or LocalEventBuffer()
+
+    @classmethod
+    def from_env(
+        cls,
+        environ: Optional[Mapping[str, str]] = None,
+        *,
+        timeout_s: float = 30.0,
+        event_buffer: Optional[LocalEventBuffer] = None,
+        paci_client: Optional[PaciTokenClient] = None,
+    ) -> "SkillsGatewayClient":
+        """Build a client from Skills PACI env (preferred) or local-test static bearer."""
+        env = environ if environ is not None else os.environ
+        base_url = (env.get("GATEWAY_URL") or "http://127.0.0.1:8787").rstrip("/")
+        mode = resolve_auth_mode(env)
+
+        resolved_paci = paci_client
+        static: Optional[str] = None
+
+        if resolved_paci is None and paci_env_configured(env):
+            resolved_paci = PaciTokenClient.from_env(env)
+
+        if resolved_paci is None:
+            static_token = (
+                str(env.get("LINKSKILLS_CANARY_AUTHORIZATION") or "").strip()
+                or str(env.get("GATEWAY_TOKEN") or "").strip()
+                or str(env.get("LINKSKILLS_LOCAL_TEST_STATIC_BEARER") or "").strip()
+            )
+            if static_token:
+                if mode != AUTH_MODE_LOCAL_TEST:
+                    raise PaciConfigError(
+                        "Static bearer env "
+                        "(LINKSKILLS_CANARY_AUTHORIZATION / GATEWAY_TOKEN / "
+                        "LINKSKILLS_LOCAL_TEST_STATIC_BEARER) is local-test only; "
+                        "set LINKSKILLS_AUTH_MODE=local-test or configure PACI "
+                        f"({ENV_HINT})"
+                    )
+                static = static_token
+
+        if resolved_paci is None and not static:
+            raise PaciConfigError(
+                "No Skills authorization configured: set PACI env "
+                f"({ENV_HINT}) or local-test static bearer"
+            )
+
+        return cls(
+            base_url=base_url,
+            authorization=static,
+            paci_client=resolved_paci,
+            timeout_s=timeout_s,
+            event_buffer=event_buffer,
+        )
 
     def health(self) -> Dict[str, Any]:
         return self._request("GET", "/health")
@@ -125,11 +204,9 @@ class SkillsGatewayClient:
             "Content-Type": "application/json",
             "X-Request-Id": request_id or str(uuid.uuid4()),
         }
-        token = authorization or self.authorization
+        token = self._resolve_authorization(authorization)
         if token:
-            headers["Authorization"] = (
-                token if token.lower().startswith("bearer ") else f"Bearer {token}"
-            )
+            headers["Authorization"] = token
         if idempotency_key:
             headers["Idempotency-Key"] = idempotency_key
         body = {"params": dict(params or {}), "request_id": headers["X-Request-Id"]}
@@ -167,6 +244,15 @@ class SkillsGatewayClient:
             "remaining": len(remaining),
         }
 
+    def _resolve_authorization(self, override: Optional[str] = None) -> Optional[str]:
+        if override:
+            return _format_authorization(override)
+        if self.paci_client is not None:
+            return self.paci_client.authorization_header()
+        if self.authorization:
+            return _format_authorization(self.authorization)
+        return None
+
     def _request(
         self,
         method: str,
@@ -193,3 +279,10 @@ class SkillsGatewayClient:
             raise RuntimeError(f"gateway HTTP {exc.code}: {detail}") from exc
         except URLError as exc:
             raise RuntimeError(f"gateway unreachable: {exc}") from exc
+
+
+# Kept short for error messages (no secrets).
+ENV_HINT = (
+    "LINKSKILLS_PACI_CLIENT_ID, LINKSKILLS_PACI_TOKEN_ENDPOINT, "
+    "LINKSKILLS_PACI_CLIENT_PRIVATE_KEY_FILE"
+)

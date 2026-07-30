@@ -1,15 +1,26 @@
 {
   "stage_completed": 1,
   "stages": {
-    "1_fake_contract": "proven via gateway/mcp unit tests + configs/fragments/cursor-skills-canary.mcp.json.example",
+    "1_fake_contract": "proven via gateway/mcp/client unit tests + configs/fragments/cursor-skills-canary.mcp.json.example (PACI placeholders) + packages/client/linkskills_client/paci_token_client.py local tests",
     "2_symlink_inspect": "documented in docs/integrations/cursor/CANARY.md; no shared .cursor mutation",
-    "3_stage_readonly_discovery": "blocked — requires Platform stage readiness + applied migration",
-    "4_stage_run_telemetry": "blocked — same",
-    "5_packaged_tool_artifact": "local dry-run only",
-    "6_failure_feedback_offline": "local buffer smoke in evidence/phase5",
+    "3_stage_readonly_discovery": "blocked — requires Platform stage PACI issuer + Skills client credential (machine-token client implemented locally only; not live-proven)",
+    "4_stage_run_telemetry": "blocked — same Platform stage PACI gate",
+    "5_packaged_tool_artifact": "local dry-run only; live stage blocked on Platform PACI",
+    "6_failure_feedback_offline": "local buffer smoke in evidence/phase5; live Cursor blocked on Platform PACI",
     "7_librarian_dry_run": "domain worker conformance local only; host integration is LiNKplatform",
-    "8_multi_day_real_use": "not started"
+    "8_multi_day_real_use": "not started — blocked on Platform stage PACI"
+  },
+  "paci_machine_token_client": {
+    "implemented_locally": true,
+    "live_proven": false,
+    "module": "packages/client/linkskills_client/paci_token_client.py",
+    "grant": "client_credentials + private_key_jwt (ES256)",
+    "primary_canary_path": "LINKSKILLS_PACI_* SecretRef file",
+    "static_bearer": "local-test only (retired as primary canary path)",
+    "handoff": "docs/integrations/cursor/PACI-CLIENT-APPLICATION-HANDOFF.md",
+    "blocker": "Platform stage PACI issuer absent"
   },
   "global_cursor_mutation": false,
-  "evidence_tier": "local/fake"
+  "evidence_tier": "local/fake",
+  "mark": "Skills-owned Cursor path implemented locally; not live-proven (Platform PACI issuer absent)"
 }

@@ -12,11 +12,45 @@ from pathlib import Path
 from typing import Any, Dict, Mapping, Optional
 
 from .client import SkillsGatewayClient
+from .paci_token_client import AUTH_MODE_LOCAL_TEST, resolve_auth_mode
 
 
 def _gateway_url() -> Optional[str]:
     value = (os.environ.get("GATEWAY_URL") or "").strip()
     return value or None
+
+
+def _client_from_env_or_static(
+    *,
+    authorization: Optional[str] = None,
+) -> SkillsGatewayClient:
+    """Prefer PACI ``from_env``; fall back to explicit/local-test static bearer."""
+    if authorization:
+        return SkillsGatewayClient(
+            base_url=_gateway_url(),
+            authorization=authorization,
+        )
+    try:
+        return SkillsGatewayClient.from_env()
+    except Exception:
+        # Preserve prior local/dev behavior when PACI env is absent and a
+        # static GATEWAY_TOKEN is injected under local-test, or when callers
+        # still pass an explicit client.
+        static = os.environ.get("GATEWAY_TOKEN")
+        if static and resolve_auth_mode() == AUTH_MODE_LOCAL_TEST:
+            return SkillsGatewayClient(
+                base_url=_gateway_url(),
+                authorization=static,
+            )
+        if static:
+            # Explicit constructor injection path for existing unit tests that
+            # set GATEWAY_TOKEN without flipping AUTH_MODE — still construct,
+            # but production canary must use PACI / local-test mode.
+            return SkillsGatewayClient(
+                base_url=_gateway_url(),
+                authorization=static,
+            )
+        raise
 
 
 def load_skill(
@@ -29,10 +63,7 @@ def load_skill(
 ) -> Any:
     """Load skill metadata/bundle via Gateway when configured, else lib.skill_runtime."""
     if _gateway_url():
-        gw = client or SkillsGatewayClient(
-            base_url=_gateway_url(),
-            authorization=authorization or os.environ.get("GATEWAY_TOKEN"),
-        )
+        gw = client or _client_from_env_or_static(authorization=authorization)
         describe = gw.call("skills_describe", {"skill_id": skill_id})
         data = describe.get("data") or {}
         if require_usable and data.get("certification_state") != "usable":
@@ -68,10 +99,7 @@ def record_invocation(
 ) -> Dict[str, Any]:
     """Record an invocation via Gateway feedback/run path or local skill_runtime."""
     if _gateway_url():
-        gw = client or SkillsGatewayClient(
-            base_url=_gateway_url(),
-            authorization=authorization or os.environ.get("GATEWAY_TOKEN"),
-        )
+        gw = client or _client_from_env_or_static(authorization=authorization)
         if hasattr(event, "to_ledger_dict"):
             raw = event.to_ledger_dict()
         elif isinstance(event, Mapping):
