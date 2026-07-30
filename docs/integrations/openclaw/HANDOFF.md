@@ -18,7 +18,7 @@ Consume exact frozen Platform contract:
 | Field | Value |
 |---|---|
 | Contract | `platform.auth-claims/1.1.0` |
-| Package | `@linktrend/platform-contracts@0.2.1` (schema vendored from LiNKplatform) |
+| Package | `@linktrend/platform-contracts@0.2.2` (schema vendored from LiNKplatform) |
 | Schema bytes SHA-256 | `c2e8bc68b3feb9a3dacc497f5a5d497b466c400804fb4f9e41734c10772ddfa1` |
 | contentHash | `fb518834be897c32574df5f7235704fdb0de708bd3da1b48fc448246e3eca567` |
 

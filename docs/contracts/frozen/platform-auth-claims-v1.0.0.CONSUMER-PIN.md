@@ -6,7 +6,7 @@
 | Platform package | `@linktrend/platform-contracts` `0.2.1` |
 | Consumer | LiNKskills Gateway / MCP |
 | Pin date | `2026-07-28` |
-| Status | `consumed_for_integration` |
+| Status | `historical_rejection_only` (superseded by `platform.auth-claims/1.1.0` / `@linktrend/platform-contracts@0.2.2`) |
 
 ## Exact hashes (must match Platform freeze)
 

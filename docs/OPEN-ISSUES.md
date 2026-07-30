@@ -33,9 +33,9 @@ Runnable generic host: `LiNKplatform/packages/librarian-runner`. Skills domain w
 Gateway/MCP production paths consume canonical Platform AuthClaims via `PlatformClaimsVerifier` **with a Platform-approved cryptographic authenticator**. Unsigned `platform.<base64url(JSON)>` is confined to `LocalUnsignedClaimsVerifier` under explicit `LINKSKILLS_AUTH_MODE=local-test`. Competing `fake.*` tokens are rejected. Gateway/MCP startup fails closed without production authenticator config. **Live Platform token issuance / stage auth / signing keys** remain a Platform gate.
 Spoofed body identity is rejected.
 **Correction (2026-07-28):** prior fake-shape acceptance on production verifier path is removed.
-**Wave 2 (2026-07-28):** consumes frozen `platform.auth-claims/1.0.0` (`@linktrend/platform-contracts@0.2.1`) with exact schema/content hashes; rejects snake_case, unknown fields, and `actorKind: agent`. See `docs/contracts/frozen/platform-auth-claims-v1.0.0.CONSUMER-PIN.md`.
+**Wave 2 (2026-07-28):** historical consume of frozen `platform.auth-claims/1.0.0` (`@linktrend/platform-contracts@0.2.1`) — rejection-only / historical pin retained at `docs/contracts/frozen/platform-auth-claims-v1.0.0.CONSUMER-PIN.md`.
 **Wave 4 (2026-07-28):** unsigned production default removed; cryptographic authenticity required outside local-test. See `docs/handoffs/2026-07-28-grok-certification-correction-wave4.md`.
-**Wave 5 (2026-07-28):** consumer repinned to `platform.auth-claims/1.1.0` (`orgId` null only for `actorKind: service`); exact `permittedOperations` enforcement. See `docs/contracts/frozen/platform-auth-claims-v1.1.0.CONSUMER-PIN.md` and `docs/handoffs/2026-07-28-grok-certification-correction-wave5.md`.
+**Wave 5 (2026-07-28):** consumer repinned to `platform.auth-claims/1.1.0` (`orgId` null only for `actorKind: service`); exact `permittedOperations` enforcement. Package pin corrected to `@linktrend/platform-contracts@0.2.2` (2026-07-30). See `docs/contracts/frozen/platform-auth-claims-v1.1.0.CONSUMER-PIN.md`.
 
 ### 5. Live stage/prod internal-launch readiness
 

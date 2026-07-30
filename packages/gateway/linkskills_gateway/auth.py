@@ -31,7 +31,7 @@ from typing import Any, Callable, Dict, Mapping, Optional, Protocol, Set
 
 
 CLAIM_CONTRACT_VERSION = "platform.auth-claims/1.1.0"
-PLATFORM_CONTRACTS_PACKAGE = "0.2.1"
+PLATFORM_CONTRACTS_PACKAGE = "0.2.2"
 AUTH_MODE_PRODUCTION = "production"
 AUTH_MODE_LOCAL_TEST = "local-test"
 ACTOR_KINDS = frozenset(

@@ -3,11 +3,11 @@
 | Field | Value |
 |---|---|
 | Contract | `platform.auth-claims/1.1.0` |
-| Platform package | `@linktrend/platform-contracts` `0.2.1` (schema vendored from LiNKplatform) |
+| Platform package | `@linktrend/platform-contracts` `0.2.2` (schema vendored from LiNKplatform) |
 | Consumer | LiNKskills Gateway / MCP |
-| Pin date | `2026-07-28` |
+| Pin date | `2026-07-28` (package pin corrected to `0.2.2` on `2026-07-30`) |
 | Status | `consumed_for_integration` |
-| Prior pin | `platform.auth-claims/1.0.0` (superseded for Skills consumers) |
+| Prior pin | `platform.auth-claims/1.0.0` / package `0.2.1` (superseded for Skills consumers; retained as historical / rejection-only) |
 
 ## Exact hashes (must match Platform schema bytes)
 

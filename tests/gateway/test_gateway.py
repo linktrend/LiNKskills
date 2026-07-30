@@ -84,7 +84,7 @@ class LocalUnsignedAuthTests(unittest.TestCase):
     def test_frozen_schema_hashes(self) -> None:
         meta = verify_frozen_auth_claims_schema()
         self.assertEqual(meta["contract"], CLAIM_CONTRACT_VERSION)
-        self.assertEqual(meta["package"], "0.2.1")
+        self.assertEqual(meta["package"], "0.2.2")
 
     def test_valid_unsigned_token_accepted_in_local_test(self) -> None:
         token = mint_platform_token(_platform_claims())
