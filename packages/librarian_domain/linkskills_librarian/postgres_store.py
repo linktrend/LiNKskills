@@ -13,11 +13,17 @@ RLS identity is applied per transaction with:
   SET LOCAL via set_config('app.current_actor_id', ..., true);
   SET LOCAL via set_config('app.current_org_id', ..., true);
 
+Actor/org GUCs are derived exclusively from ``bind_identity`` /
+``identity()``. ``enqueue()`` stamps row ownership from that bound
+context and rejects any non-empty item ``actor_id`` / ``org_id`` that
+disagrees. Item fields never set RLS GUCs.
+
 Default service scope is ``actor`` (actor + org isolation). Privileged
 Librarian workers that must see/claim across actors within one org must
 pass ``service_scope="org"`` (or env ``LINKSKILLS_LIBRARIAN_SERVICE_SCOPE=org``),
 which sets transaction-local ``app.librarian_service_scope=org``. Runtime
-role never receives this privilege.
+role never receives this privilege. Privileged scope does not relax
+enqueue identity honesty — forged item actor/org still fail.
 """
 
 from __future__ import annotations
@@ -185,17 +191,47 @@ class PostgresReviewQueueStore:
             else:
                 self.bind_identity(str(previous[0]), str(previous[1] or ""))
 
-    def _current_identity(
-        self,
-        *,
-        actor_id: Optional[str] = None,
-        org_id: Optional[str] = None,
-    ) -> Tuple[str, str]:
+    def _current_identity(self) -> Tuple[str, str]:
+        """Return bound RLS identity only — never item/request fields."""
         bound_actor = getattr(self._identity, "actor_id", None)
         bound_org = getattr(self._identity, "org_id", None)
-        resolved_actor = str(actor_id if actor_id is not None else (bound_actor or ""))
-        resolved_org = str(org_id if org_id is not None else (bound_org or ""))
-        return resolved_actor, resolved_org
+        return str(bound_actor or ""), str(bound_org or "")
+
+    def _require_bound_identity(self) -> Tuple[str, str]:
+        """Fail closed when enqueue/mutate paths lack bind_identity / identity()."""
+        actor_id, org_id = self._current_identity()
+        if not actor_id or not org_id:
+            raise ValueError(
+                "review_queue requires bound identity via bind_identity / "
+                "identity(); actor_id and org_id must not be taken from "
+                "untrusted item fields"
+            )
+        return actor_id, org_id
+
+    def _assert_item_identity_agrees(
+        self,
+        item: Mapping[str, Any],
+        *,
+        bound_actor: str,
+        bound_org: str,
+    ) -> None:
+        """Reject item actor/org that disagree with the bound identity.
+
+        Omitted or empty item identity fields are allowed; bound identity is
+        stamped onto the stored row. Non-empty values must match exactly.
+        """
+        item_actor = str(item.get("actor_id") or "").strip()
+        item_org = str(item.get("org_id") or "").strip()
+        if item_actor and item_actor != bound_actor:
+            raise ValueError(
+                f"review_queue item actor_id {item_actor!r} disagrees with "
+                f"bound identity actor_id {bound_actor!r}"
+            )
+        if item_org and item_org != bound_org:
+            raise ValueError(
+                f"review_queue item org_id {item_org!r} disagrees with "
+                f"bound identity org_id {bound_org!r}"
+            )
 
     def _tx_idle(self) -> bool:
         status = self._conn.info.transaction_status
@@ -260,15 +296,12 @@ class PostgresReviewQueueStore:
         stored = dict(item)
         review_id = str(stored.get("review_id") or uuid.uuid4())
         stored["review_id"] = review_id
-        actor_id, org_id = self._current_identity(
-            actor_id=str(stored.get("actor_id") or "") or None,
-            org_id=str(stored.get("org_id") or "") or None,
+        # RLS GUCs and row ownership come only from bind_identity / identity().
+        # Item actor_id/org_id are never trusted for GUC setting.
+        actor_id, org_id = self._require_bound_identity()
+        self._assert_item_identity_agrees(
+            stored, bound_actor=actor_id, bound_org=org_id
         )
-        if not actor_id or not org_id:
-            raise ValueError(
-                "review_queue enqueue requires actor_id and org_id "
-                "(bind_identity or item fields)"
-            )
         stored["actor_id"] = actor_id
         stored["org_id"] = org_id
         kind = str(stored.get("kind") or "general")

@@ -95,8 +95,9 @@ Names must match runtime parsers (`paci_authenticator.py`, `paci_token_client.py
 | `LINKSKILLS_PACI_AUDIENCE` | when PACI live | Expected audience; default `lskills-api` |
 | `LINKSKILLS_PACI_REQUIRED_SERVICE_SCOPES` | optional | CSV; default `lskills` |
 | `LINKSKILLS_PACI_INTROSPECTION_URL` | when PACI live | Introspection URL for high-risk writes |
-| `LINKSKILLS_PACI_INTROSPECTION_CLIENT_ID` | with introspection | Client id for introspection assertion |
-| `LINKSKILLS_PACI_CLIENT_ID` | client canary | Public client id |
+| `LINKSKILLS_PACI_INTROSPECTION_CLIENT_ID` | with introspection | Resource-server **assertion** client id (who calls introspect via `private_key_jwt`) |
+| `LINKSKILLS_PACI_TRUSTED_MINT_CLIENT_IDS` | with introspection | CSV allow-list of **token-minting** client IDs permitted in active introspection responses. Distinct from `LINKSKILLS_PACI_INTROSPECTION_CLIENT_ID`. Outside `local-test`, production startup and high-risk writes fail closed if this allow-list is missing, empty, or ambiguous |
+| `LINKSKILLS_PACI_CLIENT_ID` | client canary | Public client id (this consumer’s mint identity; must also appear in the Gateway mint allow-list above) |
 | `LINKSKILLS_PACI_TOKEN_ENDPOINT` | client canary | Token endpoint |
 | `LINKSKILLS_PACI_CLIENT_PRIVATE_KEY_FILE` | client canary | Absolute SecretRef file path to ES256 PEM |
 | `LINKSKILLS_PACI_CLIENT_KID` | optional | JOSE `kid` for client assertion |

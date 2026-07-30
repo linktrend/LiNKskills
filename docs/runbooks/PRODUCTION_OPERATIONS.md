@@ -103,8 +103,9 @@ Private key material reaches the PACI client only as a **file path** via
 | PACI JWKS | `LINKSKILLS_PACI_JWKS_URI` | Same origin as issuer |
 | PACI audience | `LINKSKILLS_PACI_AUDIENCE` | Default `lskills-api` |
 | Required service scopes | `LINKSKILLS_PACI_REQUIRED_SERVICE_SCOPES` | CSV; default `lskills` |
-| Introspection | `LINKSKILLS_PACI_INTROSPECTION_URL` / `LINKSKILLS_PACI_INTROSPECTION_CLIENT_ID` | High-risk writes |
-| Token mint | `LINKSKILLS_PACI_TOKEN_ENDPOINT` / `LINKSKILLS_PACI_CLIENT_ID` | Client credentials |
+| Introspection | `LINKSKILLS_PACI_INTROSPECTION_URL` / `LINKSKILLS_PACI_INTROSPECTION_CLIENT_ID` | High-risk writes; assertion client id is who the Gateway uses to call introspect |
+| Trusted mint allow-list | `LINKSKILLS_PACI_TRUSTED_MINT_CLIENT_IDS` | CSV of **token-minting** client IDs allowed in active introspection responses. Distinct from the resource-server assertion client id (`LINKSKILLS_PACI_INTROSPECTION_CLIENT_ID`). Missing/empty outside `local-test` ⇒ fail closed at Gateway startup (when introspection is configured) and on high-risk writes |
+| Token mint | `LINKSKILLS_PACI_TOKEN_ENDPOINT` / `LINKSKILLS_PACI_CLIENT_ID` | Client credentials (consumer mint identity) |
 | Client private key file | `LINKSKILLS_PACI_CLIENT_PRIVATE_KEY_FILE` | Absolute SecretRef path to ES256 PEM |
 | Client assertion kid | `LINKSKILLS_PACI_CLIENT_KID` | Optional JOSE `kid` |
 | Mint scope / resource audience | `LINKSKILLS_PACI_SCOPE` / `LINKSKILLS_PACI_RESOURCE_AUDIENCE` | Optional Skills-pinned |

@@ -640,6 +640,161 @@ class GatewayPostgresEphemeralTests(unittest.TestCase):
         finally:
             store.close()
 
+    def test_review_queue_enqueue_rejects_forged_actor_identity(self) -> None:
+        """Bound actor-a/org-a + item actor-b/org-a must fail; no row for either."""
+        from linkskills_librarian.postgres_store import PostgresReviewQueueStore
+
+        store = PostgresReviewQueueStore(self.dsn, rls=True, service_scope="actor")
+        try:
+            with store.identity("actor-a", "org-a"):
+                with self.assertRaises(ValueError) as ctx:
+                    store.enqueue(
+                        {
+                            "review_id": "rev-forge-actor",
+                            "kind": "general",
+                            "status": "queued",
+                            "actor_id": "actor-b",
+                            "org_id": "org-a",
+                            "provenance": {"attack": "forged-actor"},
+                        }
+                    )
+                self.assertIn("actor_id", str(ctx.exception))
+                self.assertIn("disagrees", str(ctx.exception))
+                self.assertIn("bound identity", str(ctx.exception))
+                self.assertEqual(store.list_queue(), [])
+
+            with store.identity("actor-b", "org-a"):
+                self.assertEqual(store.list_queue(), [])
+                self.assertEqual(store.depth(), 0)
+            with store.identity("actor-a", "org-a"):
+                self.assertEqual(store.list_queue(), [])
+                self.assertEqual(store.depth(), 0)
+        finally:
+            store.close()
+
+    def test_review_queue_enqueue_rejects_forged_org_identity(self) -> None:
+        """Bound actor-a/org-a + item actor-a/org-b must fail; no row visible."""
+        from linkskills_librarian.postgres_store import PostgresReviewQueueStore
+
+        store = PostgresReviewQueueStore(self.dsn, rls=True, service_scope="actor")
+        try:
+            with store.identity("actor-a", "org-a"):
+                with self.assertRaises(ValueError) as ctx:
+                    store.enqueue(
+                        {
+                            "review_id": "rev-forge-org",
+                            "kind": "general",
+                            "status": "queued",
+                            "actor_id": "actor-a",
+                            "org_id": "org-b",
+                            "provenance": {"attack": "forged-org"},
+                        }
+                    )
+                self.assertIn("org_id", str(ctx.exception))
+                self.assertIn("disagrees", str(ctx.exception))
+                self.assertEqual(store.list_queue(), [])
+            with store.identity("actor-a", "org-b"):
+                self.assertEqual(store.list_queue(), [])
+        finally:
+            store.close()
+
+    def test_review_queue_enqueue_rejects_absent_bound_identity(self) -> None:
+        """Without bind_identity, enqueue fails even if item carries actor/org."""
+        from linkskills_librarian.postgres_store import PostgresReviewQueueStore
+
+        store = PostgresReviewQueueStore(self.dsn, rls=True, service_scope="actor")
+        try:
+            with self.assertRaises(ValueError) as ctx:
+                store.enqueue(
+                    {
+                        "review_id": "rev-no-bind",
+                        "kind": "general",
+                        "status": "queued",
+                        "actor_id": "actor-a",
+                        "org_id": "org-a",
+                        "provenance": {},
+                    }
+                )
+            self.assertIn("bound identity", str(ctx.exception))
+            with store.identity("actor-a", "org-a"):
+                self.assertEqual(store.list_queue(), [])
+        finally:
+            store.close()
+
+    def test_review_queue_privileged_org_scope_rejects_forged_enqueue(self) -> None:
+        """service_scope=org still requires honest bound identity on enqueue."""
+        from linkskills_librarian.postgres_store import PostgresReviewQueueStore
+
+        privileged = PostgresReviewQueueStore(
+            self.dsn, rls=True, service_scope="org"
+        )
+        try:
+            with privileged.identity("svc-librarian", "org-a"):
+                with self.assertRaises(ValueError) as ctx:
+                    privileged.enqueue(
+                        {
+                            "review_id": "rev-priv-forge",
+                            "kind": "general",
+                            "status": "queued",
+                            "actor_id": "actor-forged",
+                            "org_id": "org-a",
+                            "provenance": {},
+                        }
+                    )
+                self.assertIn("disagrees", str(ctx.exception))
+                self.assertEqual(privileged.list_queue(), [])
+
+                # Matching / omitted identity still works under org scope.
+                stamped = privileged.enqueue(
+                    {
+                        "review_id": "rev-priv-honest",
+                        "kind": "general",
+                        "status": "queued",
+                        "provenance": {"ok": True},
+                    }
+                )
+                self.assertEqual(stamped["actor_id"], "svc-librarian")
+                self.assertEqual(stamped["org_id"], "org-a")
+                self.assertEqual(
+                    [r["review_id"] for r in privileged.list_queue()],
+                    ["rev-priv-honest"],
+                )
+        finally:
+            privileged.close()
+
+    def test_review_queue_mutations_use_bound_identity_only(self) -> None:
+        """list/mark_failed/recover use bound GUCs; forged item fields ignored."""
+        from linkskills_librarian.postgres_store import PostgresReviewQueueStore
+
+        store = PostgresReviewQueueStore(self.dsn, rls=True, service_scope="actor")
+        try:
+            with store.identity("actor-a", "org-a"):
+                store.enqueue(
+                    {
+                        "review_id": "rev-mut-a",
+                        "kind": "general",
+                        "status": "queued",
+                        "provenance": {},
+                    }
+                )
+                listed = store.list_queue()
+                self.assertEqual(len(listed), 1)
+                self.assertEqual(listed[0]["actor_id"], "actor-a")
+
+                failed = store.mark_failed("rev-mut-a", error="retry-me")
+                self.assertIsNotNone(failed)
+                assert failed is not None
+                self.assertEqual(failed["actor_id"], "actor-a")
+                self.assertEqual(failed["status"], "failed")
+
+            # Other actor cannot list or mutate via item fields (none accepted).
+            with store.identity("actor-b", "org-a"):
+                self.assertEqual(store.list_queue(), [])
+                self.assertIsNone(store.mark_failed("rev-mut-a", error="steal"))
+                self.assertEqual(store.recover_expired_leases(), 0)
+        finally:
+            store.close()
+
     def test_publisher_publish_and_get_by_hash(self) -> None:
         from linkskills_publisher.postgres_registry import PostgresPublisherRegistry
 

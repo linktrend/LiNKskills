@@ -36,6 +36,7 @@ AUTHENTICATOR_ENV_VARS = (
     auth_mod.ENV_PACI_REQUIRED_SERVICE_SCOPES,
     auth_mod.ENV_PACI_INTROSPECTION_URL,
     auth_mod.ENV_PACI_INTROSPECTION_CLIENT_ID,
+    auth_mod.ENV_PACI_TRUSTED_MINT_CLIENT_IDS,
     auth_mod.ENV_PLATFORM_AUTHENTICATOR,
 )
 
@@ -73,6 +74,19 @@ class OperatorConfigContractTests(unittest.TestCase):
         self.assertEqual(
             auth_mod.ENV_PACI_REQUIRED_SERVICE_SCOPES,
             "LINKSKILLS_PACI_REQUIRED_SERVICE_SCOPES",
+        )
+        self.assertEqual(
+            auth_mod.ENV_PACI_TRUSTED_MINT_CLIENT_IDS,
+            "LINKSKILLS_PACI_TRUSTED_MINT_CLIENT_IDS",
+        )
+        self.assertEqual(
+            auth_mod.ENV_PACI_INTROSPECTION_CLIENT_ID,
+            "LINKSKILLS_PACI_INTROSPECTION_CLIENT_ID",
+        )
+        self.assertNotEqual(
+            auth_mod.ENV_PACI_TRUSTED_MINT_CLIENT_IDS,
+            auth_mod.ENV_PACI_INTROSPECTION_CLIENT_ID,
+            "mint allow-list and RS assertion client id must remain distinct env names",
         )
         self.assertEqual(
             token_mod.ENV_TOKEN_ENDPOINT,
@@ -124,6 +138,8 @@ class OperatorConfigContractTests(unittest.TestCase):
         for name in (
             "LINKSKILLS_PACI_JWKS_URI",
             "LINKSKILLS_PACI_REQUIRED_SERVICE_SCOPES",
+            "LINKSKILLS_PACI_INTROSPECTION_CLIENT_ID",
+            "LINKSKILLS_PACI_TRUSTED_MINT_CLIENT_IDS",
             "LINKSKILLS_PACI_TOKEN_ENDPOINT",
             "LINKSKILLS_PACI_CLIENT_PRIVATE_KEY_FILE",
             "LINKSKILLS_SHUTDOWN_TIMEOUT_S",
@@ -132,6 +148,39 @@ class OperatorConfigContractTests(unittest.TestCase):
                 example,
                 rf"(?m)^{re.escape(name)}=",
                 f".env.example must assign {name}",
+            )
+
+    def test_operator_artifacts_state_mint_vs_assertion_client_separation(self) -> None:
+        """Docs must say the mint allow-list is distinct from the RS assertion client."""
+        service_def = (
+            REPO_ROOT / "docs" / "deploy" / "GATEWAY-MCP-SERVICE-DEFINITION.md"
+        ).read_text(encoding="utf-8")
+        runbook = (
+            REPO_ROOT / "docs" / "runbooks" / "PRODUCTION_OPERATIONS.md"
+        ).read_text(encoding="utf-8")
+        for label, text in (
+            ("service definition", service_def),
+            ("production runbook", runbook),
+        ):
+            self.assertIn(
+                "LINKSKILLS_PACI_TRUSTED_MINT_CLIENT_IDS",
+                text,
+                f"{label} must name the trusted mint allow-list",
+            )
+            self.assertIn(
+                "LINKSKILLS_PACI_INTROSPECTION_CLIENT_ID",
+                text,
+                f"{label} must name the RS assertion client id",
+            )
+            # Operator-safe separation signal (mint vs assertion / distinct).
+            lowered = text.lower()
+            self.assertTrue(
+                "token-minting" in lowered or "trusted mint" in lowered,
+                f"{label} must describe token-minting / trusted mint allow-list",
+            )
+            self.assertTrue(
+                "distinct" in lowered or "not the same" in lowered or "assertion" in lowered,
+                f"{label} must distinguish mint allow-list from assertion client",
             )
 
 
