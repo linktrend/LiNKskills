@@ -14,7 +14,7 @@
 |---|---|
 | Exact start HEAD | `61850d942ac2bf053a8a464e199e1a2f72e6fa2a` |
 | Wave-2 prompt commit | `7f0ed47fdacbb1d819a74333d685a5527a127f29` |
-| Exact clean pushed HEAD | see agent response after push |
+| Exact clean pushed HEAD |  |
 
 ## Platform repin status
 
