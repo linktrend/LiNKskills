@@ -3,6 +3,10 @@
 Routes:
   GET  /health
   GET  /ready
+  GET  /metrics
+  GET  /drain
+  POST /drain
+  POST /drain/cancel
   POST /v1/{operation}
 
 Compatibility note: ``packages/client/linkskills_client/compat.py`` wraps
@@ -13,16 +17,24 @@ gateway without an immediate cutover.
 from __future__ import annotations
 
 import json
+import os
 import sys
 import uuid
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from typing import Any, Dict, Optional, Tuple, Type
+from typing import Any, Dict, Mapping, Optional, Tuple, Type
 from urllib.parse import urlparse
 
 from .auth import (
     AuthConfigurationError,
     AuthError,
     resolve_claims_verifier,
+)
+from .ops import (
+    DrainState,
+    GatewayMetrics,
+    auth_config_present,
+    drain_from_environ,
+    store_probe_configured,
 )
 from .service import OPERATIONS, ServiceError, SkillsGatewayService
 
@@ -34,9 +46,16 @@ def _json_bytes(payload: Dict[str, Any]) -> bytes:
 def make_handler(
     service: SkillsGatewayService,
     verifier: Optional[Any] = None,
+    *,
+    metrics: Optional[GatewayMetrics] = None,
+    drain: Optional[DrainState] = None,
+    environ: Optional[Mapping[str, str]] = None,
 ) -> Type[BaseHTTPRequestHandler]:
     # Never default to unsigned decoding. Missing production authenticator fails closed.
     auth = resolve_claims_verifier(verifier=verifier)
+    stats = metrics if metrics is not None else GatewayMetrics()
+    drain_state = drain if drain is not None else drain_from_environ(environ)
+    env = environ if environ is not None else os.environ
 
     class LiNKskillsGateway(BaseHTTPRequestHandler):
         server_version = "LiNKskillsGateway/0.1"
@@ -52,6 +71,14 @@ def make_handler(
             self.send_header("Content-Length", str(len(body)))
             self.end_headers()
             self.wfile.write(body)
+
+        def _send_text(self, status: int, body: str, *, content_type: str) -> None:
+            raw = body.encode("utf-8")
+            self.send_response(status)
+            self.send_header("Content-Type", content_type)
+            self.send_header("Content-Length", str(len(raw)))
+            self.end_headers()
+            self.wfile.write(raw)
 
         def _read_json(self) -> Tuple[Optional[Dict[str, Any]], Optional[str]]:
             length = int(self.headers.get("Content-Length") or "0")
@@ -70,21 +97,52 @@ def make_handler(
                 return None, "json_object_required"
             return data, None
 
+        def _ready_payload(self) -> Dict[str, Any]:
+            configured, auth_mode, detail = auth_config_present(env)
+            draining, _reason = drain_state.snapshot()
+            return service.ready(
+                auth_configured=configured,
+                auth_mode=auth_mode,
+                auth_detail=detail,
+                draining=draining,
+                probe_store=store_probe_configured(env),
+            )
+
         def do_GET(self) -> None:  # noqa: N802
+            stats.inc_request()
             path = urlparse(self.path).path.rstrip("/") or "/"
             if path == "/health":
+                # Liveness only — process up.
                 self._send(200, service.health())
                 return
             if path == "/ready":
-                ready = dict(service.ready())
-                ready["auth_configured"] = True
-                ready["auth_mode"] = (
-                    "local-test"
-                    if getattr(auth, "local_test_only", False)
-                    else "production"
-                )
-                # Auth is resolved at process start; if we are serving, auth is configured.
+                ready = self._ready_payload()
+                stats.inc_ready(ready=bool(ready.get("ready")))
                 self._send(200 if ready.get("ready") else 503, ready)
+                return
+            if path == "/metrics":
+                ready = self._ready_payload()
+                draining, _ = drain_state.snapshot()
+                text = stats.render_prometheus(
+                    ready_gauge=1 if ready.get("ready") else 0,
+                    draining_gauge=1 if draining else 0,
+                )
+                self._send_text(
+                    200,
+                    text,
+                    content_type="text/plain; version=0.0.4; charset=utf-8",
+                )
+                return
+            if path == "/drain":
+                draining, reason = drain_state.snapshot()
+                self._send(
+                    200,
+                    {
+                        "draining": draining,
+                        "reason": reason,
+                        "in_flight": stats.snapshot()["in_flight"],
+                    },
+                )
                 return
             self._send(
                 404,
@@ -98,7 +156,52 @@ def make_handler(
             )
 
         def do_POST(self) -> None:  # noqa: N802
+            stats.inc_request()
             path = urlparse(self.path).path.rstrip("/") or "/"
+
+            if path == "/drain":
+                body, err = self._read_json()
+                if err:
+                    self._send(
+                        400,
+                        {
+                            "error": {
+                                "code": err,
+                                "message": err.replace("_", " "),
+                                "retryable": False,
+                            }
+                        },
+                    )
+                    return
+                reason = "endpoint"
+                if isinstance(body, dict) and body.get("reason"):
+                    # Bound, non-secret operator note only.
+                    reason = str(body.get("reason"))[:120]
+                drain_state.enable(reason=reason)
+                self._send(
+                    200,
+                    {
+                        "draining": True,
+                        "reason": reason,
+                        "in_flight": stats.snapshot()["in_flight"],
+                    },
+                )
+                return
+
+            if path == "/drain/cancel":
+                # Discard body if present.
+                self._read_json()
+                drain_state.disable()
+                self._send(
+                    200,
+                    {
+                        "draining": False,
+                        "reason": "",
+                        "in_flight": stats.snapshot()["in_flight"],
+                    },
+                )
+                return
+
             prefix = "/v1/"
             if not path.startswith(prefix):
                 self._send(
@@ -108,6 +211,22 @@ def make_handler(
                             "code": "not_found",
                             "message": f"Unknown path: {path}",
                             "retryable": False,
+                        }
+                    },
+                )
+                return
+
+            draining, drain_reason = drain_state.snapshot()
+            if draining:
+                stats.inc_drain_reject()
+                self._send(
+                    503,
+                    {
+                        "error": {
+                            "code": "draining",
+                            "message": "Gateway is draining; rejecting new work",
+                            "retryable": True,
+                            "reason": drain_reason,
                         }
                     },
                 )
@@ -184,6 +303,7 @@ def make_handler(
             idempotency_id = (
                 idempotency_key if isinstance(idempotency_key, str) else None
             )
+            stats.begin_work()
             try:
                 # Pass original body + headers so spoofed identity is visible.
                 # Never accept X-Actor-* override headers as authority.
@@ -191,6 +311,7 @@ def make_handler(
                     authorization,
                     request_payload=body,
                     request_headers=dict(self.headers.items()),
+                    required_operation=operation,
                 )
                 envelope = service.dispatch(
                     operation,
@@ -201,6 +322,7 @@ def make_handler(
                 )
                 self._send(200, envelope)
             except AuthError as exc:
+                stats.inc_auth_fail()
                 status = 401
                 if exc.code in {
                     "auth_forbidden",
@@ -238,6 +360,8 @@ def make_handler(
                         },
                     ),
                 )
+            finally:
+                stats.end_work()
 
     return LiNKskillsGateway
 
@@ -248,9 +372,18 @@ def create_server(
     *,
     service: Optional[SkillsGatewayService] = None,
     verifier: Optional[Any] = None,
+    metrics: Optional[GatewayMetrics] = None,
+    drain: Optional[DrainState] = None,
+    environ: Optional[Mapping[str, str]] = None,
 ) -> ThreadingHTTPServer:
     svc = service or SkillsGatewayService()
-    handler = make_handler(svc, verifier=verifier)
+    handler = make_handler(
+        svc,
+        verifier=verifier,
+        metrics=metrics,
+        drain=drain,
+        environ=environ,
+    )
     return ThreadingHTTPServer((host, port), handler)
 
 
@@ -258,15 +391,27 @@ def main() -> None:
     import argparse
 
     parser = argparse.ArgumentParser(description="LiNKskills Gateway HTTP server")
-    parser.add_argument("--host", default="127.0.0.1")
-    parser.add_argument("--port", type=int, default=8787)
+    parser.add_argument("--host", default=os.environ.get("LINKSKILLS_GATEWAY_HOST", "127.0.0.1"))
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=int(os.environ.get("LINKSKILLS_GATEWAY_PORT", "8787")),
+    )
     args = parser.parse_args()
     try:
         verifier = resolve_claims_verifier()
     except AuthConfigurationError as exc:
         print(f"linkskills-gateway auth fail-closed: {exc.message}", file=sys.stderr)
         raise SystemExit(2) from exc
-    httpd = create_server(args.host, args.port, verifier=verifier)
+    metrics = GatewayMetrics()
+    drain = drain_from_environ()
+    httpd = create_server(
+        args.host,
+        args.port,
+        verifier=verifier,
+        metrics=metrics,
+        drain=drain,
+    )
     print(f"linkskills-gateway listening on http://{args.host}:{args.port}")
     try:
         httpd.serve_forever()

@@ -92,6 +92,23 @@ EXPECTED_SCHEMA_CONTENT_HASH = (
     "fb518834be897c32574df5f7235704fdb0de708bd3da1b48fc448246e3eca567"
 )
 
+# High-risk mutating writes that require PACI RFC 7662 introspection when the
+# PACI authenticator is configured (envelope §7.4 / §8 step 6). Matches Skills
+# Gateway WRITE_OPERATIONS (durable mutations + external side effects).
+# Evidence: implemented but not proven against frozen Platform PACI service
+# (platform.auth-token-envelope/0.1.3-draft).
+HIGH_RISK_WRITE_OPERATIONS: frozenset[str] = frozenset(
+    {
+        "skills_run_start",
+        "skills_run_update",
+        "skills_run_complete",
+        "skills_run_fail",
+        "skills_tool_invoke",
+        "skills_feedback_submit",
+        "skills_trace_candidate_submit",
+    }
+)
+
 # Gateway operation -> accepted permittedOperations tokens (exact membership).
 OPERATION_PERMISSIONS: Dict[str, frozenset[str]] = {
     "skills_list": frozenset({"read", "skills:read"}),
@@ -482,13 +499,18 @@ class _AuthClaimsPolicy:
         if self.expected_org_id is not None and claims.org_id != self.expected_org_id:
             raise AuthError("auth_forbidden", "wrong_org")
         if required_operation:
-            aliases = {
-                "skills:read": {"read", "skills:read"},
-                "skills:write": {"execute", "skills:write"},
-                "read": {"read", "skills:read"},
-                "execute": {"execute", "skills:write"},
-            }
-            allowed = aliases.get(required_operation, {required_operation})
+            # Accept either a permission token (skills:read) or a Gateway/MCP
+            # operation name (skills_list) mapped via OPERATION_PERMISSIONS.
+            if required_operation in OPERATION_PERMISSIONS:
+                allowed = set(OPERATION_PERMISSIONS[required_operation])
+            else:
+                aliases = {
+                    "skills:read": {"read", "skills:read"},
+                    "skills:write": {"execute", "skills:write"},
+                    "read": {"read", "skills:read"},
+                    "execute": {"execute", "skills:write"},
+                }
+                allowed = aliases.get(required_operation, {required_operation})
             if (
                 not (allowed & set(claims.permitted_operations))
                 and "*" not in claims.permitted_operations
@@ -731,7 +753,18 @@ class PlatformClaimsVerifier(_AuthClaimsPolicy):
                 "accepted outside local-test mode",
             )
 
-        authenticated = self.authenticator.authenticate(token)
+        # Prefer operation-aware auth when the authenticator supports PACI
+        # high-risk introspection (envelope §8 step 6). Non-PACI authenticators
+        # keep authenticate(token) only.
+        authenticate_for_operation = getattr(
+            self.authenticator, "authenticate_for_operation", None
+        )
+        if callable(authenticate_for_operation):
+            authenticated = authenticate_for_operation(
+                token, operation=required_operation
+            )
+        else:
+            authenticated = self.authenticator.authenticate(token)
         claims = self.normalize_claims(authenticated.claims)
         self.check_lifecycle(
             claims,

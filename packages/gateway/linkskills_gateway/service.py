@@ -536,6 +536,34 @@ class SkillsGatewayService:
                 http_status=403,
             )
 
+        # Bind actor/org into Postgres session for RLS when the store supports it.
+        identity_ctx = getattr(self._store, "identity", None)
+        if callable(identity_ctx):
+            with identity_ctx(actor.actor_id, actor.org_id or ""):
+                return self._dispatch_authorized(
+                    operation,
+                    params,
+                    actor=actor,
+                    request_id=request_id,
+                    idempotency_key=idempotency_key,
+                )
+        return self._dispatch_authorized(
+            operation,
+            params,
+            actor=actor,
+            request_id=request_id,
+            idempotency_key=idempotency_key,
+        )
+
+    def _dispatch_authorized(
+        self,
+        operation: str,
+        params: Mapping[str, Any],
+        *,
+        actor: ActorClaims,
+        request_id: str,
+        idempotency_key: Optional[str],
+    ) -> Dict[str, Any]:
         if operation in WRITE_OPERATIONS:
             # Fail closed before DB/external branching, handlers, intents, or mutation.
             idempotency_key = normalize_idempotency_key(idempotency_key)
@@ -1008,20 +1036,75 @@ class SkillsGatewayService:
             )
 
     def health(self) -> Dict[str, Any]:
+        """Liveness: process is up. No dependency or secret checks."""
         return {
             "status": "ok",
             "service": "linkskills-gateway",
-            "contract_version": CONTRACT_VERSION,
-            "skill_count": len(self._skills),
             "time": _utc_now(),
         }
 
-    def ready(self) -> Dict[str, Any]:
-        return {
-            "ready": self._ready and len(self._skills) > 0,
-            "catalog_loaded": len(self._skills) > 0,
+    def probe_store_reachable(self) -> bool:
+        """Cheap store touch for readiness. Never returns secret material."""
+        store = self._store
+        probe = getattr(store, "probe_reachable", None)
+        if callable(probe):
+            return bool(probe())
+        conn = getattr(store, "_conn", None)
+        if conn is not None:
+            conn.execute("SELECT 1").fetchone()
+            return True
+        # In-memory / protocol stores: get_run of a sentinel is a no-op read.
+        store.get_run("__linkskills_ready_probe__")
+        return True
+
+    def ready(
+        self,
+        *,
+        auth_configured: bool = True,
+        auth_mode: str = "production",
+        auth_detail: str = "",
+        draining: bool = False,
+        probe_store: bool = False,
+    ) -> Dict[str, Any]:
+        """Readiness: catalog + auth config (+ optional store probe). No secrets."""
+        catalog_loaded = len(self._skills) > 0
+        store_reachable: Optional[bool] = None
+        store_error: Optional[str] = None
+        if probe_store:
+            try:
+                store_reachable = self.probe_store_reachable()
+            except Exception as exc:  # noqa: BLE001 — readiness boundary
+                store_reachable = False
+                # Class name only — never include connection strings / messages with secrets.
+                store_error = type(exc).__name__
+
+        ready = (
+            bool(self._ready)
+            and catalog_loaded
+            and bool(auth_configured)
+            and not draining
+            and (store_reachable is not False)
+        )
+        payload: Dict[str, Any] = {
+            "ready": ready,
+            "catalog_loaded": catalog_loaded,
+            "auth_configured": bool(auth_configured),
+            "auth_mode": auth_mode,
+            "draining": bool(draining),
+            "skill_count": len(self._skills),
+            "contract_version": CONTRACT_VERSION,
             "time": _utc_now(),
         }
+        if auth_detail:
+            payload["auth_detail"] = auth_detail
+        if probe_store:
+            payload["store_probe"] = "configured"
+            payload["store_reachable"] = bool(store_reachable)
+            if store_error:
+                payload["store_error"] = store_error
+        else:
+            payload["store_probe"] = "skipped"
+        return payload
 
     # ----------------------------------------------------------- operations
     def op_skills_list(

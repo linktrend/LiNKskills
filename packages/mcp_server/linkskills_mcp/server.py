@@ -153,6 +153,7 @@ class SkillsMcpServer:
         actor = self._resolve_actor(
             authorization=authorization or args.get("authorization"),
             request_payload=verify_payload,
+            required_operation=name,
         )
         return self.service.dispatch(
             name,
@@ -167,6 +168,7 @@ class SkillsMcpServer:
         *,
         authorization: Optional[str],
         request_payload: Mapping[str, Any],
+        required_operation: Optional[str] = None,
     ) -> ActorClaims:
         if authorization:
             return self.verifier.verify(
@@ -174,6 +176,7 @@ class SkillsMcpServer:
                 if authorization.lower().startswith("bearer ")
                 else f"Bearer {authorization}",
                 request_payload=request_payload,
+                required_operation=required_operation,
             )
         if self.default_actor is not None:
             # Explicitly injected test/canary identity only — still reject spoof keys.
