@@ -15,7 +15,7 @@
 | Exact start HEAD | `bae7c36d93b90d558f43ac0b8132ce84658fd443` |
 | Wave-3 prompt/session commit | `7b1908378b2794c63c4a547b7e2487bf48dd722c` |
 | Implementation commit | `3db896c084150734b5c134d172d6225432c6b80d` |
-| Exact clean pushed HEAD | reported by agent after push |
+| Exact clean pushed HEAD | `8497761f82ea6fa5f30059729de08532d6296a64` |
 
 Wave-2 Exact clean HEAD amendment: see dated amendment on
 `docs/handoffs/2026-07-30-linkskills-production-iv-correction-wave2.md`
