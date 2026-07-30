@@ -8,6 +8,7 @@ from .auth import (
     PlatformClaimsVerifier,
     resolve_claims_verifier,
 )
+from .ops import DrainState, GatewayMetrics, auth_config_present
 from .service import SkillsGatewayService, OPERATIONS
 from .server import create_server, make_handler
 
@@ -15,8 +16,11 @@ __all__ = [
     "ActorClaims",
     "AuthConfigurationError",
     "AuthError",
+    "DrainState",
+    "GatewayMetrics",
     "LocalUnsignedClaimsVerifier",
     "PlatformClaimsVerifier",
+    "auth_config_present",
     "resolve_claims_verifier",
     "SkillsGatewayService",
     "OPERATIONS",

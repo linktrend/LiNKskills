@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "linkskills-librarian"
+version = "0.1.0"
+description = "LiNKskills Librarian domain worker (host integration owned by LiNKplatform)"
+requires-python = ">=3.11"
+license = { text = "Proprietary" }
+dependencies = [
+  "linkskills-core>=0.1.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["linkskills_librarian*"]

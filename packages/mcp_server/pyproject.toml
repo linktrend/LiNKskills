@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "linkskills-mcp"
+version = "0.1.0"
+description = "LiNKskills MCP adapter over SkillsGatewayService"
+requires-python = ">=3.11"
+license = { text = "Proprietary" }
+dependencies = [
+  "linkskills-gateway>=0.1.0",
+]
+
+[project.scripts]
+linkskills-mcp = "linkskills_mcp.server:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["linkskills_mcp*"]

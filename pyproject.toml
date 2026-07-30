@@ -1,0 +1,72 @@
+# LiNKskills workspace meta-package (documentation + optional umbrella install).
+#
+# Preferred editable installs (stdlib Gateway retained — no ASGI framework):
+#
+#   pip install -e packages/core
+#   pip install -e packages/gateway
+#   pip install -e packages/mcp_server
+#   pip install -e packages/client
+#   pip install -e packages/librarian_domain
+#
+# Or install this root meta-package after the path packages above are available:
+#
+#   pip install -e .
+#
+# Dev/test path without install (legacy PYTHONPATH form still works):
+#   PYTHONPATH="packages/contracts:packages/core:packages/publisher:packages/eval_runner:packages/tool_runtime:packages/gateway:packages/mcp_server:packages/client:packages/librarian_domain:." python3 -m pytest -q
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "linkskills"
+version = "0.1.0"
+description = "LiNKskills centralized skill catalog — Gateway, MCP, client, librarian domain"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "Proprietary" }
+authors = [{ name = "LiNKtrend" }]
+# Umbrella depends on the installable domain packages. Install those path
+# packages first (or use a resolver that understands local path deps).
+dependencies = [
+  "linkskills-core>=0.1.0",
+  "linkskills-gateway>=0.1.0",
+  "linkskills-mcp>=0.1.0",
+  "linkskills-client>=0.1.0",
+  "linkskills-librarian>=0.1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0",
+  "pyyaml>=6.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/linktrend/LiNKskills"
+Documentation = "https://github.com/linktrend/LiNKskills/tree/main/docs"
+
+[tool.setuptools]
+# Root is a meta-package only; importable code lives under packages/*.
+packages = []
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+norecursedirs = [
+  "archive",
+  ".git",
+  ".hg",
+  ".svn",
+  "_darcs",
+  ".tox",
+  "dist",
+  "build",
+  "*.egg",
+  ".venv",
+  "venv",
+  "node_modules",
+  "__pycache__",
+  ".linkskills-state",
+]
+python_files = ["test_*.py"]

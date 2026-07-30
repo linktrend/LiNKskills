@@ -1,3 +1,9 @@
 # Dev / CI dependencies for LiNKskills package tests (not production runtime pins).
 pyyaml>=6.0
 pytest>=8.0
+
+# Optional: Postgres adapters (gateway / librarian / publisher) and ephemeral RLS proofs.
+# Required when LINKSKILLS_GATEWAY_STORE=postgres or running tests/migrations/*_ephemeral*.
+# psycopg>=3.1 ; binary wheels: psycopg[binary]>=3.1
+psycopg[binary]>=3.1
+cryptography>=42.0
