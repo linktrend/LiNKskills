@@ -128,6 +128,11 @@ def open_review_queue_store(
     state_dir: Optional[Path] = None,
     store_path: Optional[Path] = None,
 ) -> ReviewQueueStore:
+    backend = os.environ.get("LINKSKILLS_LIBRARIAN_STORE", "").strip().lower()
+    if backend == "postgres":
+        from .postgres_store import open_postgres_review_queue_store
+
+        return open_postgres_review_queue_store()
     if store_path is not None:
         return SqliteReviewQueueStore(store_path)
     if state_dir is not None or os.environ.get("LINKSKILLS_LIBRARIAN_DURABLE", "").strip() in {

@@ -1189,9 +1189,29 @@ def open_gateway_store(
     state_dir: Optional[Path] = None,
     store: Optional[GatewayStore] = None,
 ) -> GatewayStore:
-    """Open durable SQLite when state_dir is provided or durable env is set."""
+    """Open store backend: postgres (env), SQLite (durable), or in-memory.
+
+    Postgres is selected when ``LINKSKILLS_GATEWAY_STORE=postgres`` and a DSN is
+    present in ``LINKSKILLS_DATABASE_URL`` or ``DATABASE_URL``. SQLite/memory
+    remain the default for local and unit tests.
+    """
     if store is not None:
         return store
+    backend = os.environ.get("LINKSKILLS_GATEWAY_STORE", "").strip().lower()
+    if backend == "postgres":
+        dsn = (
+            os.environ.get("LINKSKILLS_DATABASE_URL", "").strip()
+            or os.environ.get("DATABASE_URL", "").strip()
+            or os.environ.get("LINKSKILLS_EPHEMERAL_PG_URL", "").strip()
+        )
+        if not dsn:
+            raise ValueError(
+                "LINKSKILLS_GATEWAY_STORE=postgres requires "
+                "LINKSKILLS_DATABASE_URL or DATABASE_URL"
+            )
+        from .postgres_store import PostgresGatewayStore
+
+        return PostgresGatewayStore(dsn)
     use_durable = state_dir is not None or os.environ.get(
         "LINKSKILLS_GATEWAY_DURABLE", ""
     ).strip() in {"1", "true", "yes"}

@@ -16,6 +16,7 @@ Apply only after platform foundation + prior lskills catalog migrations are pres
 | 3 (prerequisite, already landed) | `supabase/migrations/20260718_000004_lskills_postgrest_exposure.sql` | `4220d70b626313f572a38720958fb78550b3b89c0efab5366a449d33c0b22ca0` |
 | 4 (**this package**) | `supabase/migrations/20260727_000005_lskills_registry_foundation.sql` | `36081765032f21dfd2dcca223035555e1e54b71298874235def8e0362c55c4ed` |
 | 5 (RLS upgrade) | `supabase/migrations/20260728_000006_lskills_rls_actor_org_scope.sql` | `12c2e45e94fd9216a5857ce53ce299a953dc2ee869f89bcdb392857133df763d` |
+| 6 (gateway persistence) | `supabase/migrations/20260730_000007_lskills_gateway_persistence.sql` | `c26d1c55d9f87e242fe1e225fd4240cd911a5e0315d88500417d491689596222` |
 
 Also requires LiNKplatform `platform` foundation (`platform.organizations`, roles helpers) already applied on the shared database.
 
@@ -28,6 +29,8 @@ Also requires LiNKplatform `platform` foundation (`platform.organizations`, role
 ## What this migration adds (additive only)
 
 Tables: `releases`, `bundles`, `fragments`, `tools`, `execution_profiles`, `certifications`, `skill_runs`, `run_events`, `feedback`, `trace_to_eval_candidates`.
+
+Gateway persistence add-on (000007): `idempotency`, `side_effect_intents`, `gateway_events`, plus additive `events_json` / `feedback_json` columns on `skill_runs`.
 
 Does **not** drop or alter existing `catalog` / `telemetry` / `eval_runs` tables.
 
