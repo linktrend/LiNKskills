@@ -39,3 +39,11 @@ Does **not** own: live Platform migrate/deploy, sibling repo edits, paid resourc
 
 - Session registered; parallel Grok 4.5 High lanes launching.
 - Production prompt preserved as authorized Principal input.
+
+
+## Closed 2026-07-30 Asia/Taipei
+
+- Production packet implemented and pushed on draft PR #22.
+- Hard stop: Platform frozen PACI + live stage, OpenClaw Lisa gate, Codex verification, paid hosts.
+- Session moved to `completed/`.
+- Provisional handoff: `docs/handoffs/2026-07-30-linkskills-production-execution-provisional.md`.

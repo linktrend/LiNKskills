@@ -15,7 +15,7 @@
 |---|---|
 | Exact start HEAD | `af1177a6428e3128b5360da5b92aecd670502589` |
 | Session/prompt commit | `69c60b2f50143a09bb659ed3c2bd6234575cb64d` |
-| Exact clean pushed HEAD | *(filled after final push — see agent response / git tip)* |
+| Exact clean pushed HEAD (pre-session-close) | `4236c073e41e7e8988ea0be5ca502628a5fa936d` |
 
 ## Session
 
