@@ -1,0 +1,65 @@
+# Phase 3 canary: genuinely executed packaged-tool suite.
+# Suite-authored observed_output/fixture_output are intentionally absent.
+# Certification requires immutable executor receipts from real invocations.
+schema_version: "0.1"
+suite_id: canary-echo-suite
+skill_id: canary-echo
+suite_version: 0.2.0
+skill_version_range: ">=0.1.0"
+pass_threshold: 0.8
+rubric:
+  - dimension: correctness
+    weight: 1.0
+    hard_fail_below: 0.5
+cases:
+  - id: echo-hello
+    case_type: golden
+    input: |
+      Echo the token HELLO_CANARY exactly once via packaged text-echo.
+    expected_criteria:
+      - "output contains HELLO_CANARY"
+    execute:
+      kind: packaged_tool
+      tool_id: text-echo
+      tool_dir: tools/text-echo
+      version: "1.0.0"
+      argv:
+        - HELLO_CANARY
+    assertions:
+      must_contain:
+        - "HELLO_CANARY"
+      must_not_contain:
+        - "PROMPT_ONLY"
+      exit_code: 0
+  - id: echo-json
+    case_type: golden
+    input: |
+      Return JSON acknowledging the echo via packaged text-echo --json.
+    expected_criteria:
+      - "json ok/status field present"
+    execute:
+      kind: packaged_tool
+      tool_id: text-echo
+      tool_dir: tools/text-echo
+      version: "1.0.0"
+      argv:
+        - "--json"
+        - "ping"
+    assertions:
+      must_contain:
+        - '"status": "ok"'
+        - '"echo": "ping"'
+      json_schema_fields:
+        - status
+        - echo
+      exit_code: 0
+evidence_policy:
+  retain:
+    - outputs
+    - assertion_results
+    - execution_receipts
+  redact:
+    - secrets
+isolation:
+  requires_clean_workspace: true
+  cleanup_required: true

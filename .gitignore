@@ -8,6 +8,12 @@
 .DS_Store
 __pycache__/
 *.pyc
+*.egg-info/
+.eggs/
+dist/
+build/
+.venv/
+venv/
 
 # LTR Runtime Identity Isolation
 tools/ltr/src/token.json
@@ -24,3 +30,7 @@ tools/vault/data/*.bin
 archive/logic-engine-2026-07-14/logic-engine/runtime/*.json
 archive/logic-engine-2026-07-14/logic-engine/runtime/*.jsonl
 archive/logic-engine-2026-07-14/logic-engine/runtime/*.log
+
+# Wave-5 local runtime state / confined workspace noise
+.linkskills-state/
+tools/*/tmp/

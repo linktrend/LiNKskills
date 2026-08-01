@@ -1,0 +1,350 @@
+{
+  "note": "Honest classification ledger (lanes 5+6, 2026-07-30). No skill is promoted to usable/certified without sealed live executor receipts with network_isolation=denied on a certifiable host. macOS cannot certify (ADR 0009). This file is not a live promotion.",
+  "as_of": "2026-07-30",
+  "updated_at": "2026-07-30T03:05:00Z",
+  "wave": "lanes_5_6_honesty",
+  "live_certification": "not performed",
+  "macos_certifiable": false,
+  "linux_bwrap_required": true,
+  "evidence_tier": "local/fake only — no sealed live certifiable receipts in-repo for catalog skills",
+  "launch_target_source": "evidence/phase1/canary-set.json",
+  "required_canonical_artifacts": [
+    "references/skill-pack.json",
+    "references/eval-suite.json",
+    "references/execution-profile.json"
+  ],
+  "hashing": {
+    "shared_module": "packages/core/linkskills_core/hashing.py",
+    "status": "verified_wave_8",
+    "validator_recalculates_cross_artifact_hashes": true
+  },
+  "idempotency": {
+    "fence_token": true,
+    "db_owned_atomic_reserve_mutate_complete": true,
+    "mutation_context_explicit_request_owned": true,
+    "mutation_gate_serialize_commit_through_publish": true,
+    "mutation_reads_store_not_stale_cache": true,
+    "write_operations_require_validated_idempotency_key": true,
+    "ungated_write_handler_fallback_removed": true,
+    "crash_injection_after_mutation": true,
+    "external_side_effect_complete_checks_reservation_fence": true,
+    "downstream_key_stable_not_fence_derived": true,
+    "downstream_idempotency_propagated_not_implicit_honored": true,
+    "reclaim_preserves_durable_side_effect_result": true,
+    "external_side_effects": "at_least_once_with_intent_result_reconciliation"
+  },
+  "certification_rules": {
+    "requires_sealed_executor_receipt": true,
+    "requires_network_isolation": "denied",
+    "allow_unproven_never_certifies": true,
+    "prompt_only_never_certifies": true,
+    "suite_authored_observed_output_never_certifies": true,
+    "authority": [
+      "docs/adr/0009-confined-executor-network-isolation.md",
+      "packages/core/linkskills_core/certification.py",
+      "evidence/phase10/CLASSIFICATION-HONESTY.md"
+    ]
+  },
+  "non_certifying_local_evidence": [
+    {
+      "path": "evidence/phase3/canary-echo-cli.json",
+      "skill_id": "canary-echo",
+      "in_catalog": false,
+      "platform": "macOS",
+      "network_isolation": null,
+      "legacy_certified_flag": true,
+      "honest_status": "non_certifying — macOS receipt missing network_isolation=denied; superseded by ADR 0009",
+      "does_not_promote": true
+    }
+  ],
+  "sealed_live_receipt_evidence_paths": [],
+  "launch_targets_with_canonical_v01_artifacts": [
+    "git-safeguard",
+    "citation-enforcer",
+    "skill-template",
+    "tool-architect",
+    "skill-architect",
+    "self-improvement",
+    "repository-manager",
+    "audit-protocol",
+    "search-strategy",
+    "compliance-guardian"
+  ],
+  "usable_candidates_after_real_eval": [
+    "git-safeguard",
+    "citation-enforcer",
+    "skill-template",
+    "tool-architect",
+    "repository-manager",
+    "audit-protocol",
+    "compliance-guardian"
+  ],
+  "usable_candidates_note": "Aspirational only after Linux bwrap sealed receipts + suite pass. Not promoted in this ledger.",
+  "remain_draft_until_suite_upgrade": [
+    "skill-architect",
+    "self-improvement",
+    "search-strategy"
+  ],
+  "deprecated_or_retired": [],
+  "all_34_default_catalog_state": "draft",
+  "skills": {
+    "audit-protocol": {
+      "classification": "draft",
+      "launch_target": true,
+      "canonical_v01_artifacts": true,
+      "suite_readiness": "ready_for_runner",
+      "sealed_live_receipt_evidence": [],
+      "reason": "No sealed live network_isolation=denied receipt in-repo"
+    },
+    "blocker-resolution": {
+      "classification": "draft",
+      "launch_target": false,
+      "canonical_v01_artifacts": false,
+      "sealed_live_receipt_evidence": [],
+      "reason": "Catalog default draft; no sealed live certifying evidence"
+    },
+    "channel-ops": {
+      "classification": "draft",
+      "launch_target": false,
+      "canonical_v01_artifacts": false,
+      "sealed_live_receipt_evidence": [],
+      "reason": "Catalog default draft; no sealed live certifying evidence"
+    },
+    "citation-enforcer": {
+      "classification": "draft",
+      "launch_target": true,
+      "canonical_v01_artifacts": true,
+      "suite_readiness": "ready_for_runner",
+      "sealed_live_receipt_evidence": [],
+      "reason": "No sealed live network_isolation=denied receipt in-repo"
+    },
+    "compliance-guardian": {
+      "classification": "draft",
+      "launch_target": true,
+      "canonical_v01_artifacts": true,
+      "suite_readiness": "ready_for_runner",
+      "sealed_live_receipt_evidence": [],
+      "reason": "No sealed live network_isolation=denied receipt in-repo"
+    },
+    "creative-director": {
+      "classification": "draft",
+      "launch_target": false,
+      "canonical_v01_artifacts": false,
+      "sealed_live_receipt_evidence": [],
+      "reason": "Catalog default draft; no sealed live certifying evidence"
+    },
+    "creative-qa": {
+      "classification": "draft",
+      "launch_target": false,
+      "canonical_v01_artifacts": false,
+      "sealed_live_receipt_evidence": [],
+      "reason": "Catalog default draft; no sealed live certifying evidence"
+    },
+    "department-head": {
+      "classification": "draft",
+      "launch_target": false,
+      "canonical_v01_artifacts": false,
+      "sealed_live_receipt_evidence": [],
+      "reason": "Catalog default draft; no sealed live certifying evidence"
+    },
+    "devops-sre": {
+      "classification": "draft",
+      "launch_target": false,
+      "canonical_v01_artifacts": false,
+      "sealed_live_receipt_evidence": [],
+      "reason": "Catalog default draft; no sealed live certifying evidence"
+    },
+    "engagement-to-strategy-loop": {
+      "classification": "draft",
+      "launch_target": false,
+      "canonical_v01_artifacts": false,
+      "sealed_live_receipt_evidence": [],
+      "reason": "Catalog default draft; no sealed live certifying evidence"
+    },
+    "executive-sync-8am": {
+      "classification": "draft",
+      "launch_target": false,
+      "canonical_v01_artifacts": false,
+      "sealed_live_receipt_evidence": [],
+      "reason": "Catalog default draft; no sealed live certifying evidence"
+    },
+    "git-safeguard": {
+      "classification": "draft",
+      "launch_target": true,
+      "canonical_v01_artifacts": true,
+      "suite_readiness": "ready_for_runner",
+      "sealed_live_receipt_evidence": [],
+      "reason": "No sealed live network_isolation=denied receipt in-repo"
+    },
+    "lead-engineer": {
+      "classification": "draft",
+      "launch_target": false,
+      "canonical_v01_artifacts": false,
+      "sealed_live_receipt_evidence": [],
+      "reason": "Catalog default draft; no sealed live certifying evidence"
+    },
+    "market-analyst": {
+      "classification": "draft",
+      "launch_target": false,
+      "canonical_v01_artifacts": false,
+      "sealed_live_receipt_evidence": [],
+      "reason": "Catalog default draft; no sealed live certifying evidence"
+    },
+    "marketing-strategist": {
+      "classification": "draft",
+      "launch_target": false,
+      "canonical_v01_artifacts": false,
+      "sealed_live_receipt_evidence": [],
+      "reason": "Catalog default draft; no sealed live certifying evidence"
+    },
+    "persistent-qa": {
+      "classification": "draft",
+      "launch_target": false,
+      "canonical_v01_artifacts": false,
+      "sealed_live_receipt_evidence": [],
+      "reason": "Catalog default draft; no sealed live certifying evidence"
+    },
+    "prd-architect": {
+      "classification": "draft",
+      "launch_target": false,
+      "canonical_v01_artifacts": false,
+      "sealed_live_receipt_evidence": [],
+      "reason": "Catalog default draft; no sealed live certifying evidence"
+    },
+    "repository-manager": {
+      "classification": "draft",
+      "launch_target": true,
+      "canonical_v01_artifacts": true,
+      "suite_readiness": "ready_for_runner",
+      "sealed_live_receipt_evidence": [],
+      "reason": "No sealed live network_isolation=denied receipt in-repo"
+    },
+    "revenue-adapter-base": {
+      "classification": "draft",
+      "launch_target": false,
+      "canonical_v01_artifacts": false,
+      "sealed_live_receipt_evidence": [],
+      "reason": "Catalog default draft; no sealed live certifying evidence"
+    },
+    "search-strategy": {
+      "classification": "draft",
+      "launch_target": true,
+      "canonical_v01_artifacts": true,
+      "suite_readiness": "baseline_incomplete",
+      "sealed_live_receipt_evidence": [],
+      "reason": "Suite incomplete + no sealed live certifying evidence; remain draft until suite upgrade"
+    },
+    "self-critique-loop": {
+      "classification": "draft",
+      "launch_target": false,
+      "canonical_v01_artifacts": false,
+      "sealed_live_receipt_evidence": [],
+      "reason": "Catalog default draft; no sealed live certifying evidence"
+    },
+    "self-improvement": {
+      "classification": "draft",
+      "launch_target": true,
+      "canonical_v01_artifacts": true,
+      "suite_readiness": "baseline_incomplete",
+      "sealed_live_receipt_evidence": [],
+      "reason": "Suite incomplete + no sealed live certifying evidence; remain draft until suite upgrade"
+    },
+    "seo-semantic-auditor": {
+      "classification": "draft",
+      "launch_target": false,
+      "canonical_v01_artifacts": false,
+      "sealed_live_receipt_evidence": [],
+      "reason": "Catalog default draft; no sealed live certifying evidence"
+    },
+    "skill-architect": {
+      "classification": "draft",
+      "launch_target": true,
+      "canonical_v01_artifacts": true,
+      "suite_readiness": "baseline_incomplete",
+      "sealed_live_receipt_evidence": [],
+      "reason": "Suite incomplete + no sealed live certifying evidence; remain draft until suite upgrade"
+    },
+    "skill-template": {
+      "classification": "draft",
+      "launch_target": true,
+      "canonical_v01_artifacts": true,
+      "suite_readiness": "ready_for_runner",
+      "sealed_live_receipt_evidence": [],
+      "reason": "No sealed live network_isolation=denied receipt in-repo"
+    },
+    "smart-file-clerk": {
+      "classification": "draft",
+      "launch_target": false,
+      "canonical_v01_artifacts": false,
+      "sealed_live_receipt_evidence": [],
+      "reason": "Catalog default draft; no sealed live certifying evidence"
+    },
+    "software-pm": {
+      "classification": "draft",
+      "launch_target": false,
+      "canonical_v01_artifacts": false,
+      "sealed_live_receipt_evidence": [],
+      "reason": "Catalog default draft; no sealed live certifying evidence"
+    },
+    "studio-architect": {
+      "classification": "draft",
+      "launch_target": false,
+      "canonical_v01_artifacts": false,
+      "sealed_live_receipt_evidence": [],
+      "reason": "Catalog default draft; no sealed live certifying evidence"
+    },
+    "studio-controller": {
+      "classification": "draft",
+      "launch_target": false,
+      "canonical_v01_artifacts": false,
+      "sealed_live_receipt_evidence": [],
+      "reason": "Catalog default draft; no sealed live certifying evidence"
+    },
+    "studio-health-reporting": {
+      "classification": "draft",
+      "launch_target": false,
+      "canonical_v01_artifacts": false,
+      "sealed_live_receipt_evidence": [],
+      "reason": "Catalog default draft; no sealed live certifying evidence"
+    },
+    "task-decomposition": {
+      "classification": "draft",
+      "launch_target": false,
+      "canonical_v01_artifacts": false,
+      "sealed_live_receipt_evidence": [],
+      "reason": "Catalog default draft; no sealed live certifying evidence"
+    },
+    "tool-architect": {
+      "classification": "draft",
+      "launch_target": true,
+      "canonical_v01_artifacts": true,
+      "suite_readiness": "ready_for_runner",
+      "sealed_live_receipt_evidence": [],
+      "reason": "No sealed live network_isolation=denied receipt in-repo"
+    },
+    "ui-ux-guardian": {
+      "classification": "draft",
+      "launch_target": false,
+      "canonical_v01_artifacts": false,
+      "sealed_live_receipt_evidence": [],
+      "reason": "Catalog default draft; no sealed live certifying evidence"
+    },
+    "workflow-architect": {
+      "classification": "draft",
+      "launch_target": false,
+      "canonical_v01_artifacts": false,
+      "sealed_live_receipt_evidence": [],
+      "reason": "Catalog default draft; no sealed live certifying evidence"
+    }
+  },
+  "counts": {
+    "total_catalog_skills": 34,
+    "draft": 34,
+    "usable": 0,
+    "eval_pending": 0,
+    "deprecated": 0,
+    "retired": 0,
+    "with_sealed_live_receipts": 0
+  },
+  "legacy_yaml_note": "Legacy references/eval-suite.yaml alone cannot establish launch readiness; validator requires schema-valid canonical JSON for launch targets and recalculated hash agreement."
+}

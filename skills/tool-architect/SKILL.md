@@ -19,7 +19,8 @@ tooling:
 tools: [read_file, write_file, make_dir, list_dir, shell_exec, get_tool_details]
 dependencies: []
 permissions: [fs_read, fs_write, shell_exec]
-scope_out: ["Do not build hidden proprietary wrappers without interface.json", "Do not bypass /tools registry conventions"]
+scope_out: ["Do not build hidden proprietary wrappers without interface.json", "Do not bypass /tools registry conventions", "Do not implement governance, entitlements, leases, or permission-to-act"]
+format_profile: heavy
 persistence:
   required: true
   state_path: ".workdir/tasks/{{task_id}}/state.jsonl"
@@ -27,6 +28,9 @@ last_updated: 2026-02-22
 ---
 
 # Tool Architect
+
+> **Validation:** Tool and skill structure checks use `python3 scripts/validate_skills.py`
+> (`validator.py` at repo root). Skill-local helper scripts must not reimplement those rules.
 
 ## Mission
 Tool Architect is the meta-skill responsible for building and maintaining the **LiNKskills Global Tools Registry** under `/tools`.
@@ -87,18 +91,19 @@ Every tool in `/tools/[tool-name]/` must include:
 
 ### Phase 3: Verify
 10. Add tests in `test/` and validate wrapper behavior.
-11. Confirm output is high-signal and parseable for agent workflows.
-12. If JIT profile applies, ensure `get_tool_details` fetch plan and schema cache notes are included.
-13. **CHECKPOINT**: append verification record to `state.jsonl`.
+11. Run `python3 scripts/validate_skills.py --scan-all --repo-root .` when tool layout affects registry compliance.
+12. Confirm output is high-signal and parseable for agent workflows.
+13. If JIT profile applies, ensure `get_tool_details` fetch plan and schema cache notes are included.
+14. **CHECKPOINT**: append verification record to `state.jsonl`.
 
 ### Phase 4: Finalization
-14. Report tool path, interface contract, test status, and known limits.
-15. Append completion checkpoint to `state.jsonl`.
+15. Report tool path, interface contract, test status, and known limits.
+16. Append completion checkpoint to `state.jsonl`.
 
 ### Phase 5: Self-Correction & Auditing
-16. Append execution summary to root `execution_ledger.jsonl`.
-17. Save trace to `.workdir/tasks/{{task_id}}/trace.log`.
-18. Update `./references/old-patterns.md` with new anti-patterns discovered.
+17. Append execution summary to root `execution_ledger.jsonl`.
+18. Save trace to `.workdir/tasks/{{task_id}}/trace.log`.
+19. Update `./references/old-patterns.md` with new anti-patterns discovered.
 
 ## Tools
 | Tool Name | Workflow Scope | Critical Execution Rule |

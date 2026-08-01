@@ -1,0 +1,15 @@
+tool_id: text-echo
+version: "1.0.0"
+description: Echoes input text in plain or JSON mode for testing parser and wrapper pipelines.
+side_effect_class: none
+lifecycle_state: usable
+schema_version: "0.1"
+entrypoint:
+  transport: cli
+  command: python3
+  args:
+    - bin/text-echo.py
+  working_directory: .
+platforms:
+  - any
+timeout_seconds: 15

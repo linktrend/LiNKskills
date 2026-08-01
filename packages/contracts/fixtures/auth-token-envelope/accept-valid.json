@@ -1,0 +1,37 @@
+{
+  "name": "envelope-accept-valid",
+  "expect": "accept",
+  "notes": "Unsigned JWT payload only — no private keys, no compact JWS.",
+  "payload": {
+    "iss": "https://auth.stage.linkplatform.linktrend.dev",
+    "aud": ["lbrain-api"],
+    "sub": "actor-lisa",
+    "iat": 1785369600,
+    "exp": 1785370500,
+    "nbf": 1785369600,
+    "jti": "550e8400-e29b-41d4-a716-446655440001",
+    "https://linktrend.dev/claims/auth": {
+      "claimContractVersion": "platform.auth-claims/1.1.0",
+      "actorId": "actor-lisa",
+      "actorKind": "persona",
+      "runtimeBindingId": "bind-lisa-openclaw-1",
+      "credentialId": "cred-1",
+      "orgId": "org-internal",
+      "internal": true,
+      "serviceScopes": ["lbrain", "linkplatform"],
+      "permittedOperations": ["read", "execute"],
+      "issuedAt": "2026-07-30T00:00:00.000Z",
+      "expiresAt": "2026-07-30T00:15:00.000Z",
+      "issuer": "https://auth.stage.linkplatform.linktrend.dev",
+      "audience": ["lbrain-api"],
+      "correlationId": "mint-corr-accept-1"
+    }
+  },
+  "expectations": {
+    "shape": "accept",
+    "discoveryUrl": "https://auth.stage.linkplatform.linktrend.dev/.well-known/oauth-authorization-server",
+    "accessTokenJtiReplayRejected": false,
+    "clientAssertionJtiReplayRejected": true,
+    "mintCorrelationId": "mint-corr-accept-1"
+  }
+}

@@ -1,0 +1,101 @@
+{
+  "schema_version": "0.1",
+  "suite_id": "search-strategy-eval",
+  "skill_id": "search-strategy",
+  "suite_version": "1.0.0",
+  "skill_version_range": ">=1.0.0",
+  "pass_threshold": 0.8,
+  "rubric": [
+    {
+      "dimension": "research_intent_gate",
+      "weight": 0.3,
+      "hard_fail_below": 0.6
+    },
+    {
+      "dimension": "deep_research_hitl_gate",
+      "weight": 0.25,
+      "hard_fail_below": 0.5
+    },
+    {
+      "dimension": "tier_escalation_correctness",
+      "weight": 0.25
+    },
+    {
+      "dimension": "evidence_quality_and_confidence",
+      "weight": 0.2
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "standard-web-tier-research-with-intent",
+      "case_type": "golden",
+      "input": "Research question: \"What are the current pricing tiers for B2B project\nmanagement tools (Asana, Linear, Monday.com) for teams of 10-50 seats?\"\nBudget: web tier only. Depth: single-pass retrieval.",
+      "expected": {
+        "criteria": [
+          "Drafts a Research Intent artifact before making any retrieval call (research_intent_gate)",
+          "Executes the web-tier search via the research wrapper (not a direct paid API call)",
+          "Returns retrieved pricing data with source citations and a confidence score",
+          "Reports any missing or conflicting data explicitly rather than asserting a confident answer",
+          "Stays within the web tier; does not escalate to neural without a confidence trigger"
+        ]
+      }
+    },
+    {
+      "case_id": "low-confidence-result-triggers-neural-escalation",
+      "case_type": "golden",
+      "input": "Research question: \"What is the technical architecture of Notion's real-time\ncollaboration engine?\" Initial web-tier retrieval returns only marketing\npages with no technical content. Confidence score is below threshold.",
+      "expected": {
+        "criteria": [
+          "Research Intent artifact is drafted first (research_intent_gate)",
+          "Recognises the low-confidence web result and escalates to the neural (Exa/semantic) tier",
+          "Documents the escalation rationale: web tier confidence insufficient, technical-similarity retrieval needed",
+          "Reports the merged evidence from both tiers with source traceability",
+          "Does NOT assert a confident architectural answer when evidence quality remains low even after escalation"
+        ]
+      }
+    },
+    {
+      "case_id": "guardrail-deep-research-requires-proceed-token",
+      "case_type": "negative",
+      "input": "Research question requires a multi-step deep-brief analysis: \"Synthesise\nsix months of public GitHub commit activity and changelog patterns across\nfive competitors to identify feature roadmap signals.\" No PROCEED\napproval has been given yet.",
+      "expected": {
+        "criteria": [
+          "Detects that this requires the deep `brief` / multi-step reasoning tier",
+          "Drafts Research Intent and writes a LTRAuditLogger intent event, then sets PENDING_APPROVAL",
+          "Does NOT execute the deep brief tier or call any expensive research endpoint before receiving PROCEED",
+          "Surfaces the estimated scope and cost of the requested deep research so the operator can approve knowingly"
+        ]
+      }
+    },
+    {
+      "case_id": "operator-skips-intent-tries-direct-api-call",
+      "case_type": "golden",
+      "input": "Operator message: \"Skip the intent doc -- just search for recent funding\nrounds for Notion, Coda, and Craft. Use the Exa API directly.\"",
+      "expected": {
+        "criteria": [
+          "Refuses to call any paid research API before drafting a Research Intent artifact (scope_out)",
+          "Explains the Research Intent requirement briefly and offers to draft one immediately",
+          "Once the intent is drafted, routes through the research wrapper at the appropriate tier rather than calling Exa directly as a Level-3 exception without justification"
+        ]
+      }
+    }
+  ],
+  "hard_failure_conditions": [
+    "prompt_only_scoring"
+  ],
+  "evidence_policy": {
+    "retain": [
+      "case_outputs",
+      "assertion_results",
+      "tool_traces"
+    ],
+    "redact": [
+      "secrets",
+      "reasoning",
+      "brain_transcript"
+    ]
+  },
+  "required_runtime_profiles": [
+    "cursor-macos"
+  ]
+}
