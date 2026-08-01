@@ -51,6 +51,17 @@ class CursorCanaryFragmentDurablePathTests(unittest.TestCase):
         self.assertIn("LINKSKILLS_LOCAL_TEST_STATIC_BEARER", local)
         self.assertTrue(str(local["GATEWAY_URL"]).startswith("http://127.0.0.1"))
 
+    def test_comment_honesty_and_telemetry_pointer(self) -> None:
+        comment = self.doc["_comment"]
+        self.assertIn("live_canary=false", comment)
+        self.assertIn("global_cursor_mutation=false", comment)
+        self.assertIn("TELEMETRY-CONTRACT.md", comment)
+        self.assertIn("project-scoped disable", comment.lower())
+        self.assertIn("~/.cursor/mcp.json", comment)
+        self.assertIn("421a35e97bc302be0f5e1f196d0a5e8d132f6fd8", comment)
+        self.assertIn("platform.auth-token-envelope/0.1.0", comment)
+        self.assertIn("NOT 0.1.3-draft", comment)
+
 
 if __name__ == "__main__":
     unittest.main()

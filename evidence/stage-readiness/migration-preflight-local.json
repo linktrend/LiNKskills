@@ -1,0 +1,55 @@
+{
+  "packet": "SKILLS-W20-STAGE-READINESS",
+  "lane": "B",
+  "evaluated_at_utc": "2026-08-01T04:27:47Z",
+  "skills_start_sha": "35d528f510cfb41bfab9ee306556dcd7a495ff16",
+  "platform_pin_readonly": "421a35e97bc302be0f5e1f196d0a5e8d132f6fd8",
+  "live_apply_authority": "LiNKplatform alone",
+  "stage_db_apply_receipt": null,
+  "backup_receipt": null,
+  "invented_stage_receipts": false,
+  "manifest": {
+    "path": "docs/migrations/MANIFEST-20260727-lskills-registry-v0.1.md",
+    "rows_checked": 8,
+    "all_sha256_match": true,
+    "files": [
+      "supabase/migrations/20260715_000002_lskills_catalog_core.sql",
+      "supabase/migrations/20260715_000003_lskills_catalog_seed.sql",
+      "supabase/migrations/20260718_000004_lskills_postgrest_exposure.sql",
+      "supabase/migrations/20260727_000005_lskills_registry_foundation.sql",
+      "supabase/migrations/20260728_000006_lskills_rls_actor_org_scope.sql",
+      "supabase/migrations/20260730_000007_lskills_gateway_persistence.sql",
+      "supabase/migrations/20260730_000008_lskills_review_queue.sql",
+      "supabase/migrations/20260730_000009_lskills_review_queue_actor_isolation.sql"
+    ]
+  },
+  "local_ephemeral_postgres": {
+    "scope": "disposable_docker_or_dsn_only",
+    "shared_stage_prod_touched": false,
+    "command": ".venv/bin/python -m pytest -q tests/migrations/",
+    "result": "passed",
+    "passed": 46,
+    "failed": 0,
+    "skipped": 0,
+    "duration_seconds": 26.69,
+    "notes": "Structural + ephemeral disposable Postgres + Lane B preflight doc invariants. No shared/stage/prod DB touch."
+  },
+  "isolation_probe": {
+    "os": "Darwin",
+    "default_mode": "refuses_execution_when_isolation_unavailable",
+    "allow_unproven_stamp": "unproven",
+    "certifiable_network_isolation_denied": false
+  },
+  "hard_blockers_open": [
+    "B1_no_platform_stage_apply_receipt",
+    "B2_no_filled_backup_receipt",
+    "B3_stage_apply_evidence_absent",
+    "B6_sealed_linux_network_isolation_denied_unavailable_on_macos"
+  ],
+  "do_not_claim": [
+    "stage_or_prod_migrations_applied",
+    "filled_backup_or_restore_proof_on_shared_db",
+    "sealed_network_isolation_denied_on_this_host",
+    "catalog_usable_or_certified_from_this_lane"
+  ]
+}

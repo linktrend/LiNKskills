@@ -9,6 +9,8 @@
 - **Proxy:** `packages/mcp_server/linkskills_mcp/paci_stdio_proxy.py`
 - **Client:** `packages/client/linkskills_client/paci_token_client.py`
 - **Rollback:** `docs/integrations/cursor/ROLLBACK.md`
+- **Telemetry contract (future stage, docs only):** `docs/integrations/cursor/TELEMETRY-CONTRACT.md`
+- **Global Cursor / Secrets:** Forbidden — never edit `~/.cursor/mcp.json`; never paste PACI private keys, JWKS private material, or live bearers into Git, chat, or MCP env values
 
 ## Contract pins (frozen — not draft)
 
@@ -68,8 +70,9 @@ Until those exist, keep the fragment placeholders and run only local/fake PACI c
 8. **HTTPS gate:** Outside local-test loopback, `GATEWAY_URL` and PACI endpoints must be https (coordinated with `LINKSKILLS_AUTH_MODE=local-test` + loopback for unit tests only).
 9. **Refuse silent in-memory:** `LINKSKILLS_AUTH_MODE=production` never constructs an in-process in-memory Gateway because `LINKSKILLS_ENV`/store/DSN are missing — startup fails closed with an actionable error. In-process production is opt-in only (`LINKSKILLS_MCP_ALLOW_INPROCESS_PRODUCTION=1` + stage/prod env + postgres + DSN).
 10. **Start Gateway** with Platform-approved production authenticator + PACI verification path when live; proxy injects short-lived bearer (TTL ≤900s, early renew &lt;20%, 401 invalidate + bounded retry) per frozen envelope `0.1.0`.
-11. **Smoke (when Platform stage PACI exists):** project-scoped Cursor load → PACI mint → Gateway `skills_*` read-only discovery (Stage 3). Record evidence under `evidence/phase7/`.
+11. **Smoke (when Platform stage PACI exists):** project-scoped Cursor load → PACI mint → Gateway `skills_*` read-only discovery (Stage 3). Record evidence under `evidence/phase7/` and refresh `evidence/stage-readiness/cursor-canary-readiness.json`. Do **not** claim Stages 4–8 until telemetry flush and representative-set evidence exist per `TELEMETRY-CONTRACT.md`.
 12. **If mint fails:** fail closed. Do not fall back to static bearer in production/canary. Check endpoint pin, `client_id`, key file readability, and assertion clock — without printing key material.
+13. **Telemetry (still blocked today):** Do not enable live stage telemetry flush from this handoff alone. Offline buffer + redaction rules are documented in `TELEMETRY-CONTRACT.md`; local/fake smoke lives under `evidence/phase5/` and is not stage evidence.
 
 ## Local-test static bearer (explicit only)
 

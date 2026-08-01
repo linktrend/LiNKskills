@@ -4,10 +4,13 @@
 - **Date:** 2026-08-01
 - **Owner:** LiNKskills (Cursor product canary)
 - **Live canary:** **false** — not started; project-scoped contract/docs only
+- **Global Cursor mutation:** **false** — no edits to `~/.cursor/mcp.json` or user-level settings
 - **Fragment:** `configs/fragments/cursor-skills-canary.mcp.json.example`
 - **Entrypoint:** `python -m linkskills_mcp.paci_stdio_proxy` (PACI-aware; not bare `linkskills_mcp.server`)
 - **PACI application steps:** `docs/integrations/cursor/PACI-CLIENT-APPLICATION-HANDOFF.md`
+- **Telemetry contract (future stage):** `docs/integrations/cursor/TELEMETRY-CONTRACT.md`
 - **Rollback:** `docs/integrations/cursor/ROLLBACK.md`
+- **Readiness evidence:** `evidence/stage-readiness/cursor-canary-readiness.json`
 
 ## Platform pin (certified candidate ≠ live)
 
@@ -19,9 +22,9 @@
 
 ## Proven in this repo
 
-**Fake/contract stage + Skills-owned PACI token client + stdio MCP proxy (local).** Project-scoped MCP/gateway unit tests, the example fragment (PACI placeholders + proxy module), `linkskills_client.paci_token_client`, and `linkskills_mcp.paci_stdio_proxy` exist. **No global Cursor mutation was performed** (no edits to `~/.cursor/mcp.json`, shared IDE Development `.cursor` symlink target, or user-level Cursor settings).
+**Fake/contract stage + Skills-owned PACI token client + stdio MCP proxy (local).** Project-scoped MCP/gateway unit tests, the example fragment (PACI placeholders + proxy module), `linkskills_client.paci_token_client`, and `linkskills_mcp.paci_stdio_proxy` exist. Telemetry contract docs + local/fake buffer smoke (`evidence/phase5/`) exist. **No global Cursor mutation was performed** (no edits to `~/.cursor/mcp.json`, shared IDE Development `.cursor` symlink target, or user-level Cursor settings).
 
-**Not live-proven:** Platform stage PACI issuer / JWKS / Skills credential registration are absent. Stages 3–8 remain blocked on Platform stage PACI. The certified Platform candidate pin above does **not** authorize starting a live canary.
+**Not live-proven:** Platform stage PACI issuer / JWKS / Skills credential registration are absent. Stages 3–8 remain blocked on Platform stage PACI. The certified Platform candidate pin above does **not** authorize starting a live canary or live telemetry flush.
 
 ## Auth path (Cursor consumer)
 
@@ -39,14 +42,31 @@ See Platform frozen `platform.auth-token-envelope/0.1.0` §§6–7 for assertion
 
 | Stage | Intent | Status in this repo |
 |---|---|---|
-| 1 | Prove fake/contract tests with isolated or project-scoped configuration | **Proven (fake/contract)** via gateway/MCP/client/PACI-proxy unit tests + example fragment |
-| 2 | Inspect `.cursor` symlinks and shared/global settings read-only; record ownership | Documented in `docs/inventories/cursor-codex-mutation-surfaces.md` — no mutation |
+| 1 | Prove fake/contract tests with isolated or project-scoped configuration | **Ready (fake/contract)** via gateway/MCP/client/PACI-proxy unit tests + example fragment + Lane C contract tests |
+| 2 | Inspect `.cursor` symlinks and shared/global settings read-only; record ownership | **Ready (docs)** in `docs/inventories/cursor-codex-mutation-surfaces.md` — no mutation |
 | 3 | Stage read-only discovery | **Blocked** — requires Platform stage PACI issuer + Skills credential |
-| 4 | Stage run/telemetry with non-side-effecting skills | **Blocked** — same |
+| 4 | Stage run/telemetry with non-side-effecting skills | **Blocked** — same; contract documented in `TELEMETRY-CONTRACT.md` (events, privacy, idempotency) — not live |
 | 5 | Exact packaged tool + artifact validation | **Blocked** on live stage; local dry-run only |
-| 6 | Controlled failures / feedback / offline buffer | Client `LocalEventBuffer` unit-covered; not live Cursor |
+| 6 | Controlled failures / feedback / offline buffer | Client `LocalEventBuffer` unit-covered + phase5 redaction smoke; not live Cursor |
 | 7 | Librarian dry-run then evidence-backed write mode | Domain worker conformance only |
-| 8 | Multi-day real use of representative canary set | Not started — blocked on Platform stage PACI |
+| 8 | Multi-day real use of representative canary set (`evidence/phase1/canary-set.json`, 10 skills) | Not started — blocked on Platform stage PACI |
+
+## Representative canary set
+
+- Path: `evidence/phase1/canary-set.json`
+- Count: **10** skills (simple/heavy, meta, tool/authoring, audit/compliance, search)
+- `live_canary: false` — selection/contract only; Stage 8 not started
+
+## Telemetry (future stage — docs only)
+
+See `docs/integrations/cursor/TELEMETRY-CONTRACT.md` for:
+
+- Expected event spine (ADR 0007) and Gateway operation mapping
+- Privacy / redaction (no secrets, no raw Brain transcripts)
+- Offline buffer + flush expectations (`LocalEventBuffer`)
+- Idempotency (`event_id` reuse, HTTP `Idempotency-Key`, stable downstream keys)
+
+Local/fake buffer smoke is **not** stage telemetry.
 
 ## Guardrails
 

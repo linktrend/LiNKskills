@@ -8,10 +8,10 @@
   "paci_envelope_not_draft": true,
   "superseded_draft_not_advertised": "platform.auth-token-envelope/0.1.3-draft",
   "stages": {
-    "1_fake_contract": "proven via gateway/mcp/client/paci-proxy unit tests + configs/fragments/cursor-skills-canary.mcp.json.example (PACI placeholders + paci_stdio_proxy entrypoint) + packages/client/linkskills_client/paci_token_client.py + packages/mcp_server/linkskills_mcp/paci_stdio_proxy.py local tests",
+    "1_fake_contract": "proven via gateway/mcp/client/paci-proxy unit tests + configs/fragments/cursor-skills-canary.mcp.json.example (PACI placeholders + paci_stdio_proxy entrypoint) + packages/client/linkskills_client/paci_token_client.py + packages/mcp_server/linkskills_mcp/paci_stdio_proxy.py local tests + Lane C contract tests",
     "2_symlink_inspect": "documented in docs/integrations/cursor/CANARY.md; no shared .cursor mutation",
     "3_stage_readonly_discovery": "blocked — requires Platform stage PACI issuer + Skills client credential (machine-token client + MCP proxy implemented locally only; not live-proven; certified candidate pin ≠ live)",
-    "4_stage_run_telemetry": "blocked — same Platform stage PACI gate",
+    "4_stage_run_telemetry": "blocked — same Platform stage PACI gate; telemetry events/privacy/idempotency documented in docs/integrations/cursor/TELEMETRY-CONTRACT.md (docs/contract only; not live flush)",
     "5_packaged_tool_artifact": "local dry-run only; live stage blocked on Platform PACI",
     "6_failure_feedback_offline": "local buffer smoke in evidence/phase5; live Cursor blocked on Platform PACI",
     "7_librarian_dry_run": "domain worker conformance local only; host integration is LiNKplatform",
@@ -34,9 +34,18 @@
     "static_bearer": "local-test only; refused for LINKSKILLS_CANARY",
     "handoff": "docs/integrations/cursor/PACI-CLIENT-APPLICATION-HANDOFF.md",
     "rollback": "docs/integrations/cursor/ROLLBACK.md",
+    "telemetry_contract": "docs/integrations/cursor/TELEMETRY-CONTRACT.md",
     "blocker": "Platform stage PACI issuer absent (certified candidate is not live authority)"
   },
+  "telemetry_contract": {
+    "path": "docs/integrations/cursor/TELEMETRY-CONTRACT.md",
+    "documented": true,
+    "live_flush_proven": false,
+    "privacy_adr": "docs/adr/0007-telemetry-privacy-retention.md",
+    "local_buffer_smoke": "evidence/phase5/event-spine-smoke.json"
+  },
   "representative_canary_set": "evidence/phase1/canary-set.json",
+  "stage_readiness_summary": "evidence/stage-readiness/cursor-canary-readiness.json",
   "evidence_tier": "local/fake",
-  "mark": "Skills-owned Cursor PACI MCP proxy implemented locally; not live-proven; live_canary=false; certified Platform candidate 421a35e… ≠ live PACI (Platform PACI issuer absent); envelope frozen 0.1.0"
+  "mark": "Skills-owned Cursor PACI MCP proxy implemented locally; telemetry contract docs expanded; not live-proven; live_canary=false; global_cursor_mutation=false; certified Platform candidate 421a35e… ≠ live PACI (Platform PACI issuer absent); envelope frozen 0.1.0"
 }

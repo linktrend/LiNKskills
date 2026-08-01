@@ -1,0 +1,54 @@
+{
+  "packet": "SKILLS-W20-STAGE-READINESS",
+  "lane": "C",
+  "surface": "project-scoped-cursor-canary",
+  "date": "2026-08-01",
+  "live_canary": false,
+  "global_cursor_mutation": false,
+  "certified_candidate_is_not_live": true,
+  "platform_certified_candidate": "421a35e97bc302be0f5e1f196d0a5e8d132f6fd8",
+  "paci_envelope_contract": "platform.auth-token-envelope/0.1.0",
+  "paci_envelope_not_draft": true,
+  "superseded_draft_not_advertised": "platform.auth-token-envelope/0.1.3-draft",
+  "evidence_tier": "contract/docs",
+  "stage_completed": 1,
+  "stage_gates": {
+    "1_fake_contract": "ready",
+    "2_symlink_inspect_readonly": "ready",
+    "3_stage_readonly_discovery": "blocked",
+    "4_stage_run_telemetry": "blocked",
+    "5_packaged_tool_artifact": "blocked",
+    "6_failure_feedback_offline": "blocked_live_local_buffer_only",
+    "7_librarian_dry_run": "blocked_live_domain_local_only",
+    "8_multi_day_real_use": "blocked"
+  },
+  "blockers": [
+    "Platform stage PACI issuer / JWKS / Skills credential registration absent",
+    "Certified Platform candidate pin is not live authority",
+    "No live Gateway stage telemetry flush authorized from this packet"
+  ],
+  "artifacts": {
+    "fragment": "configs/fragments/cursor-skills-canary.mcp.json.example",
+    "canary_plan": "docs/integrations/cursor/CANARY.md",
+    "rollback": "docs/integrations/cursor/ROLLBACK.md",
+    "telemetry_contract": "docs/integrations/cursor/TELEMETRY-CONTRACT.md",
+    "paci_handoff": "docs/integrations/cursor/PACI-CLIENT-APPLICATION-HANDOFF.md",
+    "phase7_status": "evidence/phase7/cursor-canary-status.json",
+    "canary_set": "evidence/phase1/canary-set.json",
+    "phase5_buffer_smoke": "evidence/phase5/event-spine-smoke.json"
+  },
+  "telemetry_contract": {
+    "documented": true,
+    "live_flush_proven": false,
+    "privacy_adr": "docs/adr/0007-telemetry-privacy-retention.md",
+    "offline_buffer": "packages/client LocalEventBuffer",
+    "idempotency": "event_id reuse + HTTP Idempotency-Key + stable downstream keys (docs only until stage PACI)"
+  },
+  "representative_canary_set": {
+    "path": "evidence/phase1/canary-set.json",
+    "selected_count": 10,
+    "live_canary": false
+  },
+  "rollback_mode": "project-scoped-disable-and-git-revert-only",
+  "mark": "Lane C project-scoped Cursor canary readiness expanded (telemetry contract + readiness evidence); live_canary=false; global_cursor_mutation=false; stages 3–8 blocked on Platform stage PACI; certified candidate 421a35e… ≠ live"
+}
