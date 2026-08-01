@@ -1,7 +1,7 @@
 # Certification runtime readiness — local vs stage
 
-**Packet:** SKILLS-W20-STAGE-READINESS  
-**Lane:** B (runtime / isolation honesty adjacent to migration gate)  
+**Packet:** SKILLS-W20-STAGE-READINESS
+**Lane:** B (runtime / isolation honesty adjacent to migration gate)
 **Host of this evaluation:** macOS (Darwin) agent worktree — **not** a sealed Linux certifier
 
 ## Proven locally (this lane)
@@ -26,7 +26,7 @@
 
 ## Separation rule
 
-Local ephemeral Postgres success **≠** stage migration success.  
+Local ephemeral Postgres success **≠** stage migration success.
 Local `unproven` executor runs **≠** sealed certification.
 
 ## References

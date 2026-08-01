@@ -1,9 +1,9 @@
 # PACI / Gateway stage gate (Lane A)
 
-**Packet:** `SKILLS-W20-STAGE-READINESS`  
-**Lane:** A (PACI/Gateway stage gate)  
-**Evidence class:** reference-only / local fail-closed proofs — **not** live stage/prod  
-**Platform pin (read-only):** `421a35e97bc302be0f5e1f196d0a5e8d132f6fd8`  
+**Packet:** `SKILLS-W20-STAGE-READINESS`
+**Lane:** A (PACI/Gateway stage gate)
+**Evidence class:** reference-only / local fail-closed proofs — **not** live stage/prod
+**Platform pin (read-only):** `421a35e97bc302be0f5e1f196d0a5e8d132f6fd8`
 **Rule:** certified Platform candidate ≠ live PACI authority
 
 ## Purpose

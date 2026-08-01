@@ -1,8 +1,8 @@
 # Sealed Linux evaluation gap (honest)
 
-**Packet:** SKILLS-W20-STAGE-READINESS  
-**Lane:** B  
-**Evaluated host:** macOS Darwin (agent worktree `skills-w20-stage-readiness-cli`)  
+**Packet:** SKILLS-W20-STAGE-READINESS
+**Lane:** B
+**Evaluated host:** macOS Darwin (agent worktree `skills-w20-stage-readiness-cli`)
 **Date:** 2026-08-01
 
 ## Claim under test

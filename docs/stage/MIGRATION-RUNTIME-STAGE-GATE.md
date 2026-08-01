@@ -1,8 +1,8 @@
 # Migration / runtime stage gate — SKILLS-W20
 
-**Lane:** B  
-**Date:** 2026-08-01  
-**Skills commit (workspace start):** `35d528f510cfb41bfab9ee306556dcd7a495ff16`  
+**Lane:** B
+**Date:** 2026-08-01
+**Skills commit (workspace start):** `35d528f510cfb41bfab9ee306556dcd7a495ff16`
 **Platform pin (read-only):** `421a35e97bc302be0f5e1f196d0a5e8d132f6fd8`
 
 ## Verdict
@@ -33,16 +33,16 @@
 
 ## What “ready” means here
 
-**Ready for Platform handoff** of an additive `lskills` package (hashes verified; local ephemeral optional proof recorded).  
+**Ready for Platform handoff** of an additive `lskills` package (hashes verified; local ephemeral optional proof recorded).
 **Not ready** to claim stage schema applied, catalog live counts, or production DSN.
 
 ## Hard stop conditions
 
 Proceeding to “stage migrations applied” language without:
 
-1. Filled backup receipt (pre-apply + restore dry-run), and  
-2. Platform apply receipt citing matching SHA-256 rows, and  
-3. Post-apply verification SQL evidence  
+1. Filled backup receipt (pre-apply + restore dry-run), and
+2. Platform apply receipt citing matching SHA-256 rows, and
+3. Post-apply verification SQL evidence
 
 …is a process failure. Prefer open blockers over invented receipts.
 

@@ -1,8 +1,8 @@
 # Preflight — stage readiness (migrations / runtime)
 
-**Packet:** SKILLS-W20-STAGE-READINESS  
-**Lane:** B (migrations / runtime gate)  
-**Authoring repo:** LiNKskills  
+**Packet:** SKILLS-W20-STAGE-READINESS
+**Lane:** B (migrations / runtime gate)
+**Authoring repo:** LiNKskills
 **Live apply authority:** **LiNKplatform alone** applies live shared Supabase migrations. Skills agents must not apply to stage/prod.
 
 ## Purpose
