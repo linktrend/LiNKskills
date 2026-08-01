@@ -63,7 +63,7 @@ class PaciFrozenFixtureTests(unittest.TestCase):
         self.assertEqual(PACI_ENVELOPE_CONTRACT, "platform.auth-token-envelope/0.1.0")
         self.assertEqual(PLATFORM_CONTRACTS_PACKAGE_PACI, "0.3.0")
         self.assertEqual(
-            PLATFORM_HEAD_PACI, "0455846487d0b8c583859060ba8b4be70e7f0b48"
+            PLATFORM_HEAD_PACI, "421a35e97bc302be0f5e1f196d0a5e8d132f6fd8"
         )
         self.assertEqual(MAX_ACCESS_TOKEN_TTL_SECONDS, 900)
         raw = SCHEMA_PATH.read_bytes()

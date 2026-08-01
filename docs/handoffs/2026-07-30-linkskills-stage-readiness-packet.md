@@ -66,9 +66,10 @@ Live apply remains **Platform-owned only**. Skills ships SQL + hashed manifest; 
 | Platform contracts package | `@linktrend/platform-contracts@0.2.2` | Frozen consumer pin |
 | Schema bytes SHA-256 | `c2e8bc68b3feb9a3dacc497f5a5d497b466c400804fb4f9e41734c10772ddfa1` | Frozen |
 | contentHash | `fb518834be897c32574df5f7235704fdb0de708bd3da1b48fc448246e3eca567` | Frozen |
-| PACI token envelope | `platform.auth-token-envelope/0.1.3-draft` | **DRAFT** adapter only |
-| Envelope status | `implemented but not proven against frozen Platform PACI service` | See `paci_types.py` |
-| Algorithm | ES256 (`paci+jwt`) | DRAFT envelope rules |
+| PACI token envelope | `platform.auth-token-envelope/0.1.0` | Frozen; Skills pin Platform candidate `421a35e97bc302be0f5e1f196d0a5e8d132f6fd8` |
+| Platform contracts (PACI) | `@linktrend/platform-contracts@0.3.0` | Envelope adoption; AuthClaims claim-shape remains `0.2.2` historically |
+| Envelope status | `implemented but not proven against live Platform PACI service` | Local/fake only; stage/prod **not** claimed — see `paci_types.py` |
+| Algorithm | ES256 (`paci+jwt`) | Frozen envelope rules |
 | Expected audience (Skills) | `lskills-api` | local/fake + intended stage |
 | Service scope | `lskills` | must not reuse Brain/OpenClaw audiences |
 | Local-test mode | `LINKSKILLS_AUTH_MODE=local-test` + `LocalUnsignedClaimsVerifier` | **never** stage/prod / `LINKSKILLS_CANARY` |
@@ -136,7 +137,7 @@ Long-lived Skills Gateway/MCP (post–Logic Engine):
 |---|---|---|
 | Skills service binary/package | Redeploy prior Skills SHA; disable canary flag | Platform host + Skills pin |
 | PACI pin | Remain on AuthClaims 1.1.0 / package 0.2.2; do not silently re-advertise 0.2.1 | Skills consumer |
-| Envelope draft | If Platform freezes a new envelope version, bump adapter intentionally | Skills + Platform |
+| Envelope pin | Remain on frozen `0.1.0` / package `0.3.0` until Platform freezes a new envelope; bump adapter intentionally | Skills + Platform |
 | Migrations | Additive down only; never cascade-drop `lskills` | Platform |
 | Classification | All skills stay `draft` until sealed evidence — nothing to un-promote today | Skills |
 | Cursor / Codex / OpenClaw fragments | Owners revert their host apply; Skills fragment stays immutable in-repo | Fragment owners |
@@ -179,7 +180,7 @@ Current Cursor status (`evidence/phase7/cursor-canary-status.json`): stages 3–
 
 ## 12. Residual external gates
 
-1. Platform frozen PACI service + live JWKS/issuer (envelope still DRAFT `0.1.3-draft`).
+1. Platform live PACI service + JWKS/issuer (envelope frozen `0.1.0` at certified candidate `421a35e…`; stage/prod **not** live-proven).
 2. Platform stage endpoint + applied `lskills` migrations + independent apply receipts.
 3. Separate Skills stage credentials + GSM SecretRef injection.
 4. Platform generic Librarian host loads Skills worker (Platform ADR 0008).

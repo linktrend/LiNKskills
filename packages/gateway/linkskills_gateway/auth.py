@@ -96,7 +96,8 @@ EXPECTED_SCHEMA_CONTENT_HASH = (
 # PACI authenticator is configured (envelope §7.4 / §8 step 6). Matches Skills
 # Gateway WRITE_OPERATIONS (durable mutations + external side effects).
 # PACI envelope pin: platform.auth-token-envelope/0.1.0 /
-# @linktrend/platform-contracts@0.3.0 (AuthClaims claim-shape package remains
+# @linktrend/platform-contracts@0.3.0 / Platform HEAD
+# 421a35e97bc302be0f5e1f196d0a5e8d132f6fd8 (AuthClaims claim-shape package remains
 # 0.2.2 historically; PACI adoption uses 0.3.0 — see paci_types.py).
 HIGH_RISK_WRITE_OPERATIONS: frozenset[str] = frozenset(
     {

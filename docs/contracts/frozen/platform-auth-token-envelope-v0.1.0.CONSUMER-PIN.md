@@ -5,10 +5,10 @@
 | Contract | `platform.auth-token-envelope/0.1.0` |
 | Contract version string | `platform.auth-token-envelope/0.1.0` |
 | Platform package | `@linktrend/platform-contracts` `0.3.0` |
-| Platform HEAD | `0455846487d0b8c583859060ba8b4be70e7f0b48` |
+| Platform HEAD | `421a35e97bc302be0f5e1f196d0a5e8d132f6fd8` (certified candidate; prior pin `0455846487d0b8c583859060ba8b4be70e7f0b48`) |
 | Consumer | LiNKskills Gateway (Lane 1 PACI resource-server adapter) |
-| Pin date | `2026-07-30` |
-| Status | `consumed_for_integration` (local/fake fixtures); stage/prod PACI **not** live-proven |
+| Pin date | `2026-07-30` (repin `2026-08-01`) |
+| Status | `consumed_for_integration` (local/fake fixtures); certified Platform candidate — **not** live PACI/hosting/migration authority; stage/prod PACI **not** live-proven |
 | Depends on (unchanged) | `platform.auth-claims/1.1.0` |
 | AuthClaims historical package | `0.2.2` (claim-shape only; PACI adoption uses `0.3.0`) |
 | Supersedes | DRAFT adapter `platform.auth-token-envelope/0.1.3-draft` / `platform-auth-token-envelope-v0.1.CONSUMER-ADAPTER.md` |

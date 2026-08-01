@@ -30,7 +30,7 @@ Runnable generic host: `LiNKplatform/packages/librarian-runner`. Skills domain w
 ### 4. Live Platform authentication issuer (claims shape consumed)
 
 **Status:** Partially done / still blocked on live issuer + frozen PACI envelope.
-Gateway/MCP consume AuthClaims `1.1.0` / `@linktrend/platform-contracts@0.2.2`. **2026-07-30 production packet:** Skills-owned PACI ES256/JWKS/introspection **consumer adapter** + Cursor `private_key_jwt` client landed locally and marked **implemented but not proven against frozen Platform PACI service** (envelope still `0.1.3-draft`). Live Platform token issuance / stage JWKS / introspection remain Platform gates.
+Gateway/MCP consume AuthClaims `1.1.0` / `@linktrend/platform-contracts@0.2.2` (claim-shape). PACI envelope is frozen `platform.auth-token-envelope/0.1.0` / `@linktrend/platform-contracts@0.3.0`, Skills-pinned to certified Platform candidate `421a35e97bc302be0f5e1f196d0a5e8d132f6fd8` (local/fake fixtures only). Skills-owned PACI ES256/JWKS/introspection **consumer adapter** + Cursor `private_key_jwt` client remain **implemented but not proven against live Platform PACI service**. Live Platform token issuance / stage JWKS / introspection remain Platform gates; stage/prod PACI **not** claimed.
 Spoofed body identity is rejected.
 **Correction (2026-07-28):** prior fake-shape acceptance on production verifier path is removed.
 **Wave 2 (2026-07-28):** historical consume of frozen `platform.auth-claims/1.0.0` (`@linktrend/platform-contracts@0.2.1`) — rejection-only / historical pin retained at `docs/contracts/frozen/platform-auth-claims-v1.0.0.CONSUMER-PIN.md`.

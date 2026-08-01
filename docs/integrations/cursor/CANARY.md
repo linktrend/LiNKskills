@@ -1,17 +1,27 @@
 # Cursor Canary Plan (Stages 1–8)
 
 - **Status:** Plan + fake/contract evidence only; Skills PACI machine-token **client + Cursor stdio MCP proxy implemented locally** (not live-proven)
-- **Date:** 2026-07-30
+- **Date:** 2026-08-01
 - **Owner:** LiNKskills (Cursor product canary)
+- **Live canary:** **false** — not started; project-scoped contract/docs only
 - **Fragment:** `configs/fragments/cursor-skills-canary.mcp.json.example`
 - **Entrypoint:** `python -m linkskills_mcp.paci_stdio_proxy` (PACI-aware; not bare `linkskills_mcp.server`)
 - **PACI application steps:** `docs/integrations/cursor/PACI-CLIENT-APPLICATION-HANDOFF.md`
+- **Rollback:** `docs/integrations/cursor/ROLLBACK.md`
+
+## Platform pin (certified candidate ≠ live)
+
+| Field | Value |
+|---|---|
+| Certified Platform candidate (read-only) | `421a35e97bc302be0f5e1f196d0a5e8d132f6fd8` |
+| Envelope | Frozen `platform.auth-token-envelope/0.1.0` (**not** `0.1.3-draft`) |
+| Meaning | Candidate certification of Platform contract bytes ≠ live PACI issuer, hosting, credentials, or migration authority |
 
 ## Proven in this repo
 
 **Fake/contract stage + Skills-owned PACI token client + stdio MCP proxy (local).** Project-scoped MCP/gateway unit tests, the example fragment (PACI placeholders + proxy module), `linkskills_client.paci_token_client`, and `linkskills_mcp.paci_stdio_proxy` exist. **No global Cursor mutation was performed** (no edits to `~/.cursor/mcp.json`, shared IDE Development `.cursor` symlink target, or user-level Cursor settings).
 
-**Not live-proven:** Platform stage PACI issuer / JWKS / Skills credential registration are absent. Stages 3–8 remain blocked on Platform stage PACI.
+**Not live-proven:** Platform stage PACI issuer / JWKS / Skills credential registration are absent. Stages 3–8 remain blocked on Platform stage PACI. The certified Platform candidate pin above does **not** authorize starting a live canary.
 
 ## Auth path (Cursor consumer)
 
@@ -23,7 +33,7 @@
 
 HTTPS: `GATEWAY_URL` and PACI `token_endpoint` must be **https** outside `LINKSKILLS_AUTH_MODE=local-test` + loopback. Production canary fragment defaults to `LINKSKILLS_MCP_UPSTREAM=http`.
 
-See Platform frozen `platform.auth-token-envelope/0.1.0` §§6–7 for assertion claims, 15-minute access tokens, no refresh token, and early renewal (&lt;20% TTL remaining).
+See Platform frozen `platform.auth-token-envelope/0.1.0` §§6–7 for assertion claims, 15-minute access tokens, no refresh token, and early renewal (&lt;20% TTL remaining). Do **not** cite `0.1.3-draft`.
 
 ## Stages
 
@@ -45,3 +55,4 @@ See Platform frozen `platform.auth-token-envelope/0.1.0` §§6–7 for assertion
 - Apply PACI env via the handoff doc; **do not edit global Cursor** (`~/.cursor/mcp.json`) without a coordinated maintenance window.
 - Secrets never belong in the fragment; Platform issues Skills-only PACI credentials separately (never reuse Brain/OpenClaw clients).
 - Private key: SecretRef **file path only** (`LINKSKILLS_PACI_CLIENT_PRIVATE_KEY_FILE`) — never CLI args, never logs, never Git.
+- Rollback path: `docs/integrations/cursor/ROLLBACK.md` (project-scoped disable + git revert; no live action).

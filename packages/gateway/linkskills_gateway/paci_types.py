@@ -1,7 +1,7 @@
 """PACI envelope constants for LiNKskills Gateway (frozen consumer pin).
 
-Pinned to Platform frozen ``platform.auth-token-envelope/0.1.0`` at Platform
-HEAD ``0455846487d0b8c583859060ba8b4be70e7f0b48`` /
+Pinned to Platform frozen ``platform.auth-token-envelope/0.1.0`` at certified
+Platform candidate HEAD ``421a35e97bc302be0f5e1f196d0a5e8d132f6fd8`` /
 ``@linktrend/platform-contracts@0.3.0``.
 
 AuthClaims ``platform.auth-claims/1.1.0`` is unchanged. Historical claim-shape
@@ -26,7 +26,7 @@ PACI_ENVELOPE_CONTRACT = f"{PACI_ENVELOPE_CONTRACT_ID}/{PACI_ENVELOPE_CONTRACT_V
 
 # PACI adoption package pin (envelope 0.1.0 + AuthClaims 1.1.0).
 PLATFORM_CONTRACTS_PACKAGE_PACI = "0.3.0"
-PLATFORM_HEAD_PACI = "0455846487d0b8c583859060ba8b4be70e7f0b48"
+PLATFORM_HEAD_PACI = "421a35e97bc302be0f5e1f196d0a5e8d132f6fd8"
 
 PACI_ENVELOPE_SCHEMA_BYTES_SHA256 = (
     "7173b9f9bca59ce8a0e3e3dc2b78b680dd07fdd2451215e3ecd97ff3dd463eed"

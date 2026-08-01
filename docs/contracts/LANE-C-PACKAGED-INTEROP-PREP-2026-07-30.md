@@ -11,7 +11,7 @@
 | Failed Platform tip (do **not** consume / do **not** repin) | `83501b11b78b0c5f46a5c5ef23f48de9f1317468` (prior); `ca0274178cbba0dd07e665a4d66b4ceb92c0ac09` (current failed IV) |
 | Skills frozen envelope (unchanged) | `platform.auth-token-envelope/0.1.0` |
 | Skills PACI contracts package (unchanged) | `@linktrend/platform-contracts@0.3.0` |
-| Skills frozen Platform HEAD pin (unchanged) | `0455846487d0b8c583859060ba8b4be70e7f0b48` |
+| Skills frozen Platform HEAD pin | `421a35e97bc302be0f5e1f196d0a5e8d132f6fd8` (certified candidate; supersedes `0455846487d0b8c583859060ba8b4be70e7f0b48`) |
 | Consumer pin | `docs/contracts/frozen/platform-auth-token-envelope-v0.1.0.CONSUMER-PIN.md` |
 | Code constants | `packages/gateway/linkskills_gateway/paci_types.py` |
 

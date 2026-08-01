@@ -1,6 +1,6 @@
 """PACI ``client_credentials`` + ``private_key_jwt`` (ES256) for LiNKskills only.
 
-Consumer of Platform ``platform.auth-token-envelope`` draft §§6–7:
+Consumer of Platform frozen ``platform.auth-token-envelope/0.1.0`` §§6–7:
 
 - Assertion: ``iss``/``sub`` = ``client_id``, ``aud`` = token_endpoint,
   ``iat``, ``exp`` ≤ 5 minutes, ``jti`` UUID (locally replay-tracked).

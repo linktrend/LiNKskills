@@ -66,3 +66,11 @@
 - Nested AuthClaims must remain `platform.auth-claims/1.1.0`.
 - Do not mutate the schema file or fixtures without bumping the envelope contract semver and re-freezing.
 - Signing/verification belongs in issuer/verifier runtimes with `jose`, not in this contracts package.
+
+## Skills consumer pin (LiNKskills)
+
+Skills consumes this freeze at certified Platform candidate HEAD
+`421a35e97bc302be0f5e1f196d0a5e8d132f6fd8` (envelope `0.1.0` / package `0.3.0`;
+schema/content hashes unchanged). See
+`docs/contracts/frozen/platform-auth-token-envelope-v0.1.0.CONSUMER-PIN.md`.
+Candidate is **not** live PACI/hosting/migration authority; stage/prod remain unproven.

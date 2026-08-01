@@ -1,18 +1,30 @@
 # PACI Client Application Handoff — Project-Scoped Cursor (LiNKskills)
 
-- **Date:** 2026-07-30
+- **Date:** 2026-08-01
 - **Owner:** LiNKskills
 - **Scope:** Apply Skills PACI machine-token client config to **project-scoped** Cursor MCP only
 - **Status:** Skills-owned path **implemented locally**; **not live-proven** (Platform PACI issuer absent)
+- **Live canary:** **false** — this handoff does not start a live canary
 - **Fragment:** `configs/fragments/cursor-skills-canary.mcp.json.example`
 - **Proxy:** `packages/mcp_server/linkskills_mcp/paci_stdio_proxy.py`
 - **Client:** `packages/client/linkskills_client/paci_token_client.py`
+- **Rollback:** `docs/integrations/cursor/ROLLBACK.md`
+
+## Contract pins (frozen — not draft)
+
+| Field | Value |
+|---|---|
+| Envelope | Frozen `platform.auth-token-envelope/0.1.0` (**supersedes** obsolete `0.1.3-draft`) |
+| Access TTL | ≤900 seconds; no `refresh_token`; early renew when remaining TTL &lt; 20% |
+| Assertion | `client_credentials` + `private_key_jwt` (ES256) per envelope §§6–7 |
+| Certified Platform candidate (read-only) | `421a35e97bc302be0f5e1f196d0a5e8d132f6fd8` |
+| Candidate meaning | **Certified candidate ≠ live** PACI issuer, hosting, credentials, or migration authority |
 
 ## Maintenance-window note (global Cursor)
 
 **Do not edit** `~/.cursor/mcp.json`, user-level Cursor settings, hooks, or the shared IDE Development `.cursor` symlink target for this canary.
 
-If a global mutation ever becomes unavoidable: stop, obtain the coordinated Cursor maintenance window, document rollback, then apply once. Prefer project-scoped config exclusively for Stages 1–8 until Platform stage PACI is live.
+If a global mutation ever becomes unavoidable: stop, obtain the coordinated Cursor maintenance window, document rollback (`docs/integrations/cursor/ROLLBACK.md`), then apply once. Prefer project-scoped config exclusively for Stages 1–8 until Platform stage PACI is live.
 
 ## Prerequisites (Platform-owned — currently absent)
 
@@ -25,7 +37,7 @@ Before a live canary, Platform must provide independently verified:
 5. Least-privilege Skills scopes + Skills-only resource audience.
 6. Secret injection path for the **private key PEM file** (GSM → SecretRef file on the canary host).
 
-Until those exist, keep the fragment placeholders and run only local/fake PACI client + proxy tests.
+Until those exist, keep the fragment placeholders and run only local/fake PACI client + proxy tests. Pinning the certified Platform candidate SHA does **not** satisfy these prerequisites.
 
 ## Exact application steps (project-scoped)
 
@@ -55,7 +67,7 @@ Until those exist, keep the fragment placeholders and run only local/fake PACI c
 7. **Do not** set `LINKSKILLS_CANARY_AUTHORIZATION` / `GATEWAY_TOKEN` / `LINKSKILLS_LOCAL_TEST_STATIC_BEARER` on the canary profile. Static bearers are **local-test only** (`LINKSKILLS_AUTH_MODE=local-test`) and are **refused** when `LINKSKILLS_CANARY=1`.
 8. **HTTPS gate:** Outside local-test loopback, `GATEWAY_URL` and PACI endpoints must be https (coordinated with `LINKSKILLS_AUTH_MODE=local-test` + loopback for unit tests only).
 9. **Refuse silent in-memory:** `LINKSKILLS_AUTH_MODE=production` never constructs an in-process in-memory Gateway because `LINKSKILLS_ENV`/store/DSN are missing — startup fails closed with an actionable error. In-process production is opt-in only (`LINKSKILLS_MCP_ALLOW_INPROCESS_PRODUCTION=1` + stage/prod env + postgres + DSN).
-10. **Start Gateway** with Platform-approved production authenticator + PACI verification path when live; proxy injects short-lived bearer (TTL ≤900s, early renew &lt;20%, 401 invalidate + bounded retry).
+10. **Start Gateway** with Platform-approved production authenticator + PACI verification path when live; proxy injects short-lived bearer (TTL ≤900s, early renew &lt;20%, 401 invalidate + bounded retry) per frozen envelope `0.1.0`.
 11. **Smoke (when Platform stage PACI exists):** project-scoped Cursor load → PACI mint → Gateway `skills_*` read-only discovery (Stage 3). Record evidence under `evidence/phase7/`.
 12. **If mint fails:** fail closed. Do not fall back to static bearer in production/canary. Check endpoint pin, `client_id`, key file readability, and assertion clock — without printing key material.
 
@@ -77,6 +89,7 @@ Forbidden when `LINKSKILLS_CANARY=1` expects production cryptographic verificati
 - No `refresh_token` handling; re-mint via `client_credentials` when remaining TTL &lt; 20%.
 - Access token lifetime must not exceed **900 seconds**; longer `expires_in` is rejected (fail closed).
 - Bearer never appears in tool arguments, MCP argv, logs, Git, or global Cursor config.
+- Do not treat certified Platform candidate `421a35e…` as live stage PACI.
 
 ## Diagnostics
 
@@ -84,6 +97,6 @@ Safe status (no secrets): `PaciTokenClient.status()` / `PaciStdioMcpProxy.status
 
 ## Residual gates
 
-- Platform stage PACI issuer live + Skills credential issued
-- Gateway PACI verifier proven against frozen Platform service
+- Platform stage PACI issuer live + Skills credential issued (beyond certified-candidate pin)
+- Gateway PACI verifier proven against frozen Platform service (`platform.auth-token-envelope/0.1.0`)
 - Coordinated window only if global Cursor mutation is ever required (prefer never)
