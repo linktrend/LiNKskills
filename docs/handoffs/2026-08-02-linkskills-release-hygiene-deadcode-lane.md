@@ -1,9 +1,10 @@
 # Handoff — LiNKskills Release Hygiene Lane B (Dead-Code / Reference)
 
 **Status:** Research complete. **Report-only** (`applied=false`). No deletes.
-**Date:** 2026-08-02  
-**Branch:** `dev/cloudcursor/RELEASE-HYGIENE-CLEANUP` @ investigation base SHA `46797b2`  
-**Lane:** B — dead-code / reference prove-before-delete  
+**Date:** 2026-08-02
+**Branch:** `dev/cloudcursor/RELEASE-HYGIENE-CLEANUP` @ investigation base SHA `46797b2`
+**Lane:** B — dead-code / reference prove-before-delete
+
 **Machine-readable:** `/tmp/linkskills-hygiene-lane-b.json`
 
 ## 1. Session outcome
