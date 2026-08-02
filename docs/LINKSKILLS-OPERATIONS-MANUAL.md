@@ -126,18 +126,19 @@ So a failure is usually: “checks failed, usage was still recorded locally, cer
 | Topic | Status today |
 | --- | --- |
 | Shared skill catalog on disk + validator + CI | **Built.** Dozens of skills, each with a baseline eval suite file. |
-| Internal-launch domain packages (`packages/*`) | **In-repo / being implemented** under the approved plan (contracts, core, publisher, eval runner, tool runtime, gateway, MCP, client, librarian domain). |
+| Internal-launch domain packages (`packages/*`) | **In-repo** under the approved plan (contracts, core, publisher, eval runner, tool runtime, gateway, MCP, client, librarian domain). |
 | `skills_*` MCP / HTTP Gateway (stdlib) | **Exists in-repo.** Local process health endpoints are not a claim of studio stage/prod readiness. |
-| Live Platform authentication | **Fakes in-repo** until LiNKplatform publishes real claims. |
+| Platform auth / PACI consumer pins | **Local/fake only.** AuthClaims `1.1.0` / contracts `0.2.2`; PACI envelope contracts `0.3.0`; Skills-pinned to certified Platform candidate `421a35e97bc302be0f5e1f196d0a5e8d132f6fd8`. **Not** proven against a live Platform PACI issuer. |
 | Real Eval Runner rejecting prompt-only certification | **Built in-repo.** |
-| Additive registry migration `20260727_000005` | **Packaged** here. **LiNKplatform alone applies** live. |
+| Additive registry migrations (incl. `20260727_000005`) | **Packaged** here. **LiNKplatform alone applies** live. |
 | Compatibility load helper (`lib/skill_runtime`) | **Still present** for migration; not the final sole load path. |
 | Every skill marked certified/`usable` | **Not yet.** Draft until real eval evidence and publication/certification advance. |
-| Cursor product canary | **Project-scoped only** (example fragment + notes). |
+| Cursor product canary | **Project-scoped only** (example fragment + notes). No global live canary. |
 | Codex / OpenClaw wiring | **Fragments handed off** — not applied from this repo. |
 | Librarian automatic nightly curation in production | **Host exists in LiNKplatform**; domain worker package in Skills; treat first live passes as supervised. |
 | Independent Codex verification of this plan’s implementation | **Still required / open** — Grok reports are provisional until checked. |
-| Live stage/prod internal-launch readiness | **Not claimed.** Blocked on Platform apply, real auth, supervised ops, and verification outside full Skills ownership. |
+| W20 stage readiness | **BLOCKED** (2026-08-01). Candidate docs/schemas/tests shipped; live stage PACI, stage apply receipt, and sealed Linux evidence remain absent. See `docs/handoffs/2026-08-01-linkskills-w20-stage-readiness.md`. |
+| Live stage/prod internal-launch readiness | **Not claimed.** Blocked on Platform apply, live PACI, supervised ops, and verification outside full Skills ownership. |
 | Phone dashboard for skill approvals | **Not built.** Escalations come as briefings / queued review items. |
 
 ---
@@ -174,4 +175,4 @@ Intent, Technical PRD, this Operations Manual, OPEN-ISSUES, the approved interna
 3. Steady-state delivery is the Gateway (`skills_*`); git checkout loading is a migration bridge.
 4. The Librarian improves the shelf on a schedule and escalates ambiguous upgrades to you.
 5. You do not need to run technical commands; you decide direction and escalations.
-6. Live stage/prod readiness, live migration apply, real Platform auth, and independent Codex verification are still ahead — and this handbook says so honestly.
+6. Live stage/prod readiness is still ahead (W20 **BLOCKED**); live migration apply, live Platform PACI, and independent Codex verification remain open — and this handbook says so honestly.

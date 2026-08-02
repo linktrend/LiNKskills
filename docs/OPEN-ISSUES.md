@@ -59,8 +59,8 @@ Column is future-proofing only; no authorization semantics today (ADR 0001).
 
 ### 9. Root-level historical PRD / SOP / operator briefing docs
 
-**Status:** Noted, not archived this pass (2026-07-19 judgment; still accurate).
-Files such as `SOP.md`, `OPERATOR_BRIEFING.md`, `260319 LiNKskills PRD.md`, and the Phase 0–3 dossier remain at repo root. They contain stale MAS / pre-ADR framing. They are **not** source of truth; a later cleanup may `git mv` them into `docs/archive/` once no external runbook depends on their paths.
+**Status:** Completed 2026-08-02 (release-hygiene docs lane) — archived via `git mv` to `docs/archive/legacy-root/`; historical note below retained.
+Files such as `SOP.md`, `OPERATOR_BRIEFING.md`, `260319 LiNKskills PRD.md`, and the Phase 0–3 dossier previously remained at repo root. They contain stale MAS / pre-ADR framing. They are **not** source of truth. See Recently completed item for the 2026-08-02 archive move.
 
 ### 10. Dollar-cost accounting dashboard
 
@@ -75,6 +75,10 @@ Telemetry may carry observational `cost` jsonb; no billing ledger in this Progra
 ---
 
 ## Recently completed (selected)
+
+### Root historical PRD/SOP/operator docs archived — 2026-08-02
+
+Release-hygiene docs lane (`dev/cloudcursor/RELEASE-HYGIENE-CLEANUP`) completed OPEN-ISSUES #9 by `git mv` (not delete) of superseded root documents into `docs/archive/legacy-root/`: `SOP.md`, `SOP_HUMAN.md`, `SOP_MACHINE.md`, `OPERATOR_BRIEFING.md`, `OPERATOR_BRIEFING_MVO_CLASS_A.md`, `260319 LiNKskills PRD.md`, `LiNKskills PRD v4.0 Implementation Dossier (Phase 0-3).md`, `COMMAND_REFERENCE.md`, `SKILLS_CATALOGUE.md`, `GIT_STRATEGY.md`. Updated `docs/archive/README.md`, root `README.md` status honesty (W20 **BLOCKED**; PACI local/fake pins only), Operations Manual Current status, and Technical PRD deferred/drift notes. **Left in place:** ADRs 0001–0008, SoT docs, `docs/CURSOR-GROK-*.md` (ADR/inventory-cited), migrations, evidence, certification/eval contracts, skill packages, handoffs, `archive/logic-engine-2026-07-14/`. Handoff: `docs/handoffs/2026-08-02-linkskills-release-hygiene-docs-lane.md`.
 
 ### Production packet (PACI adapter / Cursor client / Postgres / ops) — 2026-07-30
 

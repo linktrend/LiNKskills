@@ -121,7 +121,7 @@ Studio-level "library done" for the **internal-launch** scope means:
 | Scope boundary holds | No live Logic Engine deploy path; ADR 0001 accepted; ADRs 0002–0008 accepted |
 | Librarian split is clear | Instructions here; domain worker package here; generic host in LiNKplatform |
 | Actor integrations correctly scoped | Cursor project canary only; Codex/OpenClaw fragments handed off |
-| Live stage/prod readiness | **Not yet a claimed success** — blocked on Platform apply, real auth, supervised ops, Codex verification |
+| Live stage/prod readiness | **Not yet a claimed success** — W20 **BLOCKED**; blocked on Platform apply, live PACI, supervised ops, Codex verification |
 
 ---
 
@@ -134,7 +134,7 @@ Studio-level "library done" for the **internal-launch** scope means:
 | [`LINKSKILLS-INTERNAL-LAUNCH-DETAILED-DEVELOPMENT-PLAN.md`](./LINKSKILLS-INTERNAL-LAUNCH-DETAILED-DEVELOPMENT-PLAN.md) | Approved architecture and phased execution plan (hash above). |
 | [`OPEN-ISSUES.md`](./OPEN-ISSUES.md) | Append-only build log — what was built, deferred, and limited. |
 | [`adr/0001-…`](./adr/0001-retire-logic-engine-governance-layer.md) through [`adr/0008-…`](./adr/0008-librarian-ownership-cross-repo-contract.md) | Accepted ADRs for permanent scope and launch architecture. |
-| `docs/archive/*` | Superseded specs and governance notes; **not** authoritative. |
+| `docs/archive/*` (incl. `legacy-root/`) | Superseded specs, former root PRD/SOP/operator docs, and governance notes; **not** authoritative. |
 | `archive/logic-engine-2026-07-14/` | Retired governance subsystem (separate archive namespace — do not revive). |
 
 ---

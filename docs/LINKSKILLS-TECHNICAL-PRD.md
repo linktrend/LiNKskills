@@ -449,7 +449,7 @@ Honest gaps — not missing checkboxes on unfinished package scaffolding:
 8. **Org-scoped RLS on `lskills.catalog.org_id`** — future-proofing only; no authz semantics (ADR 0001).
 9. **Dollar-cost dashboard** — observational `cost` only; no billing ledger.
 10. **Permission-to-act** — NEVER in this repo (ADR 0001).
-11. **Root-level historical PRD/SOP/OPERATOR_BRIEFING docs** — still present for history; superseded as SoT by Intent / Technical PRD / Operations Manual.
+11. **Root-level historical PRD/SOP/OPERATOR_BRIEFING docs** — archived 2026-08-02 under `docs/archive/legacy-root/` (moved, not deleted); superseded as SoT by Intent / Technical PRD / Operations Manual.
 
 ---
 
@@ -466,7 +466,7 @@ Factual discrepancies between archived `docs/archive/specs/catalog-eval-telemetr
 | 2026-07-19 SoT: git checkout is *the* consumer load path | **Superseded for end state** — checkout is compatibility/migration; Gateway/published releases are steady-state (ADR 0002/0003) |
 | "Long-lived skill-text API rejected" | **Refined** — no raw prompt dump service; actor-facing Gateway MCP/HTTP over published releases is the launch architecture |
 | Spec header: "Implemented as schema — migration written" | Still accurate; plus additive `000005` packaged; live apply = Platform |
-| Older OPERATOR_BRIEFING / SOP MAS-centric deploy story | Superseded by branch promotion + CI + Gateway packages + VPS checkout runbook (migration) |
+| Older OPERATOR_BRIEFING / SOP MAS-centric deploy story | Superseded by branch promotion + CI + Gateway packages + VPS checkout runbook (migration); files now under `docs/archive/legacy-root/` |
 | README pointing at catalog-eval-telemetry-spec as SoT | Superseded by Intent / this Technical PRD / Ops Manual / OPEN-ISSUES |
 
 ---
