@@ -14,6 +14,15 @@ dist/
 build/
 .venv/
 venv/
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage/
+coverage.xml
+
+# Keep execution_ledger.jsonl tracked: validator requires the file at repo root
+# (local append-only telemetry buffer; seed rows are fixtures, not evidence packs).
 
 # LTR Runtime Identity Isolation
 tools/ltr/src/token.json

@@ -43,7 +43,7 @@ LiNKbrain remains a **separate** service (`brain_*`). There is no combined Brain
 - `validator.py` — structural Golden Template + eval-suite gate (CI).
 - `supabase/migrations/` — `lskills` catalog / telemetry / eval_runs + additive `20260727_000005` registry foundation (**LiNKplatform alone applies live**).
 - `tools/` — global CLI tool packages (`gws`, `ltr`, …).
-- `docs/archive/` — superseded documentation retained for history.
+- `docs/archive/` — superseded documentation retained for history (including `docs/archive/legacy-root/` for former root PRD/SOP/operator docs).
 - `archive/logic-engine-2026-07-14/` — retired governance subsystem (do not deploy).
 
 ## Consumer delivery
@@ -78,8 +78,10 @@ python3 scripts/check-service-ownership.py
 
 ## Status
 
-**Catalog foundation (2026-07-19) plus internal-launch architecture packages (plan hash above) are being implemented in this repository.** All skills ship baseline eval-suite YAML; CI runs validator, catalog freshness, tests, and ownership gates. The real Eval Runner rejects prompt-only certification. The Gateway/MCP surface exists in-repo with fake Platform auth. Additive registry migration `20260727_000005` is packaged for LiNKplatform to apply.
+**Catalog foundation plus internal-launch architecture packages (plan hash above) are implemented in this repository as packaging / local proof — not as live stage or production.** All skills ship baseline eval-suite YAML; CI runs validator, catalog freshness, tests, and ownership gates. The real Eval Runner rejects prompt-only certification. Gateway/MCP exist in-repo. PACI consumer pins are **local/fake only**: certified Platform candidate `421a35e97bc302be0f5e1f196d0a5e8d132f6fd8`, AuthClaims `1.1.0`, `@linktrend/platform-contracts@0.2.2` (claims) / `0.3.0` (PACI envelope). Additive registry migrations are packaged for LiNKplatform to apply.
 
-**Not claimed:** live stage/prod readiness, live migration apply, real Platform auth in shared environments, unsupervised production Librarian passes, or independent Codex verification complete. See Technical PRD §11, Operations Manual "Current status," and OPEN-ISSUES.
+**W20 stage readiness:** **BLOCKED** (see `docs/handoffs/2026-08-01-linkskills-w20-stage-readiness.md`). Candidate gates shipped; live Platform stage PACI / stage apply / sealed Linux evidence absent.
+
+**Not claimed:** live stage/prod readiness, live migration apply, live Platform PACI issuer, unsupervised production Librarian passes, or independent Codex verification complete. See Technical PRD §11, Operations Manual "Current status," and OPEN-ISSUES.
 
 The generic Librarian host lives in **`LiNKplatform/packages/librarian-runner`** (this repo holds skill-side instructions, the domain worker package, and schema packages).
