@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-03
 **Branch:** `dev/cloudcursor/skills-stage-certification`
-**Tip SHA:** `a472bd464ac5b7bcd18d70b1f97fda028ea6e5ed`
+**Tip SHA:** `e55d50b49831662779664c46347e8c199490ffd9`
 **Base tip (pre-fix):** `70a26410a071abfa74642d302a3f730bfb4a4d3d`
 **Verdict:** local remediation complete; stage/shared apply remains HOLD
 
