@@ -2,6 +2,7 @@
 
 **Date:** 2026-08-03
 **Branch:** `dev/cloudcursor/skills-stage-certification`
+**Tip SHA:** `8dec48b8545977466b2ec7a8f0581553cfc25b9d`
 **Verdict:** **PASS** for local dual-mode sealed-cert remediation; **HOLD** for GSM/stage/shared apply
 
 ## Launch-blocking gap corrected
