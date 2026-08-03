@@ -8,4 +8,3 @@
 - Never treat macOS `unproven` isolation receipts as promotion evidence.
 - Local non-promoting sealed canaries (`--local-non-promoting`) must not write
   `evidence/phase10/sealed/` release artifacts or promote `usable`.
-

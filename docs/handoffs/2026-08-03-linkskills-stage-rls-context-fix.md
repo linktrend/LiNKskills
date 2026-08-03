@@ -1,8 +1,8 @@
 # Handoff — SKILLS-STAGE-RLS-CONTEXT-FIX (third correction)
 
-**Date:** 2026-08-03  
-**Branch:** `dev/cloudcursor/SKILLS-STAGE-RLS-CONTEXT-FIX`  
-**Prior tip (HOLD):** `dd19d13d665711be2dccec71f2630499017a8e9b`  
+**Date:** 2026-08-03
+**Branch:** `dev/cloudcursor/SKILLS-STAGE-RLS-CONTEXT-FIX`
+**Prior tip (HOLD):** `dd19d13d665711be2dccec71f2630499017a8e9b`
 **This tip:** `aa25fa59f6c7d549dc3742639e8c88ff377500ea`
 
 ## Verdict
