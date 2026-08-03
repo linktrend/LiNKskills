@@ -3,7 +3,7 @@
 **Date:** 2026-08-03  
 **Branch:** `dev/cloudcursor/SKILLS-STAGE-RLS-CONTEXT-FIX`  
 **Prior tip (HOLD):** `1136b31a0de45d2e7abcfc70660ce9ceb620de57`  
-**This tip:** see `git rev-parse HEAD` after push (commit below)
+**This tip:** `1f8491bcedca5b3606bee42f738abd3d62c505fc`
 
 ## Verdict
 
