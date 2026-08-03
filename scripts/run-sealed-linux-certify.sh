@@ -13,6 +13,8 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 IMAGE="${LINKSKILLS_SEALED_CERT_IMAGE:-python:3.12-slim}"
 ISSUER_KEY="${LINKSKILLS_EVAL_RUNNER_ISSUER_KEY:-linkskills-local-eval-runner-issuer-key-not-for-production}"
 ISSUER_ID="${LINKSKILLS_EVAL_RUNNER_ISSUER_ID:-linkskills-eval-runner-sealed-linux}"
+# Stamp catalog git_sha from the host tree (container image usually lacks git).
+HOST_GIT_SHA="${LINKSKILLS_CATALOG_GIT_SHA:-$(git -C "${ROOT}" rev-parse HEAD 2>/dev/null || true)}"
 
 # Encode CLI args so the inner container shell can reconstruct them safely.
 if [[ "$#" -gt 0 ]]; then
@@ -29,6 +31,7 @@ docker run --rm --privileged \
   -w /repo \
   -e "LINKSKILLS_EVAL_RUNNER_ISSUER_KEY=${ISSUER_KEY}" \
   -e "LINKSKILLS_EVAL_RUNNER_ISSUER_ID=${ISSUER_ID}" \
+  -e "LINKSKILLS_CATALOG_GIT_SHA=${HOST_GIT_SHA}" \
   -e "CERT_ARGS_B64=${CERT_ARGS_B64}" \
   -e "PYTHONPATH=packages/contracts:packages/core:packages/publisher:packages/eval_runner:packages/tool_runtime:packages/gateway:packages/mcp_server:packages/client:packages/librarian_domain:." \
   "${IMAGE}" \

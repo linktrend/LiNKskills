@@ -48,6 +48,8 @@ from lib.skill_runtime.certification_overlay import (  # noqa: E402
 
 REPORT_REL = Path("evidence/phase10/catalog-certification-report.json")
 SEALED_DIR_REL = Path("evidence/phase10/sealed")
+CANARY_TOOL_ID = "text-echo"
+CANARY_TOOL_VERSION = "1.0.0"
 
 
 def _utc_now() -> str:
@@ -72,6 +74,70 @@ def _proven_isolation_available() -> bool:
         return False
 
 
+def build_canary_toolchain(repo_root: Path) -> Dict[str, Any]:
+    """Bind observed text-echo descriptor/code hashes into the certification toolchain.
+
+    ADR 0006 requires exact toolchain hashes so same-version code drift invalidates
+    the execution profile. ``source_hash`` is the packaged tool tree hash from
+    ``load_tool_descriptor`` / ``resolve_tool``; ``tool_hash`` aliases the binding
+    hash used by the executor (bundle_hash when present, else source_hash).
+    """
+    from linkskills_tool_runtime.resolve import resolve_tool
+
+    tool_dir = Path(repo_root) / "tools" / CANARY_TOOL_ID
+    resolved = resolve_tool(
+        tool_dir,
+        tool_id=CANARY_TOOL_ID,
+        version=CANARY_TOOL_VERSION,
+    )
+    source_hash = resolved.descriptor.source_hash
+    if not source_hash:
+        raise RuntimeError(
+            f"{CANARY_TOOL_ID} descriptor missing source_hash after resolve "
+            f"(path={tool_dir})"
+        )
+    tool_hash = resolved.bundle_hash or source_hash
+    return {
+        "tools": [
+            {
+                "tool_id": resolved.tool_id,
+                "version": resolved.version,
+                "source_hash": str(source_hash),
+                "tool_hash": str(tool_hash),
+            }
+        ]
+    }
+
+
+def certification_exit_code(
+    report: Dict[str, Any],
+    *,
+    requested_skills: Sequence[str],
+    require_sealed: bool,
+) -> int:
+    """Exit policy for sealed catalog certification.
+
+    - Explicit ``--skill`` list + sealed: nonzero if any requested skill is not usable.
+    - Full-catalog sealed run: nonzero when usable_count == 0 (intended canary path
+      failed / no canary became usable). Other skills remaining draft for
+      suite_not_executable do not alone cause failure when usable_count > 0.
+    - Unsealed / allow-unproven host: exit 0 (report still written).
+    """
+    if not require_sealed:
+        return 0
+    results = list(report.get("results") or [])
+    if requested_skills:
+        by_id = {str(r.get("skill_id")): r for r in results}
+        for skill_id in requested_skills:
+            item = by_id.get(str(skill_id))
+            if item is None or item.get("classification") != "usable":
+                return 1
+        return 0
+    if int(report.get("usable_count") or 0) == 0:
+        return 1
+    return 0
+
+
 def _suite_path_for_skill(skill_dir: Path) -> Path:
     return skill_dir / "references" / "eval-suite.yaml"
 
@@ -82,6 +148,7 @@ def _evaluate_skill(
     repo_root: Path,
     require_sealed: bool,
     isolation_ok: bool,
+    toolchain: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """Return machine-readable certification outcome for one skill."""
     skill_id = skill_dir.name
@@ -98,6 +165,9 @@ def _evaluate_skill(
         "receipt_hashes": [],
         "skill_release_hash": None,
         "profile_hash": None,
+        "toolchain": None,
+        "source_hash": None,
+        "tool_hash": None,
     }
     if not suite_path.is_file():
         base["reason_code"] = "missing_eval_suite"
@@ -137,12 +207,18 @@ def _evaluate_skill(
         )
         return base
 
+    bound_toolchain = toolchain if toolchain is not None else build_canary_toolchain(repo_root)
+    tool0 = (bound_toolchain.get("tools") or [{}])[0]
+    base["toolchain"] = bound_toolchain
+    base["source_hash"] = tool0.get("source_hash")
+    base["tool_hash"] = tool0.get("tool_hash")
+
     release_hash = compute_skill_release_hash(skill_dir)
     judge = IndependentDeterministicJudge()
     result = run_suite(
         suite,
         judge=judge,
-        toolchain={"tools": [{"tool_id": "text-echo", "version": "1.0.0"}]},
+        toolchain=bound_toolchain,
         repo_root=repo_root,
         skill_dir=skill_dir,
         skill_release_hash=release_hash,
@@ -192,6 +268,9 @@ def _evaluate_skill(
         "suite_hash": result.suite_hash,
         "weighted_score": decision.weighted_score,
         "network_isolation": "denied",
+        "toolchain": bound_toolchain,
+        "source_hash": base["source_hash"],
+        "tool_hash": base["tool_hash"],
         "host": {
             "platform": sys.platform,
             "issuer_id": os.environ.get("LINKSKILLS_EVAL_RUNNER_ISSUER_ID", ""),
@@ -255,6 +334,12 @@ def _update_ledger(
             prior["skill_release_hash"] = item["skill_release_hash"]
         if item.get("profile_hash"):
             prior["profile_hash"] = item["profile_hash"]
+        if item.get("source_hash"):
+            prior["source_hash"] = item["source_hash"]
+        if item.get("tool_hash"):
+            prior["tool_hash"] = item["tool_hash"]
+        if item.get("toolchain"):
+            prior["toolchain"] = item["toolchain"]
         skills[skill_id] = prior
 
     counts = {
@@ -352,12 +437,22 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             print(f"unknown skill id(s): {sorted(missing)}", file=sys.stderr)
             return 2
 
+    # Resolve once so profile_hash binds the observed packaged tool hash for all
+    # executable suites in this run (canary path). Non-executable skills never reach
+    # run_suite and ignore toolchain.
+    toolchain: Optional[Dict[str, Any]] = None
+    try:
+        toolchain = build_canary_toolchain(repo_root)
+    except Exception as exc:  # noqa: BLE001 — report per-skill if needed later
+        print(f"warning: canary toolchain resolve failed: {exc}", file=sys.stderr)
+
     results = [
         _evaluate_skill(
             skill_dir,
             repo_root=repo_root,
             require_sealed=require_sealed,
             isolation_ok=isolation_ok,
+            toolchain=toolchain,
         )
         for skill_dir in skill_dirs
     ]
@@ -368,6 +463,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         "isolation_probe_denied": isolation_ok,
         "require_sealed": require_sealed,
         "platform": sys.platform,
+        "toolchain": toolchain,
         "skill_count": len(results),
         "usable_count": sum(1 for r in results if r["classification"] == "usable"),
         "draft_count": sum(1 for r in results if r["classification"] == "draft"),
@@ -398,19 +494,21 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             load_hash_overlay,
         )
 
-        git_sha = None
-        try:
-            git_sha = (
-                subprocess.check_output(
-                    ["git", "rev-parse", "HEAD"],
-                    cwd=repo_root,
-                    stderr=subprocess.DEVNULL,
-                    text=True,
-                ).strip()
-                or None
-            )
-        except (subprocess.CalledProcessError, FileNotFoundError):
-            git_sha = None
+        # Prefer explicit pin (sealed Docker host → container) over in-container git.
+        git_sha = os.environ.get("LINKSKILLS_CATALOG_GIT_SHA", "").strip() or None
+        if not git_sha:
+            try:
+                git_sha = (
+                    subprocess.check_output(
+                        ["git", "rev-parse", "HEAD"],
+                        cwd=repo_root,
+                        stderr=subprocess.DEVNULL,
+                        text=True,
+                    ).strip()
+                    or None
+                )
+            except (subprocess.CalledProcessError, FileNotFoundError):
+                git_sha = None
         overlay = load_certification_overlay(repo_root)
         hashes = load_hash_overlay(repo_root)
         index = build_catalog_index(
@@ -428,8 +526,11 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             f"(usable={usable}/{index['skill_count']})"
         )
 
-    # Non-zero only when a requested sealed skill was expected to certify and failed hard.
-    return 0
+    return certification_exit_code(
+        report,
+        requested_skills=list(args.skill or []),
+        require_sealed=require_sealed,
+    )
 
 
 if __name__ == "__main__":

@@ -23,7 +23,33 @@ from isolation_probe import proven_executor_isolation_available  # noqa: E402
 
 SKILL_RELEASE = ROOT / "evidence/phase3/fixtures/canary-echo/skill-release"
 CANARY_SUITE = ROOT / "evidence/phase3/fixtures/canary-echo/eval-suite.yaml"
-CANARY_TOOLCHAIN = {"tools": [{"tool_id": "text-echo", "version": "1.0.0"}]}
+
+
+def _canary_toolchain() -> dict:
+    """Exact toolchain hashes for canary (ADR 0006)."""
+    sys.path.insert(0, str(ROOT / "packages" / "tool_runtime"))
+    from linkskills_tool_runtime.resolve import resolve_tool
+
+    resolved = resolve_tool(
+        ROOT / "tools" / "text-echo",
+        tool_id="text-echo",
+        version="1.0.0",
+    )
+    source_hash = resolved.descriptor.source_hash
+    tool_hash = resolved.bundle_hash or source_hash
+    return {
+        "tools": [
+            {
+                "tool_id": resolved.tool_id,
+                "version": resolved.version,
+                "source_hash": source_hash,
+                "tool_hash": tool_hash,
+            }
+        ]
+    }
+
+
+CANARY_TOOLCHAIN = _canary_toolchain()
 
 
 def _simple_command_suite(tmp_path: Path) -> Path:

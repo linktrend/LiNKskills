@@ -23,6 +23,28 @@ CANARY_SUITE = ROOT / "evidence" / "phase3" / "fixtures" / "canary-echo" / "eval
 SKILL_RELEASE = ROOT / "evidence/phase3/fixtures/canary-echo/skill-release"
 
 
+def _canary_toolchain() -> dict:
+    from linkskills_tool_runtime.resolve import resolve_tool
+
+    resolved = resolve_tool(
+        ROOT / "tools" / "text-echo",
+        tool_id="text-echo",
+        version="1.0.0",
+    )
+    source_hash = resolved.descriptor.source_hash
+    tool_hash = resolved.bundle_hash or source_hash
+    return {
+        "tools": [
+            {
+                "tool_id": resolved.tool_id,
+                "version": resolved.version,
+                "source_hash": source_hash,
+                "tool_hash": tool_hash,
+            }
+        ]
+    }
+
+
 def test_canary_suite_executes_and_certifies():
     assert CANARY_SUITE.is_file(), f"missing canary suite: {CANARY_SUITE}"
     assert SKILL_RELEASE.is_dir(), f"missing skill release: {SKILL_RELEASE}"
@@ -36,7 +58,7 @@ def test_canary_suite_executes_and_certifies():
         result = run_suite(
             suite,
             judge=IndependentDeterministicJudge(),
-            toolchain={"tools": [{"tool_id": "text-echo", "version": "1.0.0"}]},
+            toolchain=_canary_toolchain(),
             workspace=ws,
             repo_root=ROOT,
             skill_dir=SKILL_RELEASE,

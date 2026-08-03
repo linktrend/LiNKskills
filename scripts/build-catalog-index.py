@@ -3,7 +3,8 @@
 
 Certification state comes from the honest phase10 classification ledger overlay
 (``evidence/phase10/skill-classification-draft.json``). Missing ledger entries
-remain ``draft``. ``usable`` requires sealed receipt evidence paths in the ledger.
+remain ``draft``. ``usable`` requires verified sealed live receipts (HMAC +
+binding hashes), not nonempty evidence path strings alone.
 """
 
 from __future__ import annotations
@@ -72,27 +73,21 @@ def main() -> int:
         import json
 
         existing = json.loads(out_path.read_text(encoding="utf-8"))
-        # Compare skill identity + certification_state (ignore generated_at / git_sha churn).
-        existing_skills = {
-            (
+        # Compare skill identity + certification_state + release_hash + profile_hash
+        # (ignore generated_at / git_sha churn). Drift of either sealed hash fails --check.
+        def _identity(s: dict) -> tuple:
+            return (
                 s["skill_id"],
                 s["version"],
                 s["path"],
                 s["eval_suite_ref"],
                 s.get("certification_state", "draft"),
+                s.get("release_hash") or s.get("skill_release_hash") or "",
+                s.get("profile_hash") or "",
             )
-            for s in existing.get("skills", [])
-        }
-        fresh_skills = {
-            (
-                s["skill_id"],
-                s["version"],
-                s["path"],
-                s["eval_suite_ref"],
-                s.get("certification_state", "draft"),
-            )
-            for s in index["skills"]
-        }
+
+        existing_skills = {_identity(s) for s in existing.get("skills", [])}
+        fresh_skills = {_identity(s) for s in index["skills"]}
         if existing_skills != fresh_skills:
             print(
                 "catalog/index.json is stale; regenerate with scripts/build-catalog-index.py",

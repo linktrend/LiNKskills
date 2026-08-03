@@ -1,9 +1,9 @@
 {
   "note": "Honest classification ledger (lanes 5+6, 2026-07-30). No skill is promoted to usable/certified without sealed live executor receipts with network_isolation=denied on a certifiable host. macOS cannot certify (ADR 0009). This file is not a live promotion.",
   "as_of": "2026-08-03",
-  "updated_at": "2026-08-03T09:02:59Z",
+  "updated_at": "2026-08-03T09:20:11Z",
   "wave": "lanes_5_6_honesty",
-  "live_certification": "local sealed Linux/container certification performed 2026-08-03T09:02:59Z (1 usable)",
+  "live_certification": "local sealed Linux/container certification performed 2026-08-03T09:20:11Z (1 usable)",
   "macos_certifiable": false,
   "linux_bwrap_required": true,
   "evidence_tier": "sealed local Linux bwrap (or privileged Docker Linux); not stage/prod apply",
@@ -118,7 +118,19 @@
       "reason_code": "certified_usable",
       "suite_executable": true,
       "skill_release_hash": "skill-release:52be31db2d55866b5cfa36196c8d29a2ce3bf8e8833a1c54e588aade4b8d59ac",
-      "profile_hash": "b18989bc02101a9f8ca18e2daa4369314e547d90b8fee935e9a5b6bfdd712b83"
+      "profile_hash": "b0d3a75267170832387b52360b97ba5cc5b0f56e68e4d7fd5230a5b146f5e3b5",
+      "source_hash": "6eaa287b75c8848d700e00aa94518e1b711430b5b01a47abd516ddcbce7f71d0",
+      "tool_hash": "6eaa287b75c8848d700e00aa94518e1b711430b5b01a47abd516ddcbce7f71d0",
+      "toolchain": {
+        "tools": [
+          {
+            "tool_id": "text-echo",
+            "version": "1.0.0",
+            "source_hash": "6eaa287b75c8848d700e00aa94518e1b711430b5b01a47abd516ddcbce7f71d0",
+            "tool_hash": "6eaa287b75c8848d700e00aa94518e1b711430b5b01a47abd516ddcbce7f71d0"
+          }
+        ]
+      }
     },
     "channel-ops": {
       "classification": "draft",
