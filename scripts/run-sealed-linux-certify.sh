@@ -135,8 +135,19 @@ ISSUER_ID="$(python3 -c 'import json,sys; print(json.load(sys.stdin)["issuer_id"
 NON_PROMOTING="$(python3 -c 'import json,sys; print("1" if json.load(sys.stdin)["non_promoting"] else "0")' <<<"${PREFLIGHT_JSON}")"
 MODE="$(python3 -c 'import json,sys; print(json.load(sys.stdin)["mode"])' <<<"${PREFLIGHT_JSON}")"
 
-# Stamp catalog git_sha from the host tree (container image usually lacks git).
+# Stamp catalog provenance from the host: governed *source* commit + tree hash.
+# Never a self-referential tip SHA of a commit that will embed the catalog.
 HOST_GIT_SHA="${LINKSKILLS_CATALOG_GIT_SHA:-$(git -C "${ROOT}" rev-parse HEAD 2>/dev/null || true)}"
+if [[ -z "${LINKSKILLS_SOURCE_TREE_SHA256:-}" && -n "${HOST_GIT_SHA}" ]]; then
+  LINKSKILLS_SOURCE_TREE_SHA256="$(
+    PYTHONPATH="${ROOT}:${PYTHONPATH:-}" python3 - <<PY
+from lib.skill_runtime.catalog_provenance import compute_source_tree_sha256
+from pathlib import Path
+print(compute_source_tree_sha256(Path("${ROOT}"), commit="${HOST_GIT_SHA}"))
+PY
+  )"
+  export LINKSKILLS_SOURCE_TREE_SHA256
+fi
 
 echo "Sealed Linux certify: mode=${MODE} image=${IMAGE} root=${ROOT}"
 if [[ -n "${IMAGE_DIGEST}" ]]; then
@@ -162,6 +173,7 @@ DOCKER_ENV=(
   --env "LINKSKILLS_EVAL_RUNNER_ISSUER_KEY"
   -e "LINKSKILLS_EVAL_RUNNER_ISSUER_ID=${ISSUER_ID}"
   -e "LINKSKILLS_CATALOG_GIT_SHA=${HOST_GIT_SHA}"
+  -e "LINKSKILLS_SOURCE_TREE_SHA256=${LINKSKILLS_SOURCE_TREE_SHA256:-}"
   -e "LINKSKILLS_SEALED_CERT_MODE=${MODE}"
   -e "LINKSKILLS_SEALED_CERT_IMAGE=${IMAGE}"
   -e "LINKSKILLS_CERT_NON_PROMOTING=${NON_PROMOTING}"

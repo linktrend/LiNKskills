@@ -579,29 +579,17 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         )
 
     if args.rebuild_catalog and not args.no_rebuild_catalog:
-        import subprocess
-
         from lib.skill_runtime.catalog import build_catalog_index, write_catalog_index
         from lib.skill_runtime.certification_overlay import (
             load_certification_overlay,
             load_hash_overlay,
         )
 
-        # Prefer explicit pin (sealed Docker host → container) over in-container git.
+        # Prefer explicit source-commit pin (sealed Docker host → container).
+        # git_sha is the governed ancestor being certified — never a
+        # self-referential tip that will embed this generated catalog.
         git_sha = os.environ.get("LINKSKILLS_CATALOG_GIT_SHA", "").strip() or None
-        if not git_sha:
-            try:
-                git_sha = (
-                    subprocess.check_output(
-                        ["git", "rev-parse", "HEAD"],
-                        cwd=repo_root,
-                        stderr=subprocess.DEVNULL,
-                        text=True,
-                    ).strip()
-                    or None
-                )
-            except (subprocess.CalledProcessError, FileNotFoundError):
-                git_sha = None
+        source_tree = os.environ.get("LINKSKILLS_SOURCE_TREE_SHA256", "").strip() or None
         overlay = load_certification_overlay(repo_root)
         hashes = load_hash_overlay(repo_root)
         index = build_catalog_index(
@@ -609,6 +597,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             certification_overlay=overlay,
             hash_overlay=hashes,
             git_sha=git_sha,
+            source_tree_sha256=source_tree,
+            require_provenance=True,
         )
         written = write_catalog_index(repo_root, index)
         usable = sum(

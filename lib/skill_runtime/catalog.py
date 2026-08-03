@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import re
+import subprocess
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -136,17 +137,50 @@ def build_catalog_index(
     certification_overlay: Optional[Dict[str, str]] = None,
     hash_overlay: Optional[Dict[str, Dict[str, str]]] = None,
     git_sha: Optional[str] = None,
+    source_tree_sha256: Optional[str] = None,
+    require_provenance: bool = False,
 ) -> Dict[str, Any]:
+    """Build catalog index JSON including non-self-referential provenance.
+
+    ``git_sha`` is the certified *source* commit (governed inputs ancestor), not
+    the tip that embeds this generated catalog. ``source_tree_sha256`` binds the
+    governed input tree.
+
+    When provenance cannot be resolved (e.g. ephemeral fixtures without git) and
+    ``require_provenance`` is false, both fields are ``None``. Production
+    builders pass ``require_provenance=True`` or an explicit ``git_sha``.
+    """
+    from lib.skill_runtime.catalog_provenance import build_provenance_fields
+
     entries = build_catalog_entries(
         repo_root,
         certification_overlay=certification_overlay,
         hash_overlay=hash_overlay,
     )
+    provenance: Dict[str, Optional[str]] = {
+        "git_sha": None,
+        "source_tree_sha256": None,
+    }
+    try:
+        provenance = dict(
+            build_provenance_fields(
+                repo_root,
+                git_sha=git_sha,
+                source_tree_sha256=source_tree_sha256,
+            )
+        )
+    except (ValueError, RuntimeError, FileNotFoundError, OSError, subprocess.CalledProcessError) as exc:
+        if require_provenance or git_sha or source_tree_sha256:
+            raise
+        # Ephemeral unit fixtures may lack a git object database.
+        provenance = {"git_sha": None, "source_tree_sha256": None}
+        _ = exc
     return {
         "schema_version": 1,
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "repo_root_marker": "LiNKskills",
-        "git_sha": git_sha,
+        "git_sha": provenance["git_sha"],
+        "source_tree_sha256": provenance["source_tree_sha256"],
         "skill_count": len(entries),
         "skills": [entry.to_dict() for entry in entries],
     }
