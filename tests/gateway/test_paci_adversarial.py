@@ -20,7 +20,9 @@ from linkskills_gateway.auth import (
     AuthError,
     HIGH_RISK_WRITE_OPERATIONS,
     PlatformClaimsVerifier,
+    resolve_claims_verifier,
 )
+from linkskills_gateway.auth_testing import LocalTestHmacAuthenticator
 from linkskills_gateway.introspection import (
     IntrospectionClient,
     LocalTestClientAssertionSigner,
@@ -642,6 +644,82 @@ class PaciAdversarialTests(unittest.TestCase):
                 signer.remember_assertion_jti("already-used", until=self.now + 60)
                 signer.remember_assertion_jti("already-used", until=self.now + 120)
             self.assertEqual(ctx.exception.code, "auth_assertion_replay")
+
+
+# Live Mac Mini canary issuer that exposed the post-crypto policy mismatch.
+LIVE_CANARY_ISSUER = "https://linktrend-mini.tailf7e13a.ts.net:9443"
+
+
+class ResolveClaimsVerifierPaciIssuerPolicyTests(unittest.TestCase):
+    """Regression: outer claims policy must honor the PACI-pinned issuer.
+
+    Live failure: ``paci_authenticator`` verified ``LINKSKILLS_PACI_ISSUER``
+    successfully, then ``resolve_claims_verifier`` built
+    ``PlatformClaimsVerifier`` with default ``expected_issuer='linkplatform-issuer'``
+    and denied the already-authenticated token.
+    """
+
+    def setUp(self) -> None:
+        self.now = 1_800_000_000.0
+        self.private_key, self.jwk = generate_es256_keypair()
+        self.kid = str(self.jwk["kid"])
+        self.jwks = StaticJwksProvider(InMemoryJwksStore([self.jwk]).document())
+        self.paci = PaciJwtAuthenticator(
+            issuer=LIVE_CANARY_ISSUER,
+            audiences=AUDIENCE,
+            jwks=self.jwks,
+            now_fn=lambda: self.now,
+            auth_mode="local-test",
+        )
+
+    def _mint(self, *, issuer: str = LIVE_CANARY_ISSUER, **kwargs: Any) -> str:
+        return mint_paci_token(
+            private_key=self.private_key,
+            kid=self.kid,
+            issuer=issuer,
+            audience=AUDIENCE,
+            now=self.now,
+            **kwargs,
+        )
+
+    def test_resolve_claims_verifier_accepts_live_paci_issuer_without_policy_kwarg(
+        self,
+    ) -> None:
+        """Reproduce live canary: valid PACI token must not die on default issuer."""
+        token = self._mint()
+        # Cryptographic layer already accepts the live issuer.
+        authenticated = self.paci.authenticate(token)
+        self.assertEqual(authenticated.claims["issuer"], LIVE_CANARY_ISSUER)
+
+        # Production wiring path: no expected_issuer policy_kwarg (the bug).
+        verifier = resolve_claims_verifier(authenticator=self.paci)
+        self.assertEqual(verifier.expected_issuer, LIVE_CANARY_ISSUER)
+        claims = verifier.verify(f"Bearer {token}", now=self.now)
+        self.assertEqual(claims.issuer, LIVE_CANARY_ISSUER)
+        self.assertEqual(claims.actor_id, authenticated.claims["actorId"])
+
+    def test_resolve_claims_verifier_wrong_issuer_still_fails_cryptographically(
+        self,
+    ) -> None:
+        """Wrong JWT/AuthClaims issuer must fail in PACI verify, not only policy."""
+        evil_issuer = "https://evil-issuer.example.invalid"
+        token = self._mint(issuer=evil_issuer)
+        with self.assertRaises(AuthError) as crypto_ctx:
+            self.paci.authenticate(token)
+        self.assertEqual(crypto_ctx.exception.code, "auth_forbidden")
+        self.assertIn("issuer", crypto_ctx.exception.message.lower())
+
+        verifier = resolve_claims_verifier(authenticator=self.paci)
+        with self.assertRaises(AuthError) as policy_ctx:
+            verifier.verify(f"Bearer {token}", now=self.now)
+        self.assertEqual(policy_ctx.exception.code, "auth_forbidden")
+        self.assertIn("issuer", policy_ctx.exception.message.lower())
+
+    def test_resolve_claims_verifier_non_paci_keeps_default_issuer(self) -> None:
+        """HMAC / non-PACI authenticators retain default linkplatform-issuer policy."""
+        hmac_auth = LocalTestHmacAuthenticator()
+        verifier = resolve_claims_verifier(authenticator=hmac_auth)
+        self.assertEqual(verifier.expected_issuer, "linkplatform-issuer")
 
 
 if __name__ == "__main__":

@@ -841,6 +841,9 @@ def resolve_claims_verifier(
       (unless ``allow_local_test=False``, e.g. canary).
     - Otherwise production cryptographic verifier; missing authenticator/config
       raises ``AuthConfigurationError`` (never falls back to unsigned).
+    - When ``expected_issuer`` is omitted, prefer the authenticator's pinned
+      ``issuer`` (PACI) or ``LINKSKILLS_PACI_ISSUER``; otherwise retain the
+      ``PlatformClaimsVerifier`` default ``linkplatform-issuer``.
     """
     if verifier is not None:
         return verifier
@@ -854,6 +857,22 @@ def resolve_claims_verifier(
         return LocalUnsignedClaimsVerifier(**policy_kwargs)
 
     auth = authenticator or load_platform_authenticator_from_environ(environ)
+    # PACI authenticators pin issuer from LINKSKILLS_PACI_ISSUER during JWT
+    # verify. Align the outer AuthClaims policy with that pin so a live PACI
+    # issuer (e.g. Mac Mini canary URL) is not denied after crypto success by
+    # the legacy default expected_issuer='linkplatform-issuer'. Non-PACI
+    # authenticators without a pinned issuer keep the default. Explicit
+    # expected_issuer in policy_kwargs always wins (including None to skip
+    # the duplicate policy check when the caller opts in).
+    if "expected_issuer" not in policy_kwargs:
+        pinned = getattr(auth, "issuer", None)
+        if isinstance(pinned, str) and pinned.strip():
+            policy_kwargs["expected_issuer"] = pinned.strip()
+        else:
+            env = environ if environ is not None else os.environ
+            paci_issuer = str(env.get("LINKSKILLS_PACI_ISSUER") or "").strip()
+            if paci_issuer:
+                policy_kwargs["expected_issuer"] = paci_issuer
     return PlatformClaimsVerifier(authenticator=auth, **policy_kwargs)
 
 
