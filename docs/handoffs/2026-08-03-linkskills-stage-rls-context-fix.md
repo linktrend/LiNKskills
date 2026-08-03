@@ -2,6 +2,8 @@
 
 **Date:** 2026-08-03  
 **Branch:** `dev/cloudcursor/SKILLS-STAGE-RLS-CONTEXT-FIX`  
+**Tip:** `76c71648dd3b71cc8d45c244faa6a101dda9d04b`  
+**Code fix:** `c8c8f210f513ddad96c93c518656866cf96220e3`  
 **Start SHA:** `b7d46a1e1cc06f6662028f24e42eea73f2ed2368`
 
 ## Verdict
