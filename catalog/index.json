@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-18T09:30:11.770605+00:00",
+  "generated_at": "2026-08-03T09:04:26.093412+00:00",
   "repo_root_marker": "LiNKskills",
-  "git_sha": "2c81b00604c7cba40fa574fc25e17043e96992cb",
-  "skill_count": 34,
+  "git_sha": "0e03745a177acabfb5a5440e0bbdbc669c4081b6",
+  "skill_count": 35,
   "skills": [
     {
       "skill_id": "audit-protocol",
@@ -26,6 +26,19 @@
       "certification_state": "draft",
       "min_reasoning_tier": "high",
       "usage_trigger": "Use when developer or worker streams are repeatedly blocked and require structured diagnosis and recovery actions."
+    },
+    {
+      "skill_id": "canary-echo",
+      "version": "0.2.0",
+      "path": "skills/canary-echo",
+      "description": "Safe no-side-effect stage lifecycle canary that echoes tokens via packaged text-echo under sealed Eval Runner certification.",
+      "format_profile": "simple",
+      "eval_suite_ref": "skills/canary-echo/references/eval-suite.yaml",
+      "certification_state": "usable",
+      "min_reasoning_tier": "fast",
+      "usage_trigger": "Use when proving the certification pipeline or verifying sealed executor receipts with a deterministic echo.",
+      "release_hash": "skill-release:52be31db2d55866b5cfa36196c8d29a2ce3bf8e8833a1c54e588aade4b8d59ac",
+      "profile_hash": "b18989bc02101a9f8ca18e2daa4369314e547d90b8fee935e9a5b6bfdd712b83"
     },
     {
       "skill_id": "channel-ops",

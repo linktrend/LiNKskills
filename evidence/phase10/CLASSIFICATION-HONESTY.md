@@ -53,7 +53,8 @@ Do **not** treat any of the following as sealed live certification:
 ## macOS / Linux
 
 - **macOS:** may run local dry-runs and unit tests; must stamp `unproven`/`unavailable` when isolation cannot be proven; **must not** claim usable/certified.
-- **Linux:** certifiable only with proven path-allowlisted `bwrap --unshare-net` (no `--ro-bind / /`). Production/canary hosts needing certifiable receipts must provide this.
+- **Linux `bwrap`:** certifiable with proven path-allowlisted `bwrap --unshare-net` (no `--ro-bind / /`).
+- **Approved local container path:** privileged Docker Linux with `bwrap` via `./scripts/run-sealed-linux-certify.sh` may produce sealed receipts for catalog promotion. This is **not** stage/prod shared-host evidence and does not apply Supabase.
 
 ## Deprecated / retired
 

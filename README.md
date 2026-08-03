@@ -68,6 +68,7 @@ Full load-path, Gateway operations, telemetry, and Librarian relationship: Techn
 python3 validator.py --repo-root . --scan-all
 python3 scripts/build-catalog-index.py
 python3 scripts/build-catalog-index.py --check
+./scripts/run-sealed-linux-certify.sh   # sealed local Docker+bwrap certification (not stage)
 python3 -m unittest discover -s tests/skill_runtime -v
 # Internal-launch packages (pytest discovers tests/; archive/ excluded via pytest.ini):
 PYTHONPATH="packages/contracts:packages/core:packages/publisher:packages/eval_runner:packages/tool_runtime:packages/gateway:packages/mcp_server:packages/client:packages/librarian_domain:." \

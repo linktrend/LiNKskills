@@ -31,9 +31,17 @@ class CatalogEntry:
     certification_state: str
     min_reasoning_tier: Optional[str] = None
     usage_trigger: Optional[str] = None
+    release_hash: Optional[str] = None
+    profile_hash: Optional[str] = None
 
     def to_dict(self) -> Dict[str, Any]:
-        return asdict(self)
+        payload = asdict(self)
+        # Omit null optional hashes so draft rows stay compact.
+        if not payload.get("release_hash"):
+            payload.pop("release_hash", None)
+        if not payload.get("profile_hash"):
+            payload.pop("profile_hash", None)
+        return payload
 
 
 def _parse_frontmatter_scalar_block(text: str) -> Dict[str, str]:
@@ -83,13 +91,19 @@ def build_catalog_entries(
     repo_root: Path,
     *,
     certification_overlay: Optional[Dict[str, str]] = None,
+    hash_overlay: Optional[Dict[str, Dict[str, str]]] = None,
 ) -> List[CatalogEntry]:
     """Build catalog entries from on-disk skills.
 
     ``certification_overlay`` maps ``skill_id`` → ``certification_state`` from
-    ``lskills.catalog`` when a live DB is available. Missing keys stay ``draft``.
+    the classification ledger (or ``lskills.catalog`` when a live DB is
+    available). Missing keys stay ``draft``.
+
+    ``hash_overlay`` optionally maps ``skill_id`` → ``{release_hash, profile_hash}``
+    from sealed certification evidence.
     """
     overlay = certification_overlay or {}
+    hashes = hash_overlay or {}
     entries: List[CatalogEntry] = []
     for skill_dir in discover_skill_dirs(repo_root):
         skill_md = skill_dir / "SKILL.md"
@@ -97,6 +111,7 @@ def build_catalog_entries(
         skill_id = skill_dir.name
         version = meta.get("version", "0.0.0")
         eval_suite_ref = f"skills/{skill_id}/references/eval-suite.yaml"
+        hash_meta = hashes.get(skill_id) or {}
         entries.append(
             CatalogEntry(
                 skill_id=skill_id,
@@ -108,6 +123,8 @@ def build_catalog_entries(
                 certification_state=overlay.get(skill_id, "draft"),
                 min_reasoning_tier=meta.get("min_reasoning_tier"),
                 usage_trigger=meta.get("usage_trigger"),
+                release_hash=hash_meta.get("release_hash") or hash_meta.get("skill_release_hash"),
+                profile_hash=hash_meta.get("profile_hash"),
             )
         )
     return entries
@@ -117,10 +134,13 @@ def build_catalog_index(
     repo_root: Path,
     *,
     certification_overlay: Optional[Dict[str, str]] = None,
+    hash_overlay: Optional[Dict[str, Dict[str, str]]] = None,
     git_sha: Optional[str] = None,
 ) -> Dict[str, Any]:
     entries = build_catalog_entries(
-        repo_root, certification_overlay=certification_overlay
+        repo_root,
+        certification_overlay=certification_overlay,
+        hash_overlay=hash_overlay,
     )
     return {
         "schema_version": 1,
@@ -176,6 +196,8 @@ def list_skills(
                 certification_state=state,
                 min_reasoning_tier=raw.get("min_reasoning_tier"),
                 usage_trigger=raw.get("usage_trigger"),
+                release_hash=raw.get("release_hash") or raw.get("skill_release_hash"),
+                profile_hash=raw.get("profile_hash"),
             )
         )
     return results
