@@ -70,6 +70,12 @@ LINKSKILLS_PACI_CLIENT_PRIVATE_KEY_FILE=<SecretRef-injected PEM path>
 
 Issuer values are Platform-locked strings (D8/D9); stage/prod PACI remain **not** enabled until Platform proves them.
 
+`resolve_claims_verifier()` aligns outer AuthClaims `expected_issuer` with the
+PACI authenticator's pinned issuer (`LINKSKILLS_PACI_ISSUER`) when the caller
+does not pass an explicit `expected_issuer`. Non-PACI authenticators retain the
+legacy default `linkplatform-issuer`. Wrong issuers still fail in PACI JWT
+verification before policy.
+
 Crypto backend: **`cryptography` 46.x** (ES256). Skills avoids adding PyJWT/jose unless a later Platform helper requires it.
 
 ## Explicit non-claims
