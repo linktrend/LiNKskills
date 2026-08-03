@@ -28,8 +28,8 @@
 --   profile_hash:       9db2d1db2663d9e3fb2a60b0ab4aaaf291aed010d155caba65798b5ecb0ec188
 --   suite_hash:         8f56554dc1b731e94e735ba9dc9d9942e4c2a495ecf11986b071ac17f22a4662
 --   sealed_evidence_sha256 (file bytes):
---                       bbaae7384cffd785b0585238174b103f213062428cf45160c9435fba660f80e0
---   receipt_hashes:     ec3227e7…, e02b150a…
+--                       a0bb2d56703cb95a6766a8902176f613dffed6af39d798546b338c5b3d77c262
+--   receipt_hashes:     4da15fe0…, 7a4b885d…
 --   text-echo source/tool_hash:
 --                       29b179692378ba32ee244afa7f8b8017e918a158f37127e117cfe24a820f3d83
 --
@@ -53,9 +53,9 @@ declare
   c_skill_release_hash  text := 'skill-release:006a23b0af3abbcb9a0600c3f44bf337b89dc6cdd5be6d328097a2498a5f05bb';
   c_profile_hash        text := '9db2d1db2663d9e3fb2a60b0ab4aaaf291aed010d155caba65798b5ecb0ec188';
   c_suite_hash          text := '8f56554dc1b731e94e735ba9dc9d9942e4c2a495ecf11986b071ac17f22a4662';
-  c_evidence_hash       text := 'bbaae7384cffd785b0585238174b103f213062428cf45160c9435fba660f80e0';
-  c_receipt_hello       text := 'ec3227e77e1d19844c3d3a2d5de65520251263f228ab70a3f0bbe8a64cc8ed49';
-  c_receipt_json        text := 'e02b150ab3915005b44d72c33687677849f27946e6191a57600960a006009005';
+  c_evidence_hash       text := 'a0bb2d56703cb95a6766a8902176f613dffed6af39d798546b338c5b3d77c262';
+  c_receipt_hello       text := '4da15fe03cb8ac71d34e1b86169bfbb35f47c8c7aa411b93ab2519e075de56e8';
+  c_receipt_json        text := '7a4b885d545d0e9352be5151869fe8b4c963332225de3a5eab4b8bfdc810fa99';
   c_tool_hash           text := '29b179692378ba32ee244afa7f8b8017e918a158f37127e117cfe24a820f3d83';
   c_profile_key         text := 'canary-echo-0.2.0-linux-sealed-bwrap';
   c_issuer_id           text := 'linkskills-eval-runner-sealed-linux';

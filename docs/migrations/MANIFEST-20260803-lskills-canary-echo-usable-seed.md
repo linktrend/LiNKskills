@@ -12,8 +12,8 @@ Apply only after platform foundation + prior lskills migrations through `000009`
 | Order | File | SHA-256 |
 |---|---|---|
 | 1–8 (prerequisites) | See `MANIFEST-20260727-lskills-registry-v0.1.md` (`000002` … `000009`) | (pinned there) |
-| 9 (**this package up**) | `supabase/migrations/20260803_000010_lskills_canary_echo_usable_seed.sql` | `a1c6877589881d96a1ac32b4e5c0500a2e5311d4985f90966456c00bcf157977` |
-| 10 (companion down) | `supabase/migrations/20260803_000010_lskills_canary_echo_usable_seed_down.sql` | `7c8e3e98f0d23dee34eeac54232be962cf7df383b5e9924861648e64485da49d` |
+| 9 (**this package up**) | `supabase/migrations/20260803_000010_lskills_canary_echo_usable_seed.sql` | `5e391f4845984dbf83724b3ac931a879f774f91014fb46ced89154145df9f059` |
+| 10 (companion down) | `supabase/migrations/20260803_000010_lskills_canary_echo_usable_seed_down.sql` | `3b48c7f284ae902d6dd97d86dee5f7ba222d04d7900335bd3b3abb9681a2ef5e` |
 
 Tests recompute SHA-256 of on-disk SQL bytes and require the manifest rows to match.
 
@@ -46,9 +46,9 @@ Evidence must be **release/promoting-mode** signed with an externally supplied i
 | `skill_release_hash` | `skill-release:006a23b0af3abbcb9a0600c3f44bf337b89dc6cdd5be6d328097a2498a5f05bb` |
 | `profile_hash` | `9db2d1db2663d9e3fb2a60b0ab4aaaf291aed010d155caba65798b5ecb0ec188` |
 | `suite_hash` | `8f56554dc1b731e94e735ba9dc9d9942e4c2a495ecf11986b071ac17f22a4662` |
-| `sealed_evidence_sha256` / `evidence_hash` | `bbaae7384cffd785b0585238174b103f213062428cf45160c9435fba660f80e0` |
-| receipt `echo-hello` | `ec3227e77e1d19844c3d3a2d5de65520251263f228ab70a3f0bbe8a64cc8ed49` |
-| receipt `echo-json` | `e02b150ab3915005b44d72c33687677849f27946e6191a57600960a006009005` |
+| `sealed_evidence_sha256` / `evidence_hash` | `a0bb2d56703cb95a6766a8902176f613dffed6af39d798546b338c5b3d77c262` |
+| receipt `echo-hello` | `4da15fe03cb8ac71d34e1b86169bfbb35f47c8c7aa411b93ab2519e075de56e8` |
+| receipt `echo-json` | `7a4b885d545d0e9352be5151869fe8b4c963332225de3a5eab4b8bfdc810fa99` |
 | text-echo `source_hash` / `tool_hash` | `29b179692378ba32ee244afa7f8b8017e918a158f37127e117cfe24a820f3d83` |
 | `issuer_id` | `linkskills-eval-runner-sealed-linux` |
 | sealed image digest (release host) | `sha256:57cd7c3a7a273101a6485ba99423ee568157882804b1124b4dd04266317710de` |

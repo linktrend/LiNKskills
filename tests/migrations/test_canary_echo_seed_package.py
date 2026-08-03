@@ -151,7 +151,7 @@ class CanaryEchoSeedPackageTests(unittest.TestCase):
             self.down_sql,
         )
         self.assertIn(
-            "bbaae7384cffd785b0585238174b103f213062428cf45160c9435fba660f80e0",
+            "a0bb2d56703cb95a6766a8902176f613dffed6af39d798546b338c5b3d77c262",
             self.down_sql,
         )
         # Forbid unscoped skill/version deletes without ID/hash guards.
