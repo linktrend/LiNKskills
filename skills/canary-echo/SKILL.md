@@ -1,6 +1,6 @@
 ---
 name: canary-echo
-description: "Safe no-side-effect stage lifecycle canary that echoes tokens via packaged text-echo under sealed Eval Runner certification."
+description: "Stage lifecycle canary that echoes tokens via packaged text-echo under sealed Eval Runner certification. No durable shared/repo/network side effects; workspace-scoped tool writes and mandatory ledger telemetry only."
 usage_trigger: "Use when proving the certification pipeline or verifying sealed executor receipts with a deterministic echo."
 version: 0.2.0
 release_tag: v0.2.0
@@ -26,8 +26,20 @@ last_updated: 2026-08-03
 
 # canary-echo
 
-> **Profile: `simple`.** Stage lifecycle canary. Single-pass, stateless, no side effects.
-> Invokes packaged `tools/text-echo` only. Telemetry ledger append remains mandatory.
+> **Profile: `simple`.** Stage lifecycle canary. Single-pass and stateless with respect to
+> shared systems. Invokes packaged `tools/text-echo` only (`side_effect_class: none`).
+> Telemetry ledger append remains mandatory.
+
+## Side-effect boundary (precise)
+
+| Allowed | Forbidden |
+|---|---|
+| Packaged `text-echo` stdout (no durable mutation) | Network calls |
+| `write_file` / workspace tools **only** inside the ephemeral sealed eval workspace | Mutating the git repo, shared stage state, secrets, or durable host paths outside that workspace |
+| Append-only `execution_ledger.jsonl` telemetry (mandatory for every skill) | Claiming “no side effects” while skipping ledger telemetry |
+
+“No side effects” here means **no durable shared/repo/network mutation**. Ephemeral
+workspace writes during sealed eval and ledger telemetry are expected and in-bounds.
 
 ## Preconditions (Fail-Fast)
 1. Intelligence floor check: confirm the active runtime satisfies `frontmatter.engine`.

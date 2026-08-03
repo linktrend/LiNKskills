@@ -14,14 +14,18 @@
 --   3) UPDATE catalog.certification_state → usable
 -- Order is mandatory; do not disable the trigger or invent columns.
 --
+-- BINDING RULE: sealed evidence must be release/promoting-mode signed with an
+-- externally supplied issuer key (never the repository-visible local HMAC key).
+-- Local non-promoting canaries must not refresh this package.
+--
 -- HASH CONSTANTS — must match evidence/phase10/sealed/canary-echo-sealed.json
 -- on package finalize. Parent may refresh these after a toolchain-hash re-seal.
---   skill_release_hash: skill-release:52be31db2d55866b5cfa36196c8d29a2ce3bf8e8833a1c54e588aade4b8d59ac
---   profile_hash:       b0d3a75267170832387b52360b97ba5cc5b0f56e68e4d7fd5230a5b146f5e3b5
+--   skill_release_hash: skill-release:006a23b0af3abbcb9a0600c3f44bf337b89dc6cdd5be6d328097a2498a5f05bb
+--   profile_hash:       4e146372eb9e0e07c09ce1cd20d6bda3199d7847637c2e93bbf35b2bdde0a4f9
 --   suite_hash:         8f56554dc1b731e94e735ba9dc9d9942e4c2a495ecf11986b071ac17f22a4662
 --   sealed_evidence_sha256 (file bytes):
---                       eeda71e04b6e1e697b67e9ddacf4b357426e9ecbeeecc21381f68912bfa7deb2
---   receipt_hashes:     8168d400…, 348e69a2…
+--                       f5b7a8517130ee55e011ac93408f3c042f3e0efb77176344413ab7a3e8888f72
+--   receipt_hashes:     fb8669da…, f10a02b1…
 --   text-echo source/tool_hash:
 --                       6eaa287b75c8848d700e00aa94518e1b711430b5b01a47abd516ddcbce7f71d0
 --
@@ -49,7 +53,7 @@ insert into lskills.catalog (
   '0.2.0',
   null,
   'canary-echo',
-  'Safe no-side-effect stage lifecycle canary that echoes tokens via packaged text-echo under sealed Eval Runner certification.',
+  'Stage lifecycle canary that echoes tokens via packaged text-echo under sealed Eval Runner certification. No durable shared/repo/network side effects; workspace-scoped tool writes and mandatory ledger telemetry only.',
   'simple',
   jsonb_build_object(
     'name', 'canary-echo',
@@ -57,10 +61,10 @@ insert into lskills.catalog (
     'format_profile', 'simple',
     'release_tag', 'v0.2.0',
     'sealed_evidence_path', 'evidence/phase10/sealed/canary-echo-sealed.json',
-    'skill_release_hash', 'skill-release:52be31db2d55866b5cfa36196c8d29a2ce3bf8e8833a1c54e588aade4b8d59ac',
-    'profile_hash', 'b0d3a75267170832387b52360b97ba5cc5b0f56e68e4d7fd5230a5b146f5e3b5',
+    'skill_release_hash', 'skill-release:006a23b0af3abbcb9a0600c3f44bf337b89dc6cdd5be6d328097a2498a5f05bb',
+    'profile_hash', '4e146372eb9e0e07c09ce1cd20d6bda3199d7847637c2e93bbf35b2bdde0a4f9',
     'suite_hash', '8f56554dc1b731e94e735ba9dc9d9942e4c2a495ecf11986b071ac17f22a4662',
-    'sealed_evidence_sha256', 'eeda71e04b6e1e697b67e9ddacf4b357426e9ecbeeecc21381f68912bfa7deb2'
+    'sealed_evidence_sha256', 'f5b7a8517130ee55e011ac93408f3c042f3e0efb77176344413ab7a3e8888f72'
   ),
   jsonb_build_object(
     'advanced', 'skills/canary-echo/advanced/advanced.md',
@@ -101,13 +105,13 @@ insert into lskills.eval_runs (
   0.8,
   jsonb_build_object(
     'sealed_evidence_path', 'evidence/phase10/sealed/canary-echo-sealed.json',
-    'sealed_evidence_sha256', 'eeda71e04b6e1e697b67e9ddacf4b357426e9ecbeeecc21381f68912bfa7deb2',
-    'skill_release_hash', 'skill-release:52be31db2d55866b5cfa36196c8d29a2ce3bf8e8833a1c54e588aade4b8d59ac',
-    'profile_hash', 'b0d3a75267170832387b52360b97ba5cc5b0f56e68e4d7fd5230a5b146f5e3b5',
+    'sealed_evidence_sha256', 'f5b7a8517130ee55e011ac93408f3c042f3e0efb77176344413ab7a3e8888f72',
+    'skill_release_hash', 'skill-release:006a23b0af3abbcb9a0600c3f44bf337b89dc6cdd5be6d328097a2498a5f05bb',
+    'profile_hash', '4e146372eb9e0e07c09ce1cd20d6bda3199d7847637c2e93bbf35b2bdde0a4f9',
     'suite_hash', '8f56554dc1b731e94e735ba9dc9d9942e4c2a495ecf11986b071ac17f22a4662',
     'receipt_hashes', jsonb_build_array(
-      '8168d400dfc6d1458fd7c078b5aea4ab1708621e19d18def5c2d48f7cb475a3c',
-      '348e69a2110abc99d8f0a25c44a43603f824319fb73bc066d054933a52b12f8e'
+      'fb8669da859b2a890b614993ab500f5d794f4027191b2d1dcd2a665925c35aca',
+      'f10a02b1e130092f0fe4e302b46f2e846553b278adaaa4696dee4f28e8f089fa'
     ),
     'network_isolation', 'denied',
     'certified', true,
@@ -135,10 +139,10 @@ set
   updated_at = now(),
   frontmatter = coalesce(frontmatter, '{}'::jsonb) || jsonb_build_object(
     'sealed_evidence_path', 'evidence/phase10/sealed/canary-echo-sealed.json',
-    'skill_release_hash', 'skill-release:52be31db2d55866b5cfa36196c8d29a2ce3bf8e8833a1c54e588aade4b8d59ac',
-    'profile_hash', 'b0d3a75267170832387b52360b97ba5cc5b0f56e68e4d7fd5230a5b146f5e3b5',
+    'skill_release_hash', 'skill-release:006a23b0af3abbcb9a0600c3f44bf337b89dc6cdd5be6d328097a2498a5f05bb',
+    'profile_hash', '4e146372eb9e0e07c09ce1cd20d6bda3199d7847637c2e93bbf35b2bdde0a4f9',
     'suite_hash', '8f56554dc1b731e94e735ba9dc9d9942e4c2a495ecf11986b071ac17f22a4662',
-    'sealed_evidence_sha256', 'eeda71e04b6e1e697b67e9ddacf4b357426e9ecbeeecc21381f68912bfa7deb2'
+    'sealed_evidence_sha256', 'f5b7a8517130ee55e011ac93408f3c042f3e0efb77176344413ab7a3e8888f72'
   )
 where skill_id = 'canary-echo'
   and version = '0.2.0'
@@ -160,7 +164,7 @@ insert into lskills.releases (
   'c4e00010-a002-4000-8000-c4a47ee00001'::uuid,
   'canary-echo',
   '0.2.0',
-  'skill-release:52be31db2d55866b5cfa36196c8d29a2ce3bf8e8833a1c54e588aade4b8d59ac',
+  'skill-release:006a23b0af3abbcb9a0600c3f44bf337b89dc6cdd5be6d328097a2498a5f05bb',
   'canary',
   jsonb_build_object(
     'skill_id', 'canary-echo',
@@ -173,7 +177,7 @@ insert into lskills.releases (
   jsonb_build_object(
     'package', '20260803_000010_lskills_canary_echo_usable_seed',
     'sealed_evidence_path', 'evidence/phase10/sealed/canary-echo-sealed.json',
-    'sealed_evidence_sha256', 'eeda71e04b6e1e697b67e9ddacf4b357426e9ecbeeecc21381f68912bfa7deb2'
+    'sealed_evidence_sha256', 'f5b7a8517130ee55e011ac93408f3c042f3e0efb77176344413ab7a3e8888f72'
   )
 )
 on conflict (skill_id, version) do nothing;
@@ -189,7 +193,7 @@ insert into lskills.execution_profiles (
 ) values (
   'c4e00010-a003-4000-8000-c4a47ee00001'::uuid,
   'canary-echo-0.2.0-linux-sealed-bwrap',
-  'b0d3a75267170832387b52360b97ba5cc5b0f56e68e4d7fd5230a5b146f5e3b5',
+  '4e146372eb9e0e07c09ce1cd20d6bda3199d7847637c2e93bbf35b2bdde0a4f9',
   'linux',
   'linkskills-eval-executor/0.4.0',
   jsonb_build_object(
@@ -202,7 +206,7 @@ insert into lskills.execution_profiles (
   jsonb_build_object(
     'package', '20260803_000010_lskills_canary_echo_usable_seed',
     'issuer_id', 'linkskills-eval-runner-sealed-linux',
-    'skill_release_hash', 'skill-release:52be31db2d55866b5cfa36196c8d29a2ce3bf8e8833a1c54e588aade4b8d59ac'
+    'skill_release_hash', 'skill-release:006a23b0af3abbcb9a0600c3f44bf337b89dc6cdd5be6d328097a2498a5f05bb'
   )
 )
 on conflict (profile_key) do nothing;
@@ -222,19 +226,19 @@ select
   r.release_id,
   p.profile_id,
   'skills/canary-echo/references/eval-suite.yaml',
-  'eeda71e04b6e1e697b67e9ddacf4b357426e9ecbeeecc21381f68912bfa7deb2',
+  'f5b7a8517130ee55e011ac93408f3c042f3e0efb77176344413ab7a3e8888f72',
   'usable'::lskills.certification_state,
   timestamptz '2026-08-03 09:02:58+00',
   jsonb_build_object(
     'package', '20260803_000010_lskills_canary_echo_usable_seed',
     'sealed_evidence_path', 'evidence/phase10/sealed/canary-echo-sealed.json',
     'receipt_hashes', jsonb_build_array(
-      '8168d400dfc6d1458fd7c078b5aea4ab1708621e19d18def5c2d48f7cb475a3c',
-      '348e69a2110abc99d8f0a25c44a43603f824319fb73bc066d054933a52b12f8e'
+      'fb8669da859b2a890b614993ab500f5d794f4027191b2d1dcd2a665925c35aca',
+      'f10a02b1e130092f0fe4e302b46f2e846553b278adaaa4696dee4f28e8f089fa'
     ),
     'suite_hash', '8f56554dc1b731e94e735ba9dc9d9942e4c2a495ecf11986b071ac17f22a4662',
-    'skill_release_hash', 'skill-release:52be31db2d55866b5cfa36196c8d29a2ce3bf8e8833a1c54e588aade4b8d59ac',
-    'profile_hash', 'b0d3a75267170832387b52360b97ba5cc5b0f56e68e4d7fd5230a5b146f5e3b5',
+    'skill_release_hash', 'skill-release:006a23b0af3abbcb9a0600c3f44bf337b89dc6cdd5be6d328097a2498a5f05bb',
+    'profile_hash', '4e146372eb9e0e07c09ce1cd20d6bda3199d7847637c2e93bbf35b2bdde0a4f9',
     'seed_eval_run_id', 'c4e00010-a001-4000-8000-c4a47ee00001'
   )
 from lskills.releases r

@@ -12,7 +12,7 @@ Apply only after platform foundation + prior lskills migrations through `000009`
 | Order | File | SHA-256 |
 |---|---|---|
 | 1–8 (prerequisites) | See `MANIFEST-20260727-lskills-registry-v0.1.md` (`000002` … `000009`) | (pinned there) |
-| 9 (**this package up**) | `supabase/migrations/20260803_000010_lskills_canary_echo_usable_seed.sql` | `d14c6bef9cccbed9d2d4a6fd3a01569697aba02d071bc8d9affdeea3fac06246` |
+| 9 (**this package up**) | `supabase/migrations/20260803_000010_lskills_canary_echo_usable_seed.sql` | `08013b5a3410a07459d1a33a3fed6121ee9ddad50f6632636863ef4700c76a66` |
 | 10 (companion down) | `supabase/migrations/20260803_000010_lskills_canary_echo_usable_seed_down.sql` | `4849474ab18186f2b118d62f4209cb179d326ce02e32ec931570933289138f6b` |
 
 Tests recompute SHA-256 of on-disk SQL bytes and require the manifest rows to match.
@@ -36,17 +36,20 @@ Does **not** rewrite `000003`, drop schema, truncate, or disable triggers.
 ## Hash constants (sealed evidence)
 
 Must match `evidence/phase10/sealed/canary-echo-sealed.json` on package finalize.
-Parent may refresh after toolchain-hash re-seal.
+Evidence must be **release/promoting-mode** signed with an externally supplied issuer key
+(never the repository-visible local HMAC key). Parent may refresh after re-seal.
 
 | Constant | Value |
 |---|---|
-| `skill_release_hash` | `skill-release:52be31db2d55866b5cfa36196c8d29a2ce3bf8e8833a1c54e588aade4b8d59ac` |
-| `profile_hash` | `b0d3a75267170832387b52360b97ba5cc5b0f56e68e4d7fd5230a5b146f5e3b5` |
+| `skill_release_hash` | `skill-release:006a23b0af3abbcb9a0600c3f44bf337b89dc6cdd5be6d328097a2498a5f05bb` |
+| `profile_hash` | `4e146372eb9e0e07c09ce1cd20d6bda3199d7847637c2e93bbf35b2bdde0a4f9` |
 | `suite_hash` | `8f56554dc1b731e94e735ba9dc9d9942e4c2a495ecf11986b071ac17f22a4662` |
-| `sealed_evidence_sha256` / `evidence_hash` | `eeda71e04b6e1e697b67e9ddacf4b357426e9ecbeeecc21381f68912bfa7deb2` |
-| receipt `echo-hello` | `8168d400dfc6d1458fd7c078b5aea4ab1708621e19d18def5c2d48f7cb475a3c` |
-| receipt `echo-json` | `348e69a2110abc99d8f0a25c44a43603f824319fb73bc066d054933a52b12f8e` |
+| `sealed_evidence_sha256` / `evidence_hash` | `f5b7a8517130ee55e011ac93408f3c042f3e0efb77176344413ab7a3e8888f72` |
+| receipt `echo-hello` | `fb8669da859b2a890b614993ab500f5d794f4027191b2d1dcd2a665925c35aca` |
+| receipt `echo-json` | `f10a02b1e130092f0fe4e302b46f2e846553b278adaaa4696dee4f28e8f089fa` |
 | text-echo `source_hash` / `tool_hash` | `6eaa287b75c8848d700e00aa94518e1b711430b5b01a47abd516ddcbce7f71d0` |
+| `issuer_id` | `linkskills-eval-runner-sealed-linux` |
+| sealed image digest (release host) | `sha256:57cd7c3a7a273101a6485ba99423ee568157882804b1124b4dd04266317710de` |
 
 ## Apply / rollback instructions
 

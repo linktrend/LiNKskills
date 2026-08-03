@@ -230,38 +230,73 @@ def verify_sealed_live_evidence(
     skill_id: str,
     entry: Mapping[str, Any],
 ) -> bool:
-    """Return True only when every cited sealed path verifies for ``skill_id``."""
+    """Return True only when every cited sealed path verifies for ``skill_id``.
+
+    Promotion additionally requires a non-repository-visible issuer key: the
+    documented local HMAC material can forge receipts and must never authorize
+    ``usable`` even when its signature verifies.
+    """
     evidence_paths = entry.get("sealed_live_receipt_evidence") or []
     if not isinstance(evidence_paths, list) or not evidence_paths:
+        return False
+
+    # Lazy import to keep overlay importable without sealed_cert_mode cycles.
+    from lib.skill_runtime.sealed_cert_mode import promoting_issuer_keys
+
+    if not promoting_issuer_keys():
         return False
 
     _ensure_core_importable()
     from linkskills_core.certification import evaluate_certification_evidence
 
-    verified_any = False
-    for raw_path in evidence_paths:
-        resolved = resolve_repo_contained_path(repo_root, str(raw_path))
-        if resolved is None or not resolved.is_file():
-            return False
-        try:
-            payload = json.loads(resolved.read_text(encoding="utf-8"))
-        except (OSError, UnicodeError, json.JSONDecodeError):
-            return False
-        if not isinstance(payload, dict):
-            return False
+    # Temporarily expose only promoting keys so local-dev HMAC cannot pass.
+    import os
 
-        decision = evaluate_certification_evidence(payload)
-        if not decision.allowed:
-            return False
-        if not _evidence_result_passed(payload):
-            return False
+    prior_primary = os.environ.get("LINKSKILLS_EVAL_RUNNER_ISSUER_KEY")
+    prior_extra = os.environ.get("LINKSKILLS_EVAL_RUNNER_TRUSTED_KEYS")
+    promo_keys = promoting_issuer_keys()
+    os.environ["LINKSKILLS_EVAL_RUNNER_ISSUER_KEY"] = promo_keys[0].decode("utf-8")
+    if len(promo_keys) > 1:
+        os.environ["LINKSKILLS_EVAL_RUNNER_TRUSTED_KEYS"] = ",".join(
+            k.decode("utf-8") for k in promo_keys[1:]
+        )
+    elif "LINKSKILLS_EVAL_RUNNER_TRUSTED_KEYS" in os.environ:
+        del os.environ["LINKSKILLS_EVAL_RUNNER_TRUSTED_KEYS"]
 
-        receipts = _iter_receipts(payload)
-        if not _receipts_bind_expected(skill_id, entry, payload, receipts):
-            return False
-        verified_any = True
+    try:
+        verified_any = False
+        for raw_path in evidence_paths:
+            resolved = resolve_repo_contained_path(repo_root, str(raw_path))
+            if resolved is None or not resolved.is_file():
+                return False
+            try:
+                payload = json.loads(resolved.read_text(encoding="utf-8"))
+            except (OSError, UnicodeError, json.JSONDecodeError):
+                return False
+            if not isinstance(payload, dict):
+                return False
 
-    return verified_any
+            decision = evaluate_certification_evidence(payload)
+            if not decision.allowed:
+                return False
+            if not _evidence_result_passed(payload):
+                return False
+
+            receipts = _iter_receipts(payload)
+            if not _receipts_bind_expected(skill_id, entry, payload, receipts):
+                return False
+            verified_any = True
+
+        return verified_any
+    finally:
+        if prior_primary is None:
+            os.environ.pop("LINKSKILLS_EVAL_RUNNER_ISSUER_KEY", None)
+        else:
+            os.environ["LINKSKILLS_EVAL_RUNNER_ISSUER_KEY"] = prior_primary
+        if prior_extra is None:
+            os.environ.pop("LINKSKILLS_EVAL_RUNNER_TRUSTED_KEYS", None)
+        else:
+            os.environ["LINKSKILLS_EVAL_RUNNER_TRUSTED_KEYS"] = prior_extra
 
 
 def overlay_from_ledger(

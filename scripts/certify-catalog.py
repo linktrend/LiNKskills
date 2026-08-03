@@ -10,7 +10,13 @@ Policy (ADR 0006 / 0009 + CLASSIFICATION-HONESTY):
 
 Reproducible sealed host command (local Docker Linux + bwrap, not stage/cloud):
 
-  ./scripts/run-sealed-linux-certify.sh
+  # Release/promoting (default): external issuer key + digest-pinned image
+  LINKSKILLS_EVAL_RUNNER_ISSUER_KEY=… \
+  LINKSKILLS_SEALED_CERT_IMAGE=name@sha256:<digest> \
+    ./scripts/run-sealed-linux-certify.sh
+
+  # Local non-promoting smoke (no usable promotion)
+  ./scripts/run-sealed-linux-certify.sh --local-non-promoting
 
 This script never writes to Supabase / stage / VPS.
 """
@@ -44,6 +50,11 @@ from lib.skill_runtime.catalog import discover_skill_dirs  # noqa: E402
 from lib.skill_runtime.certification_overlay import (  # noqa: E402
     classification_ledger_path,
     load_classification_ledger,
+)
+from lib.skill_runtime.sealed_cert_mode import (  # noqa: E402
+    LOCAL_DEV_EVAL_RUNNER_ISSUER_KEY,
+    is_local_dev_issuer_key,
+    non_promoting_classification,
 )
 
 REPORT_REL = Path("evidence/phase10/catalog-certification-report.json")
@@ -142,6 +153,22 @@ def _suite_path_for_skill(skill_dir: Path) -> Path:
     return skill_dir / "references" / "eval-suite.yaml"
 
 
+def _host_cert_metadata() -> Dict[str, Any]:
+    """Record issuer id + sealed image digest/toolchain host binding (never the key)."""
+    image = os.environ.get("LINKSKILLS_SEALED_CERT_IMAGE", "").strip()
+    digest = os.environ.get("LINKSKILLS_SEALED_CERT_IMAGE_DIGEST", "").strip()
+    if not digest and "@sha256:" in image:
+        digest = image.rsplit("@sha256:", 1)[-1].strip().lower()
+    return {
+        "platform": sys.platform,
+        "issuer_id": os.environ.get("LINKSKILLS_EVAL_RUNNER_ISSUER_ID", ""),
+        "sealed_path": "linux-bwrap-or-approved-container",
+        "sealed_cert_mode": os.environ.get("LINKSKILLS_SEALED_CERT_MODE", "") or "release",
+        "sealed_cert_image": image or None,
+        "sealed_cert_image_digest": digest or None,
+    }
+
+
 def _evaluate_skill(
     skill_dir: Path,
     *,
@@ -149,6 +176,7 @@ def _evaluate_skill(
     require_sealed: bool,
     isolation_ok: bool,
     toolchain: Optional[Dict[str, Any]] = None,
+    non_promoting: bool = False,
 ) -> Dict[str, Any]:
     """Return machine-readable certification outcome for one skill."""
     skill_id = skill_dir.name
@@ -168,6 +196,7 @@ def _evaluate_skill(
         "toolchain": None,
         "source_hash": None,
         "tool_hash": None,
+        "non_promoting": bool(non_promoting),
     }
     if not suite_path.is_file():
         base["reason_code"] = "missing_eval_suite"
@@ -253,6 +282,39 @@ def _evaluate_skill(
     if not decision.certified:
         base["reason_code"] = "certify_refused"
         base["reason"] = decision.reason
+        if non_promoting:
+            base["classification"] = non_promoting_classification(False)
+        return base
+
+    # Local non-promoting mode may exercise the sealed pipeline but must never
+    # write/promote sealed release evidence or mark usable.
+    if non_promoting:
+        base["classification"] = non_promoting_classification(True)
+        base["certified"] = False
+        base["reason_code"] = "non_promoting_eval_pending"
+        base["reason"] = (
+            "local non-promoting mode: sealed pipeline exercised but catalog "
+            "outcome forced to eval_pending (no sealed release evidence written)"
+        )
+        base["receipt_hashes"] = list(decision.receipt_hashes or [])
+        return base
+
+    issuer_key = os.environ.get("LINKSKILLS_EVAL_RUNNER_ISSUER_KEY", "").strip()
+    if not issuer_key:
+        base["reason_code"] = "missing_promoting_issuer_key"
+        base["reason"] = (
+            "LINKSKILLS_EVAL_RUNNER_ISSUER_KEY required to write promoting "
+            "sealed release evidence (no fallback)"
+        )
+        return base
+    if is_local_dev_issuer_key(issuer_key):
+        base["reason_code"] = "local_dev_issuer_key_forbidden"
+        base["reason"] = (
+            "repository-visible local HMAC key cannot produce promoting usable "
+            f"evidence (forbidden key marker: {LOCAL_DEV_EVAL_RUNNER_ISSUER_KEY!r} "
+            "must not be used for release mode)"
+        )
+        # Do not include the key value beyond the known constant name above.
         return base
 
     evidence_rel = SEALED_DIR_REL / f"{skill_id}-sealed.json"
@@ -271,11 +333,7 @@ def _evaluate_skill(
         "toolchain": bound_toolchain,
         "source_hash": base["source_hash"],
         "tool_hash": base["tool_hash"],
-        "host": {
-            "platform": sys.platform,
-            "issuer_id": os.environ.get("LINKSKILLS_EVAL_RUNNER_ISSUER_ID", ""),
-            "sealed_path": "linux-bwrap-or-approved-container",
-        },
+        "host": _host_cert_metadata(),
         "generated_at": _utc_now(),
         "execution_receipts": result.execution_receipts,
         "cases": [
@@ -294,6 +352,7 @@ def _evaluate_skill(
     base["reason_code"] = "certified_usable"
     base["reason"] = decision.reason
     base["evidence_path"] = str(evidence_rel)
+    base["host"] = payload["host"]
     return base
 
 
@@ -423,10 +482,24 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         action="store_true",
         help="Skip catalog rebuild",
     )
+    parser.add_argument(
+        "--non-promoting",
+        action="store_true",
+        help=(
+            "Local non-promoting mode: force draft/eval_pending outcomes and "
+            "never write sealed release evidence under evidence/phase10/sealed/"
+        ),
+    )
     args = parser.parse_args(list(argv) if argv is not None else None)
     repo_root = args.repo_root.resolve()
     require_sealed = bool(args.require_sealed) and not args.allow_unproven_host
     isolation_ok = _proven_isolation_available()
+    non_promoting = bool(args.non_promoting) or os.environ.get(
+        "LINKSKILLS_CERT_NON_PROMOTING", ""
+    ).strip().lower() in {"1", "true", "yes", "on"}
+    if non_promoting:
+        os.environ["LINKSKILLS_CERT_NON_PROMOTING"] = "1"
+        os.environ.setdefault("LINKSKILLS_SEALED_CERT_MODE", "local-non-promoting")
 
     skill_dirs = discover_skill_dirs(repo_root)
     if args.skill:
@@ -453,6 +526,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             require_sealed=require_sealed,
             isolation_ok=isolation_ok,
             toolchain=toolchain,
+            non_promoting=non_promoting,
         )
         for skill_dir in skill_dirs
     ]
@@ -462,11 +536,16 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         "repo_root_marker": "LiNKskills",
         "isolation_probe_denied": isolation_ok,
         "require_sealed": require_sealed,
+        "non_promoting": non_promoting,
         "platform": sys.platform,
+        "host": _host_cert_metadata(),
         "toolchain": toolchain,
         "skill_count": len(results),
         "usable_count": sum(1 for r in results if r["classification"] == "usable"),
         "draft_count": sum(1 for r in results if r["classification"] == "draft"),
+        "eval_pending_count": sum(
+            1 for r in results if r["classification"] == "eval_pending"
+        ),
         "results": results,
     }
     report_path = repo_root / REPORT_REL
@@ -475,8 +554,22 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     print(
         f"Wrote {report_path.relative_to(repo_root)} "
         f"(usable={report['usable_count']} draft={report['draft_count']} "
-        f"isolation_denied={isolation_ok})"
+        f"eval_pending={report['eval_pending_count']} "
+        f"isolation_denied={isolation_ok} non_promoting={non_promoting})"
     )
+
+    # Non-promoting mode may refresh the report but must not promote the
+    # classification ledger / catalog to usable via sealed release evidence.
+    if non_promoting:
+        print(
+            "non-promoting mode: skipped ledger/catalog usable promotion "
+            "(report written; sealed release evidence not written)"
+        )
+        return certification_exit_code(
+            report,
+            requested_skills=list(args.skill or []),
+            require_sealed=False,
+        )
 
     if args.write_ledger and not args.no_write_ledger:
         ledger = _update_ledger(repo_root, results, isolation_ok=isolation_ok)

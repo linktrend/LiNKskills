@@ -22,6 +22,13 @@ Manifest: `docs/migrations/MANIFEST-20260803-lskills-canary-echo-usable-seed.md`
 
 No trigger disable; no rewrite of `000003`.
 
+## Promoting evidence binding
+
+Hash constants must match `evidence/phase10/sealed/canary-echo-sealed.json` produced in
+**release/promoting** sealed-cert mode with an externally supplied issuer key (process-only
+from GSM in production). The repository-visible local HMAC key and
+`--local-non-promoting` canaries must never refresh this package.
+
 ## Stage readiness interaction
 
 This package does **not** clear PREFLIGHT blockers B1–B5. Platform must still supply stage apply + backup receipts. Local structural tests only prove the SQL package is additive and hash-pinned.

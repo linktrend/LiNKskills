@@ -22,7 +22,9 @@ sealed evidence + publication + (when applicable) applied schema.
 **Blocked on (remaining):** executable suite upgrades for launch skills; applied
 `lskills` schema on target Supabase; supervised/live librarian passes.
 **Do not** start multi-day Cursor canary until Platform gates pass independent verification.
-**Reproducible command:** `./scripts/run-sealed-linux-certify.sh`
+**Reproducible command (release/promoting; requires external issuer key + digest-pinned image):**
+`LINKSKILLS_EVAL_RUNNER_ISSUER_KEY=… LINKSKILLS_SEALED_CERT_IMAGE=name@sha256:… ./scripts/run-sealed-linux-certify.sh`
+**Local smoke (non-promoting):** `./scripts/run-sealed-linux-certify.sh --local-non-promoting`
 
 ### 2. Confirm `lskills` migrations applied per environment (Platform-owned live apply)
 
@@ -89,10 +91,12 @@ Telemetry may carry observational `cost` jsonb; no billing ledger in this Progra
 ### Sealed local catalog canary certification — 2026-08-03
 
 Governed branch from `0e03745a177acabfb5a5440e0bbdbc669c4081b6`. Added catalog skill
-`canary-echo` (no-side-effect `text-echo` canary), wired classification-ledger
+`canary-echo` (workspace-scoped/`text-echo` canary; no durable shared/repo/network
+side effects; ledger telemetry expected), wired classification-ledger
 overlay into `scripts/build-catalog-index.py`, and automated
 `scripts/certify-catalog.py` + `./scripts/run-sealed-linux-certify.sh`
-(privileged local Docker Linux + `bwrap`). Result: **usable=1 / draft=34**
+(privileged local Docker Linux + `bwrap`; release mode requires external issuer
+key + digest-pinned image). Result: **usable=1 / draft=34**
 (35 catalog skills). Remaining skills stay draft with machine-readable
 `reason_code` (typically `suite_not_executable`). Confined executor fixes for
 container Python PATH + FHS `/lib` symlink binds. No stage/Supabase/VPS mutation.

@@ -13,7 +13,7 @@
 | Ephemeral disposable Postgres apply + RLS/gateway/review_queue | Proven when suite green | Docker/ephemeral only; never stage/prod |
 | Fail-closed confinement refuses unproven isolation under default mode | Proven | `run_confined` raises without `allow_unproven` |
 | With `LINKSKILLS_EXECUTOR_NETWORK_ISOLATION=allow_unproven` | Stamps `unproven` | Explicitly **not** certifiable |
-| Privileged Docker Linux + `bwrap` sealed catalog canary | Proven | `./scripts/run-sealed-linux-certify.sh` → `canary-echo` `usable` |
+| Privileged Docker Linux + `bwrap` sealed catalog canary | Proven | release mode: external issuer key + digest-pinned image → `canary-echo` `usable`; `--local-non-promoting` stays non-promoting |
 
 ## Blocked for stage / shared runtime
 
@@ -34,9 +34,18 @@ Local privileged Docker sealed canary **≠** stage/prod shared readiness.
 ## Reproducible sealed canary command
 
 ```bash
-./scripts/run-sealed-linux-certify.sh
+# Release/promoting (default): external issuer key + digest-pinned image required
+LINKSKILLS_EVAL_RUNNER_ISSUER_KEY=… \
+LINKSKILLS_SEALED_CERT_IMAGE=python@sha256:<digest> \
+  ./scripts/run-sealed-linux-certify.sh
 # or targeted:
-./scripts/run-sealed-linux-certify.sh --skill canary-echo
+LINKSKILLS_EVAL_RUNNER_ISSUER_KEY=… \
+LINKSKILLS_SEALED_CERT_IMAGE=python@sha256:<digest> \
+  ./scripts/run-sealed-linux-certify.sh --skill canary-echo
+
+# Local non-promoting smoke (no usable promotion / no sealed release evidence write)
+./scripts/run-sealed-linux-certify.sh --local-non-promoting --skill canary-echo
+
 python3 scripts/build-catalog-index.py --check
 ```
 

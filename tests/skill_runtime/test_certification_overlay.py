@@ -21,6 +21,10 @@ os.environ.setdefault(
     "linkskills-local-eval-runner-issuer-key-not-for-production",
 )
 
+# Promoting overlay checks reject the repository-visible local key. Unit tests
+# that assert usable promotion mint + verify under this process-only test key.
+PROMOTING_TEST_ISSUER_KEY = "linkskills-promoting-unit-test-issuer-key-not-for-ci-secret"
+
 from lib.skill_runtime.catalog import build_catalog_index
 from lib.skill_runtime.certification_overlay import (
     load_certification_overlay,
@@ -32,6 +36,7 @@ from lib.skill_runtime.certification_overlay import (
 
 def _seal_receipt(**overrides: Any) -> Dict[str, Any]:
     """Build a sealed executor receipt matching core/eval seal contract."""
+    signing_key = overrides.pop("_signing_key", None)
     base: Dict[str, Any] = {
         "receipt_id": "rcpt-1",
         "case_id": "c1",
@@ -92,9 +97,20 @@ def _seal_receipt(**overrides: Any) -> Dict[str, Any]:
         )
     ).hexdigest()
     base["receipt_hash"] = digest
-    key = os.environ["LINKSKILLS_EVAL_RUNNER_ISSUER_KEY"].encode("utf-8")
+    if signing_key is not None:
+        key = str(signing_key).encode("utf-8")
+    else:
+        key = os.environ["LINKSKILLS_EVAL_RUNNER_ISSUER_KEY"].encode("utf-8")
     base["issuer_signature"] = hmac.new(key, digest.encode("utf-8"), hashlib.sha256).hexdigest()
     return base
+
+
+def _with_promoting_key() -> None:
+    os.environ["LINKSKILLS_EVAL_RUNNER_ISSUER_KEY"] = PROMOTING_TEST_ISSUER_KEY
+
+
+def _seal_promoting_receipt(**overrides: Any) -> Dict[str, Any]:
+    return _seal_receipt(_signing_key=PROMOTING_TEST_ISSUER_KEY, **overrides)
 
 
 def _write_sealed_evidence(
@@ -384,46 +400,16 @@ class CertificationOverlayTests(unittest.TestCase):
                     outside.unlink()
 
     def test_usable_with_valid_sealed_receipt_promotes(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            receipt = _seal_receipt(skill_id="demo-skill")
-            rel = _write_sealed_evidence(root, "evidence/phase10/sealed/demo.json", receipt=receipt)
-            overlay = overlay_from_ledger(
-                {
-                    "skills": {
-                        "demo-skill": {
-                            "classification": "usable",
-                            "sealed_live_receipt_evidence": [rel],
-                            "skill_release_hash": receipt["skill_release_hash"],
-                            "profile_hash": receipt["execution_profile_hash"],
-                            "suite_hash": receipt["suite_hash"],
-                            "tool_hash": "toolhash-ccc",
-                        }
-                    }
-                },
-                repo_root=root,
-            )
-            self.assertEqual(overlay["demo-skill"], "usable")
-
-    def test_build_catalog_applies_overlay_with_valid_receipt(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            skill = root / "skills" / "demo-skill"
-            (skill / "references").mkdir(parents=True)
-            (skill / "SKILL.md").write_text(
-                "---\nname: demo-skill\ndescription: d\nversion: 0.1.0\n"
-                "usage_trigger: t\nformat_profile: simple\n---\n# demo\n",
-                encoding="utf-8",
-            )
-            (skill / "references" / "eval-suite.yaml").write_text(
-                "skill_id: demo-skill\n", encoding="utf-8"
-            )
-            receipt = _seal_receipt(skill_id="demo-skill")
-            rel = _write_sealed_evidence(root, "evidence/phase10/sealed/demo.json", receipt=receipt)
-            ledger_dir = root / "evidence" / "phase10"
-            ledger_dir.mkdir(parents=True, exist_ok=True)
-            (ledger_dir / "skill-classification-draft.json").write_text(
-                json.dumps(
+        prior = os.environ.get("LINKSKILLS_EVAL_RUNNER_ISSUER_KEY")
+        _with_promoting_key()
+        try:
+            with tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                receipt = _seal_promoting_receipt(skill_id="demo-skill")
+                rel = _write_sealed_evidence(
+                    root, "evidence/phase10/sealed/demo.json", receipt=receipt
+                )
+                overlay = overlay_from_ledger(
                     {
                         "skills": {
                             "demo-skill": {
@@ -431,16 +417,66 @@ class CertificationOverlayTests(unittest.TestCase):
                                 "sealed_live_receipt_evidence": [rel],
                                 "skill_release_hash": receipt["skill_release_hash"],
                                 "profile_hash": receipt["execution_profile_hash"],
+                                "suite_hash": receipt["suite_hash"],
+                                "tool_hash": "toolhash-ccc",
                             }
                         }
-                    }
-                ),
-                encoding="utf-8",
-            )
-            overlay = load_certification_overlay(root)
-            index = build_catalog_index(root, certification_overlay=overlay)
-            self.assertEqual(index["skill_count"], 1)
-            self.assertEqual(index["skills"][0]["certification_state"], "usable")
+                    },
+                    repo_root=root,
+                )
+                self.assertEqual(overlay["demo-skill"], "usable")
+        finally:
+            if prior is None:
+                os.environ.pop("LINKSKILLS_EVAL_RUNNER_ISSUER_KEY", None)
+            else:
+                os.environ["LINKSKILLS_EVAL_RUNNER_ISSUER_KEY"] = prior
+
+    def test_build_catalog_applies_overlay_with_valid_receipt(self) -> None:
+        prior = os.environ.get("LINKSKILLS_EVAL_RUNNER_ISSUER_KEY")
+        _with_promoting_key()
+        try:
+            with tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                skill = root / "skills" / "demo-skill"
+                (skill / "references").mkdir(parents=True)
+                (skill / "SKILL.md").write_text(
+                    "---\nname: demo-skill\ndescription: d\nversion: 0.1.0\n"
+                    "usage_trigger: t\nformat_profile: simple\n---\n# demo\n",
+                    encoding="utf-8",
+                )
+                (skill / "references" / "eval-suite.yaml").write_text(
+                    "skill_id: demo-skill\n", encoding="utf-8"
+                )
+                receipt = _seal_promoting_receipt(skill_id="demo-skill")
+                rel = _write_sealed_evidence(
+                    root, "evidence/phase10/sealed/demo.json", receipt=receipt
+                )
+                ledger_dir = root / "evidence" / "phase10"
+                ledger_dir.mkdir(parents=True, exist_ok=True)
+                (ledger_dir / "skill-classification-draft.json").write_text(
+                    json.dumps(
+                        {
+                            "skills": {
+                                "demo-skill": {
+                                    "classification": "usable",
+                                    "sealed_live_receipt_evidence": [rel],
+                                    "skill_release_hash": receipt["skill_release_hash"],
+                                    "profile_hash": receipt["execution_profile_hash"],
+                                }
+                            }
+                        }
+                    ),
+                    encoding="utf-8",
+                )
+                overlay = load_certification_overlay(root)
+                index = build_catalog_index(root, certification_overlay=overlay)
+                self.assertEqual(index["skill_count"], 1)
+                self.assertEqual(index["skills"][0]["certification_state"], "usable")
+        finally:
+            if prior is None:
+                os.environ.pop("LINKSKILLS_EVAL_RUNNER_ISSUER_KEY", None)
+            else:
+                os.environ["LINKSKILLS_EVAL_RUNNER_ISSUER_KEY"] = prior
 
     def test_build_catalog_nonexistent_evidence_stays_draft(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -488,21 +524,45 @@ class CatalogCanarySkillTests(unittest.TestCase):
         self.assertIn("text-echo", text)
         self.assertIn("scenarios:", text)
 
-    def test_repo_overlay_loader_promotes_canary_with_verified_receipt(self) -> None:
-        overlay = load_certification_overlay(REPO_ROOT)
-        self.assertEqual(overlay.get("canary-echo"), "usable")
-        for skill_id, state in overlay.items():
-            if state == "usable":
-                ledger = json.loads(
-                    (REPO_ROOT / "evidence/phase10/skill-classification-draft.json").read_text(
-                        encoding="utf-8"
-                    )
+    def test_repo_overlay_loader_requires_promoting_issuer_for_canary(self) -> None:
+        """Public/local-dev key must not promote canary; promoting key may.
+
+        Without an externally supplied promoting issuer key, overlay fail-closes
+        to draft even when sealed evidence paths are present.
+        """
+        prior = os.environ.get("LINKSKILLS_EVAL_RUNNER_ISSUER_KEY")
+        try:
+            os.environ["LINKSKILLS_EVAL_RUNNER_ISSUER_KEY"] = (
+                "linkskills-local-eval-runner-issuer-key-not-for-production"
+            )
+            overlay = load_certification_overlay(REPO_ROOT)
+            self.assertNotEqual(
+                overlay.get("canary-echo"),
+                "usable",
+                msg="local-dev issuer key must never authorize usable promotion",
+            )
+
+            promoting = os.environ.get("LINKSKILLS_PROMOTING_OVERLAY_TEST_KEY", "").strip()
+            if not promoting:
+                self.skipTest(
+                    "set LINKSKILLS_PROMOTING_OVERLAY_TEST_KEY to the process-only "
+                    "key that signed evidence/phase10/sealed/canary-echo-sealed.json"
                 )
-                entry = ledger["skills"][skill_id]
-                self.assertTrue(
-                    verify_sealed_live_evidence(REPO_ROOT, skill_id, entry),
-                    msg=f"{skill_id} usable without verified sealed evidence",
+            os.environ["LINKSKILLS_EVAL_RUNNER_ISSUER_KEY"] = promoting
+            overlay = load_certification_overlay(REPO_ROOT)
+            self.assertEqual(overlay.get("canary-echo"), "usable")
+            ledger = json.loads(
+                (REPO_ROOT / "evidence/phase10/skill-classification-draft.json").read_text(
+                    encoding="utf-8"
                 )
+            )
+            entry = ledger["skills"]["canary-echo"]
+            self.assertTrue(verify_sealed_live_evidence(REPO_ROOT, "canary-echo", entry))
+        finally:
+            if prior is None:
+                os.environ.pop("LINKSKILLS_EVAL_RUNNER_ISSUER_KEY", None)
+            else:
+                os.environ["LINKSKILLS_EVAL_RUNNER_ISSUER_KEY"] = prior
 
 
 if __name__ == "__main__":
