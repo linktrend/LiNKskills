@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-03
 **Branch:** `dev/cloudcursor/skills-stage-certification`
-**Tip SHA:** `dc2758e6896d2f6482fe89ca416c709a40aee1e8`
+**Tip SHA:** `e27ee8e5ccce67d553c8f4649ddd10cf6f7cddff` (evidence/catalog commit; branch may add docs-only commits)
 **Evidence/catalog tip (this commit family):** see branch HEAD after push
 **Governed source commit:** `0a232932d97a35661c165492649b8814705b04cc`
 **source_tree_sha256:** `e6ce798f62da1a2c9781269ac40bed4d08a5fc6c5d09a673c29c667373671894`
