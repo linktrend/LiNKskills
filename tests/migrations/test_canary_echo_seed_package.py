@@ -111,17 +111,65 @@ class CanaryEchoSeedPackageTests(unittest.TestCase):
         )
         self.assertIn("'high'", self.up_sql)
 
-    def test_idempotent_on_conflict_patterns(self) -> None:
-        self.assertIn("on conflict", self.up_code)
-        self.assertIn("do nothing", self.up_code)
+    def test_fail_closed_assertions_not_silent_do_nothing(self) -> None:
+        """Up must assert pinned row equality; silent DO NOTHING promote is forbidden."""
+        self.assertIn("raise exception", self.up_code)
+        self.assertIn("fail-closed", self.up_code)
+        # Centralized package UUID pins must remain present for parent hash refresh.
+        for pin in (
+            "c4e00010-a001-4000-8000-c4a47ee00001",
+            "c4e00010-a002-4000-8000-c4a47ee00001",
+            "c4e00010-a003-4000-8000-c4a47ee00001",
+            "c4e00010-a004-4000-8000-c4a47ee00001",
+        ):
+            self.assertIn(pin, self.up_sql)
+        # Broad silent conflict swallow without equality check is not acceptable.
+        # Prefer check-then-insert / equality assert over bare DO NOTHING promote.
+        self.assertNotRegex(
+            self.up_code,
+            r"on\s+conflict\s*\([^)]+\)\s*do\s+nothing",
+            "use fail-closed equality checks instead of silent ON CONFLICT DO NOTHING",
+        )
 
-    def test_down_deletes_only_canary_echo_rows(self) -> None:
+    def test_down_deletes_only_exact_package_ids_and_hashes(self) -> None:
         self.assertIn("canary-echo", self.down_sql)
         self.assertIn("delete from lskills.catalog", self.down_code)
         self.assertIn("delete from lskills.eval_runs", self.down_code)
         self.assertNotIn("drop table", self.down_code)
         self.assertNotIn("drop schema", self.down_code)
         self.assertNotIn("cascade", self.down_code)
+        # Exact package UUID guards (no broad skill_id+version wipe).
+        for pin in (
+            "c4e00010-a001-4000-8000-c4a47ee00001",
+            "c4e00010-a002-4000-8000-c4a47ee00001",
+            "c4e00010-a003-4000-8000-c4a47ee00001",
+            "c4e00010-a004-4000-8000-c4a47ee00001",
+        ):
+            self.assertIn(pin, self.down_sql)
+        self.assertIn(
+            "skill-release:006a23b0af3abbcb9a0600c3f44bf337b89dc6cdd5be6d328097a2498a5f05bb",
+            self.down_sql,
+        )
+        self.assertIn(
+            "bbaae7384cffd785b0585238174b103f213062428cf45160c9435fba660f80e0",
+            self.down_sql,
+        )
+        # Forbid unscoped skill/version deletes without ID/hash guards.
+        self.assertNotRegex(
+            self.down_code,
+            r"delete\s+from\s+lskills\.catalog\s+where\s+skill_id\s*=\s*'canary-echo'\s+"
+            r"and\s+version\s*=\s*'0\.2\.0'\s*;",
+        )
+        self.assertNotRegex(
+            self.down_code,
+            r"delete\s+from\s+lskills\.releases\s+where\s+skill_id\s*=\s*'canary-echo'\s+"
+            r"and\s+version\s*=\s*'0\.2\.0'\s*;",
+        )
+        self.assertNotRegex(
+            self.down_code,
+            r"delete\s+from\s+lskills\.eval_runs\s+where\s+skill_id\s*=\s*'canary-echo'\s+"
+            r"and\s+skill_version\s*=\s*'0\.2\.0'\s*;",
+        )
 
     def test_manifest_sha256_matches_sql_bytes(self) -> None:
         rows = {

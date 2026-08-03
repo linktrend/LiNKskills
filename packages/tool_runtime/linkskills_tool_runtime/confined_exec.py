@@ -393,6 +393,24 @@ def _resolve_argv0(argv0: str) -> str:
     return resolved or argv0
 
 
+def _ephemeral_sandbox_profile_path() -> Path:
+    """Allocate a seatbelt profile path under system temp (never under workspace).
+
+    Workspace is frequently the tool package directory that ``source_hash``
+    walks; writing ``tmp/fs-allowlist.sb`` there contaminated clean-archive
+    reproducibility.
+    """
+    state_root = Path(tempfile.gettempdir()) / "linkskills-confine-state"
+    state_root.mkdir(parents=True, exist_ok=True)
+    handle, name = tempfile.mkstemp(
+        prefix="fs-allowlist-",
+        suffix=".sb",
+        dir=str(state_root),
+    )
+    os.close(handle)
+    return Path(name)
+
+
 def _wrap_with_network_deny(
     argv: Sequence[str],
     *,
@@ -420,8 +438,9 @@ def _wrap_with_network_deny(
             profile = _darwin_allowlist_profile(workspace=workspace, read_paths=read_paths)
             if _profile_uses_global_file_read(profile):
                 return cmd, "unavailable"
-            profile_path = workspace / "tmp" / "fs-allowlist.sb"
-            profile_path.parent.mkdir(parents=True, exist_ok=True)
+            # Never write seatbelt profiles under workspace (often the tool package
+            # tree that source_hash walks). Keep them in ephemeral system state.
+            profile_path = _ephemeral_sandbox_profile_path()
             profile_path.write_text(profile, encoding="utf-8")
             probe_env = dict(env or sanitize_env(workspace=workspace))
             if _darwin_allowlist_boots(

@@ -14,6 +14,10 @@
 --   3) UPDATE catalog.certification_state → usable
 -- Order is mandatory; do not disable the trigger or invent columns.
 --
+-- FAIL-CLOSED: existing rows on conflict keys must match ALL pinned IDs/hashes/
+-- evidence/profile/suite/tool constants below. Mismatch → RAISE EXCEPTION
+-- (transaction rolls back; no partial usable promote).
+--
 -- BINDING RULE: sealed evidence must be release/promoting-mode signed with an
 -- externally supplied issuer key (never the repository-visible local HMAC key).
 -- Local non-promoting canaries must not refresh this package.
@@ -21,229 +25,391 @@
 -- HASH CONSTANTS — must match evidence/phase10/sealed/canary-echo-sealed.json
 -- on package finalize. Parent may refresh these after a toolchain-hash re-seal.
 --   skill_release_hash: skill-release:006a23b0af3abbcb9a0600c3f44bf337b89dc6cdd5be6d328097a2498a5f05bb
---   profile_hash:       4e146372eb9e0e07c09ce1cd20d6bda3199d7847637c2e93bbf35b2bdde0a4f9
+--   profile_hash:       9db2d1db2663d9e3fb2a60b0ab4aaaf291aed010d155caba65798b5ecb0ec188
 --   suite_hash:         8f56554dc1b731e94e735ba9dc9d9942e4c2a495ecf11986b071ac17f22a4662
 --   sealed_evidence_sha256 (file bytes):
---                       f5b7a8517130ee55e011ac93408f3c042f3e0efb77176344413ab7a3e8888f72
---   receipt_hashes:     fb8669da…, f10a02b1…
+--                       bbaae7384cffd785b0585238174b103f213062428cf45160c9435fba660f80e0
+--   receipt_hashes:     ec3227e7…, e02b150a…
 --   text-echo source/tool_hash:
---                       6eaa287b75c8848d700e00aa94518e1b711430b5b01a47abd516ddcbce7f71d0
+--                       29b179692378ba32ee244afa7f8b8017e918a158f37127e117cfe24a820f3d83
+--
+-- PACKAGE IDS (fixed):
+--   eval_run_id:        c4e00010-a001-4000-8000-c4a47ee00001
+--   release_id:         c4e00010-a002-4000-8000-c4a47ee00001
+--   profile_id:         c4e00010-a003-4000-8000-c4a47ee00001
+--   certification_id:   c4e00010-a004-4000-8000-c4a47ee00001
 --
 -- DOWN: separately dated companion
 --   20260803_000010_lskills_canary_echo_usable_seed_down.sql
--- deletes ONLY this package's rows. Never drop schema.
+-- deletes ONLY this package's exact IDs/hashes. Never drop schema.
 
--- ---------------------------------------------------------------------------
--- 1) Catalog row — draft first (trigger rejects usable without passing eval)
--- ---------------------------------------------------------------------------
-insert into lskills.catalog (
-  skill_id,
-  version,
-  org_id,
-  display_name,
-  description,
-  format_profile,
-  frontmatter,
-  disclosure_refs,
-  eval_suite_ref,
-  certification_state,
-  min_reasoning_tier
-) values (
-  'canary-echo',
-  '0.2.0',
-  null,
-  'canary-echo',
-  'Stage lifecycle canary that echoes tokens via packaged text-echo under sealed Eval Runner certification. No durable shared/repo/network side effects; workspace-scoped tool writes and mandatory ledger telemetry only.',
-  'simple',
-  jsonb_build_object(
-    'name', 'canary-echo',
-    'version', '0.2.0',
+do $pkg$
+declare
+  -- Centralized pins (parent refreshes hash literals here after re-seal).
+  c_skill_id            text := 'canary-echo';
+  c_version             text := '0.2.0';
+  c_eval_suite_ref      text := 'skills/canary-echo/references/eval-suite.yaml';
+  c_sealed_path         text := 'evidence/phase10/sealed/canary-echo-sealed.json';
+  c_skill_release_hash  text := 'skill-release:006a23b0af3abbcb9a0600c3f44bf337b89dc6cdd5be6d328097a2498a5f05bb';
+  c_profile_hash        text := '9db2d1db2663d9e3fb2a60b0ab4aaaf291aed010d155caba65798b5ecb0ec188';
+  c_suite_hash          text := '8f56554dc1b731e94e735ba9dc9d9942e4c2a495ecf11986b071ac17f22a4662';
+  c_evidence_hash       text := 'bbaae7384cffd785b0585238174b103f213062428cf45160c9435fba660f80e0';
+  c_receipt_hello       text := 'ec3227e77e1d19844c3d3a2d5de65520251263f228ab70a3f0bbe8a64cc8ed49';
+  c_receipt_json        text := 'e02b150ab3915005b44d72c33687677849f27946e6191a57600960a006009005';
+  c_tool_hash           text := '29b179692378ba32ee244afa7f8b8017e918a158f37127e117cfe24a820f3d83';
+  c_profile_key         text := 'canary-echo-0.2.0-linux-sealed-bwrap';
+  c_issuer_id           text := 'linkskills-eval-runner-sealed-linux';
+  c_adapter_version     text := 'linkskills-eval-executor/0.4.0';
+  c_package_name        text := '20260803_000010_lskills_canary_echo_usable_seed';
+  c_eval_run_id         uuid := 'c4e00010-a001-4000-8000-c4a47ee00001'::uuid;
+  c_release_id          uuid := 'c4e00010-a002-4000-8000-c4a47ee00001'::uuid;
+  c_profile_id          uuid := 'c4e00010-a003-4000-8000-c4a47ee00001'::uuid;
+  c_certification_id    uuid := 'c4e00010-a004-4000-8000-c4a47ee00001'::uuid;
+  c_certified_at        timestamptz := timestamptz '2026-08-03 09:50:05+00';
+  c_description         text := 'Stage lifecycle canary that echoes tokens via packaged text-echo under sealed Eval Runner certification. No durable shared/repo/network side effects; workspace-scoped tool writes and mandatory ledger telemetry only.';
+  v_frontmatter         jsonb;
+  v_disclosure          jsonb;
+  v_eff                 jsonb;
+  v_size                jsonb;
+  v_content_manifest    jsonb;
+  v_release_meta        jsonb;
+  v_toolchain           jsonb;
+  v_profile_meta        jsonb;
+  v_cert_meta           jsonb;
+begin
+  v_frontmatter := jsonb_build_object(
+    'name', c_skill_id,
+    'version', c_version,
     'format_profile', 'simple',
     'release_tag', 'v0.2.0',
-    'sealed_evidence_path', 'evidence/phase10/sealed/canary-echo-sealed.json',
-    'skill_release_hash', 'skill-release:006a23b0af3abbcb9a0600c3f44bf337b89dc6cdd5be6d328097a2498a5f05bb',
-    'profile_hash', '4e146372eb9e0e07c09ce1cd20d6bda3199d7847637c2e93bbf35b2bdde0a4f9',
-    'suite_hash', '8f56554dc1b731e94e735ba9dc9d9942e4c2a495ecf11986b071ac17f22a4662',
-    'sealed_evidence_sha256', 'f5b7a8517130ee55e011ac93408f3c042f3e0efb77176344413ab7a3e8888f72'
-  ),
-  jsonb_build_object(
+    'sealed_evidence_path', c_sealed_path,
+    'skill_release_hash', c_skill_release_hash,
+    'profile_hash', c_profile_hash,
+    'suite_hash', c_suite_hash,
+    'sealed_evidence_sha256', c_evidence_hash
+  );
+  v_disclosure := jsonb_build_object(
     'advanced', 'skills/canary-echo/advanced/advanced.md',
     'schemas', 'skills/canary-echo/references/schemas.json'
-  ),
-  'skills/canary-echo/references/eval-suite.yaml',
-  'draft',
-  'fast'
-)
-on conflict (skill_id, version) do nothing;
-
--- ---------------------------------------------------------------------------
--- 2) Passing eval_run bound to sealed evidence identity (existing columns only)
---    Evidence refs live in efficiency_metrics / size_metrics jsonb — no new cols.
--- ---------------------------------------------------------------------------
-insert into lskills.eval_runs (
-  eval_run_id,
-  skill_id,
-  skill_version,
-  eval_suite_ref,
-  rubric_scores,
-  overall_score,
-  passed,
-  pass_threshold,
-  efficiency_metrics,
-  size_metrics,
-  judge_model,
-  judge_model_version,
-  judge_tier
-) values (
-  'c4e00010-a001-4000-8000-c4a47ee00001'::uuid,
-  'canary-echo',
-  '0.2.0',
-  'skills/canary-echo/references/eval-suite.yaml',
-  '{"correctness": 1.0}'::jsonb,
-  1.0,
-  true,
-  0.8,
-  jsonb_build_object(
-    'sealed_evidence_path', 'evidence/phase10/sealed/canary-echo-sealed.json',
-    'sealed_evidence_sha256', 'f5b7a8517130ee55e011ac93408f3c042f3e0efb77176344413ab7a3e8888f72',
-    'skill_release_hash', 'skill-release:006a23b0af3abbcb9a0600c3f44bf337b89dc6cdd5be6d328097a2498a5f05bb',
-    'profile_hash', '4e146372eb9e0e07c09ce1cd20d6bda3199d7847637c2e93bbf35b2bdde0a4f9',
-    'suite_hash', '8f56554dc1b731e94e735ba9dc9d9942e4c2a495ecf11986b071ac17f22a4662',
-    'receipt_hashes', jsonb_build_array(
-      'fb8669da859b2a890b614993ab500f5d794f4027191b2d1dcd2a665925c35aca',
-      'f10a02b1e130092f0fe4e302b46f2e846553b278adaaa4696dee4f28e8f089fa'
-    ),
+  );
+  v_eff := jsonb_build_object(
+    'sealed_evidence_path', c_sealed_path,
+    'sealed_evidence_sha256', c_evidence_hash,
+    'skill_release_hash', c_skill_release_hash,
+    'profile_hash', c_profile_hash,
+    'suite_hash', c_suite_hash,
+    'receipt_hashes', jsonb_build_array(c_receipt_hello, c_receipt_json),
     'network_isolation', 'denied',
     'certified', true,
     'tool_calls', 2
-  ),
-  jsonb_build_object(
+  );
+  v_size := jsonb_build_object(
     'suite_id', 'canary-echo-catalog-suite',
-    'suite_version', '0.2.0',
+    'suite_version', c_version,
     'cases_passed', jsonb_build_array('echo-hello', 'echo-json'),
     'weighted_score', 1.0,
-    'issuer_id', 'linkskills-eval-runner-sealed-linux'
-  ),
-  'linkskills-eval-runner-sealed-linux',
-  'linkskills-eval-executor/0.4.0',
-  'high'
-)
-on conflict (eval_run_id) do nothing;
-
--- ---------------------------------------------------------------------------
--- 3) Promote to usable only after a passing eval_run exists for this version
--- ---------------------------------------------------------------------------
-update lskills.catalog
-set
-  certification_state = 'usable',
-  updated_at = now(),
-  frontmatter = coalesce(frontmatter, '{}'::jsonb) || jsonb_build_object(
-    'sealed_evidence_path', 'evidence/phase10/sealed/canary-echo-sealed.json',
-    'skill_release_hash', 'skill-release:006a23b0af3abbcb9a0600c3f44bf337b89dc6cdd5be6d328097a2498a5f05bb',
-    'profile_hash', '4e146372eb9e0e07c09ce1cd20d6bda3199d7847637c2e93bbf35b2bdde0a4f9',
-    'suite_hash', '8f56554dc1b731e94e735ba9dc9d9942e4c2a495ecf11986b071ac17f22a4662',
-    'sealed_evidence_sha256', 'f5b7a8517130ee55e011ac93408f3c042f3e0efb77176344413ab7a3e8888f72'
-  )
-where skill_id = 'canary-echo'
-  and version = '0.2.0'
-  and certification_state is distinct from 'usable';
-
--- ---------------------------------------------------------------------------
--- 4) Registry bindings (000005+) — releases / execution_profiles / certifications
--- ---------------------------------------------------------------------------
-insert into lskills.releases (
-  release_id,
-  skill_id,
-  version,
-  release_hash,
-  channel,
-  content_manifest,
-  immutable,
-  metadata
-) values (
-  'c4e00010-a002-4000-8000-c4a47ee00001'::uuid,
-  'canary-echo',
-  '0.2.0',
-  'skill-release:006a23b0af3abbcb9a0600c3f44bf337b89dc6cdd5be6d328097a2498a5f05bb',
-  'canary',
-  jsonb_build_object(
-    'skill_id', 'canary-echo',
-    'version', '0.2.0',
+    'issuer_id', c_issuer_id
+  );
+  v_content_manifest := jsonb_build_object(
+    'skill_id', c_skill_id,
+    'version', c_version,
     'format_profile', 'simple',
-    'eval_suite_ref', 'skills/canary-echo/references/eval-suite.yaml',
-    'suite_hash', '8f56554dc1b731e94e735ba9dc9d9942e4c2a495ecf11986b071ac17f22a4662'
-  ),
-  true,
-  jsonb_build_object(
-    'package', '20260803_000010_lskills_canary_echo_usable_seed',
-    'sealed_evidence_path', 'evidence/phase10/sealed/canary-echo-sealed.json',
-    'sealed_evidence_sha256', 'f5b7a8517130ee55e011ac93408f3c042f3e0efb77176344413ab7a3e8888f72'
-  )
-)
-on conflict (skill_id, version) do nothing;
-
-insert into lskills.execution_profiles (
-  profile_id,
-  profile_key,
-  profile_hash,
-  runtime,
-  adapter_version,
-  toolchain,
-  metadata
-) values (
-  'c4e00010-a003-4000-8000-c4a47ee00001'::uuid,
-  'canary-echo-0.2.0-linux-sealed-bwrap',
-  '4e146372eb9e0e07c09ce1cd20d6bda3199d7847637c2e93bbf35b2bdde0a4f9',
-  'linux',
-  'linkskills-eval-executor/0.4.0',
-  jsonb_build_object(
+    'eval_suite_ref', c_eval_suite_ref,
+    'suite_hash', c_suite_hash
+  );
+  v_release_meta := jsonb_build_object(
+    'package', c_package_name,
+    'sealed_evidence_path', c_sealed_path,
+    'sealed_evidence_sha256', c_evidence_hash
+  );
+  v_toolchain := jsonb_build_object(
     'tools', jsonb_build_array(
-      jsonb_build_object('tool_id', 'text-echo', 'version', '1.0.0', 'source_hash', '6eaa287b75c8848d700e00aa94518e1b711430b5b01a47abd516ddcbce7f71d0', 'tool_hash', '6eaa287b75c8848d700e00aa94518e1b711430b5b01a47abd516ddcbce7f71d0')
+      jsonb_build_object(
+        'tool_id', 'text-echo',
+        'version', '1.0.0',
+        'source_hash', c_tool_hash,
+        'tool_hash', c_tool_hash
+      )
     ),
     'network_isolation', 'denied',
     'host_sealed_path', 'linux-bwrap-or-approved-container'
-  ),
-  jsonb_build_object(
-    'package', '20260803_000010_lskills_canary_echo_usable_seed',
-    'issuer_id', 'linkskills-eval-runner-sealed-linux',
-    'skill_release_hash', 'skill-release:006a23b0af3abbcb9a0600c3f44bf337b89dc6cdd5be6d328097a2498a5f05bb'
-  )
-)
-on conflict (profile_key) do nothing;
+  );
+  v_profile_meta := jsonb_build_object(
+    'package', c_package_name,
+    'issuer_id', c_issuer_id,
+    'skill_release_hash', c_skill_release_hash
+  );
+  v_cert_meta := jsonb_build_object(
+    'package', c_package_name,
+    'sealed_evidence_path', c_sealed_path,
+    'receipt_hashes', jsonb_build_array(c_receipt_hello, c_receipt_json),
+    'suite_hash', c_suite_hash,
+    'skill_release_hash', c_skill_release_hash,
+    'profile_hash', c_profile_hash,
+    'seed_eval_run_id', c_eval_run_id
+  );
 
-insert into lskills.certifications (
-  certification_id,
-  release_id,
-  profile_id,
-  eval_run_ref,
-  evidence_hash,
-  state,
-  certified_at,
-  metadata
-)
-select
-  'c4e00010-a004-4000-8000-c4a47ee00001'::uuid,
-  r.release_id,
-  p.profile_id,
-  'skills/canary-echo/references/eval-suite.yaml',
-  'f5b7a8517130ee55e011ac93408f3c042f3e0efb77176344413ab7a3e8888f72',
-  'usable'::lskills.certification_state,
-  timestamptz '2026-08-03 09:02:58+00',
-  jsonb_build_object(
-    'package', '20260803_000010_lskills_canary_echo_usable_seed',
-    'sealed_evidence_path', 'evidence/phase10/sealed/canary-echo-sealed.json',
-    'receipt_hashes', jsonb_build_array(
-      'fb8669da859b2a890b614993ab500f5d794f4027191b2d1dcd2a665925c35aca',
-      'f10a02b1e130092f0fe4e302b46f2e846553b278adaaa4696dee4f28e8f089fa'
-    ),
-    'suite_hash', '8f56554dc1b731e94e735ba9dc9d9942e4c2a495ecf11986b071ac17f22a4662',
-    'skill_release_hash', 'skill-release:006a23b0af3abbcb9a0600c3f44bf337b89dc6cdd5be6d328097a2498a5f05bb',
-    'profile_hash', '4e146372eb9e0e07c09ce1cd20d6bda3199d7847637c2e93bbf35b2bdde0a4f9',
-    'seed_eval_run_id', 'c4e00010-a001-4000-8000-c4a47ee00001'
-  )
-from lskills.releases r
-cross join lskills.execution_profiles p
-where r.skill_id = 'canary-echo'
-  and r.version = '0.2.0'
-  and p.profile_key = 'canary-echo-0.2.0-linux-sealed-bwrap'
-on conflict (release_id, profile_id) do nothing;
+  -- ---------------------------------------------------------------------------
+  -- 1) Catalog — check-then-insert (PK skill_id, version)
+  -- ---------------------------------------------------------------------------
+  if exists (
+    select 1 from lskills.catalog
+    where skill_id = c_skill_id and version = c_version
+  ) then
+    if not exists (
+      select 1 from lskills.catalog
+      where skill_id = c_skill_id
+        and version = c_version
+        and display_name = c_skill_id
+        and description is not distinct from c_description
+        and format_profile = 'simple'::lskills.format_profile
+        and org_id is null
+        and eval_suite_ref = c_eval_suite_ref
+        and min_reasoning_tier is not distinct from 'fast'
+        and disclosure_refs = v_disclosure
+        and frontmatter->>'name' = c_skill_id
+        and frontmatter->>'version' = c_version
+        and frontmatter->>'format_profile' = 'simple'
+        and frontmatter->>'release_tag' = 'v0.2.0'
+        and frontmatter->>'sealed_evidence_path' = c_sealed_path
+        and frontmatter->>'skill_release_hash' = c_skill_release_hash
+        and frontmatter->>'profile_hash' = c_profile_hash
+        and frontmatter->>'suite_hash' = c_suite_hash
+        and frontmatter->>'sealed_evidence_sha256' = c_evidence_hash
+    ) then
+      raise exception
+        'canary-echo 000010 fail-closed: catalog row for %/% exists but does not match pinned package constants',
+        c_skill_id, c_version;
+    end if;
+  else
+    insert into lskills.catalog (
+      skill_id,
+      version,
+      org_id,
+      display_name,
+      description,
+      format_profile,
+      frontmatter,
+      disclosure_refs,
+      eval_suite_ref,
+      certification_state,
+      min_reasoning_tier
+    ) values (
+      c_skill_id,
+      c_version,
+      null,
+      c_skill_id,
+      c_description,
+      'simple',
+      v_frontmatter,
+      v_disclosure,
+      c_eval_suite_ref,
+      'draft',
+      'fast'
+    );
+  end if;
+
+  -- ---------------------------------------------------------------------------
+  -- 2) Passing eval_run — check-then-insert (PK eval_run_id)
+  -- ---------------------------------------------------------------------------
+  if exists (
+    select 1 from lskills.eval_runs where eval_run_id = c_eval_run_id
+  ) then
+    if not exists (
+      select 1 from lskills.eval_runs
+      where eval_run_id = c_eval_run_id
+        and skill_id = c_skill_id
+        and skill_version = c_version
+        and eval_suite_ref = c_eval_suite_ref
+        and passed is true
+        and overall_score = 1.0
+        and pass_threshold = 0.8
+        and judge_model = c_issuer_id
+        and judge_model_version = c_adapter_version
+        and judge_tier = 'high'::lskills.judge_tier
+        and rubric_scores = '{"correctness": 1.0}'::jsonb
+        and efficiency_metrics = v_eff
+        and size_metrics = v_size
+    ) then
+      raise exception
+        'canary-echo 000010 fail-closed: eval_runs row % exists but does not match pinned package constants',
+        c_eval_run_id;
+    end if;
+  else
+    insert into lskills.eval_runs (
+      eval_run_id,
+      skill_id,
+      skill_version,
+      eval_suite_ref,
+      rubric_scores,
+      overall_score,
+      passed,
+      pass_threshold,
+      efficiency_metrics,
+      size_metrics,
+      judge_model,
+      judge_model_version,
+      judge_tier
+    ) values (
+      c_eval_run_id,
+      c_skill_id,
+      c_version,
+      c_eval_suite_ref,
+      '{"correctness": 1.0}'::jsonb,
+      1.0,
+      true,
+      0.8,
+      v_eff,
+      v_size,
+      c_issuer_id,
+      c_adapter_version,
+      'high'
+    );
+  end if;
+
+  -- ---------------------------------------------------------------------------
+  -- 3) Promote to usable only after passing eval_run exists for this version
+  -- ---------------------------------------------------------------------------
+  update lskills.catalog
+  set
+    certification_state = 'usable',
+    updated_at = now(),
+    frontmatter = coalesce(frontmatter, '{}'::jsonb) || jsonb_build_object(
+      'sealed_evidence_path', c_sealed_path,
+      'skill_release_hash', c_skill_release_hash,
+      'profile_hash', c_profile_hash,
+      'suite_hash', c_suite_hash,
+      'sealed_evidence_sha256', c_evidence_hash
+    )
+  where skill_id = c_skill_id
+    and version = c_version
+    and certification_state is distinct from 'usable';
+
+  -- ---------------------------------------------------------------------------
+  -- 4) Releases — check-then-insert (unique skill_id, version)
+  -- ---------------------------------------------------------------------------
+  if exists (
+    select 1 from lskills.releases
+    where skill_id = c_skill_id and version = c_version
+  ) then
+    if not exists (
+      select 1 from lskills.releases
+      where skill_id = c_skill_id
+        and version = c_version
+        and release_id = c_release_id
+        and release_hash = c_skill_release_hash
+        and channel = 'canary'::lskills.release_channel
+        and immutable is true
+        and content_manifest = v_content_manifest
+        and metadata = v_release_meta
+    ) then
+      raise exception
+        'canary-echo 000010 fail-closed: releases row for %/% exists but does not match pinned package IDs/hashes',
+        c_skill_id, c_version;
+    end if;
+  else
+    insert into lskills.releases (
+      release_id,
+      skill_id,
+      version,
+      release_hash,
+      channel,
+      content_manifest,
+      immutable,
+      metadata
+    ) values (
+      c_release_id,
+      c_skill_id,
+      c_version,
+      c_skill_release_hash,
+      'canary',
+      v_content_manifest,
+      true,
+      v_release_meta
+    );
+  end if;
+
+  -- ---------------------------------------------------------------------------
+  -- 5) Execution profile — check-then-insert (unique profile_key)
+  -- ---------------------------------------------------------------------------
+  if exists (
+    select 1 from lskills.execution_profiles where profile_key = c_profile_key
+  ) then
+    if not exists (
+      select 1 from lskills.execution_profiles
+      where profile_key = c_profile_key
+        and profile_id = c_profile_id
+        and profile_hash = c_profile_hash
+        and runtime = 'linux'
+        and adapter_version is not distinct from c_adapter_version
+        and toolchain = v_toolchain
+        and metadata = v_profile_meta
+    ) then
+      raise exception
+        'canary-echo 000010 fail-closed: execution_profiles row % exists but does not match pinned package IDs/hashes/toolchain',
+        c_profile_key;
+    end if;
+  else
+    insert into lskills.execution_profiles (
+      profile_id,
+      profile_key,
+      profile_hash,
+      runtime,
+      adapter_version,
+      toolchain,
+      metadata
+    ) values (
+      c_profile_id,
+      c_profile_key,
+      c_profile_hash,
+      'linux',
+      c_adapter_version,
+      v_toolchain,
+      v_profile_meta
+    );
+  end if;
+
+  -- ---------------------------------------------------------------------------
+  -- 6) Certification — check-then-insert (unique release_id, profile_id)
+  -- ---------------------------------------------------------------------------
+  if exists (
+    select 1 from lskills.certifications
+    where release_id = c_release_id and profile_id = c_profile_id
+  ) then
+    if not exists (
+      select 1 from lskills.certifications
+      where release_id = c_release_id
+        and profile_id = c_profile_id
+        and certification_id = c_certification_id
+        and eval_run_ref is not distinct from c_eval_suite_ref
+        and evidence_hash = c_evidence_hash
+        and state = 'usable'::lskills.certification_state
+        and certified_at = c_certified_at
+        and metadata = v_cert_meta
+    ) then
+      raise exception
+        'canary-echo 000010 fail-closed: certifications row for release/profile pins exists but does not match pinned evidence/IDs';
+    end if;
+  else
+    insert into lskills.certifications (
+      certification_id,
+      release_id,
+      profile_id,
+      eval_run_ref,
+      evidence_hash,
+      state,
+      certified_at,
+      metadata
+    ) values (
+      c_certification_id,
+      c_release_id,
+      c_profile_id,
+      c_eval_suite_ref,
+      c_evidence_hash,
+      'usable'::lskills.certification_state,
+      c_certified_at,
+      v_cert_meta
+    );
+  end if;
+end
+$pkg$;

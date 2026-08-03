@@ -195,6 +195,7 @@ def _execute_packaged_tool(
 ) -> tuple[int | None, str, str, ToolCallRecord, list[Path], str]:
     # Import lazily so eval_runner remains usable without tool_runtime on PYTHONPATH
     # in narrow unit tests — but certification canaries always include it.
+    from linkskills_tool_runtime.descriptor import hash_tool_source_tree
     from linkskills_tool_runtime.invoke import invoke_tool
     from linkskills_tool_runtime.resolve import resolve_tool
 
@@ -230,7 +231,7 @@ def _execute_packaged_tool(
     tool_hash = (
         resolved.bundle_hash
         or resolved.descriptor.source_hash
-        or _hash_tree(staged)
+        or hash_tool_source_tree(staged)
     )
 
     timeout = spec.get("timeout_seconds")

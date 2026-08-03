@@ -210,6 +210,124 @@ class SealedCertShellPreflightTests(unittest.TestCase):
         self.assertNotIn(LOCAL_DEV_EVAL_RUNNER_ISSUER_KEY, combined)
 
 
+class SealedCertDockerArgvSecretTests(unittest.TestCase):
+    """Issuer key must never appear as a docker argv value (name-only --env)."""
+
+    SCRIPT = REPO_ROOT / "scripts" / "run-sealed-linux-certify.sh"
+    ENV_NAME = "LINKSKILLS_EVAL_RUNNER_ISSUER_KEY"
+    # Distinct from LOCAL_DEV so release mode is valid; never assert presence in logs.
+    RELEASE_KEY = "ws-c-argv-regression-issuer-key-not-for-production"
+    PINNED_IMAGE = (
+        "python@sha256:0123456789abcdef0123456789abcdef"
+        "0123456789abcdef0123456789abcdef"
+    )
+
+    def _assert_issuer_key_not_in_docker_argv(self, argv: list[str], secret: str) -> None:
+        """Fail if secret is an argv token or NAME=secret form."""
+        for i, token in enumerate(argv):
+            self.assertNotEqual(token, secret, msg=f"secret appears as argv[{i}]")
+            self.assertFalse(
+                token.startswith(f"{self.ENV_NAME}="),
+                msg=f"issuer key passed as KEY=value in argv[{i}]",
+            )
+            self.assertNotIn(secret, token, msg=f"secret substring in argv[{i}]")
+        # Name-only form: --env NAME (or -e NAME) with no following secret value.
+        name_only_ok = False
+        for i, token in enumerate(argv):
+            if token in ("--env", "-e") and i + 1 < len(argv):
+                nxt = argv[i + 1]
+                if nxt == self.ENV_NAME:
+                    name_only_ok = True
+                    if i + 2 < len(argv):
+                        self.assertNotEqual(argv[i + 2], secret)
+                elif nxt.startswith(f"{self.ENV_NAME}="):
+                    self.fail("issuer key must use name-only --env, not KEY=value")
+            if token == f"--env={self.ENV_NAME}" or token == f"-e={self.ENV_NAME}":
+                name_only_ok = True
+            if token.startswith(f"--env={self.ENV_NAME}=") or token.startswith(
+                f"-e={self.ENV_NAME}="
+            ):
+                self.fail("issuer key must use name-only --env, not --env=KEY=value")
+        self.assertTrue(
+            name_only_ok,
+            msg="expected bare --env LINKSKILLS_EVAL_RUNNER_ISSUER_KEY in docker argv",
+        )
+
+    def _run_with_fake_docker(
+        self,
+        *,
+        env: dict[str, str],
+        extra_args: list[str] | None = None,
+        secret: str,
+    ) -> tuple[subprocess.CompletedProcess[str], list[str]]:
+        with tempfile.TemporaryDirectory() as tmp:
+            bin_dir = Path(tmp) / "bin"
+            bin_dir.mkdir()
+            argv_log = Path(tmp) / "docker-argv.json"
+            docker_shim = bin_dir / "docker"
+            docker_shim.write_text(
+                "#!/usr/bin/env python3\n"
+                "import json, sys\n"
+                f"json.dump(sys.argv[1:], open({str(argv_log)!r}, 'w', encoding='utf-8'))\n"
+                "raise SystemExit(0)\n",
+                encoding="utf-8",
+            )
+            docker_shim.chmod(0o755)
+
+            base = os.environ.copy()
+            base["PATH"] = f"{bin_dir}:{base.get('PATH', '')}"
+            base["LINKSKILLS_SEALED_CERT_PREFLIGHT_ONLY"] = "0"
+            base.update(env)
+            for key in (
+                "LINKSKILLS_EVAL_RUNNER_ISSUER_KEY",
+                "LINKSKILLS_SEALED_CERT_IMAGE",
+                "LINKSKILLS_SEALED_CERT_MODE",
+                "LINKSKILLS_CERT_NON_PROMOTING",
+            ):
+                if key not in env:
+                    base.pop(key, None)
+
+            proc = subprocess.run(
+                ["bash", str(self.SCRIPT), *(extra_args or [])],
+                cwd=str(REPO_ROOT),
+                env=base,
+                capture_output=True,
+                text=True,
+            )
+            combined = proc.stdout + proc.stderr
+            self.assertNotIn(secret, combined, msg="key material leaked to stdout/stderr")
+            self.assertTrue(argv_log.is_file(), msg=combined)
+            recorded = json.loads(argv_log.read_text(encoding="utf-8"))
+            self.assertIsInstance(recorded, list)
+            return proc, recorded
+
+    def test_release_mode_docker_argv_uses_name_only_env_for_issuer_key(self) -> None:
+        proc, argv = self._run_with_fake_docker(
+            env={
+                "LINKSKILLS_EVAL_RUNNER_ISSUER_KEY": self.RELEASE_KEY,
+                "LINKSKILLS_SEALED_CERT_IMAGE": self.PINNED_IMAGE,
+                "LINKSKILLS_SEALED_CERT_MODE": "release",
+            },
+            secret=self.RELEASE_KEY,
+        )
+        self.assertEqual(proc.returncode, 0, msg=proc.stdout + proc.stderr)
+        self.assertEqual(argv[0], "run")
+        self._assert_issuer_key_not_in_docker_argv(argv, self.RELEASE_KEY)
+
+    def test_local_non_promoting_docker_argv_uses_name_only_env_for_issuer_key(
+        self,
+    ) -> None:
+        # Default fill exports LOCAL_DEV key into process env; must still be name-only.
+        proc, argv = self._run_with_fake_docker(
+            env={},
+            extra_args=["--local-non-promoting"],
+            secret=LOCAL_DEV_EVAL_RUNNER_ISSUER_KEY,
+        )
+        self.assertEqual(proc.returncode, 0, msg=proc.stdout + proc.stderr)
+        self.assertEqual(argv[0], "run")
+        self._assert_issuer_key_not_in_docker_argv(argv, LOCAL_DEV_EVAL_RUNNER_ISSUER_KEY)
+
+
 class NonPromotingCertifyCatalogTests(unittest.TestCase):
     def test_non_promoting_mode_cannot_write_sealed_release_evidence(self) -> None:
         import importlib.util

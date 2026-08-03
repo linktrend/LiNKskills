@@ -78,8 +78,12 @@ class ConfinedExecTests(unittest.TestCase):
         )
         joined = " ".join(wrapped)
         if status == "denied" and "sandbox-exec" in joined:
-            profile_path = self.workspace / "tmp" / "fs-allowlist.sb"
+            # Profile must live in ephemeral state, never workspace/tmp under the tool tree.
+            self.assertNotIn(str(self.workspace / "tmp" / "fs-allowlist.sb"), wrapped)
+            self.assertFalse((self.workspace / "tmp" / "fs-allowlist.sb").exists())
+            profile_path = Path(wrapped[wrapped.index("-f") + 1])
             self.assertTrue(profile_path.is_file())
+            self.assertFalse(str(profile_path).startswith(str(self.workspace)))
             profile = profile_path.read_text(encoding="utf-8")
             self.assertFalse(_profile_uses_global_file_read(profile))
             self.assertIn(self.workspace.name, profile)
@@ -89,7 +93,8 @@ class ConfinedExecTests(unittest.TestCase):
             self.assertIn("--tmpfs /", joined)
         # Wave 7: macOS deny-list/global-read must never report denied.
         if "sandbox-exec" in joined and status == "denied":
-            profile = (self.workspace / "tmp" / "fs-allowlist.sb").read_text(encoding="utf-8")
+            profile_path = Path(wrapped[wrapped.index("-f") + 1])
+            profile = profile_path.read_text(encoding="utf-8")
             self.assertNotIn("(allow file-read*)\n(deny file-read*", profile)
 
     def test_confined_cannot_read_outside_workspace_home_file(self) -> None:
@@ -153,19 +158,42 @@ class ConfinedExecTests(unittest.TestCase):
             self.skipTest("macOS-only confidentiality regression")
         from linkskills_tool_runtime.confined_exec import _wrap_with_network_deny
 
-        _wrapped, status = _wrap_with_network_deny(
+        wrapped, status = _wrap_with_network_deny(
             ["python3", "-c", "print(1)"],
             workspace=self.workspace,
         )
         # Current dyld typically cannot boot a pure allowlist; status must not be
         # denied via a leaky global-read profile.
-        profile = self.workspace / "tmp" / "fs-allowlist.sb"
+        workspace_profile = self.workspace / "tmp" / "fs-allowlist.sb"
+        self.assertFalse(workspace_profile.exists())
         if status == "denied":
+            self.assertIn("-f", wrapped)
+            profile = Path(wrapped[wrapped.index("-f") + 1])
             self.assertTrue(profile.is_file())
             text = profile.read_text(encoding="utf-8")
             self.assertNotRegex(text, r"(?m)^\(allow file-read\*\)$")
         else:
             self.assertEqual(status, "unavailable")
+
+    def test_sandbox_profile_not_written_under_workspace_tmp(self) -> None:
+        """Darwin seatbelt profiles must not pollute the hashed tool package tree."""
+        if sys.platform != "darwin":
+            self.skipTest("macOS-only sandbox profile path regression")
+        from linkskills_tool_runtime.confined_exec import _wrap_with_network_deny
+
+        wrapped, _status = _wrap_with_network_deny(
+            ["python3", "-c", "print(1)"],
+            workspace=self.workspace,
+        )
+        self.assertFalse((self.workspace / "tmp" / "fs-allowlist.sb").exists())
+        if "sandbox-exec" in wrapped and "-f" in wrapped:
+            profile = Path(wrapped[wrapped.index("-f") + 1])
+            self.assertTrue(profile.is_file())
+            try:
+                profile.relative_to(self.workspace)
+                self.fail("sandbox profile must not live under workspace")
+            except ValueError:
+                pass
 
     def test_required_network_isolation_fails_closed_without_wrapper(self) -> None:
         prev = os.environ.get("LINKSKILLS_EXECUTOR_NETWORK_ISOLATION")

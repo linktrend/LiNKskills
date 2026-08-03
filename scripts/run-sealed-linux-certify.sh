@@ -79,12 +79,16 @@ else
   ISSUER_ID="${ISSUER_ID:-linkskills-eval-runner-sealed-linux}"
 fi
 
+# Export issuer key into process env only — never as argv KEY=value (docker or
+# preflight). Docker inherits via name-only --env; preflight inherits this env.
+export LINKSKILLS_EVAL_RUNNER_ISSUER_KEY="${ISSUER_KEY}"
+
 # Fail-closed Python preflight (shared with unit tests). Never prints the key.
+# Issuer key is inherited from the exported process env (not argv).
 set +e
 PREFLIGHT_JSON="$(
   PYTHONPATH="${ROOT}:${PYTHONPATH:-}" \
   LINKSKILLS_SEALED_CERT_MODE="${MODE_HINT}" \
-  LINKSKILLS_EVAL_RUNNER_ISSUER_KEY="${ISSUER_KEY}" \
   LINKSKILLS_SEALED_CERT_IMAGE="${IMAGE}" \
   LINKSKILLS_EVAL_RUNNER_ISSUER_ID="${ISSUER_ID}" \
   LINKSKILLS_CERT_NON_PROMOTING="${LINKSKILLS_CERT_NON_PROMOTING:-}" \
@@ -155,7 +159,7 @@ else
 fi
 
 DOCKER_ENV=(
-  -e "LINKSKILLS_EVAL_RUNNER_ISSUER_KEY=${ISSUER_KEY}"
+  --env "LINKSKILLS_EVAL_RUNNER_ISSUER_KEY"
   -e "LINKSKILLS_EVAL_RUNNER_ISSUER_ID=${ISSUER_ID}"
   -e "LINKSKILLS_CATALOG_GIT_SHA=${HOST_GIT_SHA}"
   -e "LINKSKILLS_SEALED_CERT_MODE=${MODE}"

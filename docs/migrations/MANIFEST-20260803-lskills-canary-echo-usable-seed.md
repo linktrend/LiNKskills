@@ -12,8 +12,8 @@ Apply only after platform foundation + prior lskills migrations through `000009`
 | Order | File | SHA-256 |
 |---|---|---|
 | 1–8 (prerequisites) | See `MANIFEST-20260727-lskills-registry-v0.1.md` (`000002` … `000009`) | (pinned there) |
-| 9 (**this package up**) | `supabase/migrations/20260803_000010_lskills_canary_echo_usable_seed.sql` | `08013b5a3410a07459d1a33a3fed6121ee9ddad50f6632636863ef4700c76a66` |
-| 10 (companion down) | `supabase/migrations/20260803_000010_lskills_canary_echo_usable_seed_down.sql` | `4849474ab18186f2b118d62f4209cb179d326ce02e32ec931570933289138f6b` |
+| 9 (**this package up**) | `supabase/migrations/20260803_000010_lskills_canary_echo_usable_seed.sql` | `a1c6877589881d96a1ac32b4e5c0500a2e5311d4985f90966456c00bcf157977` |
+| 10 (companion down) | `supabase/migrations/20260803_000010_lskills_canary_echo_usable_seed_down.sql` | `7c8e3e98f0d23dee34eeac54232be962cf7df383b5e9924861648e64485da49d` |
 
 Tests recompute SHA-256 of on-disk SQL bytes and require the manifest rows to match.
 
@@ -29,7 +29,9 @@ Tests recompute SHA-256 of on-disk SQL bytes and require the manifest rows to ma
 1. `lskills.catalog` row for `canary-echo` / `0.2.0` (`format_profile=simple`, `org_id=null`).
 2. Passing `lskills.eval_runs` row bound to sealed evidence identity (jsonb evidence refs only).
 3. Catalog promotion to `usable` **after** the passing eval_run exists.
-4. Idempotent registry rows: `releases`, `execution_profiles`, `certifications` with sealed hashes.
+4. Fail-closed registry rows: `releases`, `execution_profiles`, `certifications` with sealed hashes.
+   Existing conflict-key rows must match **all** pinned IDs/hashes/evidence; mismatch → `RAISE EXCEPTION`
+   (transaction rolls back; no silent `ON CONFLICT DO NOTHING` promote).
 
 Does **not** rewrite `000003`, drop schema, truncate, or disable triggers.
 
@@ -42,12 +44,12 @@ Evidence must be **release/promoting-mode** signed with an externally supplied i
 | Constant | Value |
 |---|---|
 | `skill_release_hash` | `skill-release:006a23b0af3abbcb9a0600c3f44bf337b89dc6cdd5be6d328097a2498a5f05bb` |
-| `profile_hash` | `4e146372eb9e0e07c09ce1cd20d6bda3199d7847637c2e93bbf35b2bdde0a4f9` |
+| `profile_hash` | `9db2d1db2663d9e3fb2a60b0ab4aaaf291aed010d155caba65798b5ecb0ec188` |
 | `suite_hash` | `8f56554dc1b731e94e735ba9dc9d9942e4c2a495ecf11986b071ac17f22a4662` |
-| `sealed_evidence_sha256` / `evidence_hash` | `f5b7a8517130ee55e011ac93408f3c042f3e0efb77176344413ab7a3e8888f72` |
-| receipt `echo-hello` | `fb8669da859b2a890b614993ab500f5d794f4027191b2d1dcd2a665925c35aca` |
-| receipt `echo-json` | `f10a02b1e130092f0fe4e302b46f2e846553b278adaaa4696dee4f28e8f089fa` |
-| text-echo `source_hash` / `tool_hash` | `6eaa287b75c8848d700e00aa94518e1b711430b5b01a47abd516ddcbce7f71d0` |
+| `sealed_evidence_sha256` / `evidence_hash` | `bbaae7384cffd785b0585238174b103f213062428cf45160c9435fba660f80e0` |
+| receipt `echo-hello` | `ec3227e77e1d19844c3d3a2d5de65520251263f228ab70a3f0bbe8a64cc8ed49` |
+| receipt `echo-json` | `e02b150ab3915005b44d72c33687677849f27946e6191a57600960a006009005` |
+| text-echo `source_hash` / `tool_hash` | `29b179692378ba32ee244afa7f8b8017e918a158f37127e117cfe24a820f3d83` |
 | `issuer_id` | `linkskills-eval-runner-sealed-linux` |
 | sealed image digest (release host) | `sha256:57cd7c3a7a273101a6485ba99423ee568157882804b1124b4dd04266317710de` |
 
@@ -63,7 +65,8 @@ Evidence must be **release/promoting-mode** signed with an externally supplied i
 ### Rollback (Platform only)
 
 1. Apply companion `20260803_000010_lskills_canary_echo_usable_seed_down.sql`.
-2. Confirm canary-echo catalog/eval/release/profile/cert rows are gone.
+2. Confirm **only** this package's exact UUID/hash pins are removed. Later legitimate
+   `canary-echo` / `0.2.0` rows with different IDs/hashes are left alone.
 3. Do **not** `drop schema lskills cascade`.
 
 ## Verification SQL

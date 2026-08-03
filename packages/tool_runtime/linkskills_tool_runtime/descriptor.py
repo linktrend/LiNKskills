@@ -115,19 +115,94 @@ def _infer_entrypoint(tool_dir: Path, tool_id: str) -> dict[str, Any]:
     }
 
 
-def _hash_tree(root: Path) -> str:
+# Runtime / VCS / cache / build directories never participate in source_hash.
+# The governed set (files that remain after these exclusions) is the allowlist.
+_EXCLUDED_DIR_NAMES = frozenset(
+    {
+        "tmp",
+        "__pycache__",
+        ".git",
+        ".hg",
+        ".svn",
+        ".venv",
+        "venv",
+        "node_modules",
+        "dist",
+        "build",
+        ".eggs",
+        ".tox",
+        ".nox",
+        ".pytest_cache",
+        ".mypy_cache",
+        ".ruff_cache",
+        "htmlcov",
+        "coverage",
+        ".linkskills-state",
+        ".idea",
+        ".vscode",
+        ".cursor",
+    }
+)
+_EXCLUDED_SUFFIXES = frozenset({".pyc", ".pyo", ".pyd", ".so", ".dylib", ".egg", ".whl"})
+_EXCLUDED_NAMES = frozenset({".DS_Store", "Thumbs.db", ".coverage", "coverage.xml"})
+
+
+def _is_governed_source_file(path: Path, root: Path) -> bool:
+    """Return True when ``path`` is a governed package source file under ``root``."""
+    if not path.is_file():
+        return False
+    try:
+        rel_parts = path.resolve().relative_to(root.resolve()).parts
+    except ValueError:
+        return False
+    if not rel_parts:
+        return False
+    if any(part in _EXCLUDED_DIR_NAMES for part in rel_parts[:-1]):
+        return False
+    if any(part.endswith(".egg-info") for part in rel_parts):
+        return False
+    name = rel_parts[-1]
+    if name in _EXCLUDED_NAMES or name.startswith("."):
+        return False
+    if path.suffix.lower() in _EXCLUDED_SUFFIXES:
+        return False
+    return True
+
+
+def iter_governed_source_files(root: Path) -> list[Path]:
+    """Return sorted governed (allowlisted) source files under a tool package root.
+
+    Excludes ignored runtime/tmp/cache/build/bytecode/VCS artifacts so the set
+    matches a clean ``git archive`` of tracked package sources.
+    """
+    base = Path(root).resolve()
+    return sorted(
+        (p for p in base.rglob("*") if _is_governed_source_file(p, base)),
+        key=lambda p: p.relative_to(base).as_posix(),
+    )
+
+
+def hash_tool_source_tree(root: Path) -> str:
+    """Deterministic SHA-256 hex over allowlisted tool package source files.
+
+    Digest format matches the historical ``_hash_tree`` layout
+    (``relpath\\0file_sha\\0`` per sorted file) but only for governed sources.
+    """
+    base = Path(root).resolve()
     digest = hashlib.sha256()
-    for path in sorted(p for p in root.rglob("*") if p.is_file()):
-        # Skip caches / bytecode.
-        if "__pycache__" in path.parts or path.suffix == ".pyc":
-            continue
-        rel = path.relative_to(root).as_posix().encode("utf-8")
+    for path in iter_governed_source_files(base):
+        rel = path.relative_to(base).as_posix().encode("utf-8")
         digest.update(rel)
         digest.update(b"\0")
         file_digest = hashlib.sha256(path.read_bytes()).hexdigest().encode("ascii")
         digest.update(file_digest)
         digest.update(b"\0")
     return digest.hexdigest()
+
+
+def _hash_tree(root: Path) -> str:
+    """Backward-compatible alias for :func:`hash_tool_source_tree`."""
+    return hash_tool_source_tree(root)
 
 
 def _normalize(raw: dict[str, Any], *, tool_dir: Path, synthesized: bool = False) -> ToolDescriptor:
