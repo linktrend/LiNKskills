@@ -90,14 +90,25 @@ def _git(
     check: bool = True,
     input_bytes: Optional[bytes] = None,
 ) -> subprocess.CompletedProcess[bytes]:
-    return subprocess.run(
-        ["git", *args],
-        cwd=repo_root,
-        input=input_bytes,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        check=check,
-    )
+    try:
+        return subprocess.run(
+            ["git", *args],
+            cwd=repo_root,
+            input=input_bytes,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=check,
+        )
+    except FileNotFoundError as exc:
+        # Sealed containers may lack a git binary; callers fall back to FS hashing.
+        if check:
+            raise RuntimeError("git binary not available") from exc
+        return subprocess.CompletedProcess(
+            args=["git", *args],
+            returncode=127,
+            stdout=b"",
+            stderr=str(exc).encode("utf-8"),
+        )
 
 
 def _list_governed_input_paths_fs(repo_root: Path) -> List[str]:
