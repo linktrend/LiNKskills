@@ -15,6 +15,14 @@ Genuine packaged-tool execution canary for the Eval Runner certification path.
 
 ## Run
 
+Catalog lifecycle canary (preferred):
+
+```bash
+./scripts/run-sealed-linux-certify.sh --skill canary-echo
+```
+
+Fixture-only unit path (still valid for eval-runner tests):
+
 ```bash
 export PYTHONPATH="packages/contracts:packages/core:packages/publisher:packages/eval_runner:packages/tool_runtime:packages/gateway:packages/mcp_server:packages/client:packages/librarian_domain:."
 .venv/bin/python -m linkskills_eval_runner run \
@@ -23,4 +31,6 @@ export PYTHONPATH="packages/contracts:packages/core:packages/publisher:packages/
   -o /tmp/canary-echo.json
 ```
 
-Evidence summary: `evidence/phase3/canary-echo-cli.txt`
+Catalog skill package: `skills/canary-echo/`
+Sealed evidence (after sealed host run): `evidence/phase10/sealed/canary-echo-sealed.json`
+Evidence summary (legacy macOS): `evidence/phase3/canary-echo-cli.txt`

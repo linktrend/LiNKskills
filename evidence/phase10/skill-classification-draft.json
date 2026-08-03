@@ -1,12 +1,12 @@
 {
   "note": "Honest classification ledger (lanes 5+6, 2026-07-30). No skill is promoted to usable/certified without sealed live executor receipts with network_isolation=denied on a certifiable host. macOS cannot certify (ADR 0009). This file is not a live promotion.",
-  "as_of": "2026-07-30",
-  "updated_at": "2026-07-30T03:05:00Z",
+  "as_of": "2026-08-03",
+  "updated_at": "2026-08-03T10:09:03Z",
   "wave": "lanes_5_6_honesty",
-  "live_certification": "not performed",
+  "live_certification": "local sealed Linux/container certification performed 2026-08-03T10:09:03Z (1 usable)",
   "macos_certifiable": false,
   "linux_bwrap_required": true,
-  "evidence_tier": "local/fake only — no sealed live certifiable receipts in-repo for catalog skills",
+  "evidence_tier": "sealed local Linux bwrap (or privileged Docker Linux); not stage/prod apply",
   "launch_target_source": "evidence/phase1/canary-set.json",
   "required_canonical_artifacts": [
     "references/skill-pack.json",
@@ -53,11 +53,13 @@
       "platform": "macOS",
       "network_isolation": null,
       "legacy_certified_flag": true,
-      "honest_status": "non_certifying — macOS receipt missing network_isolation=denied; superseded by ADR 0009",
+      "honest_status": "non_certifying \u2014 macOS receipt missing network_isolation=denied; superseded by ADR 0009",
       "does_not_promote": true
     }
   ],
-  "sealed_live_receipt_evidence_paths": [],
+  "sealed_live_receipt_evidence_paths": [
+    "evidence/phase10/sealed/canary-echo-sealed.json"
+  ],
   "launch_targets_with_canonical_v01_artifacts": [
     "git-safeguard",
     "citation-enforcer",
@@ -94,21 +96,50 @@
       "canonical_v01_artifacts": true,
       "suite_readiness": "ready_for_runner",
       "sealed_live_receipt_evidence": [],
-      "reason": "No sealed live network_isolation=denied receipt in-repo"
+      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
+      "reason_code": "suite_not_executable",
+      "suite_executable": false
     },
     "blocker-resolution": {
       "classification": "draft",
       "launch_target": false,
       "canonical_v01_artifacts": false,
       "sealed_live_receipt_evidence": [],
-      "reason": "Catalog default draft; no sealed live certifying evidence"
+      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
+      "reason_code": "suite_not_executable",
+      "suite_executable": false
+    },
+    "canary-echo": {
+      "classification": "usable",
+      "sealed_live_receipt_evidence": [
+        "evidence/phase10/sealed/canary-echo-sealed.json"
+      ],
+      "reason": "certified: executor receipts bind case, immutable skill release, deterministic execution profile, toolchain, and collected evidence",
+      "reason_code": "certified_usable",
+      "suite_executable": true,
+      "skill_release_hash": "skill-release:006a23b0af3abbcb9a0600c3f44bf337b89dc6cdd5be6d328097a2498a5f05bb",
+      "profile_hash": "9db2d1db2663d9e3fb2a60b0ab4aaaf291aed010d155caba65798b5ecb0ec188",
+      "source_hash": "29b179692378ba32ee244afa7f8b8017e918a158f37127e117cfe24a820f3d83",
+      "tool_hash": "29b179692378ba32ee244afa7f8b8017e918a158f37127e117cfe24a820f3d83",
+      "toolchain": {
+        "tools": [
+          {
+            "tool_id": "text-echo",
+            "version": "1.0.0",
+            "source_hash": "29b179692378ba32ee244afa7f8b8017e918a158f37127e117cfe24a820f3d83",
+            "tool_hash": "29b179692378ba32ee244afa7f8b8017e918a158f37127e117cfe24a820f3d83"
+          }
+        ]
+      }
     },
     "channel-ops": {
       "classification": "draft",
       "launch_target": false,
       "canonical_v01_artifacts": false,
       "sealed_live_receipt_evidence": [],
-      "reason": "Catalog default draft; no sealed live certifying evidence"
+      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
+      "reason_code": "suite_not_executable",
+      "suite_executable": false
     },
     "citation-enforcer": {
       "classification": "draft",
@@ -116,7 +147,9 @@
       "canonical_v01_artifacts": true,
       "suite_readiness": "ready_for_runner",
       "sealed_live_receipt_evidence": [],
-      "reason": "No sealed live network_isolation=denied receipt in-repo"
+      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
+      "reason_code": "suite_not_executable",
+      "suite_executable": false
     },
     "compliance-guardian": {
       "classification": "draft",
@@ -124,49 +157,63 @@
       "canonical_v01_artifacts": true,
       "suite_readiness": "ready_for_runner",
       "sealed_live_receipt_evidence": [],
-      "reason": "No sealed live network_isolation=denied receipt in-repo"
+      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
+      "reason_code": "suite_not_executable",
+      "suite_executable": false
     },
     "creative-director": {
       "classification": "draft",
       "launch_target": false,
       "canonical_v01_artifacts": false,
       "sealed_live_receipt_evidence": [],
-      "reason": "Catalog default draft; no sealed live certifying evidence"
+      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
+      "reason_code": "suite_not_executable",
+      "suite_executable": false
     },
     "creative-qa": {
       "classification": "draft",
       "launch_target": false,
       "canonical_v01_artifacts": false,
       "sealed_live_receipt_evidence": [],
-      "reason": "Catalog default draft; no sealed live certifying evidence"
+      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
+      "reason_code": "suite_not_executable",
+      "suite_executable": false
     },
     "department-head": {
       "classification": "draft",
       "launch_target": false,
       "canonical_v01_artifacts": false,
       "sealed_live_receipt_evidence": [],
-      "reason": "Catalog default draft; no sealed live certifying evidence"
+      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
+      "reason_code": "suite_not_executable",
+      "suite_executable": false
     },
     "devops-sre": {
       "classification": "draft",
       "launch_target": false,
       "canonical_v01_artifacts": false,
       "sealed_live_receipt_evidence": [],
-      "reason": "Catalog default draft; no sealed live certifying evidence"
+      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
+      "reason_code": "suite_not_executable",
+      "suite_executable": false
     },
     "engagement-to-strategy-loop": {
       "classification": "draft",
       "launch_target": false,
       "canonical_v01_artifacts": false,
       "sealed_live_receipt_evidence": [],
-      "reason": "Catalog default draft; no sealed live certifying evidence"
+      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
+      "reason_code": "suite_not_executable",
+      "suite_executable": false
     },
     "executive-sync-8am": {
       "classification": "draft",
       "launch_target": false,
       "canonical_v01_artifacts": false,
       "sealed_live_receipt_evidence": [],
-      "reason": "Catalog default draft; no sealed live certifying evidence"
+      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
+      "reason_code": "suite_not_executable",
+      "suite_executable": false
     },
     "git-safeguard": {
       "classification": "draft",
@@ -174,42 +221,54 @@
       "canonical_v01_artifacts": true,
       "suite_readiness": "ready_for_runner",
       "sealed_live_receipt_evidence": [],
-      "reason": "No sealed live network_isolation=denied receipt in-repo"
+      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
+      "reason_code": "suite_not_executable",
+      "suite_executable": false
     },
     "lead-engineer": {
       "classification": "draft",
       "launch_target": false,
       "canonical_v01_artifacts": false,
       "sealed_live_receipt_evidence": [],
-      "reason": "Catalog default draft; no sealed live certifying evidence"
+      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
+      "reason_code": "suite_not_executable",
+      "suite_executable": false
     },
     "market-analyst": {
       "classification": "draft",
       "launch_target": false,
       "canonical_v01_artifacts": false,
       "sealed_live_receipt_evidence": [],
-      "reason": "Catalog default draft; no sealed live certifying evidence"
+      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
+      "reason_code": "suite_not_executable",
+      "suite_executable": false
     },
     "marketing-strategist": {
       "classification": "draft",
       "launch_target": false,
       "canonical_v01_artifacts": false,
       "sealed_live_receipt_evidence": [],
-      "reason": "Catalog default draft; no sealed live certifying evidence"
+      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
+      "reason_code": "suite_not_executable",
+      "suite_executable": false
     },
     "persistent-qa": {
       "classification": "draft",
       "launch_target": false,
       "canonical_v01_artifacts": false,
       "sealed_live_receipt_evidence": [],
-      "reason": "Catalog default draft; no sealed live certifying evidence"
+      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
+      "reason_code": "suite_not_executable",
+      "suite_executable": false
     },
     "prd-architect": {
       "classification": "draft",
       "launch_target": false,
       "canonical_v01_artifacts": false,
       "sealed_live_receipt_evidence": [],
-      "reason": "Catalog default draft; no sealed live certifying evidence"
+      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
+      "reason_code": "suite_not_executable",
+      "suite_executable": false
     },
     "repository-manager": {
       "classification": "draft",
@@ -217,14 +276,18 @@
       "canonical_v01_artifacts": true,
       "suite_readiness": "ready_for_runner",
       "sealed_live_receipt_evidence": [],
-      "reason": "No sealed live network_isolation=denied receipt in-repo"
+      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
+      "reason_code": "suite_not_executable",
+      "suite_executable": false
     },
     "revenue-adapter-base": {
       "classification": "draft",
       "launch_target": false,
       "canonical_v01_artifacts": false,
       "sealed_live_receipt_evidence": [],
-      "reason": "Catalog default draft; no sealed live certifying evidence"
+      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
+      "reason_code": "suite_not_executable",
+      "suite_executable": false
     },
     "search-strategy": {
       "classification": "draft",
@@ -232,14 +295,18 @@
       "canonical_v01_artifacts": true,
       "suite_readiness": "baseline_incomplete",
       "sealed_live_receipt_evidence": [],
-      "reason": "Suite incomplete + no sealed live certifying evidence; remain draft until suite upgrade"
+      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
+      "reason_code": "suite_not_executable",
+      "suite_executable": false
     },
     "self-critique-loop": {
       "classification": "draft",
       "launch_target": false,
       "canonical_v01_artifacts": false,
       "sealed_live_receipt_evidence": [],
-      "reason": "Catalog default draft; no sealed live certifying evidence"
+      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
+      "reason_code": "suite_not_executable",
+      "suite_executable": false
     },
     "self-improvement": {
       "classification": "draft",
@@ -247,14 +314,18 @@
       "canonical_v01_artifacts": true,
       "suite_readiness": "baseline_incomplete",
       "sealed_live_receipt_evidence": [],
-      "reason": "Suite incomplete + no sealed live certifying evidence; remain draft until suite upgrade"
+      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
+      "reason_code": "suite_not_executable",
+      "suite_executable": false
     },
     "seo-semantic-auditor": {
       "classification": "draft",
       "launch_target": false,
       "canonical_v01_artifacts": false,
       "sealed_live_receipt_evidence": [],
-      "reason": "Catalog default draft; no sealed live certifying evidence"
+      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
+      "reason_code": "suite_not_executable",
+      "suite_executable": false
     },
     "skill-architect": {
       "classification": "draft",
@@ -262,7 +333,9 @@
       "canonical_v01_artifacts": true,
       "suite_readiness": "baseline_incomplete",
       "sealed_live_receipt_evidence": [],
-      "reason": "Suite incomplete + no sealed live certifying evidence; remain draft until suite upgrade"
+      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
+      "reason_code": "suite_not_executable",
+      "suite_executable": false
     },
     "skill-template": {
       "classification": "draft",
@@ -270,49 +343,63 @@
       "canonical_v01_artifacts": true,
       "suite_readiness": "ready_for_runner",
       "sealed_live_receipt_evidence": [],
-      "reason": "No sealed live network_isolation=denied receipt in-repo"
+      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
+      "reason_code": "suite_not_executable",
+      "suite_executable": false
     },
     "smart-file-clerk": {
       "classification": "draft",
       "launch_target": false,
       "canonical_v01_artifacts": false,
       "sealed_live_receipt_evidence": [],
-      "reason": "Catalog default draft; no sealed live certifying evidence"
+      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
+      "reason_code": "suite_not_executable",
+      "suite_executable": false
     },
     "software-pm": {
       "classification": "draft",
       "launch_target": false,
       "canonical_v01_artifacts": false,
       "sealed_live_receipt_evidence": [],
-      "reason": "Catalog default draft; no sealed live certifying evidence"
+      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
+      "reason_code": "suite_not_executable",
+      "suite_executable": false
     },
     "studio-architect": {
       "classification": "draft",
       "launch_target": false,
       "canonical_v01_artifacts": false,
       "sealed_live_receipt_evidence": [],
-      "reason": "Catalog default draft; no sealed live certifying evidence"
+      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
+      "reason_code": "suite_not_executable",
+      "suite_executable": false
     },
     "studio-controller": {
       "classification": "draft",
       "launch_target": false,
       "canonical_v01_artifacts": false,
       "sealed_live_receipt_evidence": [],
-      "reason": "Catalog default draft; no sealed live certifying evidence"
+      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
+      "reason_code": "suite_not_executable",
+      "suite_executable": false
     },
     "studio-health-reporting": {
       "classification": "draft",
       "launch_target": false,
       "canonical_v01_artifacts": false,
       "sealed_live_receipt_evidence": [],
-      "reason": "Catalog default draft; no sealed live certifying evidence"
+      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
+      "reason_code": "suite_not_executable",
+      "suite_executable": false
     },
     "task-decomposition": {
       "classification": "draft",
       "launch_target": false,
       "canonical_v01_artifacts": false,
       "sealed_live_receipt_evidence": [],
-      "reason": "Catalog default draft; no sealed live certifying evidence"
+      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
+      "reason_code": "suite_not_executable",
+      "suite_executable": false
     },
     "tool-architect": {
       "classification": "draft",
@@ -320,31 +407,37 @@
       "canonical_v01_artifacts": true,
       "suite_readiness": "ready_for_runner",
       "sealed_live_receipt_evidence": [],
-      "reason": "No sealed live network_isolation=denied receipt in-repo"
+      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
+      "reason_code": "suite_not_executable",
+      "suite_executable": false
     },
     "ui-ux-guardian": {
       "classification": "draft",
       "launch_target": false,
       "canonical_v01_artifacts": false,
       "sealed_live_receipt_evidence": [],
-      "reason": "Catalog default draft; no sealed live certifying evidence"
+      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
+      "reason_code": "suite_not_executable",
+      "suite_executable": false
     },
     "workflow-architect": {
       "classification": "draft",
       "launch_target": false,
       "canonical_v01_artifacts": false,
       "sealed_live_receipt_evidence": [],
-      "reason": "Catalog default draft; no sealed live certifying evidence"
+      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
+      "reason_code": "suite_not_executable",
+      "suite_executable": false
     }
   },
   "counts": {
-    "total_catalog_skills": 34,
+    "total_catalog_skills": 35,
     "draft": 34,
-    "usable": 0,
+    "usable": 1,
     "eval_pending": 0,
     "deprecated": 0,
     "retired": 0,
-    "with_sealed_live_receipts": 0
+    "with_sealed_live_receipts": 1
   },
   "legacy_yaml_note": "Legacy references/eval-suite.yaml alone cannot establish launch readiness; validator requires schema-valid canonical JSON for launch targets and recalculated hash agreement."
 }

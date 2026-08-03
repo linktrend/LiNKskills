@@ -245,6 +245,40 @@ class ServiceError(Exception):
         self.http_status = http_status
 
 
+def _service_error_from_store_value_error(
+    exc: ValueError,
+    *,
+    fence_fallback: bool = False,
+) -> ServiceError:
+    """Map store ValueError to a sanitized ServiceError (never leak raw text)."""
+    message = str(exc)
+    if "postgres RLS requires" in message or "RLS requires bound" in message:
+        return ServiceError(
+            "rls_org_required",
+            "Write operations require bound actor_id and org_id "
+            "from verified PACI claims",
+            http_status=403,
+        )
+    if "disagrees with bound identity" in message:
+        return ServiceError(
+            "identity_mismatch",
+            "Request identity does not match verified PACI claims",
+            http_status=403,
+        )
+    if fence_fallback or "fence" in message.lower() or "idempotency" in message.lower():
+        return ServiceError(
+            "idempotency_fence_rejected",
+            "Idempotency fence rejected (sanitized)",
+            http_status=409,
+        )
+    return ServiceError(
+        "store_error",
+        "Persistence rejected the write (sanitized)",
+        http_status=500,
+        retryable=False,
+    )
+
+
 class SkillsGatewayService:
     """Catalog + in-memory run/telemetry operations for Gateway and MCP."""
 
@@ -533,7 +567,18 @@ class SkillsGatewayService:
             )
 
         # Bind actor/org into Postgres session for RLS when the store supports it.
+        # Write paths fail closed when orgId is null/empty — RLS org_matches denies
+        # empty GUCs, and we never invent a tenant. PACI allows null orgId only for
+        # actorKind=service; those tokens still cannot write RLS-scoped tables.
         identity_ctx = getattr(self._store, "identity", None)
+        if operation in WRITE_OPERATIONS and not str(actor.org_id or "").strip():
+            if callable(identity_ctx):
+                raise ServiceError(
+                    "rls_org_required",
+                    "Write operations require a non-null orgId claim for RLS "
+                    "tenant scope (null/empty orgId is fail-closed)",
+                    http_status=403,
+                )
         if callable(identity_ctx):
             with identity_ctx(actor.actor_id, actor.org_id or ""):
                 return self._dispatch_authorized(
@@ -645,9 +690,30 @@ class SkillsGatewayService:
                                 "idempotent_replay"
                             ]
                         return env
-                    except Exception:
+                    except ServiceError:
                         if not published:
                             mutation.discard()
+                        raise
+                    except ValueError as exc:
+                        if not published:
+                            mutation.discard()
+                        raise _service_error_from_store_value_error(exc) from exc
+                    except Exception as exc:
+                        if not published:
+                            mutation.discard()
+                        # Never surface psycopg/RLS privilege text to clients.
+                        err_name = type(exc).__name__
+                        err_text = str(exc).lower()
+                        if (
+                            err_name == "InsufficientPrivilege"
+                            or "row-level security" in err_text
+                        ):
+                            raise ServiceError(
+                                "store_error",
+                                "Persistence rejected the write (sanitized)",
+                                http_status=500,
+                                retryable=False,
+                            ) from exc
                         raise
 
             if operation in EXTERNAL_SIDE_EFFECT_OPERATIONS:
@@ -694,10 +760,8 @@ class SkillsGatewayService:
                         request_hash=request_hash,
                     )
                 except ValueError as exc:
-                    raise ServiceError(
-                        "idempotency_fence_rejected",
-                        str(exc),
-                        http_status=409,
+                    raise _service_error_from_store_value_error(
+                        exc, fence_fallback=True
                     ) from exc
                 if intent.get("status") == "result" and intent.get("result") is not None:
                     env = self.envelope(
@@ -721,10 +785,8 @@ class SkillsGatewayService:
                             fence_token=fence_token,
                         )
                     except ValueError as exc:
-                        raise ServiceError(
-                            "idempotency_fence_rejected",
-                            str(exc),
-                            http_status=409,
+                        raise _service_error_from_store_value_error(
+                            exc, fence_fallback=True
                         ) from exc
                     return env
                 handler = getattr(self, f"op_{operation}")
@@ -779,10 +841,8 @@ class SkillsGatewayService:
                 except ServiceError:
                     raise
                 except ValueError as exc:
-                    raise ServiceError(
-                        "idempotency_fence_rejected",
-                        str(exc),
-                        http_status=409,
+                    raise _service_error_from_store_value_error(
+                        exc, fence_fallback=True
                     ) from exc
                 except Exception:
                     # Leave reservation leased; fence rejects late displaced completion.

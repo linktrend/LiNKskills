@@ -20,6 +20,15 @@ Keep the catalog classification ledger honest. Local unit tests, fake hosts, mac
 
 No other informal states (`certified_local`, `almost_usable`, macOS “certified”) are valid in this ledger.
 
+## Sealed cert modes (local Docker Linux + bwrap)
+
+| Mode | How | Issuer key | Image | Catalog outcome |
+|---|---|---|---|---|
+| **release/promoting** (default) | `./scripts/run-sealed-linux-certify.sh` | Externally supplied `LINKSKILLS_EVAL_RUNNER_ISSUER_KEY` (no fallback; never the repo-visible local key; GSM process-only in production) | Digest-pinned `LINKSKILLS_SEALED_CERT_IMAGE` (`name@sha256:<64>`) | May write `evidence/phase10/sealed/` and promote `usable` |
+| **local non-promoting** | `--local-non-promoting` | Documented local key allowed | Floating tag allowed | Force `draft`/`eval_pending`; never write sealed release evidence |
+
+The repository-visible local HMAC key can forge receipts and **must never** authorize `usable`.
+
 ## Certifying evidence requirements
 
 A skill may leave `draft` toward `usable` only when **all** of the following are true and cited by path in the ledger:
@@ -53,7 +62,8 @@ Do **not** treat any of the following as sealed live certification:
 ## macOS / Linux
 
 - **macOS:** may run local dry-runs and unit tests; must stamp `unproven`/`unavailable` when isolation cannot be proven; **must not** claim usable/certified.
-- **Linux:** certifiable only with proven path-allowlisted `bwrap --unshare-net` (no `--ro-bind / /`). Production/canary hosts needing certifiable receipts must provide this.
+- **Linux `bwrap`:** certifiable with proven path-allowlisted `bwrap --unshare-net` (no `--ro-bind / /`).
+- **Approved local container path:** privileged Docker Linux with `bwrap` via `./scripts/run-sealed-linux-certify.sh` may produce sealed receipts for catalog promotion. This is **not** stage/prod shared-host evidence and does not apply Supabase.
 
 ## Deprecated / retired
 

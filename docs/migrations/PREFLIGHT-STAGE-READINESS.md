@@ -16,6 +16,7 @@ Checklist before any stage claim that depends on `lskills` schema presence, RLS,
 | Manifest | `docs/migrations/MANIFEST-20260727-lskills-registry-v0.1.md` |
 | Ordered SQL | `000002` … `000009` (see manifest table) |
 | Hash check (local) | All eight SHA-256 rows must match on-disk SQL bytes |
+| Additive canary seed (000010) | `docs/migrations/MANIFEST-20260803-lskills-canary-echo-usable-seed.md` + `docs/migrations/CANARY-ECHO-000010-NOTE.md` — packages `canary-echo` usable state; **does not** clear B1–B5 |
 | Platform pin (read-only consumer) | `421a35e97bc302be0f5e1f196d0a5e8d132f6fd8` at LiNKplatform |
 
 ## Hard blockers (stage remains BLOCKED until cleared by Platform evidence)

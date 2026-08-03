@@ -10,10 +10,21 @@ Append-only engineering build log for this repository. Prefer this file over sta
 
 ### 1. Live certification of skills to `usable` / certified profiles
 
-**Status:** Open (operational) — certification path corrected 2026-07-28.
-Filesystem catalog + eval-suite YAML exist for all 34 skills; generated `catalog/index.json` still defaults `certification_state` to `draft`. Eval Runner now requires **sealed executor receipts** from real isolated execution; suite-authored `observed_output`/`fixture_output` cannot certify. Local canary-echo is receipt-bound only. Studio-wide promotion of published certified profiles still depends on executed evidence + publication + (when applicable) applied schema.
-**Blocked on:** applied `lskills` schema (including registry foundation) on target Supabase + real eval evidence + supervised/live librarian passes.
-**Do not** start multi-day Cursor canary until certification + Platform gates pass independent verification.
+**Status:** Partially open (operational) — sealed local canary path landed 2026-08-03.
+Filesystem catalog + eval-suite YAML exist for all catalog skills; generated
+`catalog/index.json` overlays certification from
+`evidence/phase10/skill-classification-draft.json`. **One** skill
+(`canary-echo`) is `usable` after sealed Linux/`bwrap` (privileged local Docker)
+Eval Runner receipts. The remaining skills stay `draft` with machine-readable
+reasons (most suites are judged-shape / lack `execute` blocks). Studio-wide
+promotion of published certified profiles still depends on executable suites +
+sealed evidence + publication + (when applicable) applied schema.
+**Blocked on (remaining):** executable suite upgrades for launch skills; applied
+`lskills` schema on target Supabase; supervised/live librarian passes.
+**Do not** start multi-day Cursor canary until Platform gates pass independent verification.
+**Reproducible command (release/promoting; requires external issuer key + digest-pinned image):**
+`LINKSKILLS_EVAL_RUNNER_ISSUER_KEY=… LINKSKILLS_SEALED_CERT_IMAGE=name@sha256:… ./scripts/run-sealed-linux-certify.sh`
+**Local smoke (non-promoting):** `./scripts/run-sealed-linux-certify.sh --local-non-promoting`
 
 ### 2. Confirm `lskills` migrations applied per environment (Platform-owned live apply)
 
@@ -76,6 +87,20 @@ Telemetry may carry observational `cost` jsonb; no billing ledger in this Progra
 ---
 
 ## Recently completed (selected)
+
+### Sealed local catalog canary certification — 2026-08-03
+
+Governed branch from `0e03745a177acabfb5a5440e0bbdbc669c4081b6`. Added catalog skill
+`canary-echo` (workspace-scoped/`text-echo` canary; no durable shared/repo/network
+side effects; ledger telemetry expected), wired classification-ledger
+overlay into `scripts/build-catalog-index.py`, and automated
+`scripts/certify-catalog.py` + `./scripts/run-sealed-linux-certify.sh`
+(privileged local Docker Linux + `bwrap`; release mode requires external issuer
+key + digest-pinned image). Result: **usable=1 / draft=34**
+(35 catalog skills). Remaining skills stay draft with machine-readable
+`reason_code` (typically `suite_not_executable`). Confined executor fixes for
+container Python PATH + FHS `/lib` symlink binds. No stage/Supabase/VPS mutation.
+Handoff: `docs/handoffs/2026-08-03-linkskills-stage-certification-canary.md`.
 
 ### Root historical PRD/SOP/operator docs archived — 2026-08-02
 

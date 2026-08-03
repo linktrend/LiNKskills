@@ -20,6 +20,9 @@ Apply only after platform foundation + prior lskills catalog migrations are pres
 | 7 (librarian review_queue) | `supabase/migrations/20260730_000008_lskills_review_queue.sql` | `0d5cf1f6abf62bddffc2e494bd8fb7faabe5aceb44266d446bb71f1209f43bab` |
 | 8 (review_queue actor isolation) | `supabase/migrations/20260730_000009_lskills_review_queue_actor_isolation.sql` | `acd0a1dbf81697d4e278ed4cdfa11d4b410b383420e02e6105940f578b6b6467` |
 
+Additive follow-on (separate package, not part of this eight-row pin):
+`docs/migrations/MANIFEST-20260803-lskills-canary-echo-usable-seed.md` (`000010` canary-echo usable seed).
+
 Also requires LiNKplatform `platform` foundation (`platform.organizations`, roles helpers) already applied on the shared database.
 
 ## Prerequisites

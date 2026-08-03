@@ -1,0 +1,40 @@
+# canary-echo usable seed 000010 — package note
+
+**Packet add-on:** additive catalog usable-state seed for stage canary lifecycle.
+**Authoring repo:** LiNKskills
+**Live apply authority:** **LiNKplatform alone** applies live shared Supabase migrations.
+
+## Ordered apply
+
+1. Prerequisites: `000002` … `000009` (see `MANIFEST-20260727-lskills-registry-v0.1.md`).
+2. This package: `supabase/migrations/20260803_000010_lskills_canary_echo_usable_seed.sql`
+3. Rollback companion: `…_canary_echo_usable_seed_down.sql` (deletes only this package's exact IDs/hashes).
+
+Manifest: `docs/migrations/MANIFEST-20260803-lskills-canary-echo-usable-seed.md`
+
+## Usable gate satisfaction
+
+`enforce_usable_requires_passing_eval` requires a **passing** `lskills.eval_runs` row before `catalog.certification_state = usable`. This package:
+
+1. Inserts catalog as `draft` (or asserts existing row equals pinned constants)
+2. Inserts passing eval_run (sealed evidence refs in jsonb)
+3. Updates catalog to `usable`
+4. Inserts registry rows with the same fail-closed equality checks
+
+**Fail-closed:** if any pre-existing catalog/eval/release/profile/cert row on a conflict
+key differs from pinned IDs/hashes/evidence, the up migration `RAISE EXCEPTION` and the
+transaction rolls back (no partial usable promote). Down deletes only the fixed
+`c4e00010-*` UUIDs plus exact release/profile/evidence hash pins.
+
+No trigger disable; no rewrite of `000003`.
+
+## Promoting evidence binding
+
+Hash constants must match `evidence/phase10/sealed/canary-echo-sealed.json` produced in
+**release/promoting** sealed-cert mode with an externally supplied issuer key (process-only
+from GSM in production). The repository-visible local HMAC key and
+`--local-non-promoting` canaries must never refresh this package.
+
+## Stage readiness interaction
+
+This package does **not** clear PREFLIGHT blockers B1–B5. Platform must still supply stage apply + backup receipts. Local structural tests only prove the SQL package is additive and hash-pinned.

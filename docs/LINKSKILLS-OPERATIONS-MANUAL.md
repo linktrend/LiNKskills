@@ -132,7 +132,8 @@ So a failure is usually: “checks failed, usage was still recorded locally, cer
 | Real Eval Runner rejecting prompt-only certification | **Built in-repo.** |
 | Additive registry migrations (incl. `20260727_000005`) | **Packaged** here. **LiNKplatform alone applies** live. |
 | Compatibility load helper (`lib/skill_runtime`) | **Still present** for migration; not the final sole load path. |
-| Every skill marked certified/`usable` | **Not yet.** Draft until real eval evidence and publication/certification advance. |
+| Every skill marked certified/`usable` | **Not yet.** One sealed local canary (`canary-echo`) is `usable`; other catalog skills remain draft until sealed executable evidence. |
+
 | Cursor product canary | **Project-scoped only** (example fragment + notes). No global live canary. |
 | Codex / OpenClaw wiring | **Fragments handed off** — not applied from this repo. |
 | Librarian automatic nightly curation in production | **Host exists in LiNKplatform**; domain worker package in Skills; treat first live passes as supervised. |

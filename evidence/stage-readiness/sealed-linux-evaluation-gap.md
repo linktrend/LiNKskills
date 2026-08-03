@@ -30,7 +30,9 @@ Can this host produce certifiable executor receipts with `network_isolation=deni
 - A **non-paid-blocked** certifiable Linux (or already approved container/VM) evaluation host with proven `bwrap` path-scoped isolation, **or**
 - Platform-supplied sealed receipt evidence from such a host.
 
-This packet does **not** provision a paid Linux host and does **not** invent sealed receipts.
+**Local progress (2026-08-03):** `./scripts/run-sealed-linux-certify.sh` uses privileged Docker Linux + `bwrap` on the operator workstation and certified catalog `canary-echo` only. That clears the *local sealed canary* gap; it does **not** clear stage apply / stage PACI / shared DB gaps and must not be narrated as stage readiness.
+
+This packet does **not** provision a paid Linux host and does **not** invent sealed receipts on macOS.
 
 ## Non-claims
 

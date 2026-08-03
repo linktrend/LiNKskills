@@ -23,6 +23,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT / "packages" / "gateway"))
+sys.path.insert(0, str(REPO_ROOT / "packages" / "core"))
 sys.path.insert(0, str(REPO_ROOT / "packages" / "librarian_domain"))
 sys.path.insert(0, str(REPO_ROOT / "packages" / "publisher"))
 
@@ -34,7 +35,6 @@ REVIEW_QUEUE_SQL = MIGRATIONS / "20260730_000008_lskills_review_queue.sql"
 REVIEW_QUEUE_ACTOR_SQL = (
     MIGRATIONS / "20260730_000009_lskills_review_queue_actor_isolation.sql"
 )
-
 BOOTSTRAP_SQL = """
 create extension if not exists "pgcrypto";
 create schema if not exists platform;
@@ -361,6 +361,665 @@ class GatewayPostgresEphemeralTests(unittest.TestCase):
                 self.assertEqual(second["data"]["run_id"], "r1")
         finally:
             store.close()
+
+    def test_rls_missing_identity_fail_closed(self) -> None:
+        """Missing actor/org binding must fail closed before/at RLS write."""
+        from linkskills_gateway.postgres_store import PostgresGatewayStore
+
+        store = PostgresGatewayStore(self.dsn, rls=True)
+        try:
+            with self.assertRaises(ValueError) as ctx:
+                store.reserve_idempotency("actor-a", "op", "k-missing", "hash-1")
+            msg = str(ctx.exception).lower()
+            self.assertTrue(
+                "bound" in msg or "actor_id" in msg or "org_id" in msg,
+                msg,
+            )
+        finally:
+            store.close()
+
+    def _count_null_identity_events(self, *, event_type: str) -> int:
+        with self.psycopg.connect(self.dsn, autocommit=True) as conn:  # type: ignore[attr-defined]
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    select count(*)::int from lskills.gateway_events
+                    where actor_id is null
+                      and org_id is null
+                      and payload->>'type' = %s
+                    """,
+                    (event_type,),
+                )
+                row = cur.fetchone()
+                return int(row[0] if not isinstance(row, dict) else row["count"])
+
+    def test_append_event_anonymous_probe_rejected_no_null_row(self) -> None:
+        """Exact bypass proof: anonymous-probe must not insert null actor/org."""
+        from linkskills_gateway.postgres_store import PostgresGatewayStore
+
+        store = PostgresGatewayStore(self.dsn, rls=True)
+        try:
+            with self.assertRaises(ValueError) as ctx:
+                store.append_event({"type": "anonymous-probe"})
+            msg = str(ctx.exception)
+            self.assertIn("postgres RLS requires", msg)
+            self.assertIn("bound", msg.lower())
+            self.assertEqual(
+                self._count_null_identity_events(event_type="anonymous-probe"), 0
+            )
+        finally:
+            store.close()
+
+    def test_append_event_partial_identity_and_forge_and_success_reuse(self) -> None:
+        """Partial bind / forge reject; same-tenant success; rollback + pool reuse."""
+        from linkskills_gateway.postgres_store import PostgresGatewayStore
+
+        store = PostgresGatewayStore(self.dsn, rls=True)
+        try:
+            store.bind_identity("actor-partial", "")
+            with self.assertRaises(ValueError) as ctx:
+                store.append_event({"type": "partial-actor"})
+            self.assertIn("postgres RLS requires", str(ctx.exception))
+            store.clear_identity()
+
+            store.bind_identity("", "org-partial")
+            with self.assertRaises(ValueError) as ctx:
+                store.append_event({"type": "partial-org"})
+            self.assertIn("postgres RLS requires", str(ctx.exception))
+            store.clear_identity()
+
+            with self.assertRaises(ValueError) as ctx:
+                store.append_event(
+                    {
+                        "type": "payload-only",
+                        "actor_id": "actor-payload",
+                        "org_id": "org-payload",
+                    }
+                )
+            self.assertIn("postgres RLS requires", str(ctx.exception))
+
+            with store.identity("actor-a", "org-a"):
+                with self.assertRaises(ValueError) as ctx:
+                    store.append_event(
+                        {
+                            "type": "forged-event",
+                            "actor_id": "actor-d",
+                            "org_id": "org-d",
+                        }
+                    )
+                self.assertIn("disagrees", str(ctx.exception))
+                store.append_event(
+                    {"type": "same-tenant-ok", "actor_id": "actor-a", "org_id": "org-a"}
+                )
+                store.append_event({"type": "same-tenant-omit-ids"})
+
+            self.assertEqual(
+                self._count_table(
+                    "gateway_events", actor_id="actor-a", org_id="org-a"
+                ),
+                2,
+            )
+            self.assertEqual(
+                self._count_table(
+                    "gateway_events", actor_id="actor-d", org_id="org-d"
+                ),
+                0,
+            )
+            self.assertEqual(
+                self._count_null_identity_events(event_type="anonymous-probe"), 0
+            )
+            self.assertEqual(
+                self._count_null_identity_events(event_type="partial-actor"), 0
+            )
+            self.assertEqual(
+                self._count_null_identity_events(event_type="payload-only"), 0
+            )
+
+            # Rollback path: failed forge must leave connection reusable.
+            with store.identity("actor-a", "org-a"):
+                with self.assertRaises(ValueError):
+                    store.append_event(
+                        {
+                            "type": "forge-after-ok",
+                            "actor_id": "evil",
+                            "org_id": "evil-org",
+                        }
+                    )
+            with store.identity("actor-b", "org-b"):
+                store.append_event({"type": "pool-reuse-ok"})
+            self.assertEqual(
+                self._count_table(
+                    "gateway_events", actor_id="actor-b", org_id="org-b"
+                ),
+                1,
+            )
+            with store._lock:
+                with store._conn.cursor() as cur:
+                    cur.execute(
+                        "select current_setting('app.current_actor_id', true) as actor_guc, "
+                        "current_setting('app.current_org_id', true) as org_guc"
+                    )
+                    row = cur.fetchone()
+                store._conn.commit()
+            actor_guc = row["actor_guc"] if isinstance(row, dict) else row[0]
+            org_guc = row["org_guc"] if isinstance(row, dict) else row[1]
+            self.assertIn(actor_guc or "", ("", None))
+            self.assertIn(org_guc or "", ("", None))
+        finally:
+            store.close()
+
+    def _count_idempotency(self, *, actor_id: str, org_id: str, key: str) -> int:
+        with self.psycopg.connect(self.dsn, autocommit=True) as conn:  # type: ignore[attr-defined]
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    select count(*)::int from lskills.idempotency
+                    where actor_id = %s and org_id = %s and idempotency_key = %s
+                    """,
+                    (actor_id, org_id, key),
+                )
+                row = cur.fetchone()
+                return int(row[0] if not isinstance(row, dict) else row["count"])
+
+    def _count_table(
+        self, table: str, *, actor_id: str, org_id: str
+    ) -> int:
+        allowed = {
+            "feedback",
+            "trace_to_eval_candidates",
+            "gateway_events",
+            "side_effect_intents",
+            "skill_runs",
+            "idempotency",
+        }
+        if table not in allowed:
+            raise ValueError(f"unexpected table {table}")
+        with self.psycopg.connect(self.dsn, autocommit=True) as conn:  # type: ignore[attr-defined]
+            with conn.cursor() as cur:
+                cur.execute(
+                    f"""
+                    select count(*)::int from lskills.{table}
+                    where actor_id = %s and org_id = %s
+                    """,
+                    (actor_id, org_id),
+                )
+                row = cur.fetchone()
+                return int(row[0] if not isinstance(row, dict) else row["count"])
+
+    def test_adversarial_reserve_forged_actor_rejected(self) -> None:
+        """Bound actor-a/org-a + reserve(actor-b) must not insert actor-b/org-a."""
+        from linkskills_gateway.postgres_store import PostgresGatewayStore
+
+        store = PostgresGatewayStore(self.dsn, rls=True)
+        try:
+            with store.identity("actor-a", "org-a"):
+                with self.assertRaises(ValueError) as ctx:
+                    store.reserve_idempotency("actor-b", "op", "k-forge-actor", "h1")
+                self.assertIn("disagrees", str(ctx.exception))
+                self.assertIn("bound identity", str(ctx.exception))
+            self.assertEqual(
+                self._count_idempotency(
+                    actor_id="actor-b", org_id="org-a", key="k-forge-actor"
+                ),
+                0,
+            )
+            self.assertEqual(
+                self._count_idempotency(
+                    actor_id="actor-a", org_id="org-a", key="k-forge-actor"
+                ),
+                0,
+            )
+        finally:
+            store.close()
+
+    def test_adversarial_append_payload_forged_tenants_rejected(self) -> None:
+        """Payload actor/org must not overwrite bound GUCs across append_*."""
+        from linkskills_gateway.postgres_store import PostgresGatewayStore
+
+        store = PostgresGatewayStore(self.dsn, rls=True)
+        try:
+            with store.identity("actor-a", "org-a"):
+                with self.assertRaises(ValueError):
+                    store.append_feedback(
+                        {
+                            "feedback_id": str(uuid.uuid4()),
+                            "actor_id": "actor-b",
+                            "org_id": "org-b",
+                            "kind": "other",
+                            "skill_id": "demo",
+                        }
+                    )
+                with self.assertRaises(ValueError):
+                    store.append_trace(
+                        {
+                            "candidate_id": str(uuid.uuid4()),
+                            "fingerprint": f"fp-{uuid.uuid4().hex}",
+                            "actor_id": "actor-c",
+                            "org_id": "org-c",
+                            "skill_id": "demo",
+                        }
+                    )
+                with self.assertRaises(ValueError):
+                    store.append_event(
+                        {
+                            "type": "forged",
+                            "actor_id": "actor-d",
+                            "org_id": "org-d",
+                        }
+                    )
+            self.assertEqual(
+                self._count_table("feedback", actor_id="actor-b", org_id="org-b"), 0
+            )
+            self.assertEqual(
+                self._count_table(
+                    "trace_to_eval_candidates", actor_id="actor-c", org_id="org-c"
+                ),
+                0,
+            )
+            self.assertEqual(
+                self._count_table(
+                    "gateway_events", actor_id="actor-d", org_id="org-d"
+                ),
+                0,
+            )
+        finally:
+            store.close()
+
+    def test_adversarial_mixed_identity_and_same_tenant_success(self) -> None:
+        """Forged org-only / mixed reject; matching actor/org succeed and reuse."""
+        from linkskills_gateway.postgres_store import PostgresGatewayStore
+
+        store = PostgresGatewayStore(self.dsn, rls=True)
+        try:
+            with store.identity("actor-a", "org-a"):
+                with self.assertRaises(ValueError):
+                    store.reserve_idempotency("actor-mixed", "op", "k-mixed", "h1")
+                reserved = store.reserve_idempotency("actor-a", "op", "k-ok", "h-ok")
+                self.assertEqual(reserved.outcome, "reserved")
+                with self.assertRaises(ValueError):
+                    store.complete_idempotency(
+                        "actor-b",
+                        "op",
+                        "k-ok",
+                        "h-ok",
+                        {"ok": True},
+                        fence_token=reserved.fence_token or "",
+                    )
+                store.complete_idempotency(
+                    "actor-a",
+                    "op",
+                    "k-ok",
+                    "h-ok",
+                    {"ok": True},
+                    fence_token=reserved.fence_token or "",
+                )
+                replay = store.reserve_idempotency("actor-a", "op", "k-ok", "h-ok")
+                self.assertEqual(replay.outcome, "replay")
+                store.append_feedback(
+                    {
+                        "feedback_id": str(uuid.uuid4()),
+                        "actor_id": "actor-a",
+                        "org_id": "org-a",
+                        "kind": "other",
+                        "skill_id": "demo",
+                    }
+                )
+                store.append_event(
+                    {"type": "ok", "actor_id": "actor-a", "org_id": "org-a"}
+                )
+                with self.assertRaises(ValueError):
+                    store.append_feedback(
+                        {
+                            "feedback_id": str(uuid.uuid4()),
+                            "actor_id": "actor-a",
+                            "org_id": "org-evil",
+                            "kind": "other",
+                        }
+                    )
+            self.assertEqual(
+                self._count_idempotency(
+                    actor_id="actor-a", org_id="org-a", key="k-ok"
+                ),
+                1,
+            )
+            self.assertEqual(
+                self._count_table("feedback", actor_id="actor-a", org_id="org-a"), 1
+            )
+            self.assertEqual(
+                self._count_table(
+                    "gateway_events", actor_id="actor-a", org_id="org-a"
+                ),
+                1,
+            )
+            self.assertEqual(
+                self._count_table("feedback", actor_id="actor-a", org_id="org-evil"),
+                0,
+            )
+        finally:
+            store.close()
+
+    def test_adversarial_side_effect_and_nested_atomic_reject_forge(self) -> None:
+        """Side-effect intent + nested mutator cannot rebind GUCs mid-atomic."""
+        from linkskills_gateway.postgres_store import PostgresGatewayStore
+        from linkskills_gateway.service import SkillRun
+
+        store = PostgresGatewayStore(self.dsn, rls=True)
+        run_id = str(uuid.uuid4())
+        try:
+            with store.identity("actor-a", "org-a"):
+                reserved = store.reserve_idempotency(
+                    "actor-a", "skills_tool_invoke", "k-sei", "h-sei"
+                )
+                self.assertEqual(reserved.outcome, "reserved")
+                with self.assertRaises(ValueError):
+                    store.record_side_effect_intent(
+                        "actor-b",
+                        "skills_tool_invoke",
+                        "k-sei",
+                        fence_token=reserved.fence_token or "",
+                        downstream_key="dk",
+                        request_hash="h-sei",
+                    )
+                intent = store.record_side_effect_intent(
+                    "actor-a",
+                    "skills_tool_invoke",
+                    "k-sei",
+                    fence_token=reserved.fence_token or "",
+                    downstream_key="dk",
+                    request_hash="h-sei",
+                )
+                self.assertEqual(intent["status"], "intent")
+
+                def forged_mutator():
+                    store.save_run(
+                        SkillRun(
+                            run_id=run_id,
+                            skill_id="demo",
+                            version="1.0.0",
+                            release_hash="rel",
+                            profile_hash="prof",
+                            actor_id="actor-evil",
+                            org_id="org-evil",
+                            status="started",
+                            created_at="2026-08-03T00:00:00Z",
+                            updated_at="2026-08-03T00:00:00Z",
+                        )
+                    )
+                    return {"ok": False}
+
+                with self.assertRaises(ValueError) as ctx:
+                    store.run_atomic_idempotent(
+                        "actor-a",
+                        "skills_run_start",
+                        "k-nested-forge",
+                        "h-nested",
+                        forged_mutator,
+                    )
+                self.assertIn("disagrees", str(ctx.exception))
+            self.assertEqual(
+                self._count_table(
+                    "side_effect_intents", actor_id="actor-b", org_id="org-a"
+                ),
+                0,
+            )
+            self.assertEqual(
+                self._count_table(
+                    "skill_runs", actor_id="actor-evil", org_id="org-evil"
+                ),
+                0,
+            )
+            self.assertEqual(
+                self._count_idempotency(
+                    actor_id="actor-a", org_id="org-a", key="k-nested-forge"
+                ),
+                0,
+            )
+            # Connection reusable after rollback.
+            with store.identity("actor-a", "org-a"):
+                ok = store.reserve_idempotency("actor-a", "op", "k-reuse", "h-reuse")
+                self.assertEqual(ok.outcome, "reserved")
+        finally:
+            store.close()
+
+    def test_rls_cross_actor_idempotency_denied(self) -> None:
+        from linkskills_gateway.postgres_store import PostgresGatewayStore
+
+        store = PostgresGatewayStore(self.dsn, rls=True)
+        try:
+            with store.identity("actor-a", "org-a"):
+                reserved = store.reserve_idempotency("actor-a", "op", "k-x", "h1")
+                self.assertEqual(reserved.outcome, "reserved")
+                store.complete_idempotency(
+                    "actor-a",
+                    "op",
+                    "k-x",
+                    "h1",
+                    {"ok": True},
+                    fence_token=reserved.fence_token or "",
+                )
+            with store.identity("actor-b", "org-a"):
+                # Same key different actor is a distinct PK; own-row only.
+                other = store.get_idempotent("actor-a", "op", "k-x")
+                self.assertIsNone(other)
+            with store.identity("actor-a", "org-b"):
+                denied = store.get_idempotent("actor-a", "op", "k-x")
+                self.assertIsNone(denied)
+        finally:
+            store.close()
+
+    def test_rls_guc_cleared_after_commit_no_pool_leak(self) -> None:
+        """After commit, SET LOCAL GUCs must not leak on the pooled connection."""
+        from linkskills_gateway.postgres_store import PostgresGatewayStore
+
+        store = PostgresGatewayStore(self.dsn, rls=True)
+        try:
+            with store.identity("actor-a", "org-a"):
+                store.reserve_idempotency("actor-a", "op", "k-leak", "h1")
+            # Outside identity / after commit: session GUC should be empty.
+            with store._lock:
+                with store._conn.cursor() as cur:
+                    cur.execute(
+                        "select current_setting('app.current_actor_id', true) as actor_guc, "
+                        "current_setting('app.current_org_id', true) as org_guc"
+                    )
+                    row = cur.fetchone()
+                store._conn.commit()
+            actor_guc = row["actor_guc"] if isinstance(row, dict) else row[0]
+            org_guc = row["org_guc"] if isinstance(row, dict) else row[1]
+            self.assertIn(actor_guc or "", ("", None))
+            self.assertIn(org_guc or "", ("", None))
+
+            # Reuse connection as another tenant — no leakage into writes.
+            with store.identity("actor-b", "org-b"):
+                reserved = store.reserve_idempotency("actor-b", "op", "k-leak-b", "h2")
+                self.assertEqual(reserved.outcome, "reserved")
+                stolen = store.get_idempotent("actor-a", "op", "k-leak")
+                self.assertIsNone(stolen)
+        finally:
+            store.close()
+
+    def test_atomic_run_start_update_complete_same_tenant(self) -> None:
+        """Authorized same-tenant start → update → complete under RLS + nested tx."""
+        from linkskills_gateway.postgres_store import PostgresGatewayStore
+        from linkskills_gateway.service import SkillRun
+
+        store = PostgresGatewayStore(self.dsn, rls=True)
+        run_id = str(uuid.uuid4())
+        try:
+            with store.identity("actor-a", "org-a"):
+
+                def start_mutator():
+                    store.save_run(
+                        SkillRun(
+                            run_id=run_id,
+                            skill_id="demo",
+                            version="1.0.0",
+                            release_hash="rel",
+                            profile_hash="prof",
+                            actor_id="actor-a",
+                            org_id="org-a",
+                            status="started",
+                            created_at="2026-08-03T00:00:00Z",
+                            updated_at="2026-08-03T00:00:00Z",
+                            events=[{"type": "run_started"}],
+                        )
+                    )
+                    return {
+                        "operation": "skills_run_start",
+                        "data": {"run_id": run_id, "status": "started"},
+                    }
+
+                started = store.run_atomic_idempotent(
+                    "actor-a",
+                    "skills_run_start",
+                    "atomic-start-1",
+                    "hash-atomic-1",
+                    start_mutator,
+                )
+                self.assertEqual(started.outcome, "replay")
+                self.assertEqual(store.get_run(run_id)["status"], "started")
+
+                def update_mutator():
+                    store.save_run(
+                        SkillRun(
+                            run_id=run_id,
+                            skill_id="demo",
+                            version="1.0.0",
+                            release_hash="rel",
+                            profile_hash="prof",
+                            actor_id="actor-a",
+                            org_id="org-a",
+                            status="in_progress",
+                            created_at="2026-08-03T00:00:00Z",
+                            updated_at="2026-08-03T00:01:00Z",
+                            events=[
+                                {"type": "run_started"},
+                                {"type": "run_update"},
+                            ],
+                        )
+                    )
+                    return {
+                        "operation": "skills_run_update",
+                        "data": {"run_id": run_id, "status": "in_progress"},
+                    }
+
+                updated = store.run_atomic_idempotent(
+                    "actor-a",
+                    "skills_run_update",
+                    "atomic-update-1",
+                    "hash-atomic-2",
+                    update_mutator,
+                )
+                self.assertEqual(updated.outcome, "replay")
+                self.assertEqual(store.get_run(run_id)["status"], "in_progress")
+
+                def complete_mutator():
+                    store.save_run(
+                        SkillRun(
+                            run_id=run_id,
+                            skill_id="demo",
+                            version="1.0.0",
+                            release_hash="rel",
+                            profile_hash="prof",
+                            actor_id="actor-a",
+                            org_id="org-a",
+                            status="completed",
+                            created_at="2026-08-03T00:00:00Z",
+                            updated_at="2026-08-03T00:02:00Z",
+                            events=[
+                                {"type": "run_started"},
+                                {"type": "run_update"},
+                                {"type": "run_completed"},
+                            ],
+                            outcome={"ok": True},
+                        )
+                    )
+                    return {
+                        "operation": "skills_run_complete",
+                        "data": {"run_id": run_id, "status": "completed"},
+                    }
+
+                completed = store.run_atomic_idempotent(
+                    "actor-a",
+                    "skills_run_complete",
+                    "atomic-complete-1",
+                    "hash-atomic-3",
+                    complete_mutator,
+                )
+                self.assertEqual(completed.outcome, "replay")
+                loaded = store.get_run(run_id)
+                self.assertEqual(loaded["status"], "completed")
+                # Idempotent replay of start.
+                replay = store.run_atomic_idempotent(
+                    "actor-a",
+                    "skills_run_start",
+                    "atomic-start-1",
+                    "hash-atomic-1",
+                    start_mutator,
+                )
+                self.assertEqual(replay.outcome, "replay")
+                self.assertEqual(replay.envelope["data"]["run_id"], run_id)
+        finally:
+            store.close()
+
+    def test_atomic_rollback_clears_partial_writes_and_gucs(self) -> None:
+        """Crash after nested mutation rolls back idempotency + run; GUCs clear."""
+        from linkskills_gateway.postgres_store import PostgresGatewayStore
+        from linkskills_gateway.service import SkillRun
+
+        store = PostgresGatewayStore(self.dsn, rls=True)
+        run_id = str(uuid.uuid4())
+        try:
+            with store.identity("actor-a", "org-a"):
+                store._crash_after_mutation = True
+
+                def mutator():
+                    store.save_run(
+                        SkillRun(
+                            run_id=run_id,
+                            skill_id="demo",
+                            version="1.0.0",
+                            release_hash="rel",
+                            profile_hash="prof",
+                            actor_id="actor-a",
+                            org_id="org-a",
+                            status="started",
+                            created_at="2026-08-03T00:00:00Z",
+                            updated_at="2026-08-03T00:00:00Z",
+                            events=[{"type": "run_started"}],
+                        )
+                    )
+                    return {"operation": "skills_run_start", "data": {"run_id": run_id}}
+
+                with self.assertRaises(RuntimeError):
+                    store.run_atomic_idempotent(
+                        "actor-a",
+                        "skills_run_start",
+                        "atomic-crash-1",
+                        "hash-crash-1",
+                        mutator,
+                    )
+                self.assertIsNone(store.get_run(run_id))
+                self.assertIsNone(
+                    store.get_idempotent("actor-a", "skills_run_start", "atomic-crash-1")
+                )
+
+            with store._lock:
+                with store._conn.cursor() as cur:
+                    cur.execute(
+                        "select current_setting('app.current_actor_id', true) as actor_guc, "
+                        "current_setting('app.current_org_id', true) as org_guc"
+                    )
+                    row = cur.fetchone()
+                    actor_guc = row["actor_guc"] if isinstance(row, dict) else row[0]
+                    org_guc = row["org_guc"] if isinstance(row, dict) else row[1]
+                store._conn.commit()
+            self.assertIn(actor_guc or "", ("", None))
+            self.assertIn(org_guc or "", ("", None))
+        finally:
+            store._crash_after_mutation = False
+            store.close()
+
 
     def test_gateway_schema_probe(self) -> None:
         from linkskills_gateway.postgres_store import PostgresGatewayStore

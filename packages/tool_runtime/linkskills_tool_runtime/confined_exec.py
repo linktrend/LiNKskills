@@ -58,7 +58,9 @@ ALLOWED_ENV_KEYS = frozenset(
 )
 
 # Minimal PATH for confined runs (no ambient user PATH).
-_SAFE_PATH = "/usr/bin:/bin:/usr/sbin:/sbin"
+# Include /usr/local/bin for container Python images (python:*-slim) while
+# keeping PATH allowlisted and short — never inherit ambient host PATH.
+_SAFE_PATH = "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 
 _DARWIN_RUNTIME_ROOTS = (
     "/usr",
@@ -237,12 +239,23 @@ def collect_runtime_read_paths(
             return
         if not path.exists():
             return
-        resolved = _realpath(path)
-        key = str(resolved)
-        if key in seen:
-            return
-        seen.add(key)
-        roots.append(resolved)
+        # Keep both the nominal path and its realpath. On Debian/Ubuntu, ``/lib``
+        # often symlinks to ``usr/lib``; ELF interpreters still look up
+        # ``/lib/ld-linux-*.so.1``, so binding only the realpath leaves that
+        # lookup path missing inside bwrap (execve → ENOENT).
+        candidates = [path]
+        try:
+            resolved = _realpath(path)
+            if resolved != path:
+                candidates.append(resolved)
+        except (OSError, RuntimeError):
+            pass
+        for candidate in candidates:
+            key = str(candidate)
+            if key in seen:
+                continue
+            seen.add(key)
+            roots.append(candidate)
 
     add(workspace)
     exe = str(argv[0])
@@ -365,6 +378,39 @@ def _darwin_allowlist_boots(
     return True
 
 
+def _resolve_argv0(argv0: str) -> str:
+    """Resolve argv[0] to an absolute executable path when possible.
+
+    Relative names (``python3``) must become absolute before bwrap/sandbox
+    launch: sanitized PATH may omit the host directory where ``which`` found
+    the binary (common with container Pythons under ``/usr/local/bin``).
+    """
+    if not argv0:
+        return argv0
+    if os.path.isabs(argv0):
+        return argv0
+    resolved = shutil.which(argv0)
+    return resolved or argv0
+
+
+def _ephemeral_sandbox_profile_path() -> Path:
+    """Allocate a seatbelt profile path under system temp (never under workspace).
+
+    Workspace is frequently the tool package directory that ``source_hash``
+    walks; writing ``tmp/fs-allowlist.sb`` there contaminated clean-archive
+    reproducibility.
+    """
+    state_root = Path(tempfile.gettempdir()) / "linkskills-confine-state"
+    state_root.mkdir(parents=True, exist_ok=True)
+    handle, name = tempfile.mkstemp(
+        prefix="fs-allowlist-",
+        suffix=".sb",
+        dir=str(state_root),
+    )
+    os.close(handle)
+    return Path(name)
+
+
 def _wrap_with_network_deny(
     argv: Sequence[str],
     *,
@@ -378,6 +424,8 @@ def _wrap_with_network_deny(
     - ``unavailable`` — no proven isolator (caller may stamp ``unproven``)
     """
     cmd = [str(a) for a in argv]
+    if cmd:
+        cmd[0] = _resolve_argv0(cmd[0])
     system = sys.platform
     read_paths = collect_runtime_read_paths(cmd, workspace=workspace, env=env)
 
@@ -390,8 +438,9 @@ def _wrap_with_network_deny(
             profile = _darwin_allowlist_profile(workspace=workspace, read_paths=read_paths)
             if _profile_uses_global_file_read(profile):
                 return cmd, "unavailable"
-            profile_path = workspace / "tmp" / "fs-allowlist.sb"
-            profile_path.parent.mkdir(parents=True, exist_ok=True)
+            # Never write seatbelt profiles under workspace (often the tool package
+            # tree that source_hash walks). Keep them in ephemeral system state.
+            profile_path = _ephemeral_sandbox_profile_path()
             profile_path.write_text(profile, encoding="utf-8")
             probe_env = dict(env or sanitize_env(workspace=workspace))
             if _darwin_allowlist_boots(
@@ -418,6 +467,9 @@ def _wrap_with_network_deny(
                 "--tmpfs",
                 "/tmp",
             ]
+            # Parents first, then nested mounts (e.g. /usr then /usr/local) so
+            # Docker nested mount points are not hidden by a parent bind.
+            bind_paths = []
             for path in read_paths:
                 if path == workspace or _is_under(path, workspace):
                     continue
@@ -426,6 +478,9 @@ def _wrap_with_network_deny(
                 # Never re-introduce a host-wide root bind.
                 if str(path) == "/":
                     continue
+                bind_paths.append(path)
+            bind_paths.sort(key=lambda p: (len(str(p)), str(p)))
+            for path in bind_paths:
                 wrapped.extend(["--ro-bind", str(path), str(path)])
             wrapped.extend(
                 [
