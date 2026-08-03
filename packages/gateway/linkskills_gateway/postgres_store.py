@@ -725,10 +725,11 @@ class PostgresGatewayStore:
         operation: str,
         key: str,
     ) -> Optional[Dict[str, Any]]:
-        _, org_id = self._current_identity(actor_id=actor_id)
+        # RLS GUCs from bind_identity only — lookup actor_id is a query key.
+        guc_actor, org_id = self._current_identity()
         with self._lock:
             try:
-                cur = self._begin(actor_id=actor_id, org_id=org_id)
+                cur = self._begin(actor_id=guc_actor, org_id=org_id)
                 cur.execute(
                     """
                     select status, fence_token, request_hash, downstream_key, result
