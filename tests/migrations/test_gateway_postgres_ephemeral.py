@@ -378,6 +378,136 @@ class GatewayPostgresEphemeralTests(unittest.TestCase):
         finally:
             store.close()
 
+    def _count_null_identity_events(self, *, event_type: str) -> int:
+        with self.psycopg.connect(self.dsn, autocommit=True) as conn:  # type: ignore[attr-defined]
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    select count(*)::int from lskills.gateway_events
+                    where actor_id is null
+                      and org_id is null
+                      and payload->>'type' = %s
+                    """,
+                    (event_type,),
+                )
+                row = cur.fetchone()
+                return int(row[0] if not isinstance(row, dict) else row["count"])
+
+    def test_append_event_anonymous_probe_rejected_no_null_row(self) -> None:
+        """Exact bypass proof: anonymous-probe must not insert null actor/org."""
+        from linkskills_gateway.postgres_store import PostgresGatewayStore
+
+        store = PostgresGatewayStore(self.dsn, rls=True)
+        try:
+            with self.assertRaises(ValueError) as ctx:
+                store.append_event({"type": "anonymous-probe"})
+            msg = str(ctx.exception)
+            self.assertIn("postgres RLS requires", msg)
+            self.assertIn("bound", msg.lower())
+            self.assertEqual(
+                self._count_null_identity_events(event_type="anonymous-probe"), 0
+            )
+        finally:
+            store.close()
+
+    def test_append_event_partial_identity_and_forge_and_success_reuse(self) -> None:
+        """Partial bind / forge reject; same-tenant success; rollback + pool reuse."""
+        from linkskills_gateway.postgres_store import PostgresGatewayStore
+
+        store = PostgresGatewayStore(self.dsn, rls=True)
+        try:
+            store.bind_identity("actor-partial", "")
+            with self.assertRaises(ValueError) as ctx:
+                store.append_event({"type": "partial-actor"})
+            self.assertIn("postgres RLS requires", str(ctx.exception))
+            store.clear_identity()
+
+            store.bind_identity("", "org-partial")
+            with self.assertRaises(ValueError) as ctx:
+                store.append_event({"type": "partial-org"})
+            self.assertIn("postgres RLS requires", str(ctx.exception))
+            store.clear_identity()
+
+            with self.assertRaises(ValueError) as ctx:
+                store.append_event(
+                    {
+                        "type": "payload-only",
+                        "actor_id": "actor-payload",
+                        "org_id": "org-payload",
+                    }
+                )
+            self.assertIn("postgres RLS requires", str(ctx.exception))
+
+            with store.identity("actor-a", "org-a"):
+                with self.assertRaises(ValueError) as ctx:
+                    store.append_event(
+                        {
+                            "type": "forged-event",
+                            "actor_id": "actor-d",
+                            "org_id": "org-d",
+                        }
+                    )
+                self.assertIn("disagrees", str(ctx.exception))
+                store.append_event(
+                    {"type": "same-tenant-ok", "actor_id": "actor-a", "org_id": "org-a"}
+                )
+                store.append_event({"type": "same-tenant-omit-ids"})
+
+            self.assertEqual(
+                self._count_table(
+                    "gateway_events", actor_id="actor-a", org_id="org-a"
+                ),
+                2,
+            )
+            self.assertEqual(
+                self._count_table(
+                    "gateway_events", actor_id="actor-d", org_id="org-d"
+                ),
+                0,
+            )
+            self.assertEqual(
+                self._count_null_identity_events(event_type="anonymous-probe"), 0
+            )
+            self.assertEqual(
+                self._count_null_identity_events(event_type="partial-actor"), 0
+            )
+            self.assertEqual(
+                self._count_null_identity_events(event_type="payload-only"), 0
+            )
+
+            # Rollback path: failed forge must leave connection reusable.
+            with store.identity("actor-a", "org-a"):
+                with self.assertRaises(ValueError):
+                    store.append_event(
+                        {
+                            "type": "forge-after-ok",
+                            "actor_id": "evil",
+                            "org_id": "evil-org",
+                        }
+                    )
+            with store.identity("actor-b", "org-b"):
+                store.append_event({"type": "pool-reuse-ok"})
+            self.assertEqual(
+                self._count_table(
+                    "gateway_events", actor_id="actor-b", org_id="org-b"
+                ),
+                1,
+            )
+            with store._lock:
+                with store._conn.cursor() as cur:
+                    cur.execute(
+                        "select current_setting('app.current_actor_id', true) as actor_guc, "
+                        "current_setting('app.current_org_id', true) as org_guc"
+                    )
+                    row = cur.fetchone()
+                store._conn.commit()
+            actor_guc = row["actor_guc"] if isinstance(row, dict) else row[0]
+            org_guc = row["org_guc"] if isinstance(row, dict) else row[1]
+            self.assertIn(actor_guc or "", ("", None))
+            self.assertIn(org_guc or "", ("", None))
+        finally:
+            store.close()
+
     def _count_idempotency(self, *, actor_id: str, org_id: str, key: str) -> int:
         with self.psycopg.connect(self.dsn, autocommit=True) as conn:  # type: ignore[attr-defined]
             with conn.cursor() as cur:

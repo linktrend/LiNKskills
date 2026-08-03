@@ -1076,10 +1076,20 @@ class PostgresGatewayStore:
                 raise
 
     def append_event(self, record: Mapping[str, Any]) -> None:
+        """Append a gateway event under verified PACI-bound identity only.
+
+        Fail closed when bind_identity / identity() is missing or partial —
+        never insert null actor/org spine rows and never trust payload identity
+        to satisfy the bind. Payload actor/org may be omitted or must match.
+        """
         payload = dict(record)
-        bound_actor, bound_org = self._current_identity()
-        payload_actor = str(payload.get("actor_id") or "").strip()
-        payload_org = str(payload.get("org_id") or "").strip()
+        # Bound identity required before any SQL — no anonymous write branch.
+        actor_id, org_id = self._require_bound_identity()
+        self._assert_payload_identity_agrees(
+            payload, bound_actor=actor_id, bound_org=org_id
+        )
+        payload["actor_id"] = actor_id
+        payload["org_id"] = org_id
         run_id_raw = payload.get("run_id")
         run_id = None
         if run_id_raw:
@@ -1089,31 +1099,7 @@ class PostgresGatewayStore:
                 run_id = None
         with self._lock:
             try:
-                if bound_actor or bound_org or payload_actor or payload_org:
-                    # Tenant-scoped event — GUCs and row ownership from bound
-                    # identity only; payload never rebinds.
-                    actor_id, org_id = self._require_bound_identity()
-                    self._assert_payload_identity_agrees(
-                        payload, bound_actor=actor_id, bound_org=org_id
-                    )
-                    payload["actor_id"] = actor_id
-                    payload["org_id"] = org_id
-                    cur = self._begin(actor_id=actor_id, org_id=org_id)
-                else:
-                    # Anonymous spine row (null actor/org) allowed by 000007 policy.
-                    # Only when neither bound identity nor payload carries tenant ids.
-                    actor_id, org_id = "", ""
-                    if self._atomic_depth == 0 and not self._tx_idle():
-                        self._conn.rollback()
-                    cur = self._conn.cursor()
-                    if self.rls and self.role:
-                        cur.execute(f"set local role {self.role}")
-                    cur.execute(
-                        "select set_config('app.current_actor_id', '', true)"
-                    )
-                    cur.execute(
-                        "select set_config('app.current_org_id', '', true)"
-                    )
+                cur = self._begin(actor_id=actor_id, org_id=org_id)
                 if run_id is not None:
                     cur.execute(
                         """
@@ -1132,8 +1118,8 @@ class PostgresGatewayStore:
                     values (%s, %s, %s, %s)
                     """,
                     (
-                        actor_id or None,
-                        org_id or None,
+                        actor_id,
+                        org_id,
                         run_id,
                         _as_jsonb(payload),
                     ),

@@ -1,34 +1,34 @@
-# Handoff — SKILLS-STAGE-RLS-CONTEXT-FIX (second correction)
+# Handoff — SKILLS-STAGE-RLS-CONTEXT-FIX (third correction)
 
 **Date:** 2026-08-03  
 **Branch:** `dev/cloudcursor/SKILLS-STAGE-RLS-CONTEXT-FIX`  
-**Prior tip (HOLD):** `1136b31a0de45d2e7abcfc70660ce9ceb620de57`  
-**This tip:** `1f8491bcedca5b3606bee42f738abd3d62c505fc`
+**Prior tip (HOLD):** `dd19d13d665711be2dccec71f2630499017a8e9b`  
+**This tip:** see `git rev-parse HEAD` after push (commit below)
 
 ## Verdict
 
-**PASS** from independent Grok 4.5 High audit of the bound-identity GUC overwrite fix  
+Independent Grok 4.5 High audit of the anonymous `append_event` bypass fix  
 (working-tree audit before commit). Local ephemeral + gateway proofs green.  
 Do **not** treat as stage/live self-approval — no Platform apply or redeploy.
 
-## Root cause (second correction)
+## Root cause (third correction)
 
-Tip `1136b31` fixed read-path GUC sourcing (`get_idempotent`, `get_side_effect_intent`)
-but write paths still derived `app.current_actor_id` / `app.current_org_id` from
-method `actor_id` args or payload via `_current_identity(actor_id=…)` /
-`bind_identity(payload…)`. Under `identity(actor-a, org-a)`,
-`reserve_idempotency(actor-b)` inserted actor-b/org-a; forged
-`append_feedback` / `append_trace` / `append_event` payloads inserted foreign tenants.
+Tip `dd19d13` / code `1f8491b` closed arg/payload GUC overwrite on tenant writers,
+but `PostgresGatewayStore.append_event` retained an anonymous write branch: when
+neither bound identity nor payload carried actor/org, it set empty GUCs and
+inserted `gateway_events` with null actor/org. Exact disposable proof:
+`append_event({type: "anonymous-probe"})` with no bind succeeded.
 
 ## Fix (code only; no migration; no FORCE RLS)
 
-- `postgres_store.py`: `_current_identity()` bound-only; `_require_bound_identity`;
-  `_assert_write_actor_agrees` / `_assert_payload_identity_agrees`; all tenant
-  writers stamp GUCs + row ownership from bound identity only.
-- `service.py`: PACI bind once at `dispatch` via `identity(actor.actor_id, org)`;
-  sanitize store identity mismatch → `identity_mismatch` (403).
-- Tests: unit `test_postgres_bound_identity.py`; ephemeral adversarial proofs
-  (forged actor/org, mixed, missing, same-tenant, nested forge, rollback/reuse).
+- `postgres_store.py` `append_event`: remove anonymous branch; call
+  `_require_bound_identity()` before any SQL; stamp row ownership from bound
+  identity only; payload agreement-check unchanged.
+- Missing/partial identity raises the same `postgres RLS requires bound…`
+  ValueError already sanitized by service to `rls_org_required` (403).
+- Request boundary: `service.dispatch` already wraps store ops in
+  `identity(actor.actor_id, org)` from verified PACI; WRITE_OPERATIONS fail
+  closed on null/empty orgId before handlers.
 
 ## Migration requirements
 
@@ -36,13 +36,17 @@ method `actor_id` args or payload via `_current_identity(actor_id=…)` /
 
 ## Tests run
 
-- `tests.gateway.test_postgres_bound_identity` — OK
-- `tests/gateway` discover (`test_*.py`) — 198 OK
-- `tests/migrations` discover — 77 OK (includes ephemeral adversarial)
+- `tests.gateway.test_postgres_bound_identity` — OK (11; includes anonymous /
+  partial / payload-only / forge)
+- Focused ephemeral: `test_append_event_anonymous_probe_rejected_no_null_row`,
+  `test_append_event_partial_identity_and_forge_and_success_reuse` — OK
+- `tests/gateway` discover (`test_*.py`) — 201 OK
+- `tests/migrations` discover — 79 OK
+- `pytest tests/gateway tests/migrations` — 280 passed
 
 ## Rollback
 
-Revert Gateway deploy / branch tip to `1136b31a0de45d2e7abcfc70660ce9ceb620de57`.
+Revert Gateway deploy / branch tip to `dd19d13d665711be2dccec71f2630499017a8e9b`.
 No migration rollback.
 
 ## Stage (Platform-only; not performed)

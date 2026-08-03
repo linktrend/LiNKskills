@@ -97,6 +97,41 @@ class PostgresGatewayBoundIdentityUnitTests(unittest.TestCase):
         finally:
             store.close()
 
+    def test_append_event_rejects_missing_identity_before_sql(self) -> None:
+        """Anonymous probe must fail closed — no SQL without bound identity."""
+        store = _make_store()
+        try:
+            with self.assertRaises(ValueError) as ctx:
+                store.append_event({"type": "anonymous-probe"})
+            msg = str(ctx.exception)
+            self.assertIn("postgres RLS requires", msg)
+            self.assertIn("bound", msg.lower())
+            store._conn.cursor.assert_not_called()
+        finally:
+            store.close()
+
+    def test_append_event_rejects_partial_identity_before_sql(self) -> None:
+        """Actor-only or org-only binding must fail closed before SQL."""
+        store = _make_store()
+        try:
+            store.bind_identity("actor-a", "")
+            with self.assertRaises(ValueError) as ctx:
+                store.append_event({"type": "partial-actor"})
+            self.assertIn("postgres RLS requires", str(ctx.exception))
+            self.assertIn("org_id", str(ctx.exception))
+            store._conn.cursor.assert_not_called()
+
+            store.clear_identity()
+            store._conn.cursor.reset_mock()
+            store.bind_identity("", "org-a")
+            with self.assertRaises(ValueError) as ctx:
+                store.append_event({"type": "partial-org"})
+            self.assertIn("postgres RLS requires", str(ctx.exception))
+            self.assertIn("actor_id", str(ctx.exception))
+            store._conn.cursor.assert_not_called()
+        finally:
+            store.close()
+
     def test_append_event_rejects_forged_payload_before_sql(self) -> None:
         store = _make_store()
         try:
@@ -106,6 +141,23 @@ class PostgresGatewayBoundIdentityUnitTests(unittest.TestCase):
                     {"type": "evt", "actor_id": "actor-d", "org_id": "org-d"}
                 )
             self.assertIn("disagrees", str(ctx.exception))
+            store._conn.cursor.assert_not_called()
+        finally:
+            store.close()
+
+    def test_append_event_payload_identity_cannot_satisfy_missing_bind(self) -> None:
+        """Payload actor/org must not substitute for missing PACI bind."""
+        store = _make_store()
+        try:
+            with self.assertRaises(ValueError) as ctx:
+                store.append_event(
+                    {
+                        "type": "payload-only",
+                        "actor_id": "actor-payload",
+                        "org_id": "org-payload",
+                    }
+                )
+            self.assertIn("postgres RLS requires", str(ctx.exception))
             store._conn.cursor.assert_not_called()
         finally:
             store.close()
