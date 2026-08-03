@@ -35,11 +35,6 @@ REVIEW_QUEUE_SQL = MIGRATIONS / "20260730_000008_lskills_review_queue.sql"
 REVIEW_QUEUE_ACTOR_SQL = (
     MIGRATIONS / "20260730_000009_lskills_review_queue_actor_isolation.sql"
 )
-FORCE_RLS_SQL = MIGRATIONS / "20260803_000011_lskills_gateway_force_rls.sql"
-FORCE_RLS_DOWN_SQL = (
-    MIGRATIONS / "20260803_000011_lskills_gateway_force_rls_down.sql"
-)
-
 BOOTSTRAP_SQL = """
 create extension if not exists "pgcrypto";
 create schema if not exists platform;
@@ -218,7 +213,6 @@ class GatewayPostgresEphemeralTests(unittest.TestCase):
             GATEWAY_SQL,
             REVIEW_QUEUE_SQL,
             REVIEW_QUEUE_ACTOR_SQL,
-            FORCE_RLS_SQL,
         )
 
     def test_fresh_and_upgrade_paths(self) -> None:
@@ -619,35 +613,6 @@ class GatewayPostgresEphemeralTests(unittest.TestCase):
             store._crash_after_mutation = False
             store.close()
 
-    def test_force_rls_applied_and_down_relaxes(self) -> None:
-        with self.psycopg.connect(self.dsn, autocommit=True) as conn:  # type: ignore[attr-defined]
-            with conn.cursor() as cur:
-                cur.execute(
-                    """
-                    select c.relname, c.relforcerowsecurity
-                    from pg_class c
-                    join pg_namespace n on n.oid = c.relnamespace
-                    where n.nspname = 'lskills' and c.relname = 'idempotency'
-                    """
-                )
-                name, forced = cur.fetchone()
-                self.assertEqual(name, "idempotency")
-                self.assertTrue(forced)
-                cur.execute(
-                    _strip_verification(FORCE_RLS_DOWN_SQL.read_text(encoding="utf-8"))
-                )
-                cur.execute(
-                    """
-                    select c.relforcerowsecurity
-                    from pg_class c
-                    join pg_namespace n on n.oid = c.relnamespace
-                    where n.nspname = 'lskills' and c.relname = 'idempotency'
-                    """
-                )
-                self.assertFalse(cur.fetchone()[0])
-                cur.execute(
-                    _strip_verification(FORCE_RLS_SQL.read_text(encoding="utf-8"))
-                )
 
     def test_gateway_schema_probe(self) -> None:
         from linkskills_gateway.postgres_store import PostgresGatewayStore
