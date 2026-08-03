@@ -2,6 +2,7 @@
 
 **Date:** 2026-08-03
 **Branch:** `dev/cloudcursor/skills-stage-certification`
+**Evidence/catalog tip (this commit family):** see branch HEAD after push
 **Governed source commit:** `0a232932d97a35661c165492649b8814705b04cc`
 **source_tree_sha256:** `e6ce798f62da1a2c9781269ac40bed4d08a5fc6c5d09a673c29c667373671894`
 **Verdict:** local/stage-key sealed certification **PASS**; stage DB apply remains **HOLD** (Platform-only)
