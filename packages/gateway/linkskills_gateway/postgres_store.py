@@ -10,8 +10,11 @@ RLS identity is applied per transaction with:
   SET LOCAL via set_config('app.current_org_id', ..., true);
 
 Call ``bind_identity`` / ``identity(...)`` so reads/writes pass RLS.
-Actor and org GUCs must be non-empty for tenant writes (fail closed);
-null/empty PACI ``orgId`` is rejected before RLS-protected DML.
+Actor and org GUCs come **only** from that already-bound verified identity
+(PACI claims at the request boundary). Method args and payloads never
+rederive or overwrite transaction GUCs; non-empty arg/payload actor/org
+that disagree are rejected fail-closed before SQL.
+Null/empty PACI ``orgId`` is rejected before RLS-protected DML.
 Nested writers inside ``run_atomic_idempotent`` defer commit so SET LOCAL
 GUCs are not cleared mid-transaction (parity with SQLite ``_maybe_commit``).
 When ``rls=False`` (superuser ephemeral proofs without role switch), GUCs
@@ -193,17 +196,11 @@ class PostgresGatewayStore:
             else:
                 self.bind_identity(str(previous[0]), str(previous[1] or ""))
 
-    def _current_identity(
-        self,
-        *,
-        actor_id: Optional[str] = None,
-        org_id: Optional[str] = None,
-    ) -> Tuple[str, str]:
+    def _current_identity(self) -> Tuple[str, str]:
+        """Return bound RLS identity only — never method args or payload fields."""
         bound_actor = getattr(self._identity, "actor_id", None)
         bound_org = getattr(self._identity, "org_id", None)
-        resolved_actor = str(actor_id if actor_id is not None else (bound_actor or ""))
-        resolved_org = str(org_id if org_id is not None else (bound_org or ""))
-        return resolved_actor, resolved_org
+        return str(bound_actor or ""), str(bound_org or "")
 
     @staticmethod
     def _require_rls_identity(actor_id: str, org_id: str) -> None:
@@ -224,6 +221,46 @@ class PostgresGatewayStore:
                 "postgres RLS requires bound org_id via bind_identity / "
                 "identity() from verified PACI claims "
                 "(null/empty orgId is fail-closed for write paths)"
+            )
+
+    def _require_bound_identity(self) -> Tuple[str, str]:
+        """Fail closed when tenant writes lack bind_identity / identity()."""
+        actor_id, org_id = self._current_identity()
+        self._require_rls_identity(actor_id, org_id)
+        return actor_id, org_id
+
+    def _assert_write_actor_agrees(self, actor_id: str, *, bound_actor: str) -> None:
+        """Reject method actor_id that disagrees with the bound PACI identity."""
+        provided = str(actor_id or "").strip()
+        if provided != bound_actor:
+            raise ValueError(
+                f"method actor_id {provided!r} disagrees with "
+                f"bound identity actor_id {bound_actor!r}"
+            )
+
+    def _assert_payload_identity_agrees(
+        self,
+        payload: Mapping[str, Any],
+        *,
+        bound_actor: str,
+        bound_org: str,
+    ) -> None:
+        """Reject payload actor/org that disagree with the bound identity.
+
+        Omitted or empty payload identity fields are allowed; bound identity is
+        stamped onto the stored row. Non-empty values must match exactly.
+        """
+        payload_actor = str(payload.get("actor_id") or "").strip()
+        payload_org = str(payload.get("org_id") or "").strip()
+        if payload_actor and payload_actor != bound_actor:
+            raise ValueError(
+                f"payload actor_id {payload_actor!r} disagrees with "
+                f"bound identity actor_id {bound_actor!r}"
+            )
+        if payload_org and payload_org != bound_org:
+            raise ValueError(
+                f"payload org_id {payload_org!r} disagrees with "
+                f"bound identity org_id {bound_org!r}"
             )
 
     def _apply_session_identity(
@@ -302,10 +339,11 @@ class PostgresGatewayStore:
     ) -> IdempotencyReserveResult:
         lease = _lease_expiry_iso()
         fence = _new_fence_token()
-        _, org_id = self._current_identity(actor_id=actor_id)
+        guc_actor, org_id = self._require_bound_identity()
+        self._assert_write_actor_agrees(actor_id, bound_actor=guc_actor)
         with self._lock:
             try:
-                cur = self._begin(actor_id=actor_id, org_id=org_id)
+                cur = self._begin(actor_id=guc_actor, org_id=org_id)
                 try:
                     cur.execute(
                         """
@@ -314,13 +352,13 @@ class PostgresGatewayStore:
                           status, envelope, lease_expires_at, fence_token, fence_generation
                         ) values (%s, %s, %s, %s, %s, 'reserved', null, %s::timestamptz, %s, 1)
                         """,
-                        (actor_id, org_id, operation, key, request_hash, lease, fence),
+                        (guc_actor, org_id, operation, key, request_hash, lease, fence),
                     )
                     self._commit()
                     return IdempotencyReserveResult("reserved", None, fence)
                 except psycopg.IntegrityError:
                     self._conn.rollback()
-                    cur = self._begin(actor_id=actor_id, org_id=org_id)
+                    cur = self._begin(actor_id=guc_actor, org_id=org_id)
                     cur.execute(
                         """
                         select request_hash, status, envelope, lease_expires_at,
@@ -328,7 +366,7 @@ class PostgresGatewayStore:
                         from lskills.idempotency
                         where actor_id = %s and operation = %s and idempotency_key = %s
                         """,
-                        (actor_id, operation, key),
+                        (guc_actor, operation, key),
                     )
                     row = cur.fetchone()
                     if row is None:
@@ -367,7 +405,7 @@ class PostgresGatewayStore:
                             fence,
                             generation,
                             org_id,
-                            actor_id,
+                            guc_actor,
                             operation,
                             key,
                         ),
@@ -388,10 +426,11 @@ class PostgresGatewayStore:
         *,
         fence_token: str,
     ) -> None:
-        _, org_id = self._current_identity(actor_id=actor_id)
+        guc_actor, org_id = self._require_bound_identity()
+        self._assert_write_actor_agrees(actor_id, bound_actor=guc_actor)
         with self._lock:
             try:
-                cur = self._begin(actor_id=actor_id, org_id=org_id)
+                cur = self._begin(actor_id=guc_actor, org_id=org_id)
                 cur.execute(
                     """
                     update lskills.idempotency
@@ -404,7 +443,7 @@ class PostgresGatewayStore:
                     """,
                     (
                         _as_jsonb(dict(envelope)),
-                        actor_id,
+                        guc_actor,
                         operation,
                         key,
                         request_hash,
@@ -430,18 +469,19 @@ class PostgresGatewayStore:
         _before_atomic_wait(self, key=key)
         lease = _lease_expiry_iso()
         fence = _new_fence_token()
-        _, org_id = self._current_identity(actor_id=actor_id)
+        guc_actor, org_id = self._require_bound_identity()
+        self._assert_write_actor_agrees(actor_id, bound_actor=guc_actor)
         with self._lock:
             self._atomic_depth += 1
             try:
-                cur = self._begin(actor_id=actor_id, org_id=org_id)
+                cur = self._begin(actor_id=guc_actor, org_id=org_id)
                 cur.execute(
                     """
                     select request_hash, status, envelope, lease_expires_at, fence_generation
                     from lskills.idempotency
                     where actor_id = %s and operation = %s and idempotency_key = %s
                     """,
-                    (actor_id, operation, key),
+                    (guc_actor, operation, key),
                 )
                 row = cur.fetchone()
                 if row is None:
@@ -452,7 +492,7 @@ class PostgresGatewayStore:
                           status, envelope, lease_expires_at, fence_token, fence_generation
                         ) values (%s, %s, %s, %s, %s, 'reserved', null, %s::timestamptz, %s, 1)
                         """,
-                        (actor_id, org_id, operation, key, request_hash, lease, fence),
+                        (guc_actor, org_id, operation, key, request_hash, lease, fence),
                     )
                 else:
                     if str(row["request_hash"] or "") != request_hash:
@@ -489,7 +529,7 @@ class PostgresGatewayStore:
                             fence,
                             generation,
                             org_id,
-                            actor_id,
+                            guc_actor,
                             operation,
                             key,
                         ),
@@ -500,8 +540,8 @@ class PostgresGatewayStore:
                     raise RuntimeError(
                         "injected crash after mutation before idempotency complete"
                     )
-                # Re-bind GUCs after nested writers; still same transaction.
-                self._apply_session_identity(cur, actor_id=actor_id, org_id=org_id)
+                # Re-bind GUCs from bound identity only after nested writers.
+                self._apply_session_identity(cur, actor_id=guc_actor, org_id=org_id)
                 cur.execute(
                     """
                     update lskills.idempotency
@@ -514,7 +554,7 @@ class PostgresGatewayStore:
                     """,
                     (
                         _as_jsonb(envelope),
-                        actor_id,
+                        guc_actor,
                         operation,
                         key,
                         request_hash,
@@ -545,16 +585,17 @@ class PostgresGatewayStore:
         downstream_key: str,
         request_hash: str,
     ) -> Dict[str, Any]:
-        _, org_id = self._current_identity(actor_id=actor_id)
+        guc_actor, org_id = self._require_bound_identity()
+        self._assert_write_actor_agrees(actor_id, bound_actor=guc_actor)
         with self._lock:
             try:
-                cur = self._begin(actor_id=actor_id, org_id=org_id)
+                cur = self._begin(actor_id=guc_actor, org_id=org_id)
                 cur.execute(
                     """
                     select fence_token, status, request_hash from lskills.idempotency
                     where actor_id = %s and operation = %s and idempotency_key = %s
                     """,
-                    (actor_id, operation, key),
+                    (guc_actor, operation, key),
                 )
                 row = cur.fetchone()
                 if (
@@ -570,7 +611,7 @@ class PostgresGatewayStore:
                     from lskills.side_effect_intents
                     where actor_id = %s and operation = %s and idempotency_key = %s
                     """,
-                    (actor_id, operation, key),
+                    (guc_actor, operation, key),
                 )
                 existing = cur.fetchone()
                 if (
@@ -593,7 +634,7 @@ class PostgresGatewayStore:
                             request_hash,
                             downstream_key,
                             org_id,
-                            actor_id,
+                            guc_actor,
                             operation,
                             key,
                         ),
@@ -625,7 +666,7 @@ class PostgresGatewayStore:
                       updated_at = now()
                     """,
                     (
-                        actor_id,
+                        guc_actor,
                         org_id,
                         operation,
                         key,
@@ -655,16 +696,17 @@ class PostgresGatewayStore:
         fence_token: str,
         result: Mapping[str, Any],
     ) -> None:
-        _, org_id = self._current_identity(actor_id=actor_id)
+        guc_actor, org_id = self._require_bound_identity()
+        self._assert_write_actor_agrees(actor_id, bound_actor=guc_actor)
         with self._lock:
             try:
-                cur = self._begin(actor_id=actor_id, org_id=org_id)
+                cur = self._begin(actor_id=guc_actor, org_id=org_id)
                 cur.execute(
                     """
                     select fence_token, status, request_hash from lskills.idempotency
                     where actor_id = %s and operation = %s and idempotency_key = %s
                     """,
-                    (actor_id, operation, key),
+                    (guc_actor, operation, key),
                 )
                 reservation = cur.fetchone()
                 if (
@@ -681,7 +723,7 @@ class PostgresGatewayStore:
                     select request_hash from lskills.side_effect_intents
                     where actor_id = %s and operation = %s and idempotency_key = %s
                     """,
-                    (actor_id, operation, key),
+                    (guc_actor, operation, key),
                 )
                 intent = cur.fetchone()
                 if intent is None:
@@ -706,7 +748,7 @@ class PostgresGatewayStore:
                     (
                         _as_jsonb(dict(result)),
                         fence_token,
-                        actor_id,
+                        guc_actor,
                         operation,
                         key,
                     ),
@@ -726,7 +768,7 @@ class PostgresGatewayStore:
         key: str,
     ) -> Optional[Dict[str, Any]]:
         # RLS GUCs from bind_identity only — lookup actor_id is a query key.
-        guc_actor, org_id = self._current_identity()
+        guc_actor, org_id = self._require_bound_identity()
         with self._lock:
             try:
                 cur = self._begin(actor_id=guc_actor, org_id=org_id)
@@ -761,7 +803,7 @@ class PostgresGatewayStore:
     ) -> Optional[Dict[str, Any]]:
         # RLS GUCs come only from bind_identity / identity() — never from the
         # lookup actor_id argument (callers may probe foreign actor keys).
-        guc_actor, org_id = self._current_identity()
+        guc_actor, org_id = self._require_bound_identity()
         with self._lock:
             try:
                 cur = self._begin(actor_id=guc_actor, org_id=org_id)
@@ -807,25 +849,10 @@ class PostgresGatewayStore:
 
     def save_run(self, run: Any) -> None:
         payload = _run_to_dict(run)
-        payload_actor = str(payload["actor_id"])
-        payload_org = str(payload.get("org_id") or "")
-        bound_actor, bound_org = self._current_identity()
-        if bound_actor:
-            # Prefer PACI-bound identity; reject payload disagreement (no spoof).
-            if payload_actor and payload_actor != bound_actor:
-                raise ValueError(
-                    f"skill_runs actor_id {payload_actor!r} disagrees with "
-                    f"bound identity actor_id {bound_actor!r}"
-                )
-            if payload_org and payload_org != bound_org:
-                raise ValueError(
-                    f"skill_runs org_id {payload_org!r} disagrees with "
-                    f"bound identity org_id {bound_org!r}"
-                )
-            actor_id, org_id = bound_actor, bound_org
-        else:
-            actor_id, org_id = payload_actor, payload_org
-            self.bind_identity(actor_id, org_id)
+        actor_id, org_id = self._require_bound_identity()
+        self._assert_payload_identity_agrees(
+            payload, bound_actor=actor_id, bound_org=org_id
+        )
         run_id = _parse_run_id(str(payload["run_id"]))
         status = str(payload["status"])
         outcome = payload.get("outcome")
@@ -874,7 +901,7 @@ class PostgresGatewayStore:
                 raise
 
     def get_run(self, run_id: str) -> Optional[Dict[str, Any]]:
-        actor_id, org_id = self._current_identity()
+        actor_id, org_id = self._require_bound_identity()
         normalized = _parse_run_id(run_id)
         with self._lock:
             try:
@@ -926,9 +953,12 @@ class PostgresGatewayStore:
 
     def append_feedback(self, record: Mapping[str, Any]) -> None:
         payload = dict(record)
-        actor_id = str(payload.get("actor_id") or "")
-        org_id = str(payload.get("org_id") or "")
-        self.bind_identity(actor_id, org_id)
+        actor_id, org_id = self._require_bound_identity()
+        self._assert_payload_identity_agrees(
+            payload, bound_actor=actor_id, bound_org=org_id
+        )
+        payload["actor_id"] = actor_id
+        payload["org_id"] = org_id
         feedback_id = str(payload.get("feedback_id") or uuid.uuid4())
         run_id_raw = payload.get("run_id")
         run_id = _parse_run_id(str(run_id_raw)) if run_id_raw else None
@@ -963,7 +993,7 @@ class PostgresGatewayStore:
                 raise
 
     def find_trace_by_fingerprint(self, fingerprint: str) -> Optional[Dict[str, Any]]:
-        actor_id, org_id = self._current_identity()
+        actor_id, org_id = self._require_bound_identity()
         with self._lock:
             try:
                 cur = self._begin(actor_id=actor_id, org_id=org_id)
@@ -1003,9 +1033,12 @@ class PostgresGatewayStore:
 
     def append_trace(self, record: Mapping[str, Any]) -> None:
         payload = dict(record)
-        actor_id = str(payload.get("actor_id") or "")
-        org_id = str(payload.get("org_id") or "")
-        self.bind_identity(actor_id, org_id)
+        actor_id, org_id = self._require_bound_identity()
+        self._assert_payload_identity_agrees(
+            payload, bound_actor=actor_id, bound_org=org_id
+        )
+        payload["actor_id"] = actor_id
+        payload["org_id"] = org_id
         candidate_id = str(payload.get("candidate_id") or uuid.uuid4())
         fingerprint = str(payload.get("fingerprint") or "")
         run_id_raw = payload.get("run_id")
@@ -1044,8 +1077,9 @@ class PostgresGatewayStore:
 
     def append_event(self, record: Mapping[str, Any]) -> None:
         payload = dict(record)
-        actor_id = str(payload.get("actor_id") or getattr(self._identity, "actor_id", None) or "")
-        org_id = str(payload.get("org_id") or getattr(self._identity, "org_id", None) or "")
+        bound_actor, bound_org = self._current_identity()
+        payload_actor = str(payload.get("actor_id") or "").strip()
+        payload_org = str(payload.get("org_id") or "").strip()
         run_id_raw = payload.get("run_id")
         run_id = None
         if run_id_raw:
@@ -1055,13 +1089,20 @@ class PostgresGatewayStore:
                 run_id = None
         with self._lock:
             try:
-                if actor_id or org_id:
-                    # Tenant-scoped event — fail closed without both actor and org.
-                    if actor_id:
-                        self.bind_identity(actor_id, org_id)
+                if bound_actor or bound_org or payload_actor or payload_org:
+                    # Tenant-scoped event — GUCs and row ownership from bound
+                    # identity only; payload never rebinds.
+                    actor_id, org_id = self._require_bound_identity()
+                    self._assert_payload_identity_agrees(
+                        payload, bound_actor=actor_id, bound_org=org_id
+                    )
+                    payload["actor_id"] = actor_id
+                    payload["org_id"] = org_id
                     cur = self._begin(actor_id=actor_id, org_id=org_id)
                 else:
                     # Anonymous spine row (null actor/org) allowed by 000007 policy.
+                    # Only when neither bound identity nor payload carries tenant ids.
+                    actor_id, org_id = "", ""
                     if self._atomic_depth == 0 and not self._tx_idle():
                         self._conn.rollback()
                     cur = self._conn.cursor()

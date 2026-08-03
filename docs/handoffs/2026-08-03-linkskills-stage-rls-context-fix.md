@@ -1,59 +1,51 @@
-# Handoff — SKILLS-STAGE-RLS-CONTEXT-FIX
+# Handoff — SKILLS-STAGE-RLS-CONTEXT-FIX (second correction)
 
 **Date:** 2026-08-03  
 **Branch:** `dev/cloudcursor/SKILLS-STAGE-RLS-CONTEXT-FIX`  
-**Tip:** `76c71648dd3b71cc8d45c244faa6a101dda9d04b`  
-**Code fix:** `c8c8f210f513ddad96c93c518656866cf96220e3`  
-**Start SHA:** `b7d46a1e1cc06f6662028f24e42eea73f2ed2368`
+**Prior tip (HOLD):** `1136b31a0de45d2e7abcfc70660ce9ceb620de57`  
+**This tip:** see `git rev-parse HEAD` after push (commit below)
 
 ## Verdict
 
-**HOLD** for live stage (Platform apply + redeploy not done in this worktree).  
-Local ephemeral / gateway proofs: green. Do not treat as stage self-approval.
+**PASS** from independent Grok 4.5 High audit of the bound-identity GUC overwrite fix  
+(working-tree audit before commit). Local ephemeral + gateway proofs green.  
+Do **not** treat as stage/live self-approval — no Platform apply or redeploy.
 
-## Root cause
+## Root cause (second correction)
 
-`skills_run_start` → `PostgresGatewayStore.run_atomic_idempotent` INSERT into
-`lskills.idempotency` raised `psycopg.errors.InsufficientPrivilege` because RLS
-`WITH CHECK` requires transaction-local actor/org GUCs:
+Tip `1136b31` fixed read-path GUC sourcing (`get_idempotent`, `get_side_effect_intent`)
+but write paths still derived `app.current_actor_id` / `app.current_org_id` from
+method `actor_id` args or payload via `_current_identity(actor_id=…)` /
+`bind_identity(payload…)`. Under `identity(actor-a, org-a)`,
+`reserve_idempotency(actor-b)` inserted actor-b/org-a; forged
+`append_feedback` / `append_trace` / `append_event` payloads inserted foreign tenants.
 
-1. **Empty/missing orgId** → `set_config('app.current_org_id','',true)` →
-   `nullif` → `org_matches` false → RLS deny on INSERT.
-2. **Nested writer bug:** `_begin` treated `_atomic_depth > 1` only, so at
-   depth `1` nested `save_run` called `rollback()` / `commit()` on the outer
-   frame, clearing `SET LOCAL` GUCs mid-atomic transaction (SQLite already used
-   deferred `_maybe_commit`).
+## Fix (code only; no migration; no FORCE RLS)
 
-Policies in `000006`/`000007` were already correct; no schema change required.
-
-## Fix (code only; no live apply)
-
-- `postgres_store.py`: `_require_rls_identity`; `set_config(..., true)` before
-  writes; `_atomic_depth > 0` joins outer tx; `_maybe_commit` deferred nested
-  commits; `get_idempotent` GUCs from bound identity only.
-- `service.py`: fail-closed `rls_org_required` for write ops without orgId;
-  sanitize `ValueError` / RLS privilege errors to `store_error`.
-- `server.py`: catch unexpected exceptions → sanitized `internal_error` envelope
-  (no connection drop / no policy text).
+- `postgres_store.py`: `_current_identity()` bound-only; `_require_bound_identity`;
+  `_assert_write_actor_agrees` / `_assert_payload_identity_agrees`; all tenant
+  writers stamp GUCs + row ownership from bound identity only.
+- `service.py`: PACI bind once at `dispatch` via `identity(actor.actor_id, org)`;
+  sanitize store identity mismatch → `identity_mismatch` (403).
+- Tests: unit `test_postgres_bound_identity.py`; ephemeral adversarial proofs
+  (forged actor/org, mixed, missing, same-tenant, nested forge, rollback/reuse).
 
 ## Migration requirements
 
-**None for this failure.** Additive FORCE RLS (`000011`) was authored then
-removed — not required to fix INSERT RLS denial under a non-owner runtime role.
+**None.** Do not reintroduce FORCE RLS (`000011`).
 
-## Tests
+## Tests run
 
-- `tests/migrations/test_gateway_postgres_ephemeral.py` — same-tenant
-  start/update/complete; cross-tenant denial; missing context; idempotency;
-  rollback; GUC non-leakage on connection reuse.
-- `tests/gateway/test_handler_error_sanitization.py` /
-  `test_store_error_envelope.py` — sanitized HTTP envelopes.
+- `tests.gateway.test_postgres_bound_identity` — OK
+- `tests/gateway` discover (`test_*.py`) — 198 OK
+- `tests/migrations` discover — 77 OK (includes ephemeral adversarial)
 
 ## Rollback
 
-Revert Gateway deploy to pre-fix SHA. No migration rollback needed.
+Revert Gateway deploy / branch tip to `1136b31a0de45d2e7abcfc70660ce9ceb620de57`.
+No migration rollback.
 
-## Stage (Platform-only; not performed here)
+## Stage (Platform-only; not performed)
 
 1. Redeploy Gateway from this tip.
 2. Ensure `GRANT svc_lskills_runtime TO <gateway_login_role>;`

@@ -245,6 +245,40 @@ class ServiceError(Exception):
         self.http_status = http_status
 
 
+def _service_error_from_store_value_error(
+    exc: ValueError,
+    *,
+    fence_fallback: bool = False,
+) -> ServiceError:
+    """Map store ValueError to a sanitized ServiceError (never leak raw text)."""
+    message = str(exc)
+    if "postgres RLS requires" in message or "RLS requires bound" in message:
+        return ServiceError(
+            "rls_org_required",
+            "Write operations require bound actor_id and org_id "
+            "from verified PACI claims",
+            http_status=403,
+        )
+    if "disagrees with bound identity" in message:
+        return ServiceError(
+            "identity_mismatch",
+            "Request identity does not match verified PACI claims",
+            http_status=403,
+        )
+    if fence_fallback or "fence" in message.lower() or "idempotency" in message.lower():
+        return ServiceError(
+            "idempotency_fence_rejected",
+            "Idempotency fence rejected (sanitized)",
+            http_status=409,
+        )
+    return ServiceError(
+        "store_error",
+        "Persistence rejected the write (sanitized)",
+        http_status=500,
+        retryable=False,
+    )
+
+
 class SkillsGatewayService:
     """Catalog + in-memory run/telemetry operations for Gateway and MCP."""
 
@@ -663,20 +697,7 @@ class SkillsGatewayService:
                     except ValueError as exc:
                         if not published:
                             mutation.discard()
-                        message = str(exc)
-                        if "postgres RLS requires" in message or "RLS requires bound" in message:
-                            raise ServiceError(
-                                "rls_org_required",
-                                "Write operations require bound actor_id and org_id "
-                                "from verified PACI claims",
-                                http_status=403,
-                            ) from exc
-                        raise ServiceError(
-                            "store_error",
-                            "Persistence rejected the write (sanitized)",
-                            http_status=500,
-                            retryable=False,
-                        ) from exc
+                        raise _service_error_from_store_value_error(exc) from exc
                     except Exception as exc:
                         if not published:
                             mutation.discard()
@@ -739,10 +760,8 @@ class SkillsGatewayService:
                         request_hash=request_hash,
                     )
                 except ValueError as exc:
-                    raise ServiceError(
-                        "idempotency_fence_rejected",
-                        str(exc),
-                        http_status=409,
+                    raise _service_error_from_store_value_error(
+                        exc, fence_fallback=True
                     ) from exc
                 if intent.get("status") == "result" and intent.get("result") is not None:
                     env = self.envelope(
@@ -766,10 +785,8 @@ class SkillsGatewayService:
                             fence_token=fence_token,
                         )
                     except ValueError as exc:
-                        raise ServiceError(
-                            "idempotency_fence_rejected",
-                            str(exc),
-                            http_status=409,
+                        raise _service_error_from_store_value_error(
+                            exc, fence_fallback=True
                         ) from exc
                     return env
                 handler = getattr(self, f"op_{operation}")
@@ -824,10 +841,8 @@ class SkillsGatewayService:
                 except ServiceError:
                     raise
                 except ValueError as exc:
-                    raise ServiceError(
-                        "idempotency_fence_rejected",
-                        str(exc),
-                        http_status=409,
+                    raise _service_error_from_store_value_error(
+                        exc, fence_fallback=True
                     ) from exc
                 except Exception:
                     # Leave reservation leased; fence rejects late displaced completion.
