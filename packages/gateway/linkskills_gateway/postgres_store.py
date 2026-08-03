@@ -10,6 +10,10 @@ RLS identity is applied per transaction with:
   SET LOCAL via set_config('app.current_org_id', ..., true);
 
 Call ``bind_identity`` / ``identity(...)`` so reads/writes pass RLS.
+Actor and org GUCs must be non-empty for tenant writes (fail closed);
+null/empty PACI ``orgId`` is rejected before RLS-protected DML.
+Nested writers inside ``run_atomic_idempotent`` defer commit so SET LOCAL
+GUCs are not cleared mid-transaction (parity with SQLite ``_maybe_commit``).
 When ``rls=False`` (superuser ephemeral proofs without role switch), GUCs
 are still set but role is not switched.
 """
@@ -162,7 +166,11 @@ class PostgresGatewayStore:
         return set(REQUIRED_GATEWAY_TABLES).issubset(found)
 
     def bind_identity(self, actor_id: str, org_id: str) -> None:
-        """Bind transaction-local RLS identity for subsequent operations."""
+        """Bind transaction-local RLS identity for subsequent operations.
+
+        Empty org is stored as ``""`` so callers can detect missing tenant
+        scope; write paths fail closed via ``_require_rls_identity``.
+        """
         self._identity.actor_id = str(actor_id)
         self._identity.org_id = str(org_id or "")
 
@@ -197,6 +205,27 @@ class PostgresGatewayStore:
         resolved_org = str(org_id if org_id is not None else (bound_org or ""))
         return resolved_actor, resolved_org
 
+    @staticmethod
+    def _require_rls_identity(actor_id: str, org_id: str) -> None:
+        """Fail closed: RLS policies require non-empty actor + org GUCs.
+
+        Matches ``lskills.actor_matches`` / ``lskills.org_matches`` (empty
+        strings become NULL via ``nullif`` and deny all rows). Never invent
+        a default org — PACI ``orgId`` null for service actors must be
+        rejected before touching RLS-protected tables.
+        """
+        if not str(actor_id or "").strip():
+            raise ValueError(
+                "postgres RLS requires bound actor_id via bind_identity / "
+                "identity() from verified PACI claims"
+            )
+        if not str(org_id or "").strip():
+            raise ValueError(
+                "postgres RLS requires bound org_id via bind_identity / "
+                "identity() from verified PACI claims "
+                "(null/empty orgId is fail-closed for write paths)"
+            )
+
     def _apply_session_identity(
         self,
         cur: Any,
@@ -204,8 +233,12 @@ class PostgresGatewayStore:
         actor_id: str,
         org_id: str,
     ) -> None:
+        """SET LOCAL role + parameterized actor/org GUCs in the open transaction."""
+        self._require_rls_identity(actor_id, org_id)
         if self.rls and self.role:
+            # Role name is allowlisted (constructor default / explicit arg only).
             cur.execute(f"set local role {self.role}")
+        # is_local=true ⇒ transaction-scoped; cleared on commit/rollback (no pool leak).
         cur.execute(
             "select set_config('app.current_actor_id', %s, true)",
             (actor_id,),
@@ -223,10 +256,17 @@ class PostgresGatewayStore:
         return int(status) == 0
 
     def _begin(self, *, actor_id: str, org_id: str) -> Any:
-        """Begin a transaction (or nested savepoint) with RLS identity."""
-        if self._atomic_depth > 1:
+        """Open or join a transaction and bind RLS identity via SET LOCAL.
+
+        Nested writers inside ``run_atomic_idempotent`` (``_atomic_depth > 0``)
+        must **not** rollback/commit the outer frame — that would clear SET LOCAL
+        GUCs and break idempotency + skill_runs atomicity (SQLite uses the same
+        deferred-commit pattern via ``_maybe_commit``).
+        """
+        self._require_rls_identity(actor_id, org_id)
+        if self._atomic_depth > 0:
+            # Join the outer atomic transaction; re-apply GUCs (still SET LOCAL).
             cur = self._conn.cursor()
-            cur.execute(f"savepoint gw_atomic_{self._atomic_depth}")
             self._apply_session_identity(cur, actor_id=actor_id, org_id=org_id)
             return cur
         if not self._tx_idle():
@@ -236,23 +276,22 @@ class PostgresGatewayStore:
         self._apply_session_identity(cur, actor_id=actor_id, org_id=org_id)
         return cur
 
-    def _commit(self) -> None:
-        # Nested atomic writers use savepoints; only the outer frame commits.
-        if self._atomic_depth <= 1:
+    def _maybe_commit(self) -> None:
+        """Commit only when not nested inside an atomic idempotency transaction."""
+        if self._atomic_depth == 0:
             self._conn.commit()
-        elif self._atomic_depth > 1:
-            with self._conn.cursor() as cur:
-                cur.execute(f"release savepoint gw_atomic_{self._atomic_depth}")
+
+    def _commit(self) -> None:
+        """Commit standalone / outer-frame work (not nested domain writers)."""
+        self._maybe_commit()
 
     def _rollback(self) -> None:
-        if self._atomic_depth <= 1:
+        """Rollback only the outermost frame; nested failures defer to outer."""
+        if self._atomic_depth == 0:
             try:
                 self._conn.rollback()
             except Exception:  # pragma: no cover
                 pass
-        else:
-            with self._conn.cursor() as cur:
-                cur.execute(f"rollback to savepoint gw_atomic_{self._atomic_depth}")
 
     def reserve_idempotency(
         self,
@@ -417,17 +456,18 @@ class PostgresGatewayStore:
                     )
                 else:
                     if str(row["request_hash"] or "") != request_hash:
-                        self._commit()
+                        # Early outcomes still need an outer commit (depth>0).
+                        self._conn.commit()
                         return IdempotencyReserveResult("conflict")
                     if row["status"] == "completed" and row["envelope"] is not None:
                         envelope = row["envelope"]
                         if isinstance(envelope, str):
                             envelope = json.loads(envelope)
-                        self._commit()
+                        self._conn.commit()
                         return IdempotencyReserveResult("replay", dict(envelope))
                     lease_iso = _iso_or_none(row["lease_expires_at"])
                     if row["status"] == "reserved" and not _lease_expired(lease_iso):
-                        self._commit()
+                        self._conn.commit()
                         return IdempotencyReserveResult("in_progress")
                     generation = int(row["fence_generation"] or 0) + 1
                     cur.execute(
@@ -454,11 +494,14 @@ class PostgresGatewayStore:
                             key,
                         ),
                     )
+                # Nested domain writers (save_run etc.) defer commit while depth>0.
                 envelope = dict(mutator())
                 if _crash_after_mutation_requested(self, key=key):
                     raise RuntimeError(
                         "injected crash after mutation before idempotency complete"
                     )
+                # Re-bind GUCs after nested writers; still same transaction.
+                self._apply_session_identity(cur, actor_id=actor_id, org_id=org_id)
                 cur.execute(
                     """
                     update lskills.idempotency
@@ -479,12 +522,15 @@ class PostgresGatewayStore:
                     ),
                 )
                 if cur.rowcount != 1:
-                    self._rollback()
+                    self._conn.rollback()
                     raise ValueError("idempotency fence rejected during atomic complete")
-                self._commit()
+                self._conn.commit()
                 return IdempotencyReserveResult("replay", envelope, fence)
             except Exception:
-                self._rollback()
+                try:
+                    self._conn.rollback()
+                except Exception:  # pragma: no cover
+                    pass
                 raise
             finally:
                 self._atomic_depth -= 1
@@ -712,10 +758,12 @@ class PostgresGatewayStore:
     def get_idempotent(
         self, actor_id: str, operation: str, key: str
     ) -> Optional[Dict[str, Any]]:
-        _, org_id = self._current_identity(actor_id=actor_id)
+        # RLS GUCs come only from bind_identity / identity() — never from the
+        # lookup actor_id argument (callers may probe foreign actor keys).
+        guc_actor, org_id = self._current_identity()
         with self._lock:
             try:
-                cur = self._begin(actor_id=actor_id, org_id=org_id)
+                cur = self._begin(actor_id=guc_actor, org_id=org_id)
                 cur.execute(
                     """
                     select envelope, status from lskills.idempotency
@@ -758,9 +806,25 @@ class PostgresGatewayStore:
 
     def save_run(self, run: Any) -> None:
         payload = _run_to_dict(run)
-        actor_id = str(payload["actor_id"])
-        org_id = str(payload.get("org_id") or "")
-        self.bind_identity(actor_id, org_id)
+        payload_actor = str(payload["actor_id"])
+        payload_org = str(payload.get("org_id") or "")
+        bound_actor, bound_org = self._current_identity()
+        if bound_actor:
+            # Prefer PACI-bound identity; reject payload disagreement (no spoof).
+            if payload_actor and payload_actor != bound_actor:
+                raise ValueError(
+                    f"skill_runs actor_id {payload_actor!r} disagrees with "
+                    f"bound identity actor_id {bound_actor!r}"
+                )
+            if payload_org and payload_org != bound_org:
+                raise ValueError(
+                    f"skill_runs org_id {payload_org!r} disagrees with "
+                    f"bound identity org_id {bound_org!r}"
+                )
+            actor_id, org_id = bound_actor, bound_org
+        else:
+            actor_id, org_id = payload_actor, payload_org
+            self.bind_identity(actor_id, org_id)
         run_id = _parse_run_id(str(payload["run_id"]))
         status = str(payload["status"])
         outcome = payload.get("outcome")
@@ -803,7 +867,7 @@ class PostgresGatewayStore:
                         payload.get("updated_at"),
                     ),
                 )
-                self._commit()
+                self._maybe_commit()
             except Exception:
                 self._rollback()
                 raise
@@ -981,8 +1045,6 @@ class PostgresGatewayStore:
         payload = dict(record)
         actor_id = str(payload.get("actor_id") or getattr(self._identity, "actor_id", None) or "")
         org_id = str(payload.get("org_id") or getattr(self._identity, "org_id", None) or "")
-        if actor_id:
-            self.bind_identity(actor_id, org_id)
         run_id_raw = payload.get("run_id")
         run_id = None
         if run_id_raw:
@@ -992,7 +1054,24 @@ class PostgresGatewayStore:
                 run_id = None
         with self._lock:
             try:
-                cur = self._begin(actor_id=actor_id, org_id=org_id)
+                if actor_id or org_id:
+                    # Tenant-scoped event — fail closed without both actor and org.
+                    if actor_id:
+                        self.bind_identity(actor_id, org_id)
+                    cur = self._begin(actor_id=actor_id, org_id=org_id)
+                else:
+                    # Anonymous spine row (null actor/org) allowed by 000007 policy.
+                    if self._atomic_depth == 0 and not self._tx_idle():
+                        self._conn.rollback()
+                    cur = self._conn.cursor()
+                    if self.rls and self.role:
+                        cur.execute(f"set local role {self.role}")
+                    cur.execute(
+                        "select set_config('app.current_actor_id', '', true)"
+                    )
+                    cur.execute(
+                        "select set_config('app.current_org_id', '', true)"
+                    )
                 if run_id is not None:
                     cur.execute(
                         """
@@ -1017,7 +1096,7 @@ class PostgresGatewayStore:
                         _as_jsonb(payload),
                     ),
                 )
-                self._commit()
+                self._maybe_commit()
             except Exception:
                 self._rollback()
                 raise

@@ -368,6 +368,28 @@ def make_handler(
                         },
                     ),
                 )
+            except Exception as exc:
+                # Never drop the connection on unexpected store/runtime faults.
+                # Log type only — no tokens, DSNs, or traceback bodies to clients.
+                err_type = type(exc).__name__
+                sys.stderr.write(
+                    f"linkskills_gateway internal_error op={operation} "
+                    f"request_id={request_id} type={err_type}\n"
+                )
+                self._send(
+                    500,
+                    service.envelope(
+                        actor=None,
+                        operation=operation,
+                        request_id=request_id,
+                        idempotency_id=idempotency_id,
+                        error={
+                            "code": "internal_error",
+                            "message": "Internal server error",
+                            "retryable": True,
+                        },
+                    ),
+                )
             finally:
                 stats.end_work()
 

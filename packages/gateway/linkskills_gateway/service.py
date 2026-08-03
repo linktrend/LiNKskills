@@ -533,7 +533,18 @@ class SkillsGatewayService:
             )
 
         # Bind actor/org into Postgres session for RLS when the store supports it.
+        # Write paths fail closed when orgId is null/empty — RLS org_matches denies
+        # empty GUCs, and we never invent a tenant. PACI allows null orgId only for
+        # actorKind=service; those tokens still cannot write RLS-scoped tables.
         identity_ctx = getattr(self._store, "identity", None)
+        if operation in WRITE_OPERATIONS and not str(actor.org_id or "").strip():
+            if callable(identity_ctx):
+                raise ServiceError(
+                    "rls_org_required",
+                    "Write operations require a non-null orgId claim for RLS "
+                    "tenant scope (null/empty orgId is fail-closed)",
+                    http_status=403,
+                )
         if callable(identity_ctx):
             with identity_ctx(actor.actor_id, actor.org_id or ""):
                 return self._dispatch_authorized(
@@ -645,9 +656,43 @@ class SkillsGatewayService:
                                 "idempotent_replay"
                             ]
                         return env
-                    except Exception:
+                    except ServiceError:
                         if not published:
                             mutation.discard()
+                        raise
+                    except ValueError as exc:
+                        if not published:
+                            mutation.discard()
+                        message = str(exc)
+                        if "postgres RLS requires" in message or "RLS requires bound" in message:
+                            raise ServiceError(
+                                "rls_org_required",
+                                "Write operations require bound actor_id and org_id "
+                                "from verified PACI claims",
+                                http_status=403,
+                            ) from exc
+                        raise ServiceError(
+                            "store_error",
+                            "Persistence rejected the write (sanitized)",
+                            http_status=500,
+                            retryable=False,
+                        ) from exc
+                    except Exception as exc:
+                        if not published:
+                            mutation.discard()
+                        # Never surface psycopg/RLS privilege text to clients.
+                        err_name = type(exc).__name__
+                        err_text = str(exc).lower()
+                        if (
+                            err_name == "InsufficientPrivilege"
+                            or "row-level security" in err_text
+                        ):
+                            raise ServiceError(
+                                "store_error",
+                                "Persistence rejected the write (sanitized)",
+                                http_status=500,
+                                retryable=False,
+                            ) from exc
                         raise
 
             if operation in EXTERNAL_SIDE_EFFECT_OPERATIONS:

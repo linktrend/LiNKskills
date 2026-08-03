@@ -23,6 +23,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT / "packages" / "gateway"))
+sys.path.insert(0, str(REPO_ROOT / "packages" / "core"))
 sys.path.insert(0, str(REPO_ROOT / "packages" / "librarian_domain"))
 sys.path.insert(0, str(REPO_ROOT / "packages" / "publisher"))
 
@@ -33,6 +34,10 @@ GATEWAY_SQL = MIGRATIONS / "20260730_000007_lskills_gateway_persistence.sql"
 REVIEW_QUEUE_SQL = MIGRATIONS / "20260730_000008_lskills_review_queue.sql"
 REVIEW_QUEUE_ACTOR_SQL = (
     MIGRATIONS / "20260730_000009_lskills_review_queue_actor_isolation.sql"
+)
+FORCE_RLS_SQL = MIGRATIONS / "20260803_000011_lskills_gateway_force_rls.sql"
+FORCE_RLS_DOWN_SQL = (
+    MIGRATIONS / "20260803_000011_lskills_gateway_force_rls_down.sql"
 )
 
 BOOTSTRAP_SQL = """
@@ -213,6 +218,7 @@ class GatewayPostgresEphemeralTests(unittest.TestCase):
             GATEWAY_SQL,
             REVIEW_QUEUE_SQL,
             REVIEW_QUEUE_ACTOR_SQL,
+            FORCE_RLS_SQL,
         )
 
     def test_fresh_and_upgrade_paths(self) -> None:
@@ -361,6 +367,287 @@ class GatewayPostgresEphemeralTests(unittest.TestCase):
                 self.assertEqual(second["data"]["run_id"], "r1")
         finally:
             store.close()
+
+    def test_rls_missing_identity_fail_closed(self) -> None:
+        """Missing actor/org binding must fail closed before/at RLS write."""
+        from linkskills_gateway.postgres_store import PostgresGatewayStore
+
+        store = PostgresGatewayStore(self.dsn, rls=True)
+        try:
+            with self.assertRaises(ValueError) as ctx:
+                store.reserve_idempotency("actor-a", "op", "k-missing", "hash-1")
+            self.assertIn("org_id", str(ctx.exception).lower())
+        finally:
+            store.close()
+
+    def test_rls_cross_actor_idempotency_denied(self) -> None:
+        from linkskills_gateway.postgres_store import PostgresGatewayStore
+
+        store = PostgresGatewayStore(self.dsn, rls=True)
+        try:
+            with store.identity("actor-a", "org-a"):
+                reserved = store.reserve_idempotency("actor-a", "op", "k-x", "h1")
+                self.assertEqual(reserved.outcome, "reserved")
+                store.complete_idempotency(
+                    "actor-a",
+                    "op",
+                    "k-x",
+                    "h1",
+                    {"ok": True},
+                    fence_token=reserved.fence_token or "",
+                )
+            with store.identity("actor-b", "org-a"):
+                # Same key different actor is a distinct PK; own-row only.
+                other = store.get_idempotent("actor-a", "op", "k-x")
+                self.assertIsNone(other)
+            with store.identity("actor-a", "org-b"):
+                denied = store.get_idempotent("actor-a", "op", "k-x")
+                self.assertIsNone(denied)
+        finally:
+            store.close()
+
+    def test_rls_guc_cleared_after_commit_no_pool_leak(self) -> None:
+        """After commit, SET LOCAL GUCs must not leak on the pooled connection."""
+        from linkskills_gateway.postgres_store import PostgresGatewayStore
+
+        store = PostgresGatewayStore(self.dsn, rls=True)
+        try:
+            with store.identity("actor-a", "org-a"):
+                store.reserve_idempotency("actor-a", "op", "k-leak", "h1")
+            # Outside identity / after commit: session GUC should be empty.
+            with store._lock:
+                with store._conn.cursor() as cur:
+                    cur.execute(
+                        "select current_setting('app.current_actor_id', true) as actor_guc, "
+                        "current_setting('app.current_org_id', true) as org_guc"
+                    )
+                    row = cur.fetchone()
+                store._conn.commit()
+            actor_guc = row["actor_guc"] if isinstance(row, dict) else row[0]
+            org_guc = row["org_guc"] if isinstance(row, dict) else row[1]
+            self.assertIn(actor_guc or "", ("", None))
+            self.assertIn(org_guc or "", ("", None))
+
+            # Reuse connection as another tenant — no leakage into writes.
+            with store.identity("actor-b", "org-b"):
+                reserved = store.reserve_idempotency("actor-b", "op", "k-leak-b", "h2")
+                self.assertEqual(reserved.outcome, "reserved")
+                stolen = store.get_idempotent("actor-a", "op", "k-leak")
+                self.assertIsNone(stolen)
+        finally:
+            store.close()
+
+    def test_atomic_run_start_update_complete_same_tenant(self) -> None:
+        """Authorized same-tenant start → update → complete under RLS + nested tx."""
+        from linkskills_gateway.postgres_store import PostgresGatewayStore
+        from linkskills_gateway.service import SkillRun
+
+        store = PostgresGatewayStore(self.dsn, rls=True)
+        run_id = str(uuid.uuid4())
+        try:
+            with store.identity("actor-a", "org-a"):
+
+                def start_mutator():
+                    store.save_run(
+                        SkillRun(
+                            run_id=run_id,
+                            skill_id="demo",
+                            version="1.0.0",
+                            release_hash="rel",
+                            profile_hash="prof",
+                            actor_id="actor-a",
+                            org_id="org-a",
+                            status="started",
+                            created_at="2026-08-03T00:00:00Z",
+                            updated_at="2026-08-03T00:00:00Z",
+                            events=[{"type": "run_started"}],
+                        )
+                    )
+                    return {
+                        "operation": "skills_run_start",
+                        "data": {"run_id": run_id, "status": "started"},
+                    }
+
+                started = store.run_atomic_idempotent(
+                    "actor-a",
+                    "skills_run_start",
+                    "atomic-start-1",
+                    "hash-atomic-1",
+                    start_mutator,
+                )
+                self.assertEqual(started.outcome, "replay")
+                self.assertEqual(store.get_run(run_id)["status"], "started")
+
+                def update_mutator():
+                    store.save_run(
+                        SkillRun(
+                            run_id=run_id,
+                            skill_id="demo",
+                            version="1.0.0",
+                            release_hash="rel",
+                            profile_hash="prof",
+                            actor_id="actor-a",
+                            org_id="org-a",
+                            status="in_progress",
+                            created_at="2026-08-03T00:00:00Z",
+                            updated_at="2026-08-03T00:01:00Z",
+                            events=[
+                                {"type": "run_started"},
+                                {"type": "run_update"},
+                            ],
+                        )
+                    )
+                    return {
+                        "operation": "skills_run_update",
+                        "data": {"run_id": run_id, "status": "in_progress"},
+                    }
+
+                updated = store.run_atomic_idempotent(
+                    "actor-a",
+                    "skills_run_update",
+                    "atomic-update-1",
+                    "hash-atomic-2",
+                    update_mutator,
+                )
+                self.assertEqual(updated.outcome, "replay")
+                self.assertEqual(store.get_run(run_id)["status"], "in_progress")
+
+                def complete_mutator():
+                    store.save_run(
+                        SkillRun(
+                            run_id=run_id,
+                            skill_id="demo",
+                            version="1.0.0",
+                            release_hash="rel",
+                            profile_hash="prof",
+                            actor_id="actor-a",
+                            org_id="org-a",
+                            status="completed",
+                            created_at="2026-08-03T00:00:00Z",
+                            updated_at="2026-08-03T00:02:00Z",
+                            events=[
+                                {"type": "run_started"},
+                                {"type": "run_update"},
+                                {"type": "run_completed"},
+                            ],
+                            outcome={"ok": True},
+                        )
+                    )
+                    return {
+                        "operation": "skills_run_complete",
+                        "data": {"run_id": run_id, "status": "completed"},
+                    }
+
+                completed = store.run_atomic_idempotent(
+                    "actor-a",
+                    "skills_run_complete",
+                    "atomic-complete-1",
+                    "hash-atomic-3",
+                    complete_mutator,
+                )
+                self.assertEqual(completed.outcome, "replay")
+                loaded = store.get_run(run_id)
+                self.assertEqual(loaded["status"], "completed")
+                # Idempotent replay of start.
+                replay = store.run_atomic_idempotent(
+                    "actor-a",
+                    "skills_run_start",
+                    "atomic-start-1",
+                    "hash-atomic-1",
+                    start_mutator,
+                )
+                self.assertEqual(replay.outcome, "replay")
+                self.assertEqual(replay.envelope["data"]["run_id"], run_id)
+        finally:
+            store.close()
+
+    def test_atomic_rollback_clears_partial_writes_and_gucs(self) -> None:
+        """Crash after nested mutation rolls back idempotency + run; GUCs clear."""
+        from linkskills_gateway.postgres_store import PostgresGatewayStore
+        from linkskills_gateway.service import SkillRun
+
+        store = PostgresGatewayStore(self.dsn, rls=True)
+        run_id = str(uuid.uuid4())
+        try:
+            with store.identity("actor-a", "org-a"):
+                store._crash_after_mutation = True
+
+                def mutator():
+                    store.save_run(
+                        SkillRun(
+                            run_id=run_id,
+                            skill_id="demo",
+                            version="1.0.0",
+                            release_hash="rel",
+                            profile_hash="prof",
+                            actor_id="actor-a",
+                            org_id="org-a",
+                            status="started",
+                            created_at="2026-08-03T00:00:00Z",
+                            updated_at="2026-08-03T00:00:00Z",
+                            events=[{"type": "run_started"}],
+                        )
+                    )
+                    return {"operation": "skills_run_start", "data": {"run_id": run_id}}
+
+                with self.assertRaises(RuntimeError):
+                    store.run_atomic_idempotent(
+                        "actor-a",
+                        "skills_run_start",
+                        "atomic-crash-1",
+                        "hash-crash-1",
+                        mutator,
+                    )
+                self.assertIsNone(store.get_run(run_id))
+                self.assertIsNone(
+                    store.get_idempotent("actor-a", "skills_run_start", "atomic-crash-1")
+                )
+
+            with store._lock:
+                with store._conn.cursor() as cur:
+                    cur.execute(
+                        "select current_setting('app.current_actor_id', true) as actor_guc, "
+                        "current_setting('app.current_org_id', true) as org_guc"
+                    )
+                    row = cur.fetchone()
+                    actor_guc = row["actor_guc"] if isinstance(row, dict) else row[0]
+                    org_guc = row["org_guc"] if isinstance(row, dict) else row[1]
+                store._conn.commit()
+            self.assertIn(actor_guc or "", ("", None))
+            self.assertIn(org_guc or "", ("", None))
+        finally:
+            store._crash_after_mutation = False
+            store.close()
+
+    def test_force_rls_applied_and_down_relaxes(self) -> None:
+        with self.psycopg.connect(self.dsn, autocommit=True) as conn:  # type: ignore[attr-defined]
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    select c.relname, c.relforcerowsecurity
+                    from pg_class c
+                    join pg_namespace n on n.oid = c.relnamespace
+                    where n.nspname = 'lskills' and c.relname = 'idempotency'
+                    """
+                )
+                name, forced = cur.fetchone()
+                self.assertEqual(name, "idempotency")
+                self.assertTrue(forced)
+                cur.execute(
+                    _strip_verification(FORCE_RLS_DOWN_SQL.read_text(encoding="utf-8"))
+                )
+                cur.execute(
+                    """
+                    select c.relforcerowsecurity
+                    from pg_class c
+                    join pg_namespace n on n.oid = c.relnamespace
+                    where n.nspname = 'lskills' and c.relname = 'idempotency'
+                    """
+                )
+                self.assertFalse(cur.fetchone()[0])
+                cur.execute(
+                    _strip_verification(FORCE_RLS_SQL.read_text(encoding="utf-8"))
+                )
 
     def test_gateway_schema_probe(self) -> None:
         from linkskills_gateway.postgres_store import PostgresGatewayStore
