@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://linktrend.dev/schemas/platform-auth-claims/1.1.0",
+  "title": "Platform Auth Claims",
+  "description": "Canonical LiNKplatform authentication claim object (platform.auth-claims/1.1.0). CamelCase only; additionalProperties false. orgId may be null only when actorKind is service.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "claimContractVersion",
+    "actorId",
+    "actorKind",
+    "runtimeBindingId",
+    "credentialId",
+    "orgId",
+    "internal",
+    "serviceScopes",
+    "permittedOperations",
+    "issuedAt",
+    "expiresAt",
+    "issuer",
+    "audience",
+    "correlationId"
+  ],
+  "properties": {
+    "claimContractVersion": {
+      "type": "string",
+      "const": "platform.auth-claims/1.1.0",
+      "description": "Frozen contract identity: platform.auth-claims/1.1.0"
+    },
+    "actorId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Canonical durable actor identifier"
+    },
+    "actorKind": {
+      "type": "string",
+      "enum": ["human", "persona", "service", "adapter", "program_executor"],
+      "description": "Actor kind; transient sessions are not actors"
+    },
+    "runtimeBindingId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Runtime/installation binding that issued or presents these claims"
+    },
+    "credentialId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Credential metadata ID (never secret material)"
+    },
+    "orgId": {
+      "type": ["string", "null"],
+      "description": "Organisation association; null only when actorKind is service (Platform-global service principals)"
+    },
+    "internal": {
+      "type": "boolean",
+      "description": "Whether the actor is an internal Platform/service principal"
+    },
+    "serviceScopes": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "minItems": 1,
+      "description": "Service scopes this credential may enter (e.g. lbrain, lskills, linkplatform)"
+    },
+    "permittedOperations": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "Operations permitted within the granted scopes"
+    },
+    "issuedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601 issuance timestamp (UTC recommended)"
+    },
+    "expiresAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601 expiry timestamp; claims are rejected at or after this instant"
+    },
+    "issuer": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Platform issuer identity that minted the claims"
+    },
+    "audience": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "minItems": 1,
+      "description": "Intended audiences (API/service names) that may accept these claims"
+    },
+    "programRestrictions": {
+      "type": ["array", "null"],
+      "items": { "type": "string", "minLength": 1 },
+      "description": "Optional Program ID allow-list; omit or null when unrestricted at claim layer"
+    },
+    "repositoryRestrictions": {
+      "type": ["array", "null"],
+      "items": { "type": "string", "minLength": 1 },
+      "description": "Optional repository allow-list; omit or null when unrestricted at claim layer"
+    },
+    "correlationId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Opaque request/correlation ID; must not carry domain payloads"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "orgId": { "type": "null" } }
+      },
+      "then": {
+        "properties": { "actorKind": { "const": "service" } },
+        "required": ["actorKind"]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "actorKind": {
+            "enum": ["human", "persona", "adapter", "program_executor"]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "orgId": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  ]
+}

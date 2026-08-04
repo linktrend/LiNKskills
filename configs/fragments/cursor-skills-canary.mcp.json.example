@@ -1,0 +1,35 @@
+{
+  "mcpServers": {
+    "linkskills-canary": {
+      "command": "python3",
+      "args": [
+        "-m",
+        "linkskills_mcp.paci_stdio_proxy"
+      ],
+      "env": {
+        "PYTHONPATH": "packages/gateway:packages/mcp_server:packages/client:packages/librarian_domain:packages/eval_runner:packages/tool_runtime:packages/contracts:packages/core:.",
+        "GATEWAY_URL": "https://REPLACE_WITH_SKILLS_STAGE_GATEWAY_URL",
+        "LINKSKILLS_MCP_UPSTREAM": "http",
+        "LINKSKILLS_CANARY": "1",
+        "LINKSKILLS_AUTH_MODE": "production",
+        "LINKSKILLS_PLATFORM_AUTHENTICATOR": "REPLACE_WITH_PLATFORM_APPROVED_AUTHENTICATOR_MODULE:factory",
+        "LINKSKILLS_PACI_CLIENT_ID": "REPLACE_WITH_SKILLS_STAGE_CLIENT_ID",
+        "LINKSKILLS_PACI_TOKEN_ENDPOINT": "https://REPLACE_WITH_SKILLS_STAGE_PACI_TOKEN_ENDPOINT",
+        "LINKSKILLS_PACI_CLIENT_PRIVATE_KEY_FILE": "REPLACE_WITH_SECRETREF_FILE_PATH_TO_ES256_PRIVATE_KEY_PEM",
+        "LINKSKILLS_PACI_CLIENT_KID": "REPLACE_WITH_CLIENT_JWKS_KID_UUID",
+        "LINKSKILLS_PACI_SCOPE": "REPLACE_WITH_SKILLS_LEAST_PRIVILEGE_SCOPES",
+        "LINKSKILLS_PACI_RESOURCE_AUDIENCE": "REPLACE_WITH_SKILLS_ONLY_RESOURCE_AUDIENCE",
+        "LINKSKILLS_PACI_JWKS_URI_NOTE": "Platform publishes issuer JWKS for Gateway verification; client holds only the assertion private key via SecretRef file — never paste JWKS private material here"
+      },
+      "disabled": false
+    }
+  },
+  "_comment": "Project-scoped Cursor MCP fragment for LiNKskills canary. NO secrets. Envelope pin: platform.auth-token-envelope/0.1.0 (NOT 0.1.3-draft). Platform certified candidate 421a35e97bc302be0f5e1f196d0a5e8d132f6fd8 is read-only contract evidence — certified candidate ≠ live PACI/hosting/credentials. live_canary=false and global_cursor_mutation=false for this packet. Entrypoint is linkskills_mcp.paci_stdio_proxy (PACI-aware stdio proxy): mints short-lived access tokens via client_credentials + private_key_jwt (ES256), injects Authorization server-side, never puts bearer in tool args/argv/logs/Git/global Cursor config. Production canary defaults to LINKSKILLS_MCP_UPSTREAM=http against https GATEWAY_URL (durable stage Gateway). In-process production is refuse-by-default: requires LINKSKILLS_MCP_ALLOW_INPROCESS_PRODUCTION=1 plus LINKSKILLS_ENV=stage|production, postgres store, and DSN — never silent in-memory. GATEWAY_URL and PACI token_endpoint must be https outside LINKSKILLS_AUTH_MODE=local-test loopback. Static bearer (LINKSKILLS_CANARY_AUTHORIZATION / GATEWAY_TOKEN / LINKSKILLS_LOCAL_TEST_STATIC_BEARER) is LOCAL-TEST ONLY and refused for LINKSKILLS_CANARY. Do not merge into ~/.cursor/mcp.json without the coordinated Cursor maintenance gate. Do not start the multi-day canary from this fragment alone — Platform stage PACI issuer must exist first. Future stage telemetry events/privacy/idempotency: docs/integrations/cursor/TELEMETRY-CONTRACT.md (docs only; stages 3–8 blocked). Skills-owned path implemented locally; not live-proven. Rollback: docs/integrations/cursor/ROLLBACK.md (project-scoped disable + git revert only).",
+  "_local_test_static_bearer_only": {
+    "LINKSKILLS_AUTH_MODE": "local-test",
+    "LINKSKILLS_LOCAL_TEST_STATIC_BEARER": "REPLACE_WITH_UNSIGNED_OR_TEST_BEARER_LOCAL_ONLY",
+    "GATEWAY_URL": "http://127.0.0.1:8787",
+    "LINKSKILLS_MCP_UPSTREAM": "in-process",
+    "note": "Forbidden for LINKSKILLS_CANARY=1 production canary. Use only for isolated local unit/integration tests (http loopback allowed only with local-test)."
+  }
+}

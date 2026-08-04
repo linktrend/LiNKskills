@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "linkskills-gateway"
+version = "0.1.0"
+description = "LiNKskills stdlib HTTP Gateway (skills_* JSON API)"
+requires-python = ">=3.11"
+license = { text = "Proprietary" }
+# Stdlib HTTP Gateway — no FastAPI/uvicorn.
+# core is mandatory: privacy/validation (payload_guard) must be available at import.
+# cryptography is for PACI JWT verify when Platform authenticator / JWKS is wired.
+dependencies = [
+  "linkskills-core>=0.1.0",
+  "linkskills-tool-runtime>=0.1.0",
+  "cryptography>=42.0.0",
+]
+
+[project.optional-dependencies]
+postgres = [
+  "psycopg[binary]>=3.1",
+]
+
+[project.scripts]
+linkskills-gateway = "linkskills_gateway.server:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["linkskills_gateway*"]

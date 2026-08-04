@@ -1,0 +1,320 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://linktrend.dev/schemas/linkskills/stage-gateway-config-v0.1.json",
+  "title": "LiNKskills Stage Gateway / PACI Config v0.1 (reference-only candidate)",
+  "description": "Candidate-only reference schema for Gateway/MCP machine-token stage readiness. Documents required fields and fail-closed selection rules. Does NOT invent live Platform PACI issuer/JWKS/credentials/endpoints. Certified Platform candidate pin is contract evidence only — not live PACI authority. Evidence class: reference_only / not_live_proven.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "config_class",
+    "evidence_status",
+    "deployment_target",
+    "auth_mode",
+    "linkskills_env",
+    "https_policy",
+    "machine_token",
+    "gateway",
+    "paci",
+    "fail_closed_selection",
+    "platform_pins",
+    "hard_blockers",
+    "non_claims"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "0.1"
+    },
+    "config_class": {
+      "type": "string",
+      "enum": ["reference_only"],
+      "description": "Configs conforming to this schema are reference/candidate only — not live deploy manifests."
+    },
+    "evidence_status": {
+      "type": "string",
+      "enum": ["not_live_proven"],
+      "description": "Stage/prod PACI remains unproven until Platform supplies independently verified live issuer."
+    },
+    "deployment_target": {
+      "type": "string",
+      "enum": ["stage", "canary", "production"],
+      "description": "Never local-test. local-test is a separate Skills-owned loopback path."
+    },
+    "auth_mode": {
+      "type": "string",
+      "const": "production",
+      "description": "LINKSKILLS_AUTH_MODE for stage/canary/production MUST be production. local-test is forbidden on these targets."
+    },
+    "linkskills_env": {
+      "type": "string",
+      "enum": ["stage", "staging", "production", "prod"],
+      "description": "LINKSKILLS_ENV production-like family. Stage canary uses stage|staging."
+    },
+    "https_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["require_https_outside_local_test_loopback", "local_test_loopback_hosts"],
+      "properties": {
+        "require_https_outside_local_test_loopback": {
+          "type": "boolean",
+          "const": true
+        },
+        "local_test_loopback_hosts": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": ["127.0.0.1", "localhost", "::1"]
+          },
+          "uniqueItems": true
+        },
+        "notes": { "type": "string" }
+      }
+    },
+    "machine_token": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "token_endpoint_auth_method",
+        "assertion_alg",
+        "private_key_material",
+        "access_token_ttl_max_s"
+      ],
+      "properties": {
+        "token_endpoint_auth_method": {
+          "type": "string",
+          "const": "private_key_jwt"
+        },
+        "assertion_alg": {
+          "type": "string",
+          "const": "ES256"
+        },
+        "private_key_material": {
+          "type": "string",
+          "const": "secretref_file_path_only",
+          "description": "Private key only via SecretRef file path env (LINKSKILLS_PACI_CLIENT_PRIVATE_KEY_FILE). Never inline PEM, never Git, never CLI args."
+        },
+        "access_token_ttl_max_s": {
+          "type": "integer",
+          "const": 900
+        },
+        "client_assertion_lifetime_max_s": {
+          "type": "integer",
+          "const": 300
+        }
+      }
+    },
+    "gateway": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "gateway_url",
+        "store",
+        "platform_authenticator",
+        "mcp_upstream"
+      ],
+      "properties": {
+        "gateway_url": {
+          "type": "string",
+          "minLength": 1,
+          "description": "https durable stage Gateway URL. Use _PLATFORM_SUPPLIED_* placeholder until Platform publishes a real endpoint. Never invent live hosts."
+        },
+        "store": {
+          "type": "string",
+          "const": "postgres",
+          "description": "Stage/prod Gateway store must be postgres (memory/sqlite forbidden as silent default)."
+        },
+        "platform_authenticator": {
+          "type": "string",
+          "minLength": 1,
+          "description": "LINKSKILLS_PLATFORM_AUTHENTICATOR module:attr. Production/stage requires a real Platform authenticator factory (not LocalUnsignedClaimsVerifier)."
+        },
+        "mcp_upstream": {
+          "type": "string",
+          "enum": ["http"],
+          "description": "Canary/stage default is durable HTTP Gateway. In-process production is refuse-by-default."
+        },
+        "canary_enabled": {
+          "type": "boolean",
+          "description": "When true, LINKSKILLS_CANARY=1 and local-test/static bearer paths are forbidden."
+        }
+      }
+    },
+    "paci": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "issuer",
+        "jwks_uri",
+        "audience",
+        "required_service_scopes",
+        "token_endpoint",
+        "introspection_url",
+        "introspection_client_id",
+        "trusted_mint_client_ids",
+        "client_id",
+        "client_private_key_file",
+        "resource_audience"
+      ],
+      "properties": {
+        "issuer": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Platform-supplied PACI issuer URI (no trailing slash). Leave _PLATFORM_SUPPLIED_* until live issuer exists."
+        },
+        "jwks_uri": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Same-origin JWKS URI under issuer. Platform-supplied; do not invent."
+        },
+        "audience": {
+          "type": "string",
+          "const": "lskills-api"
+        },
+        "required_service_scopes": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "token_endpoint": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Platform-supplied token endpoint for client_credentials + private_key_jwt."
+        },
+        "introspection_url": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Platform-supplied RFC 7662 introspection URL (required for high-risk writes)."
+        },
+        "introspection_client_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Resource-server private_key_jwt assertion client id (who calls introspect)."
+        },
+        "trusted_mint_client_ids": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true,
+          "description": "CSV allow-list of mint client IDs; required outside local-test when introspection configured."
+        },
+        "client_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Skills machine client id (stage credential separate from prod)."
+        },
+        "client_private_key_file": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Absolute SecretRef-rendered file path env value for ES256 PEM. Never inline key material in this config."
+        },
+        "client_kid": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1
+        },
+        "resource_audience": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Skills-only resource audience; Brain/OpenClaw reuse forbidden."
+        }
+      }
+    },
+    "fail_closed_selection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "local_test_forbidden_for_targets",
+        "require_platform_authenticator",
+        "forbid_static_bearer_for_canary",
+        "forbid_local_test_assertion_signer_outside_local_test"
+      ],
+      "properties": {
+        "local_test_forbidden_for_targets": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": ["stage", "canary", "production"]
+          },
+          "uniqueItems": true
+        },
+        "require_platform_authenticator": {
+          "type": "boolean",
+          "const": true
+        },
+        "forbid_static_bearer_for_canary": {
+          "type": "boolean",
+          "const": true
+        },
+        "forbid_local_test_assertion_signer_outside_local_test": {
+          "type": "boolean",
+          "const": true
+        },
+        "notes": { "type": "string" }
+      }
+    },
+    "platform_pins": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "certified_platform_candidate_sha",
+        "envelope_contract",
+        "contracts_package_paci",
+        "certified_candidate_is_live_paci_authority"
+      ],
+      "properties": {
+        "certified_platform_candidate_sha": {
+          "type": "string",
+          "const": "421a35e97bc302be0f5e1f196d0a5e8d132f6fd8"
+        },
+        "envelope_contract": {
+          "type": "string",
+          "const": "platform.auth-token-envelope/0.1.0"
+        },
+        "contracts_package_paci": {
+          "type": "string",
+          "const": "0.3.0"
+        },
+        "auth_claims_contract": {
+          "type": "string",
+          "const": "platform.auth-claims/1.1.0"
+        },
+        "certified_candidate_is_live_paci_authority": {
+          "type": "boolean",
+          "const": false,
+          "description": "Hard rule: certified Platform candidate ≠ live PACI authority."
+        }
+      }
+    },
+    "hard_blockers": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "status", "summary"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "status": {
+            "type": "string",
+            "enum": ["blocking", "cleared"]
+          },
+          "summary": { "type": "string", "minLength": 1 },
+          "owner": { "type": "string" }
+        }
+      }
+    },
+    "non_claims": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "notes": { "type": "string" }
+  }
+}

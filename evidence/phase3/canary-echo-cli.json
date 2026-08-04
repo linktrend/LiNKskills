@@ -1,0 +1,286 @@
+{
+  "cases": [
+    {
+      "assertions": [
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'HELLO_CANARY'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'PROMPT_ONLY'",
+          "passed": true
+        },
+        {
+          "detail": "match",
+          "hard_fail": false,
+          "name": "exit_code",
+          "passed": true
+        }
+      ],
+      "case_id": "echo-hello",
+      "case_score": 1.0,
+      "evidence_source": "executor",
+      "execution_receipt": {
+        "artifact_hashes": [
+          "a60ed2bec335142d6b9312736a8dbb37b24b9184e589753e00fdd7814196196f",
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        ],
+        "case_id": "echo-hello",
+        "environment": {
+          "executor_version": "linkskills-eval-executor/0.2.0",
+          "machine": "arm64",
+          "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+          "python_version": "3.14.3",
+          "repo_root": "/Users/linktrend/Projects/LiNKskills",
+          "system": "Darwin",
+          "workspace_root": "/var/folders/wk/0t_2fmld5jx8xlwh2fwsjzmh0000gp/T/linkskills-eval-hp60zcdr"
+        },
+        "evidence_source": "executor",
+        "execution_profile_hash": "288543a4379181fc6f5b47299c679c5ca7b3df6130dcf8b481b9188c83346a7b",
+        "executor_version": "linkskills-eval-executor/0.2.0",
+        "exit_code": 0,
+        "finished_at": "2026-07-28T01:25:33Z",
+        "receipt_hash": "9b6d827046f8b916c114e05dc184ba403be36a1d567f65537defed8a641cecfe",
+        "receipt_id": "bbea7086-0ab2-4d6f-b6a2-28a54f71d325",
+        "skill_id": "canary-echo",
+        "skill_release_hash": "skill-release:036f019dc24542ebc4f68bd0502178d5be5587abe049fb9661adeb2923fcb379",
+        "started_at": "2026-07-28T01:25:33Z",
+        "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_hash": "a60ed2bec335142d6b9312736a8dbb37b24b9184e589753e00fdd7814196196f",
+        "suite_hash": "a564173690b0745271d34991c69c8234039305501a4fccedaadf0954ac71a50a",
+        "suite_id": "canary-echo-suite",
+        "tool_calls": [
+          {
+            "adapter_kind": "local_process",
+            "argv": [
+              "HELLO_CANARY"
+            ],
+            "error": null,
+            "exit_code": 0,
+            "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdout_hash": "a60ed2bec335142d6b9312736a8dbb37b24b9184e589753e00fdd7814196196f",
+            "timed_out": false,
+            "tool_hash": "29b179692378ba32ee244afa7f8b8017e918a158f37127e117cfe24a820f3d83",
+            "tool_id": "text-echo",
+            "version": "1.0.0"
+          }
+        ],
+        "toolchain": {}
+      },
+      "has_observed_evidence": true,
+      "judge_scores": {
+        "correctness": 1.0
+      },
+      "reason": "passed executed deterministic checks",
+      "status": "passed"
+    },
+    {
+      "assertions": [
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"status\": \"ok\"'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"echo\": \"ping\"'",
+          "passed": true
+        },
+        {
+          "detail": "present: status, echo",
+          "hard_fail": false,
+          "name": "json_schema_fields",
+          "passed": true
+        },
+        {
+          "detail": "match",
+          "hard_fail": false,
+          "name": "exit_code",
+          "passed": true
+        }
+      ],
+      "case_id": "echo-json",
+      "case_score": 1.0,
+      "evidence_source": "executor",
+      "execution_receipt": {
+        "artifact_hashes": [
+          "a955d1066cbda6b39ae6b19a35f75725573be9f5e661451aa170362bdf29ccb5",
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        ],
+        "case_id": "echo-json",
+        "environment": {
+          "executor_version": "linkskills-eval-executor/0.2.0",
+          "machine": "arm64",
+          "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+          "python_version": "3.14.3",
+          "repo_root": "/Users/linktrend/Projects/LiNKskills",
+          "system": "Darwin",
+          "workspace_root": "/var/folders/wk/0t_2fmld5jx8xlwh2fwsjzmh0000gp/T/linkskills-eval-hp60zcdr"
+        },
+        "evidence_source": "executor",
+        "execution_profile_hash": "288543a4379181fc6f5b47299c679c5ca7b3df6130dcf8b481b9188c83346a7b",
+        "executor_version": "linkskills-eval-executor/0.2.0",
+        "exit_code": 0,
+        "finished_at": "2026-07-28T01:25:33Z",
+        "receipt_hash": "e8a1cfc998e6807ecc63b31d87702721d4d6d510436291f6e148d80ce5bc025e",
+        "receipt_id": "c27ddfc0-bc3a-4672-9847-62a79a199b8c",
+        "skill_id": "canary-echo",
+        "skill_release_hash": "skill-release:036f019dc24542ebc4f68bd0502178d5be5587abe049fb9661adeb2923fcb379",
+        "started_at": "2026-07-28T01:25:33Z",
+        "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_hash": "a955d1066cbda6b39ae6b19a35f75725573be9f5e661451aa170362bdf29ccb5",
+        "suite_hash": "a564173690b0745271d34991c69c8234039305501a4fccedaadf0954ac71a50a",
+        "suite_id": "canary-echo-suite",
+        "tool_calls": [
+          {
+            "adapter_kind": "local_process",
+            "argv": [
+              "--json",
+              "ping"
+            ],
+            "error": null,
+            "exit_code": 0,
+            "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdout_hash": "a955d1066cbda6b39ae6b19a35f75725573be9f5e661451aa170362bdf29ccb5",
+            "timed_out": false,
+            "tool_hash": "29b179692378ba32ee244afa7f8b8017e918a158f37127e117cfe24a820f3d83",
+            "tool_id": "text-echo",
+            "version": "1.0.0"
+          }
+        ],
+        "toolchain": {}
+      },
+      "has_observed_evidence": true,
+      "judge_scores": {
+        "correctness": 1.0
+      },
+      "reason": "passed executed deterministic checks",
+      "status": "passed"
+    }
+  ],
+  "certifiable": true,
+  "certified": true,
+  "certify_reason": "certified: executor receipts bind case, immutable skill release, deterministic execution profile, toolchain, and collected evidence",
+  "dimension_scores": {
+    "correctness": 1.0
+  },
+  "execution_receipts": [
+    {
+      "artifact_hashes": [
+        "a60ed2bec335142d6b9312736a8dbb37b24b9184e589753e00fdd7814196196f",
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      ],
+      "case_id": "echo-hello",
+      "environment": {
+        "executor_version": "linkskills-eval-executor/0.2.0",
+        "machine": "arm64",
+        "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+        "python_version": "3.14.3",
+        "repo_root": "/Users/linktrend/Projects/LiNKskills",
+        "system": "Darwin",
+        "workspace_root": "/var/folders/wk/0t_2fmld5jx8xlwh2fwsjzmh0000gp/T/linkskills-eval-hp60zcdr"
+      },
+      "evidence_source": "executor",
+      "execution_profile_hash": "288543a4379181fc6f5b47299c679c5ca7b3df6130dcf8b481b9188c83346a7b",
+      "executor_version": "linkskills-eval-executor/0.2.0",
+      "exit_code": 0,
+      "finished_at": "2026-07-28T01:25:33Z",
+      "receipt_hash": "9b6d827046f8b916c114e05dc184ba403be36a1d567f65537defed8a641cecfe",
+      "receipt_id": "bbea7086-0ab2-4d6f-b6a2-28a54f71d325",
+      "skill_id": "canary-echo",
+      "skill_release_hash": "skill-release:036f019dc24542ebc4f68bd0502178d5be5587abe049fb9661adeb2923fcb379",
+      "started_at": "2026-07-28T01:25:33Z",
+      "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_hash": "a60ed2bec335142d6b9312736a8dbb37b24b9184e589753e00fdd7814196196f",
+      "suite_hash": "a564173690b0745271d34991c69c8234039305501a4fccedaadf0954ac71a50a",
+      "suite_id": "canary-echo-suite",
+      "tool_calls": [
+        {
+          "adapter_kind": "local_process",
+          "argv": [
+            "HELLO_CANARY"
+          ],
+          "error": null,
+          "exit_code": 0,
+          "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_hash": "a60ed2bec335142d6b9312736a8dbb37b24b9184e589753e00fdd7814196196f",
+          "timed_out": false,
+          "tool_hash": "29b179692378ba32ee244afa7f8b8017e918a158f37127e117cfe24a820f3d83",
+          "tool_id": "text-echo",
+          "version": "1.0.0"
+        }
+      ],
+      "toolchain": {}
+    },
+    {
+      "artifact_hashes": [
+        "a955d1066cbda6b39ae6b19a35f75725573be9f5e661451aa170362bdf29ccb5",
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      ],
+      "case_id": "echo-json",
+      "environment": {
+        "executor_version": "linkskills-eval-executor/0.2.0",
+        "machine": "arm64",
+        "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+        "python_version": "3.14.3",
+        "repo_root": "/Users/linktrend/Projects/LiNKskills",
+        "system": "Darwin",
+        "workspace_root": "/var/folders/wk/0t_2fmld5jx8xlwh2fwsjzmh0000gp/T/linkskills-eval-hp60zcdr"
+      },
+      "evidence_source": "executor",
+      "execution_profile_hash": "288543a4379181fc6f5b47299c679c5ca7b3df6130dcf8b481b9188c83346a7b",
+      "executor_version": "linkskills-eval-executor/0.2.0",
+      "exit_code": 0,
+      "finished_at": "2026-07-28T01:25:33Z",
+      "receipt_hash": "e8a1cfc998e6807ecc63b31d87702721d4d6d510436291f6e148d80ce5bc025e",
+      "receipt_id": "c27ddfc0-bc3a-4672-9847-62a79a199b8c",
+      "skill_id": "canary-echo",
+      "skill_release_hash": "skill-release:036f019dc24542ebc4f68bd0502178d5be5587abe049fb9661adeb2923fcb379",
+      "started_at": "2026-07-28T01:25:33Z",
+      "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_hash": "a955d1066cbda6b39ae6b19a35f75725573be9f5e661451aa170362bdf29ccb5",
+      "suite_hash": "a564173690b0745271d34991c69c8234039305501a4fccedaadf0954ac71a50a",
+      "suite_id": "canary-echo-suite",
+      "tool_calls": [
+        {
+          "adapter_kind": "local_process",
+          "argv": [
+            "--json",
+            "ping"
+          ],
+          "error": null,
+          "exit_code": 0,
+          "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_hash": "a955d1066cbda6b39ae6b19a35f75725573be9f5e661451aa170362bdf29ccb5",
+          "timed_out": false,
+          "tool_hash": "29b179692378ba32ee244afa7f8b8017e918a158f37127e117cfe24a820f3d83",
+          "tool_id": "text-echo",
+          "version": "1.0.0"
+        }
+      ],
+      "toolchain": {}
+    }
+  ],
+  "hard_fail_dimensions": [],
+  "judge_kind": "independent_deterministic",
+  "passed": true,
+  "profile_hash": "288543a4379181fc6f5b47299c679c5ca7b3df6130dcf8b481b9188c83346a7b",
+  "reasons": [],
+  "receipt_hashes": [
+    "9b6d827046f8b916c114e05dc184ba403be36a1d567f65537defed8a641cecfe",
+    "e8a1cfc998e6807ecc63b31d87702721d4d6d510436291f6e148d80ce5bc025e"
+  ],
+  "skill_id": "canary-echo",
+  "skill_release_hash": "skill-release:036f019dc24542ebc4f68bd0502178d5be5587abe049fb9661adeb2923fcb379",
+  "suite_hash": "a564173690b0745271d34991c69c8234039305501a4fccedaadf0954ac71a50a",
+  "suite_id": "canary-echo-suite",
+  "suite_version": "0.2.0",
+  "toolchain": {},
+  "weighted_score": 1.0
+}

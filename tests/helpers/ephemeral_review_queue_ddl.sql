@@ -1,0 +1,7 @@
+-- DEPRECATED helper stub — NOT a live migration and NOT executable DDL.
+--
+-- Ephemeral Postgres proofs MUST load the real additive migration:
+--   supabase/migrations/20260730_000008_lskills_review_queue.sql
+--
+-- LiNKplatform alone applies live shared migrations.
+-- This file intentionally contains no CREATE / ALTER statements.
