@@ -3,6 +3,7 @@
 # Preferred editable installs (stdlib Gateway retained — no ASGI framework):
 #
 #   pip install -e packages/core
+#   pip install -e packages/tool_runtime
 #   pip install -e packages/gateway
 #   pip install -e "packages/gateway[postgres]"   # optional Postgres adapter driver
 #   pip install -e packages/client
@@ -34,6 +35,7 @@ authors = [{ name = "LiNKtrend" }]
 # packages first (or use a resolver that understands local path deps).
 dependencies = [
   "linkskills-core>=0.1.0",
+  "linkskills-tool-runtime>=0.1.0",
   "linkskills-gateway>=0.1.0",
   "linkskills-mcp>=0.1.0",
   "linkskills-client>=0.1.0",

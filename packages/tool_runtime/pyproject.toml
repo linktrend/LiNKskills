@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "linkskills-tool-runtime"
+version = "0.1.0"
+description = "LiNKskills packaged tool descriptor resolution and invocation runtime"
+requires-python = ">=3.11"
+license = { text = "Proprietary" }
+dependencies = [
+  "pyyaml>=6.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["linkskills_tool_runtime*"]
