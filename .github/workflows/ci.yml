@@ -30,7 +30,7 @@ jobs:
           python3 scripts/build-catalog-index.py --check
 
       - name: Install test dependencies
-        run: pip install pyyaml pytest
+        run: pip install -r requirements-dev.txt
 
       - name: Unit tests (skill runtime)
         run: python3 -m unittest discover -s tests/skill_runtime -v
