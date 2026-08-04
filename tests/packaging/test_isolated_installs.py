@@ -8,6 +8,7 @@ live network services (Gateway/Postgres/PACI).
 from __future__ import annotations
 
 import os
+import re
 import subprocess
 import sys
 import textwrap
@@ -19,6 +20,14 @@ import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 PACKAGES = REPO_ROOT / "packages"
+DOCUMENTED_RUNTIME_PACKAGE_ORDER = (
+    "core",
+    "tool_runtime",
+    "gateway",
+    "client",
+    "mcp_server",
+    "librarian_domain",
+)
 
 
 def _run(
@@ -97,20 +106,28 @@ def packaging_venv(tmp_path_factory: pytest.TempPathFactory) -> Path:
     venv_dir = root / "venv"
     py = _create_venv(venv_dir)
 
-    # Install in dependency order so name pins resolve from local path packages.
-    _pip_install(py, "-e", str(PACKAGES / "core"))
-    _pip_install(py, "-e", str(PACKAGES / "tool_runtime"))
-    _pip_install(py, "-e", str(PACKAGES / "gateway"))
+    # Exercise the exact documented runtime package order in a fresh venv so
+    # local name pins resolve before dependent packages are installed.
+    for package_name in DOCUMENTED_RUNTIME_PACKAGE_ORDER:
+        _pip_install(py, "-e", str(PACKAGES / package_name))
     _pip_install(py, "-e", f"{PACKAGES / 'gateway'}[postgres]")
-    _pip_install(py, "-e", str(PACKAGES / "client"))
-    _pip_install(py, "-e", str(PACKAGES / "mcp_server"))
-    _pip_install(py, "-e", str(PACKAGES / "librarian_domain"))
     _pip_install(py, "-e", str(PACKAGES / "publisher"))
     _pip_install(py, "-e", str(PACKAGES / "eval_runner"))
     return py
 
 
 class TestPackageMetadata:
+    def test_runbook_matches_exercised_install_order(self) -> None:
+        runbook = (
+            REPO_ROOT / "docs" / "runbooks" / "PRODUCTION_OPERATIONS.md"
+        ).read_text(encoding="utf-8")
+        documented = re.findall(
+            r"^pip install -e packages/([a-z_]+)$", runbook, flags=re.MULTILINE
+        )
+        assert tuple(documented[: len(DOCUMENTED_RUNTIME_PACKAGE_ORDER)]) == (
+            DOCUMENTED_RUNTIME_PACKAGE_ORDER
+        )
+
     def test_pyprojects_declare_required_deps(self) -> None:
         gateway = (PACKAGES / "gateway" / "pyproject.toml").read_text(encoding="utf-8")
         assert "linkskills-core>=0.1.0" in gateway

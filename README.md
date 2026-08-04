@@ -79,7 +79,9 @@ python3 scripts/check-service-ownership.py
 
 For a long-lived Gateway host, install `packages/tool_runtime` before
 `packages/gateway`; it provides the `skills_tool_invoke` descriptor/invocation
-runtime and its PyYAML dependency. The exact host sequence is in
+runtime and its PyYAML dependency. Install `packages/client` before
+`packages/mcp_server`, which declares the client as a required dependency. The
+exact host sequence is in
 [`docs/runbooks/PRODUCTION_OPERATIONS.md`](docs/runbooks/PRODUCTION_OPERATIONS.md).
 
 ## Status
