@@ -472,6 +472,11 @@ class PostgresGatewayStore:
         guc_actor, org_id = self._require_bound_identity()
         self._assert_write_actor_agrees(actor_id, bound_actor=guc_actor)
         with self._lock:
+            # Outer atomic frame increments depth before _begin; reset any
+            # leftover/aborted transaction first so SET LOCAL ROLE + GUCs apply
+            # on a clean transaction (nested writers still join via depth>0).
+            if self._atomic_depth == 0 and not self._tx_idle():
+                self._conn.rollback()
             self._atomic_depth += 1
             try:
                 cur = self._begin(actor_id=guc_actor, org_id=org_id)
