@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://linktrend.dev/schemas/linkskills/mcp-api-envelope-v0.1.json",
+  "title": "LiNKskills MCP/API Envelope v0.1",
+  "description": "Common success response envelope for skills_* MCP tools and HTTP API.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "contract_version",
+    "request_id",
+    "server_time",
+    "data"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "0.1"
+    },
+    "contract_version": {
+      "type": "string",
+      "const": "0.1",
+      "description": "Domain contract version for skills_* operations."
+    },
+    "request_id": { "type": "string", "minLength": 1 },
+    "idempotency_key": { "type": "string" },
+    "server_time": { "type": "string", "format": "date-time" },
+    "actor_id": { "type": "string" },
+    "session_id": { "type": "string" },
+    "run_id": { "type": "string" },
+    "release_hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "execution_profile_hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "data": {
+      "description": "Operation-specific payload.",
+      "type": ["object", "array", "string", "number", "boolean", "null"]
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "message"],
+        "properties": {
+          "code": { "type": "string", "minLength": 1 },
+          "message": { "type": "string", "minLength": 1 }
+        }
+      },
+      "default": []
+    },
+    "compatibility_state": {
+      "type": "string",
+      "enum": ["current", "deprecated", "retired"]
+    },
+    "recommended_next_operation": {
+      "type": "string",
+      "enum": [
+        "skills_list",
+        "skills_search",
+        "skills_describe",
+        "skills_fragment_get",
+        "skills_release_get",
+        "skills_run_start",
+        "skills_run_update",
+        "skills_run_complete",
+        "skills_run_fail",
+        "skills_tool_resolve",
+        "skills_tool_invoke",
+        "skills_input_validate",
+        "skills_output_validate",
+        "skills_feedback_submit",
+        "skills_trace_candidate_submit",
+        "none"
+      ]
+    },
+    "error": {
+      "description": "Present only on failure responses that still use the envelope shell.",
+      "type": "object"
+    }
+  }
+}

@@ -1,0 +1,295 @@
+{
+  "cases": [
+    {
+      "case_id": "echo-hello",
+      "evidence_source": "executor",
+      "execution_receipt": {
+        "artifact_hashes": [
+          "a60ed2bec335142d6b9312736a8dbb37b24b9184e589753e00fdd7814196196f",
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        ],
+        "case_id": "echo-hello",
+        "environment": {
+          "executor_version": "linkskills-eval-executor/0.4.0",
+          "machine": "aarch64",
+          "network_isolation": "denied",
+          "platform": "Linux-6.12.76-linuxkit-aarch64-with-glibc2.41",
+          "python_version": "3.12.13",
+          "repo_root": "/repo",
+          "system": "Linux",
+          "workspace_root": "/tmp/linkskills-eval-0y0arc32"
+        },
+        "evidence_source": "executor",
+        "execution_profile_hash": "9db2d1db2663d9e3fb2a60b0ab4aaaf291aed010d155caba65798b5ecb0ec188",
+        "executor_version": "linkskills-eval-executor/0.4.0",
+        "exit_code": 0,
+        "finished_at": "2026-08-03T10:09:03Z",
+        "issuer_id": "linkskills-eval-runner-sealed-linux",
+        "issuer_signature": "d10d5ffb4800613eb79615bfa32bc4e25dc7414bb9365975b9b89d93172b06fd",
+        "network_isolation": "denied",
+        "provenance_kind": "eval_runner_hmac_v1",
+        "receipt_hash": "4da15fe03cb8ac71d34e1b86169bfbb35f47c8c7aa411b93ab2519e075de56e8",
+        "receipt_id": "484a20f8-2f7a-4d99-8bd7-1a5be9c139f2",
+        "skill_id": "canary-echo",
+        "skill_release_hash": "skill-release:006a23b0af3abbcb9a0600c3f44bf337b89dc6cdd5be6d328097a2498a5f05bb",
+        "started_at": "2026-08-03T10:09:03Z",
+        "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_hash": "a60ed2bec335142d6b9312736a8dbb37b24b9184e589753e00fdd7814196196f",
+        "suite_hash": "8f56554dc1b731e94e735ba9dc9d9942e4c2a495ecf11986b071ac17f22a4662",
+        "suite_id": "canary-echo-catalog-suite",
+        "tool_calls": [
+          {
+            "adapter_kind": "local_process",
+            "argv": [
+              "HELLO_CANARY"
+            ],
+            "error": null,
+            "exit_code": 0,
+            "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdout_hash": "a60ed2bec335142d6b9312736a8dbb37b24b9184e589753e00fdd7814196196f",
+            "timed_out": false,
+            "tool_hash": "29b179692378ba32ee244afa7f8b8017e918a158f37127e117cfe24a820f3d83",
+            "tool_id": "text-echo",
+            "version": "1.0.0"
+          }
+        ],
+        "toolchain": {
+          "tools": [
+            {
+              "source_hash": "29b179692378ba32ee244afa7f8b8017e918a158f37127e117cfe24a820f3d83",
+              "tool_hash": "29b179692378ba32ee244afa7f8b8017e918a158f37127e117cfe24a820f3d83",
+              "tool_id": "text-echo",
+              "version": "1.0.0"
+            }
+          ]
+        }
+      },
+      "status": "passed"
+    },
+    {
+      "case_id": "echo-json",
+      "evidence_source": "executor",
+      "execution_receipt": {
+        "artifact_hashes": [
+          "a955d1066cbda6b39ae6b19a35f75725573be9f5e661451aa170362bdf29ccb5",
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        ],
+        "case_id": "echo-json",
+        "environment": {
+          "executor_version": "linkskills-eval-executor/0.4.0",
+          "machine": "aarch64",
+          "network_isolation": "denied",
+          "platform": "Linux-6.12.76-linuxkit-aarch64-with-glibc2.41",
+          "python_version": "3.12.13",
+          "repo_root": "/repo",
+          "system": "Linux",
+          "workspace_root": "/tmp/linkskills-eval-0y0arc32"
+        },
+        "evidence_source": "executor",
+        "execution_profile_hash": "9db2d1db2663d9e3fb2a60b0ab4aaaf291aed010d155caba65798b5ecb0ec188",
+        "executor_version": "linkskills-eval-executor/0.4.0",
+        "exit_code": 0,
+        "finished_at": "2026-08-03T10:09:03Z",
+        "issuer_id": "linkskills-eval-runner-sealed-linux",
+        "issuer_signature": "9a920faa1e566558201ea7b9ec3d376df965a9818cec12345f32a79608204dd0",
+        "network_isolation": "denied",
+        "provenance_kind": "eval_runner_hmac_v1",
+        "receipt_hash": "7a4b885d545d0e9352be5151869fe8b4c963332225de3a5eab4b8bfdc810fa99",
+        "receipt_id": "9a99de89-a64f-4792-875a-efb597bd76d3",
+        "skill_id": "canary-echo",
+        "skill_release_hash": "skill-release:006a23b0af3abbcb9a0600c3f44bf337b89dc6cdd5be6d328097a2498a5f05bb",
+        "started_at": "2026-08-03T10:09:03Z",
+        "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_hash": "a955d1066cbda6b39ae6b19a35f75725573be9f5e661451aa170362bdf29ccb5",
+        "suite_hash": "8f56554dc1b731e94e735ba9dc9d9942e4c2a495ecf11986b071ac17f22a4662",
+        "suite_id": "canary-echo-catalog-suite",
+        "tool_calls": [
+          {
+            "adapter_kind": "local_process",
+            "argv": [
+              "--json",
+              "ping"
+            ],
+            "error": null,
+            "exit_code": 0,
+            "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdout_hash": "a955d1066cbda6b39ae6b19a35f75725573be9f5e661451aa170362bdf29ccb5",
+            "timed_out": false,
+            "tool_hash": "29b179692378ba32ee244afa7f8b8017e918a158f37127e117cfe24a820f3d83",
+            "tool_id": "text-echo",
+            "version": "1.0.0"
+          }
+        ],
+        "toolchain": {
+          "tools": [
+            {
+              "source_hash": "29b179692378ba32ee244afa7f8b8017e918a158f37127e117cfe24a820f3d83",
+              "tool_hash": "29b179692378ba32ee244afa7f8b8017e918a158f37127e117cfe24a820f3d83",
+              "tool_id": "text-echo",
+              "version": "1.0.0"
+            }
+          ]
+        }
+      },
+      "status": "passed"
+    }
+  ],
+  "certified": true,
+  "certify_reason": "certified: executor receipts bind case, immutable skill release, deterministic execution profile, toolchain, and collected evidence",
+  "execution_receipts": [
+    {
+      "artifact_hashes": [
+        "a60ed2bec335142d6b9312736a8dbb37b24b9184e589753e00fdd7814196196f",
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      ],
+      "case_id": "echo-hello",
+      "environment": {
+        "executor_version": "linkskills-eval-executor/0.4.0",
+        "machine": "aarch64",
+        "network_isolation": "denied",
+        "platform": "Linux-6.12.76-linuxkit-aarch64-with-glibc2.41",
+        "python_version": "3.12.13",
+        "repo_root": "/repo",
+        "system": "Linux",
+        "workspace_root": "/tmp/linkskills-eval-0y0arc32"
+      },
+      "evidence_source": "executor",
+      "execution_profile_hash": "9db2d1db2663d9e3fb2a60b0ab4aaaf291aed010d155caba65798b5ecb0ec188",
+      "executor_version": "linkskills-eval-executor/0.4.0",
+      "exit_code": 0,
+      "finished_at": "2026-08-03T10:09:03Z",
+      "issuer_id": "linkskills-eval-runner-sealed-linux",
+      "issuer_signature": "d10d5ffb4800613eb79615bfa32bc4e25dc7414bb9365975b9b89d93172b06fd",
+      "network_isolation": "denied",
+      "provenance_kind": "eval_runner_hmac_v1",
+      "receipt_hash": "4da15fe03cb8ac71d34e1b86169bfbb35f47c8c7aa411b93ab2519e075de56e8",
+      "receipt_id": "484a20f8-2f7a-4d99-8bd7-1a5be9c139f2",
+      "skill_id": "canary-echo",
+      "skill_release_hash": "skill-release:006a23b0af3abbcb9a0600c3f44bf337b89dc6cdd5be6d328097a2498a5f05bb",
+      "started_at": "2026-08-03T10:09:03Z",
+      "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_hash": "a60ed2bec335142d6b9312736a8dbb37b24b9184e589753e00fdd7814196196f",
+      "suite_hash": "8f56554dc1b731e94e735ba9dc9d9942e4c2a495ecf11986b071ac17f22a4662",
+      "suite_id": "canary-echo-catalog-suite",
+      "tool_calls": [
+        {
+          "adapter_kind": "local_process",
+          "argv": [
+            "HELLO_CANARY"
+          ],
+          "error": null,
+          "exit_code": 0,
+          "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_hash": "a60ed2bec335142d6b9312736a8dbb37b24b9184e589753e00fdd7814196196f",
+          "timed_out": false,
+          "tool_hash": "29b179692378ba32ee244afa7f8b8017e918a158f37127e117cfe24a820f3d83",
+          "tool_id": "text-echo",
+          "version": "1.0.0"
+        }
+      ],
+      "toolchain": {
+        "tools": [
+          {
+            "source_hash": "29b179692378ba32ee244afa7f8b8017e918a158f37127e117cfe24a820f3d83",
+            "tool_hash": "29b179692378ba32ee244afa7f8b8017e918a158f37127e117cfe24a820f3d83",
+            "tool_id": "text-echo",
+            "version": "1.0.0"
+          }
+        ]
+      }
+    },
+    {
+      "artifact_hashes": [
+        "a955d1066cbda6b39ae6b19a35f75725573be9f5e661451aa170362bdf29ccb5",
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      ],
+      "case_id": "echo-json",
+      "environment": {
+        "executor_version": "linkskills-eval-executor/0.4.0",
+        "machine": "aarch64",
+        "network_isolation": "denied",
+        "platform": "Linux-6.12.76-linuxkit-aarch64-with-glibc2.41",
+        "python_version": "3.12.13",
+        "repo_root": "/repo",
+        "system": "Linux",
+        "workspace_root": "/tmp/linkskills-eval-0y0arc32"
+      },
+      "evidence_source": "executor",
+      "execution_profile_hash": "9db2d1db2663d9e3fb2a60b0ab4aaaf291aed010d155caba65798b5ecb0ec188",
+      "executor_version": "linkskills-eval-executor/0.4.0",
+      "exit_code": 0,
+      "finished_at": "2026-08-03T10:09:03Z",
+      "issuer_id": "linkskills-eval-runner-sealed-linux",
+      "issuer_signature": "9a920faa1e566558201ea7b9ec3d376df965a9818cec12345f32a79608204dd0",
+      "network_isolation": "denied",
+      "provenance_kind": "eval_runner_hmac_v1",
+      "receipt_hash": "7a4b885d545d0e9352be5151869fe8b4c963332225de3a5eab4b8bfdc810fa99",
+      "receipt_id": "9a99de89-a64f-4792-875a-efb597bd76d3",
+      "skill_id": "canary-echo",
+      "skill_release_hash": "skill-release:006a23b0af3abbcb9a0600c3f44bf337b89dc6cdd5be6d328097a2498a5f05bb",
+      "started_at": "2026-08-03T10:09:03Z",
+      "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_hash": "a955d1066cbda6b39ae6b19a35f75725573be9f5e661451aa170362bdf29ccb5",
+      "suite_hash": "8f56554dc1b731e94e735ba9dc9d9942e4c2a495ecf11986b071ac17f22a4662",
+      "suite_id": "canary-echo-catalog-suite",
+      "tool_calls": [
+        {
+          "adapter_kind": "local_process",
+          "argv": [
+            "--json",
+            "ping"
+          ],
+          "error": null,
+          "exit_code": 0,
+          "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_hash": "a955d1066cbda6b39ae6b19a35f75725573be9f5e661451aa170362bdf29ccb5",
+          "timed_out": false,
+          "tool_hash": "29b179692378ba32ee244afa7f8b8017e918a158f37127e117cfe24a820f3d83",
+          "tool_id": "text-echo",
+          "version": "1.0.0"
+        }
+      ],
+      "toolchain": {
+        "tools": [
+          {
+            "source_hash": "29b179692378ba32ee244afa7f8b8017e918a158f37127e117cfe24a820f3d83",
+            "tool_hash": "29b179692378ba32ee244afa7f8b8017e918a158f37127e117cfe24a820f3d83",
+            "tool_id": "text-echo",
+            "version": "1.0.0"
+          }
+        ]
+      }
+    }
+  ],
+  "generated_at": "2026-08-03T10:09:03Z",
+  "host": {
+    "issuer_id": "linkskills-eval-runner-sealed-linux",
+    "platform": "linux",
+    "sealed_cert_image": "python@sha256:57cd7c3a7a273101a6485ba99423ee568157882804b1124b4dd04266317710de",
+    "sealed_cert_image_digest": "57cd7c3a7a273101a6485ba99423ee568157882804b1124b4dd04266317710de",
+    "sealed_cert_mode": "release",
+    "sealed_path": "linux-bwrap-or-approved-container"
+  },
+  "network_isolation": "denied",
+  "profile_hash": "9db2d1db2663d9e3fb2a60b0ab4aaaf291aed010d155caba65798b5ecb0ec188",
+  "receipt_hashes": [
+    "4da15fe03cb8ac71d34e1b86169bfbb35f47c8c7aa411b93ab2519e075de56e8",
+    "7a4b885d545d0e9352be5151869fe8b4c963332225de3a5eab4b8bfdc810fa99"
+  ],
+  "skill_id": "canary-echo",
+  "skill_release_hash": "skill-release:006a23b0af3abbcb9a0600c3f44bf337b89dc6cdd5be6d328097a2498a5f05bb",
+  "source_hash": "29b179692378ba32ee244afa7f8b8017e918a158f37127e117cfe24a820f3d83",
+  "suite_hash": "8f56554dc1b731e94e735ba9dc9d9942e4c2a495ecf11986b071ac17f22a4662",
+  "tool_hash": "29b179692378ba32ee244afa7f8b8017e918a158f37127e117cfe24a820f3d83",
+  "toolchain": {
+    "tools": [
+      {
+        "source_hash": "29b179692378ba32ee244afa7f8b8017e918a158f37127e117cfe24a820f3d83",
+        "tool_hash": "29b179692378ba32ee244afa7f8b8017e918a158f37127e117cfe24a820f3d83",
+        "tool_id": "text-echo",
+        "version": "1.0.0"
+      }
+    ]
+  },
+  "weighted_score": 1.0
+}

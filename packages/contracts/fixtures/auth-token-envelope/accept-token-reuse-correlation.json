@@ -1,0 +1,40 @@
+{
+  "name": "envelope-accept-token-reuse-correlation",
+  "expect": "accept",
+  "notes": "Same access-token jti / mint correlationId across two requests; per-request X-Request-Id values must be independent.",
+  "payload": {
+    "iss": "https://auth.stage.linkplatform.linktrend.dev",
+    "aud": ["lbrain-api"],
+    "sub": "actor-lisa",
+    "iat": 1785369600,
+    "exp": 1785370500,
+    "nbf": 1785369600,
+    "jti": "550e8400-e29b-41d4-a716-446655440006",
+    "https://linktrend.dev/claims/auth": {
+      "claimContractVersion": "platform.auth-claims/1.1.0",
+      "actorId": "actor-lisa",
+      "actorKind": "persona",
+      "runtimeBindingId": "bind-lisa-openclaw-1",
+      "credentialId": "cred-1",
+      "orgId": "org-internal",
+      "internal": true,
+      "serviceScopes": ["lbrain", "linkplatform"],
+      "permittedOperations": ["read", "execute"],
+      "issuedAt": "2026-07-30T00:00:00.000Z",
+      "expiresAt": "2026-07-30T00:15:00.000Z",
+      "issuer": "https://auth.stage.linkplatform.linktrend.dev",
+      "audience": ["lbrain-api"],
+      "correlationId": "mint-corr-reuse-1"
+    }
+  },
+  "expectations": {
+    "shape": "accept",
+    "accessTokenJtiReplayRejected": false,
+    "requests": [
+      { "X-Request-Id": "req-aaaa-1111-2222-3333-444444444444" },
+      { "X-Request-Id": "req-bbbb-1111-2222-3333-444444444444" }
+    ],
+    "mintCorrelationIdConstant": "mint-corr-reuse-1",
+    "requestCorrelationMustDifferFromMint": true
+  }
+}

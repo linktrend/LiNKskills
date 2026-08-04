@@ -1,0 +1,36 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "example-skill",
+  "display_name": "Broken Skill Pack",
+  "version": "1.0.0",
+  "description": "Missing required nested fields on purpose.",
+  "capability_category": "verification",
+  "lifecycle_state": "draft",
+  "format_profile": "simple",
+  "routing": {
+    "when_to_use": "invalid fixture",
+    "when_not_to_use": ["n/a"],
+    "tags": ["invalid"]
+  },
+  "execution": {
+    "required_inputs": [],
+    "expected_outputs": [{ "name": "result", "description": "x" }],
+    "forbidden_actions": ["none"],
+    "verification_steps": ["none"],
+    "completion_criteria": ["none"]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.yaml",
+    "suite_schema_version": "0.1"
+  }
+}

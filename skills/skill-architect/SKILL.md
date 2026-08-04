@@ -19,7 +19,8 @@ tooling:
 tools: [write_file, read_file, make_dir, list_dir, shell_exec, get_tool_details]
 dependencies: []
 permissions: [fs_read, fs_write, shell_exec]
-scope_out: ["Do not create simple-profile skills that still need resumable task state", "Do not execute business actions of target skills; only design, migrate, or refine skill artifacts"]
+scope_out: ["Do not create simple-profile skills that still need resumable task state", "Do not execute business actions of target skills; only design, migrate, or refine skill artifacts", "Do not implement governance, entitlements, leases, or permission-to-act — LiNKskills owns catalog/eval/telemetry only"]
+format_profile: heavy
 persistence:
   required: true
   state_path: ".workdir/tasks/{{task_id}}/state.jsonl"
@@ -27,6 +28,11 @@ last_updated: 2026-02-20
 ---
 
 # Skill Architect
+
+> **Validation:** Structural compliance is enforced by the canonical repo validator
+> (`validator.py` / `scripts/validate_skills.py`) — not skill-local copies. Phase 4
+> always runs `python3 scripts/validate_skills.py --path skills/<skill_id> --repo-root .`
+> from the LiNKskills repository root.
 
 ## Decision Tree (Fail-Fast & Persistence)
 0.  **Audit Check**: Is this a resume of a previous design/migration/refinement task?
@@ -132,7 +138,7 @@ If a third-party skill/prompt/codebase is provided, perform a **Structural Audit
 20. **CHECKPOINT**: Append one of `SCAFFOLDED`, `MIGRATED`, or `REFINED` to `state.jsonl`.
 
 ### Phase 4: Verification
-21. Run `python3 ../../validator.py --path ../{{skill_name}} --repo-root ../..`.
+21. Run `python3 scripts/validate_skills.py --path skills/{{skill_name}} --repo-root .` from the LiNKskills repo root (delegates to `validator.py`).
 22. Run `python3 ../../global_evaluator.py --root ../..` for `REFINER` mode or when cross-skill risk insight is needed.
 23. If validation fails, record errors in `state.jsonl` and old-patterns with `status: "VALIDATION_FAILED"`.
 24. Report findings and compatibility notes to the user.

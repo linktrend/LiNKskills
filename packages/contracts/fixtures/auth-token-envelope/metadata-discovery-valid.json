@@ -1,0 +1,24 @@
+{
+  "name": "envelope-metadata-discovery",
+  "expect": "accept",
+  "notes": "RFC 8414 metadata audit — omit authorization_endpoint; response_types_supported []; no client_secret_*.",
+  "issuer": "https://auth.stage.linkplatform.linktrend.dev",
+  "discoveryUrl": "https://auth.stage.linkplatform.linktrend.dev/.well-known/oauth-authorization-server",
+  "metadata": {
+    "issuer": "https://auth.stage.linkplatform.linktrend.dev",
+    "token_endpoint": "https://auth.stage.linkplatform.linktrend.dev/oauth/token",
+    "jwks_uri": "https://auth.stage.linkplatform.linktrend.dev/.well-known/jwks.json",
+    "introspection_endpoint": "https://auth.stage.linkplatform.linktrend.dev/oauth/introspect",
+    "grant_types_supported": ["client_credentials"],
+    "token_endpoint_auth_methods_supported": ["private_key_jwt"],
+    "token_endpoint_auth_signing_alg_values_supported": ["ES256"],
+    "introspection_endpoint_auth_methods_supported": ["private_key_jwt"],
+    "response_types_supported": [],
+    "scopes_supported": ["lbrain", "lskills", "linkplatform"]
+  },
+  "expectations": {
+    "auditReasons": [],
+    "authorization_endpoint_omitted": true,
+    "response_types_supported": []
+  }
+}

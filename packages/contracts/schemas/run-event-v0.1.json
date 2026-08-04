@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://linktrend.dev/schemas/linkskills/run-event-v0.1.json",
+  "title": "LiNKskills Run Event v0.1",
+  "description": "Canonical telemetry event envelope for skill runs and related activity.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "event_id",
+    "event_type",
+    "occurred_at",
+    "sequence",
+    "sensitivity"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "0.1"
+    },
+    "event_id": { "type": "string", "minLength": 1 },
+    "event_type": {
+      "type": "string",
+      "enum": [
+        "skill.requested",
+        "skill.candidates_returned",
+        "skill.selected",
+        "skill.not_selected",
+        "skill.fragment_disclosed",
+        "skill.run_started",
+        "tool.resolved",
+        "tool.called",
+        "tool.completed",
+        "tool.failed",
+        "artifact.produced",
+        "verification.completed",
+        "verification.failed",
+        "skill.run_completed",
+        "skill.run_failed",
+        "skill.run_abandoned",
+        "feedback.submitted",
+        "eval.candidate_created",
+        "eval.executed",
+        "release.promoted",
+        "release.demoted",
+        "release.rolled_back"
+      ]
+    },
+    "occurred_at": { "type": "string", "format": "date-time" },
+    "sequence": { "type": "integer", "minimum": 0 },
+    "idempotency_key": { "type": "string" },
+    "correlation_id": { "type": "string" },
+    "actor_id": { "type": "string" },
+    "runtime_profile_id": { "type": "string" },
+    "session_id": { "type": "string" },
+    "program_ref": { "type": "string" },
+    "repository": { "type": "string" },
+    "issue_ref": { "type": "string" },
+    "run_id": { "type": "string" },
+    "skill_id": { "type": "string" },
+    "skill_release_hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "execution_profile_hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "tool_id": { "type": "string" },
+    "tool_release_hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "outcome": {
+      "type": "string",
+      "enum": ["success", "failure", "abandoned", "partial", "info"]
+    },
+    "failure_class": {
+      "type": "string",
+      "enum": [
+        "skill_failure",
+        "tool_failure",
+        "infrastructure",
+        "validation",
+        "timeout",
+        "cancelled",
+        "unknown"
+      ]
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "duration_ms": { "type": "number", "minimum": 0 },
+        "token_input": { "type": "integer", "minimum": 0 },
+        "token_output": { "type": "integer", "minimum": 0 },
+        "tool_calls": { "type": "integer", "minimum": 0 },
+        "cost_usd": { "type": "number", "minimum": 0 }
+      }
+    },
+    "artifact_refs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["ref"],
+        "properties": {
+          "ref": { "type": "string", "minLength": 1 },
+          "content_hash": {
+            "type": "string",
+            "pattern": "^sha256:[a-f0-9]{64}$"
+          },
+          "media_type": { "type": "string" }
+        }
+      },
+      "default": []
+    },
+    "sensitivity": {
+      "type": "string",
+      "enum": ["public_internal", "restricted", "sensitive", "redacted"]
+    },
+    "payload": {
+      "type": "object",
+      "description": "Safe structured details. Must not contain secrets or private transcripts.",
+      "additionalProperties": true
+    },
+    "brain_activity_ref": {
+      "type": "string",
+      "description": "Opaque LiNKbrain correlation reference only."
+    }
+  }
+}

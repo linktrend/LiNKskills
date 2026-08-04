@@ -1,0 +1,90 @@
+{
+  "schema_version": "0.1",
+  "config_class": "reference_only",
+  "evidence_status": "not_live_proven",
+  "deployment_target": "stage",
+  "auth_mode": "production",
+  "linkskills_env": "stage",
+  "https_policy": {
+    "require_https_outside_local_test_loopback": true,
+    "local_test_loopback_hosts": ["127.0.0.1", "localhost", "::1"],
+    "notes": "HTTP allowed only under LINKSKILLS_AUTH_MODE=local-test with loopback host. Stage/canary/production require https."
+  },
+  "machine_token": {
+    "token_endpoint_auth_method": "private_key_jwt",
+    "assertion_alg": "ES256",
+    "private_key_material": "secretref_file_path_only",
+    "access_token_ttl_max_s": 900,
+    "client_assertion_lifetime_max_s": 300
+  },
+  "gateway": {
+    "gateway_url": "_PLATFORM_SUPPLIED_STAGE_GATEWAY_URL_",
+    "store": "postgres",
+    "platform_authenticator": "_PLATFORM_SUPPLIED_AUTHENTICATOR_MODULE:factory_",
+    "mcp_upstream": "http",
+    "canary_enabled": false
+  },
+  "paci": {
+    "issuer": "_PLATFORM_SUPPLIED_STAGE_PACI_ISSUER_",
+    "jwks_uri": "_PLATFORM_SUPPLIED_STAGE_PACI_JWKS_URI_",
+    "audience": "lskills-api",
+    "required_service_scopes": ["lskills"],
+    "token_endpoint": "_PLATFORM_SUPPLIED_STAGE_PACI_TOKEN_ENDPOINT_",
+    "introspection_url": "_PLATFORM_SUPPLIED_STAGE_PACI_INTROSPECTION_URL_",
+    "introspection_client_id": "_PLATFORM_SUPPLIED_STAGE_RS_ASSERTION_CLIENT_ID_",
+    "trusted_mint_client_ids": ["_PLATFORM_SUPPLIED_STAGE_MINT_CLIENT_ID_"],
+    "client_id": "_PLATFORM_SUPPLIED_STAGE_SKILLS_CLIENT_ID_",
+    "client_private_key_file": "_SECRETREF_RENDERED_ABSOLUTE_PATH_TO_ES256_PEM_",
+    "client_kid": "_PLATFORM_SUPPLIED_STAGE_CLIENT_KID_",
+    "scope": "_PLATFORM_SUPPLIED_STAGE_LEAST_PRIVILEGE_SCOPES_",
+    "resource_audience": "lskills-api"
+  },
+  "fail_closed_selection": {
+    "local_test_forbidden_for_targets": ["stage", "canary", "production"],
+    "require_platform_authenticator": true,
+    "forbid_static_bearer_for_canary": true,
+    "forbid_local_test_assertion_signer_outside_local_test": true,
+    "notes": "LINKSKILLS_AUTH_MODE=local-test is never valid for stage/canary/production. Production requires LINKSKILLS_PLATFORM_AUTHENTICATOR. LocalTestClientAssertionSigner is forbidden outside local-test."
+  },
+  "platform_pins": {
+    "certified_platform_candidate_sha": "421a35e97bc302be0f5e1f196d0a5e8d132f6fd8",
+    "envelope_contract": "platform.auth-token-envelope/0.1.0",
+    "contracts_package_paci": "0.3.0",
+    "auth_claims_contract": "platform.auth-claims/1.1.0",
+    "certified_candidate_is_live_paci_authority": false
+  },
+  "hard_blockers": [
+    {
+      "id": "platform-stage-paci-issuer-absent",
+      "status": "blocking",
+      "summary": "Platform stage PACI issuer / JWKS / token endpoint / introspection are absent (not live). Do not invent URLs.",
+      "owner": "LiNKplatform"
+    },
+    {
+      "id": "platform-stage-skills-credentials-absent",
+      "status": "blocking",
+      "summary": "Separate Skills stage machine credentials + SecretRef-rendered private key file path not supplied by Platform.",
+      "owner": "LiNKplatform"
+    },
+    {
+      "id": "platform-stage-gateway-endpoint-absent",
+      "status": "blocking",
+      "summary": "Durable https Skills stage Gateway/MCP base URL not Platform-supplied.",
+      "owner": "LiNKplatform"
+    },
+    {
+      "id": "certified-candidate-not-live-authority",
+      "status": "blocking",
+      "summary": "Certified Platform candidate 421a35e97bc302be0f5e1f196d0a5e8d132f6fd8 is contract evidence only — not live PACI authority.",
+      "owner": "LiNKplatform"
+    }
+  ],
+  "non_claims": [
+    "Not live stage PACI mint/verify/introspect",
+    "Not live canary start",
+    "Not production proven",
+    "No invented issuer/JWKS/token/introspection URLs",
+    "No secrets in git"
+  ],
+  "notes": "Reference-only candidate for SKILLS-W20-STAGE-READINESS Lane A. Fill _PLATFORM_SUPPLIED_* only from Platform-verified evidence. See docs/stage/PACI-GATEWAY-STAGE-GATE.md."
+}

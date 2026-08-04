@@ -19,7 +19,7 @@ tooling:
 tools: [write_file, read_file, list_dir, get_tool_details]
 dependencies: []
 permissions: [fs_read, fs_write]
-scope_out: ["Do not execute business workflows from this template", "Do not remove persistence and audit primitives"]
+scope_out: ["Do not execute business workflows from this template", "Do not remove persistence and audit primitives", "Do not implement governance, entitlements, leases, or permission-to-act"]
 format_profile: heavy
 persistence:
   required: true
@@ -28,6 +28,10 @@ last_updated: 2026-02-20
 ---
 
 # <Skill Name Identifier>
+
+> **Validation:** Use `python3 scripts/validate_skills.py` (repo root) — canonical
+> structural gate in `validator.py`. Do not maintain duplicate validators under
+> `skills/*/scripts/`.
 
 ## Format Profile (choose before scaffolding)
 This file is the **`heavy`** profile of the golden template (`format_profile: heavy`):

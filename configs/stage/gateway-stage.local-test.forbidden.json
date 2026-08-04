@@ -1,0 +1,63 @@
+{
+  "schema_version": "0.1",
+  "config_class": "reference_only",
+  "evidence_status": "not_live_proven",
+  "deployment_target": "stage",
+  "auth_mode": "local-test",
+  "linkskills_env": "stage",
+  "https_policy": {
+    "require_https_outside_local_test_loopback": true,
+    "local_test_loopback_hosts": ["127.0.0.1", "localhost", "::1"]
+  },
+  "machine_token": {
+    "token_endpoint_auth_method": "private_key_jwt",
+    "assertion_alg": "ES256",
+    "private_key_material": "secretref_file_path_only",
+    "access_token_ttl_max_s": 900,
+    "client_assertion_lifetime_max_s": 300
+  },
+  "gateway": {
+    "gateway_url": "http://127.0.0.1:8787",
+    "store": "postgres",
+    "platform_authenticator": "unused-local-test",
+    "mcp_upstream": "http",
+    "canary_enabled": true
+  },
+  "paci": {
+    "issuer": "http://127.0.0.1:9",
+    "jwks_uri": "http://127.0.0.1:9/.well-known/jwks.json",
+    "audience": "lskills-api",
+    "required_service_scopes": ["lskills"],
+    "token_endpoint": "http://127.0.0.1:9/oauth/token",
+    "introspection_url": "http://127.0.0.1:9/oauth/introspect",
+    "introspection_client_id": "local-rs",
+    "trusted_mint_client_ids": ["local-mint"],
+    "client_id": "local-client",
+    "client_private_key_file": "/tmp/not-for-stage.pem",
+    "resource_audience": "lskills-api"
+  },
+  "fail_closed_selection": {
+    "local_test_forbidden_for_targets": ["stage", "canary", "production"],
+    "require_platform_authenticator": true,
+    "forbid_static_bearer_for_canary": true,
+    "forbid_local_test_assertion_signer_outside_local_test": true
+  },
+  "platform_pins": {
+    "certified_platform_candidate_sha": "421a35e97bc302be0f5e1f196d0a5e8d132f6fd8",
+    "envelope_contract": "platform.auth-token-envelope/0.1.0",
+    "contracts_package_paci": "0.3.0",
+    "auth_claims_contract": "platform.auth-claims/1.1.0",
+    "certified_candidate_is_live_paci_authority": false
+  },
+  "hard_blockers": [
+    {
+      "id": "intentionally-invalid-local-test-on-stage",
+      "status": "blocking",
+      "summary": "NEGATIVE EXAMPLE ONLY — LINKSKILLS_AUTH_MODE=local-test on deployment_target=stage must fail closed."
+    }
+  ],
+  "non_claims": [
+    "This file is a deliberate invalid fixture for fail-closed tests; never deploy"
+  ],
+  "notes": "FORBIDDEN fixture. Schema requires auth_mode=production for stage. Do not use as an operator template."
+}

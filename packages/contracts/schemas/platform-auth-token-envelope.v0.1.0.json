@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://linktrend.dev/schemas/platform-auth-token-envelope/0.1.0",
+  "title": "Platform Auth Token Envelope",
+  "description": "Frozen JWT payload for platform.auth-token-envelope/0.1.0. Embeds platform.auth-claims/1.1.0 (unchanged). Mint must normalize AuthClaims issuedAt/expiresAt to whole-second UTC so iat/nbf/exp NumericDate boundaries match AuthClaims validation exactly. Nested authClaims.correlationId is mint-time opaque issuance correlation only — not per-request Gateway correlation. AuthClaims $ref resolves by bundling packages/contracts/schemas/platform-auth-claims.v1.1.0.json (contentHash fb518834be897c32574df5f7235704fdb0de708bd3da1b48fc448246e3eca567) — do not fetch $ref over the network at runtime. Access-token jti is not single-use. Phase-1 iss must not end with '/'. Discovery URL = iss + '/.well-known/oauth-authorization-server'.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "iss",
+    "aud",
+    "sub",
+    "iat",
+    "exp",
+    "nbf",
+    "jti",
+    "https://linktrend.dev/claims/auth"
+  ],
+  "properties": {
+    "iss": {
+      "type": "string",
+      "format": "uri",
+      "minLength": 1,
+      "pattern": "^.+[^/]$",
+      "description": "Absolute PACI issuer URI (environment-specific). Phase-1 root issuers must not end with '/'. Discovery URL = iss + '/.well-known/oauth-authorization-server'."
+    },
+    "aud": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "Must equal AuthClaims.audience as a set"
+    },
+    "sub": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Must equal AuthClaims.actorId"
+    },
+    "iat": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "RFC 7519 NumericDate; equals unix seconds of mint-normalized AuthClaims.issuedAt (whole-second UTC)"
+    },
+    "exp": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "RFC 7519 NumericDate; equals unix seconds of mint-normalized AuthClaims.expiresAt (whole-second UTC)"
+    },
+    "nbf": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Phase-1 equals iat"
+    },
+    "jti": {
+      "type": "string",
+      "format": "uuid",
+      "description": "RFC 4122 UUID identifying this access token for correlation/audit; multi-request use allowed while valid (not a single-use ticket)"
+    },
+    "https://linktrend.dev/claims/auth": {
+      "$ref": "./platform-auth-claims.v1.1.0.json",
+      "description": "Exact frozen AuthClaims 1.1.0 object (bundled sibling schema). Nested correlationId is mint-time opaque issuance correlation only; per-request Gateway correlation uses an independent header/field (proposed X-Request-Id), not this claim."
+    }
+  }
+}

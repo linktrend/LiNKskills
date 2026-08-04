@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "linkskills-client"
+version = "0.1.0"
+description = "LiNKskills HTTP client, offline event buffer, and skill_runtime compat wrappers"
+requires-python = ">=3.11"
+license = { text = "Proprietary" }
+dependencies = [
+  # PACI private_key_jwt client (Lane 2); stdlib HTTP client itself needs no extras.
+  "cryptography>=42.0.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["linkskills_client*"]

@@ -1,0 +1,72 @@
+{
+  "draft_count": 0,
+  "eval_pending_count": 0,
+  "generated_at": "2026-08-03T10:09:03Z",
+  "host": {
+    "issuer_id": "linkskills-eval-runner-sealed-linux",
+    "platform": "linux",
+    "sealed_cert_image": "python@sha256:57cd7c3a7a273101a6485ba99423ee568157882804b1124b4dd04266317710de",
+    "sealed_cert_image_digest": "57cd7c3a7a273101a6485ba99423ee568157882804b1124b4dd04266317710de",
+    "sealed_cert_mode": "release",
+    "sealed_path": "linux-bwrap-or-approved-container"
+  },
+  "isolation_probe_denied": true,
+  "non_promoting": false,
+  "platform": "linux",
+  "repo_root_marker": "LiNKskills",
+  "require_sealed": true,
+  "results": [
+    {
+      "certified": true,
+      "certify_reason": "certified: executor receipts bind case, immutable skill release, deterministic execution profile, toolchain, and collected evidence",
+      "classification": "usable",
+      "evidence_path": "evidence/phase10/sealed/canary-echo-sealed.json",
+      "host": {
+        "issuer_id": "linkskills-eval-runner-sealed-linux",
+        "platform": "linux",
+        "sealed_cert_image": "python@sha256:57cd7c3a7a273101a6485ba99423ee568157882804b1124b4dd04266317710de",
+        "sealed_cert_image_digest": "57cd7c3a7a273101a6485ba99423ee568157882804b1124b4dd04266317710de",
+        "sealed_cert_mode": "release",
+        "sealed_path": "linux-bwrap-or-approved-container"
+      },
+      "non_promoting": false,
+      "passed": true,
+      "profile_hash": "9db2d1db2663d9e3fb2a60b0ab4aaaf291aed010d155caba65798b5ecb0ec188",
+      "reason": "certified: executor receipts bind case, immutable skill release, deterministic execution profile, toolchain, and collected evidence",
+      "reason_code": "certified_usable",
+      "receipt_hashes": [
+        "4da15fe03cb8ac71d34e1b86169bfbb35f47c8c7aa411b93ab2519e075de56e8",
+        "7a4b885d545d0e9352be5151869fe8b4c963332225de3a5eab4b8bfdc810fa99"
+      ],
+      "skill_dir": "skills/canary-echo",
+      "skill_id": "canary-echo",
+      "skill_release_hash": "skill-release:006a23b0af3abbcb9a0600c3f44bf337b89dc6cdd5be6d328097a2498a5f05bb",
+      "source_hash": "29b179692378ba32ee244afa7f8b8017e918a158f37127e117cfe24a820f3d83",
+      "suite_path": "skills/canary-echo/references/eval-suite.yaml",
+      "tool_hash": "29b179692378ba32ee244afa7f8b8017e918a158f37127e117cfe24a820f3d83",
+      "toolchain": {
+        "tools": [
+          {
+            "source_hash": "29b179692378ba32ee244afa7f8b8017e918a158f37127e117cfe24a820f3d83",
+            "tool_hash": "29b179692378ba32ee244afa7f8b8017e918a158f37127e117cfe24a820f3d83",
+            "tool_id": "text-echo",
+            "version": "1.0.0"
+          }
+        ]
+      },
+      "weighted_score": 1.0
+    }
+  ],
+  "skill_count": 1,
+  "toolchain": {
+    "tools": [
+      {
+        "source_hash": "29b179692378ba32ee244afa7f8b8017e918a158f37127e117cfe24a820f3d83",
+        "tool_hash": "29b179692378ba32ee244afa7f8b8017e918a158f37127e117cfe24a820f3d83",
+        "tool_id": "text-echo",
+        "version": "1.0.0"
+      }
+    ]
+  },
+  "usable_count": 1
+}
