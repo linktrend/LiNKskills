@@ -3,8 +3,7 @@
 **Date:** 2026-08-04
 **Branch:** `dev/cloudcursor/SKILLS-STAGE-IDEMPOTENCY-RLS-FIX`
 **Start SHA:** `eaf397042d575e74951c862b27f9489ac4d9f352`
-**This tip:** `aa8055404d342b8fef2f19874301b8fd0ebdd355`
-**Code tip:** `5efff786535193d5fe164bc4f7e1fbb592c37c8a`
+**This tip:** `5efff786535193d5fe164bc4f7e1fbb592c37c8a` (code fix; docs pins may follow on branch HEAD)
 **Packet:** SKILLS-STAGE-IDEMPOTENCY-RLS-FIX
 
 ## Verdict
