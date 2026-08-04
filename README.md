@@ -77,6 +77,11 @@ python3 scripts/flush-telemetry.py
 python3 scripts/check-service-ownership.py
 ```
 
+For a long-lived Gateway host, install `packages/tool_runtime` before
+`packages/gateway`; it provides the `skills_tool_invoke` descriptor/invocation
+runtime and its PyYAML dependency. The exact host sequence is in
+[`docs/runbooks/PRODUCTION_OPERATIONS.md`](docs/runbooks/PRODUCTION_OPERATIONS.md).
+
 ## Status
 
 **Catalog foundation plus internal-launch architecture packages (plan hash above) are implemented in this repository as packaging / local proof — not as live stage or production.** All skills ship baseline eval-suite YAML; CI runs validator, catalog freshness, tests, and ownership gates. The real Eval Runner rejects prompt-only certification. Gateway/MCP exist in-repo. PACI consumer pins are **local/fake only**: certified Platform candidate `421a35e97bc302be0f5e1f196d0a5e8d132f6fd8`, AuthClaims `1.1.0`, `@linktrend/platform-contracts@0.2.2` (claims) / `0.3.0` (PACI envelope). Additive registry migrations are packaged for LiNKplatform to apply.

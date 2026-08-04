@@ -99,6 +99,7 @@ def packaging_venv(tmp_path_factory: pytest.TempPathFactory) -> Path:
 
     # Install in dependency order so name pins resolve from local path packages.
     _pip_install(py, "-e", str(PACKAGES / "core"))
+    _pip_install(py, "-e", str(PACKAGES / "tool_runtime"))
     _pip_install(py, "-e", str(PACKAGES / "gateway"))
     _pip_install(py, "-e", f"{PACKAGES / 'gateway'}[postgres]")
     _pip_install(py, "-e", str(PACKAGES / "client"))
@@ -113,6 +114,7 @@ class TestPackageMetadata:
     def test_pyprojects_declare_required_deps(self) -> None:
         gateway = (PACKAGES / "gateway" / "pyproject.toml").read_text(encoding="utf-8")
         assert "linkskills-core>=0.1.0" in gateway
+        assert "linkskills-tool-runtime>=0.1.0" in gateway
         assert "cryptography>=" in gateway
         assert 'postgres = [' in gateway or "postgres =" in gateway
         assert "psycopg[binary]>=3.1" in gateway
@@ -134,6 +136,12 @@ class TestPackageMetadata:
         assert 'name = "linkskills-eval-runner"' in eval_runner
         assert "linkskills-core>=" in eval_runner
         assert "pyyaml>=" in eval_runner
+
+        tool_runtime = (PACKAGES / "tool_runtime" / "pyproject.toml").read_text(
+            encoding="utf-8"
+        )
+        assert 'name = "linkskills-tool-runtime"' in tool_runtime
+        assert "pyyaml>=6.0" in tool_runtime
 
 
 class TestPrivacyFailClosedSource:
@@ -250,6 +258,29 @@ class TestIsolatedInstallImportStart:
             print("postgres_extra_ok", psycopg.__name__)
             """,
         )
+
+    def test_tool_runtime_import_and_descriptor_resolution(
+        self, packaging_venv: Path
+    ) -> None:
+        """Gateway tool execution dependencies work in an isolated installed venv."""
+        out = _py_ok(
+            packaging_venv,
+            f"""
+            from importlib.metadata import version
+            from pathlib import Path
+            import yaml
+            from linkskills_tool_runtime.resolve import resolve_tool
+
+            tool = resolve_tool(
+                Path({str(REPO_ROOT / "tools" / "text-echo")!r}),
+                tool_id="text-echo",
+            )
+            assert tool.tool_id == "text-echo"
+            assert tool.descriptor.source_hash
+            print("tool_runtime_ok", version("linkskills-tool-runtime"), yaml.__version__)
+            """,
+        )
+        assert "tool_runtime_ok" in out
 
     def test_mcp_and_client_import(self, packaging_venv: Path) -> None:
         _py_ok(

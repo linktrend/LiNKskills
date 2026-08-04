@@ -34,6 +34,9 @@ python3 -m venv .venv && source .venv/bin/activate
 pip install -U pip setuptools wheel
 
 pip install -e packages/core
+# Required by the Gateway's skills_tool_invoke operation.  It supplies tool
+# descriptor resolution/invocation and its YAML parser dependency.
+pip install -e packages/tool_runtime
 pip install -e packages/gateway
 pip install -e packages/mcp_server
 pip install -e packages/client
