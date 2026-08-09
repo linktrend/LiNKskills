@@ -8,8 +8,8 @@ Consumer of Platform frozen ``platform.auth-token-envelope/0.1.0`` §§6–7:
   expected access lifetime 15 minutes; **no** ``refresh_token`` handling.
 - Early renewal when remaining TTL < 20% of lifetime.
 - Bounded retry/backoff on transient failures; fail closed on auth errors.
-- Private key only via SecretRef file path
-  (``LINKSKILLS_PACI_CLIENT_PRIVATE_KEY_FILE``) — never CLI args; never logged.
+- Private key via a SecretRef file path or one inherited file descriptor
+  (``LINKSKILLS_PACI_CLIENT_PRIVATE_KEY_FD``) — never CLI args; never logged.
 - Audience/endpoint pinned for Skills; Brain/OpenClaw reuse helpers refused.
 
 **Mark:** Skills-owned Cursor path implemented locally; not live-proven
@@ -46,11 +46,13 @@ DEFAULT_MAX_RETRIES = 3
 DEFAULT_BACKOFF_BASE_S = 0.25
 DEFAULT_TIMEOUT_S = 15.0
 GATEWAY_401_RETRY_MAX = 1  # invalidate + remint once on resource-server 401
+MAX_PRIVATE_KEY_BYTES = 64 * 1024
 
 # Env SecretRef / config keys (no secret values)
 ENV_CLIENT_ID = "LINKSKILLS_PACI_CLIENT_ID"
 ENV_TOKEN_ENDPOINT = "LINKSKILLS_PACI_TOKEN_ENDPOINT"
 ENV_PRIVATE_KEY_FILE = "LINKSKILLS_PACI_CLIENT_PRIVATE_KEY_FILE"
+ENV_PRIVATE_KEY_FD = "LINKSKILLS_PACI_CLIENT_PRIVATE_KEY_FD"
 ENV_KID = "LINKSKILLS_PACI_CLIENT_KID"
 ENV_SCOPE = "LINKSKILLS_PACI_SCOPE"
 ENV_RESOURCE_AUDIENCE = "LINKSKILLS_PACI_RESOURCE_AUDIENCE"
@@ -176,7 +178,7 @@ class PaciClientConfig:
 
     client_id: str
     token_endpoint: str
-    private_key_file: Path
+    private_key_file: Optional[Path] = None
     kid: Optional[str] = None
     scope: Optional[str] = None
     resource_audience: Optional[str] = None
@@ -188,6 +190,7 @@ class PaciClientConfig:
     timeout_s: float = DEFAULT_TIMEOUT_S
     domain: str = "skills"
     auth_mode: str = AUTH_MODE_PRODUCTION
+    private_key_fd: Optional[int] = None
 
     def __post_init__(self) -> None:
         if self.domain != "skills":
@@ -219,13 +222,34 @@ class PaciClientConfig:
             )
         if self.early_renewal_fraction <= 0 or self.early_renewal_fraction >= 1:
             raise PaciConfigError("early_renewal_fraction must be in (0, 1)")
-        key_path = Path(self.private_key_file)
-        if not key_path.is_file():
+        if (self.private_key_file is None) == (self.private_key_fd is None):
             raise PaciConfigError(
-                "private_key_file SecretRef path does not exist or is not a file "
-                f"(set {ENV_PRIVATE_KEY_FILE})"
+                "configure exactly one PACI private-key source: "
+                f"{ENV_PRIVATE_KEY_FILE} or {ENV_PRIVATE_KEY_FD}"
             )
-        object.__setattr__(self, "private_key_file", key_path)
+        if self.private_key_file is not None:
+            key_path = Path(self.private_key_file)
+            if not key_path.is_file():
+                raise PaciConfigError(
+                    "private_key_file SecretRef path does not exist or is not a file "
+                    f"(set {ENV_PRIVATE_KEY_FILE})"
+                )
+            object.__setattr__(self, "private_key_file", key_path)
+        if self.private_key_fd is not None:
+            if (
+                isinstance(self.private_key_fd, bool)
+                or not isinstance(self.private_key_fd, int)
+                or self.private_key_fd < 3
+            ):
+                raise PaciConfigError(
+                    f"{ENV_PRIVATE_KEY_FD} must identify an inherited descriptor >= 3"
+                )
+            try:
+                os.fstat(self.private_key_fd)
+            except OSError as exc:
+                raise PaciConfigError(
+                    f"{ENV_PRIVATE_KEY_FD} does not identify an open inherited descriptor"
+                ) from exc
 
 
 @dataclass
@@ -248,26 +272,58 @@ class PaciTokenClient:
     _urlopen: Any = field(default=urlopen, repr=False, compare=False)
 
     def __post_init__(self) -> None:
-        self._private_key = self._load_private_key(self.config.private_key_file)
+        if self.config.private_key_fd is not None:
+            self._private_key = self._load_private_key_fd(self.config.private_key_fd)
+        else:
+            assert self.config.private_key_file is not None
+            self._private_key = self._load_private_key_file(self.config.private_key_file)
 
     @staticmethod
-    def _load_private_key(path: Path) -> ec.EllipticCurvePrivateKey:
-        # Never log path contents or key bytes.
-        try:
-            raw = path.read_bytes()
-        except OSError as exc:
-            raise PaciConfigError("unable to read PACI client private key SecretRef file") from exc
+    def _parse_private_key(raw: bytes, *, source: str) -> ec.EllipticCurvePrivateKey:
+        if len(raw) >= MAX_PRIVATE_KEY_BYTES:
+            raise PaciConfigError(f"PACI client private key {source} exceeds 64 KiB")
         try:
             key = serialization.load_pem_private_key(raw, password=None)
         except Exception as exc:  # noqa: BLE001 — fail closed, no key detail
             raise PaciConfigError(
-                "PACI client private key file is not a usable PEM private key"
+                f"PACI client private key {source} is not a usable PEM private key"
             ) from exc
         if not isinstance(key, ec.EllipticCurvePrivateKey):
             raise PaciConfigError("PACI client private key must be an EC key (ES256 / P-256)")
         if not isinstance(key.curve, ec.SECP256R1):
             raise PaciConfigError("PACI client private key curve must be P-256 (SECP256R1)")
         return key
+
+    @classmethod
+    def _load_private_key_file(cls, path: Path) -> ec.EllipticCurvePrivateKey:
+        # Never log path contents or key bytes.
+        try:
+            raw = path.read_bytes()
+        except OSError as exc:
+            raise PaciConfigError("unable to read PACI client private key SecretRef file") from exc
+        return cls._parse_private_key(raw, source="file")
+
+    @classmethod
+    def _load_private_key_fd(cls, fd: int) -> ec.EllipticCurvePrivateKey:
+        # The child owns the inherited descriptor. Read it once and close it so
+        # key bytes do not remain available after client initialization.
+        stream = None
+        try:
+            stream = os.fdopen(fd, "rb", closefd=True)
+            with stream:
+                raw = stream.read(MAX_PRIVATE_KEY_BYTES)
+        except OSError as exc:
+            # fdopen owns closure once it succeeds; close the original
+            # descriptor only when fdopen itself failed.
+            if stream is None:
+                try:
+                    os.close(fd)
+                except OSError:
+                    pass
+            raise PaciConfigError(
+                "unable to read PACI client private key inherited descriptor"
+            ) from exc
+        return cls._parse_private_key(raw, source="inherited descriptor")
 
     @classmethod
     def from_env(
@@ -280,11 +336,23 @@ class PaciTokenClient:
         client_id = str(env.get(ENV_CLIENT_ID) or "").strip()
         token_endpoint = str(env.get(ENV_TOKEN_ENDPOINT) or "").strip()
         key_file = str(env.get(ENV_PRIVATE_KEY_FILE) or "").strip()
-        if not client_id or not token_endpoint or not key_file:
+        key_fd_raw = str(env.get(ENV_PRIVATE_KEY_FD) or "").strip()
+        if not client_id or not token_endpoint or (not key_file and not key_fd_raw):
             raise PaciConfigError(
                 "PACI env incomplete: require "
-                f"{ENV_CLIENT_ID}, {ENV_TOKEN_ENDPOINT}, {ENV_PRIVATE_KEY_FILE}"
+                f"{ENV_CLIENT_ID}, {ENV_TOKEN_ENDPOINT}, and exactly one of "
+                f"{ENV_PRIVATE_KEY_FILE} or {ENV_PRIVATE_KEY_FD}"
             )
+        if key_file and key_fd_raw:
+            raise PaciConfigError(
+                f"configure exactly one of {ENV_PRIVATE_KEY_FILE} or {ENV_PRIVATE_KEY_FD}"
+            )
+        key_fd: Optional[int] = None
+        if key_fd_raw:
+            try:
+                key_fd = int(key_fd_raw, 10)
+            except ValueError as exc:
+                raise PaciConfigError(f"{ENV_PRIVATE_KEY_FD} must be an integer") from exc
         kid = str(env.get(ENV_KID) or "").strip() or None
         scope = str(env.get(ENV_SCOPE) or "").strip() or None
         audience = str(env.get(ENV_RESOURCE_AUDIENCE) or "").strip() or None
@@ -292,11 +360,12 @@ class PaciTokenClient:
         config = PaciClientConfig(
             client_id=client_id,
             token_endpoint=token_endpoint,
-            private_key_file=Path(key_file),
+            private_key_file=Path(key_file) if key_file else None,
             kid=kid,
             scope=scope,
             resource_audience=audience,
             auth_mode=mode,
+            private_key_fd=key_fd,
         )
         client = cls(config=config)
         if urlopen_impl is not None:
@@ -314,7 +383,8 @@ class PaciTokenClient:
             "resource_audience": self.config.resource_audience,
             "scope": self.config.scope,
             "kid_configured": bool(self.config.kid),
-            "private_key_file_set": True,
+            "private_key_file_set": self.config.private_key_file is not None,
+            "private_key_fd_set": self.config.private_key_fd is not None,
             "has_cached_token": cached is not None,
             "cached_expires_in_s": (
                 max(0, int(cached.expires_at - now)) if cached is not None else None
@@ -514,12 +584,15 @@ class PaciTokenClient:
 
 
 def paci_env_configured(environ: Optional[Mapping[str, str]] = None) -> bool:
-    """True when Skills PACI SecretRef env triad is present (values not validated)."""
+    """True when Skills PACI auth env has a configured key source."""
     env = environ if environ is not None else os.environ
     return bool(
         str(env.get(ENV_CLIENT_ID) or "").strip()
         and str(env.get(ENV_TOKEN_ENDPOINT) or "").strip()
-        and str(env.get(ENV_PRIVATE_KEY_FILE) or "").strip()
+        and bool(
+            str(env.get(ENV_PRIVATE_KEY_FILE) or "").strip()
+            or str(env.get(ENV_PRIVATE_KEY_FD) or "").strip()
+        )
     )
 
 
