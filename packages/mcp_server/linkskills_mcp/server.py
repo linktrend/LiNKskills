@@ -98,7 +98,7 @@ def resolve_canary_default_actor(
     raise SystemExit(
         "LINKSKILLS_CANARY requires PACI machine-token path: "
         "python -m linkskills_mcp.paci_stdio_proxy "
-        "(LINKSKILLS_PACI_CLIENT_ID / TOKEN_ENDPOINT / CLIENT_PRIVATE_KEY_FILE)"
+        "(LINKSKILLS_PACI_CLIENT_ID / TOKEN_ENDPOINT / private-key SecretRef)"
     )
 
 
