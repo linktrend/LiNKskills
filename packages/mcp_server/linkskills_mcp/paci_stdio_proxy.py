@@ -4,7 +4,7 @@ Cursor launches this module (not the bare MCP server) for ``LINKSKILLS_CANARY``.
 The proxy:
 
 1. Acquires short-lived PACI access tokens via ``PaciTokenClient`` /
-   ``SkillsGatewayClient.from_env`` (SecretRef private key file only).
+   ``SkillsGatewayClient.from_env`` (SecretRef file or inherited descriptor).
 2. Forwards JSON-RPC to an in-process ``SkillsMcpServer`` **or** the HTTP
    Gateway, injecting ``Authorization`` server-side.
 3. Never places bearer tokens in tool arguments, argv, logs, Git, or global
@@ -219,7 +219,7 @@ def build_paci_client(
         raise SystemExit(
             "PACI env incomplete for Cursor MCP proxy: require "
             "LINKSKILLS_PACI_CLIENT_ID, LINKSKILLS_PACI_TOKEN_ENDPOINT, "
-            "LINKSKILLS_PACI_CLIENT_PRIVATE_KEY_FILE"
+            "and exactly one private-key SecretRef file or inherited descriptor"
         )
     return PaciTokenClient.from_env(env)
 

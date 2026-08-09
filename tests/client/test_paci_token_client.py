@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import os
 import sys
 import tempfile
 import threading
@@ -36,14 +37,17 @@ from linkskills_client.paci_token_client import (  # noqa: E402
 )
 
 
-def _write_ephemeral_es256_pem(path: Path) -> None:
+def _ephemeral_es256_pem() -> bytes:
     key = ec.generate_private_key(ec.SECP256R1())
-    pem = key.private_bytes(
+    return key.private_bytes(
         encoding=serialization.Encoding.PEM,
         format=serialization.PrivateFormat.PKCS8,
         encryption_algorithm=serialization.NoEncryption(),
     )
-    path.write_bytes(pem)
+
+
+def _write_ephemeral_es256_pem(path: Path) -> None:
+    path.write_bytes(_ephemeral_es256_pem())
 
 
 class _TokenEndpointState:
@@ -251,6 +255,132 @@ class PaciTokenClientTests(unittest.TestCase):
                 private_key_file=missing,
                 auth_mode=AUTH_MODE_LOCAL_TEST,
             )
+
+    def test_from_env_requires_a_private_key_source(self) -> None:
+        with self.assertRaisesRegex(PaciConfigError, "exactly one"):
+            PaciTokenClient.from_env(
+                {
+                    "LINKSKILLS_PACI_CLIENT_ID": "skills-stage-client",
+                    "LINKSKILLS_PACI_TOKEN_ENDPOINT": self.token_endpoint,
+                    "LINKSKILLS_AUTH_MODE": "local-test",
+                }
+            )
+
+    def test_from_env_reads_and_closes_inherited_private_key_fd(self) -> None:
+        read_fd, write_fd = os.pipe()
+        try:
+            os.write(write_fd, _ephemeral_es256_pem())
+        finally:
+            os.close(write_fd)
+        try:
+            client = PaciTokenClient.from_env(
+                {
+                    "LINKSKILLS_PACI_CLIENT_ID": "skills-stage-client",
+                    "LINKSKILLS_PACI_TOKEN_ENDPOINT": self.token_endpoint,
+                    "LINKSKILLS_PACI_CLIENT_PRIVATE_KEY_FD": str(read_fd),
+                    "LINKSKILLS_PACI_SCOPE": "skills:read",
+                    "LINKSKILLS_AUTH_MODE": "local-test",
+                }
+            )
+            self.assertEqual(client.get_access_token(), "skills-access-token-1")
+            status = client.status()
+            self.assertTrue(status["private_key_fd_set"])
+            self.assertFalse(status["private_key_file_set"])
+        finally:
+            with self.assertRaises(OSError):
+                os.fstat(read_fd)
+
+    def test_from_env_rejects_ambiguous_private_key_sources(self) -> None:
+        read_fd, write_fd = os.pipe()
+        os.close(write_fd)
+        try:
+            with self.assertRaises(PaciConfigError):
+                PaciTokenClient.from_env(
+                    {
+                        "LINKSKILLS_PACI_CLIENT_ID": "skills-stage-client",
+                        "LINKSKILLS_PACI_TOKEN_ENDPOINT": self.token_endpoint,
+                        "LINKSKILLS_PACI_CLIENT_PRIVATE_KEY_FILE": str(self.key_path),
+                        "LINKSKILLS_PACI_CLIENT_PRIVATE_KEY_FD": str(read_fd),
+                        "LINKSKILLS_AUTH_MODE": "local-test",
+                    }
+                )
+        finally:
+            os.close(read_fd)
+
+    def test_from_env_rejects_non_integer_private_key_fd(self) -> None:
+        with self.assertRaisesRegex(PaciConfigError, "must be an integer"):
+            PaciTokenClient.from_env(
+                {
+                    "LINKSKILLS_PACI_CLIENT_ID": "skills-stage-client",
+                    "LINKSKILLS_PACI_TOKEN_ENDPOINT": self.token_endpoint,
+                    "LINKSKILLS_PACI_CLIENT_PRIVATE_KEY_FD": "not-an-integer",
+                    "LINKSKILLS_AUTH_MODE": "local-test",
+                }
+            )
+
+    def test_from_env_rejects_private_key_fd_below_three(self) -> None:
+        with self.assertRaisesRegex(PaciConfigError, "descriptor >= 3"):
+            PaciTokenClient.from_env(
+                {
+                    "LINKSKILLS_PACI_CLIENT_ID": "skills-stage-client",
+                    "LINKSKILLS_PACI_TOKEN_ENDPOINT": self.token_endpoint,
+                    "LINKSKILLS_PACI_CLIENT_PRIVATE_KEY_FD": "2",
+                    "LINKSKILLS_AUTH_MODE": "local-test",
+                }
+            )
+
+    def test_from_env_rejects_closed_private_key_fd(self) -> None:
+        read_fd, write_fd = os.pipe()
+        os.close(read_fd)
+        os.close(write_fd)
+        with self.assertRaises(PaciConfigError):
+            PaciTokenClient.from_env(
+                {
+                    "LINKSKILLS_PACI_CLIENT_ID": "skills-stage-client",
+                    "LINKSKILLS_PACI_TOKEN_ENDPOINT": self.token_endpoint,
+                    "LINKSKILLS_PACI_CLIENT_PRIVATE_KEY_FD": str(read_fd),
+                    "LINKSKILLS_AUTH_MODE": "local-test",
+                }
+            )
+
+    def test_from_env_rejects_oversized_inherited_private_key(self) -> None:
+        with tempfile.TemporaryFile() as stream:
+            stream.write(b"x" * 65_536)
+            stream.seek(0)
+            inherited_fd = os.dup(stream.fileno())
+            with self.assertRaisesRegex(PaciConfigError, "exceeds 64 KiB"):
+                PaciTokenClient.from_env(
+                    {
+                        "LINKSKILLS_PACI_CLIENT_ID": "skills-stage-client",
+                        "LINKSKILLS_PACI_TOKEN_ENDPOINT": self.token_endpoint,
+                        "LINKSKILLS_PACI_CLIENT_PRIVATE_KEY_FD": str(inherited_fd),
+                        "LINKSKILLS_AUTH_MODE": "local-test",
+                    }
+                )
+            with self.assertRaises(OSError):
+                os.fstat(inherited_fd)
+
+    def test_from_env_rejects_malformed_inherited_private_key_without_leaking_bytes(self) -> None:
+        secret_marker = b"PRIVATE-KEY-SENTINEL-MUST-NOT-LEAK"
+        read_fd, write_fd = os.pipe()
+        try:
+            os.write(write_fd, secret_marker)
+        finally:
+            os.close(write_fd)
+        try:
+            with self.assertRaisesRegex(PaciConfigError, "not a usable PEM private key") as ctx:
+                PaciTokenClient.from_env(
+                    {
+                        "LINKSKILLS_PACI_CLIENT_ID": "skills-stage-client",
+                        "LINKSKILLS_PACI_TOKEN_ENDPOINT": self.token_endpoint,
+                        "LINKSKILLS_PACI_CLIENT_PRIVATE_KEY_FD": str(read_fd),
+                        "LINKSKILLS_AUTH_MODE": "local-test",
+                    }
+                )
+            self.assertNotIn(secret_marker.decode("ascii"), str(ctx.exception))
+        finally:
+            with self.assertRaises(OSError):
+                os.fstat(read_fd)
 
     def test_from_env_and_gateway_client_paci_bearer(self) -> None:
         env = {
