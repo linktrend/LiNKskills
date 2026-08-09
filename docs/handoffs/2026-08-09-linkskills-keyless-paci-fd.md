@@ -1,8 +1,8 @@
 # Handoff — LiNKskills keyless PACI inherited descriptor
 
-**Date:** 2026-08-09 Asia/Taipei  
-**Branch:** `feature/keyless-paci-fd`  
-**Start SHA:** `b94657a`  
+**Date:** 2026-08-09 Asia/Taipei
+**Branch:** `feature/keyless-paci-fd`
+**Start SHA:** `b94657a`
 **Status:** Implementation validated; ready for review.
 
 ## Purpose
