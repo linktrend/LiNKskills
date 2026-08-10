@@ -49,7 +49,9 @@ python3 /Users/linktrend/Projects/IDE\ Development/scripts/ide-development.py ro
 
 ## Checkpoint
 
-- Commit: `076188eb373833cbd19e9afff4cdb11822a86a91`
-- Remote: `origin/feature/IDE-deployment` equals the local commit exactly.
+- Installation commit: `076188eb373833cbd19e9afff4cdb11822a86a91`.
+- Final closeout commit: `e6780f2def369cee45ac0e62d969dbfa4721c653`.
+- Remote: `origin/feature/IDE-deployment` equals the final closeout commit
+  exactly.
 - No PR was opened; no merge, rebase, protected-branch, GitHub settings,
   runtime, or credential action was performed.
