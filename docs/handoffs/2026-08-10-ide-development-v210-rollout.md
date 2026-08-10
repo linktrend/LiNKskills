@@ -56,6 +56,6 @@ authorized operation is `install`, not `update`.
   credential, settings, GitHub, PR, merge, or protected-branch evidence was
   requested or obtained.
 - **Installation commit:** `076188eb373833cbd19e9afff4cdb11822a86a91`.
-- **Final closeout commit:** `e6780f2def369cee45ac0e62d969dbfa4721c653`;
-  local `HEAD` equals `origin/feature/IDE-deployment` exactly after the final
+- **Final branch state:** this scoped documentation closeout commit; local
+  `HEAD` equals `origin/feature/IDE-deployment` exactly after the final
   checkpoint push. No PR was opened.
