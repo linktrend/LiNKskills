@@ -47,4 +47,9 @@ python3 /Users/linktrend/Projects/IDE\ Development/scripts/ide-development.py ro
   --target /Users/linktrend/Projects/LiNKskills-worktrees/IDE-deployment --json
 ```
 
-The checkpoint commit and remote equality are recorded in the final handoff.
+## Checkpoint
+
+- Commit: `076188eb373833cbd19e9afff4cdb11822a86a91`
+- Remote: `origin/feature/IDE-deployment` equals the local commit exactly.
+- No PR was opened; no merge, rebase, protected-branch, GitHub settings,
+  runtime, or credential action was performed.

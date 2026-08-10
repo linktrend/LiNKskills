@@ -55,5 +55,7 @@ authorized operation is `install`, not `update`.
 - **Blockers:** none for this local installation checkpoint. No live runtime,
   credential, settings, GitHub, PR, merge, or protected-branch evidence was
   requested or obtained.
-- **Final checkpoint:** to be recorded after the scoped commit and push as the
-  exact local SHA and exact `origin/feature/IDE-deployment` SHA.
+- **Final checkpoint:** commit
+  `076188eb373833cbd19e9afff4cdb11822a86a91`; local `HEAD` equals
+  `origin/feature/IDE-deployment` exactly after the checkpoint push. No PR was
+  opened.
