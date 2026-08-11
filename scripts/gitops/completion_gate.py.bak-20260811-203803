@@ -34,6 +34,7 @@ import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
+from urllib.parse import urlsplit
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 if str(SCRIPT_DIR) not in sys.path:
@@ -530,6 +531,43 @@ def cmd_review_ready(args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def github_owner_repo_from_remote(url: str) -> str | None:
+    """Return ``owner/repo`` only for an exact GitHub HTTPS or SSH remote."""
+    raw = (url or "").strip()
+    scp_match = re.fullmatch(
+        r"git@github\.com:([A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+(?:\.git)?)",
+        raw,
+    )
+    if scp_match:
+        path = scp_match.group(1)
+    else:
+        try:
+            parsed = urlsplit(raw)
+            port = parsed.port
+        except ValueError:
+            return None
+        if parsed.scheme not in {"https", "ssh"} or parsed.hostname != "github.com":
+            return None
+        if parsed.scheme == "https" and port not in {None, 443}:
+            return None
+        if parsed.scheme == "ssh" and (parsed.username != "git" or port not in {None, 22}):
+            return None
+        if parsed.query or parsed.fragment:
+            return None
+        path = parsed.path.removeprefix("/")
+
+    if path.endswith(".git"):
+        path = path[:-4]
+    parts = path.split("/")
+    if (
+        len(parts) != 2
+        or any(part in {"", ".", ".."} for part in parts)
+        or any(re.fullmatch(r"[A-Za-z0-9_.-]+", part) is None for part in parts)
+    ):
+        return None
+    return "/".join(parts)
+
+
 def resolve_repository(workdir: Path) -> tuple[str | None, str]:
     """Resolve owner/repo for durable repair records without printing secrets.
 
@@ -558,30 +596,9 @@ def resolve_repository(workdir: Path) -> tuple[str | None, str]:
         origin = run(["git", "remote", "get-url", "origin"], cwd=workdir)
     if origin.returncode != 0:
         return None, "missing_origin_remote"
-    url = (origin.stdout or "").strip()
-    # Strip credentials if present in URL without echoing them
-    # e.g. https://user:token@github.com/owner/repo.git
-    sanitized = url
-    if "://" in sanitized and "@" in sanitized.split("://", 1)[1]:
-        scheme, rest = sanitized.split("://", 1)
-        sanitized = f"{scheme}://" + rest.split("@", 1)[1]
-    owner_repo = ""
-    if sanitized.startswith("git@") and ":" in sanitized:
-        # git@github.com:owner/repo.git
-        path = sanitized.split(":", 1)[1]
-        owner_repo = path
-    elif "github.com/" in sanitized:
-        owner_repo = sanitized.split("github.com/", 1)[1]
-    elif "github.com:" in sanitized:
-        owner_repo = sanitized.split("github.com:", 1)[1]
-    else:
+    owner_repo = github_owner_repo_from_remote(origin.stdout or "")
+    if owner_repo is None:
         return None, "origin_not_github_or_unrecognized"
-    owner_repo = owner_repo.strip()
-    if owner_repo.endswith(".git"):
-        owner_repo = owner_repo[:-4]
-    owner_repo = owner_repo.strip("/")
-    if owner_repo.count("/") != 1 or " " in owner_repo:
-        return None, "origin_ambiguous_owner_repo"
     # Reject if both origin and upstream exist and disagree (ambiguous fork layout)
     upstream = run(["git", "remote", "get-url", "upstream"], cwd=workdir)
     if upstream.returncode == 0:
