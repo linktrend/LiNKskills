@@ -1,5 +1,10 @@
 # LiNKskills — Open Issues
 
+**2026-08-11 reconciliation:** the service integration and IDE Development
+rollout are complete. Remaining honest gap: record an exact deployed
+LiNKskills checkout SHA on the next deployment/audit; do not infer it from
+health alone. Historical blocked entries below must be read with their dates.
+
 Append-only engineering build log for this repository. Prefer this file over stale prose elsewhere when asking “what is actually done / deferred?”
 
 **Source of truth for product intent and design:** [`LINKSKILLS-INTENT.md`](./LINKSKILLS-INTENT.md), [`LINKSKILLS-TECHNICAL-PRD.md`](./LINKSKILLS-TECHNICAL-PRD.md), [`LINKSKILLS-OPERATIONS-MANUAL.md`](./LINKSKILLS-OPERATIONS-MANUAL.md), approved plan [`LINKSKILLS-INTERNAL-LAUNCH-DETAILED-DEVELOPMENT-PLAN.md`](./LINKSKILLS-INTERNAL-LAUNCH-DETAILED-DEVELOPMENT-PLAN.md) (SHA-256 `31a6cc70bb778ce1dff236819e4bf600b0495dbb06c95bac55bcb2b0b2f5fe88`), ADRs 0001–0008.

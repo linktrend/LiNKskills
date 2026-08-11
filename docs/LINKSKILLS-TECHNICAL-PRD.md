@@ -1,5 +1,10 @@
 # LiNKskills — Technical PRD
 
+> **Current state, 2026-08-11:** Gateway/MCP functionality is deployed and Lisa
+> reaches it through the native governed bridge. Older statements that the
+> service exists only as a local package are superseded. Health does not by
+> itself prove an exact deployed checkout SHA.
+
 **Status:** Technical reference for the LiNKskills Program as implemented and being implemented under the **approved internal-launch architecture** (verified against `packages/`, `lib/skill_runtime`, `validator.py`, `scripts/`, `supabase/migrations/`, `skills/`, ADRs 0001–0008, tests, and CI). Reconciles the 2026-07-19 git-checkout catalog baseline with the launch plan now in active implementation.
 
 **Ground rule:** Code and accepted ADRs are the source of truth for what exists. Where older docs under `docs/archive/` disagree, this document follows code/ADRs and calls out drift in §12. **Do not invent live stage/prod health claims** — packaged ≠ applied; in-repo Gateway ≠ production readiness.

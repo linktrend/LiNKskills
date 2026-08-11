@@ -2,7 +2,7 @@
 
 Everything under `docs/archive/` is retained for history but is **no longer authoritative**. Some of it (especially the catalog/eval/telemetry design spec's "not done" follow-ups) is factually stale relative to the code as it stands today — see the Technical PRD §12 drift table.
 
-**Current source of truth (pre-production honesty, 2026-08-02):**
+**Current source of truth (refreshed 2026-08-11):**
 
 - [`../LINKSKILLS-INTENT.md`](../LINKSKILLS-INTENT.md) — why LiNKskills exists, scope, and what "done" means.
 - [`../LINKSKILLS-TECHNICAL-PRD.md`](../LINKSKILLS-TECHNICAL-PRD.md) — the exhaustive technical reference for how the system actually works, including where archived documents have drifted from real code.
@@ -39,7 +39,11 @@ Filename mentions of these paths in live ADRs (especially ADR 0001) are **histor
 - `CONSUMER-SKILL-LOAD-PATH.md` — former consumer load-path doc; content absorbed into Technical PRD §6.
 - `specs/catalog-eval-telemetry-spec.md` — original catalog/eval/telemetry design spec; superseded where the build evolved (format_profile implemented, eval suites backfilled, Librarian runner in LiNKplatform, consumer runtime landed). See Technical PRD §12.
 
-**Related but outside this folder:** `archive/logic-engine-2026-07-14/` at the repo root is the retired Logic Engine governance subsystem (separate archive namespace — do not revive or deploy).
+**Related but outside this folder:** `archive/logic-engine-2026-07-14/` at the repo root is a self-contained retired code snapshot (separate archive namespace — do not revive or deploy). It stays outside `docs/` to preserve its historical directory structure. Runtime-consumed certification artifacts likewise remain at root-level `evidence/`.
+
+The former root `global_blacklist.md` and `shared/AIOS_RUNTIME_BINDING.md` were
+archived here on 2026-08-11. They had no live code, test, CI, or operational
+references and described superseded AIOS/MVO-era behavior.
 
 **Not archived here (left live on purpose):** `docs/CURSOR-GROK-*.md` execution/correction prompts — still cited as authority by ADRs 0002–0008 and inventories; do not move without updating every citation.
 

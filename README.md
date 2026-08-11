@@ -45,6 +45,7 @@ LiNKbrain remains a **separate** service (`brain_*`). There is no combined Brain
 - `tools/` — global CLI tool packages (`gws`, `ltr`, …).
 - `docs/archive/` — superseded documentation retained for history (including `docs/archive/legacy-root/` for former root PRD/SOP/operator docs).
 - `archive/logic-engine-2026-07-14/` — retired governance subsystem (do not deploy).
+- `evidence/` — runtime-consumed certification evidence. It intentionally remains at the repository root because code, tests, and migrations bind to these paths.
 
 ## Consumer delivery
 
@@ -86,10 +87,17 @@ exact host sequence is in
 
 ## Status
 
-**Catalog foundation plus internal-launch architecture packages (plan hash above) are implemented in this repository as packaging / local proof — not as live stage or production.** All skills ship baseline eval-suite YAML; CI runs validator, catalog freshness, tests, and ownership gates. The real Eval Runner rejects prompt-only certification. Gateway/MCP exist in-repo. PACI consumer pins are **local/fake only**: certified Platform candidate `421a35e97bc302be0f5e1f196d0a5e8d132f6fd8`, AuthClaims `1.1.0`, `@linktrend/platform-contracts@0.2.2` (claims) / `0.3.0` (PACI envelope). Additive registry migrations are packaged for LiNKplatform to apply.
+**Current source state (2026-08-11):** `main`, `staging`, and `development`
+contain the same source tree. The Skills Gateway is running on the VPS and the
+current Lisa/OpenClaw release reaches it through the native Skills bridge. The
+catalog, validator, Gateway/MCP packages, certification paths, and IDE
+Development rollout are on the integration branches.
 
-**W20 stage readiness:** **BLOCKED** (see `docs/handoffs/2026-08-01-linkskills-w20-stage-readiness.md`). Candidate gates shipped; live Platform stage PACI / stage apply / sealed Linux evidence absent.
+This is real service-integration evidence, but it is not permission to infer a
+specific deployed LiNKskills commit from health alone. Record the exact Skills
+checkout SHA whenever it is next deployed or audited.
 
-**Not claimed:** live stage/prod readiness, live migration apply, live Platform PACI issuer, unsupervised production Librarian passes, or independent Codex verification complete. See Technical PRD §11, Operations Manual "Current status," and OPEN-ISSUES.
-
-The generic Librarian host lives in **`LiNKplatform/packages/librarian-runner`** (this repo holds skill-side instructions, the domain worker package, and schema packages).
+The generic Librarian host remains in
+**`LiNKplatform/packages/librarian-runner`**. LiNKskills owns its skill-domain
+logic, catalog, contracts, and evidence; LiNKplatform owns live hosting and
+migration application.
