@@ -1,5 +1,9 @@
 # LiNKskills Operations Manual
 
+> **Operational update, 2026-08-11:** The VPS Skills service is healthy and
+> integrated with Lisa. Preserve the root-level `evidence/` path because
+> certification code and migration receipts bind to it directly.
+
 **Who this is for:** you — LiNKtrend’s Principal. You make strategic decisions and review escalations. You do not write skills, run validators, or manage servers day to day.
 
 **What this is:** a plain-English handbook for what LiNKskills is *today*, and what your role in it is. It is not a technical design document.
