@@ -1,5 +1,10 @@
 # LiNKskills — Intent
 
+> **Current state, 2026-08-11:** The Skills service and native Lisa bridge are
+> live and healthy on the VPS. Repository integration branches include the
+> current IDE Development rollout. Exact deployed-source equality still needs
+> a SHA receipt whenever the Skills checkout is next audited or deployed.
+
 **Status:** Confirmed Intent for the LiNKskills Program itself (this repository), written in the same spirit as LiNKdeveloper's Intent artifact — a plain-English statement of what is being built, why, for whom, and what "done" means. Grounded in the **approved internal-launch architecture now being implemented** (plan hash below), not only the narrower 2026-07-19 git-checkout catalog surface.
 
 **Audience:** The Principal (sole human authority) and any agent across any Program that needs to understand *why this library exists* before reading the Technical PRD.
