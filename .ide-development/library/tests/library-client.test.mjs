@@ -1,22 +1,37 @@
 import { execFileSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { join, win32 } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { LibraryClient, LibraryClientError } from '../library-client.mjs'
-import { validSpdxExpression } from '../vendor/spdx-expression-validate.mjs'
+import { LibraryClient, LibraryClientError, pathInside, realPathInside } from '../library-client.mjs'
+import { validSpdxExpression } from '../dependencies/spdx-expression-validate.mjs'
 
 const sha256 = (value) => createHash('sha256').update(value).digest('hex')
 const json = (value) => `${JSON.stringify(value, null, 2)}\n`
+
+test('path containment rejects Windows cross-drive paths', () => {
+  assert.equal(pathInside('C:\\consumer', 'C:\\consumer\\bundle', win32), true)
+  assert.equal(pathInside('C:\\consumer', 'D:\\bundle', win32), false)
+})
+
+test('real path containment rejects an intermediate symlink escape', () => {
+  const canonicalize = (value) => value === '/consumer/link/bundle' ? '/outside/bundle' : value
+  assert.equal(realPathInside('/consumer', '/consumer/link/bundle', canonicalize), false)
+})
+
+test('real path containment fails closed when canonicalization fails', () => {
+  const canonicalize = () => { throw Object.assign(new Error('missing path'), { code: 'ENOENT' }) }
+  assert.equal(realPathInside('/consumer', '/consumer/missing', canonicalize), false)
+})
 
 function git(cwd, args) {
   return execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim()
 }
 
-function entry({ id, state = 'usable', selectable = true, framework = 'react', nodeRequirement = '>=20', dependencyVersion = '19.1.1' }) {
+function entry({ id, state = 'usable', selectable = true, framework = 'react', nodeRequirement = '>=20', dependencyVersion = '19.1.1', operatingSystems }) {
   const readme = `# ${id}\n\nA verified test component.\n`
   return {
     schemaVersion: 2,
@@ -31,7 +46,7 @@ function entry({ id, state = 'usable', selectable = true, framework = 'react', n
     state,
     contentMode: state === 'metadata_only' ? 'documentation' : 'executable',
     selectable,
-    compatibility: { node: nodeRequirement, runtimes: ['node'] },
+    compatibility: { node: nodeRequirement, runtimes: ['node'], ...(operatingSystems ? { operatingSystems } : {}) },
     dependencies: { packages: state === 'metadata_only' ? [] : [{ name: 'react', version: dependencyVersion, ecosystem: 'npm' }], services: [] },
     ...(state === 'metadata_only' ? {} : { testContract: { runner: 'node:test', files: ['tests/example.test.mjs'], timeoutMs: 30000 } }),
     license: { spdx: 'MIT', redistributionAllowed: true },
@@ -83,7 +98,7 @@ function createAuthority(extraEntries = []) {
 }
 
 function client(authority, cacheRoot, options = {}) {
-  return new LibraryClient({ repoUrl: authority.root, baseBranch: 'development', cacheRoot, runId: 'test-run', consumerId: 'test-consumer', ...options })
+  return new LibraryClient({ repoUrl: authority.root, baseBranch: 'development', cacheRoot, consumerRoot: cacheRoot, runId: 'test-run', consumerId: 'test-consumer', ...options })
 }
 
 function writeBundle(root, item) {
@@ -137,6 +152,21 @@ test('rejects metadata-only selection and incompatible dependencies', () => {
   } finally { rmSync(authority.root, { recursive: true, force: true }); rmSync(cache, { recursive: true, force: true }) }
 })
 
+test('accepts catalog OS constraints and rejects an incompatible consumer OS', () => {
+  const constrained = entry({ id: 'linux-only', operatingSystems: ['linux'] })
+  const authority = createAuthority([constrained])
+  const cache = mkdtempSync(join(tmpdir(), 'linklibraries-os-'))
+  try {
+    const instance = client(authority, cache)
+    const selected = instance.selectEntry('linux-only', { operatingSystem: 'linux', dependencies: { react: '19.1.1' }, frameworks: ['react'] })
+    assert.equal(selected.compatibility.operatingSystem, 'linux')
+    assert.throws(
+      () => instance.selectEntry('linux-only', { operatingSystem: 'darwin', dependencies: { react: '19.1.1' }, frameworks: ['react'] }),
+      (error) => error.code === 'entry_incompatible' && error.details.errors.some((item) => item.code === 'operating_system_incompatible'),
+    )
+  } finally { rmSync(authority.root, { recursive: true, force: true }); rmSync(cache, { recursive: true, force: true }) }
+})
+
 test('executes packaged v2 schema conditionals, additionalProperties, formats, and valid cases', () => {
   const authority = createAuthority()
   const cache = mkdtempSync(join(tmpdir(), 'linklibraries-schema-'))
@@ -173,7 +203,7 @@ test('executes packaged v2 schema conditionals, additionalProperties, formats, a
 })
 
 test('matches locked LiNKlibraries SPDX current, deprecated, and exception sets', () => {
-  const vendor = fileURLToPath(new URL('../vendor/', import.meta.url))
+  const vendor = fileURLToPath(new URL('../dependencies/', import.meta.url))
   const load = (name) => JSON.parse(readFileSync(join(vendor, name), 'utf8'))
   const current = load('spdx-license-ids.json')
   const deprecated = load('spdx-license-ids-deprecated.json')
@@ -255,6 +285,49 @@ test('rejects schema-invalid deprecated selectable entries before selection', ()
   } finally { rmSync(authority.root, { recursive: true, force: true }); rmSync(cache, { recursive: true, force: true }); rmSync(selectionCache, { recursive: true, force: true }) }
 })
 
+test('treats valid deprecated entries as searchable metadata but never selectable', () => {
+  const deprecated = entry({ id: 'deprecated-valid', state: 'deprecated', selectable: false })
+  deprecated.deprecation = { reason: 'Replaced by a maintained entry.', deprecatedAt: '2026-08-04T00:00:00.000Z' }
+  const authority = createAuthority([deprecated])
+  const cache = mkdtempSync(join(tmpdir(), 'linklibraries-deprecated-valid-'))
+  try {
+    const instance = client(authority, cache)
+    assert.equal(instance.fetchEntry(deprecated.entryId).entryJson.state, 'deprecated')
+    assert.throws(() => instance.selectEntry(deprecated.entryId), (error) => error.code === 'entry_not_selectable')
+  } finally { rmSync(authority.root, { recursive: true, force: true }); rmSync(cache, { recursive: true, force: true }) }
+})
+
+test('rejects contribution bundles that escape the declared consumer root', () => {
+  const authority = createAuthority()
+  const consumer = mkdtempSync(join(tmpdir(), 'linklibraries-contribution-root-'))
+  const outside = mkdtempSync(join(tmpdir(), 'linklibraries-contribution-outside-'))
+  try {
+    writeBundle(outside, entry({ id: 'outside-contribution' }))
+    assert.throws(() => client(authority, consumer, { consumerRoot: consumer }).prepareContribution(outside), (error) => error.code === 'invalid_contribution')
+  } finally { rmSync(authority.root, { recursive: true, force: true }); rmSync(consumer, { recursive: true, force: true }); rmSync(outside, { recursive: true, force: true }) }
+})
+
+test('contribution CLI binds an explicit consumer root when launched elsewhere', () => {
+  const consumer = mkdtempSync(join(tmpdir(), 'linklibraries-contribution-cli-root-'))
+  const elsewhere = mkdtempSync(join(tmpdir(), 'linklibraries-contribution-cli-cwd-'))
+  const cache = mkdtempSync(join(tmpdir(), 'linklibraries-contribution-cli-cache-'))
+  const bundle = join(consumer, 'bundle')
+  try {
+    writeBundle(bundle, entry({ id: 'cli-contribution' }))
+    const script = fileURLToPath(new URL('../library-client.mjs', import.meta.url))
+    const output = execFileSync(process.execPath, [script, 'prepare-contribution', '--bundle', bundle, '--consumer-root', consumer], {
+      cwd: elsewhere,
+      encoding: 'utf8',
+      env: { ...process.env, LINKTREND_SHARED_LIBRARY_CHECKOUT: cache },
+    })
+    assert.equal(JSON.parse(output).entryId, 'cli-contribution')
+  } finally {
+    rmSync(consumer, { recursive: true, force: true })
+    rmSync(elsewhere, { recursive: true, force: true })
+    rmSync(cache, { recursive: true, force: true })
+  }
+})
+
 test('enforces exact, caret, tilde, comparator conjunction, malformed, and unsupported npm ranges', () => {
   const ranges = [
     entry({ id: 'range-exact', dependencyVersion: '20.2.3' }),
@@ -271,6 +344,9 @@ test('enforces exact, caret, tilde, comparator conjunction, malformed, and unsup
     for (const id of ['range-exact', 'range-caret', 'range-tilde', 'range-comparator']) {
       assert.doesNotThrow(() => instance.selectEntry(id, { nodeVersion: '20.2.3', dependencies: { react: '^20.1.0' } }))
     }
+    assert.doesNotThrow(() => instance.selectEntry('range-caret', { nodeVersion: '20.2.3', dependencies: { react: '>=20.0.0' } }))
+    assert.doesNotThrow(() => instance.selectEntry('range-tilde', { nodeVersion: '20.2.3', dependencies: { react: '>=20.2.0' } }))
+    assert.throws(() => instance.selectEntry('range-caret', { nodeVersion: '20.2.3', dependencies: { react: '>=21.0.0' } }), (error) => error.code === 'entry_incompatible' && error.details.errors.some((item) => item.code === 'dependency_incompatible'))
     assert.throws(() => instance.selectEntry('range-caret', { nodeVersion: '20.2.3', dependencies: { react: '19.1.1' } }), (error) => error.code === 'entry_incompatible' && error.details.errors.some((item) => item.code === 'dependency_incompatible'))
     assert.throws(() => instance.selectEntry('range-malformed', { nodeVersion: '20.2.3', dependencies: { react: '20.2.3' } }), (error) => error.code === 'entry_incompatible' && error.details.errors.some((item) => item.code === 'dependency_range_malformed'))
     assert.throws(() => instance.selectEntry('range-unsupported', { nodeVersion: '20.2.3', dependencies: { react: '20.2.3' } }), (error) => error.code === 'entry_incompatible' && error.details.errors.some((item) => item.code === 'dependency_range_unsupported'))
@@ -292,6 +368,45 @@ test('fails closed on tampered cache and only reuses revalidated offline evidenc
     assert.equal(reused.stale, true)
     rmSync(join(cache, 'entries', `hello-world@${authority.sha}`, 'verification.json'))
     assert.throws(() => offline.fetchEntry('hello-world'), (error) => error.code === 'offline_verification_missing')
+  } finally { rmSync(authority.root, { recursive: true, force: true }); rmSync(cache, { recursive: true, force: true }) }
+})
+
+test('repairs an incomplete online cache entry but preserves offline fail-closed behavior', () => {
+  const authority = createAuthority()
+  const cache = mkdtempSync(join(tmpdir(), 'linklibraries-incomplete-cache-'))
+  const partial = join(cache, 'entries', `hello-world@${authority.sha}`)
+  try {
+    mkdirSync(partial, { recursive: true })
+    writeFileSync(join(partial, 'partial-download'), 'unverified\n')
+    const repaired = client(authority, cache).fetchEntry('hello-world')
+    assert.equal(repaired.cacheStatus, 'verified')
+    assert.equal(existsSync(join(partial, 'partial-download')), false)
+    rmSync(join(partial, 'verification.json'))
+    assert.throws(() => client(authority, cache, { offline: true }).fetchEntry('hello-world'), (error) => error.code === 'offline_verification_missing')
+  } finally { rmSync(authority.root, { recursive: true, force: true }); rmSync(cache, { recursive: true, force: true }) }
+})
+
+test('CLI select discovers package compatibility from the consumer working directory', () => {
+  const authority = createAuthority()
+  const cache = mkdtempSync(join(tmpdir(), 'linklibraries-cli-select-'))
+  const consumer = join(cache, 'consumer')
+  mkdirSync(consumer)
+  writeFileSync(join(consumer, 'package.json'), json({ dependencies: { react: '19.1.1' } }))
+  try {
+    const output = execFileSync(
+      process.execPath,
+      [fileURLToPath(new URL('../library-client.mjs', import.meta.url)), 'select', '--entry', 'hello-world'],
+      {
+        cwd: consumer,
+        encoding: 'utf8',
+        env: {
+          ...process.env,
+          LINKTREND_SHARED_LIBRARY_REPO_URL: authority.root,
+          LINKTREND_SHARED_LIBRARY_CHECKOUT: join(cache, 'cli-cache'),
+        },
+      },
+    )
+    assert.equal(JSON.parse(output).compatibility.ok, true)
   } finally { rmSync(authority.root, { recursive: true, force: true }); rmSync(cache, { recursive: true, force: true }) }
 })
 

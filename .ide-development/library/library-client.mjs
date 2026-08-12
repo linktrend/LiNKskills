@@ -16,13 +16,14 @@ import {
   mkdirSync,
   readdirSync,
   readFileSync,
+  realpathSync,
   renameSync,
   rmSync,
   writeFileSync,
 } from 'node:fs'
-import { dirname, join, relative, resolve, sep } from 'node:path'
+import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { validSpdxExpression } from './vendor/spdx-expression-validate.mjs'
+import { validSpdxExpression } from './dependencies/spdx-expression-validate.mjs'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const DEFAULT_REPO = process.env.LINKTREND_SHARED_LIBRARY_REPO_URL ?? 'https://github.com/linktrend/LiNKlibraries.git'
@@ -255,11 +256,19 @@ function safeRelativePath(value) {
   return value.split('/').every((part) => part.length > 0 && part !== '.' && part !== '..')
 }
 
-function pathInside(root, path) {
-  const rootAbs = resolve(root)
-  const pathAbs = resolve(path)
-  const rel = relative(rootAbs, pathAbs)
-  return rel === '' || (!rel.startsWith(`..${sep}`) && rel !== '..' && !rel.startsWith(sep))
+export function pathInside(root, path, pathApi = { isAbsolute, relative, resolve, sep }) {
+  const rootAbs = pathApi.resolve(root)
+  const pathAbs = pathApi.resolve(path)
+  const rel = pathApi.relative(rootAbs, pathAbs)
+  return rel === '' || (!pathApi.isAbsolute(rel) && !rel.startsWith(`..${pathApi.sep}`) && rel !== '..')
+}
+
+export function realPathInside(root, path, canonicalize = realpathSync) {
+  try {
+    return pathInside(canonicalize(root), canonicalize(path))
+  } catch {
+    return false
+  }
 }
 
 function parseVersion(value, { partial = false } = {}) {
@@ -285,6 +294,7 @@ function bound(version, inclusive) {
 
 function intersectBounds(current, next, lower) {
   if (!current) return next
+  if (!next) return current
   const comparison = compareVersions(current.version, next.version)
   if ((lower && comparison < 0) || (!lower && comparison > 0)) return next
   if (comparison !== 0) return current
@@ -523,8 +533,8 @@ function listPayloadFiles(root) {
   return files
 }
 
-function verifyEntryPayload(entry, entryRoot) {
-  if (!pathInside(entryRoot, entryRoot)) fail('path_escape', 'entry root is unsafe')
+function verifyEntryPayload(entry, entryRoot, allowedRoot) {
+  if (!realPathInside(allowedRoot, entryRoot)) fail('path_escape', 'entry root escapes its allowed cache or contribution root')
   const actual = listPayloadFiles(entryRoot)
   const declared = new Map(entry.files.map((file) => [file.path, file.sha256]))
   for (const file of actual) {
@@ -546,9 +556,12 @@ function packageMap(packageJson) {
   return Object.assign({}, packageJson?.dependencies ?? {}, packageJson?.devDependencies ?? {}, packageJson?.peerDependencies ?? {})
 }
 
-function compatibilityReport(entry, { consumerRoot, runtime = 'node', nodeVersion = process.versions.node, frameworks, dependencies, services } = {}) {
+function compatibilityReport(entry, { consumerRoot, runtime = 'node', nodeVersion = process.versions.node, operatingSystem = process.platform, frameworks, dependencies, services } = {}) {
   const errors = []
   if (!entry.compatibility.runtimes.includes(runtime)) errors.push({ code: 'runtime_incompatible', runtime, supported: entry.compatibility.runtimes })
+  if (entry.compatibility.operatingSystems?.length && !entry.compatibility.operatingSystems.includes(operatingSystem)) {
+    errors.push({ code: 'operating_system_incompatible', operatingSystem, supported: entry.compatibility.operatingSystems })
+  }
   const nodeRange = parseVersionRange(entry.compatibility.node)
   if (!nodeRange.ok) errors.push(rangeCompatibilityError(`node_range_${nodeRange.kind}`, 'node', entry.compatibility.node, undefined, nodeRange.detail))
   else if (!parseVersion(nodeVersion)) errors.push({ code: 'node_version_malformed', nodeVersion })
@@ -587,7 +600,7 @@ function compatibilityReport(entry, { consumerRoot, runtime = 'node', nodeVersio
   }
   const availableServices = new Set((services ?? []).map((item) => String(item)))
   for (const dependency of entry.dependencies.services) if (dependency.required && !availableServices.has(dependency.name)) errors.push({ code: 'service_missing', name: dependency.name })
-  return { ok: errors.length === 0, errors, nodeVersion, runtime, frameworkCount: entry.frameworks.length, dependencyCount: entry.dependencies.packages.length }
+  return { ok: errors.length === 0, errors, nodeVersion, runtime, operatingSystem, frameworkCount: entry.frameworks.length, dependencyCount: entry.dependencies.packages.length }
 }
 
 export class LibraryClient {
@@ -604,7 +617,7 @@ export class LibraryClient {
     this.baseBranch = baseBranch
     this.cacheRoot = resolve(cacheRoot)
     this.offline = offline
-    this.consumerRoot = consumerRoot ? resolve(consumerRoot) : undefined
+    this.consumerRoot = resolve(consumerRoot ?? process.cwd())
     this.consumerId = consumerId
     this.runId = runId
     this.mirrorDir = join(this.cacheRoot, 'mirror')
@@ -695,7 +708,7 @@ export class LibraryClient {
     const entry = readJson(entryPath, 'cached entry')
     validateEntryDocument(entry, `cached ${entryId}`)
     if (sha256File(entryPath) !== metadata.entryJsonSha256) fail('cache_integrity_failure', `Cached entry metadata was tampered: ${entryId}@${sha}`)
-    const payloadHashes = verifyEntryPayload(entry, localPath)
+    const payloadHashes = verifyEntryPayload(entry, localPath, this.entryCacheDir)
     if (JSON.stringify(payloadHashes) !== JSON.stringify(metadata.payloadHashes)) fail('cache_integrity_failure', `Cached payload evidence was tampered: ${entryId}@${sha}`)
     const row = snapshot.catalog.entries.find((candidate) => candidate.entryId === entryId)
     if (!row || JSON.stringify(projectCatalogEntry(entry)) !== JSON.stringify(row)) fail('catalog_entry_mismatch', `Cached entry metadata does not match the catalog row: ${entryId}`)
@@ -708,7 +721,14 @@ export class LibraryClient {
     const sha = commitSha ?? snapshot.catalogCommitSha
     if (sha !== snapshot.catalogCommitSha) fail('entry_catalog_sha_mismatch', `Entry ${entryId} must be fetched at catalog commit ${snapshot.catalogCommitSha}`, { catalogCommitSha: snapshot.catalogCommitSha, requested: sha })
     const localPath = this.cachePath(entryId, sha)
-    if (existsSync(localPath)) return this.verifyCachedEntry(entryId, sha, { snapshot })
+    if (existsSync(localPath)) {
+      if (existsSync(join(localPath, 'verification.json'))) return this.verifyCachedEntry(entryId, sha, { snapshot })
+      if (this.offline) fail('offline_verification_missing', `Offline verification record is missing for ${entryId}@${sha}`)
+      // A failed online fetch may leave a partial directory. It has no
+      // verification authority, so discard only this validated cache key and
+      // rebuild it from the immutable authority commit.
+      rmSync(localPath, { recursive: true, force: true })
+    }
     if (this.offline) fail('offline_verification_missing', `Offline verification record is missing for ${entryId}@${sha}`)
     const row = snapshot.catalog.entries.find((candidate) => candidate.entryId === entryId)
     if (!row) fail('entry_not_found', `Entry not found in catalog: ${entryId}`)
@@ -724,7 +744,7 @@ export class LibraryClient {
     const entry = readJson(join(localPath, 'entry.json'), 'authority entry')
     validateEntryDocument(entry, `entry ${entryId}`)
     if (entry.entryId !== entryId || JSON.stringify(projectCatalogEntry(entry)) !== JSON.stringify(row)) fail('catalog_entry_mismatch', `Entry does not match its catalog row: ${entryId}`)
-    const payloadHashes = verifyEntryPayload(entry, localPath)
+    const payloadHashes = verifyEntryPayload(entry, localPath, this.entryCacheDir)
     const metadata = { schemaVersion: 1, entryId, entryCommitSha: sha, catalogCommitSha: sha, catalogEntriesSha256: snapshot.catalog.entriesSha256, entryJsonSha256: sha256File(join(localPath, 'entry.json')), payloadHashes, verified: true }
     writeJsonAtomic(join(localPath, 'verification.json'), metadata)
     return this.verifyCachedEntry(entryId, sha, { snapshot })
@@ -732,8 +752,8 @@ export class LibraryClient {
 
   selectEntry(entryId, options = {}) {
     const fetched = this.fetchEntry(entryId, options.commitSha)
-    if (!fetched.entryJson.selectable || !['usable', 'deprecated'].includes(fetched.entryJson.state)) fail('entry_not_selectable', `Entry is not selectable: ${entryId}`, { state: fetched.entryJson.state, selectable: fetched.entryJson.selectable })
-    const compatibility = compatibilityReport(fetched.entryJson, { consumerRoot: options.consumerRoot ?? this.consumerRoot, runtime: options.runtime, nodeVersion: options.nodeVersion, frameworks: options.frameworks, dependencies: options.dependencies, services: options.services })
+    if (!fetched.entryJson.selectable || fetched.entryJson.state !== 'usable') fail('entry_not_selectable', `Entry is not selectable: ${entryId}`, { state: fetched.entryJson.state, selectable: fetched.entryJson.selectable })
+    const compatibility = compatibilityReport(fetched.entryJson, { consumerRoot: options.consumerRoot ?? this.consumerRoot, runtime: options.runtime, nodeVersion: options.nodeVersion, operatingSystem: options.operatingSystem, frameworks: options.frameworks, dependencies: options.dependencies, services: options.services })
     if (!compatibility.ok) fail('entry_incompatible', `Entry is incompatible with the consumer: ${entryId}`, compatibility)
     const provenance = this.recordProvenance(fetched, { selected: true, compatibility })
     return { ...fetched, compatibility, provenance }
@@ -756,8 +776,9 @@ export class LibraryClient {
 
   prepareContribution(bundlePath) {
     const abs = resolve(bundlePath)
-    if (!pathInside(abs, abs) || !existsSync(join(abs, 'entry.json'))) fail('invalid_contribution', 'Contribution bundle must contain entry.json')
-    const entry = readJson(join(abs, 'entry.json'), 'contribution entry')
+    const entryPath = join(abs, 'entry.json')
+    if (!existsSync(entryPath) || !lstatSync(abs).isDirectory() || lstatSync(entryPath).isSymbolicLink() || !realPathInside(this.consumerRoot, abs)) fail('invalid_contribution', 'Contribution bundle must be a real directory inside the consumer root and contain a regular entry.json')
+    const entry = readJson(entryPath, 'contribution entry')
     validateEntryDocument(entry, 'contribution entry')
     return { bundlePath: abs, entryId: entry.entryId }
   }
@@ -767,7 +788,7 @@ export class LibraryClient {
       const prepared = this.prepareContribution(bundlePath)
       const entryPath = join(prepared.bundlePath, 'entry.json')
       const entry = readJson(entryPath, 'contribution entry')
-      const payloadHashes = verifyEntryPayload(entry, prepared.bundlePath)
+      const payloadHashes = verifyEntryPayload(entry, prepared.bundlePath, this.consumerRoot)
       return { ok: true, entryId: prepared.entryId, payloadHashes }
     } catch (error) {
       return { ok: false, errors: [{ code: error.code ?? 'invalid_contribution', message: error.message }] }
@@ -790,13 +811,50 @@ function option(args, name) {
   return index >= 0 ? args[index + 1] : undefined
 }
 
+function options(args, name) {
+  const values = []
+  for (let index = 0; index < args.length; index += 1) {
+    if (args[index] === name) {
+      const value = args[index + 1]
+      if (!value || value.startsWith('--')) fail('argument_required', `${name} requires a value`)
+      values.push(value)
+    }
+  }
+  return values
+}
+
+function dependencyOptions(args) {
+  const values = options(args, '--dependency')
+  if (!values.length) return undefined
+  const dependencies = {}
+  for (const value of values) {
+    const separator = value.indexOf('=')
+    if (separator < 1 || separator === value.length - 1) fail('argument_invalid', '--dependency must use name=version')
+    dependencies[value.slice(0, separator)] = value.slice(separator + 1)
+  }
+  return dependencies
+}
+
 function main(argv) {
   const [command, ...args] = argv
-  const client = new LibraryClient()
+  const cliConsumerRoot = option(args, '--consumer-root')
+  const client = new LibraryClient({ consumerRoot: cliConsumerRoot })
   if (command === 'sync') return printJson(client.fetchCatalog())
   if (command === 'search') return printJson(client.search({ query: option(args, '--query') ?? '', kind: option(args, '--kind'), selectable: option(args, '--selectable') === undefined ? undefined : option(args, '--selectable') === 'true' }))
   if (command === 'show') return printJson(client.fetchEntry(option(args, '--entry') ?? fail('argument_required', '--entry required')))
-  if (command === 'select') return printJson(client.selectEntry(option(args, '--entry') ?? fail('argument_required', '--entry required')))
+  if (command === 'select') {
+    const frameworks = options(args, '--framework')
+    const services = options(args, '--service')
+    return printJson(client.selectEntry(option(args, '--entry') ?? fail('argument_required', '--entry required'), {
+      consumerRoot: cliConsumerRoot ?? process.cwd(),
+      runtime: option(args, '--runtime'),
+      nodeVersion: option(args, '--node-version'),
+      operatingSystem: option(args, '--operating-system'),
+      frameworks: frameworks.length ? frameworks : undefined,
+      dependencies: dependencyOptions(args),
+      services: services.length ? services : undefined,
+    }))
+  }
   if (command === 'verify-cache') return printJson(client.verifyCachedEntry(option(args, '--entry') ?? fail('argument_required', '--entry required'), client.fetchCatalog().catalogCommitSha))
   if (command === 'report') return printJson(client.report(option(args, '--entry')))
   if (command === 'prepare-contribution') return printJson(client.prepareContribution(option(args, '--bundle') ?? fail('argument_required', '--bundle required')))
@@ -807,7 +865,7 @@ function main(argv) {
     return
   }
   if (command === 'publish-contribution') return printJson(client.publishContribution(option(args, '--bundle') ?? fail('argument_required', '--bundle required')))
-  if (!command || command === 'help') return console.log('Usage: node library-client.mjs <sync|search|show|select|verify-cache|report|prepare-contribution|validate-contribution|publish-contribution>')
+  if (!command || command === 'help') return console.log('Usage: node library-client.mjs <sync|search|show|select|verify-cache|report|prepare-contribution|validate-contribution|publish-contribution> [--consumer-root <path>]')
   fail('unknown_command', `Unknown command: ${command}`)
 }
 
