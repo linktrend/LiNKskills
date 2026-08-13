@@ -1,0 +1,29 @@
+{
+  "schema_version": "0.2",
+  "contract_version": "skills.api.v0.2",
+  "transport_policy": {
+    "mode": "transport_agnostic",
+    "implementation_status": "policy_only_no_transport_change",
+    "stateless": true,
+    "sessionless": true,
+    "initialize_required": false,
+    "session_reliance_allowed": false
+  },
+  "auth_policy": {
+    "per_request": true,
+    "authorization_header": "Bearer platform-verifiable token",
+    "caller_minted_identity_allowed": false
+  },
+  "operation_map": {
+    "tools": ["skills_release_verify", "skills_use_report_submit", "skills_use_report_status_get", "skills_feedback_submit", "skills_feedback_status_get", "skills_librarian_status_get"],
+    "resources": ["skills://guide/capabilities", "skills://guide/domains/{domain}", "skills://catalog?cursor={cursor}&limit={limit}", "skills://catalog/search?query={query}&cursor={cursor}&limit={limit}", "skills://release/{skill_id}?cursor={cursor}&limit={limit}", "skills://release/{skill_id}/{version}/summary", "skills://release/{skill_id}/{version}/qualification", "skills://release/{skill_id}/{version}/manifest", "skills://release/{skill_id}/{version}/entrypoint", "skills://release/{skill_id}/{version}/sections?cursor={cursor}&limit={limit}", "skills://release/{skill_id}/{version}/section/{section_id}?cursor={cursor}&limit={limit}", "skills://release/{skill_id}/{version}/resources?cursor={cursor}&limit={limit}", "skills://release/{skill_id}/{version}/resource/{resource_id}?cursor={cursor}&limit={limit}"]
+  },
+  "typed_errors": ["contract_incompatible", "auth_required", "auth_invalid", "forbidden", "not_found", "validation_failed", "idempotency_conflict", "legacy_execution_disabled", "unsupported_operation", "expired_release", "revoked_release", "not_qualified"],
+  "compatibility_policy": {
+    "v1_preserved": true,
+    "v2_additive": true,
+    "no_dual_era_downgrade": true,
+    "legacy_execution_advertised": false,
+    "legacy_execution_default": "disabled_http_410_separate_capability"
+  }
+}

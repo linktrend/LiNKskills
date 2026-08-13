@@ -1,0 +1,35 @@
+{
+  "schema_version": "0.2",
+  "baseline_commit": "66bc9c571424383ed336e2ef0656494f52976abf",
+  "baseline_tree": "92655db825d6264f0cdecfa8f4084d1e2841cf6c",
+  "legacy_http": {
+    "operation_method": "POST",
+    "operation_path_template": "/v1/{operation}",
+    "health_path": "/health",
+    "operations": ["skills_list", "skills_search", "skills_describe", "skills_fragment_get", "skills_release_get", "skills_run_start", "skills_run_update", "skills_run_complete", "skills_run_fail", "skills_tool_resolve", "skills_tool_invoke", "skills_input_validate", "skills_output_validate", "skills_feedback_submit", "skills_trace_candidate_submit"],
+    "resources": []
+  },
+  "legacy_mcp": {
+    "entrypoints": ["python -m linkskills_mcp", "linkskills-mcp-server"],
+    "transport": "json_rpc_2_0_newline_delimited_stdio",
+    "rpc_methods": ["initialize", "notifications/initialized", "ping", "tools/list", "tools/call"],
+    "tools": ["skills_list", "skills_search", "skills_describe", "skills_fragment_get", "skills_release_get", "skills_run_start", "skills_run_update", "skills_run_complete", "skills_run_fail", "skills_tool_resolve", "skills_tool_invoke", "skills_input_validate", "skills_output_validate", "skills_feedback_submit", "skills_trace_candidate_submit"],
+    "resources": []
+  },
+  "authorization": {
+    "production": "Authorization: Bearer platform-verifiable token",
+    "test_only": "explicitly injected default_actor",
+    "caller_minted_identity_allowed": false
+  },
+  "compatibility_policy": {
+    "v1_preserved": true,
+    "v2_additive": true,
+    "v2_does_not_advertise_legacy_execution": true,
+    "legacy_execution_default": "disabled_http_410_separate_capability"
+  },
+  "sdk_policy": {
+    "python_mcp_sdk_pinned": false,
+    "official_support_verified": true,
+    "status": "transport_sdk_pin_deferred_after_official_verification"
+  }
+}

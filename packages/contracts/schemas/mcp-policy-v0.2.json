@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://linktrend.dev/schemas/linkskills/mcp-policy-v0.2.json",
+  "title": "LiNKskills MCP Policy v0.2",
+  "description": "Transport-independent policy freeze for the additive provider API.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "contract_version", "transport_policy", "auth_policy", "operation_map", "typed_errors", "compatibility_policy"],
+  "properties": {
+    "schema_version": { "type": "string", "const": "0.2" },
+    "contract_version": { "type": "string", "const": "skills.api.v0.2" },
+    "transport_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "implementation_status", "stateless", "sessionless", "initialize_required", "session_reliance_allowed"],
+      "properties": {
+        "mode": { "type": "string", "const": "transport_agnostic" },
+        "implementation_status": { "type": "string", "const": "policy_only_no_transport_change" },
+        "stateless": { "type": "boolean", "const": true },
+        "sessionless": { "type": "boolean", "const": true },
+        "initialize_required": { "type": "boolean", "const": false },
+        "session_reliance_allowed": { "type": "boolean", "const": false }
+      }
+    },
+    "auth_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["per_request", "authorization_header", "caller_minted_identity_allowed"],
+      "properties": {
+        "per_request": { "type": "boolean", "const": true },
+        "authorization_header": { "type": "string", "const": "Bearer platform-verifiable token" },
+        "caller_minted_identity_allowed": { "type": "boolean", "const": false }
+      }
+    },
+    "operation_map": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tools", "resources"],
+      "properties": {
+        "tools": {
+          "type": "array",
+          "minItems": 5,
+          "maxItems": 6,
+          "uniqueItems": true,
+          "items": { "type": "string", "enum": ["skills_release_verify", "skills_use_report_submit", "skills_use_report_status_get", "skills_feedback_submit", "skills_feedback_status_get", "skills_librarian_status_get"] }
+        },
+        "resources": {
+          "type": "array",
+          "minItems": 13,
+          "maxItems": 13,
+          "uniqueItems": true,
+          "items": { "type": "string", "enum": ["skills://guide/capabilities", "skills://guide/domains/{domain}", "skills://catalog?cursor={cursor}&limit={limit}", "skills://catalog/search?query={query}&cursor={cursor}&limit={limit}", "skills://release/{skill_id}?cursor={cursor}&limit={limit}", "skills://release/{skill_id}/{version}/summary", "skills://release/{skill_id}/{version}/qualification", "skills://release/{skill_id}/{version}/manifest", "skills://release/{skill_id}/{version}/entrypoint", "skills://release/{skill_id}/{version}/sections?cursor={cursor}&limit={limit}", "skills://release/{skill_id}/{version}/section/{section_id}?cursor={cursor}&limit={limit}", "skills://release/{skill_id}/{version}/resources?cursor={cursor}&limit={limit}", "skills://release/{skill_id}/{version}/resource/{resource_id}?cursor={cursor}&limit={limit}"] }
+        }
+      }
+    },
+    "typed_errors": {
+      "type": "array",
+      "minItems": 12,
+      "maxItems": 12,
+      "uniqueItems": true,
+      "items": { "type": "string", "enum": ["contract_incompatible", "auth_required", "auth_invalid", "forbidden", "not_found", "validation_failed", "idempotency_conflict", "legacy_execution_disabled", "unsupported_operation", "expired_release", "revoked_release", "not_qualified"] }
+    },
+    "compatibility_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["v1_preserved", "v2_additive", "no_dual_era_downgrade", "legacy_execution_advertised", "legacy_execution_default"],
+      "properties": {
+        "v1_preserved": { "type": "boolean", "const": true },
+        "v2_additive": { "type": "boolean", "const": true },
+        "no_dual_era_downgrade": { "type": "boolean", "const": true },
+        "legacy_execution_advertised": { "type": "boolean", "const": false },
+        "legacy_execution_default": { "type": "string", "const": "disabled_http_410_separate_capability" }
+      }
+    }
+  }
+}

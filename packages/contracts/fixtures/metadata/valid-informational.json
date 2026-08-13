@@ -1,0 +1,50 @@
+{
+  "schema_version": "0.2",
+  "skill_id": "source-review",
+  "skill_version": "2.0.0",
+  "domain": "research",
+  "scope_class": "general",
+  "scope_refs": ["opaque:scope:source-review"],
+  "locale": "en",
+  "jurisdiction_or_venue": {
+    "qualified_jurisdiction": "TW",
+    "venue_class": "informational",
+    "qualification_state": "qualified_one_at_a_time"
+  },
+  "platform_or_channel": {
+    "platform_class": "generic",
+    "channel_class": "mcp",
+    "channel_ref": "opaque:channel:research"
+  },
+  "reach": {
+    "metadata_version": "0.2",
+    "channel_class": "internal",
+    "channel_ref": "opaque:reach:research"
+  },
+  "input_sensitivity_class": "internal",
+  "allowed_data_classes": ["public_reference", "opaque_cross_service_reference"],
+  "required_human_gate": "none",
+  "source_and_citation_obligations": {
+    "source_policy": "all_external_claims_sourced",
+    "citation_policy": "url_and_access_date",
+    "requires_access_date": true,
+    "source_refs": ["opaque:source:policy"]
+  },
+  "review_by": "2026-09-01T00:00:00Z",
+  "expires_at": "2026-10-01T00:00:00Z",
+  "authority": {
+    "metadata_only": true,
+    "can_execute": false,
+    "can_select": false,
+    "can_grant": false,
+    "can_approve": false,
+    "can_escalate": false
+  },
+  "format_compatibility": {
+    "authoritative_format": "skill_pack_v0.1",
+    "okf_v0_2": {
+      "status": "not_applicable",
+      "mapping_ref": "opaque:compatibility:none"
+    }
+  }
+}
