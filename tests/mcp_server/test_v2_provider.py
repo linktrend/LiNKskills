@@ -1,5 +1,5 @@
 import unittest
-from linkskills_mcp.v2_provider import V2Provider, RESOURCE_OPERATIONS, TOOLS
+from linkskills_mcp.v2_provider import ModernSkillsMcpServer, V2Provider, RESOURCE_OPERATIONS, TOOLS
 class V2ProviderTests(unittest.TestCase):
  def setUp(self): self.p=V2Provider(); self.base={'protocol_version':'2026-07-28','authorization':'bound','version':'1.0.0'}
  def test_resource_first_tools_restricted(self):
@@ -10,3 +10,8 @@ class V2ProviderTests(unittest.TestCase):
  def test_exact_resource_bounded(self):
   x=self.p.handle(dict(self.base,operation='skills_release_describe',limit=2)); self.assertTrue(x['ok']); self.assertTrue(x['no_fallback'])
   self.assertEqual(self.p.handle(dict(self.base,operation='skills_release_describe',version=''))['error'],'exact_release_required')
+ def test_modern_mcp_has_no_initialize_or_session(self):
+  server=ModernSkillsMcpServer()
+  self.assertEqual(server.handle_rpc({'id':1,'method':'initialize'})['error']['message'],'session_not_supported')
+  listed=server.handle_rpc({'id':2,'method':'resources/list','params':{'authorization':'bound'}})
+  self.assertEqual(len(listed['result']['resources']),13)

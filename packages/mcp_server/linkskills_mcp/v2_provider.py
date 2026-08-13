@@ -35,3 +35,36 @@ class V2Provider:
             if not isinstance(limit, int) or not 1 <= limit <= 100: return {"ok": False, "error": "validation_failed"}
             return {"ok": True, "kind": "resource", "operation": op, "version": version, "cursor": cursor, "limit": limit, "no_fallback": True}
         return {"ok": True, "kind": "tool", "operation": op}
+
+
+class ModernSkillsMcpServer:
+    """Stateless MCP 2026-07-28 JSON-RPC adapter for the v2 provider facade.
+
+    It intentionally has no ``initialize`` handshake or mutable session. Every
+    request conveys authorization in its request metadata.
+    """
+    protocol_version = "2026-07-28"
+    def __init__(self, provider: V2Provider | None = None) -> None: self.provider = provider or V2Provider()
+    def handle_rpc(self, message: dict) -> dict | None:
+        req_id = message.get("id"); method = message.get("method"); params = message.get("params") or {}
+        if req_id is None: return None
+        if method == "initialize": return self._error(req_id, "session_not_supported")
+        auth = (params.get("_meta") or {}).get("authorization") or params.get("authorization")
+        if method == "resources/list":
+            response = self.provider.handle({"protocol_version":self.protocol_version,"authorization":auth,"operation":"skills_capabilities_get","version":"catalogue"})
+            return self._result(req_id, {"resources": list(self.provider.resources())} if response["ok"] else response)
+        if method == "tools/list":
+            response = self.provider.handle({"protocol_version":self.protocol_version,"authorization":auth,"operation":"skills_release_verify"})
+            return self._result(req_id, {"tools": list(self.provider.tools())} if response["ok"] else response)
+        if method == "resources/read":
+            uri = str(params.get("uri") or ""); operation = str(params.get("operation") or "")
+            response = self.provider.handle({"protocol_version":self.protocol_version,"authorization":auth,"operation":operation,"version":params.get("version"),"cursor":params.get("cursor"),"limit":params.get("limit",50),"session_id":params.get("session_id")})
+            return self._result(req_id, {"contents":[{"uri":uri,"text":""}],"structuredContent":response,"isError":not response["ok"]})
+        if method == "tools/call":
+            response = self.provider.handle({"protocol_version":self.protocol_version,"authorization":auth,"operation":params.get("name")})
+            return self._result(req_id, {"structuredContent":response,"isError":not response["ok"]})
+        return self._error(req_id, "unsupported_operation")
+    @staticmethod
+    def _result(req_id: object, value: object) -> dict: return {"jsonrpc":"2.0","id":req_id,"result":value}
+    @staticmethod
+    def _error(req_id: object, code: str) -> dict: return {"jsonrpc":"2.0","id":req_id,"error":{"code":-32602,"message":code}}
