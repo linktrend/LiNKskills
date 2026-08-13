@@ -2,9 +2,16 @@
 
 ## Candidate identity
 
-This handoff applies only to the source candidate commit that contains this
-file.  Source validation is evidence for repository behavior only; it is not
-stage, consumer, deployment, or production evidence.
+Integrated provider source checkpoint: `c0c8ad53038b328c4d8e56344698b6e9a18c7d72`
+(tree `8b736c10260643c8127d30aae470d67d01dbd8ff`). It contains the serially
+integrated MCP, release/attestation, and telemetry/privacy repairs.
+
+The initial published handoff commit is
+`f705e488c357d6fa6c09fc7f6c4b866d016567d9` (tree
+`1b0f8e841ec108cc840294bd89c7fe25dcf3ce3a`) on
+`issue/88-final-provider-repair`. This correction supersedes its stale
+validation wording. Source validation is evidence for repository behavior
+only; it is not stage, consumer, deployment, or production evidence.
 
 ## Provider contract
 
@@ -62,10 +69,30 @@ canaries remain external HOLDs.
 Focused v2 MCP, release/attestation, and telemetry tests are in
 `tests/mcp_server/test_v2_provider.py`, `tests/core/test_release_v2.py`,
 `tests/publisher/test_release_v2.py`, and
-`tests/librarian_domain/test_telemetry_v2.py`.  The repository-wide test suite
-must be rerun against the exact candidate in a Python >=3.11 environment with
-the declared dev dependencies.  The host Python 3.9 is not package-compatible;
-the bundled Python 3.12 runtime is suitable when used with a disposable venv.
+`tests/librarian_domain/test_telemetry_v2.py`.
+
+The following focused commands passed on the integrated checkpoint:
+
+```sh
+PYTHONPATH=packages/mcp_server:packages/client:packages/contracts:packages/core:packages/publisher:packages/eval_runner:packages/tool_runtime:packages/gateway:packages/librarian_domain:packages/persistence python3 -m unittest tests.mcp_server.test_v2_provider -v
+PYTHONPATH=packages/core:packages/publisher python3 -m unittest tests.core.test_release_v2 tests.publisher.test_release_v2 -v
+PYTHONPATH=packages/librarian_domain:packages/core python3 -m unittest tests.librarian_domain.test_telemetry_v2 -v
+```
+
+Results: 5 MCP tests, 4 release/attestation tests, and 3 telemetry/privacy
+tests passed. A serial repository-wide validation then passed on the exact
+candidate after this handoff was added: 524 tests passed, 2 expected skips, 0
+failures. The executed command was:
+
+```sh
+<disposable-python-3.12-venv>/bin/python -m unittest discover -s tests -p 'test_*.py'
+```
+
+That disposable environment used the repository's `requirements-dev.txt` and
+editable local packages. The host Python 3.9 remains unsuitable for packages
+requiring Python >=3.11; this is not a source defect. `git diff --check` and
+clean-worktree checks passed before publication, and the branch was pushed,
+fetched, and verified equal at `origin/issue/88-final-provider-repair`.
 
 This document makes no claim that a stage endpoint exists, Platform identity
 verification is live, a migration has been applied, a consumer is configured,
