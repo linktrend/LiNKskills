@@ -71,15 +71,10 @@
       "enum": ["und", "en", "en-US", "en-GB", "en-SG", "zh-Hant", "zh-TW", "es", "es-CR"]
     },
     "jurisdiction_or_venue": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["qualified_jurisdiction", "venue_class", "qualification_state"],
-      "properties": {
-        "qualified_jurisdiction": { "type": "string", "enum": ["UNSPECIFIED", "TW", "CR", "SG", "US", "GB"] },
-        "venue_class": { "type": "string", "enum": ["informational", "regulatory", "court", "market", "contractual", "other"] },
-        "qualification_state": { "type": "string", "enum": ["unqualified", "qualified_one_at_a_time", "expired", "withdrawn"] },
-        "venue_ref": { "$ref": "#/$defs/opaqueRef" }
-      }
+      "oneOf": [
+        { "$ref": "#/$defs/genericJurisdictionProfile" },
+        { "$ref": "#/$defs/legalJurisdictionProfile" }
+      ]
     },
     "platform_or_channel": {
       "type": "object",
@@ -97,7 +92,7 @@
       "required": ["metadata_version", "channel_class", "channel_ref"],
       "properties": {
         "metadata_version": { "type": "string", "const": "0.2" },
-        "channel_class": { "type": "string", "enum": ["web", "email", "messaging", "social", "crm", "internal", "other"] },
+        "channel_class": { "type": "string", "minLength": 1, "maxLength": 48, "pattern": "^[a-z][a-z0-9_-]*$" },
         "channel_ref": { "$ref": "#/$defs/opaqueRef" },
         "platform_ref": { "$ref": "#/$defs/opaqueRef" }
       }
@@ -161,7 +156,53 @@
       }
     }
   },
+  "allOf": [
+    {
+      "if": {
+        "required": ["domain"],
+        "properties": { "domain": { "const": "legal_information" } }
+      },
+      "then": {
+        "properties": {
+          "jurisdiction_or_venue": { "$ref": "#/$defs/legalJurisdictionProfile" },
+          "required_human_gate": { "const": "matter_lawyer_and_tenant_admin_review" }
+        }
+      },
+      "else": {
+        "properties": {
+          "jurisdiction_or_venue": { "$ref": "#/$defs/genericJurisdictionProfile" }
+        }
+      }
+    }
+  ],
   "$defs": {
+    "genericJurisdictionProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["profile", "policy_ref", "venue_class", "qualification_state"],
+      "properties": {
+        "profile": { "type": "string", "const": "generic" },
+        "policy_ref": { "$ref": "#/$defs/opaqueRef" },
+        "venue_class": { "type": "string", "enum": ["informational", "regulatory", "court", "market", "contractual", "other"] },
+        "qualification_state": { "type": "string", "enum": ["not_applicable", "unqualified", "expired", "withdrawn"] },
+        "venue_ref": { "$ref": "#/$defs/opaqueRef" }
+      }
+    },
+    "legalJurisdictionProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["profile", "policy_ref", "ordered_jurisdictions", "qualified_jurisdiction", "venue_class", "qualification_state", "review_rule"],
+      "properties": {
+        "profile": { "type": "string", "const": "legal_information" },
+        "policy_ref": { "$ref": "#/$defs/opaqueRef" },
+        "ordered_jurisdictions": { "type": "array", "const": ["TW", "CR", "SG", "US", "GB"] },
+        "qualified_jurisdiction": { "type": "string", "enum": ["TW", "CR", "SG", "US", "GB"] },
+        "venue_class": { "type": "string", "enum": ["informational", "regulatory", "court", "contractual", "other"] },
+        "qualification_state": { "type": "string", "enum": ["unqualified", "qualified_one_at_a_time", "expired", "withdrawn"] },
+        "review_rule": { "type": "string", "const": "matter_lawyer_and_tenant_admin_review" },
+        "venue_ref": { "$ref": "#/$defs/opaqueRef" }
+      }
+    },
     "opaqueRef": {
       "type": "string",
       "minLength": 3,

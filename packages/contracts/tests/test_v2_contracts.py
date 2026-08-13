@@ -60,6 +60,11 @@ class V2ContractTests(unittest.TestCase):
             {"skills_release_verify", "skills_use_report_submit", "skills_use_report_status_get",
              "skills_feedback_submit", "skills_feedback_status_get", "skills_librarian_status_get"},
         )
+        resource_templates = {
+            uri
+            for resource in policy["operation_map"]["resources"]
+            for uri in resource["uri_templates"]
+        }
         self.assertTrue(
             {"skills://guide/capabilities", "skills://catalog?cursor={cursor}&limit={limit}",
              "skills://catalog/search?query={query}&cursor={cursor}&limit={limit}",
@@ -67,7 +72,11 @@ class V2ContractTests(unittest.TestCase):
              "skills://release/{skill_id}/{version}/entrypoint",
              "skills://release/{skill_id}/{version}/section/{section_id}?cursor={cursor}&limit={limit}",
              "skills://release/{skill_id}/{version}/resource/{resource_id}?cursor={cursor}&limit={limit}"}
-            .issubset(policy["operation_map"]["resources"])
+            .issubset(resource_templates)
+        )
+        self.assertEqual(
+            {resource["name"] for resource in policy["operation_map"]["resources"]},
+            read_operations,
         )
         self.assertNotIn("skills_tool_invoke", policy["operation_map"]["tools"])
         self.assertFalse(policy["compatibility_policy"]["no_dual_era_downgrade"] is False)
@@ -77,7 +86,7 @@ class V2ContractTests(unittest.TestCase):
     def test_metadata_vocabularies_and_informational_authority(self) -> None:
         payload = load_fixture("metadata", "valid-informational.json")
         self.assert_valid(payload, "provider-metadata-v0.2.json")
-        self.assertEqual(payload["jurisdiction_or_venue"]["qualified_jurisdiction"], "TW")
+        self.assertEqual(payload["jurisdiction_or_venue"]["profile"], "generic")
         self.assertEqual(payload["format_compatibility"]["authoritative_format"], "skill_pack_v0.1")
         self.assertTrue(payload["authority"]["metadata_only"])
 

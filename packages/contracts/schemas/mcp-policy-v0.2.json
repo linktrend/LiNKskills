@@ -49,7 +49,27 @@
           "minItems": 13,
           "maxItems": 13,
           "uniqueItems": true,
-          "items": { "type": "string", "enum": ["skills://guide/capabilities", "skills://guide/domains/{domain}", "skills://catalog?cursor={cursor}&limit={limit}", "skills://catalog/search?query={query}&cursor={cursor}&limit={limit}", "skills://release/{skill_id}?cursor={cursor}&limit={limit}", "skills://release/{skill_id}/{version}/summary", "skills://release/{skill_id}/{version}/qualification", "skills://release/{skill_id}/{version}/manifest", "skills://release/{skill_id}/{version}/entrypoint", "skills://release/{skill_id}/{version}/sections?cursor={cursor}&limit={limit}", "skills://release/{skill_id}/{version}/section/{section_id}?cursor={cursor}&limit={limit}", "skills://release/{skill_id}/{version}/resources?cursor={cursor}&limit={limit}", "skills://release/{skill_id}/{version}/resource/{resource_id}?cursor={cursor}&limit={limit}"] }
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "uri_templates"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "enum": ["skills_capabilities_get", "skills_catalog_list", "skills_catalog_search", "skills_release_list", "skills_release_describe", "skills_qualification_get", "skills_release_entrypoint_get", "skills_release_sections_list", "skills_release_section_get", "skills_release_resources_list", "skills_release_resource_get", "skills_release_content_get", "skills_release_package_get"]
+              },
+              "uri_templates": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 2,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "enum": ["skills://guide/capabilities", "skills://guide/domains/{domain}", "skills://catalog?cursor={cursor}&limit={limit}", "skills://catalog/search?query={query}&cursor={cursor}&limit={limit}", "skills://release/{skill_id}?cursor={cursor}&limit={limit}", "skills://release/{skill_id}/{version}/summary", "skills://release/{skill_id}/{version}/qualification", "skills://release/{skill_id}/{version}/manifest", "skills://release/{skill_id}/{version}/entrypoint", "skills://release/{skill_id}/{version}/sections?cursor={cursor}&limit={limit}", "skills://release/{skill_id}/{version}/section/{section_id}?cursor={cursor}&limit={limit}", "skills://release/{skill_id}/{version}/fragment/{fragment_id}?cursor={cursor}&limit={limit}", "skills://release/{skill_id}/{version}/resources?cursor={cursor}&limit={limit}", "skills://release/{skill_id}/{version}/resource/{resource_id}?cursor={cursor}&limit={limit}", "skills://release/{skill_id}/{version}/content/{content_id}", "skills://release/{skill_id}/{version}/package"]
+                }
+              }
+            }
+          }
         }
       }
     },

@@ -16,7 +16,21 @@
   },
   "operation_map": {
     "tools": ["skills_release_verify", "skills_use_report_submit", "skills_use_report_status_get", "skills_feedback_submit", "skills_feedback_status_get", "skills_librarian_status_get"],
-    "resources": ["skills://guide/capabilities", "skills://guide/domains/{domain}", "skills://catalog?cursor={cursor}&limit={limit}", "skills://catalog/search?query={query}&cursor={cursor}&limit={limit}", "skills://release/{skill_id}?cursor={cursor}&limit={limit}", "skills://release/{skill_id}/{version}/summary", "skills://release/{skill_id}/{version}/qualification", "skills://release/{skill_id}/{version}/manifest", "skills://release/{skill_id}/{version}/entrypoint", "skills://release/{skill_id}/{version}/sections?cursor={cursor}&limit={limit}", "skills://release/{skill_id}/{version}/section/{section_id}?cursor={cursor}&limit={limit}", "skills://release/{skill_id}/{version}/resources?cursor={cursor}&limit={limit}", "skills://release/{skill_id}/{version}/resource/{resource_id}?cursor={cursor}&limit={limit}"]
+    "resources": [
+      {"name": "skills_capabilities_get", "uri_templates": ["skills://guide/capabilities", "skills://guide/domains/{domain}"]},
+      {"name": "skills_catalog_list", "uri_templates": ["skills://catalog?cursor={cursor}&limit={limit}"]},
+      {"name": "skills_catalog_search", "uri_templates": ["skills://catalog/search?query={query}&cursor={cursor}&limit={limit}"]},
+      {"name": "skills_release_list", "uri_templates": ["skills://release/{skill_id}?cursor={cursor}&limit={limit}"]},
+      {"name": "skills_release_describe", "uri_templates": ["skills://release/{skill_id}/{version}/summary"]},
+      {"name": "skills_qualification_get", "uri_templates": ["skills://release/{skill_id}/{version}/qualification"]},
+      {"name": "skills_release_entrypoint_get", "uri_templates": ["skills://release/{skill_id}/{version}/manifest", "skills://release/{skill_id}/{version}/entrypoint"]},
+      {"name": "skills_release_sections_list", "uri_templates": ["skills://release/{skill_id}/{version}/sections?cursor={cursor}&limit={limit}"]},
+      {"name": "skills_release_section_get", "uri_templates": ["skills://release/{skill_id}/{version}/section/{section_id}?cursor={cursor}&limit={limit}", "skills://release/{skill_id}/{version}/fragment/{fragment_id}?cursor={cursor}&limit={limit}"]},
+      {"name": "skills_release_resources_list", "uri_templates": ["skills://release/{skill_id}/{version}/resources?cursor={cursor}&limit={limit}"]},
+      {"name": "skills_release_resource_get", "uri_templates": ["skills://release/{skill_id}/{version}/resource/{resource_id}?cursor={cursor}&limit={limit}"]},
+      {"name": "skills_release_content_get", "uri_templates": ["skills://release/{skill_id}/{version}/content/{content_id}"]},
+      {"name": "skills_release_package_get", "uri_templates": ["skills://release/{skill_id}/{version}/package"]}
+    ]
   },
   "typed_errors": ["contract_incompatible", "auth_required", "auth_invalid", "forbidden", "not_found", "validation_failed", "idempotency_conflict", "legacy_execution_disabled", "unsupported_operation", "expired_release", "revoked_release", "not_qualified"],
   "compatibility_policy": {
