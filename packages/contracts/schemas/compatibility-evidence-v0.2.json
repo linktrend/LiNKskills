@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://linktrend.dev/schemas/linkskills/compatibility-evidence-v0.2.json",
+  "title": "LiNKskills v1 Compatibility Evidence v0.2",
+  "description": "Machine-readable inventory of the legacy public Skills API and MCP surface.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "baseline_commit", "baseline_tree", "legacy_http", "legacy_mcp", "authorization", "compatibility_policy", "sdk_policy"],
+  "properties": {
+    "schema_version": { "type": "string", "const": "0.2" },
+    "baseline_commit": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+    "baseline_tree": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+    "legacy_http": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operation_method", "operation_path_template", "health_path", "operations", "resources"],
+      "properties": {
+        "operation_method": { "type": "string", "const": "POST" },
+        "operation_path_template": { "type": "string", "const": "/v1/{operation}" },
+        "health_path": { "type": "string", "const": "/health" },
+        "operations": { "$ref": "#/$defs/legacyOperations" },
+        "resources": { "type": "array", "maxItems": 0, "items": { "type": "string" } }
+      }
+    },
+    "legacy_mcp": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entrypoints", "transport", "rpc_methods", "tools", "resources"],
+      "properties": {
+        "entrypoints": { "type": "array", "minItems": 2, "maxItems": 2, "uniqueItems": true, "items": { "type": "string", "maxLength": 96 } },
+        "transport": { "type": "string", "const": "json_rpc_2_0_newline_delimited_stdio" },
+        "rpc_methods": { "type": "array", "minItems": 5, "maxItems": 5, "uniqueItems": true, "items": { "type": "string", "enum": ["initialize", "notifications/initialized", "ping", "tools/list", "tools/call"] } },
+        "tools": { "$ref": "#/$defs/legacyOperations" },
+        "resources": { "type": "array", "maxItems": 0, "items": { "type": "string" } }
+      }
+    },
+    "authorization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["production", "test_only", "caller_minted_identity_allowed"],
+      "properties": {
+        "production": { "type": "string", "const": "Authorization: Bearer platform-verifiable token" },
+        "test_only": { "type": "string", "const": "explicitly injected default_actor" },
+        "caller_minted_identity_allowed": { "type": "boolean", "const": false }
+      }
+    },
+    "compatibility_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["v1_preserved", "v2_additive", "v2_does_not_advertise_legacy_execution", "legacy_execution_default"],
+      "properties": {
+        "v1_preserved": { "type": "boolean", "const": true },
+        "v2_additive": { "type": "boolean", "const": true },
+        "v2_does_not_advertise_legacy_execution": { "type": "boolean", "const": true },
+        "legacy_execution_default": { "type": "string", "const": "disabled_http_410_separate_capability" }
+      }
+    },
+    "sdk_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["python_mcp_sdk_pinned", "official_support_verified", "status"],
+      "properties": {
+        "python_mcp_sdk_pinned": { "type": "boolean", "const": false },
+        "official_support_verified": { "type": "boolean", "const": true },
+        "status": { "type": "string", "const": "transport_sdk_pin_deferred_after_official_verification" }
+      }
+    }
+  },
+  "$defs": {
+    "legacyOperations": {
+      "type": "array",
+      "minItems": 15,
+      "maxItems": 15,
+      "uniqueItems": true,
+      "items": { "type": "string", "enum": ["skills_list", "skills_search", "skills_describe", "skills_fragment_get", "skills_release_get", "skills_run_start", "skills_run_update", "skills_run_complete", "skills_run_fail", "skills_tool_resolve", "skills_tool_invoke", "skills_input_validate", "skills_output_validate", "skills_feedback_submit", "skills_trace_candidate_submit"] }
+    }
+  }
+}

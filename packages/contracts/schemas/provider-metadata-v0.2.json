@@ -1,0 +1,213 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://linktrend.dev/schemas/linkskills/provider-metadata-v0.2.json",
+  "title": "LiNKskills Provider Metadata v0.2",
+  "description": "Bounded, informational metadata for a provider Skill Pack.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "skill_id",
+    "skill_version",
+    "domain",
+    "scope_class",
+    "scope_refs",
+    "locale",
+    "jurisdiction_or_venue",
+    "platform_or_channel",
+    "reach",
+    "input_sensitivity_class",
+    "allowed_data_classes",
+    "required_human_gate",
+    "source_and_citation_obligations",
+    "review_by",
+    "expires_at",
+    "authority",
+    "format_compatibility"
+  ],
+  "x-forbidden-property-names": [
+    "secret",
+    "secrets",
+    "password",
+    "token",
+    "access_token",
+    "refresh_token",
+    "authorization",
+    "private_key",
+    "credential",
+    "prompt",
+    "transcript",
+    "conversation",
+    "raw_input",
+    "raw_output",
+    "customer",
+    "consumer",
+    "case",
+    "lead",
+    "trading_order",
+    "portfolio"
+  ],
+  "properties": {
+    "schema_version": { "type": "string", "const": "0.2" },
+    "skill_id": { "type": "string", "minLength": 1, "maxLength": 96, "pattern": "^[a-z0-9][a-z0-9-]*$" },
+    "skill_version": { "type": "string", "minLength": 1, "maxLength": 32, "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?$" },
+    "domain": {
+      "type": "string",
+      "enum": ["development", "operations", "research", "education", "marketing", "sales", "content", "design", "data", "security", "automation", "legal_information", "finance_information", "trading_research", "platform", "other"]
+    },
+    "scope_class": {
+      "type": "string",
+      "enum": ["general", "repository", "workspace", "organization", "program", "issue", "runtime", "jurisdiction", "channel", "release"]
+    },
+    "scope_refs": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/opaqueRef" }
+    },
+    "locale": {
+      "type": "string",
+      "enum": ["und", "en", "en-US", "en-GB", "en-SG", "zh-Hant", "zh-TW", "es", "es-CR"]
+    },
+    "jurisdiction_or_venue": {
+      "oneOf": [
+        { "$ref": "#/$defs/genericJurisdictionProfile" },
+        { "$ref": "#/$defs/legalJurisdictionProfile" }
+      ]
+    },
+    "platform_or_channel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["platform_class", "channel_class"],
+      "properties": {
+        "platform_class": { "type": "string", "enum": ["generic", "openai", "anthropic", "google", "cursor", "codex", "openclaw", "github", "slack", "telegram", "crm", "library", "other"] },
+        "channel_class": { "type": "string", "enum": ["mcp", "http", "cli", "web", "email", "messaging", "social", "crm", "internal", "other"] },
+        "channel_ref": { "$ref": "#/$defs/opaqueRef" }
+      }
+    },
+    "reach": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["metadata_version", "channel_class", "channel_ref"],
+      "properties": {
+        "metadata_version": { "type": "string", "const": "0.2" },
+        "channel_class": { "type": "string", "minLength": 1, "maxLength": 48, "pattern": "^[a-z][a-z0-9_-]*$" },
+        "channel_ref": { "$ref": "#/$defs/opaqueRef" },
+        "platform_ref": { "$ref": "#/$defs/opaqueRef" }
+      }
+    },
+    "input_sensitivity_class": {
+      "type": "string",
+      "enum": ["public", "internal", "personal", "confidential", "regulated"]
+    },
+    "allowed_data_classes": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "uniqueItems": true,
+      "items": { "type": "string", "enum": ["public_reference", "published_content", "non_personal_internal", "pseudonymous_identifier", "business_contact_metadata", "synthetic_fixture", "opaque_cross_service_reference"] }
+    },
+    "required_human_gate": {
+      "type": "string",
+      "enum": ["none", "operator_review", "tenant_admin_review", "matter_lawyer_review", "matter_lawyer_and_tenant_admin_review", "principal_review"]
+    },
+    "source_and_citation_obligations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_policy", "citation_policy", "requires_access_date"],
+      "properties": {
+        "source_policy": { "type": "string", "enum": ["none", "tenant_supplied_sources_only", "primary_sources_required", "all_external_claims_sourced"] },
+        "citation_policy": { "type": "string", "enum": ["none", "url", "source_ref", "statute", "case_citation", "url_and_access_date"] },
+        "requires_access_date": { "type": "boolean" },
+        "source_refs": { "type": "array", "maxItems": 16, "uniqueItems": true, "items": { "$ref": "#/$defs/opaqueRef" } }
+      }
+    },
+    "review_by": { "type": "string", "format": "date-time", "maxLength": 40 },
+    "expires_at": { "type": "string", "format": "date-time", "maxLength": 40 },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["metadata_only", "can_execute", "can_select", "can_grant", "can_approve", "can_escalate"],
+      "properties": {
+        "metadata_only": { "type": "boolean", "const": true },
+        "can_execute": { "type": "boolean", "const": false },
+        "can_select": { "type": "boolean", "const": false },
+        "can_grant": { "type": "boolean", "const": false },
+        "can_approve": { "type": "boolean", "const": false },
+        "can_escalate": { "type": "boolean", "const": false }
+      }
+    },
+    "format_compatibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["authoritative_format", "okf_v0_2"],
+      "properties": {
+        "authoritative_format": { "type": "string", "const": "skill_pack_v0.1" },
+        "okf_v0_2": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "mapping_ref"],
+          "properties": {
+            "status": { "type": "string", "enum": ["not_applicable", "optional_mapping"] },
+            "mapping_ref": { "$ref": "#/$defs/opaqueRef" }
+          }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "required": ["domain"],
+        "properties": { "domain": { "const": "legal_information" } }
+      },
+      "then": {
+        "properties": {
+          "jurisdiction_or_venue": { "$ref": "#/$defs/legalJurisdictionProfile" },
+          "required_human_gate": { "const": "matter_lawyer_and_tenant_admin_review" }
+        }
+      },
+      "else": {
+        "properties": {
+          "jurisdiction_or_venue": { "$ref": "#/$defs/genericJurisdictionProfile" }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "genericJurisdictionProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["profile", "policy_ref", "venue_class", "qualification_state"],
+      "properties": {
+        "profile": { "type": "string", "const": "generic" },
+        "policy_ref": { "$ref": "#/$defs/opaqueRef" },
+        "venue_class": { "type": "string", "enum": ["informational", "regulatory", "court", "market", "contractual", "other"] },
+        "qualification_state": { "type": "string", "enum": ["not_applicable", "unqualified", "expired", "withdrawn"] },
+        "venue_ref": { "$ref": "#/$defs/opaqueRef" }
+      }
+    },
+    "legalJurisdictionProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["profile", "policy_ref", "ordered_jurisdictions", "qualified_jurisdiction", "venue_class", "qualification_state", "review_rule"],
+      "properties": {
+        "profile": { "type": "string", "const": "legal_information" },
+        "policy_ref": { "$ref": "#/$defs/opaqueRef" },
+        "ordered_jurisdictions": { "type": "array", "const": ["TW", "CR", "SG", "US", "GB"] },
+        "qualified_jurisdiction": { "type": "string", "enum": ["TW", "CR", "SG", "US", "GB"] },
+        "venue_class": { "type": "string", "enum": ["informational", "regulatory", "court", "contractual", "other"] },
+        "qualification_state": { "type": "string", "enum": ["unqualified", "qualified_one_at_a_time", "expired", "withdrawn"] },
+        "review_rule": { "type": "string", "const": "matter_lawyer_and_tenant_admin_review" },
+        "venue_ref": { "$ref": "#/$defs/opaqueRef" }
+      }
+    },
+    "opaqueRef": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 160,
+      "pattern": "^opaque:[A-Za-z0-9][A-Za-z0-9._:/-]{1,158}$"
+    }
+  }
+}
