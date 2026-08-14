@@ -1,8 +1,8 @@
-"""Stdlib-friendly JSON Schema loader and lightweight required/type validator.
+"""Stdlib-friendly JSON Schema loader and bounded contract validator.
 
-Supports a practical subset of draft-2020-12 used by LiNKskills v0.1 schemas:
-required, type, const, enum, properties, items, $ref (#/$defs/...), minLength,
-minimum/maximum, minItems, and pattern (basic). Does not depend on jsonschema.
+The validator intentionally supports the small, deterministic subset used by
+the repository's v0.1 and v0.2 contracts. It remains dependency-free so fresh
+checkouts can validate contract fixtures before package installation.
 """
 
 from __future__ import annotations
@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 import re
 from dataclasses import dataclass, field
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -51,18 +52,23 @@ def schemas_dir() -> Path:
 
 
 def list_schemas() -> list[str]:
-    return sorted(p.name for p in schemas_dir().glob("*-v0.1.json"))
+    return sorted(
+        path.name
+        for pattern in ("*-v0.1.json", "*-v0.2.json")
+        for path in schemas_dir().glob(pattern)
+    )
 
 
 def load_schema(name: str) -> dict[str, Any]:
-    """Load a schema by filename or short name (e.g. 'skill-pack' / 'skill-pack-v0.1.json')."""
-    filename = name if name.endswith(".json") else f"{name}-v0.1.json" if "-v" not in name else f"{name}.json"
+    """Load a schema by filename or an explicitly versioned short name."""
+    filename = name if name.endswith(".json") else f"{name}.json"
     if not filename.endswith(".json"):
         filename = f"{filename}.json"
     # normalize short names like skill-pack
     candidates = [
         schemas_dir() / filename,
         schemas_dir() / f"{name}-v0.1.json",
+        schemas_dir() / f"{name}-v0.2.json",
         schemas_dir() / f"{name}.json",
     ]
     for path in candidates:
@@ -131,6 +137,8 @@ def _validate(
     path: str,
     errors: list[ValidationError],
 ) -> None:
+    _validate_combinators(instance, schema, root, path, errors)
+
     if "$ref" in schema:
         _validate(instance, _resolve_ref(root, schema["$ref"]), root, path, errors)
         return
@@ -150,8 +158,15 @@ def _validate(
     if isinstance(instance, str):
         if "minLength" in schema and len(instance) < int(schema["minLength"]):
             errors.append(ValidationError(path, f"string shorter than minLength {schema['minLength']}"))
+        if "maxLength" in schema and len(instance) > int(schema["maxLength"]):
+            errors.append(ValidationError(path, f"string longer than maxLength {schema['maxLength']}"))
         if "pattern" in schema and re.search(schema["pattern"], instance) is None:
             errors.append(ValidationError(path, f"string does not match pattern {schema['pattern']!r}"))
+        if schema.get("format") == "date-time":
+            try:
+                datetime.fromisoformat(instance.replace("Z", "+00:00"))
+            except ValueError:
+                errors.append(ValidationError(path, "invalid date-time"))
 
     if isinstance(instance, (int, float)) and not isinstance(instance, bool):
         if "minimum" in schema and instance < schema["minimum"]:
@@ -164,12 +179,20 @@ def _validate(
     if isinstance(instance, list):
         if "minItems" in schema and len(instance) < int(schema["minItems"]):
             errors.append(ValidationError(path, f"array shorter than minItems {schema['minItems']}"))
+        if "maxItems" in schema and len(instance) > int(schema["maxItems"]):
+            errors.append(ValidationError(path, f"array longer than maxItems {schema['maxItems']}"))
+        if schema.get("uniqueItems"):
+            encoded = [json.dumps(item, sort_keys=True, separators=(",", ":")) for item in instance]
+            if len(set(encoded)) != len(encoded):
+                errors.append(ValidationError(path, "array items must be unique"))
         item_schema = schema.get("items")
         if isinstance(item_schema, dict):
             for idx, item in enumerate(instance):
                 _validate(item, item_schema, root, f"{path}[{idx}]", errors)
 
     if isinstance(instance, dict):
+        if "maxProperties" in schema and len(instance) > int(schema["maxProperties"]):
+            errors.append(ValidationError(path, f"object has more than maxProperties {schema['maxProperties']}"))
         required = schema.get("required") or []
         errors.extend(validate_required(instance, required, path=path))
         props = schema.get("properties") or {}
@@ -180,3 +203,74 @@ def _validate(
             extras = set(instance) - set(props)
             for key in sorted(extras):
                 errors.append(ValidationError(f"{path}.{key}", "additional property not allowed"))
+
+    forbidden = schema.get("x-forbidden-property-names") or []
+    if forbidden:
+        _find_forbidden_properties(instance, set(forbidden), path, errors)
+
+
+def _validate_combinators(
+    instance: Any,
+    schema: dict[str, Any],
+    root: dict[str, Any],
+    path: str,
+    errors: list[ValidationError],
+) -> None:
+    """Validate the compositional keywords used by the v2 record variants."""
+    for child in schema.get("allOf") or []:
+        if isinstance(child, dict):
+            _validate(instance, child, root, path, errors)
+
+    alternatives = schema.get("oneOf")
+    if isinstance(alternatives, list):
+        successes = 0
+        for child in alternatives:
+            branch_errors: list[ValidationError] = []
+            if isinstance(child, dict):
+                _validate(instance, child, root, path, branch_errors)
+            if not branch_errors:
+                successes += 1
+        if successes != 1:
+            errors.append(ValidationError(path, f"oneOf expected exactly one matching branch, got {successes}"))
+
+    alternatives = schema.get("anyOf")
+    if isinstance(alternatives, list):
+        if not any(
+            isinstance(child, dict) and not _branch_errors(instance, child, root, path)
+            for child in alternatives
+        ):
+            errors.append(ValidationError(path, "anyOf expected at least one matching branch"))
+
+    if isinstance(schema.get("not"), dict) and not _branch_errors(instance, schema["not"], root, path):
+        errors.append(ValidationError(path, "not condition matched"))
+
+    condition = schema.get("if")
+    if isinstance(condition, dict):
+        if not _branch_errors(instance, condition, root, path):
+            child = schema.get("then")
+        else:
+            child = schema.get("else")
+        if isinstance(child, dict):
+            _validate(instance, child, root, path, errors)
+
+
+def _branch_errors(instance: Any, schema: dict[str, Any], root: dict[str, Any], path: str) -> list[ValidationError]:
+    branch_errors: list[ValidationError] = []
+    _validate(instance, schema, root, path, branch_errors)
+    return branch_errors
+
+
+def _find_forbidden_properties(
+    instance: Any,
+    forbidden: set[str],
+    path: str,
+    errors: list[ValidationError],
+) -> None:
+    if isinstance(instance, dict):
+        for key, value in instance.items():
+            if key.lower() in forbidden:
+                errors.append(ValidationError(f"{path}.{key}", "forbidden property name"))
+            _find_forbidden_properties(value, forbidden, f"{path}.{key}", errors)
+    elif isinstance(instance, list):
+        for idx, value in enumerate(instance):
+            _find_forbidden_properties(value, forbidden, f"{path}[{idx}]", errors)
