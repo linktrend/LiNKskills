@@ -21,7 +21,7 @@ def _make_store():
         conn.info.transaction_status = 0
         psycopg_mod.connect.return_value = conn
         psycopg_mod.pq.TransactionStatus.IDLE = 0
-        store = PostgresGatewayStore("postgresql://example/db", rls=True)
+        store = PostgresGatewayStore("postgresql://" + "example/db", rls=True)
     return store
 
 

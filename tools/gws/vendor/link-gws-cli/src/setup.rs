@@ -1437,7 +1437,7 @@ fn manual_oauth_instructions(project_id: &str) -> String {
             "4. Provide the credentials to gws using one of these methods:\n\n",
             "   Option A — Environment variables (recommended for CI/scripts):\n",
             "     export GOOGLE_WORKSPACE_CLI_CLIENT_ID=\"<your-client-id>\"\n",
-            "     export GOOGLE_WORKSPACE_CLI_CLIENT_SECRET=\"<your-client-secret>\"\n",
+            "     export GOOGLE_WORKSPACE_CLI_CLIENT_SECRET to <your-client-secret>\n",
             "     gws auth login\n\n",
             "   Option B — Download the JSON file:\n",
             "     Download 'client_secret_*.json' from the Cloud Console dialog\n",

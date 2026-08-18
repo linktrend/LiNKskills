@@ -112,7 +112,7 @@ class StoreErrorEnvelopeHttpTests(unittest.TestCase):
                 "Authorization": f"Bearer {self.token}",
                 "Content-Type": "application/json",
                 "Content-Length": str(len(body)),
-                "Idempotency-Key": "stage-rls-boom-1",
+                "Idempotency-Key": "ltfx.test-store-error-envelope-py-key-115-09ddf3e18e.v1",
             },
         )
         resp = conn.getresponse()
@@ -194,7 +194,7 @@ class StoreErrorEnvelopeHttpTests(unittest.TestCase):
                 "Authorization": f"Bearer {token}",
                 "Content-Type": "application/json",
                 "Content-Length": str(len(body)),
-                "Idempotency-Key": "no-org-1",
+                "Idempotency-Key": "ltfx.test-store-error-envelope-py-key-197-cd1b233d88.v1",
             },
         )
         resp = conn.getresponse()

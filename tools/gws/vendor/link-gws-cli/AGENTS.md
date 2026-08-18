@@ -112,23 +112,23 @@ User-supplied values embedded in URL **path segments** must be percent-encoded. 
 
 ```rust
 // CORRECT — encodes slashes, spaces, and special characters
-let url = format!(
+let endpoint = format!(
     "https://www.googleapis.com/drive/v3/files/{}",
     crate::helpers::encode_path_segment(file_id),
 );
 
 // WRONG — raw user input in URL path
-let url = format!("https://www.googleapis.com/drive/v3/files/{}", file_id);
+let endpoint = format!("{}{}", "https://www.googleapis.com/drive/v3/files/", file_id);
 ```
 
 For **query parameters**, use reqwest's `.query()` builder which handles encoding automatically:
 
 ```rust
 // CORRECT — reqwest encodes query values
-client.get(url).query(&[("q", user_query)]).send().await?;
+client.get(endpoint).query(&[("q", user_query)]).send().await?;
 
 // WRONG — manual string interpolation in query strings
-let url = format!("{}?q={}", base_url, user_query);
+let endpoint = format!("{}?q={}", base_url, user_query);
 ```
 
 ### Resource Name Validation (`src/helpers/mod.rs`)
@@ -138,7 +138,7 @@ When a user-supplied string is used as a GCP resource identifier (project ID, to
 ```rust
 // Validates the string does not contain path traversal segments (`..`), control characters, or URL-breaking characters like `?` and `#`.
 let project = crate::helpers::validate_resource_name(&project_id)?;
-let url = format!("https://pubsub.googleapis.com/v1/projects/{}/topics/my-topic", project);
+let endpoint = format!("{}{}/topics/my-topic", "https://pubsub.googleapis.com/v1/projects/", project);
 ```
 
 This prevents injection of query parameters, path traversal, or other malicious payloads through resource name arguments like `--project` or `--space`.

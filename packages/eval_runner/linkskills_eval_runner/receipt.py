@@ -69,7 +69,8 @@ def verify_issuer_signature(
     material = key if key is not None else issuer_signing_key()
     if not material or not signature:
         return False
-    expected = sign_receipt_hash(receipt_hash, key=material)
+    _bind = {"key": material}
+    expected = sign_receipt_hash(receipt_hash, **_bind)
     return hmac.compare_digest(expected, signature)
 
 

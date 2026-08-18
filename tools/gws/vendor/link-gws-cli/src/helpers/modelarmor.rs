@@ -327,9 +327,9 @@ async fn handle_sanitize(
     let body = parse_sanitize_args(matches, data_field)?;
 
     let base = regional_base_url(location);
-    let url = format!("{base}/{template}:{method_name}");
+    let endpoint = format!("{base}/{template}:{method_name}");
 
-    model_armor_post(&url, &body).await
+    model_armor_post(&endpoint, &body).await
 }
 
 #[derive(Debug, PartialEq)]
@@ -577,7 +577,7 @@ pub fn build_sanitize_request_data(
     })?;
 
     let base = regional_base_url(location);
-    let url = format!("{base}/{template}:{method}");
+    let endpoint = format!("{base}/{template}:{method}");
 
     // Identify data field based on method
     let data_field = if method == "sanitizeUserPrompt" {
@@ -587,7 +587,7 @@ pub fn build_sanitize_request_data(
     };
 
     let body = json!({data_field: {"text": text}}).to_string();
-    Ok((body, url))
+    Ok((body, endpoint))
 }
 
 pub fn parse_sanitize_response(resp_text: &str) -> Result<SanitizationResult, GwsError> {

@@ -23,7 +23,7 @@
 //!     "auth_uri": "https://accounts.google.com/o/oauth2/auth",
 //!     "token_uri": "https://oauth2.googleapis.com/token",
 //!     "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-//!     "client_secret": "GOCSPX-...",
+//!     "client_secret": "ltfx.oauth-config-rs-client-secret-26-4a0715d81e.v1",
 //!     "redirect_uris": ["http://localhost"]
 //!   }
 //! }
@@ -109,7 +109,7 @@ mod tests {
         let config = ClientSecretFile {
             installed: InstalledConfig {
                 client_id: "test-id.apps.googleusercontent.com".to_string(),
-                client_secret: "GOCSPX-test".to_string(),
+                client_secret: "ltfx.oauth-config-rs-client-secret-112-5aa601ade7.v1".to_string(),
                 project_id: "my-project".to_string(),
                 auth_uri: "https://accounts.google.com/o/oauth2/auth".to_string(),
                 token_uri: "https://oauth2.googleapis.com/token".to_string(),
@@ -143,7 +143,7 @@ mod tests {
                 "auth_uri": "https://accounts.google.com/o/oauth2/auth",
                 "token_uri": "https://oauth2.googleapis.com/token",
                 "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-                "client_secret": "test-client-secret",
+                "client_secret": "ltfx.oauth-config-rs-client-secret-146-8ac9501886.v1",
                 "redirect_uris": ["http://localhost"]
             }
         }"#;

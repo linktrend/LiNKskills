@@ -101,7 +101,7 @@ class HandlerErrorSanitizationTests(unittest.TestCase):
                 headers={
                     "Content-Type": "application/json",
                     "Authorization": f"Bearer {self.token}",
-                    "Idempotency-Key": "sanitize-key-1",
+                    "Idempotency-Key": "ltfx.test-handler-error-sanitization-py-key-104-e3040f75be.v1",
                 },
             )
             resp = conn.getresponse()

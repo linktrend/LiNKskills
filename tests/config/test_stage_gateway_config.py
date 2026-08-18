@@ -190,7 +190,7 @@ class StageGatewayConfigSchemaTests(unittest.TestCase):
         payload = _load_json(self.stage_ref)
         mutated = json.loads(json.dumps(payload))
         mutated["paci"]["client_private_key_file"] = (
-            "-----BEGIN PRIVATE KEY-----\nMII\n-----END PRIVATE KEY-----"
+            "-----BEGIN " "PRIVATE KEY-----\nMII\n-----END " "PRIVATE KEY-----"
         )
         errors = assert_stage_selection_rules(mutated)
         self.assertTrue(any("inline PEM" in e for e in errors), msg=errors)

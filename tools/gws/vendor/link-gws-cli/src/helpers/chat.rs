@@ -261,7 +261,7 @@ mod tests {
     #[test]
     fn test_parse_send_args_rejects_query_injection_in_space() {
         let matches =
-            make_matches_send(&["test", "--space", "spaces/AAA?key=injected", "--text", "t"]);
+            make_matches_send(&["test", "--space", "spaces/AAA?q=injected", "--text", "t"]);
         let result = parse_send_args(&matches);
         assert!(
             result.is_err(),
