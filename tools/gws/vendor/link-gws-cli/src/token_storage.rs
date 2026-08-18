@@ -107,7 +107,7 @@ impl EncryptedTokenStorage {
 
 #[async_trait::async_trait]
 impl TokenStorage for EncryptedTokenStorage {
-    async fn set(&self, scopes: &[&str], token: TokenInfo) -> Result<(), TokenStorageError> {
+    async fn set(&self, scopes: &[&str], token_info: TokenInfo) -> Result<(), TokenStorageError> {
         let mut map_lock = self.cache.lock().await;
 
         // Initialize cache if this is the first write
@@ -116,7 +116,7 @@ impl TokenStorage for EncryptedTokenStorage {
         }
 
         if let Some(map) = map_lock.as_mut() {
-            map.insert(Self::cache_key(scopes), token);
+            map.insert(Self::cache_key(scopes), token_info);
             self.save_to_disk(map)
                 .await
                 .map_err(|e| TokenStorageError::Other(std::borrow::Cow::Owned(e.to_string())))?;

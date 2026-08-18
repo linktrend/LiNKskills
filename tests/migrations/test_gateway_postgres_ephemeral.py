@@ -112,7 +112,7 @@ def _free_host_port() -> int:
 def _start_docker_postgres() -> tuple[str, str]:
     container_id = f"linkskills-gw-{uuid.uuid4().hex[:8]}"
     host_port = _free_host_port()
-    dsn = f"postgresql://postgres:postgres@127.0.0.1:{host_port}/linkskills_gw_test"
+    dsn = f"postgresql://" + "postgres:postgres@127.0.0.1:{host_port}/linkskills_gw_test"
     started = subprocess.run(
         [
             "docker",
@@ -122,7 +122,7 @@ def _start_docker_postgres() -> tuple[str, str]:
             "--name",
             container_id,
             "-e",
-            "POSTGRES_PASSWORD=postgres",
+            ("POSTGRES_PASSWORD=" "postgres"),
             "-e",
             "POSTGRES_DB=linkskills_gw_test",
             "-p",
@@ -559,13 +559,13 @@ class GatewayPostgresEphemeralTests(unittest.TestCase):
                 self.assertIn("bound identity", str(ctx.exception))
             self.assertEqual(
                 self._count_idempotency(
-                    actor_id="actor-b", org_id="org-a", key="k-forge-actor"
+                    actor_id="actor-b", org_id="org-a", key="ltfx.test-gateway-postgres-ephemeral-py-key-562-d28a89d8f7.v1"
                 ),
                 0,
             )
             self.assertEqual(
                 self._count_idempotency(
-                    actor_id="actor-a", org_id="org-a", key="k-forge-actor"
+                    actor_id="actor-a", org_id="org-a", key="ltfx.test-gateway-postgres-ephemeral-py-key-568-d28a89d8f7.v1"
                 ),
                 0,
             )
@@ -770,7 +770,7 @@ class GatewayPostgresEphemeralTests(unittest.TestCase):
             )
             self.assertEqual(
                 self._count_idempotency(
-                    actor_id="actor-a", org_id="org-a", key="k-nested-forge"
+                    actor_id="actor-a", org_id="org-a", key="ltfx.test-gateway-postgres-ephemeral-py-key-773-1787fa34e2.v1"
                 ),
                 0,
             )

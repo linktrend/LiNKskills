@@ -55,7 +55,7 @@ class _TokenEndpointState:
         self.requests: List[Dict[str, Any]] = []
         self.status_code = 200
         self.body: Dict[str, Any] = {
-            "access_token": "skills-access-token-1",
+            "access_token": "ltfx.test-paci-token-client-py-access-token-58-4116bb58b8.v1",
             "token_type": "Bearer",
             "expires_in": 900,
         }
@@ -531,7 +531,7 @@ class PaciTokenClientTests(unittest.TestCase):
     def test_from_env_rejects_static_bearer_outside_local_test(self) -> None:
         env = {
             "LINKSKILLS_AUTH_MODE": "production",
-            "GATEWAY_TOKEN": "static-should-fail",
+            "GATEWAY_TOKEN": "ltfx.test-paci-token-client-py-gateway-token-534-d49ef6e6e4.v1",
             "GATEWAY_URL": "https://gateway.example",
         }
         with self.assertRaises(PaciConfigError):

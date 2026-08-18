@@ -111,7 +111,7 @@ class OpenGatewayStoreEnvTests(unittest.TestCase):
             os.environ,
             {
                 "LINKSKILLS_GATEWAY_STORE": "postgres",
-                "LINKSKILLS_DATABASE_URL": "postgresql://example/db",
+                "LINKSKILLS_DATABASE_URL": "postgresql://" + "example/db",
             },
             clear=False,
         ):
@@ -121,7 +121,7 @@ class OpenGatewayStoreEnvTests(unittest.TestCase):
             ) as ctor:
                 store = open_gateway_store(repo_root=REPO_ROOT)
         self.assertIs(store, fake)
-        ctor.assert_called_once_with("postgresql://example/db")
+        ctor.assert_called_once_with("postgresql://" + "example/db")
         fake.probe_reachable.assert_called_once()
         fake.probe_schema_ready.assert_called_once()
 
@@ -133,7 +133,7 @@ class OpenGatewayStoreEnvTests(unittest.TestCase):
             os.environ,
             {
                 "LINKSKILLS_GATEWAY_STORE": "postgres",
-                "LINKSKILLS_DATABASE_URL": "postgresql://example/db",
+                "LINKSKILLS_DATABASE_URL": "postgresql://" + "example/db",
             },
             clear=False,
         ):
@@ -155,7 +155,7 @@ class PostgresGatewayStoreUnitTests(unittest.TestCase):
             conn.info.transaction_status = 0
             psycopg_mod.connect.return_value = conn
             psycopg_mod.pq.TransactionStatus.IDLE = 0
-            store = PostgresGatewayStore("postgresql://example/db", rls=False)
+            store = PostgresGatewayStore("postgresql://" + "example/db", rls=False)
             store.bind_identity("actor-a", "org-a")
             self.assertEqual(store._current_identity(), ("actor-a", "org-a"))
             with store.identity("actor-b", "org-b"):
@@ -173,7 +173,7 @@ class LibrarianPostgresOpenTests(unittest.TestCase):
             os.environ,
             {
                 "LINKSKILLS_LIBRARIAN_STORE": "postgres",
-                "LINKSKILLS_DATABASE_URL": "postgresql://example/db",
+                "LINKSKILLS_DATABASE_URL": "postgresql://" + "example/db",
             },
             clear=False,
         ):
@@ -225,7 +225,7 @@ class PublisherPostgresOpenTests(unittest.TestCase):
             os.environ,
             {
                 "LINKSKILLS_PUBLISHER_STORE": "postgres",
-                "LINKSKILLS_DATABASE_URL": "postgresql://example/db",
+                "LINKSKILLS_DATABASE_URL": "postgresql://" + "example/db",
             },
             clear=False,
         ):

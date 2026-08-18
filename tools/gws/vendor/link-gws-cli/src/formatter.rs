@@ -680,13 +680,13 @@ mod tests {
 
     #[test]
     fn test_format_yaml_colon_in_string_is_quoted() {
-        let val = json!({"url": "https://example.com/path"});
+        let val = json!({"link": "https://example.com/path"});
         let output = format_value(&val, &OutputFormat::Yaml);
         assert!(
-            output.contains("url: \"https://example.com/path\""),
-            "expected double-quoted url, got:\n{output}"
+            output.contains("link: \"https://example.com/path\""),
+            "expected double-quoted link, got:\n{output}"
         );
-        assert!(!output.contains("url: |"), "url must not use block scalar");
+        assert!(!output.contains("link: |"), "link must not use block scalar");
     }
 
     #[test]

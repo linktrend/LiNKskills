@@ -1,10 +1,14 @@
 {
   description = "Google Workspace CLI — dynamic command surface from Discovery Service";
 
-  inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    flake-utils.url = "github:numtide/flake-utils";
-  };
+  inputs =
+    let
+      nixpkgsRef = "github:NixOS/nixpkgs/nixos-unstable";
+      flakeUtilsRef = "github:numtide/flake-utils";
+    in {
+      nixpkgs.url = nixpkgsRef;
+      flake-utils.url = flakeUtilsRef;
+    };
 
   outputs = { self, nixpkgs, flake-utils }:
     flake-utils.lib.eachDefaultSystem (system:

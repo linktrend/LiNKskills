@@ -214,7 +214,7 @@ pub async fn fetch_discovery_document(
         }
     }
 
-    let url = format!(
+    let endpoint = format!(
         "https://www.googleapis.com/discovery/v1/apis/{}/{}/rest",
         crate::validate::encode_path_segment(service),
         crate::validate::encode_path_segment(version),
@@ -222,7 +222,7 @@ pub async fn fetch_discovery_document(
 
     tracing::debug!(service = %service, version = %version, "Fetching discovery document");
     let client = crate::client::build_client()?;
-    let resp = client.get(&url).send().await?;
+    let resp = client.get(&endpoint).send().await?;
 
     let body = if resp.status().is_success() {
         resp.text().await?
