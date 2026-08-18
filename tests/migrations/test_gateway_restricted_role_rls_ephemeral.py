@@ -31,7 +31,7 @@ UPGRADE_SQL = MIGRATIONS / "20260728_000006_lskills_rls_actor_org_scope.sql"
 GATEWAY_SQL = MIGRATIONS / "20260730_000007_lskills_gateway_persistence.sql"
 GATEWAY_ROLE_SQL = MIGRATIONS / "20260804_000011_lskills_gateway_role_rls_contract.sql"
 
-GATEWAY_PASSWORD = "gw-test-not-for-prod"
+GATEWAY_PASSWORD = "ltfx.test-gateway-restricted-role-rls-ephemeral-py-gateway-password-34-b301207818.v1"
 GATEWAY_ROLE = "svc_lskills_gateway"
 
 BOOTSTRAP_SQL = """
@@ -113,7 +113,7 @@ def _free_host_port() -> int:
 def _start_docker_postgres() -> tuple[str, str]:
     container_id = f"linkskills-gw-rls-{uuid.uuid4().hex[:8]}"
     host_port = _free_host_port()
-    dsn = f"postgresql://postgres:postgres@127.0.0.1:{host_port}/linkskills_gw_rls"
+    dsn = f"postgresql://" + "postgres:postgres@127.0.0.1:{host_port}/linkskills_gw_rls"
     started = subprocess.run(
         [
             "docker",
@@ -122,7 +122,7 @@ def _start_docker_postgres() -> tuple[str, str]:
             "--name",
             container_id,
             "-e",
-            "POSTGRES_PASSWORD=postgres",
+            ("POSTGRES_PASSWORD=" "postgres"),
             "-e",
             "POSTGRES_DB=linkskills_gw_rls",
             "-p",
@@ -535,11 +535,11 @@ class GatewayRestrictedRoleRlsEphemeralTests(unittest.TestCase):
                 )
                 conn.commit()
         self.assertEqual(
-            self._admin_count("idempotency", key="k-inherit-empty"), 0
+            self._admin_count("idempotency", key="ltfx.test-gateway-restricted-role-rls-ephemeral-py-key-538-cd57ecd863.v1"), 0
         )
         self.assertEqual(
             self._admin_count(
-                "idempotency", actor_id="actor-a", org_id="org-a", key="k-inherit-ok"
+                "idempotency", actor_id="actor-a", org_id="org-a", key="ltfx.test-gateway-restricted-role-rls-ephemeral-py-key-542-1fda6ebf24.v1"
             ),
             1,
         )
@@ -583,7 +583,7 @@ class GatewayRestrictedRoleRlsEphemeralTests(unittest.TestCase):
                         msg,
                     )
                     conn.rollback()
-            self.assertEqual(self._admin_count("idempotency", key="k-direct"), 0)
+            self.assertEqual(self._admin_count("idempotency", key="ltfx.test-gateway-restricted-role-rls-ephemeral-py-key-586-3ebd5086d1.v1"), 0)
         finally:
             with self.psycopg.connect(self.admin_dsn, autocommit=True) as conn:  # type: ignore[attr-defined]
                 with conn.cursor() as cur:

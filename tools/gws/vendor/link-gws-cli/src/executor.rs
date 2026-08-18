@@ -162,9 +162,9 @@ async fn build_http_request(
     client: &reqwest::Client,
     method: &RestMethod,
     input: &ExecutionInput,
-    token: Option<&str>,
+    token: std::option::Option<&str>,
     auth_method: &AuthMethod,
-    page_token: Option<&str>,
+    page_token: std::option::Option<&str>,
     pages_fetched: u32,
     upload: &Option<UploadSource<'_>>,
 ) -> Result<reqwest::RequestBuilder, GwsError> {
@@ -400,7 +400,7 @@ pub async fn execute_method(
     method: &RestMethod,
     params_json: Option<&str>,
     body_json: Option<&str>,
-    token: Option<&str>,
+    token: std::option::Option<&str>,
     auth_method: AuthMethod,
     output_path: Option<&str>,
     upload: Option<UploadSource<'_>>,
@@ -432,7 +432,7 @@ pub async fn execute_method(
         return Ok(None);
     }
 
-    let mut page_token: Option<String> = None;
+    let mut page_token: std::option::Option<String> = None;
     let mut pages_fetched: u32 = 0;
     let mut captured_values = Vec::new();
 

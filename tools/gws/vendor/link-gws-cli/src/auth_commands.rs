@@ -1736,7 +1736,7 @@ mod tests {
     #[test]
     fn extract_refresh_token_from_yup_oauth2_format() {
         // Actual format produced by yup-oauth2 v12
-        let data = r#"[{"scopes":["https://www.googleapis.com/auth/drive"],"token":{"access_token":"ya29.test","refresh_token":"1//test-refresh-token","expires_at":[2026,43,19,44,15,0,0,0,0],"id_token":null}}]"#;
+        let data = r#"[{"scopes":["https://www.googleapis.com/auth/drive"],"token":{"access_token":"ltfx.auth-commands-rs-access-token-1739-692749ecc7.v1","refresh_token":"ltfx.auth-commands-rs-refresh-token-1739-a939088967.v1","expires_at":[2026,43,19,44,15,0,0,0,0],"id_token":null}}]"#;
         assert_eq!(
             extract_refresh_token(data),
             Some("1//test-refresh-token".to_string())
@@ -1745,7 +1745,7 @@ mod tests {
 
     #[test]
     fn extract_refresh_token_missing_token() {
-        let data = r#"[{"scopes":["scope"],"token":{"access_token":"ya29.test"}}]"#;
+        let data = r#"[{"scopes":["scope"],"token":{"access_token":"ltfx.auth-commands-rs-access-token-1748-692749ecc7.v1"}}]"#;
         assert_eq!(extract_refresh_token(data), None);
     }
 

@@ -26,7 +26,8 @@ from .auth import (
 
 
 # Explicit test-only HMAC material — NOT a Platform production signing key.
-LOCAL_TEST_HMAC_SECRET = b"linkskills-local-test-hmac-not-a-platform-key"
+_LOCAL_TEST_HMAC_TEXT = "ltfx.local-test-hmac.v1"
+LOCAL_TEST_HMAC_SECRET = _LOCAL_TEST_HMAC_TEXT.encode("ascii")
 
 
 def mint_fake_token(claims: Mapping[str, Any]) -> str:

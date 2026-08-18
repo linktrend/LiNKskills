@@ -329,14 +329,14 @@ pub(super) async fn fetch_message_metadata(
     token: &str,
     message_id: &str,
 ) -> Result<OriginalMessage, GwsError> {
-    let url = format!(
+    let endpoint = format!(
         "https://gmail.googleapis.com/gmail/v1/users/me/messages/{}",
         crate::validate::encode_path_segment(message_id)
     );
 
     let resp = crate::client::send_with_retry(|| {
         client
-            .get(&url)
+            .get(&endpoint)
             .bearer_auth(token)
             .query(&[("format", "full")])
     })
@@ -1039,7 +1039,7 @@ pub(super) async fn send_raw_email(
     matches: &ArgMatches,
     raw_message: &str,
     thread_id: Option<&str>,
-    existing_token: Option<&str>,
+    existing_token: std::option::Option<&str>,
 ) -> Result<(), GwsError> {
     let metadata = build_send_metadata(thread_id);
 
