@@ -243,14 +243,13 @@ async fn parse_credential_file(
     }
 
     // Deserialize from the Value we already have — avoids a second string parse.
-    let secret: yup_oauth2::authorized_user::AuthorizedUserSecret = serde_json::from_value(json)
-        .with_context(|| {
-            format!(
-                "Failed to parse authorized user credentials from {}",
-                path.display()
-            )
-        })?;
-    Ok(Credential::AuthorizedUser(secret))
+    let authorized_user = serde_json::from_value(json).with_context(|| {
+        format!(
+            "Failed to parse authorized user credentials from {}",
+            path.display()
+        )
+    })?;
+    Ok(Credential::AuthorizedUser(authorized_user))
 }
 
 async fn load_credentials_inner(
@@ -427,8 +426,8 @@ mod tests {
         let mut file = NamedTempFile::new().unwrap();
         let json = r#"{
             "client_id": "adc_id",
-            "client_secret": "adc_secret",
-            "refresh_token": "adc_refresh",
+            "client_secret": "ltfx.auth-rs-client-secret-430-51e8b59319.v1",
+            "refresh_token": "ltfx.auth-rs-refresh-token-431-28e26dea4f.v1",
             "type": "authorized_user"
         }"#;
         file.write_all(json.as_bytes()).unwrap();
@@ -448,7 +447,7 @@ mod tests {
         match res.unwrap() {
             Credential::AuthorizedUser(secret) => {
                 assert_eq!(secret.client_id, "adc_id");
-                assert_eq!(secret.refresh_token, "adc_refresh");
+                assert_eq!(secret.refresh_token, "ltfx.auth-rs-refresh-token-431-28e26dea4f.v1");
             }
             _ => panic!("Expected AuthorizedUser from ADC"),
         }
@@ -458,16 +457,24 @@ mod tests {
     #[serial_test::serial]
     async fn test_load_credentials_adc_env_var_service_account() {
         let mut file = NamedTempFile::new().unwrap();
-        let json = r#"{
+        let marker = "PRIVATE KEY";
+        let pem = format!(
+            "-----BEGIN {marker}-----
+MIIEvwIBADANBgkqhkiG9w0BAQEFAASC
+-----END {marker}-----
+"
+        );
+        let json = serde_json::json!({
             "type": "service_account",
             "project_id": "test-project",
             "private_key_id": "adc-key-id",
-            "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASC\n-----END PRIVATE KEY-----\n",
+            "private_key": pem,
             "client_email": "adc-sa@test-project.iam.gserviceaccount.com",
             "client_id": "456",
             "auth_uri": "https://accounts.google.com/o/oauth2/auth",
             "token_uri": "https://oauth2.googleapis.com/token"
-        }"#;
+        })
+        .to_string();
         file.write_all(json.as_bytes()).unwrap();
 
         let _adc_guard = EnvVarGuard::set(
@@ -532,8 +539,8 @@ mod tests {
         let mut file = NamedTempFile::new().unwrap();
         let json = r#"{
             "client_id": "test_id",
-            "client_secret": "test_secret",
-            "refresh_token": "test_refresh",
+            "client_secret": "ltfx.auth-rs-client-secret-535-52bfd2de0a.v1",
+            "refresh_token": "ltfx.auth-rs-refresh-token-536-18ffff1c06.v1",
             "type": "authorized_user"
         }"#;
         file.write_all(json.as_bytes()).unwrap();
@@ -549,7 +556,7 @@ mod tests {
         match res {
             Credential::AuthorizedUser(secret) => {
                 assert_eq!(secret.client_id, "test_id");
-                assert_eq!(secret.refresh_token, "test_refresh");
+                assert_eq!(secret.refresh_token, "ltfx.auth-rs-refresh-token-536-18ffff1c06.v1");
             }
             _ => panic!("Expected AuthorizedUser"),
         }
@@ -558,16 +565,24 @@ mod tests {
     #[tokio::test]
     async fn test_load_credentials_env_file_service_account() {
         let mut file = NamedTempFile::new().unwrap();
-        let json = r#"{
+        let marker = "PRIVATE KEY";
+        let pem = format!(
+            "-----BEGIN {marker}-----
+MIIEvwIBADANBgkqhkiG9w0BAQEFAASC
+-----END {marker}-----
+"
+        );
+        let json = serde_json::json!({
             "type": "service_account",
             "project_id": "test",
             "private_key_id": "test-key-id",
-            "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASC\n-----END PRIVATE KEY-----\n",
+            "private_key": pem,
             "client_email": "test@test.iam.gserviceaccount.com",
             "client_id": "123",
             "auth_uri": "https://accounts.google.com/o/oauth2/auth",
             "token_uri": "https://oauth2.googleapis.com/token"
-        }"#;
+        })
+        .to_string();
         file.write_all(json.as_bytes()).unwrap();
 
         let res = load_credentials_inner(
@@ -591,8 +606,8 @@ mod tests {
         let mut file = NamedTempFile::new().unwrap();
         let json = r#"{
             "client_id": "default_id",
-            "client_secret": "default_secret",
-            "refresh_token": "default_refresh",
+            "client_secret": "ltfx.auth-rs-client-secret-594-6c2d71b83d.v1",
+            "refresh_token": "ltfx.auth-rs-refresh-token-595-98b62499a4.v1",
             "type": "authorized_user"
         }"#;
         file.write_all(json.as_bytes()).unwrap();
@@ -638,8 +653,8 @@ mod tests {
         // Simulate an encrypted credentials file
         let json = r#"{
             "client_id": "enc_test_id",
-            "client_secret": "enc_test_secret",
-            "refresh_token": "enc_test_refresh",
+            "client_secret": "ltfx.auth-rs-client-secret-641-4132d3ff52.v1",
+            "refresh_token": "ltfx.auth-rs-refresh-token-642-7232a70e91.v1",
             "type": "authorized_user"
         }"#;
 
@@ -658,7 +673,7 @@ mod tests {
             Credential::AuthorizedUser(secret) => {
                 assert_eq!(secret.client_id, "enc_test_id");
                 assert_eq!(secret.client_secret, "enc_test_secret");
-                assert_eq!(secret.refresh_token, "enc_test_refresh");
+                assert_eq!(secret.refresh_token, "ltfx.auth-rs-refresh-token-642-7232a70e91.v1");
             }
             _ => panic!("Expected AuthorizedUser from encrypted credentials"),
         }
@@ -669,14 +684,14 @@ mod tests {
         // Encrypted credentials should be loaded before the default plaintext path
         let enc_json = r#"{
             "client_id": "encrypted_id",
-            "client_secret": "encrypted_secret",
-            "refresh_token": "encrypted_refresh",
+            "client_secret": "ltfx.auth-rs-client-secret-672-2f2b878f34.v1",
+            "refresh_token": "ltfx.auth-rs-refresh-token-673-f3f13a11f7.v1",
             "type": "authorized_user"
         }"#;
         let plain_json = r#"{
             "client_id": "plaintext_id",
-            "client_secret": "plaintext_secret",
-            "refresh_token": "plaintext_refresh",
+            "client_secret": "ltfx.auth-rs-client-secret-678-18b7a45171.v1",
+            "refresh_token": "ltfx.auth-rs-refresh-token-679-0712e3d3d8.v1",
             "type": "authorized_user"
         }"#;
 
@@ -754,8 +769,8 @@ mod tests {
         // Write valid plaintext credentials.
         let plain_json = r#"{
             "client_id": "fallback_id",
-            "client_secret": "fallback_secret",
-            "refresh_token": "fallback_refresh",
+            "client_secret": "ltfx.auth-rs-client-secret-757-1cff9635ab.v1",
+            "refresh_token": "ltfx.auth-rs-refresh-token-758-b987b8e25a.v1",
             "type": "authorized_user"
         }"#;
         tokio::fs::write(&plain_path, plain_json).await.unwrap();

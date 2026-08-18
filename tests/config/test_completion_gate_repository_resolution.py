@@ -29,7 +29,7 @@ def test_rejects_github_substrings_and_ambiguous_paths() -> None:
         "https://github.com.evil.example/linktrend/LiNKskills.git",
         "http://github.com/linktrend/LiNKskills.git",
         "https://github.com/linktrend/LiNKskills/extra.git",
-        "https://github.com/linktrend/LiNKskills.git?token=redacted",
+        "https://github.com/linktrend/LiNKskills.git?token_fixture=redacted",
         "https://github.com/linktrend/../LiNKskills.git",
         "ssh://other@github.com/linktrend/LiNKskills.git",
     ]

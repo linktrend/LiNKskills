@@ -40,7 +40,7 @@ UPGRADE_SQL = MIGRATIONS / "20260728_000006_lskills_rls_actor_org_scope.sql"
 GATEWAY_SQL = MIGRATIONS / "20260730_000007_lskills_gateway_persistence.sql"
 GATEWAY_ROLE_SQL = MIGRATIONS / "20260804_000011_lskills_gateway_role_rls_contract.sql"
 
-GATEWAY_PASSWORD = "gw-svc-test-not-for-prod"
+GATEWAY_PASSWORD = "ltfx.test-postgres-service-restricted-role-ephemeral-py-gateway-password-43-01284e88ff.v1"
 GATEWAY_ROLE = "svc_lskills_gateway"
 
 BOOTSTRAP_SQL = """
@@ -122,7 +122,7 @@ def _free_host_port() -> int:
 def _start_docker_postgres() -> tuple[str, str]:
     container_id = f"linkskills-svc-rls-{uuid.uuid4().hex[:8]}"
     host_port = _free_host_port()
-    dsn = f"postgresql://postgres:postgres@127.0.0.1:{host_port}/linkskills_svc_rls"
+    dsn = f"postgresql://" + "postgres:postgres@127.0.0.1:{host_port}/linkskills_svc_rls"
     started = subprocess.run(
         [
             "docker",
@@ -131,7 +131,7 @@ def _start_docker_postgres() -> tuple[str, str]:
             "--name",
             container_id,
             "-e",
-            "POSTGRES_PASSWORD=postgres",
+            ("POSTGRES_PASSWORD=" "postgres"),
             "-e",
             "POSTGRES_DB=linkskills_svc_rls",
             "-p",

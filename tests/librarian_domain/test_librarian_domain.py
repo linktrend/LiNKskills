@@ -91,7 +91,7 @@ def _seal_receipt(**overrides):
         )
     ).hexdigest()
     base["receipt_hash"] = digest
-    key = os.environ["LINKSKILLS_EVAL_RUNNER_ISSUER_KEY"].encode("utf-8")
+    key = os.environ.get("LINKSKILLS_EVAL_RUNNER_ISSUER_KEY").encode("utf-8")
     base["issuer_signature"] = hmac.new(key, digest.encode("utf-8"), hashlib.sha256).hexdigest()
     assert sealed_executor_receipt(base)
     return base

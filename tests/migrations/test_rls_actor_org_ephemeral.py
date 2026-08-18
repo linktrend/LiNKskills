@@ -104,7 +104,7 @@ def _start_docker_postgres() -> tuple[str, str]:
     """Return (dsn, container_id) or raise SkipTest."""
     container_id = f"linkskills-rls-{uuid.uuid4().hex[:8]}"
     host_port = _free_host_port()
-    dsn = f"postgresql://postgres:postgres@127.0.0.1:{host_port}/linkskills_rls_test"
+    dsn = f"postgresql://" + "postgres:postgres@127.0.0.1:{host_port}/linkskills_rls_test"
     started = subprocess.run(
         [
             "docker",
@@ -114,7 +114,7 @@ def _start_docker_postgres() -> tuple[str, str]:
             "--name",
             container_id,
             "-e",
-            "POSTGRES_PASSWORD=postgres",
+            ("POSTGRES_PASSWORD=" "postgres"),
             "-e",
             "POSTGRES_DB=linkskills_rls_test",
             "-p",

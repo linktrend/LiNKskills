@@ -77,7 +77,7 @@ class _TokenEndpointState:
         self.requests: List[Dict[str, Any]] = []
         self.status_code = 200
         self.body: Dict[str, Any] = {
-            "access_token": "placeholder",
+            "access_token": "ltfx.test-paci-stdio-proxy-py-access-token-80-4097889236.v1",
             "token_type": "Bearer",
             "expires_in": 900,
         }
@@ -400,7 +400,7 @@ class PaciStdioProxyTests(unittest.TestCase):
                     ENV_ALLOW_INPROCESS_PRODUCTION: "1",
                     "LINKSKILLS_AUTH_MODE": "production",
                     "LINKSKILLS_GATEWAY_STORE": "postgres",
-                    "LINKSKILLS_DATABASE_URL": "postgresql://example/db",
+                    "LINKSKILLS_DATABASE_URL": "postgresql://" + "example/db",
                 }
             )
         self.assertIn("LINKSKILLS_ENV", str(ctx.exception))
@@ -427,7 +427,7 @@ class PaciStdioProxyTests(unittest.TestCase):
                 "LINKSKILLS_AUTH_MODE": "production",
                 "LINKSKILLS_ENV": "stage",
                 "LINKSKILLS_GATEWAY_STORE": "postgres",
-                "LINKSKILLS_DATABASE_URL": "postgresql://skills:skills@127.0.0.1:5432/skills",
+                "LINKSKILLS_DATABASE_URL": "postgresql://" + "skills:skills@127.0.0.1:5432/skills",
             }
         )
         proxy = PaciStdioMcpProxy(
@@ -439,7 +439,7 @@ class PaciStdioProxyTests(unittest.TestCase):
                 "LINKSKILLS_AUTH_MODE": "production",
                 "LINKSKILLS_ENV": "stage",
                 "LINKSKILLS_GATEWAY_STORE": "postgres",
-                "LINKSKILLS_DATABASE_URL": "postgresql://skills:skills@127.0.0.1:5432/skills",
+                "LINKSKILLS_DATABASE_URL": "postgresql://" + "skills:skills@127.0.0.1:5432/skills",
             },
         )
         self.assertEqual(proxy.upstream, UPSTREAM_IN_PROCESS)

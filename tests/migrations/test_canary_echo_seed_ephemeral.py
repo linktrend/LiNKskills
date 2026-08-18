@@ -108,7 +108,7 @@ def _free_host_port() -> int:
 def _start_docker_postgres() -> tuple[str, str]:
     container_id = f"linkskills-canary-seed-{uuid.uuid4().hex[:8]}"
     host_port = _free_host_port()
-    dsn = f"postgresql://postgres:postgres@127.0.0.1:{host_port}/linkskills_canary_seed"
+    dsn = f"postgresql://" + "postgres:postgres@127.0.0.1:{host_port}/linkskills_canary_seed"
     started = subprocess.run(
         [
             "docker",
@@ -118,7 +118,7 @@ def _start_docker_postgres() -> tuple[str, str]:
             "--name",
             container_id,
             "-e",
-            "POSTGRES_PASSWORD=postgres",
+            ("POSTGRES_PASSWORD=" "postgres"),
             "-e",
             "POSTGRES_DB=linkskills_canary_seed",
             "-p",

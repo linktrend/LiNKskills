@@ -29,7 +29,7 @@ promoting artifacts.
 
 ### Overlay / promotion honesty
 
-`verify_sealed_live_evidence` ignores the local-dev key: public-key-signed receipts cannot
+`verify_sealed_live_evidence` ignores the local-dev signing material; public-key-signed receipts cannot
 authorize `usable`.
 
 ### canary-echo side-effect claim

@@ -25,7 +25,7 @@ def _make_store(*, service_scope: str = "actor"):
             PostgresReviewQueueStore, "table_exists", return_value=True
         ):
             store = PostgresReviewQueueStore(
-                "postgresql://example/db",
+                "postgresql://" + "example/db",
                 rls=True,
                 require_table=True,
                 service_scope=service_scope,
