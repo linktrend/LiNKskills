@@ -1,0 +1,48 @@
+skill_id: personal-compliance-tracker
+suite_version: 1.0.0
+
+rubric:
+  - dimension: measurement_and_rate_accuracy
+    weight: 0.30
+    hard_fail_below: 0.60
+  - dimension: timing_and_idempotency
+    weight: 0.25
+    hard_fail_below: 0.60
+  - dimension: privacy_boundary
+    weight: 0.20
+    hard_fail_below: 0.60
+  - dimension: correction_and_source_tracking
+    weight: 0.15
+  - dimension: reminder_discipline
+    weight: 0.10
+pass_threshold: 0.82
+
+scenarios:
+  - id: threshold-before-next-window
+    input: |
+      Fresh context-matched observations predict that a device reaches its
+      configured threshold before the next planned charging window. A previous
+      delivery intent for this cycle already exists.
+    expected_criteria:
+      - "Uses the fresh context-specific rate and compares it with the next window"
+      - "Does not create a duplicate delivery intent"
+      - "Returns the existing intent or its delivery status"
+  - id: stale-evidence
+    input: |
+      The last observation is stale and charging contexts conflict. The operator
+      asks for the current threshold prediction.
+    expected_criteria:
+      - "Refuses to guess a current rate"
+      - "Requests the smallest fresh check-in needed"
+      - "Preserves prior observations and marks the result awaiting-check-in"
+  - id: time-window-classification
+    input: |
+      A report arrives after the configured on-time window but before the
+      configured day-reset boundary.
+    expected_criteria:
+      - "Classifies the report as late, not on-time"
+      - "Does not classify it as missed before the reset boundary"
+      - "Uses the consumer timezone and configured boundaries"
+
+judge:
+  min_reasoning_tier: high

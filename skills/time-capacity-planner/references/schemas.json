@@ -1,0 +1,34 @@
+{
+  "definitions": {
+    "input": {
+      "type": "object",
+      "required": ["request", "capacity_profile"],
+      "properties": {
+        "request": {"type": "string"},
+        "capacity_profile": {"type": "object"},
+        "task_sources": {"type": "array"},
+        "calendar_sources": {"type": "array"}
+      }
+    },
+    "output": {
+      "type": "object",
+      "required": ["status", "items", "decisions"],
+      "properties": {
+        "status": {"type": "string"},
+        "items": {"type": "array"},
+        "decisions": {"type": "array"},
+        "evidence_requirements": {"type": "array"}
+      }
+    },
+    "state": {
+      "type": "object",
+      "required": ["task_id", "status", "phase"],
+      "properties": {
+        "task_id": {"type": "string"},
+        "status": {"type": "string"},
+        "phase": {"type": "string"},
+        "updated_at": {"type": "string"}
+      }
+    }
+  }
+}

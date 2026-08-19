@@ -1,0 +1,19 @@
+{
+  "definitions": {
+    "input": {
+      "type": "object",
+      "required": ["cycle_date", "rules"],
+      "properties": {"cycle_date": {"type": "string"}, "rules": {"type": "object"}, "observations": {"type": "array"}}
+    },
+    "output": {
+      "type": "object",
+      "required": ["status", "ledger_result", "delivery_intents"],
+      "properties": {"status": {"type": "string"}, "ledger_result": {"type": "object"}, "delivery_intents": {"type": "array"}}
+    },
+    "state": {
+      "type": "object",
+      "required": ["task_id", "status", "phase"],
+      "properties": {"task_id": {"type": "string"}, "status": {"type": "string"}, "phase": {"type": "string"}}
+    }
+  }
+}
