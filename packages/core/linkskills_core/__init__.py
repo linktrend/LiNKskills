@@ -14,6 +14,12 @@ from .hashing import (
     stamp_execution_profile,
     verify_execution_profile_hashes,
 )
+from .qualification_lock import (
+    QualificationLockError,
+    build_qualification_lock,
+    load_qualification_lock,
+    verify_qualification_lock,
+)
 from .lifecycle import (
     CERTIFICATION_STATES,
     CertificationState,
@@ -41,6 +47,8 @@ __all__ = [
     "allowlist_and_redact",
     "assert_transition",
     "allowed_transitions",
+    "QualificationLockError",
+    "build_qualification_lock",
     "build_skill_bundle_manifest",
     "can_transition",
     "content_hash_for_directory",
@@ -48,6 +56,7 @@ __all__ = [
     "evaluate_certification_evidence",
     "execution_profile_identity_hash",
     "filter_compatible_usable_releases",
+    "load_qualification_lock",
     "prepare_feedback_params",
     "prepare_run_mutation_params",
     "prepare_trace_params",
@@ -57,6 +66,7 @@ __all__ = [
     "skill_release_hash",
     "stamp_execution_profile",
     "verify_execution_profile_hashes",
+    "verify_qualification_lock",
 ]
 
 __version__ = "0.1.0"

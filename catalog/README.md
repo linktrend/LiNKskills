@@ -18,5 +18,8 @@ python3 scripts/build-catalog-index.py --check
 ./scripts/run-sealed-linux-certify.sh
 ```
 
+ISS-04 contract qualification (published/qualified immutable releases, not
+sealed `usable` certification) is recorded in `qualification-lock.json`.
+
 See [`docs/LINKSKILLS-TECHNICAL-PRD.md`](../docs/LINKSKILLS-TECHNICAL-PRD.md) §6
 (consumer load path) and [`docs/stage/CERTIFICATION-RUNTIME-READINESS.md`](../docs/stage/CERTIFICATION-RUNTIME-READINESS.md).
