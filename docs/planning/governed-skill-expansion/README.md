@@ -2,7 +2,7 @@
 
 **Status:** Final planning package; implementation not authorized
 
-**Authoritative installed baseline:** LiNKskills remote `main` commit `ded1baa63939db92f7616ac7393401a702d881de`, tree `d03e551d9c0189a3f22d67663a53cb68235f3c1d`
+**Authoritative execution-planning baseline:** LiNKskills remote `development` commit `2896fd89726f0b20258ec5a7bba55ccc6299ceb6`, tree `727694a95c83678bd6c7be7da2c5b26127b49e6e`
 
 **Execution protocol:** Coding Execution Protocol `1.0.1`, amendment `V25_BOOTSTRAP_LEAN`, distributed by IDE Development `2.5.1`
 
@@ -16,8 +16,11 @@ This package adds the approved governed-skill expansion to the existing LiNKskil
 4. [`REQUIREMENTS-TRACEABILITY.md`](./REQUIREMENTS-TRACEABILITY.md) — requirement-to-packet and proof coverage.
 5. [`LISA-CANARY-BINDINGS.md`](./LISA-CANARY-BINDINGS.md) — exact OpenClaw-owned instance acceptance values kept out of reusable releases.
 6. [`EXECUTION-MANIFEST.json`](./EXECUTION-MANIFEST.json) — schema-valid LiNKskills packet manifest in `PLAN` state.
-7. The assigned file under [`packets/`](./packets/) — bounded work and acceptance criteria.
-8. [`cross-repository/HANDOFF-PACKETS.md`](./cross-repository/HANDOFF-PACKETS.md) — work owned by Platform, OpenClaw, LiNKautowork, or another repository.
+7. [`MODEL-ROUTING-SUCCESSOR.md`](./MODEL-ROUTING-SUCCESSOR.md) — Principal-authoritative routing controls and admission rules.
+8. [`MODEL-ROUTING-MATRIX.json`](./MODEL-ROUTING-MATRIX.json) — exact packet/subtask route, fallback, review, Terra, and cost assignments.
+9. [`MODEL-ROUTING-RECEIPT.json`](./MODEL-ROUTING-RECEIPT.json) — digest binding between the manifest and routing matrix.
+10. The assigned file under [`packets/`](./packets/) — bounded work and acceptance criteria.
+11. [`cross-repository/HANDOFF-PACKETS.md`](./cross-repository/HANDOFF-PACKETS.md) — work owned by Platform, OpenClaw, LiNKautowork, or another repository.
 
 ## Authority and reconciliation
 
@@ -31,14 +34,17 @@ This package adds the approved governed-skill expansion to the existing LiNKskil
 
 Approval of these documents authorizes planning acceptance only. Execution requires a separately recorded founder approval bound to the manifest digest. Before the first mutation, the orchestrator must:
 
-1. verify the IDE Development `2.5.1` consumer surfaces against authoritative remote `main` commit `ded1baa63939db92f7616ac7393401a702d881de` or an explicitly approved descendant containing the identical installed package;
+1. verify the IDE Development `2.5.1` consumer surfaces against the manifest-bound remote `development` commit/tree or an explicitly approved descendant containing the identical installed package;
 2. record the then-current approved execution-base commit and tree in the manifest;
 3. regenerate and validate the manifest if that identity differs from this planning baseline;
 4. verify all packet path ownership against concurrent work;
-5. create issue branches and acquire packet-repository leases; and
-6. stop at every reserved protocol, migration, live-provider, publication, main-promotion, activation, or production-deployment gate until its exact approval is recorded.
+5. validate the routing receipt and obtain a PREPARED admission readback for the exact route, selector, parameters, effective model/mode, provider family, usage pool, and Fast=false;
+6. create issue branches and acquire packet-repository leases; and
+7. stop at every reserved protocol, migration, live-provider, publication, main-promotion, activation, or production-deployment gate until its exact approval is recorded.
 
-The original planning checkout was stale. Authoritative remote `main` was read back at `ded1baa63939db92f7616ac7393401a702d881de`; `.ide-development/VERSION`, installed state, execution protocol, contracts, root `AGENTS.md`, and both Codex/Cursor entrypoints prove the LiNKskills v2.5.1 rollout. Re-reading those surfaces at execution start is exact-candidate verification, not an outstanding portfolio rollout.
+The original planning checkout was stale. The v2.5.1 rollout and governed branch reconciliation subsequently reached remote `development` at the baseline recorded above. Re-reading the installed package and exact route surfaces at execution start is exact-candidate verification, not an outstanding portfolio rollout.
+
+The routing matrix is a separate companion because IDE v2.5.1's execution-manifest schema rejects unknown packet fields. The manifest and matrix become one dispatch identity only through the SHA-256 values in `MODEL-ROUTING-RECEIPT.json`; neither file may be changed independently without issuing a new receipt.
 
 ## Package index
 

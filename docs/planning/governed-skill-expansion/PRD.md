@@ -200,6 +200,12 @@ Lisa, Eric, David, Sara, and Jane packs are immutable selection manifests refere
 
 Within a ready set, IDE Development admits no more than one local and two hosted packets and must honor resource, lease, heartbeat, retry, and evidence controls.
 
+### Model routing and cost control
+
+`MODEL-ROUTING-MATRIX.json` is the packet-level routing authority for this program. AUTO COST is the preferred automatic route and is valid only through a supported Cursor SDK/router transport that explicitly selects `auto-smart` with `optimize_for=cost` and returns the effective model/mode. Generic Auto, Auto Balance, Auto Intelligence, omission-based defaults, unverifiable Auto, and every Fast mode are prohibited. Composer 2.5 is limited to fully bounded, simple, repetitive, objectively verified, reversible work. Cursor Grok 4.6 Medium with Fast=false owns complex, sensitive, context-heavy, and long-running work. Third-party routes require the matrix's named capability or independent-review reason and cost pool.
+
+Every admitted subtask records its requested selector, parameters, transport, returned effective model identity/mode/provider family/usage pool, and PREPARED intent before mutation. Model-quality failures permit one logged different-family hop only. Infrastructure or input failure retains the same model and cannot trigger a model substitution. Independent model review is a separate worker; independent Terra checkpoint verification remains a distinct evidence gate and is never replaced by that reviewer.
+
 ## 13. Definition of done
 
 All are mandatory:
@@ -221,6 +227,7 @@ All are mandatory:
 - provider source, consumer, hosted stage, VPS, E2E, and production evidence are separately identified;
 - schema/migration/protocol changes have explicit founder approval and rollback evidence;
 - all issue checkpoints contain exact pushed commit/tree, scoped diff, focused tests, independent Terra verification, and manifest evidence; and
+- the manifest/matrix receipt validates, every packet/subtask follows its exact route, no Fast or generic Auto is admitted, live selector/effective-mode readback is retained, third-party exceptions contain necessity/cost evidence, and fallback behavior is one-hop and failure-class correct; and
 - final reconciliation reports every requirement as proven, partially proven, blocked outside ownership, or intentionally excluded—never inferred from file presence.
 
 ## 14. Approval decision

@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "kind": "linktrend.model-routing-successor-receipt",
+  "programId": "linkskills-governed-skill-expansion",
+  "createdAt": "2026-08-22T07:04:37+08:00",
+  "executionState": "PLAN",
+  "approvalInferred": false,
+  "productDispatchAuthorized": false,
+  "predecessorPlanningIdentity": {
+    "commit": "f4a4b75f8f166dd80ffd9e0573bb4ce82bc9d10a",
+    "tree": "10fa50055aee43ecdb975cc62477e9d69e6b0efe"
+  },
+  "executionBaseline": {
+    "repository": "linktrend/LiNKskills",
+    "ref": "refs/remotes/origin/development",
+    "commit": "2896fd89726f0b20258ec5a7bba55ccc6299ceb6",
+    "tree": "727694a95c83678bd6c7be7da2c5b26127b49e6e"
+  },
+  "bindings": [
+    {
+      "path": "docs/planning/governed-skill-expansion/EXECUTION-MANIFEST.json",
+      "sha256": "c14c3ccdb612d9bee2be2a4d4ff71358e98cff63e6f09c9f58ac9e49816e7263"
+    },
+    {
+      "path": "docs/planning/governed-skill-expansion/MODEL-ROUTING-MATRIX.json",
+      "sha256": "f3d9b6fbb0aa70d2bdbccdeab8bee5ca5af9801f745196a2bd3e5f05fe8bfa78"
+    },
+    {
+      "path": "docs/planning/governed-skill-expansion/MODEL-ROUTING-SUCCESSOR.md",
+      "sha256": "febcee762e00fceb26055e643f18ec04b3d198892023f2363a3107f4395cc37a"
+    }
+  ],
+  "validation": {
+    "executionManifestSchema": "PASS",
+    "routingMatrixJson": "PASS",
+    "packetCoverage": "27/27",
+    "packetOrderMatchesManifest": true,
+    "routeProfilesResolve": true,
+    "fastAllowed": false,
+    "genericAutoAllowed": false,
+    "independentReviewSeparate": true,
+    "terraCheckpointSeparate": true,
+    "liveCatalogueReadback": "HOLD_UNTIL_AUTHORIZED_EXECUTION_ADMISSION"
+  }
+}

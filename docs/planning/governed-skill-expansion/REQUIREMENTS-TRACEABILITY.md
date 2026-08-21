@@ -35,4 +35,4 @@ This matrix prevents requirement loss and duplicate implementation. Packet compl
 
 ## Explicit exclusions trace
 
-The following are never implemented in LiNKskills packets: identity/credentials/RBAC; Brain knowledge/rule approval; schedules and delivery; private ledgers; OAuth/account bindings; browser binary/profile/cookies/network sandbox; Google CLI; Odoo server/connector; model routing; deterministic scheduler runtime; Program Ledger mutation; non-skill software; real private data; or future-agent activation.
+The following are never implemented as LiNKskills product capability in these packets: identity/credentials/RBAC; Brain knowledge/rule approval; schedules and delivery; private ledgers; OAuth/account bindings; browser binary/profile/cookies/network sandbox; Google CLI; Odoo server/connector; model-provider routing/runtime configuration; deterministic scheduler runtime; Program Ledger mutation; non-skill software; real private data; or future-agent activation. The companion model-routing matrix governs only which execution worker may implement or review each packet; it does not add model routing to the LiNKskills product.
