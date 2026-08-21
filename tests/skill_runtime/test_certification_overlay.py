@@ -106,7 +106,7 @@ def _seal_receipt(**overrides: Any) -> Dict[str, Any]:
 
 
 def _with_promoting_key() -> None:
-    os.environ.get("LINKSKILLS_EVAL_RUNNER_ISSUER_KEY") = PROMOTING_TEST_ISSUER_KEY
+    os.environ["LINKSKILLS_EVAL_RUNNER_ISSUER_KEY"] = PROMOTING_TEST_ISSUER_KEY
 
 
 def _seal_promoting_receipt(**overrides: Any) -> Dict[str, Any]:
@@ -429,7 +429,7 @@ class CertificationOverlayTests(unittest.TestCase):
             if prior is None:
                 os.environ.pop("LINKSKILLS_EVAL_RUNNER_ISSUER_KEY", None)
             else:
-                os.environ.get("LINKSKILLS_EVAL_RUNNER_ISSUER_KEY") = prior
+                os.environ["LINKSKILLS_EVAL_RUNNER_ISSUER_KEY"] = prior
 
     def test_build_catalog_applies_overlay_with_valid_receipt(self) -> None:
         prior = os.environ.get("LINKSKILLS_EVAL_RUNNER_ISSUER_KEY")
@@ -476,7 +476,7 @@ class CertificationOverlayTests(unittest.TestCase):
             if prior is None:
                 os.environ.pop("LINKSKILLS_EVAL_RUNNER_ISSUER_KEY", None)
             else:
-                os.environ.get("LINKSKILLS_EVAL_RUNNER_ISSUER_KEY") = prior
+                os.environ["LINKSKILLS_EVAL_RUNNER_ISSUER_KEY"] = prior
 
     def test_build_catalog_nonexistent_evidence_stays_draft(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -532,7 +532,7 @@ class CatalogCanarySkillTests(unittest.TestCase):
         """
         prior = os.environ.get("LINKSKILLS_EVAL_RUNNER_ISSUER_KEY")
         try:
-            os.environ.get("LINKSKILLS_EVAL_RUNNER_ISSUER_KEY") = (
+            os.environ["LINKSKILLS_EVAL_RUNNER_ISSUER_KEY"] = (
                 "linkskills-local-eval-runner-issuer-key-not-for-production"
             )
             overlay = load_certification_overlay(REPO_ROOT)
@@ -548,7 +548,7 @@ class CatalogCanarySkillTests(unittest.TestCase):
                     "set LINKSKILLS_PROMOTING_OVERLAY_TEST_KEY to the process-only "
                     "key that signed evidence/phase10/sealed/canary-echo-sealed.json"
                 )
-            os.environ.get("LINKSKILLS_EVAL_RUNNER_ISSUER_KEY") = promoting
+            os.environ["LINKSKILLS_EVAL_RUNNER_ISSUER_KEY"] = promoting
             overlay = load_certification_overlay(REPO_ROOT)
             self.assertEqual(overlay.get("canary-echo"), "usable")
             ledger = json.loads(
@@ -562,7 +562,7 @@ class CatalogCanarySkillTests(unittest.TestCase):
             if prior is None:
                 os.environ.pop("LINKSKILLS_EVAL_RUNNER_ISSUER_KEY", None)
             else:
-                os.environ.get("LINKSKILLS_EVAL_RUNNER_ISSUER_KEY") = prior
+                os.environ["LINKSKILLS_EVAL_RUNNER_ISSUER_KEY"] = prior
 
 
 if __name__ == "__main__":
