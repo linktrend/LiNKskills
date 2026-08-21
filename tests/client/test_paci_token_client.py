@@ -153,7 +153,7 @@ class PaciTokenClientTests(unittest.TestCase):
     def test_mint_client_credentials_private_key_jwt(self) -> None:
         client = self._client()
         token = client.get_access_token()
-        self.assertEqual(token, "skills-access-token-1")
+        self.assertEqual(token, "ltfx.test-paci-token-client-py-access-token-58-4116bb58b8.v1")
         self.assertEqual(len(self.state.requests), 1)
         form = self.state.requests[0]["form"]
         self.assertEqual(form["grant_type"], "client_credentials")
@@ -219,7 +219,7 @@ class PaciTokenClientTests(unittest.TestCase):
         self.state._failures_remaining = 2
         client = self._client(max_retries=3, backoff_base_s=0.01)
         token = client.get_access_token()
-        self.assertEqual(token, "skills-access-token-1")
+        self.assertEqual(token, "ltfx.test-paci-token-client-py-access-token-58-4116bb58b8.v1")
         self.assertGreaterEqual(len(self.state.requests), 3)
 
     def test_transient_exhausted_raises(self) -> None:
@@ -282,7 +282,10 @@ class PaciTokenClientTests(unittest.TestCase):
                     "LINKSKILLS_AUTH_MODE": "local-test",
                 }
             )
-            self.assertEqual(client.get_access_token(), "skills-access-token-1")
+            self.assertEqual(
+                client.get_access_token(),
+                "ltfx.test-paci-token-client-py-access-token-58-4116bb58b8.v1",
+            )
             status = client.status()
             self.assertTrue(status["private_key_fd_set"])
             self.assertFalse(status["private_key_file_set"])
@@ -392,7 +395,10 @@ class PaciTokenClientTests(unittest.TestCase):
             "GATEWAY_URL": "http://127.0.0.1:9",
         }
         paci = PaciTokenClient.from_env(env)
-        self.assertEqual(paci.get_access_token(), "skills-access-token-1")
+        self.assertEqual(
+            paci.get_access_token(),
+            "ltfx.test-paci-token-client-py-access-token-58-4116bb58b8.v1",
+        )
 
         # Fake gateway that records Authorization.
         recorded: Dict[str, str] = {}
@@ -422,7 +428,10 @@ class PaciTokenClientTests(unittest.TestCase):
                 paci_client=paci,
             )
             client.call("skills_list", {})
-            self.assertEqual(recorded["authorization"], "Bearer skills-access-token-1")
+            self.assertEqual(
+                recorded["authorization"],
+                "Bearer ltfx.test-paci-token-client-py-access-token-58-4116bb58b8.v1",
+            )
         finally:
             gw.shutdown()
             gw.server_close()
