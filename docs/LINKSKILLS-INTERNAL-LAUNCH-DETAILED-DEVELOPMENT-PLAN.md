@@ -1,5 +1,16 @@
 # LiNKskills Internal Launch — Detailed Development Plan
 
+> **Later bounded expansion:** The internal-launch foundation in this document
+> remains historical architecture/execution authority for work already
+> delivered. The final planning package at
+> [`planning/governed-skill-expansion/`](./planning/governed-skill-expansion/)
+> is the later authority for standard MCP v2 exact-resource retrieval,
+> family-first three-gate discovery, governed external collections, the
+> approved reusable skill families, and exact-release role manifests. Its
+> local-execution model supersedes any provider-side `skills_run_*` or
+> `skills_tool_*` end-state described below; it does not retroactively alter
+> immutable releases or historical evidence.
+
 **Status:** Proposed for Principal review. This document is a development plan, not authorization to make every described change at once. Implementation begins only after the Principal approves this plan and each repository follows its own coordination and Git workflow.
 
 **Primary repository:** `LiNKskills`

@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "kind": "linktrend.model-routing-successor-receipt",
+  "programId": "linkskills-governed-skill-expansion",
+  "createdAt": "2026-08-22T09:52:05+08:00",
+  "executionState": "PLAN",
+  "approvalInferred": false,
+  "productDispatchAuthorized": false,
+  "predecessorPlanningIdentity": {
+    "commit": "c755157840eb4d4f0794244807c4330420075778",
+    "tree": "9381203797f3cd05a47e8ba6884aa75ec977344d"
+  },
+  "supersededReceiptSha256": "78f3f2c857dc4a247f381972eb4d799a0f6043da06f7c49d1e48e232aa9f93af",
+  "executionBaseline": {
+    "repository": "linktrend/LiNKskills",
+    "ref": "refs/remotes/origin/development",
+    "commit": "2896fd89726f0b20258ec5a7bba55ccc6299ceb6",
+    "tree": "727694a95c83678bd6c7be7da2c5b26127b49e6e"
+  },
+  "matchedCapabilityEvidence": {
+    "receiptSha256": "23a0173dc24e67a86a87aacd7aee8b8ec93719371070a7e26fe7045b33267aeb",
+    "apiKeyName": "LiNKdeveloper",
+    "userId": "348277621",
+    "userEmail": "product@linktrend.media",
+    "cursorSdkVersion": "1.0.28",
+    "catalogueModelCount": 36,
+    "autoSmartPresent": false,
+    "optimizeForCostPresent": false,
+    "programRunIdentityMatch": "MATCHED",
+    "additionalAccountPreflightRequired": false
+  },
+  "routingDecision": {
+    "state": "RECLASSIFIED",
+    "autoCostAssignments": 0,
+    "composerAssignments": [
+      "PKT-08",
+      "PKT-13",
+      "PKT-14"
+    ],
+    "grokAssignments": [
+      "PKT-06",
+      "PKT-16",
+      "PKT-18",
+      "PKT-19",
+      "PKT-24"
+    ],
+    "reclassificationIsFallback": false,
+    "credentialSearchAuthorized": false,
+    "loginAuthorized": false,
+    "dispatchAuthorized": false,
+    "supersededPreparedIntents": {
+      "sourceMatrixSha256": "f3d9b6fbb0aa70d2bdbccdeab8bee5ca5af9801f745196a2bd3e5f05fe8bfa78",
+      "invalidationReceiptSha256": "78f3f2c857dc4a247f381972eb4d799a0f6043da06f7c49d1e48e232aa9f93af",
+      "state": "IMMUTABLE_INELIGIBLE_SUPERSEDED",
+      "packetIds": [
+        "PKT-06",
+        "PKT-08",
+        "PKT-13",
+        "PKT-14",
+        "PKT-16",
+        "PKT-18",
+        "PKT-19",
+        "PKT-24"
+      ]
+    }
+  },
+  "bindings": [
+    {
+      "path": "docs/planning/governed-skill-expansion/EXECUTION-MANIFEST.json",
+      "sha256": "c14c3ccdb612d9bee2be2a4d4ff71358e98cff63e6f09c9f58ac9e49816e7263"
+    },
+    {
+      "path": "docs/planning/governed-skill-expansion/MODEL-ROUTING-MATRIX.json",
+      "sha256": "5877168e5ba0e8523fe6ce765548525e2eabf707944f161f7f1cac55a64c287f"
+    },
+    {
+      "path": "docs/planning/governed-skill-expansion/MODEL-ROUTING-SUCCESSOR.md",
+      "sha256": "3befce649789720a8180313d1a5587da8634fbc05f6e52999b3f7cdf89e96ef9"
+    }
+  ],
+  "validation": {
+    "executionManifestSchema": "PASS",
+    "manifestDigestRecomputed": "PASS_UNCHANGED",
+    "routingMatrixJson": "PASS",
+    "packetCoverage": "27/27",
+    "packetOrderMatchesManifest": true,
+    "routeCounts": {
+      "autoCost": 0,
+      "composer": 5,
+      "grok": 21,
+      "independentOpusPacket": 1
+    },
+    "separateIndependentOpusReviews": 16,
+    "terraCheckpoints": 27,
+    "fastAllowed": false,
+    "genericAutoAllowed": false,
+    "programRunIdentityBound": true,
+    "programRunIdentityMatch": "MATCHED",
+    "supersededPreparedIntentsEligible": false,
+    "liveRouteReadback": "REQUIRED_AT_FUTURE_ADMISSION"
+  }
+}
