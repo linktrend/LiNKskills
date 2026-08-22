@@ -16,18 +16,18 @@ This is the consolidated Principal-authoritative successor to the earlier Sonnet
 4. **Third-party models** are exceptions. This package binds Opus 4.8 Medium only to separate consequential independent review and GPT-5.6 Sol Medium only to a one-hop quality-recovery exception after Grok. Gemini and other third-party routes are not assigned.
 5. **Fast is forbidden** on every route. Absence of a verifiable Fast=false capability/readback is a HOLD, not permission to infer non-Fast.
 
-## Program Run execution-identity HOLD
+## Matched Program Run execution identity
 
 Capability receipt `sha256:23a0173dc24e67a86a87aacd7aee8b8ec93719371070a7e26fe7045b33267aeb` proves AUTO COST unavailable only for authenticated identity `apiKeyName=LiNKdeveloper`, `userId=348277621`, `userEmail=product@linktrend.media`, using `cursor-sdk 1.0.28`; its 36-model catalogue contains only generic default Auto, with `auto-smart` and `optimize_for=cost` absent.
 
-The LiNKskills Program Run's actual authenticated execution account/team/API identity is not yet bound. No credential search, login, dispatch, or identity-sameness inference is authorized. Therefore the matrix is HOLD, and its eight AUTO COST assignments remain provisional rather than being prematurely reclassified.
+The Principal confirmed that every portfolio orchestrator and Program Run uses that exact authenticated identity. The identity is therefore KNOWN and MATCHED; no further account preflight is required or authorized for this planning correction. AUTO COST has zero current assignments.
 
-Before approval or dispatch:
+The eight former AUTO COST assignments are explicitly reclassified, not treated as failures or fallbacks:
 
-1. bind the Program Run's authenticated execution identity;
-2. if it exactly matches the receipt identity, reclassify all eight AUTO COST packet/subtask assignments explicitly as Composer or Grok in one successor;
-3. if it differs, run one read-only `Cursor.models.list()` capability preflight for that exact identity and retain AUTO COST only if `auto-smart` plus `optimize_for=cost` is available and readback-capable; and
-4. invalidate every PREPARED intent derived from a matrix that lacked the required identity binding.
+1. Composer: PKT-08, PKT-13, and PKT-14 are bounded, reversible content work with objective fixtures and no sensitive runtime mutation.
+2. Grok: PKT-06, PKT-16, PKT-18, PKT-19, and PKT-24 include migration, cross-system/source, licence, contract/vendor-risk, or broad integration work that is not Composer-eligible.
+
+PREPARED intents derived from the superseded AUTO COST matrix remain immutable evidence but are permanently ineligible for admission. They cannot be revived, rewritten, or treated as fallback attempts; any future execution admission must bind this successor.
 
 ## Admission receipt
 
@@ -41,7 +41,7 @@ Before any subtask mutation, the orchestrator must retain:
 - a provider-family comparison for any fallback or independent reviewer; and
 - the separately assigned Terra checkpoint identity.
 
-The matrix records exact requested selectors from the Principal-authoritative Cursor routing contract, but the whole matrix remains admission-HOLD until the Program Run identity is bound and the applicable capability decision is recorded.
+The matrix records exact Composer, Grok, Sol, and Opus selectors from the Principal-authoritative Cursor routing contract. Each assigned route still requires its ordinary admission-time live selector and effective-model/mode readback; this is not another account-capability preflight.
 
 ## Failure and fallback controls
 
@@ -58,14 +58,14 @@ Opus independent review is a separate worker receiving the original request, app
 
 ## Cost forecast
 
-The package uses route-call units because live token volume and account pricing are execution-time facts. The provisional baseline before identity binding is 27 author workers plus 16 independent-review workers: eight AUTO COST, two Composer, sixteen Grok, and PKT-26 as the independent Opus reconciliation worker. These are not dispatchable route reservations. No Gemini/bulk route is budgeted. Quality fallback is exceptional and capped at one extra author attempt per affected subtask; it is not pre-consumed capacity.
+The package uses route-call units because live token volume and account pricing are execution-time facts. The baseline is 27 author workers plus 16 independent-review workers: zero AUTO COST, five Composer, twenty-one Grok, and PKT-26 as the independent Opus reconciliation worker. These are planning assignments, not dispatch authority. No Gemini/bulk route is budgeted. Quality fallback is exceptional and capped at one extra author attempt per affected subtask; it is not pre-consumed capacity.
 
 Third-party cost pools are limited to:
 
 - `other:independent-review` — Opus on the 16 consequential review assignments, justified by provider-family-independent challenge; and
 - `other:quality-recovery` — Sol only after a logged Grok or xAI-effective AUTO COST model-quality failure.
 
-AUTO COST, Composer, and Grok use the Cursor pool. Every receipt records the returned usage pool so cost reporting is evidence-based rather than inferred.
+Composer and Grok use the Cursor pool. Every receipt records the returned usage pool so cost reporting is evidence-based rather than inferred.
 
 ## Acceptance controls
 
@@ -74,8 +74,9 @@ AUTO COST, Composer, and Grok use the Cursor pool. Every receipt records the ret
 - every packet binds implementation, deterministic verification, independent-review disposition, and Terra checkpoint verification;
 - no selector or parameter enables Fast;
 - no generic or unverifiable Auto is accepted;
-- the Program Run execution identity is bound and the applicable one-time account capability preflight is receipt-backed;
-- no PREPARED intent from the identity-unbound matrix remains valid;
+- the matched Program Run identity and capability receipt are bound;
+- AUTO COST has zero assignments;
+- every superseded AUTO COST PREPARED intent remains immutable and ineligible;
 - every fallback is logged, different-family, one-hop, and model-quality-only;
 - third-party use has a task-specific necessity and cost-pool reason;
 - independent review uses a separate worker; and
