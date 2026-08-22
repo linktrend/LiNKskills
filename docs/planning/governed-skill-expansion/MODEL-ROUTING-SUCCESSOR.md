@@ -6,7 +6,7 @@
 
 ## Authority
 
-This is the narrow Principal-authoritative successor to the earlier Sonnet/Sol-first planning default. Product scope, packet dependencies, owned paths, acceptance criteria, and repository ownership remain unchanged. The installed IDE v2.5.1 manifest schema has `additionalProperties: false` and no routing field, so the exact routing assignment is carried by a companion matrix and digest-bound receipt instead of an invalid manifest extension.
+This is the consolidated Principal-authoritative successor to the earlier Sonnet/Sol-first planning default. Product scope, packet dependencies, owned paths, acceptance criteria, and repository ownership remain unchanged. The installed IDE v2.5.1 manifest schema has `additionalProperties: false` and no routing field, so the exact routing assignment is carried by a companion matrix and digest-bound receipt instead of an invalid manifest extension.
 
 ## Required routes
 
@@ -15,6 +15,19 @@ This is the narrow Principal-authoritative successor to the earlier Sonnet/Sol-f
 3. **Cursor Grok 4.6 Medium** uses `grok-4.6` with `effort=medium` and `fast=false` for complex, sensitive, context-heavy, or long-running work.
 4. **Third-party models** are exceptions. This package binds Opus 4.8 Medium only to separate consequential independent review and GPT-5.6 Sol Medium only to a one-hop quality-recovery exception after Grok. Gemini and other third-party routes are not assigned.
 5. **Fast is forbidden** on every route. Absence of a verifiable Fast=false capability/readback is a HOLD, not permission to infer non-Fast.
+
+## Program Run execution-identity HOLD
+
+Capability receipt `sha256:23a0173dc24e67a86a87aacd7aee8b8ec93719371070a7e26fe7045b33267aeb` proves AUTO COST unavailable only for authenticated identity `apiKeyName=LiNKdeveloper`, `userId=348277621`, `userEmail=product@linktrend.media`, using `cursor-sdk 1.0.28`; its 36-model catalogue contains only generic default Auto, with `auto-smart` and `optimize_for=cost` absent.
+
+The LiNKskills Program Run's actual authenticated execution account/team/API identity is not yet bound. No credential search, login, dispatch, or identity-sameness inference is authorized. Therefore the matrix is HOLD, and its eight AUTO COST assignments remain provisional rather than being prematurely reclassified.
+
+Before approval or dispatch:
+
+1. bind the Program Run's authenticated execution identity;
+2. if it exactly matches the receipt identity, reclassify all eight AUTO COST packet/subtask assignments explicitly as Composer or Grok in one successor;
+3. if it differs, run one read-only `Cursor.models.list()` capability preflight for that exact identity and retain AUTO COST only if `auto-smart` plus `optimize_for=cost` is available and readback-capable; and
+4. invalidate every PREPARED intent derived from a matrix that lacked the required identity binding.
 
 ## Admission receipt
 
@@ -28,14 +41,14 @@ Before any subtask mutation, the orchestrator must retain:
 - a provider-family comparison for any fallback or independent reviewer; and
 - the separately assigned Terra checkpoint identity.
 
-The current unauthenticated planning shell could identify Cursor Agent version `2026.08.11-e8db854`, but `agent models` correctly failed with `Authentication required`. No login, token, model call, or substitution was attempted. Therefore the matrix records exact requested selectors from the Principal-authoritative Cursor routing contract, while each route remains admission-HOLD until the authorized execution transport proves the live catalogue and effective readback.
+The matrix records exact requested selectors from the Principal-authoritative Cursor routing contract, but the whole matrix remains admission-HOLD until the Program Run identity is bound and the applicable capability decision is recorded.
 
 ## Failure and fallback controls
 
 - Escalation is allowed only for `code_defect`, `quality_gate_failed`, or recurring `timeout_uncertain` attributable to model quality.
 - The evidence log must contain attempt identity, exact model/readback, failure class, reason, and timestamp before the one-hop fallback starts.
 - Infrastructure, authentication, capacity, transport, quota, repository, input, or tool failures do not change the model. Repair and retry the same route or HOLD.
-- AUTO COST normally falls back to Grok. If AUTO COST's effective model is already xAI, use the matrix's different-family Sol quality-recovery exception instead; never create a same-family hop.
+- AUTO COST normally falls back to Grok after a model-quality failure only. Account capability or identity failure is infrastructure/admission failure and cannot be treated as fallback.
 - Composer falls back once to Grok. Grok falls back once to Sol. Sol and independent-review failures surface to repair with no automatic second hop.
 - A fallback is not a new default and does not amend later packet routing.
 
@@ -45,7 +58,7 @@ Opus independent review is a separate worker receiving the original request, app
 
 ## Cost forecast
 
-The package uses route-call units because live token volume and account pricing are execution-time facts. Baseline maximum before quality fallback is 27 author workers plus 16 independent-review workers. Eight author packets prefer AUTO COST, two use Composer, sixteen use Grok, and PKT-26 is the independent Opus reconciliation worker. No Gemini/bulk route is budgeted. Quality fallback is exceptional and capped at one extra author attempt per affected subtask; it is not pre-consumed capacity.
+The package uses route-call units because live token volume and account pricing are execution-time facts. The provisional baseline before identity binding is 27 author workers plus 16 independent-review workers: eight AUTO COST, two Composer, sixteen Grok, and PKT-26 as the independent Opus reconciliation worker. These are not dispatchable route reservations. No Gemini/bulk route is budgeted. Quality fallback is exceptional and capped at one extra author attempt per affected subtask; it is not pre-consumed capacity.
 
 Third-party cost pools are limited to:
 
@@ -61,7 +74,8 @@ AUTO COST, Composer, and Grok use the Cursor pool. Every receipt records the ret
 - every packet binds implementation, deterministic verification, independent-review disposition, and Terra checkpoint verification;
 - no selector or parameter enables Fast;
 - no generic or unverifiable Auto is accepted;
-- AUTO COST uses a supported Cursor SDK/router transport or remains HOLD;
+- the Program Run execution identity is bound and the applicable one-time account capability preflight is receipt-backed;
+- no PREPARED intent from the identity-unbound matrix remains valid;
 - every fallback is logged, different-family, one-hop, and model-quality-only;
 - third-party use has a task-specific necessity and cost-pool reason;
 - independent review uses a separate worker; and

@@ -2,19 +2,51 @@
   "schemaVersion": 1,
   "kind": "linktrend.model-routing-successor-receipt",
   "programId": "linkskills-governed-skill-expansion",
-  "createdAt": "2026-08-22T07:04:37+08:00",
-  "executionState": "PLAN",
+  "createdAt": "2026-08-22T09:47:43+08:00",
+  "executionState": "HOLD_MISSING_PROGRAM_RUN_EXECUTION_IDENTITY",
   "approvalInferred": false,
   "productDispatchAuthorized": false,
   "predecessorPlanningIdentity": {
-    "commit": "f4a4b75f8f166dd80ffd9e0573bb4ce82bc9d10a",
-    "tree": "10fa50055aee43ecdb975cc62477e9d69e6b0efe"
+    "commit": "e1c0e1210f0fa3696355ad4532d86f62335a2b3e",
+    "tree": "88b752c92e256f95826ba1880b5e1be041667f18"
   },
+  "supersededReceiptSha256": "148478ac0901667d51cb182afabdbb944f3dfa9012af3cebe29520eda433e8e1",
   "executionBaseline": {
     "repository": "linktrend/LiNKskills",
     "ref": "refs/remotes/origin/development",
     "commit": "2896fd89726f0b20258ec5a7bba55ccc6299ceb6",
     "tree": "727694a95c83678bd6c7be7da2c5b26127b49e6e"
+  },
+  "scopedCapabilityEvidence": {
+    "receiptSha256": "23a0173dc24e67a86a87aacd7aee8b8ec93719371070a7e26fe7045b33267aeb",
+    "apiKeyName": "LiNKdeveloper",
+    "userId": "348277621",
+    "userEmail": "product@linktrend.media",
+    "cursorSdkVersion": "1.0.28",
+    "catalogueModelCount": 36,
+    "autoSmartPresent": false,
+    "optimizeForCostPresent": false,
+    "programRunIdentityMatch": "UNKNOWN"
+  },
+  "routingDecision": {
+    "state": "HOLD",
+    "reason": "The LiNKskills Program Run authenticated execution identity is not bound; the scoped capability receipt cannot be assumed to apply.",
+    "autoCostAssignments": 8,
+    "autoCostAssignmentsProvisional": true,
+    "requiredNextEvidence": "Bind the Program Run account/team/API identity. Apply the scoped receipt only on exact match; otherwise run one read-only Cursor.models.list() capability preflight for that identity.",
+    "credentialSearchAuthorized": false,
+    "loginAuthorized": false,
+    "dispatchAuthorized": false,
+    "affectedPreparedIntentsInvalidated": [
+      "PKT-06",
+      "PKT-08",
+      "PKT-13",
+      "PKT-14",
+      "PKT-16",
+      "PKT-18",
+      "PKT-19",
+      "PKT-24"
+    ]
   },
   "bindings": [
     {
@@ -23,23 +55,30 @@
     },
     {
       "path": "docs/planning/governed-skill-expansion/MODEL-ROUTING-MATRIX.json",
-      "sha256": "f3d9b6fbb0aa70d2bdbccdeab8bee5ca5af9801f745196a2bd3e5f05fe8bfa78"
+      "sha256": "84d84b049a6d1ce8adc1a6074745b13c0714bb87fc93a5c669acf40413ee4026"
     },
     {
       "path": "docs/planning/governed-skill-expansion/MODEL-ROUTING-SUCCESSOR.md",
-      "sha256": "febcee762e00fceb26055e643f18ec04b3d198892023f2363a3107f4395cc37a"
+      "sha256": "d63e20ef01f593b698e334c2bb37fcf55bd0f5678db0edf189352030fc9f90b0"
     }
   ],
   "validation": {
     "executionManifestSchema": "PASS",
+    "manifestDigestRecomputed": "PASS_UNCHANGED",
     "routingMatrixJson": "PASS",
     "packetCoverage": "27/27",
     "packetOrderMatchesManifest": true,
-    "routeProfilesResolve": true,
+    "routeCounts": {
+      "autoCostProvisional": 8,
+      "composer": 2,
+      "grok": 16,
+      "independentOpusPacket": 1
+    },
+    "separateIndependentOpusReviews": 16,
+    "terraCheckpoints": 27,
     "fastAllowed": false,
     "genericAutoAllowed": false,
-    "independentReviewSeparate": true,
-    "terraCheckpointSeparate": true,
-    "liveCatalogueReadback": "HOLD_UNTIL_AUTHORIZED_EXECUTION_ADMISSION"
+    "programRunIdentityBound": false,
+    "liveCatalogueReadback": "HOLD_PENDING_IDENTITY_BINDING"
   }
 }
