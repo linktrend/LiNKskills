@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "kind": "linktrend.model-routing-successor-receipt",
   "programId": "linkskills-governed-skill-expansion",
-  "createdAt": "2026-08-22T09:52:05+08:00",
+  "createdAt": "2026-08-22T11:00:00+08:00",
   "executionState": "PLAN",
   "approvalInferred": false,
   "productDispatchAuthorized": false,
@@ -14,8 +14,8 @@
   "executionBaseline": {
     "repository": "linktrend/LiNKskills",
     "ref": "refs/remotes/origin/development",
-    "commit": "2896fd89726f0b20258ec5a7bba55ccc6299ceb6",
-    "tree": "727694a95c83678bd6c7be7da2c5b26127b49e6e"
+    "commit": "91970bbb273acd12a643c722608ded33e42ae7e4",
+    "tree": "5312f355243bda6452422a262e18135cb2c07372"
   },
   "matchedCapabilityEvidence": {
     "receiptSha256": "23a0173dc24e67a86a87aacd7aee8b8ec93719371070a7e26fe7045b33267aeb",
@@ -71,11 +71,11 @@
     },
     {
       "path": "docs/planning/governed-skill-expansion/MODEL-ROUTING-MATRIX.json",
-      "sha256": "5877168e5ba0e8523fe6ce765548525e2eabf707944f161f7f1cac55a64c287f"
+      "sha256": "dd3010e19e78a332c8d39027449a750cf41150f1a5a10631662ea8aacea7a882"
     },
     {
       "path": "docs/planning/governed-skill-expansion/MODEL-ROUTING-SUCCESSOR.md",
-      "sha256": "3befce649789720a8180313d1a5587da8634fbc05f6e52999b3f7cdf89e96ef9"
+      "sha256": "ea4b80bde6925aa9dbfc071361b11d930f552839766c9498a916ccfb76f2a88b"
     }
   ],
   "validation": {
@@ -87,16 +87,51 @@
     "routeCounts": {
       "autoCost": 0,
       "composer": 5,
-      "grok": 21,
-      "independentOpusPacket": 1
+      "grokMedium": 21,
+      "grokHighIndependentReviews": 16,
+      "lunaHighCheckpointVerifications": 27
     },
-    "separateIndependentOpusReviews": 16,
-    "terraCheckpoints": 27,
     "fastAllowed": false,
     "genericAutoAllowed": false,
     "programRunIdentityBound": true,
     "programRunIdentityMatch": "MATCHED",
     "supersededPreparedIntentsEligible": false,
-    "liveRouteReadback": "REQUIRED_AT_FUTURE_ADMISSION"
+    "liveRouteReadback": "REQUIRED_AT_FUTURE_ADMISSION",
+    "separateGrokHighReviews": 16,
+    "lunaHighCheckpointVerifications": 27,
+    "noOpusForUndispatched": true,
+    "noTerraForUndispatched": true,
+    "routingAmendmentValidated": "PASS_NARROW_DOCUMENT_ONLY",
+    "readinessChecksRerun": false
+  },
+  "routingAmendment": {
+    "id": "ROUTING-AMENDMENT-2026-08-22-COST-CONTROL",
+    "scope": "all undispatched packets, independent reviews, and checkpoint verifications",
+    "implementationRoutes": {
+      "composer": "composer-2.5",
+      "grok": "cursor-grok-4.6-medium"
+    },
+    "independentReview": {
+      "modelSlug": "cursor-grok-4.6-high",
+      "fast": false,
+      "separateWorker": true,
+      "reviewOnly": true,
+      "assignments": 16
+    },
+    "checkpointVerification": {
+      "modelSlug": "gpt-5.6-luna-high",
+      "fast": false,
+      "assignments": 27,
+      "futureFounderSpecialistExceptionRequired": true,
+      "semanticAuditDuplication": false
+    },
+    "forbiddenUndispatched": [
+      "claude-opus-4-8-thinking-medium",
+      "Terra"
+    ],
+    "completedWorkRemainsValid": true,
+    "runningReviewsMayFinish": true,
+    "supersedeUndispatchedPreparedOpusTerra": true,
+    "packetRowsReclassifiedAtDispatch": false
   }
 }

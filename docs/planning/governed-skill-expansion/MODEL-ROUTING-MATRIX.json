@@ -12,7 +12,10 @@
       "selection": {
         "id": "auto-smart",
         "params": [
-          { "id": "optimize_for", "value": "cost" }
+          {
+            "id": "optimize_for",
+            "value": "cost"
+          }
         ]
       },
       "requestedProviderFamily": "cursor-router",
@@ -53,14 +56,20 @@
       "selection": {
         "id": "composer-2.5",
         "params": [
-          { "id": "fast", "value": "false" }
+          {
+            "id": "fast",
+            "value": "false"
+          }
         ]
       },
       "requestedProviderFamily": "cursor",
       "costPool": "cursor",
       "fast": false,
       "liveStatus": "HOLD_UNTIL_AUTHORIZED_CATALOGUE_AND_EFFECTIVE_READBACK",
-      "qualityFallback": { "route": "grok", "maximumHops": 1 }
+      "qualityFallback": {
+        "route": "grok",
+        "maximumHops": 1
+      }
     },
     "grok": {
       "modelSlug": "cursor-grok-4.6-medium",
@@ -68,15 +77,24 @@
       "selection": {
         "id": "grok-4.6",
         "params": [
-          { "id": "effort", "value": "medium" },
-          { "id": "fast", "value": "false" }
+          {
+            "id": "effort",
+            "value": "medium"
+          },
+          {
+            "id": "fast",
+            "value": "false"
+          }
         ]
       },
       "requestedProviderFamily": "xai",
       "costPool": "cursor",
       "fast": false,
       "liveStatus": "HOLD_UNTIL_AUTHORIZED_CATALOGUE_AND_EFFECTIVE_READBACK",
-      "qualityFallback": { "route": "specialist_sol", "maximumHops": 1 }
+      "qualityFallback": {
+        "route": "specialist_sol",
+        "maximumHops": 1
+      }
     },
     "specialist_sol": {
       "modelSlug": "gpt-5.6-sol-medium",
@@ -84,9 +102,18 @@
       "selection": {
         "id": "gpt-5.6-sol",
         "params": [
-          { "id": "reasoning", "value": "medium" },
-          { "id": "context", "value": "1m" },
-          { "id": "fast", "value": "false" }
+          {
+            "id": "reasoning",
+            "value": "medium"
+          },
+          {
+            "id": "context",
+            "value": "1m"
+          },
+          {
+            "id": "fast",
+            "value": "false"
+          }
         ]
       },
       "requestedProviderFamily": "openai",
@@ -96,23 +123,52 @@
       "liveStatus": "HOLD_UNTIL_AUTHORIZED_CATALOGUE_AND_EFFECTIVE_READBACK",
       "qualityFallback": null
     },
-    "independent_opus": {
-      "modelSlug": "claude-opus-4-8-thinking-medium",
+    "grok_review": {
+      "modelSlug": "cursor-grok-4.6-high",
       "transport": "cursor-cloud-api",
       "selection": {
-        "id": "claude-opus-4-8",
+        "id": "grok-4.6",
         "params": [
-          { "id": "thinking", "value": "true" },
-          { "id": "effort", "value": "medium" },
-          { "id": "context", "value": "1m" },
-          { "id": "fast", "value": "false" }
+          {
+            "id": "effort",
+            "value": "high"
+          },
+          {
+            "id": "fast",
+            "value": "false"
+          }
         ]
       },
-      "requestedProviderFamily": "anthropic",
-      "costPool": "other:independent-review",
+      "requestedProviderFamily": "xai",
+      "costPool": "cursor",
       "fast": false,
-      "necessity": "Separate provider-family challenge for consequential architecture, protocol, security, privacy, migration, legal, financial, health, authorization, or final integration work.",
+      "role": "independent semantic review only; never implementation",
+      "separateWorkerFromImplementer": true,
       "liveStatus": "HOLD_UNTIL_AUTHORIZED_CATALOGUE_AND_EFFECTIVE_READBACK",
+      "qualityFallback": null
+    },
+    "checkpoint_luna": {
+      "modelSlug": "gpt-5.6-luna-high",
+      "transport": "cursor-cloud-api",
+      "selection": {
+        "id": "gpt-5.6-luna",
+        "params": [
+          {
+            "id": "reasoning",
+            "value": "high"
+          },
+          {
+            "id": "fast",
+            "value": "false"
+          }
+        ]
+      },
+      "requestedProviderFamily": "openai",
+      "costPool": "other:checkpoint-verification",
+      "fast": false,
+      "role": "exact checkpoint identity, scope, evidence, tests, and protocol compliance; no semantic code audit duplication",
+      "futureFounderExceptionRequired": true,
+      "liveStatus": "HOLD_UNTIL_AUTHORIZED_CATALOGUE_AND_EFFECTIVE_READBACK_AND_FOUNDER_SPECIALIST_EXCEPTION",
       "qualityFallback": null
     }
   },
@@ -164,38 +220,263 @@
     "subtaskInheritance": {
       "packetWorkItems": "inherit the packet implementation route",
       "verificationCommands": "inherit the packet deterministicVerification route and do not create an extra worker unless explicitly admitted",
-      "independentReviewTasks": "use only the packet independentReview route in a separate worker",
-      "checkpointVerification": "use the distinct Terra checkpoint verifier"
-    }
+      "independentReviewTasks": "use the centrally aliased grok_review route in a separate worker",
+      "checkpointVerification": "use the centrally aliased checkpoint_luna verifier; do not duplicate semantic code review"
+    },
+    "routingAuthorityAmendmentId": "ROUTING-AMENDMENT-2026-08-22-COST-CONTROL",
+    "independentReviewRoute": "grok_review",
+    "checkpointVerificationRoute": "checkpoint_luna",
+    "checkpointVerificationDistinct": true,
+    "specialistModelsRequireFutureFounderException": true,
+    "forbiddenModelsForUndispatched": [
+      "claude-opus-4-8-thinking-medium",
+      "Terra"
+    ]
   },
   "packets": [
-    { "packetId": "PKT-00", "implementation": "grok", "deterministicVerification": "grok", "classification": "complex architecture and approval-boundary work", "independentReview": "independent_opus", "reviewReason": "architecture and approval-boundary challenge", "terraCheckpoint": "required" },
-    { "packetId": "PKT-01", "implementation": "grok", "deterministicVerification": "grok", "classification": "complex schema and immutable release-contract work", "independentReview": "independent_opus", "reviewReason": "schema and release-contract challenge", "terraCheckpoint": "required" },
-    { "packetId": "PKT-02", "implementation": "grok", "deterministicVerification": "grok", "classification": "complex MCP protocol migration and authority separation", "independentReview": "independent_opus", "reviewReason": "protocol migration and authority separation", "terraCheckpoint": "required" },
-    { "packetId": "PKT-03", "implementation": "grok", "deterministicVerification": "grok", "classification": "complex migration, provenance, and Librarian lifecycle work", "independentReview": "independent_opus", "reviewReason": "migration, provenance, and Librarian lifecycle", "terraCheckpoint": "required" },
-    { "packetId": "PKT-04", "implementation": "grok", "deterministicVerification": "grok", "classification": "complex security, privacy, and evaluation-control work", "independentReview": "independent_opus", "reviewReason": "security, privacy, and evaluation controls", "terraCheckpoint": "required" },
-    { "packetId": "PKT-05", "implementation": "grok", "deterministicVerification": "grok", "classification": "large external inventory with integrity, licence, and quarantine analysis", "independentReview": "independent_opus", "reviewReason": "large external collection integrity and quarantine", "terraCheckpoint": "required" },
-    { "packetId": "PKT-06", "implementation": "grok", "deterministicVerification": "grok", "classification": "multi-skill migration and canonical research workflow integration exceeds bounded Composer scope", "independentReview": null, "reviewReason": "Terra remains required", "terraCheckpoint": "required" },
-    { "packetId": "PKT-07", "implementation": "grok", "deterministicVerification": "grok", "classification": "complex browser authority and prompt-injection safety work", "independentReview": "independent_opus", "reviewReason": "browser authority and prompt-injection safety", "terraCheckpoint": "required" },
-    { "packetId": "PKT-08", "implementation": "composer", "deterministicVerification": "composer", "classification": "bounded reversible communication-skill content with objective fixtures and no sensitive runtime mutation", "independentReview": null, "reviewReason": "Terra remains required", "terraCheckpoint": "required" },
-    { "packetId": "PKT-09", "implementation": "grok", "deterministicVerification": "grok", "classification": "complex reporting modes, evidence logic, and migration behavior", "independentReview": null, "reviewReason": "Terra remains required", "terraCheckpoint": "required" },
-    { "packetId": "PKT-10", "implementation": "grok", "deterministicVerification": "grok", "classification": "complex private compliance, image, and battery-state safety", "independentReview": "independent_opus", "reviewReason": "private compliance, image, and battery-state safety", "terraCheckpoint": "required" },
-    { "packetId": "PKT-11", "implementation": "grok", "deterministicVerification": "grok", "classification": "complex scheduling, task authority, evidence, and state contract", "independentReview": "independent_opus", "reviewReason": "consequential scheduling, task authority, and state contract", "terraCheckpoint": "required" },
-    { "packetId": "PKT-12", "implementation": "grok", "deterministicVerification": "grok", "classification": "complex private-health logic and privacy-negative behavior", "independentReview": "independent_opus", "reviewReason": "private health and privacy-negative behavior", "terraCheckpoint": "required" },
-    { "packetId": "PKT-13", "implementation": "composer", "deterministicVerification": "composer", "classification": "bounded reversible decision-brief skill content with objective validation", "independentReview": null, "reviewReason": "Terra remains required", "terraCheckpoint": "required" },
-    { "packetId": "PKT-14", "implementation": "composer", "deterministicVerification": "composer", "classification": "bounded reversible planning-skill content following existing skill and test patterns", "independentReview": null, "reviewReason": "Terra remains required", "terraCheckpoint": "required" },
-    { "packetId": "PKT-15", "implementation": "grok", "deterministicVerification": "grok", "classification": "complex financial logic and Odoo contract boundary", "independentReview": "independent_opus", "reviewReason": "financial logic and Odoo contract boundary", "terraCheckpoint": "required" },
-    { "packetId": "PKT-16", "implementation": "grok", "deterministicVerification": "grok", "classification": "cross-system Odoo and LiNKreach boundary plus external-source evaluation exceeds bounded Composer scope", "independentReview": null, "reviewReason": "Terra remains required", "terraCheckpoint": "required" },
-    { "packetId": "PKT-17", "implementation": "grok", "deterministicVerification": "grok", "classification": "complex legal-operation boundary and escalation safety", "independentReview": "independent_opus", "reviewReason": "legal-operation boundary and escalation safety", "terraCheckpoint": "required" },
-    { "packetId": "PKT-18", "implementation": "grok", "deterministicVerification": "grok", "classification": "external candidate licence, provenance, and cross-store task-routing analysis exceeds bounded Composer scope", "independentReview": null, "reviewReason": "Terra remains required", "terraCheckpoint": "required" },
-    { "packetId": "PKT-19", "implementation": "grok", "deterministicVerification": "grok", "classification": "contract, commitment, supplier, and continuity-risk reasoning is consequential and not simple", "independentReview": null, "reviewReason": "Terra remains required", "terraCheckpoint": "required" },
-    { "packetId": "PKT-20", "implementation": "grok", "deterministicVerification": "grok", "classification": "complex agent authority, suspension, evidence, and credential separation", "independentReview": "independent_opus", "reviewReason": "agent authority, suspension, and credential separation", "terraCheckpoint": "required" },
-    { "packetId": "PKT-21", "implementation": "grok", "deterministicVerification": "grok", "classification": "complex security incident and continuity consequences", "independentReview": "independent_opus", "reviewReason": "security incident and continuity consequences", "terraCheckpoint": "required" },
-    { "packetId": "PKT-22", "implementation": "composer", "deterministicVerification": "composer", "classification": "bounded exact-reference manifests with objective validation and easy rollback", "independentReview": null, "reviewReason": "Terra remains required", "terraCheckpoint": "required" },
-    { "packetId": "PKT-23", "implementation": "grok", "deterministicVerification": "grok", "classification": "complex cross-source qualification and adversarial evidence", "independentReview": "independent_opus", "reviewReason": "cross-source qualification and adversarial evidence", "terraCheckpoint": "required" },
-    { "packetId": "PKT-24", "implementation": "grok", "deterministicVerification": "grok", "classification": "broad multi-surface catalogue, supersession, documentation, and integration work exceeds bounded Composer scope", "independentReview": "independent_opus", "reviewReason": "shared catalogue, supersession, and final integration surface", "terraCheckpoint": "required" },
-    { "packetId": "PKT-25", "implementation": "composer", "deterministicVerification": "composer", "classification": "fully bounded reversible exact-tree command verification with objective output", "independentReview": null, "reviewReason": "Terra remains required", "terraCheckpoint": "required" },
-    { "packetId": "PKT-26", "implementation": "independent_opus", "deterministicVerification": "independent_opus", "classification": "separate consequential independent definition-of-done reconciliation", "independentReview": null, "reviewReason": "the packet itself is the separate independent definition-of-done review worker", "terraCheckpoint": "required" }
+    {
+      "packetId": "PKT-00",
+      "implementation": "grok",
+      "deterministicVerification": "grok",
+      "classification": "complex architecture and approval-boundary work",
+      "independentReview": "independent_opus",
+      "reviewReason": "architecture and approval-boundary challenge",
+      "terraCheckpoint": "required"
+    },
+    {
+      "packetId": "PKT-01",
+      "implementation": "grok",
+      "deterministicVerification": "grok",
+      "classification": "complex schema and immutable release-contract work",
+      "independentReview": "independent_opus",
+      "reviewReason": "schema and release-contract challenge",
+      "terraCheckpoint": "required"
+    },
+    {
+      "packetId": "PKT-02",
+      "implementation": "grok",
+      "deterministicVerification": "grok",
+      "classification": "complex MCP protocol migration and authority separation",
+      "independentReview": "independent_opus",
+      "reviewReason": "protocol migration and authority separation",
+      "terraCheckpoint": "required"
+    },
+    {
+      "packetId": "PKT-03",
+      "implementation": "grok",
+      "deterministicVerification": "grok",
+      "classification": "complex migration, provenance, and Librarian lifecycle work",
+      "independentReview": "independent_opus",
+      "reviewReason": "migration, provenance, and Librarian lifecycle",
+      "terraCheckpoint": "required"
+    },
+    {
+      "packetId": "PKT-04",
+      "implementation": "grok",
+      "deterministicVerification": "grok",
+      "classification": "complex security, privacy, and evaluation-control work",
+      "independentReview": "independent_opus",
+      "reviewReason": "security, privacy, and evaluation controls",
+      "terraCheckpoint": "required"
+    },
+    {
+      "packetId": "PKT-05",
+      "implementation": "grok",
+      "deterministicVerification": "grok",
+      "classification": "large external inventory with integrity, licence, and quarantine analysis",
+      "independentReview": "independent_opus",
+      "reviewReason": "large external collection integrity and quarantine",
+      "terraCheckpoint": "required"
+    },
+    {
+      "packetId": "PKT-06",
+      "implementation": "grok",
+      "deterministicVerification": "grok",
+      "classification": "multi-skill migration and canonical research workflow integration exceeds bounded Composer scope",
+      "independentReview": null,
+      "reviewReason": "Terra remains required",
+      "terraCheckpoint": "required"
+    },
+    {
+      "packetId": "PKT-07",
+      "implementation": "grok",
+      "deterministicVerification": "grok",
+      "classification": "complex browser authority and prompt-injection safety work",
+      "independentReview": "independent_opus",
+      "reviewReason": "browser authority and prompt-injection safety",
+      "terraCheckpoint": "required"
+    },
+    {
+      "packetId": "PKT-08",
+      "implementation": "composer",
+      "deterministicVerification": "composer",
+      "classification": "bounded reversible communication-skill content with objective fixtures and no sensitive runtime mutation",
+      "independentReview": null,
+      "reviewReason": "Terra remains required",
+      "terraCheckpoint": "required"
+    },
+    {
+      "packetId": "PKT-09",
+      "implementation": "grok",
+      "deterministicVerification": "grok",
+      "classification": "complex reporting modes, evidence logic, and migration behavior",
+      "independentReview": null,
+      "reviewReason": "Terra remains required",
+      "terraCheckpoint": "required"
+    },
+    {
+      "packetId": "PKT-10",
+      "implementation": "grok",
+      "deterministicVerification": "grok",
+      "classification": "complex private compliance, image, and battery-state safety",
+      "independentReview": "independent_opus",
+      "reviewReason": "private compliance, image, and battery-state safety",
+      "terraCheckpoint": "required"
+    },
+    {
+      "packetId": "PKT-11",
+      "implementation": "grok",
+      "deterministicVerification": "grok",
+      "classification": "complex scheduling, task authority, evidence, and state contract",
+      "independentReview": "independent_opus",
+      "reviewReason": "consequential scheduling, task authority, and state contract",
+      "terraCheckpoint": "required"
+    },
+    {
+      "packetId": "PKT-12",
+      "implementation": "grok",
+      "deterministicVerification": "grok",
+      "classification": "complex private-health logic and privacy-negative behavior",
+      "independentReview": "independent_opus",
+      "reviewReason": "private health and privacy-negative behavior",
+      "terraCheckpoint": "required"
+    },
+    {
+      "packetId": "PKT-13",
+      "implementation": "composer",
+      "deterministicVerification": "composer",
+      "classification": "bounded reversible decision-brief skill content with objective validation",
+      "independentReview": null,
+      "reviewReason": "Terra remains required",
+      "terraCheckpoint": "required"
+    },
+    {
+      "packetId": "PKT-14",
+      "implementation": "composer",
+      "deterministicVerification": "composer",
+      "classification": "bounded reversible planning-skill content following existing skill and test patterns",
+      "independentReview": null,
+      "reviewReason": "Terra remains required",
+      "terraCheckpoint": "required"
+    },
+    {
+      "packetId": "PKT-15",
+      "implementation": "grok",
+      "deterministicVerification": "grok",
+      "classification": "complex financial logic and Odoo contract boundary",
+      "independentReview": "independent_opus",
+      "reviewReason": "financial logic and Odoo contract boundary",
+      "terraCheckpoint": "required"
+    },
+    {
+      "packetId": "PKT-16",
+      "implementation": "grok",
+      "deterministicVerification": "grok",
+      "classification": "cross-system Odoo and LiNKreach boundary plus external-source evaluation exceeds bounded Composer scope",
+      "independentReview": null,
+      "reviewReason": "Terra remains required",
+      "terraCheckpoint": "required"
+    },
+    {
+      "packetId": "PKT-17",
+      "implementation": "grok",
+      "deterministicVerification": "grok",
+      "classification": "complex legal-operation boundary and escalation safety",
+      "independentReview": "independent_opus",
+      "reviewReason": "legal-operation boundary and escalation safety",
+      "terraCheckpoint": "required"
+    },
+    {
+      "packetId": "PKT-18",
+      "implementation": "grok",
+      "deterministicVerification": "grok",
+      "classification": "external candidate licence, provenance, and cross-store task-routing analysis exceeds bounded Composer scope",
+      "independentReview": null,
+      "reviewReason": "Terra remains required",
+      "terraCheckpoint": "required"
+    },
+    {
+      "packetId": "PKT-19",
+      "implementation": "grok",
+      "deterministicVerification": "grok",
+      "classification": "contract, commitment, supplier, and continuity-risk reasoning is consequential and not simple",
+      "independentReview": null,
+      "reviewReason": "Terra remains required",
+      "terraCheckpoint": "required"
+    },
+    {
+      "packetId": "PKT-20",
+      "implementation": "grok",
+      "deterministicVerification": "grok",
+      "classification": "complex agent authority, suspension, evidence, and credential separation",
+      "independentReview": "independent_opus",
+      "reviewReason": "agent authority, suspension, and credential separation",
+      "terraCheckpoint": "required"
+    },
+    {
+      "packetId": "PKT-21",
+      "implementation": "grok",
+      "deterministicVerification": "grok",
+      "classification": "complex security incident and continuity consequences",
+      "independentReview": "independent_opus",
+      "reviewReason": "security incident and continuity consequences",
+      "terraCheckpoint": "required"
+    },
+    {
+      "packetId": "PKT-22",
+      "implementation": "composer",
+      "deterministicVerification": "composer",
+      "classification": "bounded exact-reference manifests with objective validation and easy rollback",
+      "independentReview": null,
+      "reviewReason": "Terra remains required",
+      "terraCheckpoint": "required"
+    },
+    {
+      "packetId": "PKT-23",
+      "implementation": "grok",
+      "deterministicVerification": "grok",
+      "classification": "complex cross-source qualification and adversarial evidence",
+      "independentReview": "independent_opus",
+      "reviewReason": "cross-source qualification and adversarial evidence",
+      "terraCheckpoint": "required"
+    },
+    {
+      "packetId": "PKT-24",
+      "implementation": "grok",
+      "deterministicVerification": "grok",
+      "classification": "broad multi-surface catalogue, supersession, documentation, and integration work exceeds bounded Composer scope",
+      "independentReview": "independent_opus",
+      "reviewReason": "shared catalogue, supersession, and final integration surface",
+      "terraCheckpoint": "required"
+    },
+    {
+      "packetId": "PKT-25",
+      "implementation": "composer",
+      "deterministicVerification": "composer",
+      "classification": "fully bounded reversible exact-tree command verification with objective output",
+      "independentReview": null,
+      "reviewReason": "Terra remains required",
+      "terraCheckpoint": "required"
+    },
+    {
+      "packetId": "PKT-26",
+      "implementation": "independent_opus",
+      "deterministicVerification": "independent_opus",
+      "classification": "separate consequential independent definition-of-done reconciliation",
+      "independentReview": null,
+      "reviewReason": "the packet itself is the separate independent definition-of-done review worker",
+      "terraCheckpoint": "required"
+    }
   ],
   "costForecast": {
     "unit": "one admitted model worker attempt",
@@ -204,7 +485,8 @@
       "auto_cost": 0,
       "composer": 5,
       "grok": 21,
-      "independent_opus_as_packet_author": 1
+      "grok_review": 16,
+      "checkpoint_luna": 27
     },
     "separateIndependentReviewAttempts": 16,
     "maximumFallbackPerFailedSubtask": 1,
@@ -212,6 +494,56 @@
     "thirdPartyInitialAuthorRoutes": 1,
     "thirdPartyReviewRoutes": 16,
     "thirdPartyFallbackRoutes": "exception-only",
-    "geminiOrBulkRoutes": 0
+    "geminiOrBulkRoutes": 0,
+    "checkpointVerificationAttempts": 27,
+    "specialistCheckpointRoutes": 27,
+    "specialistInitialAuthorRoutes": 0,
+    "futureFounderExceptionRequiredForSpecialist": true
+  },
+  "routingAuthorityAmendment": {
+    "id": "ROUTING-AMENDMENT-2026-08-22-COST-CONTROL",
+    "effectiveScope": "all undispatched packets, independent reviews, and checkpoint verifications",
+    "productScopeUnchanged": true,
+    "manifestDigestUnchanged": true,
+    "implementationRoutes": {
+      "boundedSimple": {
+        "route": "composer",
+        "modelSlug": "composer-2.5",
+        "fast": false
+      },
+      "complexLongRunning": {
+        "route": "grok",
+        "modelSlug": "cursor-grok-4.6-medium",
+        "fast": false
+      }
+    },
+    "independentReviewRoute": {
+      "route": "grok_review",
+      "modelSlug": "cursor-grok-4.6-high",
+      "fast": false,
+      "reviewOnly": true,
+      "separateWorkerFromImplementer": true
+    },
+    "checkpointVerificationRoute": {
+      "route": "checkpoint_luna",
+      "modelSlug": "gpt-5.6-luna-high",
+      "fast": false,
+      "role": "exact checkpoint identity, scope, evidence, tests, and protocol compliance only",
+      "doesNotDuplicateSemanticCodeAudit": true,
+      "futureFounderExceptionRequired": true
+    },
+    "logicalRoleAliases": {
+      "independent_opus": "grok_review",
+      "terraCheckpoint": "checkpoint_luna",
+      "required": "apply aliases centrally at admission; do not reclassify packet rows at dispatch"
+    },
+    "forbiddenForUndispatched": [
+      "claude-opus-4-8-thinking-medium",
+      "Terra"
+    ],
+    "supersedesUndispatchedPreparedIdentities": true,
+    "completedWorkRemainsValid": true,
+    "runningReviewsMayFinish": true,
+    "specialistExceptionPolicy": "future explicit founder exception required for checkpoint_luna; no implicit exception"
   }
 }
