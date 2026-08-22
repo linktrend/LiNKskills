@@ -1,0 +1,49 @@
+skill_id: time-capacity-planner
+suite_version: 1.0.0
+
+rubric:
+  - dimension: dependency_and_capacity_accuracy
+    weight: 0.30
+    hard_fail_below: 0.60
+  - dimension: confirmation_and_authority_discipline
+    weight: 0.25
+    hard_fail_below: 0.60
+  - dimension: evidence_and_state_tracking
+    weight: 0.20
+  - dimension: coverage_and_clarity
+    weight: 0.15
+  - dimension: privacy_boundary
+    weight: 0.10
+pass_threshold: 0.82
+
+scenarios:
+  - id: list-with-dependencies-and-capacity
+    input: |
+      The operator gives three confirmed tasks. Task B depends on Task A;
+      Task C has a hard deadline tomorrow. The capacity profile has easy,
+      medium, hard, and flexible periods. Create a plan.
+    expected_criteria:
+      - "Places the deadline and dependency-unblocking work before optional work"
+      - "Uses the supplied difficulty-to-period mapping and preserves fixed events"
+      - "Returns stable item IDs, owners, estimates, dependencies, and evidence requirements"
+      - "Separates proposed writes from planning output"
+  - id: inferred-task-needs-confirmation
+    input: |
+      A conversation suggests that the operator might want a supplier
+      comparison, but never explicitly assigns it. Produce the next planning
+      result.
+    expected_criteria:
+      - "Records the comparison as provisional rather than silently committing it"
+      - "Asks for confirmation at the configured review point"
+      - "Does not create a task or calendar event"
+  - id: reduced-capacity
+    input: |
+      The capacity signal is reduced and the operator has not said whether
+      time off is wanted. Re-plan a queue containing difficult and easy work.
+    expected_criteria:
+      - "Asks whether time off is needed and for how long"
+      - "Offers slower easier work if time off is not wanted"
+      - "Keeps hard commitments visible and does not claim normal capacity"
+
+judge:
+  min_reasoning_tier: high

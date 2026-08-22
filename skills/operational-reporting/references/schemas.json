@@ -1,0 +1,19 @@
+{
+  "definitions": {
+    "input": {
+      "type": "object",
+      "required": ["mode", "window", "sources", "delivery"],
+      "properties": {"mode": {"type": "string"}, "window": {"type": "object"}, "sources": {"type": "array"}, "delivery": {"type": "array"}}
+    },
+    "output": {
+      "type": "object",
+      "required": ["status", "sections", "receipts"],
+      "properties": {"status": {"type": "string"}, "sections": {"type": "array"}, "receipts": {"type": "array"}, "redactions": {"type": "array"}}
+    },
+    "state": {
+      "type": "object",
+      "required": ["task_id", "status", "phase"],
+      "properties": {"task_id": {"type": "string"}, "status": {"type": "string"}, "phase": {"type": "string"}}
+    }
+  }
+}

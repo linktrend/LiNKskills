@@ -1,0 +1,19 @@
+{
+  "definitions": {
+    "input": {
+      "type": "object",
+      "required": ["subject_ref", "privacy_policy", "checkpoint_profile"],
+      "properties": {"subject_ref": {"type": "string"}, "privacy_policy": {"type": "object"}, "checkpoint_profile": {"type": "object"}, "observations": {"type": "array"}}
+    },
+    "output": {
+      "type": "object",
+      "required": ["status", "private_report", "capacity_state", "redaction_receipt"],
+      "properties": {"status": {"type": "string"}, "private_report": {"type": "object"}, "capacity_state": {"type": "string"}, "redaction_receipt": {"type": "object"}}
+    },
+    "state": {
+      "type": "object",
+      "required": ["task_id", "status", "phase"],
+      "properties": {"task_id": {"type": "string"}, "status": {"type": "string"}, "phase": {"type": "string"}}
+    }
+  }
+}
