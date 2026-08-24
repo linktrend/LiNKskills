@@ -1,0 +1,84 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Meeting Management contracts",
+  "definitions": {
+    "evidence": {
+      "type": "object", "additionalProperties": false,
+      "required": ["ref", "status", "provenance", "licence"],
+      "properties": {
+        "ref": {"type": "string", "pattern": "^fixture:[a-z0-9-]+$"},
+        "status": {"type": "string", "enum": ["confirmed", "inferred", "not_reported", "unknown"]},
+        "provenance": {"type": "string", "minLength": 1}, "licence": {"type": "string", "minLength": 1}, "claim": {"type": "string", "maxLength": 240}
+      }
+    },
+    "follow_up": {
+      "type": "object", "additionalProperties": false,
+      "required": ["follow_up_ref", "title", "owner", "status"],
+      "properties": {
+        "follow_up_ref": {"type": "string", "pattern": "^fixture:followup-[a-z0-9-]+$"},
+        "title": {"type": "string", "minLength": 2, "maxLength": 200},
+        "owner": {"type": "string", "maxLength": 80},
+        "deadline": {"type": "string", "maxLength": 80},
+        "dependency": {"type": "string", "maxLength": 120},
+        "destination_mappings": {"type": "object", "additionalProperties": {"type": "string", "maxLength": 120}},
+        "status": {"type": "string", "enum": ["Proposed", "Assigned", "Awaiting evidence", "Verified", "Blocked", "Cancelled"]},
+        "evidence_ref": {"type": "string", "pattern": "^fixture:[a-z0-9-]+$"},
+        "verification_ref": {"type": "string", "pattern": "^fixture:[a-z0-9-]+$"}
+      }
+    },
+    "input": {
+      "type": "object", "additionalProperties": false,
+      "required": ["request_id", "mode", "privacy_classification", "source_evidence", "meeting"],
+      "properties": {
+        "request_id": {"type": "string", "pattern": "^mm-[a-z0-9-]+$"},
+        "mode": {"type": "string", "enum": ["candidate_review", "agenda", "prebrief", "notes", "follow_up", "full"]},
+        "privacy_classification": {"type": "string", "enum": ["synthetic", "redacted", "restricted"]},
+        "source_evidence": {"type": "array", "minItems": 1, "items": {"$ref": "#/definitions/evidence"}},
+        "requested_actions": {"type": "array", "uniqueItems": true, "items": {"type": "string", "enum": ["read", "prepare", "summarize", "extract", "route", "send", "create", "update", "retire", "reschedule"]}},
+        "meeting": {
+          "type": "object", "additionalProperties": false,
+          "required": ["meeting_ref", "purpose", "owner"],
+          "properties": {
+            "meeting_ref": {"type": "string", "pattern": "^fixture:meeting-[a-z0-9-]+$"},
+            "purpose": {"type": "string", "minLength": 2, "maxLength": 240},
+            "owner": {"type": "string", "maxLength": 80},
+            "desired_decision": {"type": "string", "maxLength": 240},
+            "participants": {"type": "array", "items": {"type": "string", "pattern": "^fixture:participant-[a-z0-9-]+$"}},
+            "agenda_items": {"type": "array", "items": {"type": "string", "maxLength": 200}},
+            "transcript_ref": {"type": "string", "pattern": "^fixture:transcript-[a-z0-9-]+$"},
+            "transcript_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+            "redacted_notes": {"type": "string", "maxLength": 1200},
+            "decisions": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["decision_ref", "statement"], "properties": {"decision_ref": {"type": "string", "pattern": "^fixture:decision-[a-z0-9-]+$"}, "statement": {"type": "string", "maxLength": 240}, "owner": {"type": "string"}, "evidence_ref": {"type": "string", "pattern": "^fixture:[a-z0-9-]+$"}, "confidence": {"type": "string", "enum": ["high", "medium", "low", "unknown"]}}}},
+            "follow_ups": {"type": "array", "items": {"$ref": "#/definitions/follow_up"}},
+            "candidate": {"type": "object", "additionalProperties": false, "properties": {"candidate_ref": {"type": "string", "pattern": "^fixture:candidate-[a-z0-9-]+$"}, "last_reviewed": {"type": "string"}, "attendance_signal": {"type": "string"}, "decision_value": {"type": "string"}, "duplicate_risk": {"type": "boolean"}, "next_review_date": {"type": "string"}}}
+          }
+        }
+      }
+    },
+    "output_follow_up": {
+      "type": "object", "additionalProperties": false,
+      "required": ["follow_up_ref", "title", "owner", "status", "destination_mappings", "verification"],
+      "properties": {
+        "follow_up_ref": {"type": "string"}, "title": {"type": "string"}, "owner": {"type": "string"}, "status": {"type": "string"}, "deadline": {"type": "string"}, "dependency": {"type": "string"}, "destination_mappings": {"type": "object", "additionalProperties": {"type": "string"}}, "verification": {"type": "string"}
+      }
+    },
+    "output": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "mode", "idempotency_key", "meeting_ref", "agenda", "prebrief", "notes", "decisions", "follow_ups", "candidate_review", "privacy", "effects", "rollback"],
+      "properties": {
+        "status": {"type": "string", "enum": ["FAILED", "PENDING_APPROVAL", "COMPLETED"]},
+        "mode": {"type": "string"}, "idempotency_key": {"type": "string", "pattern": "^mm-[a-f0-9]{16}$"}, "meeting_ref": {"type": "string"},
+        "agenda": {"type": "object", "additionalProperties": false, "required": ["objective", "items", "time_boxes", "evidence_prompts", "parking_lot"], "properties": {"objective": {"type": "string"}, "items": {"type": "array", "items": {"type": "string"}}, "time_boxes": {"type": "array", "items": {"type": "string"}}, "evidence_prompts": {"type": "array", "items": {"type": "string"}}, "parking_lot": {"type": "array", "items": {"type": "string"}}}},
+        "prebrief": {"type": "object", "additionalProperties": false, "required": ["included", "private", "questions", "risk_prompts", "shared_routing_allowed"], "properties": {"included": {"type": "boolean"}, "private": {"type": "boolean", "const": true}, "questions": {"type": "array", "items": {"type": "string"}}, "risk_prompts": {"type": "array", "items": {"type": "string"}}, "shared_routing_allowed": {"type": "boolean", "const": false}}},
+        "notes": {"type": "object", "additionalProperties": false, "required": ["included", "summary", "evidence_refs", "raw_transcript_retained"], "properties": {"included": {"type": "boolean"}, "summary": {"type": "string", "maxLength": 1600}, "evidence_refs": {"type": "array", "items": {"type": "string"}}, "raw_transcript_retained": {"type": "boolean", "const": false}}},
+        "decisions": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["decision_ref", "statement", "owner", "evidence_ref", "confidence", "alternatives"], "properties": {"decision_ref": {"type": "string"}, "statement": {"type": "string"}, "owner": {"type": "string"}, "evidence_ref": {"type": "string"}, "confidence": {"type": "string"}, "alternatives": {"type": "array", "items": {"type": "string"}}}}},
+        "follow_ups": {"type": "array", "items": {"$ref": "#/definitions/output_follow_up"}},
+        "candidate_review": {"type": "object", "additionalProperties": false, "required": ["included", "disposition", "reasons", "schedule_mutated"], "properties": {"included": {"type": "boolean"}, "disposition": {"type": "string", "enum": ["maintain", "review", "retire", "not_applicable"]}, "reasons": {"type": "array", "items": {"type": "string"}}, "schedule_mutated": {"type": "boolean", "const": false}}},
+        "privacy": {"type": "object", "additionalProperties": false, "required": ["classification", "raw_transcript_retained", "private_data_echoed"], "properties": {"classification": {"type": "string"}, "raw_transcript_retained": {"type": "boolean", "const": false}, "private_data_echoed": {"type": "boolean", "const": false}}},
+        "effects": {"type": "object", "additionalProperties": false, "required": ["external_calls", "messages_sent", "mutations", "private_state_writes"], "properties": {"external_calls": {"type": "array", "maxItems": 0}, "messages_sent": {"type": "array", "maxItems": 0}, "mutations": {"type": "array", "maxItems": 0}, "private_state_writes": {"type": "boolean", "const": false}}},
+        "rollback": {"type": "string", "const": "ABSENT@517f22ee135c298a17a74f84a84b60accdf22cf4/tree:d2514ee298074c70f9bb5fb19f2fc71af7d43f16 (no prior qualified PKT-18 release)"}
+      }
+    },
+    "state": {"type": "object", "additionalProperties": false, "required": ["task_id", "workflow_step", "status", "variables", "last_updated"], "properties": {"task_id": {"type": "string", "pattern": "^mm-[a-z0-9-]+$"}, "workflow_step": {"type": "string"}, "status": {"type": "string", "enum": ["INITIALIZED", "IN_PROGRESS", "PENDING_APPROVAL", "COMPLETED", "FAILED"]}, "variables": {"type": "object", "additionalProperties": false}, "last_updated": {"type": "string", "minLength": 1}}}
+  }
+}
