@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://linktrend.dev/schemas/linkskills/update-candidate-v0.1.json",
+  "title": "LiNKskills Upstream Update Candidate v0.1",
+  "description": "Signed idempotent upstream change proposal; it never changes a current pointer automatically.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "candidate_id", "idempotency_key", "submitted_at", "submitted_by", "source", "diff", "licence_finding", "review_state", "automatic_promotion", "current_pointer_change", "attestation", "trust_boundary"],
+  "properties": {
+    "schema_version": { "type": "string", "const": "0.1" },
+    "candidate_id": { "$ref": "#/$defs/id" },
+    "idempotency_key": { "type": "string", "minLength": 16, "maxLength": 160, "pattern": "^[A-Za-z0-9._:-]+$" },
+    "submitted_at": { "type": "string", "format": "date-time", "maxLength": 40 },
+    "submitted_by": { "type": "string", "minLength": 1, "maxLength": 160 },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["publisher", "repository", "old_ref", "new_ref", "old_inventory_digest", "new_inventory_digest", "old_content_digest", "new_content_digest", "source_commit"],
+      "properties": {
+        "publisher": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "repository": { "type": "string", "minLength": 1, "maxLength": 512 },
+        "old_ref": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "new_ref": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "old_inventory_digest": { "$ref": "#/$defs/digest" },
+        "new_inventory_digest": { "$ref": "#/$defs/digest" },
+        "old_content_digest": { "$ref": "#/$defs/digest" },
+        "new_content_digest": { "$ref": "#/$defs/digest" },
+        "source_commit": { "$ref": "#/$defs/commit" }
+      }
+    },
+    "diff": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reference", "digest"],
+      "properties": {
+        "reference": { "type": "string", "minLength": 1, "maxLength": 512 },
+        "digest": { "$ref": "#/$defs/digest" },
+        "changed_resource_ids": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/id" }, "default": [] }
+      }
+    },
+    "licence_finding": { "type": "string", "enum": ["unchanged_compatible", "changed_compatible", "incompatible", "unknown", "requires_review"] },
+    "review_state": { "type": "string", "enum": ["pending", "accepted", "adapt", "postponed", "rejected"] },
+    "automatic_promotion": { "type": "boolean", "const": false },
+    "current_pointer_change": { "type": "boolean", "const": false },
+    "attestation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["algorithm", "key_id", "issuer", "claims_digest", "signature", "trust_boundary"],
+      "properties": {
+        "algorithm": { "type": "string", "const": "ES256" },
+        "key_id": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "issuer": { "type": "string", "const": "linkskills-upstream-poller" },
+        "claims_digest": { "$ref": "#/$defs/digest" },
+        "signature": { "type": "string", "minLength": 1, "maxLength": 4096 },
+        "trust_boundary": { "type": "string", "const": "linkskills-update-attestation" }
+      }
+    },
+    "trust_boundary": { "type": "string", "const": "linkskills-update-candidate" }
+  },
+  "$defs": {
+    "id": { "type": "string", "minLength": 1, "maxLength": 96, "pattern": "^[a-z0-9][a-z0-9-]*$" },
+    "digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "commit": { "type": "string", "pattern": "^[a-f0-9]{40}(?:[a-f0-9]{24})?$" }
+  }
+}

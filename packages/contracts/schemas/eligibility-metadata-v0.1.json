@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://linktrend.dev/schemas/linkskills/eligibility-metadata-v0.1.json",
+  "title": "LiNKskills Eligibility Metadata v0.1",
+  "description": "The non-substitutable technical, release, profile, and tool gates for selection.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "eligibility_id", "release_id", "evaluated_at", "platform_technical_eligibility", "skills_release_selectability", "consumer_profile_activation", "consumer_tool_authority", "decision", "trust_boundary"],
+  "properties": {
+    "schema_version": { "type": "string", "const": "0.1" },
+    "eligibility_id": { "$ref": "#/$defs/id" },
+    "release_id": { "type": "string", "minLength": 3 },
+    "evaluated_at": { "type": "string", "format": "date-time", "maxLength": 40 },
+    "platform_technical_eligibility": { "$ref": "#/$defs/gate" },
+    "skills_release_selectability": { "$ref": "#/$defs/gate" },
+    "consumer_profile_activation": { "$ref": "#/$defs/gate" },
+    "consumer_tool_authority": { "$ref": "#/$defs/gate" },
+    "decision": { "type": "string", "enum": ["eligible", "ineligible"] },
+    "denial_reasons": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "enum": ["missing_platform_evidence", "release_not_selectable", "profile_not_activated", "tool_not_authorized", "incomplete_provenance", "unknown_trust_boundary", "incompatible", "quarantined", "unqualified", "withdrawn", "superseded"] },
+      "default": []
+    },
+    "trust_boundary": { "type": "string", "const": "linkskills-eligibility" }
+  },
+  "$defs": {
+    "id": { "type": "string", "minLength": 1, "maxLength": 96, "pattern": "^[a-z0-9][a-z0-9-]*$" },
+    "gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "evidence_ref", "evaluated_by"],
+      "properties": {
+        "status": { "type": "boolean" },
+        "evidence_ref": { "type": "string", "pattern": "^opaque:[A-Za-z0-9][A-Za-z0-9._:/-]{1,158}$" },
+        "evaluated_by": { "type": "string", "minLength": 1, "maxLength": 160 }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "required": ["decision"],
+        "properties": { "decision": { "const": "eligible" } }
+      },
+      "then": {
+        "properties": {
+          "platform_technical_eligibility": { "properties": { "status": { "const": true } } },
+          "skills_release_selectability": { "properties": { "status": { "const": true } } },
+          "consumer_profile_activation": { "properties": { "status": { "const": true } } },
+          "consumer_tool_authority": { "properties": { "status": { "const": true } } }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": ["decision"],
+        "properties": { "decision": { "const": "ineligible" } }
+      },
+      "then": {
+        "required": ["denial_reasons"],
+        "properties": { "denial_reasons": { "minItems": 1 } }
+      }
+    }
+  ]
+}
