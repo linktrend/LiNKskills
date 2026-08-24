@@ -1,0 +1,65 @@
+{
+  "definitions": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["audience", "purpose", "content", "status"],
+      "properties": {
+        "audience": { "type": "string", "enum": ["principal", "technical", "agent"] },
+        "purpose": { "type": "string", "minLength": 3, "maxLength": 500 },
+        "content": { "type": "string", "minLength": 1, "maxLength": 12000 },
+        "status": { "type": "string", "enum": ["draft", "decision_request", "approval_request", "approval", "rejection", "update"] },
+        "evidence_pointers": {
+          "type": "array",
+          "maxItems": 32,
+          "items": { "type": "string", "minLength": 1, "maxLength": 1000 }
+        },
+        "uncertainty": {
+          "type": "array",
+          "maxItems": 32,
+          "items": { "type": "string", "minLength": 1, "maxLength": 1000 }
+        },
+        "choices": {
+          "type": "array",
+          "maxItems": 16,
+          "items": { "type": "string", "minLength": 1, "maxLength": 500 }
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "audience", "message", "choices", "evidence", "uncertainty", "effects"],
+      "properties": {
+        "status": { "type": "string", "enum": ["DRAFT", "BLOCKED", "READY_FOR_OWNER"] },
+        "audience": { "type": "string", "enum": ["principal", "technical", "agent"] },
+        "message": { "type": "string", "minLength": 1, "maxLength": 12000 },
+        "choices": {
+          "type": "array",
+          "maxItems": 16,
+          "items": { "type": "string", "minLength": 1, "maxLength": 500 }
+        },
+        "evidence": {
+          "type": "array",
+          "maxItems": 32,
+          "items": { "type": "string", "minLength": 1, "maxLength": 1000 }
+        },
+        "uncertainty": {
+          "type": "array",
+          "maxItems": 32,
+          "items": { "type": "string", "minLength": 1, "maxLength": 1000 }
+        },
+        "effects": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["messages_sent", "external_calls", "mutations"],
+          "properties": {
+            "messages_sent": { "type": "array", "maxItems": 0 },
+            "external_calls": { "type": "array", "maxItems": 0 },
+            "mutations": { "type": "array", "maxItems": 0 }
+          }
+        }
+      }
+    }
+  }
+}
