@@ -1,0 +1,32 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "personal-compliance",
+  "display_name": "Personal Compliance",
+  "version": "1.0.0",
+  "description": "Configurable selfie state transitions and adaptive battery preparation with strict private-consumer boundaries.",
+  "capability_category": "personal_compliance",
+  "provenance": {"author": "LiNKskills Library", "source": "LiNKskills PRD PKT-10", "license": "LiNKtrend internal"},
+  "release_channel": "development",
+  "lifecycle_state": "draft",
+  "format_profile": "heavy",
+  "compatible_runtime_profiles": ["cursor-macos"],
+  "min_capability_tier": "high",
+  "routing": {
+    "when_to_use": "Use for configurable synthetic selfie-compliance, battery projection, bundled measurement, and image-correction preparation.",
+    "when_not_to_use": ["Do not use as a device, image, calendar, reminder, health, treatment, or private-ledger connector.", "Do not use with real private values, images, locations, routines, identifiers, or credentials.", "Do not use for diagnosis, consent inference, treatment change, or standing-rule activation."],
+    "tags": ["personal-compliance", "selfie", "battery", "privacy", "state-machine"],
+    "exclusion_rules": ["OpenClaw owns private state, schedules, bindings, and delivery.", "Platform owns identity and capability grants."]
+  },
+  "execution": {
+    "required_inputs": [{"name": "request", "description": "Synthetic request, consumer configuration, source evidence, and bounded observations.", "schema": {"$ref": "references/schemas.json#/definitions/input"}}],
+    "expected_outputs": [{"name": "result", "description": "State/projection/correction preparation with no effects.", "schema": {"$ref": "references/schemas.json#/definitions/output"}}],
+    "procedure_summary": "Validate privacy and provenance, classify the state machine, learn bounded synthetic rates, preserve uncertainty/corrections, and return an owner-gated result.",
+    "forbidden_actions": ["Store or echo real private data or image bytes", "Read a device or invoke a calendar/reminder/image/ledger connector", "Diagnose or change treatment", "Infer consent or activate standing rules"],
+    "verification_steps": ["Run canonical validator", "Run scoped state/projection/privacy tests", "Confirm hashes, no prohibited paths, no external effects, and exact rollback"],
+    "completion_criteria": ["All required states and projections are typed", "Effects are empty and private_state_writes is false", "Uncertainty, owner escalation, idempotency, and rollback are explicit"]
+  },
+  "dependencies": {"schema_version": "0.1", "skill_dependencies": ["company-communication"], "packaged_tools": [], "host_capabilities": ["filesystem_read", "filesystem_write"], "external_services": [], "library_assets": [], "runtime_requirements": [], "optional_dependencies": []},
+  "eval": {"suite_path": "references/eval-suite.json", "suite_schema_version": "0.1", "required_certification_profiles": ["cursor-macos"], "verification_refs": ["references/eval-suite.yaml"]},
+  "telemetry": {"classification": "public_internal", "redaction_rules": ["strip_private_values", "strip_images", "strip_locations", "strip_routines", "strip_reasoning"], "retention_policy": "retain synthetic IDs, evidence hashes, typed outcomes, and receipts only"},
+  "fragments": [{"fragment_id": "summary", "disclosure_level": 2, "path": "SKILL.md"}, {"fragment_id": "advanced", "disclosure_level": 4, "path": "advanced/advanced.md"}]
+}
