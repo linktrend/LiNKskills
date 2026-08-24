@@ -11,7 +11,7 @@ import unittest
 from pathlib import Path
 
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[3]
 SKILL = ROOT / "skills" / "personal-compliance"
 sys.path.insert(0, str(ROOT / "packages" / "contracts"))
 from linkskills_contracts import validate_instance  # noqa: E402
