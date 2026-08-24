@@ -129,7 +129,7 @@ def _selfie_state(request: dict[str, Any], config: dict[str, Any]) -> tuple[str,
 
 
 def _battery_projection(request: dict[str, Any], config: dict[str, Any]) -> dict[str, Any]:
-    """Learn local synthetic rates and make a saturation-aware projection."""
+    """Learn context-specific synthetic rates and make a bounded projection."""
 
     battery = request.get("battery") or {}
     observations = battery.get("observations") or []
@@ -144,8 +144,8 @@ def _battery_projection(request: dict[str, Any], config: dict[str, Any]) -> dict
     ordered = sorted(observations, key=lambda item: float(item.get("timestamp_hours", -1)))
     if any(not isinstance(item.get("percentage"), (int, float)) or not 0 <= item["percentage"] <= 100 for item in ordered):
         return {"available": False, "current_percent": None, "projected_percent": None, "threshold_percent": threshold, "alert": False, "maintenance_cancelled": False, "rate_labels": ["invalid-observation"]}
-    charge_rates: list[float] = []
-    discharge_rates: list[float] = []
+    charge_rates_by_context: dict[str, list[float]] = {}
+    discharge_rates_by_context: dict[str, list[float]] = {}
     contexts: set[str] = set()
     for before, after in zip(ordered, ordered[1:]):
         elapsed = float(after["timestamp_hours"]) - float(before["timestamp_hours"])
@@ -155,21 +155,32 @@ def _battery_projection(request: dict[str, Any], config: dict[str, Any]) -> dict
         contexts.add(context)
         delta = float(after["percentage"]) - float(before["percentage"])
         if delta > 0 and after.get("plugged") is True:
-            charge_rates.append(delta / elapsed)
+            charge_rates_by_context.setdefault(context, []).append(delta / elapsed)
         elif delta < 0 and after.get("plugged") is False:
-            discharge_rates.append(abs(delta) / elapsed)
+            discharge_rates_by_context.setdefault(context, []).append(abs(delta) / elapsed)
     current = float(ordered[-1]["percentage"])
+    current_context = f"{ordered[-1].get('charger_key')}@{ordered[-1].get('location_key')}"
+    charge_rates = charge_rates_by_context.get(current_context, [])
+    discharge_rates = discharge_rates_by_context.get(current_context, [])
     labels = [f"contexts:{len(contexts)}"]
     if len(charge_rates) < minimum or len(discharge_rates) < minimum:
         labels.append("provisional-rates")
-    else:
-        labels.append("learned-rates")
-    discharge = sum(discharge_rates) / len(discharge_rates) if discharge_rates else 0.0
-    projected = max(0.0, round(current - discharge * float(horizon), 2))
-    alert = projected <= float(threshold) if discharge_rates else False
+        return {"available": False, "current_percent": current, "projected_percent": None, "threshold_percent": threshold, "alert": False, "maintenance_cancelled": False, "rate_labels": labels + [f"context:{current_context}"]}
+    labels.append("learned-rates")
+    charge = sum(charge_rates) / len(charge_rates)
+    discharge = sum(discharge_rates) / len(discharge_rates)
+    # Keep the discharge risk projection for threshold alerts, while using
+    # the learned charge rate and upper target as a hard saturation bound.
+    # This models the bounded next-charge window without treating charging as
+    # permission to suppress a consumer-owned low-battery alert.
+    discharge_projection = max(0.0, round(current - discharge * float(horizon), 2))
+    charge_saturation = min(float(target), round(current + charge * float(horizon), 2))
+    projected = min(discharge_projection, charge_saturation)
+    alert = projected <= float(threshold)
     labels.append("saturation-aware-charge-estimate")
+    labels.append(f"context:{current_context}")
     labels.append("silent-no-alert" if not alert else "threshold-alert")
-    return {"available": bool(discharge_rates), "current_percent": current, "projected_percent": projected if discharge_rates else None, "threshold_percent": threshold, "alert": alert, "maintenance_cancelled": False, "rate_labels": labels}
+    return {"available": True, "current_percent": current, "projected_percent": projected, "threshold_percent": threshold, "alert": alert, "maintenance_cancelled": False, "rate_labels": labels}
 
 
 def _image_review(request: dict[str, Any]) -> dict[str, Any]:
@@ -236,11 +247,16 @@ def main() -> int:
     try:
         value = json.load(sys.stdin)
         if not isinstance(value, dict):
-            raise ValueError("input must be a JSON object")
+            safe = {"invalid_input_type": type(value).__name__}
+            result = _result(status="FAILED", mode="other", disposition="invalid-input", rationale="Input must be a JSON object; no processing occurred.", confidence="high", evidence_refs=[], escalation_required=True, escalation_reason="Provide one object matching the input contract.", idempotency_key=_idempotency_key(safe))
+            print(json.dumps(result, sort_keys=True))
+            return 1
         print(json.dumps(normalize_request(value), sort_keys=True))
         return 0
-    except Exception as error:  # structured, non-sensitive CLI failure
-        print(json.dumps({"status": "FAILED", "error": str(error)}, sort_keys=True))
+    except Exception:  # structured, non-sensitive CLI failure
+        safe = {"invalid_input": "malformed"}
+        result = _result(status="FAILED", mode="other", disposition="invalid-input", rationale="Input could not be parsed or validated; no processing occurred.", confidence="high", evidence_refs=[], escalation_required=True, escalation_reason="Provide one object matching the input contract.", idempotency_key=_idempotency_key(safe))
+        print(json.dumps(result, sort_keys=True))
         return 1
 
 

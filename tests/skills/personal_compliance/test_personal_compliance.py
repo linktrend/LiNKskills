@@ -6,6 +6,7 @@ import hashlib
 import importlib.util
 import json
 import re
+import subprocess
 import sys
 import unittest
 from pathlib import Path
@@ -135,6 +136,29 @@ class PersonalComplianceTests(unittest.TestCase):
         self.assertIn("learned-rates", result["battery_projection"]["rate_labels"])
         self.assertIn("saturation-aware-charge-estimate", result["battery_projection"]["rate_labels"])
         self.assert_output(result)
+
+    def test_battery_requires_minimum_rates_in_the_active_context(self):
+        config = {**request("battery_tracking")["configuration"], "minimum_rate_observations": 2}
+        observations = [
+            {"timestamp_hours": 0, "percentage": 40, "plugged": False, "charger_key": "fixture:a", "location_key": "fixture:home"},
+            {"timestamp_hours": 1, "percentage": 35, "plugged": False, "charger_key": "fixture:a", "location_key": "fixture:home"},
+            {"timestamp_hours": 2, "percentage": 55, "plugged": True, "charger_key": "fixture:b", "location_key": "fixture:office"},
+        ]
+        result = HELPER.normalize_request(request("battery_tracking", configuration=config, battery={"observations": observations}))
+        projection = result["battery_projection"]
+        self.assertFalse(projection["available"])
+        self.assertIsNone(projection["projected_percent"])
+        self.assertFalse(projection["alert"])
+        self.assertIn("provisional-rates", projection["rate_labels"])
+        self.assert_output(result)
+
+    def test_malformed_cli_input_keeps_the_failure_contract(self):
+        helper_path = SKILL / "scripts" / "helper_tool.py"
+        completed = subprocess.run([sys.executable, str(helper_path)], input="[]", text=True, capture_output=True, check=False)
+        self.assertEqual(completed.returncode, 1)
+        result = json.loads(completed.stdout)
+        self.assert_output(result)
+        self.assertEqual(result["status"], "FAILED")
 
     def test_silent_no_alert_has_no_reminder(self):
         config = {**request("battery_tracking")["configuration"], "next_charge_hours": 1}
