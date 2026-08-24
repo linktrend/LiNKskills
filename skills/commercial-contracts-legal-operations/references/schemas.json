@@ -33,11 +33,13 @@
     "output": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["status", "workflow", "decision", "evidence_refs", "next_actions", "escalation", "effects", "jurisdiction_assessment"],
+      "required": ["status", "workflow", "decision", "disposition", "idempotency_key", "evidence_refs", "next_actions", "escalation", "effects", "jurisdiction_assessment"],
       "properties": {
         "status": {"enum": ["INITIALIZED", "IN_PROGRESS", "PENDING_APPROVAL", "COMPLETED", "FAILED"]},
         "workflow": {"type": "string"},
         "decision": {"type": "object", "required": ["disposition", "rationale", "confidence", "legal_authority"], "properties": {"disposition": {"type": "string"}, "rationale": {"type": "string"}, "confidence": {"enum": ["high", "medium", "low", "unknown"]}, "legal_authority": {"const": "not_granted"}}, "additionalProperties": false},
+        "disposition": {"type": "string", "minLength": 1},
+        "idempotency_key": {"type": "string", "pattern": "^clo-[a-f0-9]{16}$"},
         "evidence_refs": {"type": "array", "items": {"type": "string"}},
         "obligation_register": {"type": "array", "items": {"$ref": "#/definitions/obligation"}},
         "playbook_comparison": {"type": "array", "items": {"type": "object", "required": ["ref", "result", "evidence_refs"], "properties": {"ref": {"type": "string"}, "result": {"enum": ["match", "gap", "unclear", "not_applicable"]}, "evidence_refs": {"type": "array", "items": {"type": "string"}}}, "additionalProperties": false}},
