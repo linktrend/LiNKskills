@@ -1,0 +1,32 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "sales-customer-management",
+  "display_name": "Sales and Customer Management",
+  "version": "1.0.0",
+  "description": "Evidence-backed sales and customer-management preparation with Odoo and LiNKreach ownership boundaries.",
+  "capability_category": "sales_customer_management",
+  "provenance": {"author": "LiNKskills Library", "source": "LiNKskills PRD PKT-16", "license": "LiNKtrend internal"},
+  "release_channel": "development",
+  "lifecycle_state": "draft",
+  "format_profile": "heavy",
+  "compatible_runtime_profiles": ["cursor-macos"],
+  "min_capability_tier": "high",
+  "routing": {
+    "when_to_use": "Use for evidenced lead, pipeline, proposal, onboarding, renewal-risk, or founder-escalation preparation.",
+    "when_not_to_use": ["Do not use as an Odoo connector or CRM runtime.", "Do not use to send messages, mutate records, commit pricing, or promise renewals.", "Do not use with live credentials, customer data, contract text, or private company data."],
+    "tags": ["sales", "customer-management", "pipeline", "onboarding", "renewal", "risk"],
+    "exclusion_rules": ["LiNKreach owns customer-service and relationship operations.", "The owning consumer owns Odoo credentials and connector execution."]
+  },
+  "execution": {
+    "required_inputs": [{"name": "request", "description": "Synthetic request reference, workflow, source evidence, authority, and privacy classification.", "schema": {"$ref": "references/schemas.json#/definitions/input"}}],
+    "expected_outputs": [{"name": "result", "description": "Auditable preparation, denial, or escalation with no live effects.", "schema": {"$ref": "references/schemas.json#/definitions/output"}}],
+    "procedure_summary": "Normalize evidence, reason over authority and risk, prepare an owner-bound artifact, and append redacted audit state.",
+    "forbidden_actions": ["Store or echo live credentials, customer data, contract text, or private company data", "Call or mutate Odoo", "Send messages or commit pricing, contracts, or renewals", "Infer founder approval"],
+    "verification_steps": ["Run the canonical validator", "Run the scoped unit/eval checks", "Confirm no prohibited paths or live effects"],
+    "completion_criteria": ["Output contract is complete and evidence-grounded", "Effects sent/applied/mutated_records are false", "Owner, escalation, and rollback are explicit"]
+  },
+  "dependencies": {"schema_version": "0.1", "skill_dependencies": ["marketing-strategist", "market-analyst", "search-strategy"], "packaged_tools": [], "host_capabilities": ["filesystem_read", "filesystem_write"], "external_services": [], "library_assets": [], "runtime_requirements": [], "optional_dependencies": []},
+  "eval": {"suite_path": "references/eval-suite.json", "suite_schema_version": "0.1", "required_certification_profiles": ["cursor-macos"], "verification_refs": ["references/eval-suite.yaml"]},
+  "telemetry": {"classification": "public_internal", "redaction_rules": ["strip_secrets", "strip_customer_data", "strip_contract_text", "strip_reasoning"], "retention_policy": "retain synthetic IDs, evidence hashes, and receipts only"},
+  "fragments": [{"fragment_id": "summary", "disclosure_level": 2, "path": "SKILL.md"}, {"fragment_id": "advanced", "disclosure_level": 4, "path": "advanced/advanced.md"}]
+}
