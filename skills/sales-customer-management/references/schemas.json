@@ -1,0 +1,53 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Sales and Customer Management contracts",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["request_id", "workflow", "source_evidence", "authority", "privacy_classification"],
+      "properties": {
+        "request_id": {"type": "string", "pattern": "^scm-[a-z0-9-]+$"},
+        "workflow": {"type": "string", "enum": ["lead_intake", "qualification", "pipeline", "proposal_follow_up", "onboarding", "renewal_risk", "founder_escalation", "other"]},
+        "source_evidence": {"type": "array", "items": {"$ref": "#/definitions/evidence"}, "minItems": 1},
+        "authority": {"type": "object", "required": ["status", "owner"], "properties": {"status": {"enum": ["confirmed", "provisional", "not_reported"]}, "owner": {"type": "string"}, "approved_actions": {"type": "array", "items": {"enum": ["read", "prepare", "write"]}}}, "additionalProperties": false},
+        "privacy_classification": {"type": "string", "enum": ["synthetic", "redacted", "restricted"]},
+        "other_specify": {"type": "string", "maxLength": 240}
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "required": ["ref", "claim", "status", "provenance"],
+      "properties": {"ref": {"type": "string"}, "claim": {"type": "string", "maxLength": 500}, "status": {"enum": ["confirmed", "inferred", "not_reported"]}, "provenance": {"type": "string"}, "licence": {"type": "string"}},
+      "additionalProperties": false
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "workflow", "decision", "evidence_refs", "next_actions", "escalation", "effects"],
+      "properties": {
+        "status": {"enum": ["INITIALIZED", "IN_PROGRESS", "PENDING_APPROVAL", "COMPLETED", "FAILED"]},
+        "workflow": {"type": "string"},
+        "decision": {"type": "object", "required": ["disposition", "rationale", "confidence"], "properties": {"disposition": {"type": "string"}, "rationale": {"type": "string"}, "confidence": {"enum": ["high", "medium", "low", "unknown"]}}, "additionalProperties": false},
+        "evidence_refs": {"type": "array", "items": {"type": "string"}},
+        "next_actions": {"type": "array", "items": {"type": "string"}},
+        "escalation": {"type": "object", "required": ["required", "reason", "owner"], "properties": {"required": {"type": "boolean"}, "reason": {"type": "string"}, "owner": {"type": "string"}}, "additionalProperties": false},
+        "effects": {"type": "object", "required": ["sent", "applied", "mutated_records"], "properties": {"sent": {"const": false}, "applied": {"const": false}, "mutated_records": {"const": false}}, "additionalProperties": false},
+        "rollback": {"type": "string"}
+      }
+    },
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["task_id", "workflow_step", "status", "variables", "last_updated"],
+      "properties": {
+        "task_id": {"type": "string", "pattern": "^scm-[a-z0-9-]+$"},
+        "workflow_step": {"type": "string"},
+        "status": {"enum": ["INITIALIZED", "IN_PROGRESS", "PENDING_APPROVAL", "COMPLETED", "FAILED"]},
+        "variables": {"type": "object", "additionalProperties": false, "properties": {"request_digest": {"type": "string"}, "evidence_refs": {"type": "array", "items": {"type": "string"}}, "owner": {"type": "string"}}},
+        "last_updated": {"type": "string", "format": "date-time"},
+        "rollback": {"type": "string"}
+      }
+    }
+  }
+}
