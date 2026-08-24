@@ -136,10 +136,10 @@ class TimeManagementTests(unittest.TestCase):
         self.assert_output(result)
 
     def test_privacy_and_missing_evidence_do_not_echo(self):
-        private = request(secret="do-not-echo")
+        private = request(secret="ltfx.time-management-private.v1")
         rejected = HELPER.normalize_request(private)
         self.assertEqual(rejected["status"], "FAILED")
-        self.assertNotIn("do-not-echo", json.dumps(rejected))
+        self.assertNotIn("ltfx.time-management-private.v1", json.dumps(rejected))
         missing = request(source_evidence=[{"ref": "fixture:tm-demo-001", "status": "unknown", "provenance": "synthetic-fixture", "licence": "internal"}])
         self.assertEqual(HELPER.normalize_request(missing)["status"], "PENDING_APPROVAL")
 
