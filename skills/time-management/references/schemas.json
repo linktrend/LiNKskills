@@ -1,0 +1,112 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Time Management contracts",
+  "definitions": {
+    "evidence": {
+      "type": "object", "additionalProperties": false,
+      "required": ["ref", "status", "provenance", "licence"],
+      "properties": {
+        "ref": {"type": "string", "pattern": "^fixture:[a-z0-9-]+$"},
+        "status": {"type": "string", "enum": ["confirmed", "inferred", "not_reported", "unknown"]},
+        "provenance": {"type": "string", "minLength": 1},
+        "licence": {"type": "string", "minLength": 1},
+        "claim": {"type": "string", "maxLength": 240}
+      }
+    },
+    "task": {
+      "type": "object", "additionalProperties": false,
+      "required": ["title", "confirmation", "owner", "importance", "difficulty", "estimated_periods", "status"],
+      "properties": {
+        "task_id": {"type": "string", "pattern": "^T-[0-9]{6}$"},
+        "title": {"type": "string", "minLength": 2, "maxLength": 200},
+        "confirmation": {"type": "string", "enum": ["Confirmed", "Provisional"]},
+        "owner": {"type": "string", "enum": ["Principal", "Lisa", "subordinate", "unassigned"]},
+        "importance": {"type": "string", "enum": ["critical", "high", "normal", "low"]},
+        "difficulty": {"type": "string", "enum": ["easy", "medium", "hard"]},
+        "estimated_periods": {"type": "integer", "minimum": 1, "maximum": 20},
+        "deadline": {"type": "string", "maxLength": 80},
+        "dependencies": {"type": "array", "items": {"type": "string", "maxLength": 120}},
+        "unlocks": {"type": "array", "items": {"type": "string", "maxLength": 120}},
+        "external_mappings": {"type": "object", "additionalProperties": {"type": "string", "maxLength": 120}},
+        "status": {"type": "string", "enum": ["Provisional", "Ready", "Scheduled", "In progress", "Waiting", "Blocked", "Awaiting Carlos's update", "Awaiting for other", "Verified complete", "Completed — Carlos reported", "Cancelled", "duplicate", "created by mistake"]},
+        "evidence_refs": {"type": "array", "items": {"type": "string", "pattern": "^fixture:[a-z0-9-]+$"}},
+        "verification_ref": {"type": "string", "pattern": "^fixture:[a-z0-9-]+$"},
+        "awaited": {"type": "string", "maxLength": 160}
+      }
+    },
+    "period": {
+      "type": "object", "additionalProperties": false,
+      "required": ["period_id", "label", "difficulty", "protected"],
+      "properties": {
+        "period_id": {"type": "string", "pattern": "^fixture:period-[a-z0-9-]+$"},
+        "label": {"type": "string", "minLength": 2, "maxLength": 80},
+        "difficulty": {"type": "string", "enum": ["easy", "medium", "hard", "flexible", "break"]},
+        "protected": {"type": "boolean"},
+        "available": {"type": "boolean"}
+      }
+    },
+    "input": {
+      "type": "object", "additionalProperties": false,
+      "required": ["request_id", "mode", "privacy_classification", "source_evidence", "tasks", "capacity"],
+      "properties": {
+        "request_id": {"type": "string", "pattern": "^tm-[a-z0-9-]+$"},
+        "mode": {"type": "string", "enum": ["intake", "plan", "morning_review", "evening_review", "monthly_report", "standing_rule"]},
+        "privacy_classification": {"type": "string", "enum": ["synthetic", "redacted", "restricted"]},
+        "source_evidence": {"type": "array", "minItems": 1, "items": {"$ref": "#/definitions/evidence"}},
+        "tasks": {"type": "array", "items": {"$ref": "#/definitions/task"}},
+        "capacity": {
+          "type": "object", "additionalProperties": false, "required": ["state", "periods"],
+          "properties": {
+            "state": {"type": "string", "enum": ["high", "normal", "reduced", "unavailable", "recovered"]},
+            "periods": {"type": "array", "items": {"$ref": "#/definitions/period"}},
+            "flexible_period_id": {"type": "string", "pattern": "^fixture:period-[a-z0-9-]+$"},
+            "overdue_principal_work": {"type": "boolean"},
+            "ready_current_week": {"type": "boolean"},
+            "resolvable_blocker": {"type": "boolean"},
+            "deadline_at_risk": {"type": "boolean"},
+            "useful_action_before_next_workday": {"type": "boolean"}
+          }
+        },
+        "requested_actions": {"type": "array", "uniqueItems": true, "items": {"type": "string", "enum": ["read", "prepare", "research", "record", "schedule", "send", "commit", "activate"]}},
+        "review": {
+          "type": "object", "additionalProperties": false,
+          "properties": {"result_known": {"type": "boolean"}, "acknowledged": {"type": "boolean"}, "outcomes": {"type": "array", "items": {"type": "string"}}}
+        },
+        "standing_rule": {
+          "type": "object", "additionalProperties": false,
+          "properties": {"trigger": {"type": "string"}, "automatic_action": {"type": "string"}, "exceptions": {"type": "array", "items": {"type": "string"}}, "affected_agents_or_systems": {"type": "array", "items": {"type": "string"}}, "permanence_or_review_date": {"type": "string"}}
+        },
+        "weekly_outcomes": {"type": "array", "items": {"type": "string"}},
+        "four_week_warnings": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "output_task": {
+      "type": "object", "additionalProperties": false,
+      "required": ["task_id", "title", "confirmation", "owner", "status", "priority_rank", "evidence_required"],
+      "properties": {
+        "task_id": {"type": "string", "pattern": "^T-[0-9]{6}$"}, "title": {"type": "string"}, "confirmation": {"type": "string"}, "owner": {"type": "string"}, "status": {"type": "string"}, "priority_rank": {"type": "integer", "minimum": 1}, "estimated_periods": {"type": "integer", "minimum": 1}, "dependencies": {"type": "array", "items": {"type": "string"}}, "unlocks": {"type": "array", "items": {"type": "string"}}, "external_mappings": {"type": "object", "additionalProperties": {"type": "string"}}, "proposed_period": {"type": ["string", "null"]}, "evidence_required": {"type": "array", "items": {"type": "string"}}, "verification": {"type": "string"}
+      }
+    },
+    "output": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "mode", "idempotency_key", "items", "priority_order", "capacity_decision", "flexible_period", "reviews", "monthly_report", "standing_rule", "decisions", "evidence_refs", "effects", "rollback"],
+      "properties": {
+        "status": {"type": "string", "enum": ["FAILED", "PENDING_APPROVAL", "COMPLETED"]},
+        "mode": {"type": "string"},
+        "idempotency_key": {"type": "string", "pattern": "^tm-[a-f0-9]{16}$"},
+        "items": {"type": "array", "items": {"$ref": "#/definitions/output_task"}},
+        "priority_order": {"type": "array", "items": {"type": "string", "pattern": "^T-[0-9]{6}$"}},
+        "capacity_decision": {"type": "object", "additionalProperties": false, "required": ["state", "recommendation", "time_off_question", "health_cause_included"], "properties": {"state": {"type": "string"}, "recommendation": {"type": "string"}, "time_off_question": {"type": "boolean"}, "health_cause_included": {"type": "boolean", "const": false}}},
+        "flexible_period": {"type": "object", "additionalProperties": false, "required": ["decision", "checks", "reason"], "properties": {"decision": {"type": "string", "enum": ["work", "personal", "unknown"]}, "checks": {"type": "object", "additionalProperties": false, "required": ["no_overdue_principal_work", "no_ready_current_week_task", "no_resolvable_blocker", "no_at_risk_deadline_or_outcome", "no_useful_action_before_next_workday"], "properties": {"no_overdue_principal_work": {"type": "boolean"}, "no_ready_current_week_task": {"type": "boolean"}, "no_resolvable_blocker": {"type": "boolean"}, "no_at_risk_deadline_or_outcome": {"type": "boolean"}, "no_useful_action_before_next_workday": {"type": "boolean"}}}, "reason": {"type": "string"}}},
+        "reviews": {"type": "object", "additionalProperties": false, "required": ["morning", "evening", "acknowledgement_inferred", "end_check"], "properties": {"morning": {"type": "array", "items": {"type": "string"}}, "evening": {"type": "array", "items": {"type": "string"}}, "acknowledgement_inferred": {"type": "boolean", "const": false}, "end_check": {"type": "object", "additionalProperties": false, "required": ["requested", "reason"], "properties": {"requested": {"type": "boolean"}, "reason": {"type": "string"}}}}},
+        "monthly_report": {"type": "object", "additionalProperties": false, "required": ["included", "mobile_friendly", "contains_task_ids", "omits_minor_task_dump"], "properties": {"included": {"type": "boolean"}, "mobile_friendly": {"type": "boolean"}, "contains_task_ids": {"type": "boolean"}, "omits_minor_task_dump": {"type": "boolean"}}},
+        "standing_rule": {"type": "object", "additionalProperties": false, "required": ["proposed", "activated", "trigger", "automatic_action", "exceptions", "affected_agents_or_systems", "permanence_or_review_date"], "properties": {"proposed": {"type": "boolean"}, "activated": {"type": "boolean", "const": false}, "trigger": {"type": "string"}, "automatic_action": {"type": "string"}, "exceptions": {"type": "array", "items": {"type": "string"}}, "affected_agents_or_systems": {"type": "array", "items": {"type": "string"}}, "permanence_or_review_date": {"type": "string"}}},
+        "decisions": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["matter", "recommendation", "reason", "choices"], "properties": {"matter": {"type": "string"}, "recommendation": {"type": "string"}, "reason": {"type": "string"}, "choices": {"type": "array", "minItems": 2, "items": {"type": "string"}}}}},
+        "evidence_refs": {"type": "array", "items": {"type": "string"}},
+        "effects": {"type": "object", "additionalProperties": false, "required": ["external_calls", "messages_sent", "mutations", "private_state_writes"], "properties": {"external_calls": {"type": "array", "maxItems": 0}, "messages_sent": {"type": "array", "maxItems": 0}, "mutations": {"type": "array", "maxItems": 0}, "private_state_writes": {"type": "boolean", "const": false}}},
+        "rollback": {"type": "string", "const": "ABSENT@517f22ee135c298a17a74f84a84b60accdf22cf4/tree:d2514ee298074c70f9bb5fb19f2fc71af7d43f16 (no prior qualified PKT-11 release)"}
+      }
+    },
+    "state": {"type": "object", "additionalProperties": false, "required": ["task_id", "workflow_step", "status", "variables", "last_updated"], "properties": {"task_id": {"type": "string", "pattern": "^tm-[a-z0-9-]+$"}, "workflow_step": {"type": "string"}, "status": {"type": "string", "enum": ["INITIALIZED", "IN_PROGRESS", "PENDING_APPROVAL", "COMPLETED", "FAILED"]}, "variables": {"type": "object", "additionalProperties": false}, "last_updated": {"type": "string", "minLength": 1}}}
+  }
+}
