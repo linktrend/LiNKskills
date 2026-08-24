@@ -16,7 +16,6 @@ DECLARED_ACTIONS = {"read", "prepare", "compare", *FORBIDDEN_ACTIONS}
 ROLLBACK_TARGET = (
     "ABSENT@c89bad5ce3bc91340cf388b923d2befecb406546/"
     "tree:9d0be7cedb0fc4ec42bf382735ede36d100f8614"
-    " (no prior qualified PKT-17 release)"
 )
 EFFECTS = {"sent": False, "signed": False, "accepted": False, "filed": False, "mutated_records": False}
 

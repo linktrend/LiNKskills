@@ -38,6 +38,12 @@ class CommercialContractsLegalOperationsTests(unittest.TestCase):
         self.assertIn("jurisdiction_assessment", schema["definitions"]["output"]["required"])
         self.assertIn("disposition", schema["definitions"]["output"]["required"])
         self.assertIn("idempotency_key", schema["definitions"]["output"]["required"])
+        self.assertIn("rollback", schema["definitions"]["output"]["required"])
+        self.assertEqual(
+            schema["definitions"]["output"]["properties"]["rollback"]["const"],
+            "ABSENT@c89bad5ce3bc91340cf388b923d2befecb406546/tree:9d0be7cedb0fc4ec42bf382735ede36d100f8614",
+        )
+        self.assertIn("requested_actions", schema["definitions"]["input"]["properties"])
         self.assertIn("legal_authority", schema["definitions"]["output"]["properties"]["decision"]["required"])
         suite = json.loads((SKILL / "references/eval-suite.json").read_text(encoding="utf-8"))
         self.assertEqual("commercial-contracts-legal-operations", suite["skill_id"])
@@ -81,10 +87,29 @@ class CommercialContractsLegalOperationsTests(unittest.TestCase):
             self.assertEqual(result["disposition"], result["decision"]["disposition"])
             self.assertRegex(result["idempotency_key"], r"^clo-[a-f0-9]{16}$")
             self.assertTrue(all(value is False for value in result["effects"].values()))
+        missing_rollback = {key: value for key, value in cases[0].items() if key != "rollback"}
+        self.assertFalse(validate_instance(missing_rollback, output_schema).ok)
+        wrong_rollback = {**cases[0], "rollback": "ABSENT@other/tree:0"}
+        self.assertFalse(validate_instance(wrong_rollback, output_schema).ok)
         unknown = cases[1]
         self.assertEqual("PENDING_APPROVAL", unknown["status"])
         self.assertEqual("authority_escalation", unknown["disposition"])
         self.assertTrue(unknown["escalation"]["required"])
+
+    def test_input_action_contract_preserves_fail_closed_boundary(self):
+        schema = json.loads((SKILL / "references/schemas.json").read_text(encoding="utf-8"))
+        input_schema = {**schema, **schema["definitions"]["input"]}
+        base = {
+            "request_id": "clo-demo-001",
+            "workflow": "intake",
+            "matter_ref": "matter-demo-001",
+            "source_evidence": [{"ref": "fixture:source-demo-001", "claim": "synthetic", "status": "confirmed", "provenance": "fixture", "licence": "internal"}],
+            "authority": {"status": "confirmed", "owner": "principal"},
+            "privacy_classification": "synthetic",
+        }
+        self.assertTrue(validate_instance({**base, "requested_actions": ["read", "prepare"]}, input_schema).ok)
+        self.assertTrue(validate_instance({**base, "requested_actions": ["sign"]}, input_schema).ok)
+        self.assertFalse(validate_instance({**base, "requested_actions": ["publish"]}, input_schema).ok)
 
     def test_helper_rejects_malformed_action_lists(self):
         helper = load_helper()

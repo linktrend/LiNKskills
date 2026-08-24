@@ -52,7 +52,9 @@ Classify unavailable, malformed, unauthorized, jurisdiction-ambiguous, and priva
 
 PKT-17 has no prior qualified release or live pointer. The exact rollback target is:
 
-`ABSENT@c89bad5ce3bc91340cf388b923d2befecb406546/tree:9d0be7cedb0fc4ec42bf382735ede36d100f8614 (no prior qualified PKT-17 release)`
+`ABSENT@c89bad5ce3bc91340cf388b923d2befecb406546/tree:9d0be7cedb0fc4ec42bf382735ede36d100f8614`
+
+This identity represents no prior qualified PKT-17 release.
 
 Rollback means discard the unapproved local artifact and restore that absent state. It
 does not create a release, change a catalog pointer, contact a counterparty, or mutate a

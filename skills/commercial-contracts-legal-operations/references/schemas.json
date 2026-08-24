@@ -13,6 +13,7 @@
         "jurisdiction": {"type": "string", "maxLength": 160},
         "source_evidence": {"type": "array", "items": {"$ref": "#/definitions/evidence"}, "minItems": 1},
         "authority": {"type": "object", "required": ["status", "owner"], "properties": {"status": {"enum": ["confirmed", "provisional", "not_reported"]}, "owner": {"type": "string"}, "approved_actions": {"type": "array", "items": {"enum": ["read", "prepare", "compare"]}}}, "additionalProperties": false},
+        "requested_actions": {"type": "array", "uniqueItems": true, "items": {"enum": ["read", "prepare", "compare", "sign", "accept", "send", "file", "negotiate", "renew", "terminate", "mutate"]}},
         "privacy_classification": {"type": "string", "enum": ["synthetic", "redacted", "restricted"]},
         "privilege_status": {"type": "string", "enum": ["not_claimed", "owner_marked", "unknown"]},
         "other_specify": {"type": "string", "maxLength": 240}
@@ -33,7 +34,7 @@
     "output": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["status", "workflow", "decision", "disposition", "idempotency_key", "evidence_refs", "next_actions", "escalation", "effects", "jurisdiction_assessment"],
+      "required": ["status", "workflow", "decision", "disposition", "idempotency_key", "evidence_refs", "next_actions", "escalation", "effects", "jurisdiction_assessment", "rollback"],
       "properties": {
         "status": {"enum": ["INITIALIZED", "IN_PROGRESS", "PENDING_APPROVAL", "COMPLETED", "FAILED"]},
         "workflow": {"type": "string"},
@@ -47,7 +48,7 @@
         "escalation": {"type": "object", "required": ["required", "reason", "owner"], "properties": {"required": {"type": "boolean"}, "reason": {"type": "string"}, "owner": {"enum": ["lawyer", "principal", "owner", "none"]}}, "additionalProperties": false},
         "jurisdiction_assessment": {"type": "object", "required": ["status", "basis"], "properties": {"status": {"enum": ["supplied_not_verified", "unknown", "escalate", "not_applicable"]}, "basis": {"type": "string"}}, "additionalProperties": false},
         "effects": {"type": "object", "required": ["sent", "signed", "accepted", "filed", "mutated_records"], "properties": {"sent": {"const": false}, "signed": {"const": false}, "accepted": {"const": false}, "filed": {"const": false}, "mutated_records": {"const": false}}, "additionalProperties": false},
-        "rollback": {"type": "string"}
+        "rollback": {"const": "ABSENT@c89bad5ce3bc91340cf388b923d2befecb406546/tree:9d0be7cedb0fc4ec42bf382735ede36d100f8614"}
       }
     },
     "state": {
