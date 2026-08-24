@@ -41,7 +41,7 @@
       "additionalProperties": false,
       "required": ["task_id", "workflow_step", "status", "variables", "last_updated"],
       "properties": {
-        "task_id": {"type": "string", "pattern": "^scm-[a-z0-9-]+$"},
+        "task_id": {"type": "string", "pattern": "^\\d{8}-\\d{4}-[A-Z0-9]+-\\d{6}$"},
         "workflow_step": {"type": "string"},
         "status": {"enum": ["INITIALIZED", "IN_PROGRESS", "PENDING_APPROVAL", "COMPLETED", "FAILED"]},
         "variables": {"type": "object", "additionalProperties": false, "properties": {"request_digest": {"type": "string"}, "evidence_refs": {"type": "array", "items": {"type": "string"}}, "owner": {"type": "string"}}},

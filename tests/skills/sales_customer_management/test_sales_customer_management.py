@@ -32,6 +32,11 @@ class SalesCustomerManagementContractTests(unittest.TestCase):
         self.assertTrue({"input", "output", "state"}.issubset(schema["definitions"]))
         self.assertIn("source_evidence", schema["definitions"]["input"]["required"])
         self.assertIn("effects", schema["definitions"]["output"]["required"])
+        api_specs = (SKILL / "references/api-specs.md").read_text(encoding="utf-8")
+        for phrase in ("Existing-overlap and source review matrix", "Licence/provenance review", "Security/privacy review", "Maintenance review", "ABSENT@c89bad5ce3bc91340cf388b923d2befecb406546/tree:9d0be7cedb0fc4ec42bf382735ede36d100f8614"):
+            self.assertIn(phrase, api_specs)
+        example = (SKILL / "examples/success-pattern.md").read_text(encoding="utf-8")
+        self.assertIn("never completes with", example)
         suite = json.loads((SKILL / "references/eval-suite.json").read_text(encoding="utf-8"))
         self.assertEqual("sales-customer-management", suite["skill_id"])
         self.assertGreaterEqual(len(suite["cases"]), 10)
@@ -47,7 +52,24 @@ class SalesCustomerManagementContractTests(unittest.TestCase):
         self.assertEqual(first, second)
         self.assertEqual("PENDING_APPROVAL", first["status"])
         self.assertEqual({"sent": False, "applied": False, "mutated_records": False}, first["effects"])
+        self.assertRegex(first["rollback"], r"^ABSENT@c89bad5ce3bc91340cf388b923d2befecb406546/")
         self.assertEqual("FAILED", helper.normalize_request({"privacy_classification": "restricted"})["status"])
+
+    def test_task_id_uses_repository_global_runtime_format(self):
+        task_id = "20260824-1537-SCM-000001"
+        self.assertRegex(task_id, r"^\d{8}-\d{4}-[A-Z0-9]+-\d{6}$")
+        self.assertNotRegex("scm-scm-demo-001-deadbeef", r"^\d{8}-\d{4}-[A-Z0-9]+-\d{6}$")
+        schema = json.loads((SKILL / "references/schemas.json").read_text(encoding="utf-8"))
+        self.assertEqual(schema["definitions"]["state"]["properties"]["task_id"]["pattern"], r"^\d{8}-\d{4}-[A-Z0-9]+-\d{6}$")
+
+    def test_helper_rejects_pii_and_missing_evidence(self):
+        helper = load_helper()
+        email = {"workflow": "qualification", "privacy_classification": "synthetic", "source_evidence": [{"ref": "fixture:x", "claim": "customer@example.com", "status": "confirmed"}]}
+        self.assertEqual("FAILED", helper.normalize_request(email)["status"])
+        missing = {"workflow": "qualification", "privacy_classification": "synthetic", "source_evidence": []}
+        self.assertEqual("FAILED", helper.normalize_request(missing)["status"])
+        not_reported = {"workflow": "qualification", "privacy_classification": "synthetic", "source_evidence": [{"ref": "fixture:x", "status": "not_reported"}]}
+        self.assertEqual("PENDING_APPROVAL", helper.normalize_request(not_reported)["status"])
 
 
 if __name__ == "__main__":

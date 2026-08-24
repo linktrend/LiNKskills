@@ -33,7 +33,7 @@ Prepare auditable, reversible sales and customer-management work products. This 
 
 ## Decision tree
 
-1. **Audit/resume check.** Create a synthetic `task_id` (`scm-<request_id>-<short-hash>`) or resume only the matching `.workdir/tasks/{{task_id}}/state.jsonl`. Refuse a mismatched or missing request identity.
+1. **Audit/resume check.** Create a global-format `task_id` (`YYYYMMDD-HHMM-SCM-<6-digit>`) or resume only the matching `.workdir/tasks/{{task_id}}/state.jsonl`. Refuse a mismatched or missing request identity.
 2. **Intelligence floor.** Use high reasoning for conflicting evidence, privacy, pricing, legal, renewal, or authority questions. A specialist is preferred for CRM/contract facts; a generalist may perform normalization only when evidence is complete. State uncertainty instead of guessing.
 3. **Tooling protocol.** Use native CLI first, then a local CLI wrapper. Inspect a tool with `get_tool_details` before use. A direct API is an exception requiring an owner-provided capability receipt and must not receive credentials here. MCP is an adapter only; it cannot bypass approval or ownership.
 4. **Prerequisite check.** Confirm the workflow, synthetic request reference, source/provenance, authority status, privacy classification, and intended owning team. Missing evidence produces `needs-evidence` or `PENDING_APPROVAL`, never fabricated CRM state.
@@ -43,7 +43,10 @@ Prepare auditable, reversible sales and customer-management work products. This 
 
 In scope are lead-intake normalization and qualification; preparation of an Odoo pipeline payload; proposal and follow-up drafts; onboarding readiness and LiNKreach handoff packets; renewal and customer-risk assessment; and founder escalation. Every output is a draft, receipt, or explicit denial. The workflow supports `Other — specify` requests by preserving the supplied description and routing for clarification.
 
-Before release, record an existing-overlap matrix against adjacent skills and the owning consumer, then complete source, licence, security, and maintenance review. A release receipt must bind the exact content/provenance and declared effects; no live pointer or activation is created by this skill.
+Before release, record the existing-overlap and source-review matrix in
+`references/api-specs.md`, then complete the source, licence, security, and
+maintenance review. A release receipt must bind the exact content/provenance
+and declared effects; no live pointer or activation is created by this skill.
 
 Out of scope are CRM/Odoo runtime connectors, account bindings, credentials, identity/RBAC, schedules, browser/network automation, message delivery, payment, contract execution, final pricing, renewal commitments, and customer-service transport. LiNKreach owns customer-service and relationship operations. The owning integration/consumer owns Odoo connectors and credentials.
 
@@ -55,7 +58,7 @@ Out of scope are CRM/Odoo runtime connectors, account bindings, credentials, ide
 4. **Finalization (Resume Point).** Emit the output contract, evidence references, redaction result, owner, rollback pointer, and next actions. A successful preparation ends `COMPLETED`; an unresolved gate remains `PENDING_APPROVAL`.
 5. **Self-Correction & Auditing.** Append a redacted event to root `execution_ledger.jsonl`, save `trace.log`, record tool/evidence receipts, and update `references/old-patterns.md` only when a corrected failure reveals a reusable anti-pattern. Set `FAILED` with a safe rollback instruction on unrecoverable errors.
 
-Each phase has a checkpoint. On retry, resume from the last valid checkpoint; do not repeat a non-idempotent external action because this skill has no external apply operation. Rollback means discard the unapproved draft and restore the prior exact qualified release or prior state ledger entry; it never means deleting source evidence.
+Each phase has a checkpoint. On retry, resume from the last valid checkpoint; do not repeat a non-idempotent external action because this skill has no external apply operation. Rollback means discard the unapproved draft and restore the exact target documented in `references/api-specs.md`; it never means deleting source evidence.
 
 ## Authority and safety rules
 
