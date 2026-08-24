@@ -185,7 +185,11 @@ def _security_metadata(
         reasons.append("candidate:privacy_findings")
 
     licence = candidate.get("licence", candidate.get("license"))
-    licence_status = str(licence.get("status") or "").strip().lower() if isinstance(licence, Mapping) else ""
+    licence_status = (
+        str(licence.get("status") or licence.get("review_status") or "").strip().lower()
+        if isinstance(licence, Mapping)
+        else ""
+    )
     if licence_status not in {"approved", "compatible", "reviewed", "not_required"}:
         reasons.append("candidate:licence_gap")
     if candidate.get("observed_content_digest") and release:
