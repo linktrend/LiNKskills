@@ -1,0 +1,19 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "executive-decisions-governance",
+  "display_name": "Executive Decisions and Governance",
+  "version": "1.0.0",
+  "description": "Evidence-bounded mobile decision briefs with owner-only decisions, rule impact, and descriptive implementation tracking.",
+  "capability_category": "executive_governance",
+  "lifecycle_state": "draft",
+  "format_profile": "simple",
+  "compatible_runtime_profiles": ["cursor-macos"],
+  "min_capability_tier": "high",
+  "routing": {"when_to_use": "Use for a unique matter requiring evidence, risks, choices, a recommendation, an owner decision record, rule-impact draft, or implementation tracking.", "when_not_to_use": ["Do not approve, activate, enforce, schedule, send, create tasks, or mutate a Program.", "Do not replace meeting, time-management, workforce, communication transport, or consumer-owned governance systems."], "tags": ["executive", "decisions", "governance", "evidence", "authority"]},
+  "execution": {"required_inputs": [{"name": "matter_ref", "description": "Unique matter reference"}, {"name": "source_evidence", "description": "Explicit synthetic, redacted, or public evidence"}, {"name": "mode", "description": "Decision brief, record, rule impact, or implementation tracking"}], "expected_outputs": [{"name": "decision_brief", "description": "Mobile-readable evidence and owner-review record with empty effects"}], "forbidden_actions": ["Approve or activate a decision or governance rule", "Create tasks, schedules, meetings, workforce, or Program state", "Send or select transport", "Retain private or confidential input"], "verification_steps": ["Check unique matter and evidence refs", "Require choices and Other — specify for non-exhaustive sets", "Separate recommendation from owner decision", "Confirm authority remains inactive and effects are empty"], "completion_criteria": ["Brief is evidence-honest and mobile-readable", "Owner-only decision/rule records are explicit", "Implementation tracking remains descriptive"]},
+  "dependencies": {"schema_version": "0.1", "skill_dependencies": ["company-communication"], "packaged_tools": [], "host_capabilities": ["filesystem_read", "filesystem_write"], "external_services": [], "library_assets": [], "runtime_requirements": [], "optional_dependencies": []},
+  "eval": {"suite_path": "references/eval-suite.json", "suite_schema_version": "0.1"},
+  "telemetry": {"classification": "public_internal", "redaction_rules": ["strip_secrets", "strip_private_data", "strip_customer_data", "strip_confidential_company_data", "strip_reasoning", "strip_transport_payloads"], "retention_policy": "retain_ids_and_hashes"},
+  "fragments": [{"fragment_id": "summary", "disclosure_level": 2, "path": "SKILL.md"}, {"fragment_id": "advanced", "disclosure_level": 3, "path": "advanced/advanced.md"}, {"fragment_id": "examples", "disclosure_level": 3, "path": "examples/success-pattern.md"}, {"fragment_id": "api-specs", "disclosure_level": 4, "path": "references/api-specs.md"}, {"fragment_id": "schemas", "disclosure_level": 4, "path": "references/schemas.json"}],
+  "release_channel": "canary"
+}
