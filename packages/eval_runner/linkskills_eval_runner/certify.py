@@ -133,7 +133,7 @@ def certify_run(
             for c in run.case_results
             if c.case_id in blocked_ids
         }
-        prompt_token = (
+        blocked_case_label = (
             "not_executable_prompt_only"
             if any(
                 c.status == CaseStatus.NOT_EXECUTABLE_PROMPT_ONLY
@@ -145,7 +145,7 @@ def certify_run(
         return CertificationDecision(
             certified=False,
             reason=(
-                f"cannot certify: {prompt_token} cases "
+                f"cannot certify: {blocked_case_label} cases "
                 f"({', '.join(f'{cid}={statuses[cid]}' for cid in blocked_ids)})"
             ),
             weighted_score=score,
