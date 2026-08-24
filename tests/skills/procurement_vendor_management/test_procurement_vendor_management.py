@@ -84,6 +84,17 @@ class ProcurementVendorManagementTests(unittest.TestCase):
             self.assertTrue(result["escalation"]["required"])
             self.assertTrue(all(value is False for value in result["effects"].values()))
 
+    def test_unknown_workflow_and_incomplete_provenance_fail_closed(self):
+        helper = load_helper()
+        unknown = helper.normalize_request({"workflow": "supplier_magic", "privacy_classification": "synthetic", "source_evidence": []})
+        incomplete = helper.normalize_request({"workflow": "supplier_comparison", "privacy_classification": "synthetic", "source_evidence": [{"ref": "fixture:supplier-demo-004", "status": "confirmed"}]})
+        self.output_check(unknown)
+        self.output_check(incomplete)
+        self.assertEqual("PENDING_APPROVAL", unknown["status"])
+        self.assertEqual("authority_escalation", unknown["disposition"])
+        self.assertEqual("PENDING_APPROVAL", incomplete["status"])
+        self.assertEqual("needs-evidence", incomplete["disposition"])
+
     def test_eval_suite_has_all_procurement_workflows(self):
         suite = json.loads((SKILL / "references/eval-suite.json").read_text(encoding="utf-8"))
         text = json.dumps(suite)

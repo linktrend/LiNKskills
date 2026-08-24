@@ -12,6 +12,8 @@ from typing import Any
 
 LIVE_MARKERS = re.compile(r"(?:sk_live|api[_-]?key|password|bearer|BEGIN " + r"PRIVATE KEY)", re.I)
 PRIVATE_FIELD_MARKER = re.compile(r'"(?:bank|account|routing|tax_id|personal_id|phone|email|address)"\s*:', re.I)
+EMAIL_MARKER = re.compile(r"\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b", re.I)
+WORKFLOWS = {"supplier_intake", "supplier_comparison", "pricing_verification", "contract_review", "renewal_review", "performance_review", "continuity_risk", "approval_brief", "other"}
 FORBIDDEN_ACTIONS = {"approve", "order", "accept", "send", "negotiate", "renew", "terminate", "mutate"}
 DECLARED_ACTIONS = {"read", "prepare", "compare", *FORBIDDEN_ACTIONS}
 ROLLBACK_TARGET = "ABSENT@c89bad5ce3bc91340cf388b923d2befecb406546/tree:9d0be7cedb0fc4ec42bf382735ede36d100f8614"
@@ -38,24 +40,30 @@ def normalize_request(request: dict[str, Any]) -> dict[str, Any]:
     """Prepare a synthetic procurement result and fail closed on unsafe input."""
     raw = json.dumps(request, sort_keys=True)
     digest = hashlib.sha256(raw.encode("utf-8")).hexdigest()[:16]
-    if LIVE_MARKERS.search(raw) or PRIVATE_FIELD_MARKER.search(raw) or request.get("privacy_classification") == "restricted":
-        return _result(request=request, digest=digest, status="FAILED", disposition="privacy_rejected", rationale="Restricted or sensitive procurement material was rejected before processing.", confidence="high", refs=[], next_actions=["Supply synthetic or redacted evidence without credentials or private vendor data."], escalation=True, reason="Privacy gate requires consumer-owner review.", owner="consumer_owner")
+    workflow_value = request.get("workflow", "other")
+    workflow = workflow_value if isinstance(workflow_value, str) else "other"
+    output_request = {**request, "workflow": workflow}
+    if LIVE_MARKERS.search(raw) or EMAIL_MARKER.search(raw) or PRIVATE_FIELD_MARKER.search(raw) or request.get("privacy_classification") == "restricted":
+        return _result(request=output_request, digest=digest, status="FAILED", disposition="privacy_rejected", rationale="Restricted or sensitive procurement material was rejected before processing.", confidence="high", refs=[], next_actions=["Supply synthetic or redacted evidence without credentials or private vendor data."], escalation=True, reason="Privacy gate requires consumer-owner review.", owner="consumer_owner")
+    if workflow not in WORKFLOWS:
+        return _result(request=output_request, digest=digest, status="PENDING_APPROVAL", disposition="authority_escalation", rationale="The workflow is not declared by the procurement contract and was not inferred.", confidence="low", refs=[], next_actions=["Classify the request as one of the declared procurement workflows."], escalation=True, reason="Unknown workflows cannot be mapped to a supplier action.", owner="consumer_owner")
     evidence = request.get("source_evidence", [])
     if not isinstance(evidence, list) or not evidence:
-        return _result(request=request, digest=digest, status="FAILED", disposition="needs-evidence", rationale="No source evidence was supplied.", confidence="unknown", refs=[], next_actions=["Supply evidence references with provenance and licence."], escalation=True, reason="Procurement claims cannot be prepared without evidence.", owner="consumer_owner")
+        return _result(request=output_request, digest=digest, status="FAILED", disposition="needs-evidence", rationale="No source evidence was supplied.", confidence="unknown", refs=[], next_actions=["Supply evidence references with provenance and licence."], escalation=True, reason="Procurement claims cannot be prepared without evidence.", owner="consumer_owner")
     if any(not isinstance(item, dict) or not item.get("ref") for item in evidence):
-        return _result(request=request, digest=digest, status="FAILED", disposition="needs-evidence", rationale="Evidence identity is incomplete.", confidence="unknown", refs=[], next_actions=["Supply stable evidence references and provenance."], escalation=True, reason="Every evidence item needs a stable reference.", owner="consumer_owner")
+        return _result(request=output_request, digest=digest, status="FAILED", disposition="needs-evidence", rationale="Evidence identity is incomplete.", confidence="unknown", refs=[], next_actions=["Supply stable evidence references and provenance."], escalation=True, reason="Every evidence item needs a stable reference.", owner="consumer_owner")
     refs = [str(item["ref"]) for item in evidence]
     requested_raw = request.get("requested_actions", [])
     unknown = not isinstance(requested_raw, list) or any(not isinstance(action, str) or action not in DECLARED_ACTIONS for action in requested_raw)
     if unknown:
-        return _result(request=request, digest=digest, status="PENDING_APPROVAL", disposition="authority_escalation", rationale="An undeclared requested action was rejected fail-closed.", confidence="low", refs=refs, next_actions=["Name only read, prepare, or compare and obtain consumer-owner approval for any effect."], escalation=True, reason="Unknown actions cannot be inferred or executed.", owner="consumer_owner")
+        return _result(request=output_request, digest=digest, status="PENDING_APPROVAL", disposition="authority_escalation", rationale="An undeclared requested action was rejected fail-closed.", confidence="low", refs=refs, next_actions=["Name only read, prepare, or compare and obtain consumer-owner approval for any effect."], escalation=True, reason="Unknown actions cannot be inferred or executed.", owner="consumer_owner")
     requested = set(requested_raw)
     if requested & FORBIDDEN_ACTIONS or request.get("workflow") in {"approval_brief", "continuity_risk", "other"}:
-        return _result(request=request, digest=digest, status="PENDING_APPROVAL", disposition="authority_escalation" if requested & FORBIDDEN_ACTIONS else "prepared", rationale="The request requires consumer-owner review before any commitment or unresolved risk decision.", confidence="low", refs=refs, next_actions=["Review the evidence and approve a bounded next action outside this provider."], escalation=True, reason="Spending, acceptance, supplier commitment, or material continuity risk remains owner-gated.", owner="consumer_owner")
-    if any(item.get("status") == "not_reported" for item in evidence):
-        return _result(request=request, digest=digest, status="PENDING_APPROVAL", disposition="needs-evidence", rationale="One or more material procurement signals are not reported.", confidence="unknown", refs=refs, next_actions=["Supply or confirm the missing pricing, term, performance, or continuity evidence."], escalation=True, reason="Incomplete evidence cannot support a supplier decision.", owner="consumer_owner")
-    return _result(request=request, digest=digest, status="COMPLETED", disposition="prepared", rationale="Evidence-bound procurement preparation completed without selecting a supplier or applying an external effect.", confidence="medium", refs=refs, next_actions=["Consumer owner reviews the prepared artifact before any commitment."], escalation=False, reason="No external action is performed by this helper.", owner="none")
+        return _result(request=output_request, digest=digest, status="PENDING_APPROVAL", disposition="authority_escalation" if requested & FORBIDDEN_ACTIONS else "prepared", rationale="The request requires consumer-owner review before any commitment or unresolved risk decision.", confidence="low", refs=refs, next_actions=["Review the evidence and approve a bounded next action outside this provider."], escalation=True, reason="Spending, acceptance, supplier commitment, or material continuity risk remains owner-gated.", owner="consumer_owner")
+    incomplete = any(item.get("status") not in {"confirmed", "inferred"} or not item.get("provenance") or not item.get("licence") for item in evidence)
+    if incomplete:
+        return _result(request=output_request, digest=digest, status="PENDING_APPROVAL", disposition="needs-evidence", rationale="One or more material procurement signals or provenance fields are incomplete.", confidence="unknown", refs=refs, next_actions=["Supply or confirm the missing pricing, term, performance, continuity, provenance, or licence evidence."], escalation=True, reason="Incomplete evidence cannot support a supplier decision.", owner="consumer_owner")
+    return _result(request=output_request, digest=digest, status="COMPLETED", disposition="prepared", rationale="Evidence-bound procurement preparation completed without selecting a supplier or applying an external effect.", confidence="medium", refs=refs, next_actions=["Consumer owner reviews the prepared artifact before any commitment."], escalation=False, reason="No external action is performed by this helper.", owner="none")
 
 
 def main() -> int:
