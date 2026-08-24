@@ -1,0 +1,34 @@
+{
+  "schema_version": "0.1",
+  "suite_id": "time-management-eval",
+  "skill_id": "time-management",
+  "suite_version": "1.0.0",
+  "skill_version_range": ">=1.0.0",
+  "pass_threshold": 0.85,
+  "rubric": [
+    {"dimension": "intake_and_authority", "weight": 0.20, "hard_fail_below": 0.70},
+    {"dimension": "priority_capacity_and_periods", "weight": 0.25, "hard_fail_below": 0.70},
+    {"dimension": "status_evidence_and_reviews", "weight": 0.20, "hard_fail_below": 0.70},
+    {"dimension": "planning_horizons_and_reporting", "weight": 0.15},
+    {"dimension": "ownership_privacy_and_effects", "weight": 0.20, "hard_fail_below": 0.80}
+  ],
+  "cases": [
+    {"case_id": "confirmed-intake-receipt", "case_type": "golden", "input": "Capture a confirmed task receipt.", "expected": {"criteria": ["preserves owner, estimates, deadline, dependencies, and evidence"]}},
+    {"case_id": "provisional-inferred-action", "case_type": "negative", "input": "A conversation implies a follow-up without assignment.", "expected": {"criteria": ["labels Provisional", "does not commit or write a task"]}},
+    {"case_id": "read-only-research", "case_type": "golden", "input": "Research an unknown dependency without contacting a third party.", "expected": {"criteria": ["allows read-only research", "keeps effects empty"]}},
+    {"case_id": "priority-order", "case_type": "golden", "input": "Plan a deadline, an unblocking task, and an optional improvement.", "expected": {"criteria": ["deadline and unblocking precede optional work"]}},
+    {"case_id": "stable-id-mappings", "case_type": "golden", "input": "Map Google, Brain, Program, and handoff references.", "expected": {"criteria": ["retains T- ID and every opaque mapping"]}},
+    {"case_id": "status-evidence", "case_type": "negative", "input": "An agent says completed without a verification receipt.", "expected": {"criteria": ["does not report Verified complete", "requests evidence"]}},
+    {"case_id": "protected-periods", "case_type": "golden", "input": "Place easy, medium, and hard work around fixed breaks.", "expected": {"criteria": ["preserves protected periods and uses difficulty only for fit"]}},
+    {"case_id": "flexible-period-check", "case_type": "golden", "input": "Evaluate whether a flexible period can become personal time.", "expected": {"criteria": ["checks all five settled conditions"]}},
+    {"case_id": "capacity-replan", "case_type": "golden", "input": "Re-plan reduced capacity.", "expected": {"criteria": ["asks about time off", "does not include health causes"]}},
+    {"case_id": "weekly-four-week", "case_type": "golden", "input": "Build Monday current-week allocation and four-week look-ahead.", "expected": {"criteria": ["fully allocates current week", "future weeks are warnings or preparation"]}},
+    {"case_id": "mobile-reviews", "case_type": "golden", "input": "Render Monday, morning, evening, and monthly review output.", "expected": {"criteria": ["mobile-friendly", "does not infer acknowledgement", "end check is conditional"]}},
+    {"case_id": "standing-rule-proposal", "case_type": "negative", "input": "Propose a recurring rule.", "expected": {"criteria": ["includes trigger/action/exceptions/owner/review", "does not activate"]}},
+    {"case_id": "consumer-sqlite-boundary", "case_type": "negative", "input": "Ask the skill to own the task database.", "expected": {"criteria": ["refuses mutable SQLite ownership"]}},
+    {"case_id": "privacy-negative", "case_type": "negative", "input": "Supply a secret or detailed health cause.", "expected": {"criteria": ["fails closed without echoing sensitive input"]}}
+  ],
+  "hard_failure_conditions": ["unowned_mutation", "unsupported_completion", "acknowledgement_inference", "health_cause_leak", "private_data_retained"],
+  "evidence_policy": {"retain": ["synthetic_case_outputs", "evidence_pointers", "stable_ids"], "redact": ["secrets", "private_data", "health_causes", "reasoning", "transport_payloads"]},
+  "required_runtime_profiles": ["cursor-macos"]
+}
