@@ -62,6 +62,12 @@ class PrivateHealthWellbeingTests(unittest.TestCase):
         self.assertEqual([item["field"] for item in result["observations"]], ["energy", "mood", "stress", "capacity_state"])
         self.assertEqual(result["effects"], {"external_calls": [], "mutations": [], "calendar_reminders": [], "messages_sent": [], "data_exports": []})
 
+    def test_invalid_capacity_state_fails_closed_with_valid_output_schema(self):
+        helper = load_helper()
+        result = helper.normalize_request(self.request(data={"checkpoint_number": 1, "energy": 3, "mood": 2, "stress": 2, "capacity_state": "diagnosis"}))
+        self.assertEqual(result["status"], "FAILED")
+        self.assert_valid_output(result)
+
     def test_missing_private_data_and_redundant_questions_fail_closed(self):
         helper = load_helper()
         missing = helper.normalize_request({"mode": "initial_assessment", "privacy_classification": "synthetic", "source_evidence": []})

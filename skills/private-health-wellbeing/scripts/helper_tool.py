@@ -151,7 +151,8 @@ def normalize_request(request: dict[str, Any]) -> dict[str, Any]:
     if mode in {"initial_assessment", "monthly_assessment"}:
         _not_reported_fields(result, data, refs)
     elif mode == "checkpoint":
-        if data.get("checkpoint_number") is None:
+        checkpoint_number = data.get("checkpoint_number")
+        if isinstance(checkpoint_number, bool) or not isinstance(checkpoint_number, int) or not 1 <= checkpoint_number <= 3:
             return _failure(mode, "checkpoint_number 1-3 is required", refs)
         for field in ("energy", "mood", "stress"):
             value = data.get(field, "not_reported")
@@ -159,6 +160,8 @@ def normalize_request(request: dict[str, Any]) -> dict[str, Any]:
                 return _failure(mode, f"{field} must be a separate integer from 1 to 5 or not_reported", refs)
             _add(result, field, value, "not_reported" if value == "not_reported" else "reported", refs)
         capacity = data.get("capacity_state", "not_reported")
+        if capacity not in {"low", "steady", "available", "not_reported"}:
+            return _failure(mode, "capacity_state must be low, steady, available, or not_reported", refs)
         _add(result, "capacity_state", capacity, "not_reported" if capacity == "not_reported" else "reported", refs)
         result["capacity_state"] = capacity
     elif mode == "hydration":
