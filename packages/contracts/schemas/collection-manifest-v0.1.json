@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://linktrend.dev/schemas/linkskills/collection-manifest-v0.1.json",
+  "title": "LiNKskills Collection Manifest v0.1",
+  "description": "Immutable collection membership and source inventory metadata.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "collection_id", "version", "display_name", "manifest_digest", "inventory_digest", "source", "members", "lifecycle_state", "inactive_by_default", "trust_boundary"],
+  "properties": {
+    "schema_version": { "type": "string", "const": "0.1" },
+    "collection_id": { "$ref": "#/$defs/id" },
+    "version": { "$ref": "#/$defs/semver" },
+    "display_name": { "type": "string", "minLength": 1, "maxLength": 160 },
+    "description": { "type": "string", "maxLength": 280 },
+    "manifest_digest": { "$ref": "#/$defs/digest" },
+    "inventory_digest": { "$ref": "#/$defs/digest" },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["publisher", "repository", "source_ref", "source_commit", "retrieved_at", "licence"],
+      "properties": {
+        "publisher": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "repository": { "type": "string", "minLength": 1, "maxLength": 512 },
+        "source_ref": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "source_commit": { "$ref": "#/$defs/commit" },
+        "source_path": { "$ref": "#/$defs/relative_path" },
+        "retrieved_at": { "type": "string", "format": "date-time", "maxLength": 40 },
+        "licence": { "$ref": "#/$defs/licence" }
+      }
+    },
+    "members": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["release_id", "skill_id", "version", "release_kind", "artifact_digest", "inventory_digest", "content_digest", "resource_ids"],
+        "properties": {
+          "release_id": { "type": "string", "minLength": 3 },
+          "skill_id": { "$ref": "#/$defs/id" },
+          "version": { "$ref": "#/$defs/semver" },
+          "release_kind": { "type": "string", "enum": ["native", "vendor", "adapted"] },
+          "artifact_digest": { "$ref": "#/$defs/digest" },
+          "inventory_digest": { "$ref": "#/$defs/digest" },
+          "content_digest": { "$ref": "#/$defs/digest" },
+          "resource_ids": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/id" } }
+        }
+      }
+    },
+    "lifecycle_state": { "type": "string", "enum": ["draft", "eval_pending", "qualified", "deprecated", "superseded", "withdrawn", "quarantined", "rejected", "incompatible", "unqualified"] },
+    "inactive_by_default": { "type": "boolean", "const": true },
+    "trust_boundary": { "type": "string", "const": "linkskills-collection" }
+  },
+  "$defs": {
+    "id": { "type": "string", "minLength": 1, "maxLength": 96, "pattern": "^[a-z0-9][a-z0-9-]*$" },
+    "semver": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?$" },
+    "digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "commit": { "type": "string", "pattern": "^[a-f0-9]{40}(?:[a-f0-9]{24})?$" },
+    "relative_path": { "type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*\\\\)(?!.*//)[A-Za-z0-9._@+, -]+(?:/[A-Za-z0-9._@+, -]+)*$" },
+    "licence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["licence_id", "attribution_required", "review_status"],
+      "properties": {
+        "licence_id": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "attribution_required": { "type": "boolean" },
+        "notice_ref": { "type": "string", "pattern": "^opaque:[A-Za-z0-9][A-Za-z0-9._:/-]{1,158}$" },
+        "review_status": { "type": "string", "enum": ["not_required", "reviewed_compatible", "reviewed_incompatible"] }
+      }
+    }
+  }
+}
