@@ -1,10 +1,16 @@
 import importlib.util
 import json
 import pathlib
+import sys
 import unittest
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(ROOT / "packages" / "contracts"))
+
+from linkskills_contracts import validate_instance  # noqa: E402
+
+
 SKILL = ROOT / "skills" / "sales-customer-management"
 
 
@@ -17,6 +23,11 @@ def load_helper():
 
 
 class SalesCustomerManagementContractTests(unittest.TestCase):
+    def assert_output_contract(self, output):
+        schema = json.loads((SKILL / "references/schemas.json").read_text(encoding="utf-8"))["definitions"]["output"]
+        result = validate_instance(output, schema)
+        self.assertTrue(result.ok, msg=[str(error) for error in result.errors])
+
     def test_required_artifacts_and_boundaries(self):
         required = ["SKILL.md", "advanced/advanced.md", "references/schemas.json", "references/eval-suite.json", "references/eval-suite.yaml", "references/api-specs.md", "references/old-patterns.md", "scripts/helper_tool.py"]
         for relative in required:
@@ -50,6 +61,7 @@ class SalesCustomerManagementContractTests(unittest.TestCase):
         first = helper.normalize_request(request)
         second = helper.normalize_request(request)
         self.assertEqual(first, second)
+        self.assert_output_contract(first)
         self.assertEqual("PENDING_APPROVAL", first["status"])
         self.assertEqual({"sent": False, "applied": False, "mutated_records": False}, first["effects"])
         self.assertRegex(first["rollback"], r"^ABSENT@c89bad5ce3bc91340cf388b923d2befecb406546/")
@@ -65,11 +77,17 @@ class SalesCustomerManagementContractTests(unittest.TestCase):
     def test_helper_rejects_pii_and_missing_evidence(self):
         helper = load_helper()
         email = {"workflow": "qualification", "privacy_classification": "synthetic", "source_evidence": [{"ref": "fixture:x", "claim": "customer@example.com", "status": "confirmed"}]}
-        self.assertEqual("FAILED", helper.normalize_request(email)["status"])
+        privacy_result = helper.normalize_request(email)
+        self.assert_output_contract(privacy_result)
+        self.assertEqual("FAILED", privacy_result["status"])
         missing = {"workflow": "qualification", "privacy_classification": "synthetic", "source_evidence": []}
-        self.assertEqual("FAILED", helper.normalize_request(missing)["status"])
+        missing_result = helper.normalize_request(missing)
+        self.assert_output_contract(missing_result)
+        self.assertEqual("FAILED", missing_result["status"])
         not_reported = {"workflow": "qualification", "privacy_classification": "synthetic", "source_evidence": [{"ref": "fixture:x", "status": "not_reported"}]}
-        self.assertEqual("PENDING_APPROVAL", helper.normalize_request(not_reported)["status"])
+        not_reported_result = helper.normalize_request(not_reported)
+        self.assert_output_contract(not_reported_result)
+        self.assertEqual("PENDING_APPROVAL", not_reported_result["status"])
 
 
 if __name__ == "__main__":

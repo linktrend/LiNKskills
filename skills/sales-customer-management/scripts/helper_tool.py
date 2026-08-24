@@ -19,15 +19,49 @@ ROLLBACK_TARGET = (
     "tree:9d0be7cedb0fc4ec42bf382735ede36d100f8614"
     " (no prior qualified PKT-16 release)"
 )
+EFFECTS = {"sent": False, "applied": False, "mutated_records": False}
 
 
-def _failure(disposition: str, workflow: str = "unknown") -> dict[str, Any]:
-    """Return a redacted terminal result with every external effect disabled."""
+def _owner(request: dict[str, Any]) -> str:
+    authority = request.get("authority")
+    if isinstance(authority, dict) and isinstance(authority.get("owner"), str) and authority["owner"]:
+        return authority["owner"]
+    return "consumer_or_principal"
+
+
+def _result(
+    *,
+    status: str,
+    workflow: str,
+    disposition: str,
+    rationale: str,
+    confidence: str,
+    evidence_refs: list[str],
+    next_actions: list[str],
+    escalation_required: bool,
+    escalation_reason: str,
+    owner: str,
+    idempotency_key: str,
+) -> dict[str, Any]:
+    """Return an output-contract-complete, redacted preparation result."""
     return {
-        "status": "FAILED",
+        "status": status,
         "workflow": workflow,
+        "decision": {
+            "disposition": disposition,
+            "rationale": rationale,
+            "confidence": confidence,
+        },
         "disposition": disposition,
-        "effects": {"sent": False, "applied": False, "mutated_records": False},
+        "idempotency_key": idempotency_key,
+        "evidence_refs": evidence_refs,
+        "next_actions": next_actions,
+        "escalation": {
+            "required": escalation_required,
+            "reason": escalation_reason,
+            "owner": owner,
+        },
+        "effects": dict(EFFECTS),
         "rollback": ROLLBACK_TARGET,
     }
 
@@ -38,36 +72,90 @@ def normalize_request(request: dict[str, Any]) -> dict[str, Any]:
     workflow = request.get("workflow", "unknown")
     if not isinstance(workflow, str) or not workflow:
         workflow = "unknown"
+    digest = hashlib.sha256(raw.encode("utf-8")).hexdigest()[:16]
+    idempotency_key = f"scm-{digest}"
+    owner = _owner(request)
     if (
         LIVE_MARKERS.search(raw)
         or EMAIL_MARKER.search(raw)
         or PRIVATE_FIELD_MARKER.search(raw)
         or request.get("privacy_classification") == "restricted"
     ):
-        return _failure("privacy_rejected", workflow)
+        return _result(
+            status="FAILED",
+            workflow=workflow,
+            disposition="privacy_rejected",
+            rationale="Input was rejected by the privacy gate before processing.",
+            confidence="high",
+            evidence_refs=[],
+            next_actions=["Provide synthetic or redacted evidence without credentials or customer data."],
+            escalation_required=True,
+            escalation_reason="Privacy classification or sensitive content requires owner review.",
+            owner=owner,
+            idempotency_key=idempotency_key,
+        )
     evidence = request.get("source_evidence", [])
     if not isinstance(evidence, list) or not evidence:
-        return _failure("needs-evidence", workflow)
+        return _result(
+            status="FAILED",
+            workflow=workflow,
+            disposition="needs-evidence",
+            rationale="No source evidence was supplied.",
+            confidence="unknown",
+            evidence_refs=[],
+            next_actions=["Supply bounded source evidence and provenance."],
+            escalation_required=True,
+            escalation_reason="The workflow cannot proceed without source evidence.",
+            owner=owner,
+            idempotency_key=idempotency_key,
+        )
     if any(not isinstance(item, dict) or not item.get("ref") for item in evidence):
-        return _failure("needs-evidence", workflow)
+        return _result(
+            status="FAILED",
+            workflow=workflow,
+            disposition="needs-evidence",
+            rationale="One or more evidence items lacks a stable reference.",
+            confidence="unknown",
+            evidence_refs=[],
+            next_actions=["Supply evidence with stable references and provenance."],
+            escalation_required=True,
+            escalation_reason="Evidence identity is incomplete.",
+            owner=owner,
+            idempotency_key=idempotency_key,
+        )
     refs = [str(item.get("ref", "")) for item in evidence if isinstance(item, dict) and item.get("ref")]
-    digest = hashlib.sha256(raw.encode("utf-8")).hexdigest()[:16]
     disposition = "needs-evidence" if any(item.get("status") == "not_reported" for item in evidence) else "prepared"
     if disposition == "needs-evidence":
-        return {
-            "status": "PENDING_APPROVAL",
-            "workflow": workflow,
-            "disposition": disposition,
-            "evidence_refs": refs,
-            "idempotency_key": f"scm-{digest}",
-            "effects": {"sent": False, "applied": False, "mutated_records": False},
-            "rollback": ROLLBACK_TARGET,
-        }
+        return _result(
+            status="PENDING_APPROVAL",
+            workflow=workflow,
+            disposition=disposition,
+            rationale="One or more material signals are not reported.",
+            confidence="unknown",
+            evidence_refs=refs,
+            next_actions=["Owner supplies or confirms the missing evidence."],
+            escalation_required=True,
+            escalation_reason="Material evidence is incomplete.",
+            owner=owner,
+            idempotency_key=idempotency_key,
+        )
     if workflow in {"pipeline", "proposal_follow_up", "onboarding", "renewal_risk", "founder_escalation", "other"}:
         status = "PENDING_APPROVAL"
     else:
         status = "COMPLETED"
-    return {"status": status, "workflow": workflow, "disposition": disposition, "evidence_refs": refs, "idempotency_key": f"scm-{digest}", "effects": {"sent": False, "applied": False, "mutated_records": False}, "rollback": ROLLBACK_TARGET}
+    return _result(
+        status=status,
+        workflow=workflow,
+        disposition=disposition,
+        rationale="Prepared an evidence-bound owner review artifact without external effects.",
+        confidence="medium",
+        evidence_refs=refs,
+        next_actions=["Owner reviews the prepared artifact before any external action."],
+        escalation_required=status == "PENDING_APPROVAL",
+        escalation_reason="External action remains owner-gated." if status == "PENDING_APPROVAL" else "No external action requested.",
+        owner=owner,
+        idempotency_key=idempotency_key,
+    )
 
 
 def main() -> int:
