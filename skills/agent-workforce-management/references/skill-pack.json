@@ -1,0 +1,32 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "agent-workforce-management",
+  "display_name": "Agent Workforce Management",
+  "version": "1.0.0",
+  "description": "Evidence-bounded reusable roles, supplied Brain-rule selection, capability and delegation requests, workload and quality monitoring, and safe suspend or retire proposals.",
+  "capability_category": "agent_workforce",
+  "lifecycle_state": "draft",
+  "format_profile": "simple",
+  "compatible_runtime_profiles": ["cursor-macos"],
+  "min_capability_tier": "high",
+  "routing": {
+    "when_to_use": "Use for a workforce matter requiring a reusable role, applicable supplied Brain rule, bounded capability request, domain delegation, workload or quality review, or owner-review suspension/retirement proposal.",
+    "when_not_to_use": ["Do not activate, suspend, retire, schedule, grant, or supervise an agent.", "Do not replace Brain rule governance, Platform grants, Program Ledger, credentials, private memory, or a consumer workforce runtime."],
+    "tags": ["agent-workforce", "roles", "delegation", "quality", "evidence", "authority"],
+    "related_skills": ["department-head", "executive-decisions-governance", "time-management"]
+  },
+  "execution": {
+    "required_inputs": [{"name": "workforce_ref", "description": "Unique workforce matter reference"}, {"name": "source_evidence", "description": "Explicit synthetic, redacted, or public evidence"}, {"name": "mode", "description": "Role, rule, capability, delegation, monitoring, quality, or proposal mode"}],
+    "optional_inputs": [{"name": "role", "description": "Reusable role definition"}, {"name": "rule_selection", "description": "Supplied Brain-rule applicability record"}, {"name": "capability_requests", "description": "Bounded capability or skill assignment requests"}, {"name": "delegations", "description": "Owner-scoped domain delegation proposals"}, {"name": "workload", "description": "Load and blocker observations"}, {"name": "quality", "description": "Outcome and repeated-failure observations"}, {"name": "proposals", "description": "Training, review, suspend, or retire proposals"}],
+    "expected_outputs": [{"name": "workforce_review", "description": "Owner-review workforce envelope with explicit authority and empty effects"}],
+    "forbidden_actions": ["Activate, suspend, retire, or supervise an agent", "Approve Brain rules or technical/capability grants", "Copy credentials, private memory, identity, or account bindings", "Call connectors, send messages, schedule work, or mutate external state"],
+    "verification_steps": ["Check unique workforce reference and evidence namespaces", "Validate role, rule, capability, delegation, workload, quality, and proposal references", "Keep owner and consumer authority explicit", "Confirm all effects and authority flags remain empty/false"],
+    "completion_criteria": ["Artifact is evidence-honest and bounded", "Proposals remain owner-review records", "No agent activation, grant, suspension, retirement, credential, private-memory, or external effect is claimed"],
+    "failure_handling": "Return BLOCKED with typed uncertainty and empty nested arrays for authority, privacy, duplicate, or malformed input; return DRAFT for unreported evidence."
+  },
+  "dependencies": {"schema_version": "0.1", "skill_dependencies": ["department-head", "executive-decisions-governance"], "packaged_tools": [], "host_capabilities": ["filesystem_read", "filesystem_write"], "external_services": [], "library_assets": [], "runtime_requirements": [], "optional_dependencies": []},
+  "eval": {"suite_path": "references/eval-suite.json", "suite_schema_version": "0.1", "required_certification_profiles": ["cursor-macos"]},
+  "telemetry": {"classification": "public_internal", "redaction_rules": ["strip_secrets", "strip_private_memory", "strip_identity", "strip_customer_data", "strip_confidential_company_data", "strip_reasoning", "strip_transport_payloads"], "retention_policy": "retain_ids_and_hashes"},
+  "fragments": [{"fragment_id": "summary", "disclosure_level": 2, "path": "SKILL.md"}, {"fragment_id": "advanced", "disclosure_level": 3, "path": "advanced/advanced.md"}, {"fragment_id": "examples", "disclosure_level": 3, "path": "examples/success-pattern.md"}, {"fragment_id": "api-specs", "disclosure_level": 4, "path": "references/api-specs.md"}, {"fragment_id": "schemas", "disclosure_level": 4, "path": "references/schemas.json"}],
+  "release_channel": "canary"
+}

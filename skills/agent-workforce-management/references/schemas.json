@@ -1,0 +1,147 @@
+{
+  "definitions": {
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ref", "status"],
+      "properties": {
+        "ref": {"type": "string", "pattern": "^(fixture|source|consumer):[^\\s]+$", "maxLength": 256},
+        "status": {"type": "string", "enum": ["confirmed", "reported", "not_reported"]},
+        "claim": {"type": "string", "minLength": 1, "maxLength": 500}
+      }
+    },
+    "role": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role_ref", "purpose", "domain", "boundary", "owner_ref", "evidence_ref"],
+      "properties": {
+        "role_ref": {"type": "string", "pattern": "^role:[^\\s]+$", "maxLength": 256},
+        "purpose": {"type": "string", "minLength": 3, "maxLength": 500},
+        "domain": {"type": "string", "minLength": 2, "maxLength": 256},
+        "boundary": {"type": "string", "minLength": 3, "maxLength": 1000},
+        "owner_ref": {"type": "string", "pattern": "^(owner|consumer):[^\\s]+$", "maxLength": 256},
+        "evidence_ref": {"type": "string", "pattern": "^(fixture|source|consumer):[^\\s]+$", "maxLength": 256}
+      }
+    },
+    "rule_selection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rule_ref", "applicability", "evidence_ref"],
+      "properties": {
+        "rule_ref": {"type": "string", "pattern": "^rule:[^\\s]+$", "maxLength": 256},
+        "applicability": {"type": "string", "enum": ["applicable", "not_applicable", "uncertain"]},
+        "evidence_ref": {"type": "string", "pattern": "^(fixture|source|consumer):[^\\s]+$", "maxLength": 256}
+      }
+    },
+    "capability_request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["capability_ref", "purpose", "evidence_ref"],
+      "properties": {
+        "capability_ref": {"type": "string", "pattern": "^capability:[^\\s]+$", "maxLength": 256},
+        "purpose": {"type": "string", "minLength": 3, "maxLength": 500},
+        "evidence_ref": {"type": "string", "pattern": "^(fixture|source|consumer):[^\\s]+$", "maxLength": 256}
+      }
+    },
+    "delegation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["delegation_ref", "domain", "owner_ref", "status", "evidence_ref"],
+      "properties": {
+        "delegation_ref": {"type": "string", "pattern": "^delegation:[^\\s]+$", "maxLength": 256},
+        "domain": {"type": "string", "minLength": 2, "maxLength": 256},
+        "owner_ref": {"type": "string", "pattern": "^(owner|consumer):[^\\s]+$", "maxLength": 256},
+        "status": {"type": "string", "enum": ["proposed", "confirmed", "blocked", "not_reported"]},
+        "evidence_ref": {"type": "string", "pattern": "^(fixture|source|consumer):[^\\s]+$", "maxLength": 256}
+      }
+    },
+    "workload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["agent_ref", "load_state", "blocker_refs", "evidence_ref"],
+      "properties": {
+        "agent_ref": {"type": "string", "pattern": "^agent:[^\\s]+$", "maxLength": 256},
+        "load_state": {"type": "string", "enum": ["available", "balanced", "overloaded", "blocked", "not_reported"]},
+        "blocker_refs": {"type": "array", "maxItems": 16, "items": {"type": "string", "pattern": "^(fixture|source|consumer):[^\\s]+$"}},
+        "evidence_ref": {"type": "string", "pattern": "^(fixture|source|consumer):[^\\s]+$", "maxLength": 256}
+      }
+    },
+    "quality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["agent_ref", "outcome", "repeated_failure_count", "evidence_ref"],
+      "properties": {
+        "agent_ref": {"type": "string", "pattern": "^agent:[^\\s]+$", "maxLength": 256},
+        "outcome": {"type": "string", "enum": ["passed", "degraded", "failed", "not_reported"]},
+        "repeated_failure_count": {"type": "integer", "minimum": 0, "maximum": 1000},
+        "evidence_ref": {"type": "string", "pattern": "^(fixture|source|consumer):[^\\s]+$", "maxLength": 256}
+      }
+    },
+    "proposal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["proposal_ref", "agent_ref", "kind", "status", "reason", "evidence_ref"],
+      "properties": {
+        "proposal_ref": {"type": "string", "pattern": "^proposal:[^\\s]+$", "maxLength": 256},
+        "agent_ref": {"type": "string", "pattern": "^agent:[^\\s]+$", "maxLength": 256},
+        "kind": {"type": "string", "enum": ["training", "skill_review", "authority_review", "suspend", "retire"]},
+        "status": {"type": "string", "const": "proposed"},
+        "reason": {"type": "string", "minLength": 3, "maxLength": 1000},
+        "evidence_ref": {"type": "string", "pattern": "^(fixture|source|consumer):[^\\s]+$", "maxLength": 256}
+      }
+    },
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "privacy_classification", "workforce_ref", "source_evidence"],
+      "properties": {
+        "mode": {"type": "string", "enum": ["role_definition", "rule_selection", "capability_request", "delegation_plan", "workforce_review", "quality_review", "suspend_proposal", "retire_proposal"]},
+        "privacy_classification": {"type": "string", "enum": ["synthetic", "redacted", "public"]},
+        "workforce_ref": {"type": "string", "pattern": "^workforce:[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"},
+        "source_evidence": {"type": "array", "minItems": 1, "maxItems": 32, "uniqueItems": true, "items": {"$ref": "#/definitions/evidence"}},
+        "role": {"$ref": "#/definitions/role"},
+        "rule_selection": {"$ref": "#/definitions/rule_selection"},
+        "capability_requests": {"type": "array", "maxItems": 32, "items": {"$ref": "#/definitions/capability_request"}},
+        "delegations": {"type": "array", "maxItems": 32, "items": {"$ref": "#/definitions/delegation"}},
+        "workload": {"type": "array", "maxItems": 32, "items": {"$ref": "#/definitions/workload"}},
+        "quality": {"type": "array", "maxItems": 32, "items": {"$ref": "#/definitions/quality"}},
+        "proposals": {"type": "array", "maxItems": 32, "items": {"$ref": "#/definitions/proposal"}},
+        "recommendation": {"type": "string", "minLength": 1, "maxLength": 1000},
+        "requested_action": {"type": "string", "enum": ["draft", "record", "activate", "suspend", "retire", "approve_grant", "copy_credentials", "copy_private_memory", "unknown"]}
+      }
+    },
+    "effects": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["messages_sent", "external_calls", "mutations"],
+      "properties": {
+        "messages_sent": {"type": "array", "maxItems": 0},
+        "external_calls": {"type": "array", "maxItems": 0},
+        "mutations": {"type": "array", "maxItems": 0}
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "mode", "workforce_ref", "role", "rule_selection", "capability_requests", "delegations", "workload", "quality", "proposals", "recommendation", "evidence", "uncertainty", "authority", "effects", "rollback"],
+      "properties": {
+        "status": {"type": "string", "enum": ["READY_FOR_OWNER", "DRAFT", "BLOCKED"]},
+        "mode": {"type": "string", "minLength": 1, "maxLength": 64},
+        "workforce_ref": {"type": "string", "pattern": "^workforce:[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"},
+        "role": {"anyOf": [{"$ref": "#/definitions/role"}, {"type": "null"}]},
+        "rule_selection": {"anyOf": [{"$ref": "#/definitions/rule_selection"}, {"type": "null"}]},
+        "capability_requests": {"type": "array", "items": {"$ref": "#/definitions/capability_request"}},
+        "delegations": {"type": "array", "items": {"$ref": "#/definitions/delegation"}},
+        "workload": {"type": "array", "items": {"$ref": "#/definitions/workload"}},
+        "quality": {"type": "array", "items": {"$ref": "#/definitions/quality"}},
+        "proposals": {"type": "array", "items": {"$ref": "#/definitions/proposal"}},
+        "recommendation": {"type": "string", "minLength": 1, "maxLength": 1000},
+        "evidence": {"type": "array", "minItems": 1, "maxItems": 32, "uniqueItems": true, "items": {"type": "string", "pattern": "^(fixture|source|consumer):[^\\s]+$", "maxLength": 256}},
+        "uncertainty": {"type": "array", "items": {"type": "string", "minLength": 1, "maxLength": 500}},
+        "authority": {"type": "object", "additionalProperties": false, "required": ["owner_ref", "grants_approved", "agents_activated", "agents_suspended", "agents_retired"], "properties": {"owner_ref": {"type": "string", "minLength": 1, "maxLength": 256}, "grants_approved": {"type": "boolean", "const": false}, "agents_activated": {"type": "boolean", "const": false}, "agents_suspended": {"type": "boolean", "const": false}, "agents_retired": {"type": "boolean", "const": false}}},
+        "effects": {"$ref": "#/definitions/effects"},
+        "rollback": {"type": "string", "const": "ABSENT@517f22ee135c298a17a74f84a84b60accdf22cf4/tree:d2514ee298074c70f9bb5fb19f2fc71af7d43f16"}
+      }
+    }
+  }
+}
