@@ -1,9 +1,14 @@
 # Example Trace: Error Recovery
 
 ## Scenario
-Expense feed contains unmatched records outside expected window.
+
+An expense snapshot contains unmatched records outside the requested period,
+and the operator asks the controller to change the source.
 
 ## Recovery
-- Skill marks mismatch and sets `PENDING_APPROVAL`.
-- Generates variance table and requested data corrections.
-- Resumes close only after corrected inputs are confirmed.
+
+- Controller preserves the mismatch, marks the review `PENDING_APPROVAL`, and
+  identifies the owning consumer.
+- It produces a variance table and requested evidence corrections.
+- It does not change the source or resume a close until a new bounded snapshot
+  is supplied and the owner confirms it.
