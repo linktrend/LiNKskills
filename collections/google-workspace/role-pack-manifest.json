@@ -1,0 +1,83 @@
+{
+  "activation": {
+    "activation_owner": "consumer",
+    "enabled": false
+  },
+  "applicability": {
+    "constraints": [
+      "Consumer authorization remains required per exact release.",
+      "No credentials or live destinations are included."
+    ],
+    "role_class": "lisa",
+    "scope": "workspace",
+    "task_classes": [
+      "drive",
+      "docs",
+      "sheets",
+      "slides",
+      "gmail",
+      "calendar",
+      "tasks"
+    ]
+  },
+  "compatibility": {
+    "min_contract_version": "0.2",
+    "runtime_profiles": [
+      "gws-consumer"
+    ]
+  },
+  "description": "Eligibility-only reference set for later separately authorized Lisa Workspace use; no activation or authority grant.",
+  "display_name": "Lisa Google Workspace subset",
+  "release_refs": [
+    {
+      "artifact_digest": "sha256:d37fad56bb9547d2e169bfd04fbf1f4a377281456765c6243f092f32c973cdac",
+      "eligibility_ref": "opaque:eligibility:gws-drive-ineligible",
+      "release_id": "gws-drive@0.22.5",
+      "required": false
+    },
+    {
+      "artifact_digest": "sha256:676eb7a1d9e4a7bde0d19669299858daea3220650657199f21dcebb7fa6bf9d6",
+      "eligibility_ref": "opaque:eligibility:gws-docs-ineligible",
+      "release_id": "gws-docs@0.22.5",
+      "required": false
+    },
+    {
+      "artifact_digest": "sha256:e0db8bb632b3425b6f10dac7b30c85a4ba6ed0fd8421bccd3d2242588cc02208",
+      "eligibility_ref": "opaque:eligibility:gws-sheets-ineligible",
+      "release_id": "gws-sheets@0.22.5",
+      "required": false
+    },
+    {
+      "artifact_digest": "sha256:ac0feaccf8292d5a8de0f4e3fbbdc20b94cf15afea652d127ddc12f631e190a3",
+      "eligibility_ref": "opaque:eligibility:gws-slides-ineligible",
+      "release_id": "gws-slides@0.22.5",
+      "required": false
+    },
+    {
+      "artifact_digest": "sha256:d37f41ad13fd3467d430e60dfb985d7818ef6976bae40182f8e46a410b8caa16",
+      "eligibility_ref": "opaque:eligibility:gws-gmail-ineligible",
+      "release_id": "gws-gmail@0.22.5",
+      "required": false
+    },
+    {
+      "artifact_digest": "sha256:2be9bcdd12a425169c79473c4e56200715e4a3b6c04ed2988839b12ce8aea6b8",
+      "eligibility_ref": "opaque:eligibility:gws-calendar-ineligible",
+      "release_id": "gws-calendar@0.22.5",
+      "required": false
+    },
+    {
+      "artifact_digest": "sha256:0666278489068fdabcba1a280b7743d679363fbddc834b947378eb57277da79a",
+      "eligibility_ref": "opaque:eligibility:gws-tasks-ineligible",
+      "release_id": "gws-tasks@0.22.5",
+      "required": false
+    }
+  ],
+  "required_capability_classes": [
+    "google-workspace.read",
+    "google-workspace.draft"
+  ],
+  "role_pack_id": "lisa-google-workspace",
+  "schema_version": "0.1",
+  "trust_boundary": "linkskills-role-pack",
+  "version": "0.22.5"
+}
