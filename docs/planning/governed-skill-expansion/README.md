@@ -16,11 +16,12 @@ This package adds the approved governed-skill expansion to the existing LiNKskil
 4. [`REQUIREMENTS-TRACEABILITY.md`](./REQUIREMENTS-TRACEABILITY.md) — requirement-to-packet and proof coverage.
 5. [`LISA-CANARY-BINDINGS.md`](./LISA-CANARY-BINDINGS.md) — exact OpenClaw-owned instance acceptance values kept out of reusable releases.
 6. [`EXECUTION-MANIFEST.json`](./EXECUTION-MANIFEST.json) — schema-valid LiNKskills packet manifest in `PLAN` state.
-7. [`MODEL-ROUTING-SUCCESSOR.md`](./MODEL-ROUTING-SUCCESSOR.md) — Principal-authoritative routing controls and admission rules.
-8. [`MODEL-ROUTING-MATRIX.json`](./MODEL-ROUTING-MATRIX.json) — exact packet/subtask route, fallback, review, Terra, and cost assignments.
-9. [`MODEL-ROUTING-RECEIPT.json`](./MODEL-ROUTING-RECEIPT.json) — digest binding between the manifest and routing matrix.
-10. The assigned file under [`packets/`](./packets/) — bounded work and acceptance criteria.
-11. [`cross-repository/HANDOFF-PACKETS.md`](./cross-repository/HANDOFF-PACKETS.md) — work owned by Platform, OpenClaw, LiNKautowork, or another repository.
+7. [`ARCHITECTURE-APPROVAL-RECORD.md`](./ARCHITECTURE-APPROVAL-RECORD.md) — PKT-00 baseline evidence, decision table, blast radius, and approval/hold state.
+8. [`MODEL-ROUTING-SUCCESSOR.md`](./MODEL-ROUTING-SUCCESSOR.md) — Principal-authoritative routing controls and admission rules.
+9. [`MODEL-ROUTING-MATRIX.json`](./MODEL-ROUTING-MATRIX.json) — exact packet/subtask route, fallback, review, Terra, and cost assignments.
+10. [`MODEL-ROUTING-RECEIPT.json`](./MODEL-ROUTING-RECEIPT.json) — digest binding between the manifest and routing matrix.
+11. The assigned file under [`packets/`](./packets/) — bounded work and acceptance criteria.
+12. [`cross-repository/HANDOFF-PACKETS.md`](./cross-repository/HANDOFF-PACKETS.md) — work owned by Platform, OpenClaw, LiNKautowork, or another repository.
 
 ## Authority and reconciliation
 
