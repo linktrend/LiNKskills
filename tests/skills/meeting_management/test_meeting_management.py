@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import importlib.util
 import json
+import subprocess
 import sys
 import unittest
 from pathlib import Path
@@ -147,6 +148,12 @@ class MeetingManagementTests(unittest.TestCase):
         self.assertEqual(profile["eval_suite_hash"], "sha256:" + hashlib.sha256((SKILL / "references/eval-suite.json").read_bytes()).hexdigest())
         self.assertEqual(verify_execution_profile_hashes(SKILL), [])
         self.assertGreaterEqual(len(suite["cases"]), 10)
+
+    def test_malformed_cli_input_preserves_failure_contract(self):
+        helper_path = SKILL / "scripts" / "helper_tool.py"
+        completed = subprocess.run([sys.executable, str(helper_path)], input="[]", text=True, capture_output=True, check=False)
+        self.assertEqual(completed.returncode, 1)
+        self.assert_output(json.loads(completed.stdout))
 
 
 if __name__ == "__main__":

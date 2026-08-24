@@ -148,10 +148,16 @@ def main() -> int:
 
     try:
         payload = json.load(sys.stdin)
-        print(json.dumps(normalize_request(payload), sort_keys=True))
-        return 0
-    except Exception as error:
-        print(json.dumps({"status": "FAILED", "error": str(error)}, sort_keys=True))
+        if not isinstance(payload, dict):
+            result = _base({}, "FAILED", disposition="invalid-input")
+        else:
+            result = normalize_request(payload)
+        print(json.dumps(result, sort_keys=True))
+        return 0 if result["status"] != "FAILED" else 1
+    except Exception:
+        # Preserve the complete fail-closed output contract without echoing
+        # parser errors or malformed/private input.
+        print(json.dumps(_base({}, "FAILED", disposition="invalid-input"), sort_keys=True))
         return 1
 
 
