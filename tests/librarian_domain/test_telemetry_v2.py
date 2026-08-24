@@ -80,6 +80,29 @@ class TelemetryV2(unittest.TestCase):
         )
         self.assertEqual(len(next(iter(aggregate))), 6)
 
+    def test_private_domain_categories_are_rejected_recursively(self):
+        for field in ("calendar", "email", "drive", "battery", "selfie", "image", "identifier", "messages"):
+            report = self.report()
+            report["metadata"] = {field: "synthetic fixture only"}
+            with self.subTest(field=field):
+                result = TelemetryPort().submit(report)
+                self.assertFalse(result["accepted"])
+
+    def test_feedback_must_be_redacted_and_effects_are_bounded(self):
+        report = self.report()
+        report["feedback"] = {"redacted": True, "rating": 4}
+        report["duration_ms"] = 12
+        report["effects"] = ["stdout", "workspace_write"]
+        self.assertTrue(TelemetryPort().submit(report)["accepted"])
+
+        unsafe = self.report()
+        unsafe["feedback"] = {"redacted": False, "notes": "private transcript"}
+        self.assertFalse(TelemetryPort().submit(unsafe)["accepted"])
+
+        effects = self.report()
+        effects["effects"] = ["network"]
+        self.assertFalse(TelemetryPort().submit(effects)["accepted"])
+
 
 if __name__ == "__main__":
     unittest.main()

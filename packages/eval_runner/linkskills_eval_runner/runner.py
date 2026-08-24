@@ -31,6 +31,7 @@ from .models import (
     RubricDimension,
     SuiteResult,
 )
+from .sandbox_v2 import assess_candidate
 from .workspace import EvalWorkspace
 
 
@@ -300,6 +301,19 @@ def _parse_case(raw: dict[str, Any], suite_dir: Path) -> EvalCase:
         suite_authored_output=suite_authored,
         has_execute=has_execute,
         raw=dict(raw),
+        source_identity=dict(raw.get("source_identity") or {})
+        if isinstance(raw.get("source_identity"), dict)
+        else {},
+        release_identity=dict(raw.get("release_identity") or {})
+        if isinstance(raw.get("release_identity"), dict)
+        else {},
+        declared_effects=[str(item) for item in (raw.get("declared_effects") or [])]
+        if isinstance(raw.get("declared_effects"), list)
+        else [],
+        privacy_findings=[str(item) for item in (raw.get("privacy_findings") or [])]
+        if isinstance(raw.get("privacy_findings"), list)
+        else [],
+        compatibility=str(raw.get("compatibility") or ""),
     )
 
 
@@ -363,6 +377,23 @@ def load_eval_suite(path: Union[str, Path]) -> EvalSuite:
         suite_hash=_sha256_text(text),
         judge_config=judge_config,
         raw=data,
+        source_identity=dict(data.get("source_identity") or {})
+        if isinstance(data.get("source_identity"), dict)
+        else {},
+        release_identity=dict(data.get("release_identity") or {})
+        if isinstance(data.get("release_identity"), dict)
+        else {},
+        declared_effects=[str(item) for item in (data.get("declared_effects") or [])]
+        if isinstance(data.get("declared_effects"), list)
+        else [],
+        privacy_findings=[str(item) for item in (data.get("privacy_findings") or [])]
+        if isinstance(data.get("privacy_findings"), list)
+        else [],
+        compatibility=str(data.get("compatibility") or ""),
+        licence=dict(data.get("licence") or data.get("license") or {})
+        if isinstance(data.get("licence", data.get("license", {})), dict)
+        else {},
+        trust_boundary=str(data.get("trust_boundary") or ""),
     )
 
 
@@ -407,6 +438,41 @@ def _aggregate_dimension_scores(
     }
 
 
+def _security_candidate(case: EvalCase, suite: EvalSuite) -> Optional[dict[str, Any]]:
+    """Build bounded candidate metadata when a suite opts into security gates."""
+    keys = {
+        "source_identity",
+        "release_identity",
+        "declared_effects",
+        "privacy_findings",
+        "compatibility",
+        "licence",
+        "license",
+        "trust_boundary",
+        "observed_content_digest",
+        "active_production_mutation",
+    }
+    raw_case = case.raw
+    raw_suite = suite.raw
+    if not any(key in raw_case or key in raw_suite for key in keys):
+        return None
+    candidate: dict[str, Any] = {
+        "source_identity": case.source_identity or suite.source_identity,
+        "release_identity": case.release_identity or suite.release_identity,
+        "declared_effects": case.declared_effects or suite.declared_effects,
+        "privacy_findings": case.privacy_findings or suite.privacy_findings,
+        "compatibility": case.compatibility or suite.compatibility,
+        "licence": suite.licence or raw_case.get("licence") or raw_case.get("license") or {},
+        "trust_boundary": suite.trust_boundary or str(raw_case.get("trust_boundary") or ""),
+    }
+    for key in ("observed_content_digest", "active_production_mutation"):
+        if key in raw_case:
+            candidate[key] = raw_case[key]
+        elif key in raw_suite:
+            candidate[key] = raw_suite[key]
+    return candidate
+
+
 def run_case(
     case: EvalCase,
     *,
@@ -419,6 +485,22 @@ def run_case(
     skill_release_hash: Optional[str] = None,
 ) -> CaseResult:
     """Execute one case through the real executor; never trust suite-authored outputs."""
+    security_candidate = _security_candidate(case, suite)
+    if security_candidate is not None:
+        assessment = assess_candidate(security_candidate)
+        if not assessment.admitted:
+            return CaseResult(
+                case_id=case.id,
+                status=CaseStatus.QUARANTINED,
+                reason="candidate held in quarantine: " + ", ".join(assessment.reasons),
+                evidence_meta={
+                    "executable": bool(case_has_execute_block(case)),
+                    "security_assessment": assessment.to_dict(),
+                    "evidence_source": "policy",
+                },
+                evidence_source="policy",
+            )
+
     if not case_has_execute_block(case):
         if case_has_suite_authored_output(case) or case.suite_authored_output:
             return CaseResult(
@@ -516,6 +598,11 @@ def run_case(
         "case_score": case_score,
         "assertions_passed": assertions_passed(assertion_results),
         "suite_authored_output_ignored": case.suite_authored_output,
+        "security_assessment": (
+            assess_candidate(_security_candidate(case, suite)).to_dict()
+            if _security_candidate(case, suite) is not None
+            else None
+        ),
     }
     receipt_dict = capture.receipt.to_dict()
 
@@ -634,6 +721,8 @@ def run_suite(
                 reasons.append(f"{case.id}: not_executable_prompt_only")
             if result.status == CaseStatus.INVALID_EMBEDDED_OUTPUT:
                 reasons.append(f"{case.id}: invalid_embedded_output")
+            if result.status == CaseStatus.QUARANTINED:
+                reasons.append(f"{case.id}: quarantined")
 
         dimension_scores = _aggregate_dimension_scores(case_results, suite.rubric)
         weighted, hard_dims = weighted_score(dimension_scores, suite.rubric)
@@ -647,6 +736,7 @@ def run_suite(
             in {
                 CaseStatus.NOT_EXECUTABLE_PROMPT_ONLY,
                 CaseStatus.INVALID_EMBEDDED_OUTPUT,
+                CaseStatus.QUARANTINED,
             }
             for c in case_results
         )
@@ -678,6 +768,8 @@ def run_suite(
             reasons.append(
                 "suite contains non-executable or suite-authored-output cases; cannot certify"
             )
+            if any(c.status == CaseStatus.QUARANTINED for c in case_results):
+                reasons.append("security candidate quarantine blocks qualification")
             certifiable = False
         if hard_dims:
             reasons.append(f"hard_fail_below dimensions: {', '.join(hard_dims)}")
@@ -688,6 +780,10 @@ def run_suite(
         if any(not c.execution_receipt for c in case_results):
             reasons.append("missing immutable execution receipt(s)")
             certifiable = False
+
+        qualification = "hold_quarantine" if any(
+            c.status == CaseStatus.QUARANTINED for c in case_results
+        ) else ("qualified" if certifiable else "evidence_pending_review")
 
         receipt = ws.receipt()
         return SuiteResult(
@@ -707,6 +803,12 @@ def run_suite(
             workspace_receipt=receipt,
             evidence=evidence,
             execution_receipts=execution_receipts,
+            source_identity=dict(suite.source_identity),
+            release_identity=dict(suite.release_identity),
+            declared_effects=list(suite.declared_effects),
+            privacy_findings=list(suite.privacy_findings),
+            compatibility=suite.compatibility,
+            qualification_outcome=qualification,
         )
     finally:
         if owns_workspace:

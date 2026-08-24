@@ -4,6 +4,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 import hashlib
 import json
+import re
 from typing import Any
 
 
@@ -27,6 +28,23 @@ FORBIDDEN = {
     "health",
     "media",
     "brain_memory",
+    "calendar",
+    "email",
+    "drive",
+    "battery",
+    "selfie",
+    "image",
+    "identifier",
+    "location",
+    "schedule",
+    "messages",
+    "private_data",
+    "private_memory",
+    "medical",
+    "raw_prompt",
+    "raw_transcript",
+    "raw_output",
+    "file_path",
 }
 REQUIRED_FIELDS = {
     "report_kind",
@@ -46,14 +64,29 @@ REQUIRED_FIELDS = {
     "privacy",
     "retention_class",
 }
+OPTIONAL_FIELDS = {
+    "issue",
+    "duration_ms",
+    "receipt_ref",
+    "privacy_findings",
+    "effects",
+    "feedback",
+}
+FEEDBACK_FIELDS = {"kind", "rating", "friction", "missing_step", "outcome", "redacted"}
+_DIGEST_RE = re.compile(r"^sha256:[0-9a-f]{64}$")
 
 
 def _contains_prohibited(value: Any) -> bool:
     if isinstance(value, Mapping):
-        return any(
-            any(token in str(key).lower() for token in FORBIDDEN) or _contains_prohibited(item)
-            for key, item in value.items()
-        )
+        for key, item in value.items():
+            name = str(key).lower()
+            if name == "privacy" and isinstance(item, Mapping):
+                if any(_contains_prohibited(child) for child_key, child in item.items() if child_key not in {"raw_content", "prohibited_content"}):
+                    return True
+                continue
+            if any(token in name for token in FORBIDDEN) or _contains_prohibited(item):
+                return True
+        return False
     if isinstance(value, (list, tuple)):
         return any(_contains_prohibited(item) for item in value)
     return False
@@ -71,8 +104,34 @@ def canonical_digest(report: dict) -> str:
 
 
 def _require_string(report: dict, field: str) -> None:
-    if not isinstance(report.get(field), str) or not report[field].strip():
+    if (
+        not isinstance(report.get(field), str)
+        or not report[field].strip()
+        or len(report[field].strip()) > 256
+    ):
         raise ValueError(f"required_{field}")
+
+
+def _bounded_strings(value: Any, field: str) -> list[str]:
+    if not isinstance(value, list) or len(value) > 32:
+        raise ValueError(f"invalid_{field}")
+    result = []
+    for item in value:
+        if not isinstance(item, str) or not item.strip() or len(item) > 120:
+            raise ValueError(f"invalid_{field}")
+        result.append(item.strip())
+    return result
+
+
+def _validate_feedback(value: Any) -> None:
+    if not isinstance(value, dict) or set(value) - FEEDBACK_FIELDS:
+        raise ValueError("invalid_feedback")
+    if value.get("redacted") is not True:
+        raise ValueError("feedback_must_be_redacted")
+    for key in set(value) - {"redacted"}:
+        item = value[key]
+        if not isinstance(item, (str, int, float, bool)) or (isinstance(item, str) and len(item) > 120):
+            raise ValueError("invalid_feedback")
 
 
 def validate_report(report: dict) -> None:
@@ -83,6 +142,9 @@ def validate_report(report: dict) -> None:
         raise ValueError("prohibited_content")
     if not REQUIRED_FIELDS.issubset(report):
         raise ValueError("required_field")
+    unknown = set(report) - REQUIRED_FIELDS - OPTIONAL_FIELDS
+    if unknown:
+        raise ValueError("unknown_field")
 
     for field in (
         "skill_release_ref",
@@ -101,11 +163,31 @@ def validate_report(report: dict) -> None:
     ):
         _require_string(report, field)
 
+    if not _DIGEST_RE.fullmatch(report["skill_digest"]):
+        raise ValueError("invalid_skill_digest")
+    if "receipt_ref" in report:
+        _require_string(report, "receipt_ref")
+    if "duration_ms" in report and (
+        isinstance(report["duration_ms"], bool)
+        or not isinstance(report["duration_ms"], int)
+        or not 0 <= report["duration_ms"] <= 86_400_000
+    ):
+        raise ValueError("invalid_duration_ms")
+    if "privacy_findings" in report:
+        _bounded_strings(report["privacy_findings"], "privacy_findings")
+    if "effects" in report:
+        effects = _bounded_strings(report["effects"], "effects")
+        if any(item in {"network", "file_delete", "destructive", "production_mutation"} for item in effects):
+            raise ValueError("forbidden_effect")
+    if "feedback" in report:
+        _validate_feedback(report["feedback"])
+
     privacy = report["privacy"]
     if (
         not isinstance(privacy, dict)
         or privacy.get("raw_content") is not False
         or privacy.get("prohibited_content") is not False
+        or set(privacy) != {"raw_content", "prohibited_content"}
     ):
         raise ValueError("privacy_fields_required")
 
@@ -123,6 +205,8 @@ def validate_report(report: dict) -> None:
         if score < 10 and not isinstance(issue, dict):
             raise ValueError("typed_issue_required")
         if isinstance(issue, dict):
+            if set(issue) != {"type"}:
+                raise ValueError("issue_fields_forbidden")
             _require_string(issue, "type")
     elif kind in {"non_use", "retrieval_failure", "not_evaluated"}:
         if score is not None or "issue" in report:
@@ -144,10 +228,14 @@ class TelemetryPort:
             validate_report(report)
         except (TypeError, ValueError, json.JSONDecodeError) as exc:
             digest = canonical_digest(report) if isinstance(report, dict) else None
+            try:
+                byte_size = len(json.dumps(report, ensure_ascii=False).encode("utf-8"))
+            except (TypeError, ValueError):
+                byte_size = 0
             return {
                 "accepted": False,
                 "reason": str(exc),
-                "byte_size": len(json.dumps(report, ensure_ascii=False).encode("utf-8")),
+                "byte_size": byte_size,
                 "digest": digest,
             }
 
