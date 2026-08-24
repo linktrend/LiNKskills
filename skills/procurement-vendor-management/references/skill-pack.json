@@ -1,0 +1,32 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "procurement-vendor-management",
+  "display_name": "Procurement and Vendor Management",
+  "version": "1.0.0",
+  "description": "Evidence-grounded supplier, pricing, renewal, performance, continuity, and approval-brief preparation.",
+  "capability_category": "procurement_vendor_management",
+  "provenance": {"author": "LiNKskills Library", "source": "LiNKskills PRD PKT-19", "license": "LiNKtrend internal"},
+  "release_channel": "development",
+  "lifecycle_state": "draft",
+  "format_profile": "heavy",
+  "compatible_runtime_profiles": ["cursor-macos"],
+  "min_capability_tier": "high",
+  "routing": {
+    "when_to_use": "Use for evidenced supplier intake, comparison, pricing, contract/renewal, performance, continuity-risk, or approval-brief preparation.",
+    "when_not_to_use": ["Do not use as a purchasing, ERP, payment, or supplier connector.", "Do not order, accept, negotiate, renew, terminate, send, or mutate vendor records.", "Do not use with live credentials, bank details, private vendor data, or private contract text."],
+    "tags": ["procurement", "vendors", "suppliers", "pricing", "renewals", "continuity"],
+    "exclusion_rules": ["Consumer procurement owners retain spending and acceptance authority.", "Owning integrations retain vendor credentials and system mutation authority."]
+  },
+  "execution": {
+    "required_inputs": [{"name": "request", "description": "Synthetic request, procurement workflow, source evidence, authority, and privacy classification.", "schema": {"$ref": "references/schemas.json#/definitions/input"}}],
+    "expected_outputs": [{"name": "result", "description": "Auditable preparation, denial, or escalation with no live effects.", "schema": {"$ref": "references/schemas.json#/definitions/output"}}],
+    "procedure_summary": "Normalize supplier evidence, compare claims and risk, prepare an owner-bound artifact, and retain redacted audit state.",
+    "forbidden_actions": ["Store or echo credentials, bank data, private vendor data, or contract text", "Create orders or mutate supplier systems", "Spend, accept, negotiate, renew, terminate, or send", "Infer consumer approval or supplier state"],
+    "verification_steps": ["Run the canonical validator", "Run scoped unit/eval checks", "Confirm no prohibited paths or live effects"],
+    "completion_criteria": ["Output is complete and evidence-grounded", "Effects sent/accepted/ordered/mutated_records are false", "Owner, escalation, idempotency, and rollback are explicit"]
+  },
+  "dependencies": {"schema_version": "0.1", "skill_dependencies": ["search-strategy", "citation-enforcer", "commercial-contracts-legal-operations"], "packaged_tools": [], "host_capabilities": ["filesystem_read", "filesystem_write"], "external_services": [], "library_assets": [], "runtime_requirements": [], "optional_dependencies": []},
+  "eval": {"suite_path": "references/eval-suite.json", "suite_schema_version": "0.1", "required_certification_profiles": ["cursor-macos"], "verification_refs": ["references/eval-suite.yaml"]},
+  "telemetry": {"classification": "public_internal", "redaction_rules": ["strip_secrets", "strip_bank_data", "strip_private_vendor_data", "strip_contract_text", "strip_reasoning"], "retention_policy": "retain synthetic IDs, evidence hashes, and receipts only"},
+  "fragments": [{"fragment_id": "summary", "disclosure_level": 2, "path": "SKILL.md"}, {"fragment_id": "advanced", "disclosure_level": 4, "path": "advanced/advanced.md"}]
+}
