@@ -27,6 +27,9 @@ def _base(request: dict[str, Any], status: str, refs: list[str], uncertainty: li
     mode = str(request.get("mode") or "unknown")
     matter_ref = str(request.get("matter_ref") or "matter:unknown")
     matter = str(request.get("matter") or "Matter not reported")
+    tracking = request.get("implementation_tracking")
+    if not isinstance(tracking, list):
+        tracking = []
     return {
         "status": status,
         "mode": mode,
@@ -35,7 +38,7 @@ def _base(request: dict[str, Any], status: str, refs: list[str], uncertainty: li
         "choices": list(request.get("choices") or []),
         "decision": request.get("decision_record") or {"status": "not_reported"},
         "rule_impact": request.get("rule_impact") or {"status": "not_reported", "summary": "Rule impact not reported"},
-        "implementation_tracking": list(request.get("implementation_tracking") or []),
+        "implementation_tracking": tracking,
         "evidence": refs or ["fixture:missing"],
         "uncertainty": list(uncertainty or []),
         "authority": {"owner_ref": "not_reported", "approval_recorded": False, "activated": False},
@@ -133,14 +136,24 @@ def normalize_request(request: dict[str, Any]) -> dict[str, Any]:
     if not isinstance(tracking, list):
         return _failure(request, "implementation_tracking must be a list", refs)
     tracking_ids: set[str] = set()
+    safe_tracking_request = dict(request)
+    safe_tracking_request["implementation_tracking"] = []
     for item in tracking:
         if not isinstance(item, dict) or not all(isinstance(item.get(key), str) and item[key].strip() for key in ("id", "item", "owner_ref", "status", "evidence_ref")):
-            return _failure(request, "tracking items require id, item, owner_ref, status, and evidence_ref", refs)
+            return _failure(safe_tracking_request, "tracking items require id, item, owner_ref, status, and evidence_ref", refs)
+        if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._:-]{2,63}", item["id"]):
+            return _failure(safe_tracking_request, "tracking item id is invalid", refs)
+        if len(item["item"]) > 500 or not re.fullmatch(r"(owner|consumer):[^\s]+", item["owner_ref"]):
+            return _failure(safe_tracking_request, "tracking item owner or description is invalid", refs)
+        if item["status"] not in {"proposed", "in_progress", "blocked", "complete", "not_reported"}:
+            return _failure(safe_tracking_request, "tracking item status is invalid", refs)
+        if len(item["evidence_ref"]) > 256 or not re.fullmatch(r"(fixture|source|consumer):[^\s]+", item["evidence_ref"]):
+            return _failure(safe_tracking_request, "tracking item evidence_ref is invalid", refs)
         if item["id"] in tracking_ids:
-            return _failure(request, "duplicate implementation tracking ids are rejected", refs)
+            return _failure(safe_tracking_request, "duplicate implementation tracking ids are rejected", refs)
         tracking_ids.add(item["id"])
         if item["evidence_ref"] not in refs:
-            return _failure(request, "tracking evidence_ref must match supplied evidence", refs)
+            return _failure(safe_tracking_request, "tracking evidence_ref must match supplied evidence", refs)
     result = _base(request, "READY_FOR_OWNER", refs)
     result["uncertainty"] = [item["ref"] + " is not_reported" for item in request["source_evidence"] if item.get("status") == "not_reported"]
     if result["uncertainty"]:

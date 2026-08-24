@@ -99,6 +99,16 @@ class ExecutiveDecisionsGovernanceTests(unittest.TestCase):
         self.assertFalse(result["authority"]["activated"])
         self.assert_valid_output(result)
 
+    def test_invalid_tracking_status_fails_closed_without_echoing_invalid_item(self):
+        request = self.request(
+            mode="implementation_tracking",
+            implementation_tracking=[{"id": "track-001", "item": "Prepare owner review note", "owner_ref": "owner:principal", "status": "approved", "evidence_ref": "fixture:decision-pkt13-001"}],
+        )
+        result = load_helper().normalize_request(request)
+        self.assertEqual(result["status"], "BLOCKED")
+        self.assertEqual(result["implementation_tracking"], [])
+        self.assert_valid_output(result)
+
     def test_authority_privacy_and_duplicate_boundaries_fail_closed(self):
         helper = load_helper()
         for action in ("activate", "enforce", "send", "schedule", "create_task"):
