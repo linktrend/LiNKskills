@@ -33,6 +33,15 @@ def test_must_contain_and_must_not_contain():
     assert not check_must_not_contain("has secret", ["secret"])[0].passed
 
 
+def test_rejected_automatic_emergency_support_wording_is_hard_fail():
+    results = run_assertions(
+        "and guide you toward appropriate human or emergency support rather than waiting for the next checkpoint",
+        AssertionSpec(),
+    )
+    assert any(result.hard_fail for result in results)
+    assert not assertions_passed(results)
+
+
 def test_json_schema_fields_hard_fail_on_missing():
     output = json.dumps({"ok": True, "message": "echo"})
     ok = check_json_schema_fields(output, ["ok", "message"])

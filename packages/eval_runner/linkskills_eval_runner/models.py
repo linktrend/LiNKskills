@@ -16,6 +16,7 @@ class CaseStatus(str, Enum):
     NOT_EXECUTABLE_PROMPT_ONLY = "not_executable_prompt_only"
     INVALID_EMBEDDED_OUTPUT = "invalid_embedded_output"
     INFRASTRUCTURE_ERROR = "infrastructure_error"
+    QUARANTINED = "quarantined"
 
 
 @dataclass
@@ -57,6 +58,11 @@ class EvalCase:
     observed_exit_code: Optional[int] = None
     workspace_root: Optional[str] = None
     raw: dict[str, Any] = field(default_factory=dict)
+    source_identity: dict[str, Any] = field(default_factory=dict)
+    release_identity: dict[str, Any] = field(default_factory=dict)
+    declared_effects: list[str] = field(default_factory=list)
+    privacy_findings: list[str] = field(default_factory=list)
+    compatibility: str = ""
 
     @property
     def case_id(self) -> str:
@@ -92,6 +98,13 @@ class EvalSuite:
     suite_hash: str = ""
     judge_config: dict[str, Any] = field(default_factory=dict)
     raw: dict[str, Any] = field(default_factory=dict)
+    source_identity: dict[str, Any] = field(default_factory=dict)
+    release_identity: dict[str, Any] = field(default_factory=dict)
+    declared_effects: list[str] = field(default_factory=list)
+    privacy_findings: list[str] = field(default_factory=list)
+    compatibility: str = ""
+    licence: dict[str, Any] = field(default_factory=dict)
+    trust_boundary: str = ""
 
 
 @dataclass
@@ -165,6 +178,12 @@ class SuiteResult:
     workspace_receipt: dict[str, Any] = field(default_factory=dict)
     evidence: list[EvidenceArtifact] = field(default_factory=list)
     execution_receipts: list[dict[str, Any]] = field(default_factory=list)
+    source_identity: dict[str, Any] = field(default_factory=dict)
+    release_identity: dict[str, Any] = field(default_factory=dict)
+    declared_effects: list[str] = field(default_factory=list)
+    privacy_findings: list[str] = field(default_factory=list)
+    compatibility: str = ""
+    qualification_outcome: str = ""
 
     @property
     def has_prompt_only_cases(self) -> bool:

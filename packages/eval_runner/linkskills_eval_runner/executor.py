@@ -141,6 +141,11 @@ def compute_execution_profile_hash(
                 "execute": _stable_execute_spec(case.raw),
                 "id": case.id,
                 "input": case.input,
+                "source_identity": dict(case.source_identity),
+                "release_identity": dict(case.release_identity),
+                "declared_effects": list(case.declared_effects),
+                "privacy_findings": list(case.privacy_findings),
+                "compatibility": case.compatibility,
             }
         )
     payload = {
@@ -160,6 +165,11 @@ def compute_execution_profile_hash(
         "suite_id": suite.suite_id,
         "suite_version": suite.suite_version,
         "toolchain": dict(toolchain),
+        "source_identity": dict(suite.source_identity),
+        "release_identity": dict(suite.release_identity),
+        "declared_effects": list(suite.declared_effects),
+        "privacy_findings": list(suite.privacy_findings),
+        "compatibility": suite.compatibility,
     }
     return sha256_text(_shared_canonical_json(payload))
 
@@ -424,6 +434,14 @@ def execute_case(
         skill_release_hash=release_hash,
     )
     environment["network_isolation"] = network_isolation
+    environment["evaluation_metadata"] = {
+        "source_identity": dict(case.source_identity or suite.source_identity),
+        "release_identity": dict(case.release_identity or suite.release_identity),
+        "declared_effects": list(case.declared_effects or suite.declared_effects),
+        "privacy_findings": list(case.privacy_findings or suite.privacy_findings),
+        "compatibility": case.compatibility or suite.compatibility,
+        "trust_boundary": str(case.raw.get("trust_boundary") or suite.raw.get("trust_boundary") or ""),
+    }
     receipt = build_execution_receipt(
         case_id=case.id,
         skill_id=suite.skill_id,

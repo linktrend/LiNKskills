@@ -87,6 +87,12 @@ def certify_run(
         "dimension_scores": dimension_scores,
         "hard_fail_dimensions": hard_dims,
         "execution_receipt_count": len(run.execution_receipts),
+        "source_identity": dict(run.source_identity),
+        "release_identity": dict(run.release_identity),
+        "declared_effects": list(run.declared_effects),
+        "privacy_findings": list(run.privacy_findings),
+        "compatibility": run.compatibility,
+        "qualification_outcome": run.qualification_outcome,
     }
 
     if judge is not None and judge_is_rejected(judge):
@@ -124,6 +130,7 @@ def certify_run(
         in {
             CaseStatus.NOT_EXECUTABLE_PROMPT_ONLY,
             CaseStatus.INVALID_EMBEDDED_OUTPUT,
+            CaseStatus.QUARANTINED,
         }
     ]
     if blocked_ids:
@@ -142,6 +149,12 @@ def certify_run(
             )
             else "suite_authored_or_non_executable"
         )
+        if any(
+            c.status == CaseStatus.QUARANTINED
+            for c in run.case_results
+            if c.case_id in blocked_ids
+        ):
+            prompt_token = "quarantined_security_candidate"
         return CertificationDecision(
             certified=False,
             reason=(
@@ -163,6 +176,7 @@ def certify_run(
             CaseStatus.FAILED,
             CaseStatus.HARD_FAIL,
             CaseStatus.INFRASTRUCTURE_ERROR,
+            CaseStatus.QUARANTINED,
         }:
             return CertificationDecision(
                 certified=False,
@@ -170,6 +184,16 @@ def certify_run(
                 weighted_score=score,
                 hard_fail_dimensions=hard_dims,
                 evidence=evidence,
+            )
+        security = case.evidence_meta.get("security_assessment")
+        if isinstance(security, dict) and security.get("outcome") != "eligible_for_evaluation":
+            return CertificationDecision(
+                certified=False,
+                reason=f"cannot certify: security assessment for case {case.case_id!r} is not eligible",
+                weighted_score=score,
+                hard_fail_dimensions=hard_dims,
+                evidence=evidence,
+                receipt_hashes=receipt_hashes,
             )
         if case.evidence_source != "executor":
             return CertificationDecision(
@@ -241,6 +265,34 @@ def certify_run(
         )
     release_hash = next(iter(release_hashes))
     evidence["skill_release_hash"] = release_hash
+
+    if run.privacy_findings:
+        return CertificationDecision(
+            certified=False,
+            reason="cannot certify: privacy findings require quarantine",
+            weighted_score=score,
+            hard_fail_dimensions=hard_dims,
+            evidence=evidence,
+            receipt_hashes=receipt_hashes,
+        )
+    if run.compatibility and run.compatibility.strip().lower() != "compatible":
+        return CertificationDecision(
+            certified=False,
+            reason="cannot certify: compatibility is not proven",
+            weighted_score=score,
+            hard_fail_dimensions=hard_dims,
+            evidence=evidence,
+            receipt_hashes=receipt_hashes,
+        )
+    if run.qualification_outcome == "hold_quarantine":
+        return CertificationDecision(
+            certified=False,
+            reason="cannot certify: qualification outcome is hold_quarantine",
+            weighted_score=score,
+            hard_fail_dimensions=hard_dims,
+            evidence=evidence,
+            receipt_hashes=receipt_hashes,
+        )
 
     if expected_skill_release_hash is not None:
         expected = str(expected_skill_release_hash).strip()

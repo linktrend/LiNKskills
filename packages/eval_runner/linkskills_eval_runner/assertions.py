@@ -13,6 +13,12 @@ class AssertionHardFail(ValueError):
     """Raised when required assertion fields are missing from expected config or output."""
 
 
+REJECTED_AUTOMATIC_EMERGENCY_SUPPORT_WORDING = (
+    "and guide you toward appropriate human or emergency support rather than "
+    "waiting for the next checkpoint"
+)
+
+
 def _require_fields(spec_dict: dict[str, Any], required: list[str], *, context: str) -> None:
     """Hard-fail when expected assertion config keys are missing or null."""
     missing = [key for key in required if key not in spec_dict or spec_dict[key] is None]
@@ -206,6 +212,18 @@ def run_assertions(
     results.extend(check_json_schema_fields(text, spec.json_schema_fields))
     results.extend(check_exit_code(observed_exit_code, spec.exit_code))
     results.extend(check_file_exists(spec.file_exists, workspace_root=workspace_root))
+
+    # This wording was explicitly rejected as automatic product behavior. It
+    # is a global hard-fail even when a suite forgets to declare must_not_contain.
+    if REJECTED_AUTOMATIC_EMERGENCY_SUPPORT_WORDING in text:
+        results.append(
+            AssertionResult(
+                name="policy:no_automatic_emergency_support_wording",
+                passed=False,
+                hard_fail=True,
+                detail="rejected automatic emergency-support wording present",
+            )
+        )
 
     if spec.exact_output is not None:
         ok = text == spec.exact_output
