@@ -62,22 +62,22 @@ class RolePackValidatorTests(unittest.TestCase):
         evidence = read(ROOT / "role-packs" / "pkt-22-23-contradiction.json")
         receipt = evidence["repair_receipt"]
 
-        self.assertEqual(receipt["issue"], 236)
+        self.assertEqual(receipt["issue"], 243)
         self.assertEqual(
             receipt["rejected_checkpoint"],
             {
-                "commit": "804b1a0af5548efde2a15297d1f911ac14f46c28",
-                "tree": "60a93f43babf50999f0e2e9425ecb03c411791f1",
-                "parent": "9c219c97ba0a6d7aad05bc7c87eb117405863855",
-                "parent_tree": "93400142d8ebd338cc5aaf47fd4904da3a46449c",
+                "commit": "0c716bf09a468c342e9ecaf73efa1c82eacc07ed",
+                "tree": "ff0ed54ca7990378bd33cc42c6434f631a4198b0",
+                "parent": "da56e3cc5554d1050e4f06029f0f34674211e0ed",
+                "parent_tree": "60a93f43babf50999f0e2e9425ecb03c411791f1",
             },
         )
         self.assertEqual(
             receipt["protected_base"],
             {
                 "ref": "origin/development",
-                "commit": "9c219c97ba0a6d7aad05bc7c87eb117405863855",
-                "tree": "93400142d8ebd338cc5aaf47fd4904da3a46449c",
+                "commit": "43d4674cd88695d3402c19972daee0a5eaff4c95",
+                "tree": "aecc2f8bbbf3faeb7da6084de63fa6795e01c7f3",
             },
         )
         self.assertEqual(
