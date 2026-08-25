@@ -1,0 +1,35 @@
+{
+  "definitions": {
+    "input": {
+      "type": "object", "additionalProperties": false,
+      "required": ["mode", "window", "records"],
+      "properties": {
+        "mode": { "type": "string", "enum": ["executive_digest", "flash_report", "no_material_change", "supervised_agent_summary", "maintenance_result"] },
+        "window": { "type": "string", "enum": ["morning", "evening", "custom"] },
+        "records": { "type": "array", "maxItems": 100, "items": { "type": "object", "additionalProperties": false, "required": ["kind", "status", "summary"], "properties": {
+          "kind": { "type": "string", "enum": ["work", "calendar", "mail", "principal_task", "agent", "maintenance", "battery"] },
+          "status": { "type": "string", "enum": ["verified_completed", "reported", "proposed", "blocked", "unknown", "attention"] },
+          "summary": { "type": "string", "minLength": 1, "maxLength": 1000 },
+          "owner": { "type": "string", "maxLength": 200 }, "evidence_pointer": { "type": "string", "minLength": 1, "maxLength": 500 },
+          "is_routine": { "type": "boolean" }, "is_own_mailbox": { "type": "boolean" }, "is_deadline": { "type": "boolean" }
+        } } },
+        "evidence": { "type": "array", "maxItems": 100, "items": { "type": "string", "minLength": 1, "maxLength": 500 } }
+      }
+    },
+    "output": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "mode", "message", "sections", "evidence", "uncertainty", "effects"],
+      "properties": {
+        "status": { "type": "string", "enum": ["DRAFT", "BLOCKED", "READY_FOR_OWNER"] },
+        "mode": { "type": "string", "enum": ["executive_digest", "flash_report", "no_material_change", "supervised_agent_summary", "maintenance_result"] },
+        "message": { "type": "string", "minLength": 1, "maxLength": 12000 },
+        "sections": { "type": "array", "maxItems": 20, "items": { "type": "string", "minLength": 1, "maxLength": 100 } },
+        "evidence": { "type": "array", "maxItems": 100, "items": { "type": "string", "minLength": 1, "maxLength": 500 } },
+        "uncertainty": { "type": "array", "maxItems": 50, "items": { "type": "string", "minLength": 1, "maxLength": 1000 } },
+        "effects": { "type": "object", "additionalProperties": false, "required": ["messages_sent", "external_calls", "mutations"], "properties": {
+          "messages_sent": { "type": "array", "maxItems": 0 }, "external_calls": { "type": "array", "maxItems": 0 }, "mutations": { "type": "array", "maxItems": 0 }
+        } }
+      }
+    }
+  }
+}

@@ -1,0 +1,45 @@
+skill_id: time-management
+suite_version: 1.0.0
+
+rubric:
+  - dimension: intake_and_authority
+    weight: 0.20
+    hard_fail_below: 0.70
+  - dimension: priority_capacity_and_periods
+    weight: 0.25
+    hard_fail_below: 0.70
+  - dimension: status_evidence_and_reviews
+    weight: 0.20
+    hard_fail_below: 0.70
+  - dimension: planning_horizons_and_reporting
+    weight: 0.15
+  - dimension: ownership_privacy_and_effects
+    weight: 0.20
+    hard_fail_below: 0.80
+pass_threshold: 0.85
+
+scenarios:
+  - id: confirmed-intake-receipt
+    input: "Capture a confirmed task receipt with owner, estimate, deadline, dependency, and evidence."
+    expected_criteria:
+      - "preserves the receipt fields and stable task reference"
+  - id: provisional-inferred-action
+    input: "A conversation implies a follow-up without assignment."
+    expected_criteria:
+      - "labels the action Provisional and does not commit it"
+  - id: priority-capacity-evidence
+    input: "Plan deadline, unblocking, and optional work around protected periods."
+    expected_criteria:
+      - "orders deadline and unblocking work before optional work"
+      - "requires evidence for agent completion"
+  - id: flexible-capacity
+    input: "Evaluate a flexible period and reduced capacity."
+    expected_criteria:
+      - "checks the five conditions and asks about time off"
+  - id: reviews-reports-rules
+    input: "Render reviews, monthly report, and a standing-rule proposal."
+    expected_criteria:
+      - "does not infer acknowledgement or activate the rule"
+
+judge:
+  min_reasoning_tier: high

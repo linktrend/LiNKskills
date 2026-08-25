@@ -1,0 +1,105 @@
+{
+  "definitions": {
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ref", "status"],
+      "properties": {
+        "ref": { "type": "string", "pattern": "^(fixture|source|consumer):[^\\s]+$", "maxLength": 256 },
+        "status": { "type": "string", "enum": ["confirmed", "reported", "not_reported"] },
+        "claim": { "type": "string", "minLength": 1, "maxLength": 500 }
+      }
+    },
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "privacy_classification", "source_evidence"],
+      "properties": {
+        "mode": { "type": "string", "enum": ["initial_assessment", "monthly_assessment", "checkpoint", "hydration", "treatment_appointment", "nutrition", "meal_photo", "exercise", "sleep", "measurement", "bowel", "calendar_reminder", "capacity_export"] },
+        "privacy_classification": { "type": "string", "enum": ["synthetic", "redacted_private_snapshot"] },
+        "source_evidence": { "type": "array", "minItems": 1, "maxItems": 32, "uniqueItems": true, "items": { "$ref": "#/definitions/evidence" } },
+        "data": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "assessment_period": { "type": "string", "enum": ["initial", "monthly"] },
+            "checkpoint_number": { "type": "integer", "minimum": 1, "maximum": 3 },
+            "known_answers": { "type": "array", "maxItems": 64, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 100 } },
+            "requested_questions": { "type": "array", "maxItems": 32, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 100 } },
+            "energy": { "oneOf": [{ "type": "integer", "minimum": 1, "maximum": 5 }, { "type": "string", "const": "not_reported" }] },
+            "mood": { "oneOf": [{ "type": "integer", "minimum": 1, "maximum": 5 }, { "type": "string", "const": "not_reported" }] },
+            "stress": { "oneOf": [{ "type": "integer", "minimum": 1, "maximum": 5 }, { "type": "string", "const": "not_reported" }] },
+            "capacity_state": { "type": "string", "enum": ["low", "steady", "available", "not_reported"] },
+            "bottle_ml": { "type": "number", "minimum": 0, "maximum": 100000 },
+            "remaining_ml": { "type": "number", "minimum": 0, "maximum": 100000 },
+            "treatment_record": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["kind"],
+              "properties": {
+                "kind": { "type": "string", "enum": ["appointment", "dose", "dose_change_question"] },
+                "appointment_reference": { "type": "string", "minLength": 1, "maxLength": 256 },
+                "dose": { "type": "string", "minLength": 1, "maxLength": 128 },
+                "previous_dose": { "type": "string", "minLength": 1, "maxLength": 128 },
+                "requested_dose": { "type": "string", "minLength": 1, "maxLength": 128 },
+                "owner_question": { "type": "string", "minLength": 1, "maxLength": 500 }
+              }
+            },
+            "meal_reference": { "type": "string", "pattern": "^(fixture|consumer):[^\\s]+$", "maxLength": 256 },
+            "photo_reference": { "type": "string", "pattern": "^(fixture|consumer):[^\\s]+$", "maxLength": 256 },
+            "image_uncertainty": { "type": "string", "minLength": 1, "maxLength": 500 },
+            "correction": { "type": "string", "minLength": 1, "maxLength": 500 },
+            "protein_estimate_g": { "type": "number", "minimum": 0, "maximum": 10000 },
+            "estimate_basis": { "type": "string", "minLength": 1, "maxLength": 500 },
+            "estimate_uncertainty": { "type": "string", "minLength": 1, "maxLength": 500 },
+            "exercise_evidence": { "type": "array", "minItems": 1, "maxItems": 16, "uniqueItems": true, "items": { "type": "string", "pattern": "^(fixture|source|consumer):[^\\s]+$" } },
+            "exercise_proposal": { "type": "string", "minLength": 1, "maxLength": 1000 },
+            "sleep_start": { "type": "string", "minLength": 1, "maxLength": 64 },
+            "sleep_end": { "type": "string", "minLength": 1, "maxLength": 64 },
+            "timezone": { "type": "string", "minLength": 1, "maxLength": 64 },
+            "measurement_kind": { "type": "string", "enum": ["scale", "waist", "bowel"] },
+            "measurement_value": { "type": "number", "minimum": 0, "maximum": 100000 },
+            "measurement_unit": { "type": "string", "minLength": 1, "maxLength": 32 },
+            "device": { "type": "string", "minLength": 1, "maxLength": 128 },
+            "measurement_source": { "type": "string", "minLength": 1, "maxLength": 256 },
+            "bowel_observation": { "type": "string", "minLength": 1, "maxLength": 500 },
+            "reminder_key": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$" },
+            "reminder_at": { "type": "string", "minLength": 1, "maxLength": 64 },
+            "export_capacity_state": { "type": "boolean" },
+            "safety_concern": { "type": "string", "minLength": 1, "maxLength": 500 }
+          }
+        },
+        "task_id": { "type": "string", "pattern": "^\\d{8}-\\d{4}-[A-Z0-9]+-\\d{6}$" }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "mode", "observations", "evidence", "uncertainty", "next_actions", "effects", "privacy", "rollback"],
+      "properties": {
+        "status": { "type": "string", "enum": ["COMPLETED", "PENDING_REVIEW", "FAILED"] },
+        "mode": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "observations": { "type": "array", "maxItems": 64, "items": { "type": "object", "additionalProperties": false, "required": ["field", "value", "status"], "properties": { "field": { "type": "string", "minLength": 1, "maxLength": 128 }, "value": {}, "status": { "type": "string", "enum": ["confirmed", "reported", "not_reported", "estimated", "proposed"] }, "evidence_refs": { "type": "array", "maxItems": 16, "items": { "type": "string", "minLength": 1, "maxLength": 256 } } } } },
+        "evidence": { "type": "array", "minItems": 1, "maxItems": 32, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 256 } },
+        "uncertainty": { "type": "array", "maxItems": 32, "items": { "type": "string", "minLength": 1, "maxLength": 500 } },
+        "next_actions": { "type": "array", "maxItems": 16, "items": { "type": "string", "minLength": 1, "maxLength": 500 } },
+        "capacity_state": { "type": "string", "enum": ["low", "steady", "available", "not_reported"] },
+        "effects": { "type": "object", "additionalProperties": false, "required": ["external_calls", "mutations", "calendar_reminders", "messages_sent", "data_exports"], "properties": { "external_calls": { "type": "array", "maxItems": 0 }, "mutations": { "type": "array", "maxItems": 0 }, "calendar_reminders": { "type": "array", "maxItems": 0 }, "messages_sent": { "type": "array", "maxItems": 0 }, "data_exports": { "type": "array", "maxItems": 0 } } },
+        "privacy": { "type": "object", "additionalProperties": false, "required": ["destination", "detailed_data_retained", "exportable_fields"], "properties": { "destination": { "type": "string", "const": "private_consumer_store" }, "detailed_data_retained": { "type": "boolean", "const": true }, "exportable_fields": { "type": "array", "maxItems": 1, "items": { "type": "string", "const": "capacity_state" } } } },
+        "rollback": { "type": "string", "const": "ABSENT@610e5a42b2356d2da5eaea0ef95cea806f93f45e/tree:158d87825593e781e43d9a4eaaecf1259c6387e0" }
+      }
+    },
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["task_id", "workflow_step", "status", "input_digest", "last_updated"],
+      "properties": {
+        "task_id": { "type": "string", "pattern": "^\\d{8}-\\d{4}-[A-Z0-9]+-\\d{6}$" },
+        "workflow_step": { "type": "integer", "minimum": 1, "maximum": 5 },
+        "status": { "type": "string", "enum": ["INITIALIZED", "IN_PROGRESS", "PENDING_REVIEW", "COMPLETED", "FAILED"] },
+        "input_digest": { "type": "string", "pattern": "^sha256:(?:[0-9a-f]{64}|synthetic-[A-Za-z0-9][A-Za-z0-9._-]{0,127})$" },
+        "last_updated": { "type": "string", "format": "date-time" }
+      }
+    }
+  }
+}

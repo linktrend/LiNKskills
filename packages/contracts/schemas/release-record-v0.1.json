@@ -39,7 +39,7 @@
     },
     "lifecycle_state": {
       "type": "string",
-      "enum": ["draft", "eval_pending", "usable", "deprecated", "retired"]
+      "enum": ["draft", "eval_pending", "usable", "qualified", "deprecated", "retired", "superseded", "withdrawn", "quarantined", "rejected", "incompatible", "unqualified"]
     },
     "published_at": { "type": "string", "format": "date-time" },
     "publisher": { "type": "string" },
@@ -74,6 +74,126 @@
       "default": []
     },
     "supersedes_release_id": { "type": "string" },
-    "notes": { "type": "string" }
-  }
+    "notes": { "type": "string" },
+    "release_kind": {
+      "type": "string",
+      "enum": ["native", "vendor", "adapted"]
+    },
+    "inventory_digest": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "content_digest": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "source_ref": { "type": "string", "minLength": 1 },
+    "source_path": { "type": "string", "minLength": 1 },
+    "retrieved_at": { "type": "string", "format": "date-time" },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["publisher", "repository", "source_ref", "source_commit", "source_path", "retrieved_at", "licence", "trust_boundary"],
+      "properties": {
+        "publisher": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "repository": { "type": "string", "minLength": 1, "maxLength": 512 },
+        "source_ref": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "source_commit": { "type": "string", "pattern": "^[a-f0-9]{40}(?:[a-f0-9]{24})?$" },
+        "source_path": { "type": "string", "minLength": 1 },
+        "retrieved_at": { "type": "string", "format": "date-time" },
+        "licence": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "trust_boundary": { "type": "string", "const": "linkskills-release-provenance" }
+      }
+    },
+    "lineage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "upstream_release_id"],
+      "properties": {
+        "kind": { "type": "string", "enum": ["native", "vendor", "adapted"] },
+        "upstream_release_id": { "type": ["string", "null"], "minLength": 3 },
+        "relationship": { "type": "string", "enum": ["none", "preserved_vendor_bytes", "adapted_from_vendor"] }
+      }
+    },
+    "resource_descriptors": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "pattern": "^opaque:[A-Za-z0-9][A-Za-z0-9._:/-]{1,158}$" }
+    },
+    "eligibility_ref": { "type": "string", "pattern": "^opaque:[A-Za-z0-9][A-Za-z0-9._:/-]{1,158}$" },
+    "attestation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["algorithm", "key_id", "issuer", "claims_digest", "signature", "trust_boundary"],
+      "properties": {
+        "algorithm": { "type": "string", "const": "ES256" },
+        "key_id": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "issuer": { "type": "string", "const": "linkskills-publisher" },
+        "claims_digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+        "signature": { "type": "string", "minLength": 1, "maxLength": 4096 },
+        "trust_boundary": { "type": "string", "const": "linkskills-release-attestation" }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": { "required": ["release_kind"] },
+      "then": {
+        "required": ["inventory_digest", "content_digest", "provenance", "lineage", "resource_descriptors", "eligibility_ref", "attestation"]
+      }
+    },
+    {
+      "if": {
+        "required": ["release_kind"],
+        "properties": { "release_kind": { "const": "adapted" } }
+      },
+      "then": {
+        "properties": {
+          "lineage": {
+            "required": ["upstream_release_id"],
+            "properties": {
+              "upstream_release_id": { "type": "string", "minLength": 3 },
+              "kind": { "const": "adapted" },
+              "relationship": { "const": "adapted_from_vendor" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": ["release_kind"],
+        "properties": { "release_kind": { "const": "vendor" } }
+      },
+      "then": {
+        "properties": {
+          "lineage": {
+            "properties": {
+              "kind": { "const": "vendor" },
+              "upstream_release_id": { "type": "null" },
+              "relationship": { "const": "preserved_vendor_bytes" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": ["release_kind"],
+        "properties": { "release_kind": { "const": "native" } }
+      },
+      "then": {
+        "properties": {
+          "lineage": {
+            "properties": {
+              "kind": { "const": "native" },
+              "upstream_release_id": { "type": "null" },
+              "relationship": { "const": "none" }
+            }
+          }
+        }
+      }
+    }
+  ]
 }

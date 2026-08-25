@@ -1,0 +1,113 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Personal Compliance contracts",
+  "definitions": {
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ref", "status", "provenance", "licence"],
+      "properties": {
+        "ref": {"type": "string", "pattern": "^fixture:[a-z0-9-]+$"},
+        "status": {"type": "string", "enum": ["confirmed", "inferred", "not_reported", "unknown"]},
+        "provenance": {"type": "string", "minLength": 1},
+        "licence": {"type": "string", "minLength": 1},
+        "claim": {"type": "string", "maxLength": 240}
+      }
+    },
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["request_id", "mode", "privacy_classification", "source_evidence"],
+      "properties": {
+        "request_id": {"type": "string", "pattern": "^pc-[a-z0-9-]+$"},
+        "mode": {"type": "string", "enum": ["selfie_compliance", "battery_tracking", "combined", "other"]},
+        "privacy_classification": {"type": "string", "enum": ["synthetic", "redacted", "restricted"]},
+        "source_evidence": {"type": "array", "minItems": 1, "items": {"$ref": "#/definitions/evidence"}},
+        "configuration": {
+          "type": "object", "additionalProperties": false,
+          "properties": {
+            "valid_window": {"type": "object", "additionalProperties": false, "required": ["start", "end"], "properties": {"start": {"type": "string", "pattern": "^[0-2][0-9]:[0-5][0-9]$"}, "end": {"type": "string", "pattern": "^[0-2][0-9]:[0-5][0-9]$"}}},
+            "upper_target": {"type": "number", "minimum": 1, "maximum": 100},
+            "alert_threshold": {"type": "number", "minimum": 1, "maximum": 100},
+            "next_charge_hours": {"type": "number", "exclusiveMinimum": 0},
+            "minimum_rate_observations": {"type": "integer", "minimum": 2},
+            "checkpoint": {"type": "string", "enum": ["routine", "final"]}
+          }
+        },
+        "requested_actions": {"type": "array", "uniqueItems": true, "items": {"type": "string", "enum": ["read", "prepare", "record", "remind", "project", "correct", "send", "delete", "diagnose", "activate"]}},
+        "selfie": {
+          "type": "object", "additionalProperties": false,
+          "properties": {
+            "capture_time": {"type": "string", "pattern": "^[0-2][0-9]:[0-5][0-9]$"},
+            "window_closed": {"type": "boolean"},
+            "completion_recorded": {"type": "boolean"},
+            "existing_reminder_refs": {"type": "array", "items": {"type": "string", "pattern": "^fixture:reminder-[a-z0-9-]+$"}},
+            "reminder_kind": {"type": "string", "enum": ["first", "conditional_second"]}
+          }
+        },
+        "battery": {
+          "type": "object", "additionalProperties": false,
+          "properties": {
+            "observations": {"type": "array", "items": {"$ref": "#/definitions/battery_observation"}},
+            "maintenance_active": {"type": "boolean"}
+          }
+        },
+        "measurements": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^[a-z][a-z0-9_-]{1,31}$"}},
+        "image": {
+          "type": "object", "additionalProperties": false,
+          "properties": {
+            "image_ref": {"type": "string", "pattern": "^fixture:image-[a-z0-9-]+$"},
+            "extractions": {"type": "array", "items": {"$ref": "#/definitions/image_extraction"}},
+            "corrections": {"type": "array", "items": {"$ref": "#/definitions/image_correction"}}
+          }
+        }
+      }
+    },
+    "battery_observation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["timestamp_hours", "percentage", "plugged", "charger_key", "location_key"],
+      "properties": {
+        "timestamp_hours": {"type": "number", "minimum": 0},
+        "percentage": {"type": "number", "minimum": 0, "maximum": 100},
+        "plugged": {"type": "boolean"},
+        "charger_key": {"type": "string", "pattern": "^fixture:charger-[a-z0-9-]+$"},
+        "location_key": {"type": "string", "pattern": "^fixture:location-[a-z0-9-]+$"}
+      }
+    },
+    "image_extraction": {
+      "type": "object", "additionalProperties": false,
+      "required": ["field", "value", "confidence", "material"],
+      "properties": {"field": {"type": "string", "pattern": "^[a-z][a-z0-9_]{1,31}$"}, "value": {"type": "string", "maxLength": 120}, "confidence": {"type": "string", "enum": ["high", "medium", "low", "unknown"]}, "material": {"type": "boolean"}}
+    },
+    "image_correction": {
+      "type": "object", "additionalProperties": false,
+      "required": ["field", "prior_value", "proposed_value", "reason"],
+      "properties": {"field": {"type": "string", "pattern": "^[a-z][a-z0-9_]{1,31}$"}, "prior_value": {"type": "string", "maxLength": 120}, "proposed_value": {"type": "string", "maxLength": 120}, "reason": {"type": "string", "maxLength": 240}}
+    },
+    "output": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "mode", "decision", "disposition", "idempotency_key", "evidence_refs", "state_transition", "reminders", "battery_projection", "image_review", "measurements", "escalation", "effects", "rollback"],
+      "properties": {
+        "status": {"type": "string", "enum": ["FAILED", "PENDING_APPROVAL", "COMPLETED"]},
+        "mode": {"type": "string"},
+        "decision": {"type": "object", "additionalProperties": false, "required": ["disposition", "rationale", "confidence"], "properties": {"disposition": {"type": "string"}, "rationale": {"type": "string"}, "confidence": {"type": "string", "enum": ["high", "medium", "low", "unknown"]}}},
+        "disposition": {"type": "string"},
+        "idempotency_key": {"type": "string", "pattern": "^pc-[a-f0-9]{16}$"},
+        "evidence_refs": {"type": "array", "items": {"type": "string"}},
+        "state_transition": {"type": "object", "additionalProperties": false, "required": ["state", "reason"], "properties": {"state": {"type": "string", "enum": ["EARLY", "COMPLETED", "REPORTED_LATE", "MISSED", "NOT_APPLICABLE", "UNKNOWN"]}, "reason": {"type": "string"}}},
+        "reminders": {"type": "object", "additionalProperties": false, "required": ["proposed", "suppressed", "duplicate_of"], "properties": {"proposed": {"type": "array", "items": {"type": "string"}}, "suppressed": {"type": "boolean"}, "duplicate_of": {"type": "string"}}},
+        "battery_projection": {"type": "object", "additionalProperties": false, "required": ["available", "current_percent", "projected_percent", "threshold_percent", "alert", "maintenance_cancelled", "rate_labels"], "properties": {"available": {"type": "boolean"}, "current_percent": {"type": ["number", "null"]}, "projected_percent": {"type": ["number", "null"]}, "threshold_percent": {"type": ["number", "null"]}, "alert": {"type": "boolean"}, "maintenance_cancelled": {"type": "boolean"}, "rate_labels": {"type": "array", "items": {"type": "string"}}}},
+        "image_review": {"type": "object", "additionalProperties": false, "required": ["image_ref", "confirmed", "confirmations_needed", "correction_history"], "properties": {"image_ref": {"type": "string"}, "confirmed": {"type": "array", "items": {"type": "string"}}, "confirmations_needed": {"type": "array", "items": {"type": "string"}}, "correction_history": {"type": "array", "items": {"type": "string"}}}},
+        "measurements": {"type": "object", "additionalProperties": false, "required": ["bundled", "final_checkpoint", "next_checkpoint_requested"], "properties": {"bundled": {"type": "array", "items": {"type": "string"}}, "final_checkpoint": {"type": "boolean"}, "next_checkpoint_requested": {"type": "boolean"}}},
+        "escalation": {"type": "object", "additionalProperties": false, "required": ["required", "reason", "owner"], "properties": {"required": {"type": "boolean"}, "reason": {"type": "string"}, "owner": {"type": "string"}}},
+        "effects": {"type": "object", "additionalProperties": false, "required": ["external_calls", "messages_sent", "mutations", "private_state_writes"], "properties": {"external_calls": {"type": "array", "maxItems": 0}, "messages_sent": {"type": "array", "maxItems": 0}, "mutations": {"type": "array", "maxItems": 0}, "private_state_writes": {"type": "boolean", "const": false}}},
+        "rollback": {"type": "string", "const": "ABSENT@610e5a42b2356d2da5eaea0ef95cea806f93f45e/tree:158d87825593e781e43d9a4eaaecf1259c6387e0 (no prior qualified PKT-10 release)"}
+      }
+    },
+    "state": {
+      "type": "object", "additionalProperties": false,
+      "required": ["task_id", "workflow_step", "status", "variables", "last_updated"],
+      "properties": {"task_id": {"type": "string", "pattern": "^pc-[a-z0-9-]+$"}, "workflow_step": {"type": "string"}, "status": {"type": "string", "enum": ["INITIALIZED", "IN_PROGRESS", "PENDING_APPROVAL", "COMPLETED", "FAILED"]}, "variables": {"type": "object", "additionalProperties": false, "properties": {"request_digest": {"type": "string"}, "evidence_refs": {"type": "array", "items": {"type": "string"}}}}, "last_updated": {"type": "string", "minLength": 1}}
+    }
+  }
+}

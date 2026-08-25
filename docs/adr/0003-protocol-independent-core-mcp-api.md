@@ -29,3 +29,55 @@ LiNKskills needs one domain core callable by multiple adapters, with a hard serv
 - Cross-service correlation uses opaque IDs and approved outcome references only.
 - Domain packages should separate core services from `mcp-server` / HTTP adapters so Skill Packs remain protocol-independent.
 - Combined-gateway shortcuts are rejected even if they appear operationally convenient.
+
+## Amendment — Provider-v2 standard MCP and local consumer execution (PKT-00)
+
+- **Status:** Proposed for Principal approval; this documentation amendment does not authorize a protocol migration, provider deployment, or consumer activation.
+- **Date:** 2026-08-24
+- **Authority:** Governed Skill Expansion PRD §4.3 and frozen interfaces §§2–4; PKT-00 baseline reconciliation.
+
+### Context
+
+The original MCP decision separates transport from the Skills domain, but the governed
+expansion requires a sharper provider/consumer boundary. Catalogue discovery must be
+bounded and family-first, exact release reads must return immutable bytes with their
+integrity metadata, and the provider must not execute consumer work.
+
+### Decision
+
+1. The provider's intended v2 surface uses standard MCP initialize and capability
+   negotiation, then bounded family/subcategory/collection resources followed by an
+   exact qualified release resource. Instructions and other resource bytes are not
+   returned from broad discovery calls.
+2. Provider selection is limited to the independent Platform technical-eligibility,
+   Skills release-selectability, and consumer profile/activation gates. Awareness
+   metadata is not selectability, and selectability is not permission to act.
+3. `skills_run_*` and `skills_tool_*` provider-side execution is not part of the v2
+   intended architecture. The consumer retrieves and verifies the exact release, then
+   executes locally through its own authorised host/tool boundary.
+4. Any legacy adapter is temporary, observable, fail-closed, and removable by an
+   explicit criterion; it is not a second long-term authority.
+
+### Alternatives considered
+
+- **Retain provider-side execution as the default:** rejected because it conflates
+  reusable procedure delivery with consumer permission and runtime authority.
+- **Expose the whole catalogue or full packs in discovery:** rejected because it
+  defeats bounded progressive disclosure and exact-release integrity checks.
+- **Create a combined Brain/Skills gateway:** rejected and already prohibited by this
+  ADR; Brain and Skills remain separate services and failure domains.
+
+### Consequences and rollback
+
+PKT-01/PKT-02 must extend contracts and provider tests without duplicating existing
+release/digest primitives. OpenClaw owns the consumer implementation and local
+execution proof; Platform owns identity and shared live operations. Rollback disables
+the new provider entrypoint or adapter and restores the prior exact provider release;
+no immutable release is rewritten.
+
+### Validation path
+
+PKT-01 must prove bounded taxonomy, exact-resource, and denial schemas. PKT-02 must
+prove MCP negotiation, bounded pagination, byte/digest equality, independent gate
+denials, and absence/retirement criteria for provider-side execution before any
+consumer canary work.

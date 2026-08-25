@@ -1,0 +1,121 @@
+{
+  "definitions": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["question", "decision", "confidence_threshold", "freshness_required", "max_cost_tier", "privacy_classification"],
+      "properties": {
+        "question": { "type": "string", "minLength": 5, "maxLength": 2000 },
+        "decision": { "type": "string", "minLength": 3, "maxLength": 1000 },
+        "audience": { "type": "string", "maxLength": 256 },
+        "confidence_threshold": { "type": "number", "minimum": 0, "maximum": 1 },
+        "freshness_required": { "type": "boolean" },
+        "freshness_window_days": { "type": "integer", "minimum": 0, "maximum": 3650 },
+        "max_cost_tier": { "type": "string", "enum": ["none", "web", "neural", "brief", "social"] },
+        "depth": { "type": "string", "enum": ["single_pass", "comparative", "deep"] },
+        "operator_approval": { "type": "string", "enum": ["NOT_REQUIRED", "PROCEED", "DENIED"] },
+        "privacy_classification": { "type": "string", "enum": ["public", "synthetic", "redacted", "private"] },
+        "source_scope": { "type": "array", "items": { "type": "string", "minLength": 1 }, "maxItems": 32 }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_type", "pointer", "retrieved_at"],
+      "properties": {
+        "source_type": { "type": "string", "enum": ["primary", "secondary", "memory", "file", "search"] },
+        "pointer": { "type": "string", "minLength": 1, "maxLength": 2048 },
+        "title": { "type": "string", "maxLength": 512 },
+        "publisher": { "type": "string", "maxLength": 256 },
+        "published_at": { "type": "string", "maxLength": 64 },
+        "retrieved_at": { "type": "string", "minLength": 10, "maxLength": 64 },
+        "version": { "type": "string", "maxLength": 128 },
+        "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+      }
+    },
+    "claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["claim_id", "claim_text", "evidence_class", "source_pointers", "confidence"],
+      "properties": {
+        "claim_id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$" },
+        "claim_text": { "type": "string", "minLength": 3, "maxLength": 2000 },
+        "evidence_class": { "type": "string", "enum": ["observed_fact", "inference", "assumption", "hypothesis", "recommendation"] },
+        "source_pointers": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 1, "uniqueItems": true },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "published_at": { "type": "string", "maxLength": 64 },
+        "retrieved_at": { "type": "string", "maxLength": 64 },
+        "conflict_note": { "type": "string", "maxLength": 2000 },
+        "assumptions": { "type": "array", "items": { "type": "string", "maxLength": 512 }, "maxItems": 16 }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "report", "claims", "sources", "uncertainties", "effects"],
+      "properties": {
+        "status": { "type": "string", "enum": ["COMPLETED", "PENDING_APPROVAL", "FAILED"] },
+        "report": { "type": "string", "minLength": 1, "maxLength": 20000 },
+        "claims": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["claim_id", "claim_text", "evidence_class", "source_pointers", "confidence"],
+            "properties": {
+              "claim_id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$" },
+              "claim_text": { "type": "string", "minLength": 3, "maxLength": 2000 },
+              "evidence_class": { "type": "string", "enum": ["observed_fact", "inference", "assumption", "hypothesis", "recommendation"] },
+              "source_pointers": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 1, "uniqueItems": true },
+              "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+              "published_at": { "type": "string", "maxLength": 64 },
+              "retrieved_at": { "type": "string", "maxLength": 64 },
+              "conflict_note": { "type": "string", "maxLength": 2000 },
+              "assumptions": { "type": "array", "items": { "type": "string", "maxLength": 512 }, "maxItems": 16 }
+            }
+          }
+        },
+        "sources": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["source_type", "pointer", "retrieved_at"],
+            "properties": {
+              "source_type": { "type": "string", "enum": ["primary", "secondary", "memory", "file", "search"] },
+              "pointer": { "type": "string", "minLength": 1, "maxLength": 2048 },
+              "title": { "type": "string", "maxLength": 512 },
+              "publisher": { "type": "string", "maxLength": 256 },
+              "published_at": { "type": "string", "maxLength": 64 },
+              "retrieved_at": { "type": "string", "minLength": 10, "maxLength": 64 },
+              "version": { "type": "string", "maxLength": 128 },
+              "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+            }
+          }
+        },
+        "uncertainties": { "type": "array", "items": { "type": "string", "maxLength": 1000 }, "maxItems": 64 },
+        "effects": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["external_calls", "mutations"],
+          "properties": { "external_calls": { "type": "array", "maxItems": 0 }, "mutations": { "type": "array", "maxItems": 0 } }
+        }
+      }
+    },
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["task_id", "workflow_step", "status", "variables", "last_updated"],
+      "properties": {
+        "task_id": { "type": "string", "pattern": "^\\d{8}-\\d{4}-[A-Z0-9]+-\\d{6}$" },
+        "workflow_step": { "type": "integer", "minimum": 1, "maximum": 5 },
+        "status": { "type": "string", "enum": ["INITIALIZED", "IN_PROGRESS", "PENDING_APPROVAL", "COMPLETED", "FAILED"] },
+        "variables": { "type": "object" },
+        "last_updated": { "type": "string", "minLength": 10 },
+        "seek_index": { "type": "object" }
+      }
+    }
+  }
+}

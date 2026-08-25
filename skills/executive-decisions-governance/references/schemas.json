@@ -1,0 +1,107 @@
+{
+  "definitions": {
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ref", "status"],
+      "properties": {
+        "ref": {"type": "string", "pattern": "^(fixture|source|consumer):[^\\s]+$", "maxLength": 256},
+        "status": {"type": "string", "enum": ["confirmed", "reported", "not_reported"]},
+        "claim": {"type": "string", "minLength": 1, "maxLength": 500}
+      }
+    },
+    "choice": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "tradeoff"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,63}$"},
+        "label": {"type": "string", "minLength": 1, "maxLength": 500},
+        "tradeoff": {"type": "string", "minLength": 1, "maxLength": 1000}
+      }
+    },
+    "decision_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": {"type": "string", "enum": ["proposed", "approved", "rejected", "not_reported"]},
+        "choice_id": {"type": "string", "minLength": 1, "maxLength": 64},
+        "owner_ref": {"type": "string", "pattern": "^(owner|consumer):[^\\s]+$", "maxLength": 256},
+        "recorded_at": {"type": "string", "minLength": 1, "maxLength": 64}
+      }
+    },
+    "rule_impact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "summary"],
+      "properties": {
+        "status": {"type": "string", "enum": ["proposed", "approved", "not_reported"]},
+        "summary": {"type": "string", "minLength": 1, "maxLength": 1000},
+        "scope": {"type": "string", "minLength": 1, "maxLength": 500},
+        "owner_ref": {"type": "string", "pattern": "^(owner|consumer):[^\\s]+$", "maxLength": 256}
+      }
+    },
+    "tracking_item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "item", "owner_ref", "status", "evidence_ref"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,63}$"},
+        "item": {"type": "string", "minLength": 1, "maxLength": 500},
+        "owner_ref": {"type": "string", "pattern": "^(owner|consumer):[^\\s]+$", "maxLength": 256},
+        "status": {"type": "string", "enum": ["proposed", "in_progress", "blocked", "complete", "not_reported"]},
+        "evidence_ref": {"type": "string", "pattern": "^(fixture|source|consumer):[^\\s]+$", "maxLength": 256}
+      }
+    },
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "privacy_classification", "matter_ref", "matter", "source_evidence"],
+      "properties": {
+        "mode": {"type": "string", "enum": ["decision_brief", "record_decision", "rule_impact", "implementation_tracking"]},
+        "privacy_classification": {"type": "string", "enum": ["synthetic", "redacted", "public"]},
+        "matter_ref": {"type": "string", "pattern": "^matter:[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"},
+        "matter": {"type": "string", "minLength": 3, "maxLength": 2000},
+        "source_evidence": {"type": "array", "minItems": 1, "maxItems": 32, "uniqueItems": true, "items": {"$ref": "#/definitions/evidence"}},
+        "risks": {"type": "array", "maxItems": 16, "items": {"type": "string", "minLength": 1, "maxLength": 500}},
+        "choices": {"type": "array", "maxItems": 16, "items": {"$ref": "#/definitions/choice"}},
+        "recommendation": {"type": "string", "minLength": 1, "maxLength": 1000},
+        "decision_record": {"$ref": "#/definitions/decision_record"},
+        "rule_impact": {"$ref": "#/definitions/rule_impact"},
+        "implementation_tracking": {"type": "array", "maxItems": 32, "items": {"$ref": "#/definitions/tracking_item"}},
+        "requested_action": {"type": "string", "enum": ["draft", "record", "approve", "activate", "enforce", "send", "schedule", "create_task", "unknown"]}
+      }
+    },
+    "effects": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["messages_sent", "external_calls", "mutations"],
+      "properties": {
+        "messages_sent": {"type": "array", "maxItems": 0},
+        "external_calls": {"type": "array", "maxItems": 0},
+        "mutations": {"type": "array", "maxItems": 0}
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "mode", "matter_ref", "brief", "choices", "decision", "rule_impact", "implementation_tracking", "evidence", "uncertainty", "authority", "effects", "rollback"],
+      "properties": {
+        "status": {"type": "string", "enum": ["READY_FOR_OWNER", "DRAFT", "BLOCKED"]},
+        "mode": {"type": "string", "minLength": 1, "maxLength": 64},
+        "matter_ref": {"type": "string", "pattern": "^matter:[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"},
+        "brief": {"type": "object", "additionalProperties": false, "required": ["matter", "risks", "recommendation"], "properties": {"matter": {"type": "string", "minLength": 1, "maxLength": 2000}, "risks": {"type": "array", "maxItems": 16, "items": {"type": "string", "minLength": 1, "maxLength": 500}}, "recommendation": {"type": "string", "minLength": 1, "maxLength": 1000}}},
+        "choices": {"type": "array", "maxItems": 16, "items": {"$ref": "#/definitions/choice"}},
+        "decision": {"$ref": "#/definitions/decision_record"},
+        "rule_impact": {"$ref": "#/definitions/rule_impact"},
+        "implementation_tracking": {"type": "array", "maxItems": 32, "items": {"$ref": "#/definitions/tracking_item"}},
+        "evidence": {"type": "array", "minItems": 1, "maxItems": 32, "uniqueItems": true, "items": {"type": "string", "pattern": "^(fixture|source|consumer):[^\\s]+$", "maxLength": 256}},
+        "uncertainty": {"type": "array", "maxItems": 32, "items": {"type": "string", "minLength": 1, "maxLength": 500}},
+        "authority": {"type": "object", "additionalProperties": false, "required": ["owner_ref", "approval_recorded", "activated"], "properties": {"owner_ref": {"type": "string", "minLength": 1, "maxLength": 256}, "approval_recorded": {"type": "boolean", "const": false}, "activated": {"type": "boolean", "const": false}}},
+        "effects": {"$ref": "#/definitions/effects"},
+        "rollback": {"type": "string", "const": "ABSENT@517f22ee135c298a17a74f84a84b60accdf22cf4/tree:d2514ee298074c70f9bb5fb19f2fc71af7d43f16"}
+      }
+    }
+  }
+}
