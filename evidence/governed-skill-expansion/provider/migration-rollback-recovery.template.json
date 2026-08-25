@@ -1,0 +1,13 @@
+{
+  "schema_version": "0.1",
+  "kind": "linkskills.pkt-25.migration-rollback-recovery",
+  "status": "TEMPLATE_ONLY",
+  "live_apply_authorized": false,
+  "external_evidence_claimed": false,
+  "identity": {"repository": "<owner/repository>", "ref": "<refs/heads/exact-ref>", "commit": "<40-char-source-commit>", "tree": "<40-char-source-tree>", "manifest_sha256": "<64-char-migration-manifest-digest>"},
+  "migration": {"owner": "LiNKplatform", "environment": "<local-test|stage|production>", "ordered_up_files": [], "up_sha256": [], "prerequisites_verified": false, "backup_receipt_ref": null, "restore_rehearsal_ref": null, "apply_receipt_ref": null, "status": "NOT_PROVEN"},
+  "rollback_or_forward_fix": {"owner": "LiNKplatform", "strategy": "<reviewed-companion-down|additive-forward-fix>", "prior_manifest_sha256": null, "forward_fix_sha256": null, "disposable_restore_verified": false, "readback_digest": null, "status": "NOT_PROVEN", "rule": "Never drop the shared schema wholesale; never rewrite an applied migration."},
+  "consumer_recovery": {"owner": "<consumer-owner>", "prior_exact_pin": null, "disable_new_provider_path": false, "private_state_preserved": false, "health_readback_digest": null, "status": "NOT_PROVEN"},
+  "recovery_stop_conditions": ["missing or mismatched source/package identity", "failed backup or disposable restore", "missing owner receipt or environment readback", "missing prior exact pin", "any request to expose or rotate credentials from LiNKskills"],
+  "receipt": {"command_or_profile_digest": null, "result_digest": null, "handoff_ref": null, "rollback_ref": null}
+}

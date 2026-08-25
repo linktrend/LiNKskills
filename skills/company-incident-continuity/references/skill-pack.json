@@ -1,0 +1,32 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "company-incident-continuity",
+  "display_name": "Company Incident and Continuity Management",
+  "version": "1.0.0",
+  "description": "Evidence-bounded incident, outage, security, continuity, recovery, communication, and closure review without external effects.",
+  "capability_category": "company_incident_continuity",
+  "provenance": {"author": "LiNKskills Library", "source": "LiNKskills PRD PKT-21", "license": "LiNKtrend internal"},
+  "release_channel": "development",
+  "lifecycle_state": "draft",
+  "format_profile": "heavy",
+  "compatible_runtime_profiles": ["cursor-macos"],
+  "min_capability_tier": "high",
+  "routing": {
+    "when_to_use": "Use for evidence-backed company outage, security, continuity, recovery, communication, and closure review.",
+    "when_not_to_use": ["Do not use as an incident tracker, deployment controller, backup system, or customer messaging transport.", "Do not deploy, roll back, isolate, rotate credentials, close, or approve.", "Do not use with live credentials, customer records, raw logs, or confidential incident text."],
+    "tags": ["incident", "outage", "security", "continuity", "recovery", "closure"],
+    "exclusion_rules": ["Responders, Platform, Program Ledger, and deployment authorities retain their respective mutation authority.", "Consumer adapters retain transport, credential, and communication authority."]
+  },
+  "execution": {
+    "required_inputs": [{"name": "incident_request", "description": "Incident type, severity, state, owner references, evidence, impact, recovery, communication, and optional closure data.", "schema": {"$ref": "references/schemas.json#/definitions/input"}}],
+    "expected_outputs": [{"name": "incident_review", "description": "A deterministic READY_FOR_OWNER, DRAFT, or BLOCKED review with closure evidence and empty effects.", "schema": {"$ref": "references/schemas.json#/definitions/output"}}],
+    "procedure_summary": "Validate identity and evidence, preserve impact and ownership, compare recovery options, draft communications, and require evidence-backed closure without mutation.",
+    "forbidden_actions": ["Deploy, rollback, isolate, rotate credentials, or mutate infrastructure", "Send internal or customer communication", "Approve or close incidents, recovery, continuity, Program Ledger, or deployment state", "Store credentials, customer data, raw incident records, or confidential company material"],
+    "verification_steps": ["Run the canonical validator", "Run focused incident and continuity tests", "Verify execution-profile hashes", "Run secret scan and generated-output closure", "Confirm prohibited deploy/config/catalog paths are unchanged"],
+    "completion_criteria": ["Outage, security, continuity, recovery, communication, and closure cases are evaluated", "Owning responder, Platform, Program Ledger, and deployment authority remain explicit", "Closure requires evidence and residual risks", "Effects remain empty and private input is rejected without echo"]
+  },
+  "dependencies": {"schema_version": "0.1", "skill_dependencies": ["governed-browser-use", "executive-decisions-governance"], "packaged_tools": [], "host_capabilities": ["filesystem_read", "filesystem_write"], "external_services": [], "library_assets": [], "runtime_requirements": [], "optional_dependencies": []},
+  "eval": {"suite_path": "references/eval-suite.json", "suite_schema_version": "0.1", "required_certification_profiles": ["cursor-macos"], "verification_refs": ["references/eval-suite.yaml"]},
+  "telemetry": {"classification": "public_internal", "redaction_rules": ["strip_secrets", "strip_customer_data", "strip_raw_incident_text", "strip_private_company_data", "strip_reasoning", "retain_synthetic_ids_only"], "retention_policy": "retain synthetic IDs, evidence hashes, and receipts only"},
+  "fragments": [{"fragment_id": "summary", "disclosure_level": 2, "path": "SKILL.md"}, {"fragment_id": "advanced", "disclosure_level": 4, "path": "advanced/advanced.md"}, {"fragment_id": "schemas", "disclosure_level": 5, "path": "references/schemas.json"}]
+}

@@ -1,0 +1,32 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "commercial-contracts-legal-operations",
+  "display_name": "Commercial Contracts and Legal Operations",
+  "version": "1.0.0",
+  "description": "Evidence-grounded legal-operations preparation with explicit lawyer/Principal escalation and no final authority.",
+  "capability_category": "commercial_contracts_legal_operations",
+  "provenance": {"author": "LiNKskills Library", "source": "LiNKskills PRD PKT-17", "license": "LiNKtrend internal"},
+  "release_channel": "development",
+  "lifecycle_state": "draft",
+  "format_profile": "heavy",
+  "compatible_runtime_profiles": ["cursor-macos"],
+  "min_capability_tier": "high",
+  "routing": {
+    "when_to_use": "Use for evidenced legal-matter intake, plain-English summaries, obligation/renewal review, playbook comparison, and human escalation.",
+    "when_not_to_use": ["Do not use for final legal advice, legal representation, jurisdiction selection, or privilege determinations.", "Do not use to sign, accept, negotiate, send, file, renew, terminate, or mutate legal records.", "Do not use with live contract text, customer data, privileged material, credentials, or private company data."],
+    "tags": ["contracts", "legal-operations", "obligations", "renewals", "compliance", "escalation"],
+    "exclusion_rules": ["Lawyer or Principal owns final legal decisions.", "LiNKskills prepares evidence and choices only; external legal systems remain consumer-owned."]
+  },
+  "execution": {
+    "required_inputs": [{"name": "matter", "description": "Synthetic matter reference, workflow, jurisdiction status, source evidence, authority, and privacy classification.", "schema": {"$ref": "references/schemas.json#/definitions/input"}}],
+    "expected_outputs": [{"name": "result", "description": "Evidence-backed summary, register, comparison, refusal, or escalation with no live effects.", "schema": {"$ref": "references/schemas.json#/definitions/output"}}],
+    "procedure_summary": "Qualify sources, extract evidenced obligations, compare to an approved playbook, and escalate unresolved legal authority.",
+    "forbidden_actions": ["Store or echo live contract text, privileged material, credentials, customer data, or private company data", "Provide final legal advice or choose jurisdiction", "Sign, accept, negotiate, send, file, renew, terminate, or mutate legal records"],
+    "verification_steps": ["Run the canonical validator", "Run scoped contract and boundary tests", "Confirm synthetic-only fixtures, no live effects, and explicit rollback"],
+    "completion_criteria": ["Every material claim has evidence/provenance/licence", "Legal authority remains not_granted", "Effects sent/signed/accepted/filed/mutated_records are false", "Escalation and rollback are explicit"]
+  },
+  "dependencies": {"schema_version": "0.1", "skill_dependencies": ["compliance-guardian", "citation-enforcer", "search-strategy"], "packaged_tools": [], "host_capabilities": ["filesystem_read", "filesystem_write"], "external_services": [], "library_assets": [], "runtime_requirements": [], "optional_dependencies": []},
+  "eval": {"suite_path": "references/eval-suite.json", "suite_schema_version": "0.1", "required_certification_profiles": ["cursor-macos"], "verification_refs": ["references/eval-suite.yaml"]},
+  "telemetry": {"classification": "public_internal", "redaction_rules": ["strip_secrets", "strip_customer_data", "strip_contract_text", "strip_privileged_material", "strip_reasoning"], "retention_policy": "retain synthetic IDs, evidence hashes, source refs, and receipts only"},
+  "fragments": [{"fragment_id": "summary", "disclosure_level": 2, "path": "SKILL.md"}, {"fragment_id": "advanced", "disclosure_level": 4, "path": "advanced/advanced.md"}]
+}

@@ -1,0 +1,121 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "finance-accounting-operations",
+  "display_name": "Finance Accounting Operations",
+  "version": "1.0.0",
+  "description": "Read-only finance and accounting operations for evidence-labeled cash-flow, budget, invoice, payment, expense, close, and runway briefs from approved Odoo snapshots.",
+  "capability_category": "finance_accounting_operations",
+  "lifecycle_state": "draft",
+  "format_profile": "heavy",
+  "compatible_runtime_profiles": [
+    "cursor-macos"
+  ],
+  "min_capability_tier": "high",
+  "routing": {
+    "when_to_use": "Use for a read-only finance operations brief from an approved, synthetic or redacted Odoo snapshot and contract.",
+    "when_not_to_use": [
+      "Do not invoke Odoo, an MCP/API connector, or any external service",
+      "Do not mutate accounting records or claim tax, legal, audit, or statutory finality",
+      "Do not process credentials, customer data, or private company records"
+    ],
+    "tags": [
+      "finance",
+      "accounting",
+      "odoo",
+      "read-only"
+    ],
+    "related_skills": [
+      "studio-controller"
+    ]
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "approved_snapshot",
+        "description": "Consumer-supplied Odoo snapshot with contract, period, currency, digest, source owner, and read operations"
+      },
+      {
+        "name": "requested_views",
+        "description": "One or more requested read-only finance operations views"
+      }
+    ],
+    "expected_outputs": [
+      {
+        "name": "finance_operations_brief",
+        "description": "Evidence-labeled observations, assumptions, risks, and typed approval boundary"
+      }
+    ],
+    "forbidden_actions": [
+      "Invoke Odoo or an external connector",
+      "Create, update, post, approve, reconcile, or close an accounting record",
+      "Copy credentials, private records, or customer identifiers into release artifacts"
+    ],
+    "verification_steps": [
+      "Validate the approved Odoo contract, snapshot digest, period, currency, and source references",
+      "Validate the finance operations output schema and empty effects declaration",
+      "Return PENDING_APPROVAL for missing, stale, conflicting, private, or mutation-requested evidence"
+    ],
+    "completion_criteria": [
+      "Canonical Skill Pack and execution profile are schema-valid",
+      "Required evidence and provenance are preserved without external effects",
+      "No private data or credentials are retained"
+    ],
+    "known_limitations": [
+      "The consumer adapter owns transport, credentials, tenancy, endpoint mapping, and all mutations",
+      "A completed brief is not tax, legal, audit, statutory, or accounting-final authority"
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [
+      "revenue-adapter-base",
+      "studio-controller"
+    ],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read",
+      "filesystem_write"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.yaml",
+    "suite_schema_version": "0.1",
+    "suite_hash": "sha256:8623fd4620ecc2977ffa87d6fcdac3fa33fd63391b286d8d3071687b47ca592b"
+  },
+  "telemetry": {
+    "classification": "public_internal",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_customer_and_company_private_data",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain_ids_and_hashes"
+  },
+  "fragments": [
+    {
+      "fragment_id": "skill-md",
+      "disclosure_level": 2,
+      "path": "SKILL.md"
+    },
+    {
+      "fragment_id": "advanced",
+      "disclosure_level": 3,
+      "path": "advanced/advanced.md"
+    },
+    {
+      "fragment_id": "api-specs",
+      "disclosure_level": 3,
+      "path": "references/api-specs.md"
+    },
+    {
+      "fragment_id": "schemas",
+      "disclosure_level": 5,
+      "path": "references/schemas.json"
+    }
+  ],
+  "release_channel": "canary"
+}

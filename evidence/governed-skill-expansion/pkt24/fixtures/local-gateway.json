@@ -1,0 +1,26 @@
+{
+  "schema_version": "0.1",
+  "fixture_class": "synthetic_redacted_loopback",
+  "contains_private_data": false,
+  "provider_contacted": false,
+  "activation_requested": false,
+  "responses": {
+    "skills_list": {
+      "status": "ok",
+      "family": "research",
+      "release_id": "research@0.0.0-local-fixture",
+      "lifecycle_state": "draft",
+      "selectable": false
+    },
+    "exact_release": {
+      "status": "ok",
+      "release_id": "research@0.0.0-local-fixture",
+      "artifact_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    }
+  },
+  "events": [
+    {"event_id": "evt-pkt24-offline-001", "kind": "gateway_disconnect", "payload": "<redacted>"},
+    {"event_id": "evt-pkt24-offline-002", "kind": "bounded_retry_exhausted", "payload": "<redacted>"},
+    {"event_id": "evt-pkt24-offline-003", "kind": "replay_idempotent", "payload": "<redacted>"}
+  ]
+}

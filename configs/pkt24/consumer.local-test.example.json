@@ -1,0 +1,22 @@
+{
+  "schema_version": "0.1",
+  "config_class": "offline_rehearsal_fixture",
+  "evidence_status": "local_only_not_live_proven",
+  "mode": "local-test",
+  "gateway_url": "http://127.0.0.1:8787",
+  "credential_file": "<secretref-not-materialised-in-fixture>",
+  "resource_audience": "<skills-only-local-test-audience>",
+  "release_pin": "<immutable-release-id-for-local-fixture>",
+  "live_enabled": false,
+  "activation_allowed": false,
+  "provider_contacted": false,
+  "retry": {
+    "max_attempts": 2,
+    "backoff_ms": [0, 10],
+    "buffer_redacted_events_only": true
+  },
+  "non_claims": [
+    "No provider, Platform, shared database, OpenClaw host, VPS, deployment, activation, or qualification proof",
+    "Loopback fake Gateway only; do not deploy this fixture"
+  ]
+}

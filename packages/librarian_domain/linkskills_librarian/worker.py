@@ -24,6 +24,10 @@ from .store import ReviewQueueStore, open_review_queue_store
 
 WORKER_VERSION = "0.1"
 DOMAIN_KEY = "linkskills"
+EXTERNAL_REVIEW_OUTCOMES = frozenset({"accept", "adapt", "postpone", "reject"})
+EXTERNAL_REVIEW_EVIDENCE = frozenset(
+    {"diff", "license", "security", "compatibility", "evaluation", "customization", "feedback"}
+)
 
 
 def _utc_now() -> str:
@@ -233,5 +237,46 @@ class DomainWorker:
             "operation": "enqueue_review",
             "item": item,
             "queue_depth": self.store.depth() if self.store is not None else len(self.review_queue),
+            "at": _utc_now(),
+        }
+
+    def review_update_candidate(self, payload: Mapping[str, Any]) -> Dict[str, Any]:
+        """Record a bounded external-candidate recommendation.
+
+        The Librarian domain can recommend an outcome, but it cannot qualify a
+        release, apply a migration, or move a live pointer.  Platform receipts
+        are required for those actions.
+        """
+        candidate_id = str(payload.get("candidate_id") or "").strip()
+        outcome = str(payload.get("outcome") or "").strip().lower()
+        reviewer = str(payload.get("reviewer") or "").strip()
+        evidence = dict(payload.get("evidence") or {})
+        if not candidate_id:
+            raise ValueError("missing_candidate_id")
+        if outcome not in EXTERNAL_REVIEW_OUTCOMES:
+            raise ValueError("invalid_review_outcome")
+        if not reviewer:
+            raise ValueError("missing_reviewer")
+        missing = sorted(EXTERNAL_REVIEW_EVIDENCE.difference(evidence))
+        if missing:
+            raise ValueError("missing_review_evidence:" + ",".join(missing))
+        review_id = str(payload.get("review_id") or f"review:{candidate_id}")
+        status = {
+            "accept": "accepted_pending_platform",
+            "adapt": "adaptation_pending_platform",
+            "postpone": "postponed",
+            "reject": "rejected",
+        }[outcome]
+        return {
+            "worker_version": self.version,
+            "operation": "review_update_candidate",
+            "review_id": review_id,
+            "candidate_id": candidate_id,
+            "outcome": outcome,
+            "status": status,
+            "evidence": evidence,
+            "reviewer": reviewer,
+            "platform_apply_required": outcome in {"accept", "adapt"},
+            "direct_activation": False,
             "at": _utc_now(),
         }

@@ -1,0 +1,29 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "operational-reporting",
+  "display_name": "Operational Reporting",
+  "version": "1.0.0",
+  "description": "Five-mode, evidence-bounded operational reporting for supplied redacted records.",
+  "capability_category": "internal_launch",
+  "lifecycle_state": "draft",
+  "format_profile": "simple",
+  "compatible_runtime_profiles": ["cursor-macos"],
+  "min_capability_tier": "high",
+  "routing": {
+    "when_to_use": "Use for Executive Digest, Flash Report, No Material Change, Supervised-Agent Summary, or Maintenance Result from supplied inputs.",
+    "when_not_to_use": ["Do not collect private systems or choose a delivery transport.", "Do not replace private health/selfie tracking or immutable legacy content."],
+    "tags": ["operations", "reporting", "executive", "evidence", "mobile"]
+  },
+  "execution": {
+    "required_inputs": [{ "name": "mode", "description": "One of the five supported reporting modes" }, { "name": "window", "description": "Morning, evening, or custom supplied window" }, { "name": "records", "description": "Supplied redacted operational records" }],
+    "expected_outputs": [{ "name": "operational_report", "description": "Structured mobile report with omitted empty sections and evidence" }],
+    "forbidden_actions": ["Claim unverified completion", "Read or expose private records", "Send, schedule, publish, or select transport", "Duplicate health or selfie reporting"],
+    "verification_steps": ["Validate mode and source boundaries", "Filter status and omit empty sections", "Confirm evidence, uncertainty, and empty effects"],
+    "completion_criteria": ["Output matches the selected mode", "Only verified completion is presented as completed", "Final checkpoint does not request another reading"]
+  },
+  "dependencies": { "schema_version": "0.1", "skill_dependencies": ["company-communication"], "packaged_tools": [], "host_capabilities": ["filesystem_read", "filesystem_write"], "external_services": [], "library_assets": [], "runtime_requirements": [], "optional_dependencies": [] },
+  "eval": { "suite_path": "references/eval-suite.json", "suite_schema_version": "0.1" },
+  "telemetry": { "classification": "public_internal", "redaction_rules": ["strip_secrets", "strip_private_data", "strip_health_data", "strip_reasoning", "strip_transport_payloads"], "retention_policy": "retain_ids_and_hashes" },
+  "fragments": [{ "fragment_id": "summary", "disclosure_level": 2, "path": "SKILL.md" }, { "fragment_id": "advanced", "disclosure_level": 3, "path": "advanced/advanced.md" }, { "fragment_id": "api-specs", "disclosure_level": 4, "path": "references/api-specs.md" }, { "fragment_id": "schemas", "disclosure_level": 4, "path": "references/schemas.json" }],
+  "release_channel": "canary"
+}
