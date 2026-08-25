@@ -15,7 +15,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-from package_receipt import bind_receipt, canonical_json, digest_json, package_identity, sha256_bytes
+from package_receipt import PackageIdentityError, bind_receipt, canonical_json, digest_json, package_identity, sha256_bytes
 
 
 LOOPBACK_ENDPOINT = "loopback://offline-provider"
@@ -102,8 +102,14 @@ def default_identity() -> dict[str, str]:
     def git(*args: str) -> str:
         return subprocess.run(["git", *args], check=True, capture_output=True, text=True).stdout.strip()
 
+    try:
+        qualified_ref = git("symbolic-ref", "--quiet", "HEAD")
+    except subprocess.CalledProcessError as exc:
+        raise PackageIdentityError("detached_head_has_no_qualified_ref") from exc
+    if not (qualified_ref.startswith("refs/heads/") or qualified_ref.startswith("refs/remotes/")):
+        raise PackageIdentityError("git_ref_must_be_fully_qualified")
     return {"repository": git("remote", "get-url", "origin").removesuffix(".git"),
-            "ref": git("rev-parse", "--abbrev-ref", "HEAD"),
+            "ref": qualified_ref,
             "commit": git("rev-parse", "HEAD"), "tree": git("rev-parse", "HEAD^{tree}")}
 
 

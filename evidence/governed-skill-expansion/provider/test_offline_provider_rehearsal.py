@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import unittest
 
-from offline_provider_rehearsal import LOOPBACK_ENDPOINT, rehearse
+from offline_provider_rehearsal import LOOPBACK_ENDPOINT, default_identity, rehearse
 from package_receipt import PackageIdentityError, bind_receipt, package_identity
 
 
@@ -48,6 +48,17 @@ class OfflineProviderRehearsalTests(unittest.TestCase):
         identity = package_identity(**IDENTITY, package_id="x", package_version="1.0.0", package_bytes=b"x", manifest={})
         with self.assertRaises(PackageIdentityError):
             bind_receipt({}, identity, result_digest="c" * 64, receipt_ref="opaque:bad ref")
+
+    def test_receipt_ref_rejects_absolute_and_parent_paths(self) -> None:
+        identity = package_identity(**IDENTITY, package_id="x", package_version="1.0.0", package_bytes=b"x", manifest={})
+        for receipt_ref in ("/tmp/receipt.json", "../receipt.json", "receipts/../receipt.json"):
+            with self.subTest(receipt_ref=receipt_ref), self.assertRaises(PackageIdentityError):
+                bind_receipt({}, identity, result_digest="c" * 64, receipt_ref=receipt_ref)
+
+    def test_default_identity_uses_qualified_git_ref(self) -> None:
+        ref = default_identity()["ref"]
+        self.assertTrue(ref.startswith(("refs/heads/", "refs/remotes/")))
+        self.assertNotEqual(ref, "HEAD")
 
 
 if __name__ == "__main__":

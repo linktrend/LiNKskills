@@ -24,6 +24,7 @@ PREPARATORY_ONLY = "PREPARATORY_ONLY"
 BASE_COMMIT = "21271dffa4ab3a63ee16d0d9a6ce2011f069cf1a"
 BASE_TREE = "e0ad65a3643d1fdfb1b5df7e2ba6935e67f2fa9e"
 OWNED_PREFIX = "evidence/governed-skill-expansion/provider/"
+GENERATED_OUTPUT_EXCEPTION = ".github/linktrend-secret-scan-fixtures.json"
 PKT24_DEPENDENCY = {
     "packet": "PKT-24",
     "status": "unresolved",
@@ -189,13 +190,14 @@ def verify_provider_source(identity: Mapping[str, Any] | None) -> dict[str, Any]
 
 
 def verify_scope(changed_paths: Sequence[str] | None) -> dict[str, Any]:
-    """Reject any base-to-candidate path outside this packet's owned prefix."""
+    """Reject paths outside provider scope except the generated scan fixture."""
 
     paths = sorted({_text(path) for path in (changed_paths or []) if _text(path)})
-    outside = [path for path in paths if not path.startswith(OWNED_PREFIX)]
+    outside = [path for path in paths if not path.startswith(OWNED_PREFIX) and path != GENERATED_OUTPUT_EXCEPTION]
     return {
         "status": "PASS" if not outside else "FAIL",
         "allowed_prefix": OWNED_PREFIX,
+        "generated_output_exceptions": [GENERATED_OUTPUT_EXCEPTION],
         "changed_paths": paths,
         "outside_owned_paths": outside,
         "reason": "owned_paths_only" if not outside else "owned_path_leak",

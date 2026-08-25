@@ -73,7 +73,9 @@ status while the dependency or any required check remains unresolved.
 
 ## Owned-path rule
 
-The only implementation/evidence paths in this lane are under
-`evidence/governed-skill-expansion/provider/`. A base-to-candidate diff that
-contains catalogue, docs, skills, packages, migrations, deployment, release,
-configuration, or PKT-22/23/24 paths is rejected as an owned-path leak.
+The implementation/evidence paths in this lane are under
+`evidence/governed-skill-expansion/provider/`. The generated
+`.github/linktrend-secret-scan-fixtures.json` output is the sole allowed
+scope exception and must pass generated-output closure and the exact candidate
+tree secret scan. Catalogue, docs, skills, packages, migrations, deployment,
+release, configuration, and PKT-22/23/24 paths remain owned-path leaks.

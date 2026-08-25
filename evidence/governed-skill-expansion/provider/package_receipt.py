@@ -10,6 +10,7 @@ import hashlib
 import json
 import re
 from collections.abc import Mapping
+from pathlib import Path
 from typing import Any
 
 
@@ -145,6 +146,10 @@ def bind_receipt(
         raise PackageIdentityError("invalid_result_digest")
     if not isinstance(receipt_ref, str) or not receipt_ref.strip() or any(char.isspace() for char in receipt_ref):
         raise PackageIdentityError("invalid_receipt_ref")
+    if not receipt_ref.startswith("opaque:"):
+        path = Path(receipt_ref)
+        if path.is_absolute() or ".." in path.parts:
+            raise PackageIdentityError("receipt_ref_must_be_relative_and_confined")
     checkout_identity = checkout_identity or identity
     provider_identity = provider_identity or identity
     validate_source_binding(identity, checkout_identity, provider_identity)
