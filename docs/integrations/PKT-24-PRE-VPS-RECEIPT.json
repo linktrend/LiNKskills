@@ -1,0 +1,83 @@
+{
+  "schema_version": "0.1",
+  "packet": "PKT-24",
+  "lane": "pre-vps-integration-preparation",
+  "status": "PREPARATORY_ONLY",
+  "qualification_claimed": false,
+  "activation_claimed": false,
+  "live_proof_claimed": false,
+  "dependency_holds": [
+    "PKT-22 unresolved",
+    "PKT-23 unresolved",
+    "PKT-03/ISS-03 dependency for migration 000012 unresolved",
+    "LiNKplatform live migration/auth receipts absent",
+    "OpenClaw consumer proof absent",
+    "LiNKautowork receipt absent",
+    "VPS/deployment receipt absent",
+    "independent final verification absent"
+  ],
+  "base": {
+    "remote": "origin",
+    "ref": "refs/heads/development",
+    "commit_sha": "dd8f0548cc32f379bcbf3a6aa60953cf6a7d6ec9",
+    "tree_sha": "86692eb8c0fb4205bb32d0a3f6aa7d7d6a6c0485"
+  },
+  "candidate": {
+    "commit_sha": "e7f1b625015083a05ae38afc71290119e9f44fa3",
+    "tree_sha": "a28693b8fa3d949580bbcfdd715907a690974127",
+    "recording_status": "BOUND_TO_ISSUE_227_REPAIR_CHECKPOINT",
+    "note": "Bound to the exact Issue #227 repair checkpoint; this preparatory receipt is not a qualification receipt."
+  },
+  "scope": {
+    "allowed_prefixes": ["docs/integrations/"],
+    "allowed_generated_paths": [
+      ".github/linktrend-secret-scan-fixtures.json"
+    ],
+    "changed_paths_expected": [
+      "docs/integrations/PKT-24-PRE-VPS-PREP.md",
+      "docs/integrations/PKT-24-PRE-VPS-RECEIPT.json",
+      ".github/linktrend-secret-scan-fixtures.json"
+    ],
+    "forbidden_paths": [
+      "catalog/index.json",
+      "configs/",
+      "deploy/",
+      "packages/",
+      "skills/",
+      "supabase/migrations/",
+      "release pointers",
+      "external systems"
+    ]
+  },
+  "validation": {
+    "commands": [
+      "python3 -m json.tool docs/integrations/PKT-24-PRE-VPS-RECEIPT.json",
+      "python3 scripts/build-catalog-index.py --check",
+      "python3 validator.py --repo-root . --scan-all",
+      "python3 scripts/gitops/secret_scan.py --repo .",
+      "git diff --check"
+    ],
+    "results": {
+      "json_parse": "PASS",
+      "catalog_check": "HOLD_PREEXISTING_PROVENANCE_DRIFT",
+      "validator_scan_all": "PASS_WITH_PREEXISTING_WARNINGS",
+      "secret_scan": "PASS_APPROVED_SYNTHETIC_FIXTURES_ONLY",
+      "diff_check": "PASS"
+    },
+    "live_provider_stage_vps_production": "NOT_PROVEN"
+  },
+  "rollback": {
+    "source": "Revert the sole integration checkpoint; do not rewrite immutable releases.",
+    "migration": "LiNKplatform-only reviewed down package or additive forward-fix after backup/restore evidence.",
+    "consumer": "OpenClaw/deployment owner disables new profile and restores prior exact release/config pin.",
+    "recovery": "Retain prior release and require exact health/readiness plus independent receipt; otherwise HOLD."
+  },
+  "external_dependencies": {
+    "LiNKplatform": "NOT_PROVEN/HOLD",
+    "OpenClaw Prime": "NOT_PROVEN/HOLD",
+    "LiNKautowork": "NOT_PROVEN/HOLD",
+    "VPS/deployment owner": "NOT_PROVEN/HOLD",
+    "final verifier": "NOT_PROVEN/HOLD"
+  },
+  "receipt_rule": "This is an evidence-bound preparation record, not PKT-24 completion, release qualification, provider receipt, consumer proof, migration apply authorization, VPS proof, or production approval."
+}

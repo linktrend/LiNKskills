@@ -1,9 +1,15 @@
-# Example Trace: Success Pattern
+# Example Trace: Controller Review
 
 ## Scenario
-Monthly close requires consolidated reporting across Stripe and expense systems.
+
+A finance operations skill supplies a redacted monthly snapshot with a
+currency, source references, and one documented variance.
 
 ## Trace
-- Skill reconciles normalized revenue with expense records.
-- Produces GAAP bundle and logs canonical transactions in `lsl_finance`.
-- Returns successful reconciliation status and report package.
+
+- Controller labels observations and assumptions, checks the variance, and
+  prepares a close checklist.
+- It returns the owner, confidence, and evidence reference for the unresolved
+  item.
+- It declares `external_calls: []` and `mutations: []`; no ledger or source
+  record is created.

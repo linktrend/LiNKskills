@@ -22,6 +22,7 @@ from .lifecycle import (
     can_transition,
     allowed_transitions,
 )
+from .mcp_v2 import ExactResource, GovernedRelease, gate_denials
 from .payload_guard import (
     PayloadValidationError,
     allowlist_and_redact,
@@ -45,9 +46,12 @@ __all__ = [
     "can_transition",
     "content_hash_for_directory",
     "eval_suite_file_hash",
+    "ExactResource",
     "evaluate_certification_evidence",
     "execution_profile_identity_hash",
     "filter_compatible_usable_releases",
+    "gate_denials",
+    "GovernedRelease",
     "prepare_feedback_params",
     "prepare_run_mutation_params",
     "prepare_trace_params",

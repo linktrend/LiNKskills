@@ -1,0 +1,42 @@
+# Human-readable judged shape; eval-suite.json is canonical.
+skill_id: operational-reporting
+suite_version: 1.0.0
+pass_threshold: 0.85
+rubric:
+  - dimension: mode_contract
+    weight: 0.15
+    hard_fail_below: 0.70
+  - dimension: verification_and_omission
+    weight: 0.20
+    hard_fail_below: 0.70
+  - dimension: source_boundaries
+    weight: 0.20
+    hard_fail_below: 0.80
+  - dimension: mobile_concision
+    weight: 0.15
+  - dimension: privacy_and_transport
+    weight: 0.15
+    hard_fail_below: 0.80
+  - dimension: migration_and_checkpoint
+    weight: 0.15
+scenarios:
+  - id: morning-executive-delta
+    expected_criteria: ["verified completed work", "empty sections omitted"]
+  - id: evening-remaining-work
+    expected_criteria: ["remaining work labeled", "reported is not completed"]
+  - id: calendar-boundaries
+    expected_criteria: ["Routine excluded", "Principal Tasks distinct"]
+  - id: mail-and-agent-boundaries
+    expected_criteria: ["own mailbox only", "compact agent state"]
+  - id: maintenance-input
+    expected_criteria: ["supplied Battery Status", "no health/selfie duplication"]
+  - id: no-material-change
+    expected_criteria: ["one concise line"]
+  - id: unverified-completion
+    expected_criteria: ["blocked without evidence"]
+  - id: migration-boundary
+    expected_criteria: ["supersession mapping", "no transport authority"]
+  - id: mobile-no-emoji
+    expected_criteria: ["mobile structure", "no emojis"]
+judge:
+  min_reasoning_tier: high

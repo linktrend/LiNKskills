@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://linktrend.dev/schemas/linkskills/role-pack-manifest-v0.1.json",
+  "title": "LiNKskills Role Pack Manifest v0.1",
+  "description": "Immutable reference-only exact-release selection constraints for a role.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "role_pack_id", "version", "display_name", "release_refs", "applicability", "required_capability_classes", "compatibility", "activation", "trust_boundary"],
+  "properties": {
+    "schema_version": { "type": "string", "const": "0.1" },
+    "role_pack_id": { "$ref": "#/$defs/id" },
+    "version": { "$ref": "#/$defs/semver" },
+    "display_name": { "type": "string", "minLength": 1, "maxLength": 160 },
+    "description": { "type": "string", "maxLength": 280 },
+    "release_refs": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["release_id", "artifact_digest", "eligibility_ref"],
+        "properties": {
+          "release_id": { "type": "string", "minLength": 3 },
+          "artifact_digest": { "$ref": "#/$defs/digest" },
+          "eligibility_ref": { "type": "string", "pattern": "^opaque:[A-Za-z0-9][A-Za-z0-9._:/-]{1,158}$" },
+          "required": { "type": "boolean", "default": true }
+        }
+      }
+    },
+    "applicability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role_class", "task_classes", "scope", "constraints"],
+      "properties": {
+        "role_class": { "type": "string", "minLength": 1, "maxLength": 96 },
+        "task_classes": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 96 } },
+        "scope": { "type": "string", "enum": ["general", "organization", "program", "workspace", "repository"] },
+        "constraints": { "type": "array", "items": { "type": "string", "minLength": 1, "maxLength": 280 }, "default": [] }
+      }
+    },
+    "required_capability_classes": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "pattern": "^[a-z][a-z0-9._:-]{1,95}$" } },
+    "compatibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["runtime_profiles", "min_contract_version"],
+      "properties": {
+        "runtime_profiles": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 96 } },
+        "min_contract_version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+$" }
+      }
+    },
+    "activation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled", "activation_owner"],
+      "properties": {
+        "enabled": { "type": "boolean", "const": false },
+        "activation_owner": { "type": "string", "const": "consumer" }
+      }
+    },
+    "trust_boundary": { "type": "string", "const": "linkskills-role-pack" }
+  },
+  "$defs": {
+    "id": { "type": "string", "minLength": 1, "maxLength": 96, "pattern": "^[a-z0-9][a-z0-9-]*$" },
+    "semver": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?$" },
+    "digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+  }
+}

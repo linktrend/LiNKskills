@@ -1,0 +1,19 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "time-management",
+  "display_name": "Time Management",
+  "version": "1.0.0",
+  "description": "Store-independent intake, planning, reviews, evidence, capacity, and monthly reporting.",
+  "capability_category": "internal_launch",
+  "lifecycle_state": "draft",
+  "format_profile": "heavy",
+  "compatible_runtime_profiles": ["cursor-macos"],
+  "min_capability_tier": "high",
+  "routing": {"when_to_use": "Use for confirmed/provisional time-management planning and evidence reconciliation.", "when_not_to_use": ["Do not own consumer SQLite or mutable task state.", "Do not send, schedule, commit, or activate.", "Do not handle detailed health causes."], "tags": ["planning", "capacity", "evidence", "reviews"]},
+  "execution": {"required_inputs": [{"name": "tasks", "description": "Consumer-supplied task intake"}, {"name": "capacity", "description": "Consumer-supplied capacity periods"}], "expected_outputs": [{"name": "time_management_result", "description": "Stable-ID, evidence-aware effect-free planning result"}], "forbidden_actions": ["Own SQLite", "Infer acknowledgement", "Claim unsupported completion", "Activate standing rules", "Write external systems"], "verification_steps": ["Validate evidence and authority", "Order deadlines and dependencies", "Preserve protected periods and mappings", "Validate empty effects"], "completion_criteria": ["Output conforms to strict schema", "No external effects", "Unknown material facts remain pending"]},
+  "dependencies": {"schema_version": "0.1", "skill_dependencies": ["company-communication"], "packaged_tools": [], "host_capabilities": ["filesystem_read", "filesystem_write"], "external_services": [], "library_assets": [], "runtime_requirements": [], "optional_dependencies": []},
+  "eval": {"suite_path": "references/eval-suite.json", "suite_schema_version": "0.1"},
+  "telemetry": {"classification": "public_internal", "redaction_rules": ["strip_secrets", "strip_private_data", "strip_health_causes", "strip_reasoning", "strip_transport_payloads"], "retention_policy": "retain_ids_and_hashes"},
+  "fragments": [{"fragment_id": "summary", "disclosure_level": 2, "path": "SKILL.md"}, {"fragment_id": "advanced", "disclosure_level": 3, "path": "advanced/advanced.md"}, {"fragment_id": "api-specs", "disclosure_level": 4, "path": "references/api-specs.md"}, {"fragment_id": "schemas", "disclosure_level": 4, "path": "references/schemas.json"}],
+  "release_channel": "canary"
+}

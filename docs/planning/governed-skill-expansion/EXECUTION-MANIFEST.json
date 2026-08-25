@@ -1,0 +1,371 @@
+{
+  "schemaVersion": 1,
+  "protocol": {
+    "id": "coding-execution-protocol",
+    "version": "1.0.1",
+    "amendment": "V25_BOOTSTRAP_LEAN"
+  },
+  "program": {
+    "id": "linkskills-governed-skill-expansion",
+    "name": "LiNKskills Governed Skill Expansion",
+    "targetRelease": "governed-skills-v1"
+  },
+  "baseline": {
+    "repository": "linktrend/LiNKskills",
+    "commit": "2896fd89726f0b20258ec5a7bba55ccc6299ceb6",
+    "tree": "727694a95c83678bd6c7be7da2c5b26127b49e6e",
+    "ref": "refs/remotes/origin/development"
+  },
+  "packets": [
+    {
+      "id": "PKT-00",
+      "title": "Baseline reconciliation and architecture approvals",
+      "issues": ["ISS-00"],
+      "ownedPaths": ["docs/adr/", "docs/inventories/", "docs/planning/governed-skill-expansion/"],
+      "prohibitedPaths": ["packages/", "skills/", "supabase/migrations/", "deploy/"],
+      "verificationCommands": [["python3", "scripts/validate_skills.py", "--help"], ["git", "diff", "--check"]],
+      "executionState": "PLAN"
+    },
+    {
+      "id": "PKT-01",
+      "title": "Provider taxonomy and release metadata contracts",
+      "issues": ["ISS-01"],
+      "ownedPaths": ["packages/contracts/", "tests/contracts/"],
+      "prohibitedPaths": ["packages/mcp_server/", "skills/", "catalog/index.json"],
+      "verificationCommands": [["python3", "-m", "unittest", "discover", "-s", "tests/contracts", "-v"]],
+      "dependencies": ["PKT-00"],
+      "executionState": "PLAN"
+    },
+    {
+      "id": "PKT-02",
+      "title": "Standard MCP v2 family discovery and exact resource retrieval",
+      "issues": ["ISS-02"],
+      "ownedPaths": ["packages/mcp_server/", "packages/core/", "packages/client/", "tests/mcp_server/", "tests/core/", "tests/client/"],
+      "prohibitedPaths": ["packages/tool_runtime/", "skills/", "catalog/index.json"],
+      "verificationCommands": [["python3", "-m", "unittest", "tests.mcp_server.test_v2_provider", "tests.core.test_release_v2", "-v"]],
+      "dependencies": ["PKT-01"],
+      "executionState": "PLAN"
+    },
+    {
+      "id": "PKT-03",
+      "title": "External collection vendor adaptation and update lifecycle",
+      "issues": ["ISS-03"],
+      "ownedPaths": ["packages/publisher/", "packages/persistence/", "packages/librarian_domain/", "supabase/migrations/", "tests/publisher/", "tests/migrations/", "tests/librarian_domain/"],
+      "prohibitedPaths": ["tools/gws/vendor/", "skills/", "catalog/index.json"],
+      "verificationCommands": [["python3", "-m", "unittest", "discover", "-s", "tests/publisher", "-v"], ["python3", "-m", "unittest", "discover", "-s", "tests/librarian_domain", "-v"]],
+      "dependencies": ["PKT-01"],
+      "executionState": "PLAN"
+    },
+    {
+      "id": "PKT-04",
+      "title": "External content security privacy and evaluation controls",
+      "issues": ["ISS-04"],
+      "ownedPaths": ["packages/eval_runner/", "packages/librarian_domain/linkskills_librarian/telemetry_v2.py", "tests/eval_runner/", "tests/core/test_wave6_privacy_and_validator.py", "tests/librarian_domain/test_telemetry_v2.py"],
+      "prohibitedPaths": ["skills/", "tools/gws/vendor/", "catalog/index.json"],
+      "verificationCommands": [["python3", "-m", "unittest", "discover", "-s", "tests/eval_runner", "-v"], ["python3", "-m", "unittest", "tests.core.test_wave6_privacy_and_validator", "tests.librarian_domain.test_telemetry_v2", "-v"]],
+      "dependencies": ["PKT-03"],
+      "executionState": "PLAN"
+    },
+    {
+      "id": "PKT-05",
+      "title": "Governed Google Workspace collection admission",
+      "issues": ["ISS-05"],
+      "ownedPaths": ["vendor-skills/google-workspace/", "collections/google-workspace/", "tests/collections/google_workspace/"],
+      "prohibitedPaths": ["tools/gws/bin/", "tools/gws/runtime/", "configs/", "catalog/index.json"],
+      "verificationCommands": [["python3", "-m", "unittest", "discover", "-s", "tests/collections/google_workspace", "-v"], ["python3", "scripts/validate_skills.py", "--repo-root", ".", "--scan-all"]],
+      "dependencies": ["PKT-03", "PKT-04"],
+      "executionState": "PLAN"
+    },
+    {
+      "id": "PKT-06",
+      "title": "Canonical reusable research workflow",
+      "issues": ["ISS-06"],
+      "ownedPaths": ["skills/research/", "skills/search-strategy/", "skills/citation-enforcer/", "tests/skills/research/"],
+      "prohibitedPaths": ["tools/research/", "catalog/index.json"],
+      "verificationCommands": [["python3", "validator.py", "--repo-root", ".", "--path", "skills/research"], ["python3", "-m", "unittest", "discover", "-s", "tests/skills/research", "-v"]],
+      "dependencies": ["PKT-04"],
+      "executionState": "PLAN"
+    },
+    {
+      "id": "PKT-07",
+      "title": "Safe governed browser-use skill",
+      "issues": ["ISS-07"],
+      "ownedPaths": ["skills/governed-browser-use/", "tests/skills/governed_browser_use/"],
+      "prohibitedPaths": ["tools/playwright-cli/", "tools/fast-playwright/", "configs/", "catalog/index.json"],
+      "verificationCommands": [["python3", "validator.py", "--repo-root", ".", "--path", "skills/governed-browser-use"], ["python3", "-m", "unittest", "discover", "-s", "tests/skills/governed_browser_use", "-v"]],
+      "dependencies": ["PKT-04"],
+      "executionState": "PLAN"
+    },
+    {
+      "id": "PKT-08",
+      "title": "Reusable company communication skill",
+      "issues": ["ISS-08"],
+      "ownedPaths": ["skills/company-communication/", "tests/skills/company_communication/"],
+      "prohibitedPaths": ["configs/", "catalog/index.json"],
+      "verificationCommands": [["python3", "validator.py", "--repo-root", ".", "--path", "skills/company-communication"], ["python3", "-m", "unittest", "discover", "-s", "tests/skills/company_communication", "-v"]],
+      "dependencies": ["PKT-04"],
+      "executionState": "PLAN"
+    },
+    {
+      "id": "PKT-09",
+      "title": "Operational Reporting skill family",
+      "issues": ["ISS-09"],
+      "ownedPaths": ["skills/operational-reporting/", "skills/executive-sync-8am/", "skills/studio-health-reporting/", "tests/skills/operational_reporting/"],
+      "prohibitedPaths": ["configs/", "catalog/index.json"],
+      "verificationCommands": [["python3", "validator.py", "--repo-root", ".", "--path", "skills/operational-reporting"], ["python3", "-m", "unittest", "discover", "-s", "tests/skills/operational_reporting", "-v"]],
+      "dependencies": ["PKT-08"],
+      "executionState": "PLAN"
+    },
+    {
+      "id": "PKT-10",
+      "title": "Personal Compliance skill family",
+      "issues": ["ISS-10"],
+      "ownedPaths": ["skills/personal-compliance/", "tests/skills/personal_compliance/"],
+      "prohibitedPaths": ["configs/", "catalog/index.json", "execution_ledger.jsonl"],
+      "verificationCommands": [["python3", "validator.py", "--repo-root", ".", "--path", "skills/personal-compliance"], ["python3", "-m", "unittest", "discover", "-s", "tests/skills/personal_compliance", "-v"]],
+      "dependencies": ["PKT-08"],
+      "executionState": "PLAN"
+    },
+    {
+      "id": "PKT-11",
+      "title": "Time Management skill family",
+      "issues": ["ISS-11"],
+      "ownedPaths": ["skills/time-management/", "skills/department-head/", "skills/task-decomposition/", "tests/skills/time_management/"],
+      "prohibitedPaths": ["configs/", "catalog/index.json", "execution_ledger.jsonl"],
+      "verificationCommands": [["python3", "validator.py", "--repo-root", ".", "--path", "skills/time-management"], ["python3", "-m", "unittest", "discover", "-s", "tests/skills/time_management", "-v"]],
+      "dependencies": ["PKT-06", "PKT-08"],
+      "executionState": "PLAN"
+    },
+    {
+      "id": "PKT-12",
+      "title": "Private Health and Wellbeing skill family",
+      "issues": ["ISS-12"],
+      "ownedPaths": ["skills/private-health-wellbeing/", "tests/skills/private_health_wellbeing/"],
+      "prohibitedPaths": ["configs/", "catalog/index.json", "execution_ledger.jsonl"],
+      "verificationCommands": [["python3", "validator.py", "--repo-root", ".", "--path", "skills/private-health-wellbeing"], ["python3", "-m", "unittest", "discover", "-s", "tests/skills/private_health_wellbeing", "-v"]],
+      "dependencies": ["PKT-08"],
+      "executionState": "PLAN"
+    },
+    {
+      "id": "PKT-13",
+      "title": "Executive Decisions and Governance family",
+      "issues": ["ISS-13"],
+      "ownedPaths": ["skills/executive-decisions-governance/", "tests/skills/executive_decisions_governance/"],
+      "prohibitedPaths": ["catalog/index.json"],
+      "verificationCommands": [["python3", "validator.py", "--repo-root", ".", "--path", "skills/executive-decisions-governance"]],
+      "dependencies": ["PKT-06", "PKT-08"],
+      "executionState": "PLAN"
+    },
+    {
+      "id": "PKT-14",
+      "title": "Company Planning and Performance family",
+      "issues": ["ISS-14"],
+      "ownedPaths": ["skills/company-planning-performance/", "tests/skills/company_planning_performance/"],
+      "prohibitedPaths": ["catalog/index.json"],
+      "verificationCommands": [["python3", "validator.py", "--repo-root", ".", "--path", "skills/company-planning-performance"]],
+      "dependencies": ["PKT-13"],
+      "executionState": "PLAN"
+    },
+    {
+      "id": "PKT-15",
+      "title": "Finance and Accounting Operations family",
+      "issues": ["ISS-15"],
+      "ownedPaths": ["skills/finance-accounting-operations/", "skills/studio-controller/", "tests/skills/finance_accounting_operations/"],
+      "prohibitedPaths": ["tools/", "catalog/index.json"],
+      "verificationCommands": [["python3", "validator.py", "--repo-root", ".", "--path", "skills/finance-accounting-operations"]],
+      "dependencies": ["PKT-03"],
+      "executionState": "PLAN"
+    },
+    {
+      "id": "PKT-16",
+      "title": "Sales and Customer Management family",
+      "issues": ["ISS-16"],
+      "ownedPaths": ["skills/sales-customer-management/", "tests/skills/sales_customer_management/"],
+      "prohibitedPaths": ["tools/", "catalog/index.json"],
+      "verificationCommands": [["python3", "validator.py", "--repo-root", ".", "--path", "skills/sales-customer-management"]],
+      "dependencies": ["PKT-03"],
+      "executionState": "PLAN"
+    },
+    {
+      "id": "PKT-17",
+      "title": "Commercial Contracts and Legal Operations family",
+      "issues": ["ISS-17"],
+      "ownedPaths": ["skills/commercial-contracts-legal-operations/", "tests/skills/commercial_contracts_legal_operations/"],
+      "prohibitedPaths": ["tools/", "catalog/index.json"],
+      "verificationCommands": [["python3", "validator.py", "--repo-root", ".", "--path", "skills/commercial-contracts-legal-operations"]],
+      "dependencies": ["PKT-03"],
+      "executionState": "PLAN"
+    },
+    {
+      "id": "PKT-18",
+      "title": "Meeting Management family",
+      "issues": ["ISS-18"],
+      "ownedPaths": ["skills/meeting-management/", "tests/skills/meeting_management/"],
+      "prohibitedPaths": ["tools/", "catalog/index.json"],
+      "verificationCommands": [["python3", "validator.py", "--repo-root", ".", "--path", "skills/meeting-management"]],
+      "dependencies": ["PKT-06"],
+      "executionState": "PLAN"
+    },
+    {
+      "id": "PKT-19",
+      "title": "Procurement and Vendor Management family",
+      "issues": ["ISS-19"],
+      "ownedPaths": ["skills/procurement-vendor-management/", "tests/skills/procurement_vendor_management/"],
+      "prohibitedPaths": ["tools/", "catalog/index.json"],
+      "verificationCommands": [["python3", "validator.py", "--repo-root", ".", "--path", "skills/procurement-vendor-management"]],
+      "dependencies": ["PKT-17"],
+      "executionState": "PLAN"
+    },
+    {
+      "id": "PKT-20",
+      "title": "Agent Workforce Management family",
+      "issues": ["ISS-20"],
+      "ownedPaths": ["skills/agent-workforce-management/", "tests/skills/agent_workforce_management/"],
+      "prohibitedPaths": ["configs/", "catalog/index.json"],
+      "verificationCommands": [["python3", "validator.py", "--repo-root", ".", "--path", "skills/agent-workforce-management"]],
+      "dependencies": ["PKT-13"],
+      "executionState": "PLAN"
+    },
+    {
+      "id": "PKT-21",
+      "title": "Company Incident and Continuity Management family",
+      "issues": ["ISS-21"],
+      "ownedPaths": ["skills/company-incident-continuity/", "tests/skills/company_incident_continuity/"],
+      "prohibitedPaths": ["deploy/", "configs/", "catalog/index.json"],
+      "verificationCommands": [["python3", "validator.py", "--repo-root", ".", "--path", "skills/company-incident-continuity"]],
+      "dependencies": ["PKT-07", "PKT-13"],
+      "executionState": "PLAN"
+    },
+    {
+      "id": "PKT-22",
+      "title": "Reusable role-pack manifests",
+      "issues": ["ISS-22"],
+      "ownedPaths": ["role-packs/", "tests/role_packs/"],
+      "prohibitedPaths": ["configs/", "catalog/index.json"],
+      "verificationCommands": [["python3", "-m", "unittest", "discover", "-s", "tests/role_packs", "-v"]],
+      "dependencies": ["PKT-05", "PKT-09", "PKT-10", "PKT-11", "PKT-12", "PKT-13", "PKT-14", "PKT-15", "PKT-16", "PKT-17", "PKT-18", "PKT-19", "PKT-20", "PKT-21"],
+      "executionState": "PLAN"
+    },
+    {
+      "id": "PKT-23",
+      "title": "Cross-source evaluation and qualification evidence",
+      "issues": ["ISS-23"],
+      "ownedPaths": ["evidence/governed-skill-expansion/", "tests/integrations/test_governed_skill_qualification.py"],
+      "prohibitedPaths": ["catalog/index.json", "configs/", "deploy/"],
+      "verificationCommands": [["python3", "-m", "unittest", "tests.integrations.test_governed_skill_qualification", "-v"]],
+      "dependencies": ["PKT-05", "PKT-22"],
+      "executionState": "PLAN"
+    },
+    {
+      "id": "PKT-24",
+      "title": "Catalogue generation supersession mappings and documentation integration",
+      "issues": ["ISS-24"],
+      "ownedPaths": ["catalog/", "docs/LINKSKILLS-INTENT.md", "docs/LINKSKILLS-TECHNICAL-PRD.md", "docs/LINKSKILLS-OPERATIONS-MANUAL.md", "docs/OPEN-ISSUES.md", "docs/integrations/"],
+      "prohibitedPaths": ["deploy/", "configs/fragments/"],
+      "verificationCommands": [["python3", "scripts/build-catalog-index.py", "--check"], ["python3", "validator.py", "--repo-root", ".", "--scan-all"], ["git", "diff", "--check"]],
+      "dependencies": ["PKT-02", "PKT-03", "PKT-04", "PKT-23"],
+      "executionState": "PLAN"
+    },
+    {
+      "id": "PKT-25",
+      "title": "Exact-tree provider source verification",
+      "issues": ["ISS-25"],
+      "ownedPaths": ["evidence/governed-skill-expansion/provider/", "docs/handoffs/"],
+      "prohibitedPaths": ["deploy/", "configs/"],
+      "verificationCommands": [["python3", "-m", "unittest", "discover", "-s", "tests", "-p", "test_*.py", "-v"], ["python3", "scripts/build-catalog-index.py", "--check"], ["git", "diff", "--check"]],
+      "dependencies": ["PKT-24"],
+      "executionState": "PLAN"
+    },
+    {
+      "id": "PKT-26",
+      "title": "Independent definition-of-done reconciliation",
+      "issues": ["ISS-26"],
+      "ownedPaths": ["docs/handoffs/", "evidence/governed-skill-expansion/final/"],
+      "prohibitedPaths": ["packages/", "skills/", "deploy/", "configs/"],
+      "verificationCommands": [["git", "diff", "--check"], ["python3", "scripts/build-catalog-index.py", "--check"]],
+      "dependencies": ["PKT-25"],
+      "executionState": "PLAN"
+    }
+  ],
+  "issues": [
+    {"id": "ISS-00", "packetId": "PKT-00", "title": "Reconcile exact baseline and approve architecture changes"},
+    {"id": "ISS-01", "packetId": "PKT-01", "title": "Define taxonomy collection provenance and release contracts"},
+    {"id": "ISS-02", "packetId": "PKT-02", "title": "Implement standard MCP v2 progressive exact retrieval"},
+    {"id": "ISS-03", "packetId": "PKT-03", "title": "Implement external vendor adaptation and update lifecycle"},
+    {"id": "ISS-04", "packetId": "PKT-04", "title": "Enforce imported-content security privacy and evaluations"},
+    {"id": "ISS-05", "packetId": "PKT-05", "title": "Admit complete reviewed Google Workspace collection"},
+    {"id": "ISS-06", "packetId": "PKT-06", "title": "Publish canonical reusable research workflow"},
+    {"id": "ISS-07", "packetId": "PKT-07", "title": "Publish safe governed browser-use skill"},
+    {"id": "ISS-08", "packetId": "PKT-08", "title": "Publish reusable company communication skill"},
+    {"id": "ISS-09", "packetId": "PKT-09", "title": "Publish Operational Reporting family"},
+    {"id": "ISS-10", "packetId": "PKT-10", "title": "Publish Personal Compliance family"},
+    {"id": "ISS-11", "packetId": "PKT-11", "title": "Publish Time Management family"},
+    {"id": "ISS-12", "packetId": "PKT-12", "title": "Publish Private Health and Wellbeing family"},
+    {"id": "ISS-13", "packetId": "PKT-13", "title": "Publish Executive Decisions and Governance family"},
+    {"id": "ISS-14", "packetId": "PKT-14", "title": "Publish Company Planning and Performance family"},
+    {"id": "ISS-15", "packetId": "PKT-15", "title": "Publish Finance and Accounting Operations family"},
+    {"id": "ISS-16", "packetId": "PKT-16", "title": "Publish Sales and Customer Management family"},
+    {"id": "ISS-17", "packetId": "PKT-17", "title": "Publish Commercial Contracts and Legal Operations family"},
+    {"id": "ISS-18", "packetId": "PKT-18", "title": "Publish Meeting Management family"},
+    {"id": "ISS-19", "packetId": "PKT-19", "title": "Publish Procurement and Vendor Management family"},
+    {"id": "ISS-20", "packetId": "PKT-20", "title": "Publish Agent Workforce Management family"},
+    {"id": "ISS-21", "packetId": "PKT-21", "title": "Publish Company Incident and Continuity Management family"},
+    {"id": "ISS-22", "packetId": "PKT-22", "title": "Publish reusable exact-release role-pack manifests"},
+    {"id": "ISS-23", "packetId": "PKT-23", "title": "Produce cross-source qualification evidence"},
+    {"id": "ISS-24", "packetId": "PKT-24", "title": "Integrate catalogue migrations and authoritative documentation"},
+    {"id": "ISS-25", "packetId": "PKT-25", "title": "Verify exact provider source candidate"},
+    {"id": "ISS-26", "packetId": "PKT-26", "title": "Reconcile every definition-of-done criterion"}
+  ],
+  "controls": {
+    "exactCandidateInvalidation": {"enabled": true, "identityFields": ["repository", "commit", "tree", "workflowDigest", "profileDigest"]},
+    "boundedRetry": {"ordinarySourceRepairs": 3, "infrastructureAttemptsPerCandidate": 2, "codeFailureRetries": 0},
+    "orchestrationLease": {"required": true, "scope": "packet-repository", "ttlSeconds": 3600},
+    "resourceUncertainty": {"failClosed": true, "unknownIsBlocking": true},
+    "automaticApproval": {
+      "checkpoint": "automatic",
+      "stagingPromote": "automatic-on-receipt-identity",
+      "reservedActions": ["main_promote", "publish_release", "deploy_production", "github_protection_change", "provider_live_mutation"],
+      "forbiddenActors": ["self_review", "self_merge", "prefer_incoming"]
+    },
+    "gitAuthority": {
+      "workBranchPattern": "issue/<n>-<slug>",
+      "protectedRefs": ["development", "staging", "main"],
+      "implementerMayOpenPr": false,
+      "implementerMayMerge": false,
+      "nestedSelfInstall": false
+    },
+    "publisherAuthority": {
+      "canonicalForV25": "none",
+      "legacyPublishers": ["linktrend-review-ready-publisher", "mark-review-ready.sh-as-publisher", "review-ready.json", "user-pat-publisher"],
+      "missingOrFailedClassification": "WAIVED_LEGACY_GATE"
+    },
+    "autoworkDiscovery": {"requiredWhenCallable": true, "unavailableIsHold": true},
+    "issueCheckpoint": {
+      "acceptWithoutReviewReady": true,
+      "acceptWithoutToken": true,
+      "requiredEvidence": ["exact_pushed_commit_tree", "scoped_diff", "focused_tests", "independent_terra_verification", "manifest_evidence"]
+    },
+    "administratorRecovery": {"namedExceptionOnly": true, "afterReplacementProof": true, "allowedOperations": ["protection_snapshot", "restore", "readback"]},
+    "durableHeartbeat": {"writeReadbackRequired": true, "persistBeforeMutation": true},
+    "checkoutBoundVerification": {"bindToCheckout": true, "forbidMergeRefIdentity": true},
+    "retryExhaustion": {
+      "diagnoseBeforeRecovery": true,
+      "forbidSilentRetry": true,
+      "ordinaryRecovery": "new_identity",
+      "infrastructureRecovery": "hold",
+      "codeFailureRecovery": "new_identity"
+    },
+    "hostedCapacityScheduler": {
+      "requireCompleteSnapshot": true,
+      "busyIsNotDiagnosis": true,
+      "unknownIsBlocking": true,
+      "hostedConcurrencyAuthority": "execution-protocol",
+      "maxAdmittedSlots": {"local": 1, "hosted": 2},
+      "unknownProbeSeconds": 600,
+      "backstopSeconds": 600,
+      "prioritization": ["priority", "dependencyReady", "fifo"],
+      "utilizationGapEvent": "UTILIZATION_GAP",
+      "recomputeOnEvents": ["admission", "completion", "invalidation", "probe_timeout", "api_rejection", "utilization_gap_repair"]
+    }
+  }
+}

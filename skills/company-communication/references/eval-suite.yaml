@@ -1,0 +1,40 @@
+# Judged shape for the company-communication skill; the JSON suite is canonical.
+skill_id: company-communication
+suite_version: 1.0.0
+pass_threshold: 0.85
+rubric:
+  - dimension: principal_first
+    weight: 0.20
+    hard_fail_below: 0.60
+  - dimension: audience_adaptation
+    weight: 0.15
+  - dimension: decision_choices
+    weight: 0.20
+    hard_fail_below: 0.60
+  - dimension: evidence_and_uncertainty
+    weight: 0.20
+    hard_fail_below: 0.60
+  - dimension: mobile_concision
+    weight: 0.15
+  - dimension: privacy_and_transport_boundary
+    weight: 0.10
+    hard_fail_below: 0.80
+scenarios:
+  - id: principal-status
+    expected_criteria: ["plain-English outcome first", "short next step"]
+  - id: technical-audience
+    expected_criteria: ["useful technical detail", "evidence pointer"]
+  - id: agent-handoff
+    expected_criteria: ["bounded scope", "explicit blocker"]
+  - id: decision-with-other
+    expected_criteria: ["clear choices", "Other — specify"]
+  - id: approval-rejection
+    expected_criteria: ["unambiguous approval or rejection"]
+  - id: uncertain-no-evidence
+    expected_criteria: ["honest uncertainty", "blocked without evidence"]
+  - id: mobile-no-context-dump
+    expected_criteria: ["short mobile-friendly structure"]
+  - id: privacy-transport-boundary
+    expected_criteria: ["no private data", "no transport action"]
+judge:
+  min_reasoning_tier: high
