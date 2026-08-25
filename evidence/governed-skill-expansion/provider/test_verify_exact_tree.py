@@ -48,6 +48,7 @@ class ExactTreeVerificationTests(unittest.TestCase):
 
     def test_scope_rejects_any_path_leak(self) -> None:
         self.assertEqual(verify_scope([OWNED_PREFIX + "receipt.json"])["status"], "PASS")
+        self.assertEqual(verify_scope([".github/linktrend-secret-scan-fixtures.json"])["status"], "PASS")
         result = verify_scope([OWNED_PREFIX + "receipt.json", "catalog/index.json"])
         self.assertEqual(result["status"], "FAIL")
         self.assertEqual(result["outside_owned_paths"], ["catalog/index.json"])
