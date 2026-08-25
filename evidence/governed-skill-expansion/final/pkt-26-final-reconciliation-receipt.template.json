@@ -235,11 +235,11 @@
     { "id": "DOD-19", "requirement": "Final reconciliation reports every requirement as proven, partially proven, blocked outside ownership, or intentionally excluded; it never infers from file presence.", "owners": ["independent verifier"], "required_evidence_classes": ["E2E"], "classification": "not_proven", "basis": "This preparatory template is not the final independent reconciliation.", "receipt_refs": [], "rollback_ref": null, "handoff_ref": null }
   ],
   "rollback_recovery": {
-    "source": { "owner": "LiNKskills", "required_receipt_fields": ["prior_qualified_release", "revert_or_pointer_action", "result_digest"], "status": "PENDING_EXTERNAL_RECEIPT" },
-    "migration": { "owner": "LiNKplatform", "required_receipt_fields": ["manifest_digest", "applied_environment", "rollback_or_forward_fix", "readback_digest"], "status": "PENDING_EXTERNAL_RECEIPT" },
-    "consumer": { "owner": "OpenClaw Prime", "required_receipt_fields": ["prior_exact_pin", "disable_action", "private_state_preserved", "result_digest"], "status": "PENDING_EXTERNAL_RECEIPT" },
-    "autowork": { "owner": "LiNKautowork", "required_receipt_fields": ["candidate_id", "idempotency_key", "poller_stop_or_replay", "result_digest"], "status": "PENDING_EXTERNAL_RECEIPT" },
-    "hosted_stage_vps_production": { "owner": "named deployment owners", "required_receipt_fields": ["environment", "deployed_identity", "prior_identity", "rollback_action", "health_readback", "result_digest"], "status": "PENDING_EXTERNAL_RECEIPT" },
+    "source": { "owner": "LiNKskills", "required_receipt_fields": ["prior_qualified_release", "revert_or_pointer_action", "result_digest"], "receipt_ref": null, "receipt_digest": null, "identity": null, "action": null, "result_digest": null, "status": "PENDING_EXTERNAL_RECEIPT" },
+    "migration": { "owner": "LiNKplatform", "required_receipt_fields": ["manifest_digest", "applied_environment", "rollback_or_forward_fix", "readback_digest"], "receipt_ref": null, "receipt_digest": null, "identity": null, "action": null, "result_digest": null, "status": "PENDING_EXTERNAL_RECEIPT" },
+    "consumer": { "owner": "OpenClaw Prime", "required_receipt_fields": ["prior_exact_pin", "disable_action", "private_state_preserved", "result_digest"], "receipt_ref": null, "receipt_digest": null, "identity": null, "action": null, "result_digest": null, "status": "PENDING_EXTERNAL_RECEIPT" },
+    "autowork": { "owner": "LiNKautowork", "required_receipt_fields": ["candidate_id", "idempotency_key", "poller_stop_or_replay", "result_digest"], "receipt_ref": null, "receipt_digest": null, "identity": null, "action": null, "result_digest": null, "status": "PENDING_EXTERNAL_RECEIPT" },
+    "hosted_stage_vps_production": { "owner": "named deployment owners", "required_receipt_fields": ["environment", "deployed_identity", "prior_identity", "rollback_action", "health_readback", "result_digest"], "receipt_ref": null, "receipt_digest": null, "identity": null, "action": null, "result_digest": null, "status": "PENDING_EXTERNAL_RECEIPT" },
     "immutable_release_rule": "Rollback restores a previously qualified exact release or prior consumer pin; it never rewrites an immutable release."
   },
   "handoff_requirements": {
