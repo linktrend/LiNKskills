@@ -1,15 +1,15 @@
 {
   "schemaVersion": 1,
-  "headSha": "1543f7377e0311677a08188415faede2d5272563",
+  "headSha": "f9923cede22a2a3b5c2e0a7a298e7a37494f1a4e",
   "classification": "tests",
   "acceptance": "PKT-26 final resolver binds receipt repository/ref/commit/tree/evidence class/slot identity; dependencies are non-generic; receipt refs are root-confined; ledger and rollback evidence are fail-closed",
   "commands": [
     {
-      "cmd": "python3 -m unittest test_reconcile_final_dod -v (from evidence/governed-skill-expansion/final)",
+      "cmd": "python3 -m unittest discover -s . -p 'test_*.py' -v (from evidence/governed-skill-expansion/final)",
       "exitCode": 0
     },
     {
-      "cmd": "python3 -m unittest test_verify_exact_tree -v (from evidence/governed-skill-expansion/provider)",
+      "cmd": "python3 -m unittest discover -s . -p 'test_*.py' -v (from evidence/governed-skill-expansion/provider)",
       "exitCode": 0
     },
     {
@@ -25,10 +25,10 @@
       "exitCode": 0
     }
   ],
-  "at": "2026-08-25T06:22:50Z",
+  "at": "2026-08-25T06:42:02Z",
   "kind": "v25-issue-checkpoint",
   "amendment": "V25_BOOTSTRAP_LEAN",
-  "gitTree": "aecc2f8bbbf3faeb7da6084de63fa6795e01c7f3",
+  "gitTree": "56ce765fa5d954aaa5ab7b5d2a50927c03f2cf38",
   "pushed": true,
   "scopedDiff": true,
   "focusedTests": {
