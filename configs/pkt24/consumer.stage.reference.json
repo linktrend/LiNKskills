@@ -1,0 +1,24 @@
+{
+  "schema_version": "0.1",
+  "config_class": "reference_only",
+  "evidence_status": "not_live_proven",
+  "mode": "production",
+  "deployment_target": "stage",
+  "gateway_url": "<platform-supplied-https-skills-gateway-url>",
+  "credential_file": "<secretref-rendered-absolute-pem-path>",
+  "resource_audience": "<platform-supplied-skills-only-audience>",
+  "release_pin": "<immutable-published-release-id>",
+  "live_enabled": false,
+  "activation_allowed": false,
+  "provider_contacted": false,
+  "hard_blockers": [
+    "PKT-22 unresolved",
+    "PKT-23 unresolved",
+    "Platform auth, migration, and stage receipts absent",
+    "Consumer, VPS, deployment, and independent verification receipts absent"
+  ],
+  "non_claims": [
+    "Placeholders require owner-supplied configuration and approved secret injection",
+    "This file is not a deployment manifest and does not authorize live migration or activation"
+  ]
+}

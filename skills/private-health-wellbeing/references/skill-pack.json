@@ -1,0 +1,39 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "private-health-wellbeing",
+  "display_name": "Private Health and Wellbeing",
+  "version": "1.0.0",
+  "description": "Private-domain health tracking and reporting with explicit unknowns, separate measures, labeled estimates, and capacity-only export.",
+  "capability_category": "private_wellbeing",
+  "lifecycle_state": "draft",
+  "format_profile": "heavy",
+  "compatible_runtime_profiles": ["cursor-macos"],
+  "min_capability_tier": "high",
+  "routing": {
+    "when_to_use": "Use for synthetic or redacted private health observations, routine checkpoints, estimates, measurements, or owner-review preparation.",
+    "when_not_to_use": ["Do not diagnose, change treatment, provide emergency instructions, call a service, or export detailed health data."],
+    "tags": ["private-health", "wellbeing", "privacy", "evidence", "capacity"]
+  },
+  "execution": {
+    "required_inputs": [
+      {"name": "mode", "description": "One supported private health tracking mode"},
+      {"name": "privacy_classification", "description": "synthetic or redacted_private_snapshot"},
+      {"name": "source_evidence", "description": "Explicit fixture, source, or consumer references"}
+    ],
+    "expected_outputs": [{"name": "private_health_record", "description": "Evidence-labeled local draft with empty external effects"}],
+    "forbidden_actions": ["Diagnose or prescribe", "Change treatment or dose", "Create calendar reminders", "Send or export detailed health data", "Retain real personal data in release artifacts"],
+    "verification_steps": ["Check privacy classification and evidence", "Preserve not_reported and uncertainty", "Keep categories and devices separate", "Confirm private destination and empty effects"],
+    "completion_criteria": ["Required evidence is present", "Unsafe or redundant requests fail closed", "Only capacity_state can be marked exportable"]
+  },
+  "dependencies": {"schema_version": "0.1", "skill_dependencies": [], "packaged_tools": [], "host_capabilities": ["filesystem_read", "filesystem_write"], "external_services": [], "library_assets": [], "runtime_requirements": [], "optional_dependencies": []},
+  "eval": {"suite_path": "references/eval-suite.json", "suite_schema_version": "0.1"},
+  "telemetry": {"classification": "sensitive", "redaction_rules": ["strip_private_data", "strip_images", "strip_credentials", "strip_reasoning", "strip_detailed_health_fields"], "retention_policy": "retain_ids_and_hashes_only"},
+  "fragments": [
+    {"fragment_id": "summary", "disclosure_level": 2, "path": "SKILL.md"},
+    {"fragment_id": "advanced", "disclosure_level": 3, "path": "advanced/advanced.md"},
+    {"fragment_id": "examples", "disclosure_level": 3, "path": "examples/success-pattern.md"},
+    {"fragment_id": "api-specs", "disclosure_level": 4, "path": "references/api-specs.md"},
+    {"fragment_id": "schemas", "disclosure_level": 4, "path": "references/schemas.json"}
+  ],
+  "release_channel": "canary"
+}

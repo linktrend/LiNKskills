@@ -1,0 +1,178 @@
+{
+  "definitions": {
+    "input": {
+      "type": "object",
+      "required": ["period", "currency", "odoo_contract", "snapshot", "requested_views", "data_classification"],
+      "additionalProperties": false,
+      "properties": {
+        "period": { "type": "string", "minLength": 3 },
+        "currency": { "type": "string", "pattern": "^[A-Z]{3}$" },
+        "odoo_contract": {
+          "type": "object",
+          "required": ["contract_id", "contract_version", "read_operations", "authority_owner", "escalation_contact"],
+          "additionalProperties": false,
+          "properties": {
+            "contract_id": { "type": "string", "minLength": 1, "maxLength": 128 },
+            "contract_version": { "type": "string", "minLength": 1, "maxLength": 64 },
+            "read_operations": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "enum": [
+                  "invoices.read",
+                  "payments.read",
+                  "expenses.read",
+                  "budgets.read",
+                  "cash_flow.read",
+                  "period_status.read"
+                ]
+              }
+            },
+            "authority_owner": { "type": "string", "minLength": 1, "maxLength": 256 },
+            "escalation_contact": { "type": "string", "minLength": 1, "maxLength": 256 }
+          }
+        },
+        "snapshot": {
+          "type": "object",
+          "required": ["content_digest", "retrieved_at", "period", "currency", "source_owner"],
+          "additionalProperties": false,
+          "properties": {
+            "content_digest": {
+              "type": "string",
+              "pattern": "^sha256:(?:[0-9a-f]{64}|synthetic-[A-Za-z0-9][A-Za-z0-9._-]{0,127})$"
+            },
+            "retrieved_at": { "type": "string", "minLength": 1, "format": "date-time" },
+            "period": { "type": "string", "minLength": 3 },
+            "currency": { "type": "string", "pattern": "^[A-Z]{3}$" },
+            "source_owner": { "type": "string", "minLength": 1, "maxLength": 256 },
+            "records": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["kind", "amount"],
+                "additionalProperties": false,
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "enum": ["invoice", "payment", "expense", "budget", "cash_inflow", "cash_outflow", "period_status"]
+                  },
+                  "amount": {
+                    "oneOf": [
+                      { "type": "number" },
+                      { "type": "string", "pattern": "^-?[0-9]+(?:\\.[0-9]{1,4})?$" }
+                    ]
+                  },
+                  "currency": { "type": "string", "pattern": "^[A-Z]{3}$" },
+                  "period": { "type": "string", "minLength": 3, "maxLength": 32 },
+                  "reference": { "type": "string", "minLength": 1, "maxLength": 128 },
+                  "status": { "type": "string", "minLength": 1, "maxLength": 64 }
+                }
+              }
+            },
+            "source_references": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "pattern": "^https://(?:platform\\.claude\\.com/docs/|www\\.anthropic\\.com/legal/commercial-terms$|www\\.odoo\\.com/documentation/19\\.0/(?:developer/reference/external_api\\.html|legal/licenses\\.html)$)"
+              }
+            }
+          }
+        },
+        "requested_views": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1, "maxLength": 128 }
+        },
+        "data_classification": { "type": "string", "enum": ["synthetic", "redacted_consumer_snapshot"] },
+        "approval_context": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "owner": { "type": "string", "minLength": 1, "maxLength": 256 },
+            "reason": { "type": "string", "minLength": 1, "maxLength": 512 }
+          }
+        },
+        "task_id": { "type": "string", "minLength": 1, "maxLength": 128 }
+      }
+    },
+    "output": {
+      "type": "object",
+      "required": ["status", "brief", "provenance", "effects", "approval", "contract_status", "rollback_release", "rollback_parent_commit", "rollback_parent_tree"],
+      "additionalProperties": false,
+      "properties": {
+        "status": { "type": "string", "enum": ["COMPLETED", "PENDING_APPROVAL", "FAILED"] },
+        "brief": { "type": "object" },
+        "provenance": {
+          "type": "object",
+          "required": ["release_tag", "source_commit", "source_tree", "content_digest", "input_snapshot_digest", "contract_id", "contract_version", "source_references"],
+          "additionalProperties": false,
+          "properties": {
+            "release_tag": { "type": "string", "const": "v1.0.0" },
+            "source_commit": { "type": "string", "const": "8964a1012dc9ca9e4cb2a43c370f23aab55aeefd" },
+            "source_tree": { "type": "string", "const": "111bc43370683a72e94c775f2a968bc1c7f8a9f3" },
+            "content_digest": {
+              "type": "string",
+              "const": "sha256:41d80814d46853f79abd18495a1f61e3ff4f400366345b738ed16b819cff985d"
+            },
+            "input_snapshot_digest": {
+              "type": "string",
+              "pattern": "^sha256:(?:[0-9a-f]{64}|synthetic-[A-Za-z0-9][A-Za-z0-9._-]{0,127})$"
+            },
+            "contract_id": { "type": "string", "minLength": 1, "maxLength": 128 },
+            "contract_version": { "type": "string", "minLength": 1, "maxLength": 64 },
+            "source_references": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "pattern": "^https://(?:platform\\.claude\\.com/docs/|www\\.anthropic\\.com/legal/commercial-terms$|www\\.odoo\\.com/documentation/19\\.0/(?:developer/reference/external_api\\.html|legal/licenses\\.html)$)"
+              }
+            }
+          }
+        },
+        "effects": {
+          "type": "object",
+          "required": ["external_calls", "mutations"],
+          "additionalProperties": false,
+          "properties": {
+            "external_calls": { "type": "array", "maxItems": 0 },
+            "mutations": { "type": "array", "maxItems": 0 }
+          }
+        },
+        "approval": {
+          "type": "object",
+          "required": ["status"],
+          "additionalProperties": false,
+          "properties": {
+            "status": { "type": "string", "enum": ["NOT_REQUIRED", "PENDING_APPROVAL", "DENIED"] },
+            "owner": { "type": "string", "minLength": 1, "maxLength": 256 },
+            "reason": { "type": "string", "minLength": 1, "maxLength": 512 }
+          }
+        },
+        "contract_status": { "type": "string", "enum": ["VERIFIED_READ_ONLY", "MISSING", "STALE", "UNKNOWN_OPERATION", "CONFLICTING"] },
+        "rollback_release": { "type": "string", "const": "catalog:starter-foundation@1.0.0" },
+        "rollback_parent_commit": { "type": "string", "const": "2d24e55e96caf4fc2ec37330d30d740805904368" },
+        "rollback_parent_tree": { "type": "string", "const": "fa328aa50c7febaefb22f9c22f883587c49e9e3f" }
+      }
+    },
+    "state": {
+      "type": "object",
+      "required": ["task_id", "workflow_step", "status", "input_digest", "last_updated"],
+      "additionalProperties": false,
+      "properties": {
+        "task_id": { "type": "string", "pattern": "^\\d{8}-\\d{4}-[A-Z0-9]+-\\d{6}$" },
+        "workflow_step": { "type": "integer", "minimum": 1, "maximum": 5 },
+        "status": { "type": "string", "enum": ["INITIALIZED", "IN_PROGRESS", "PENDING_APPROVAL", "COMPLETED", "FAILED"] },
+        "input_digest": { "type": "string", "pattern": "^sha256:(?:[0-9a-f]{64}|synthetic-[A-Za-z0-9][A-Za-z0-9._-]{0,127})$" },
+        "last_updated": { "type": "string", "minLength": 1, "format": "date-time" },
+        "seek_index": { "type": "object" }
+      }
+    }
+  }
+}

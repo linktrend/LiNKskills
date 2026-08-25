@@ -29,6 +29,12 @@ class SchemaPresenceTests(unittest.TestCase):
         "release-record-v0.1.json",
         "error-envelope-v0.1.json",
         "mcp-api-envelope-v0.1.json",
+        "provider-taxonomy-v0.1.json",
+        "collection-manifest-v0.1.json",
+        "exact-resource-descriptor-v0.1.json",
+        "eligibility-metadata-v0.1.json",
+        "role-pack-manifest-v0.1.json",
+        "update-candidate-v0.1.json",
     }
 
     def test_all_v01_schemas_present(self) -> None:
