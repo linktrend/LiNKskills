@@ -1,0 +1,75 @@
+{
+  "schema_version": "0.1",
+  "packet": "PKT-25",
+  "status": "PREPARATORY_ONLY",
+  "route": {
+    "route_id": "codex-luna-high",
+    "model": "Codex Luna",
+    "reasoning_effort": "high",
+    "recorded_at": "<RFC3339 timestamp>"
+  },
+  "baseline": {
+    "commit": "dd8f0548cc32f379bcbf3a6aa60953cf6a7d6ec9",
+    "ref": "refs/remotes/origin/development",
+    "tree": "86692eb8c0fb4205bb32d0a3f6aa7d7d6a6c0485"
+  },
+  "dependency": {
+    "packet": "PKT-24",
+    "status": "unresolved",
+    "required_for": "serially integrated catalogue, migration, and authoritative-document candidate",
+    "effect": "no exact provider-source admission or selectable/live claim"
+  },
+  "checkout": {
+    "origin": "<normalized origin>",
+    "ref": "<exact candidate ref>",
+    "commit": "<exact candidate commit>",
+    "tree": "<exact candidate tree>",
+    "clean": false,
+    "checks": {
+      "origin": "NOT_RUN",
+      "ref": "NOT_RUN",
+      "commit": "NOT_RUN",
+      "tree": "NOT_RUN",
+      "clean": "NOT_RUN"
+    }
+  },
+  "provider_source": {
+    "repository": "<provider repository>",
+    "ref": "<provider ref>",
+    "commit": "<provider commit>",
+    "tree": "<provider tree>",
+    "paths": ["<provider-owned path>"],
+    "status": "NOT_RUN"
+  },
+  "verification": {
+    "checks": {
+      "scoped_packet_checks": "NOT_RUN",
+      "full_repository_validation": "NOT_RUN",
+      "catalog_check": "NOT_RUN",
+      "isolated_package_tests": "NOT_RUN",
+      "secret_scan": "NOT_RUN",
+      "privacy_scan": "NOT_RUN",
+      "exact_diff_audit": "NOT_RUN",
+      "ancestry_audit": "NOT_RUN"
+    },
+    "all_checks_pass": false
+  },
+  "scope": {
+    "allowed_prefix": "evidence/governed-skill-expansion/provider/",
+    "changed_paths": [],
+    "outside_owned_paths": [],
+    "status": "NOT_RUN"
+  },
+  "claims": {
+    "exact_source_candidate_passed": false,
+    "provider_live": false,
+    "stage_proven": false,
+    "vps_proven": false,
+    "production_proven": false
+  },
+  "admission": {
+    "admissible": false,
+    "reason_codes": ["dependency_pkt24_unresolved", "preparatory_only_receipt"]
+  },
+  "receipt_digest": "<computed after all fields are bound>"
+}
