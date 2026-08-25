@@ -1,0 +1,40 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "company-communication",
+  "display_name": "Company Communication",
+  "version": "1.0.0",
+  "description": "Produces concise, audience-aware, evidence-bounded communication drafts without sending them.",
+  "capability_category": "internal_launch",
+  "lifecycle_state": "draft",
+  "format_profile": "simple",
+  "compatible_runtime_profiles": ["cursor-macos"],
+  "min_capability_tier": "high",
+  "routing": {
+    "when_to_use": "Use for a concise Principal, technical, or agent-facing draft that needs clear status, decisions, evidence, or uncertainty.",
+    "when_not_to_use": ["Do not send, publish, approve, reject, or choose a transport.", "Do not present an unverified result as completed."],
+    "tags": ["communication", "plain-language", "audience", "decisions", "evidence"]
+  },
+  "execution": {
+    "required_inputs": [
+      { "name": "audience", "description": "principal, technical, or agent" },
+      { "name": "purpose", "description": "The communication goal" },
+      { "name": "content", "description": "Facts or draft material to adapt" },
+      { "name": "status", "description": "The requested communication state" }
+    ],
+    "expected_outputs": [{ "name": "communication_draft", "description": "A transport-neutral draft with evidence and uncertainty fields" }],
+    "forbidden_actions": ["Send or publish a message", "Invent evidence, completion, approval, or rejection", "Retain secrets or private data"],
+    "verification_steps": ["Check audience and purpose", "Retain evidence pointers and mark uncertainty", "Confirm effects are empty and transport remains consumer-owned"],
+    "completion_criteria": ["Draft is concise and audience-appropriate", "Unsupported completion is blocked", "Choice requests include Other — specify"]
+  },
+  "dependencies": { "schema_version": "0.1", "skill_dependencies": [], "packaged_tools": [], "host_capabilities": ["filesystem_read", "filesystem_write"], "external_services": [], "library_assets": [], "runtime_requirements": [], "optional_dependencies": [] },
+  "eval": { "suite_path": "references/eval-suite.json", "suite_schema_version": "0.1" },
+  "telemetry": { "classification": "public_internal", "redaction_rules": ["strip_secrets", "strip_private_data", "strip_reasoning", "strip_transport_payloads"], "retention_policy": "retain_ids_and_hashes" },
+  "fragments": [
+    { "fragment_id": "summary", "disclosure_level": 2, "path": "SKILL.md" },
+    { "fragment_id": "advanced", "disclosure_level": 3, "path": "advanced/advanced.md" },
+    { "fragment_id": "examples", "disclosure_level": 3, "path": "examples/success-pattern.md" },
+    { "fragment_id": "api-specs", "disclosure_level": 4, "path": "references/api-specs.md" },
+    { "fragment_id": "schemas", "disclosure_level": 4, "path": "references/schemas.json" }
+  ],
+  "release_channel": "canary"
+}

@@ -6,6 +6,10 @@ This directory is the home for repository documentation. Start with:
 - `LINKSKILLS-TECHNICAL-PRD.md` for the implemented architecture.
 - `LINKSKILLS-OPERATIONS-MANUAL.md` for operations.
 - `OPEN-ISSUES.md` for genuinely open work.
+- `planning/governed-skill-expansion/` for the final IDE v2.5.1 PRD,
+  dependency graph, manifest, and approval-gated execution packets for provider
+  v2 completion, governed external collections, approved reusable skills, and
+  role manifests.
 - `runbooks/` for current procedures.
 
 Historical material belongs in `archive/` and is not implementation authority.

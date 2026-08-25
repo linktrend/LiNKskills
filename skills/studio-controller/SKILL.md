@@ -1,12 +1,12 @@
 ---
 name: studio-controller
-description: "Financial oversight skill implementing GAAP reporting (P&L, Balance Sheet, Cashflow, AR/AP, Budget vs Actual) with Supabase lsl_finance logging and reconciliation controls."
-usage_trigger: "Use when executive finance reporting, reconciliation, and transaction oversight are required across revenue and expense systems."
-version: 1.0.0
-release_tag: v1.0.0
+description: "Reusable finance review and close-control primitive for checking evidence, variances, assumptions, and escalation boundaries without owning a ledger, connector, or accounting system."
+usage_trigger: "Use when a finance operations brief needs controller-style review, close preparation, variance escalation, or separation of observation from approval."
+version: 1.1.0
+release_tag: v1.1.0
 created: 2026-02-25
 author: LiNKskills Library
-tags: [finance, gaap, controller]
+tags: [finance, controller, close, review]
 engine:
   min_reasoning_tier: high
   preferred_model: gpt-5
@@ -17,100 +17,104 @@ tooling:
   jit_tool_threshold: 10
   require_get_tool_details: true
 tools: [write_file, read_file, list_dir, get_tool_details]
-dependencies: [revenue-adapter-base, vault, memory]
-permissions: [fs_read, fs_write, api_access]
-scope_out: ["Do not emit financial reports without GAAP template structure", "Do not finalize unless transactions are logged in lsl_finance schema"]
+dependencies: []
+permissions: [fs_read, fs_write]
+scope_out: ["Do not create or mutate a ledger, accounting system, journal, invoice, payment, expense, budget, or period lock", "Do not invoke a connector or direct API", "Do not make tax, legal, audit, or accounting-finality claims"]
+format_profile: heavy
 persistence:
   required: true
   state_path: ".workdir/tasks/{{task_id}}/state.jsonl"
-last_updated: 2026-02-25
+last_updated: 2026-08-24
 ---
 
 # studio-controller
 
+`studio-controller` is a review primitive. It checks supplied finance
+observations and close evidence, identifies variance and missing support, and
+routes a decision to the owning consumer or Principal. It does not own a
+system of record and does not call Odoo, Supabase, Vault, or any other service.
+
 ## Decision Tree (Fail-Fast & Persistence)
-0. Resume from `.workdir/tasks/*/state.jsonl` when continuation exists.
-1. Validate access to revenue inputs (`revenue-adapter-base`) and expense inputs (Vault-backed).
-2. Validate intelligence floor from `engine`.
-3. Validate tooling protocol: native cli, cli wrapper, direct api, mcp.
-4. Classify reporting mode as specialist or generalist.
-5. If generalist or >10 tools, call `get_tool_details` and cache schemas.
-6. Require GAAP suite outputs: P&L, Balance Sheet, Cashflow, AR/AP, Budget vs Actual.
-7. Require transaction logging into Supabase `lsl_finance` schema.
-8. Fail-fast on unreconciled mismatches or missing canonical fields.
 
-## Rules
+0. Resume only from the matching `.workdir/tasks/*/state.jsonl` checkpoint.
+1. Validate the input period, currency, source references, and data classification.
+2. Confirm the source is an approved, bounded snapshot; reject credentials and live private fixtures.
+3. Validate the intelligence floor and tooling protocol: native cli, cli wrapper, direct api, mcp.
+4. Classify execution as `Specialist` or `Generalist`; if `Generalist` or more than ten tools, call `get_tool_details` and cache capability summaries.
+5. Review reconciliation status, variance explanations, close blockers, and evidence quality.
+6. Separate observed values, inferences, assumptions, unknowns, and operator decisions.
+7. Escalate material mismatches, stale data, missing support, or requested mutations as `PENDING_APPROVAL`.
+8. Validate the output contract, empty external-effects declaration, provenance, and checkpoint before completion.
 
-### Scope-In
-- Reconcile revenue from YouTube/Stripe normalization against expense streams from Vault-backed systems.
-- Produce GAAP-standard reports using `/shared/templates/MASTER_FINANCE_TEMPLATES.md` at repository root.
-- Log all transactions into `lsl_finance` schema in Supabase.
+## Scope-In
 
-### Scope-Out
-- Do not publish reports with missing reconciliation status.
-- Do not alter source truth without audit trace.
-- Do not finalize without output contract validation.
+- Review cash-flow, budget/actual, invoice/payment/expense, and close-preparation observations supplied by another skill or consumer.
+- Check that each material conclusion has a source reference, period, currency, assumption label, confidence, and owner.
+- Prepare a controller-style variance table and a close checklist without declaring the period finally closed.
+- Reuse this control language from `finance-accounting-operations`; that skill owns the family workflow and Odoo contract boundary.
 
-### Tooling Protocol (CLI-First)
-1. Level 1 - Native CLI: gather and stage finance source inputs.
-2. Level 2 - CLI Wrapper Scripts: deterministic transformations and rollups.
-3. Level 3 - Direct API: exception-only for high-volume ledger operations.
-4. Level 4 - MCP: persistent long-running financial monitors only.
+## Scope-Out
 
-### Internal Persistence (Zero-Copy / Flat-File)
-- Save checkpoints to `.workdir/tasks/{{task_id}}/state.jsonl`.
-- Save report tables and reconciliation deltas as task-local files.
-- Seek specific report sections for targeted reload.
+- Do not write or maintain a private ledger, journal, accounting database, or mutable finance state.
+- Do not create, edit, approve, settle, post, or delete any Odoo or accounting record.
+- Do not invoke an Odoo, Supabase, Vault, MCP, or direct API connector.
+- Do not provide final tax, legal, statutory, audit, or accounting authority.
+- Do not hide a mismatch, treat unavailable data as zero, or infer approval from operator urgency.
 
-### Smart JIT Tool Loading (Mitigated)
-- Activate JIT only for `Generalist` or >10 tools.
-- Call `get_tool_details` and cache capability summaries.
+## Tooling Protocol (CLI-First)
+
+1. Level 1 - Native CLI: read task-local or consumer-supplied snapshots.
+2. Level 2 - CLI Wrapper Scripts: perform deterministic variance and checklist preparation.
+3. Level 3 - Direct API: not permitted; a separately owned consumer adapter supplies snapshots.
+4. Level 4 - MCP: not permitted for execution or persistence.
+
+## Internal Persistence (Zero-Copy / Flat-File)
+
+- Append checkpoints to `.workdir/tasks/{{task_id}}/state.jsonl`.
+- Store only redacted, task-local review artifacts and provenance.
+- Do not copy credentials, customer data, or company-private records into the release or trace.
 
 ## Workflow
 
-### Phase 1: Ingestion & Checkpointing
-1. Ingest normalized revenue datasets and expense extracts.
-2. Load finance templates from `/shared/templates/MASTER_FINANCE_TEMPLATES.md`.
-3. Determine specialist/generalist mode and JIT setup.
-4. Validate Input Contract.
-5. Append `INITIALIZED` checkpoint.
+### Phase 1: Intake & checkpointing
 
-### Phase 2: Logic & Reasoning
-6. Reconcile revenue/expense line items.
-7. Build P&L, Balance Sheet, Cashflow, AR/AP, and Budget vs Actual tables.
-8. Validate totals and variance thresholds.
-9. Prepare canonical transaction records for `lsl_finance`.
+1. Read the input contract at `./references/schemas.json#/definitions/input`.
+2. Validate source digest, period, currency, and redacted/synthetic classification.
+3. Append `INITIALIZED` and stop with `PENDING_APPROVAL` when a gate is missing.
 
-### Phase 3: Drafting & Asynchronous Gate
-10. Draft financial packet and reconciliation summary.
-11. If unresolved mismatch risk is high, set `PENDING_APPROVAL`.
+### Phase 2: Review & reasoning
+
+4. Reconcile only on stable references, period, currency, and amount.
+5. Categorize every item as `OBSERVED`, `INFERRED`, `MISSING`, or `CONFLICTING`.
+6. Build a variance table and close checklist; preserve unresolved items.
+
+### Phase 3: Approval boundary
+
+7. For a material mismatch, stale snapshot, or requested mutation, return a typed owner/escalation request.
+8. Never turn a review into a posting, approval, period close, or source mutation.
 
 ### Phase 4: Finalization
-12. Finalize finance reports and ledger inserts.
-13. Validate Output Contract.
-14. Append `COMPLETED` checkpoint.
 
-### Phase 5: Self-Correction & Auditing
-15. Append summary to `execution_ledger.jsonl`.
-16. Save trace to `.workdir/tasks/{{task_id}}/trace.log`.
-17. Update `references/old-patterns.md` with finance control failures.
+9. Validate `controller_review` at `./references/schemas.json#/definitions/output`.
+10. Include provenance and `external_calls: []` / `mutations: []`.
+11. Append `COMPLETED` only when review evidence is sufficient; otherwise checkpoint the typed failure.
 
-## Tools
-| Tool Name | Workflow Scope | Critical Execution Rule |
-| :--- | :--- | :--- |
-| `read_file` | Phases 1-2 | Read normalized revenue and template references before rollup. |
-| `write_file` | All | Persist GAAP report artifacts, checkpoint logs, and reconciliation outputs. |
-| `get_tool_details` | Phase 1+ | Required for generalist/JIT profile. |
+### Phase 5: Ledger and trace protocol
+
+12. Use the standard redacted runtime invocation event for telemetry; never write finance records.
+13. Add a new confirmed failure mode to `references/old-patterns.md` only after the task is resolved.
 
 ## Contracts
+
 | Direction | Artifact Name | Schema Reference | Purpose |
 | :--- | :--- | :--- | :--- |
-| **Input** | `finance_input` | `./references/schemas.json#/definitions/input` | Validate source inputs and reconciliation window. |
-| **Output** | `gaap_report_bundle` | `./references/schemas.json#/definitions/output` | Validate GAAP report coverage and lsl_finance logging status. |
-| **State** | `execution_state` | `./references/schemas.json#/definitions/state` | Persist resumable finance workflow state. |
+| **Input** | `controller_review_input` | `./references/schemas.json#/definitions/input` | Validate a bounded finance observation set. |
+| **Output** | `controller_review` | `./references/schemas.json#/definitions/output` | Return review findings and typed escalation without side effects. |
+| **State** | `execution_state` | `./references/schemas.json#/definitions/state` | Persist resumable review state. |
 
 ## Progressive Disclosure References
-- Advanced reconciliation logic: `./advanced/advanced.md`
-- Finance interfaces: `./references/api-specs.md`
+
+- Advanced review logic: `./advanced/advanced.md`
+- Interface and ownership notes: `./references/api-specs.md`
 - Known anti-patterns: `./references/old-patterns.md`
-- Version history: `./references/changelog.md`
+- Version history and rollback: `./references/changelog.md`

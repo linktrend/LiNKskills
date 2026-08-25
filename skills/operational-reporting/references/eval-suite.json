@@ -1,0 +1,30 @@
+{
+  "schema_version": "0.1",
+  "suite_id": "operational-reporting-eval",
+  "skill_id": "operational-reporting",
+  "suite_version": "1.0.0",
+  "skill_version_range": ">=1.0.0",
+  "pass_threshold": 0.85,
+  "rubric": [
+    { "dimension": "mode_contract", "weight": 0.15, "hard_fail_below": 0.70 },
+    { "dimension": "verification_and_omission", "weight": 0.20, "hard_fail_below": 0.70 },
+    { "dimension": "source_boundaries", "weight": 0.20, "hard_fail_below": 0.80 },
+    { "dimension": "mobile_concision", "weight": 0.15 },
+    { "dimension": "privacy_and_transport", "weight": 0.15, "hard_fail_below": 0.80 },
+    { "dimension": "migration_and_checkpoint", "weight": 0.15 }
+  ],
+  "cases": [
+    { "case_id": "morning-executive-delta", "case_type": "golden", "input": "Build a morning digest from supplied deltas.", "expected": { "criteria": ["includes only verified completed work", "omits empty sections", "keeps deadlines distinct from start times"] } },
+    { "case_id": "evening-remaining-work", "case_type": "golden", "input": "Build an evening digest with remaining work and blockers.", "expected": { "criteria": ["labels remaining work", "does not call reported work completed"] } },
+    { "case_id": "calendar-boundaries", "case_type": "golden", "input": "Process supplied work/personal calendar records.", "expected": { "criteria": ["excludes Routine", "distinguishes Principal Tasks", "does not infer a schedule query"] } },
+    { "case_id": "mail-and-agent-boundaries", "case_type": "golden", "input": "Summarize supplied own-mail attention items and compact agent state.", "expected": { "criteria": ["uses own mailbox only", "keeps agent summary compact"] } },
+    { "case_id": "maintenance-input", "case_type": "golden", "input": "Accept supplied maintenance result and Battery Status.", "expected": { "criteria": ["does not collect health/selfie data", "does not request another final reading"] } },
+    { "case_id": "no-material-change", "case_type": "golden", "input": "No material verified change in the supplied window.", "expected": { "criteria": ["one concise line", "no empty sections"] } },
+    { "case_id": "unverified-completion", "case_type": "negative", "input": "A record says completed but has no verification pointer.", "expected": { "criteria": ["blocks READY_FOR_OWNER", "states uncertainty"] } },
+    { "case_id": "migration-boundary", "case_type": "negative", "input": "Ask the new skill to rewrite old immutable skill content or send a briefing.", "expected": { "criteria": ["references supersession without rewriting old content", "refuses transport authority"] } },
+    { "case_id": "mobile-no-emoji", "case_type": "golden", "input": "Render a structured report for a phone screen.", "expected": { "criteria": ["short bullets or paragraphs", "no emojis by default", "no context dump"] } }
+  ],
+  "hard_failure_conditions": ["unsupported_completion", "private_data_retained", "transport_action_claimed", "health_selfie_duplication"],
+  "evidence_policy": { "retain": ["case_outputs", "assertion_results", "evidence_pointers"], "redact": ["secrets", "private_data", "health_data", "reasoning", "transport_payloads"] },
+  "required_runtime_profiles": ["cursor-macos"]
+}

@@ -1,0 +1,19 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "meeting-management",
+  "display_name": "Meeting Management",
+  "version": "1.0.0",
+  "description": "Evidence-bounded meeting agendas, private pre-briefs, redacted notes, decision routing, and follow-up verification.",
+  "capability_category": "internal_launch",
+  "lifecycle_state": "draft",
+  "format_profile": "heavy",
+  "compatible_runtime_profiles": ["cursor-macos"],
+  "min_capability_tier": "high",
+  "routing": {"when_to_use": "Use for supplied meeting candidates, agendas, pre-briefs, notes, decisions, and follow-ups.", "when_not_to_use": ["Do not retain raw transcripts.", "Do not send, schedule, or mutate destination stores.", "Do not replace governance or Time Management state."], "tags": ["meetings", "agenda", "decisions", "privacy"]},
+  "execution": {"required_inputs": [{"name": "meeting", "description": "Consumer-supplied bounded meeting data"}, {"name": "source_evidence", "description": "Synthetic or redacted evidence"}], "expected_outputs": [{"name": "meeting_management_result", "description": "Redacted meeting preparation and reconciliation result"}], "forbidden_actions": ["Retain raw transcript", "Send or create meeting artifacts", "Mutate Google/Brain/Program stores", "Claim unsupported completion"], "verification_steps": ["Validate privacy and evidence", "Separate private pre-brief from notes", "Preserve routing references", "Validate empty effects"], "completion_criteria": ["Output conforms to strict schema", "Raw transcript is not retained", "Authority gaps remain pending"]},
+  "dependencies": {"schema_version": "0.1", "skill_dependencies": ["research", "company-communication"], "packaged_tools": [], "host_capabilities": ["filesystem_read", "filesystem_write"], "external_services": [], "library_assets": [], "runtime_requirements": [], "optional_dependencies": []},
+  "eval": {"suite_path": "references/eval-suite.json", "suite_schema_version": "0.1"},
+  "telemetry": {"classification": "public_internal", "redaction_rules": ["strip_raw_transcripts", "strip_private_data", "strip_credentials", "strip_destination_payloads", "strip_reasoning"], "retention_policy": "retain_synthetic_ids_and_hashes"},
+  "fragments": [{"fragment_id": "summary", "disclosure_level": 2, "path": "SKILL.md"}, {"fragment_id": "advanced", "disclosure_level": 3, "path": "advanced/advanced.md"}, {"fragment_id": "api-specs", "disclosure_level": 4, "path": "references/api-specs.md"}, {"fragment_id": "schemas", "disclosure_level": 4, "path": "references/schemas.json"}],
+  "release_channel": "canary"
+}

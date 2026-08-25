@@ -1,0 +1,32 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "company-planning-performance",
+  "display_name": "Company Planning and Performance",
+  "version": "1.0.0",
+  "description": "Evidence-bounded company horizon planning, objective and KPI review, forecast-versus-actual comparison, delivery signal detection, and owner-review reprioritization.",
+  "capability_category": "company_planning_performance",
+  "provenance": {"author": "LiNKskills Library", "source": "LiNKskills PRD PKT-14", "license": "LiNKtrend internal"},
+  "release_channel": "development",
+  "lifecycle_state": "draft",
+  "format_profile": "heavy",
+  "compatible_runtime_profiles": ["cursor-macos"],
+  "min_capability_tier": "high",
+  "routing": {
+    "when_to_use": "Use for evidence-backed monthly, rolling four-week, quarterly, annual, three-year, or five-year planning and performance review.",
+    "when_not_to_use": ["Do not use as a Program, project, KPI, task, or scheduling system.", "Do not activate or approve reprioritization or infer unsupported forecasts.", "Do not use with live credentials, customer records, or confidential company text."],
+    "tags": ["company-planning", "performance", "objectives", "kpis", "forecasting", "evidence"],
+    "exclusion_rules": ["Consumer owners retain plan, Program, Task, and KPI mutation authority.", "Consumer adapters retain transport, credentials, and external-system authority."]
+  },
+  "execution": {
+    "required_inputs": [{"name": "planning_request", "description": "A horizon, period, evidence-linked objectives, optional KPIs/signals, privacy classification, and optional proposed reprioritization.", "schema": {"$ref": "references/schemas.json#/definitions/input"}}],
+    "expected_outputs": [{"name": "planning_review", "description": "A deterministic READY_FOR_OWNER, DRAFT, or BLOCKED review with explicit uncertainty, empty effects, and rollback.", "schema": {"$ref": "references/schemas.json#/definitions/output"}}],
+    "procedure_summary": "Validate horizon and evidence, preserve objectives and signals, compare only comparable KPI values, and draft owner-review reprioritization without mutation.",
+    "forbidden_actions": ["Create or update Program, project, objective, KPI, milestone, calendar, or Task state", "Approve, activate, schedule, send, or enforce planning decisions", "Invent numeric precision, forecast, actual, target, or completion facts", "Store credentials, customer data, or confidential company material"],
+    "verification_steps": ["Run the canonical validator", "Run the focused company-planning-performance tests", "Run secret scan and generated-output closure", "Confirm no prohibited catalog or mutable state paths"],
+    "completion_criteria": ["All six horizons are represented in the canonical eval suite", "Forecast-versus-actual comparison is evidence- and unit-bounded", "Late, blocked, obsolete, and reprioritization records remain owner-review-only", "Effects are empty and private input is rejected without echo"]
+  },
+  "dependencies": {"schema_version": "0.1", "skill_dependencies": ["executive-decisions-governance"], "packaged_tools": [], "host_capabilities": ["filesystem_read", "filesystem_write"], "external_services": [], "library_assets": [], "runtime_requirements": [], "optional_dependencies": []},
+  "eval": {"suite_path": "references/eval-suite.json", "suite_schema_version": "0.1", "required_certification_profiles": ["cursor-macos"], "verification_refs": ["references/eval-suite.yaml"]},
+  "telemetry": {"classification": "public_internal", "redaction_rules": ["strip_secrets", "strip_customer_data", "strip_private_company_data", "strip_reasoning", "retain_synthetic_ids_only"], "retention_policy": "retain synthetic IDs, evidence hashes, and receipts only"},
+  "fragments": [{"fragment_id": "summary", "disclosure_level": 2, "path": "SKILL.md"}, {"fragment_id": "advanced", "disclosure_level": 4, "path": "advanced/advanced.md"}, {"fragment_id": "schemas", "disclosure_level": 5, "path": "references/schemas.json"}]
+}

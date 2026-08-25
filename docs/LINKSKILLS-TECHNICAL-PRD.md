@@ -13,6 +13,12 @@
 
 **Companion:** [`LINKSKILLS-INTENT.md`](./LINKSKILLS-INTENT.md) — why this Program exists.
 
+**Final expansion planning package awaiting execution approval:**
+[`planning/governed-skill-expansion/`](./planning/governed-skill-expansion/)
+defines the later provider-v2 completion, governed external-collection model,
+approved shared/Lisa/business skills, role manifests, and IDE v2.5.1 execution
+packets. It does not claim those planned changes are implemented.
+
 ---
 
 ## 1. System overview / architecture
