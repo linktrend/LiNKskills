@@ -1,0 +1,55 @@
+{
+  "schema_version": "0.1",
+  "packet": "PKT-24",
+  "status": "PREPARATORY_ONLY",
+  "base": {
+    "ref": "refs/remotes/origin/development",
+    "commit": "<exact-protected-base-commit>"
+  },
+  "candidate": {
+    "origin": "<normalized-origin>",
+    "ref": "<refs/heads/issue-or-refs/remotes/origin-candidate>",
+    "commit": "<exact-candidate-commit>",
+    "tree": "<exact-candidate-tree>",
+    "clean_checkout": false
+  },
+  "package": {
+    "config_digest": "<sha256:canonical-config-fixture>",
+    "fixture_digest": "<sha256:canonical-offline-fixture>",
+    "migration_digest": "<sha256:canonical-manifest-and-observed-hashes>",
+    "changed_paths": [],
+    "outside_owned_paths": []
+  },
+  "dependencies": {
+    "status": "UNRESOLVED",
+    "holds": [
+      "PKT-22 unresolved",
+      "PKT-23 unresolved",
+      "PKT-03/ISS-03 dependency for migration 000012 unresolved",
+      "LiNKplatform live migration/auth receipts absent",
+      "OpenClaw consumer proof absent",
+      "LiNKautowork receipt absent",
+      "VPS/deployment receipt absent",
+      "independent final verification absent"
+    ]
+  },
+  "claims": {
+    "qualification_claimed": false,
+    "selectable": false,
+    "provider_live": false,
+    "consumer_proven": false,
+    "vps_proven": false,
+    "deployment_performed": false,
+    "activation_claimed": false
+  },
+  "admission": {
+    "admissible": false,
+    "reason_codes": [
+      "dependency_pkt22_unresolved",
+      "dependency_pkt23_unresolved",
+      "preparatory_only_receipt",
+      "external_proof_absent"
+    ]
+  },
+  "receipt_digest": null
+}
