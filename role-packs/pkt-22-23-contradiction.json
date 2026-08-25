@@ -1,0 +1,63 @@
+{
+  "schema_version": "0.1",
+  "packet": "PKT-22/PKT-23",
+  "status": "HOLD",
+  "admitted": false,
+  "contradiction": {
+    "id": "role-pack-presence-is-not-packet-acceptance",
+    "statement": "A schema-valid role-pack manifest is present, but its exact references are unqualified and ineligible; the committed PKT-23 receipt still marks PKT-22 unresolved.",
+    "role_pack_manifest": "collections/google-workspace/role-pack-manifest.json",
+    "preparatory_receipt": "evidence/governed-skill-expansion/preparatory-receipt.json"
+  },
+  "validator": {
+    "implementation": "role-packs/role_pack_validator.py",
+    "expected_release_reference_count": 7,
+    "expected_violation_codes": [
+      "eligibility_gate_not_satisfied",
+      "eligibility_not_eligible",
+      "release_not_qualified"
+    ]
+  },
+  "repair_receipt": {
+    "issue": 236,
+    "rejected_checkpoint": {
+      "commit": "804b1a0af5548efde2a15297d1f911ac14f46c28",
+      "tree": "60a93f43babf50999f0e2e9425ecb03c411791f1",
+      "parent": "9c219c97ba0a6d7aad05bc7c87eb117405863855",
+      "parent_tree": "93400142d8ebd338cc5aaf47fd4904da3a46449c"
+    },
+    "protected_base": {
+      "ref": "origin/development",
+      "commit": "9c219c97ba0a6d7aad05bc7c87eb117405863855",
+      "tree": "93400142d8ebd338cc5aaf47fd4904da3a46449c"
+    },
+    "rejection_findings": [
+      "stale-generated-secret-fixture-closure",
+      "stale-secret-scan-fixture-binding"
+    ],
+    "generated_output_closure": {
+      "status": "PASS",
+      "output": ".github/linktrend-secret-scan-fixtures.json",
+      "passes": 2,
+      "identity_binding": "candidateTree and output digest are taken from the exact staged checkpoint closure result"
+    },
+    "secret_scan": {
+      "status": "PASS",
+      "approved_synthetic_fixture_count": 39,
+      "blocking_finding_count": 0,
+      "identity_binding": "candidateTree and fixture approvals are read from the exact staged Git index"
+    }
+  },
+  "claims": {
+    "qualified_release": false,
+    "qualification_admission": false,
+    "selectability": false,
+    "activation": false,
+    "provider_live": false,
+    "consumer": false,
+    "hosted_stage": false,
+    "vps": false,
+    "e2e": false,
+    "production": false
+  }
+}
