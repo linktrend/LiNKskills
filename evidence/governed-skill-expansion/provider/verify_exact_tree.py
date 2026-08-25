@@ -21,7 +21,8 @@ from typing import Any
 
 PACKET = "PKT-25"
 PREPARATORY_ONLY = "PREPARATORY_ONLY"
-BASE_COMMIT = "dd8f0548cc32f379bcbf3a6aa60953cf6a7d6ec9"
+BASE_COMMIT = "21271dffa4ab3a63ee16d0d9a6ce2011f069cf1a"
+BASE_TREE = "e0ad65a3643d1fdfb1b5df7e2ba6935e67f2fa9e"
 OWNED_PREFIX = "evidence/governed-skill-expansion/provider/"
 PKT24_DEPENDENCY = {
     "packet": "PKT-24",
@@ -65,7 +66,7 @@ CHECK_DEFINITIONS: dict[str, dict[str, Any]] = {
     },
 }
 
-_HEX_RE = re.compile(r"^[0-9a-f]{40}(?:[0-9a-f]{24})?$")
+_HEX_RE = re.compile(r"^[0-9a-f]{40}$")
 _REF_RE = re.compile(r"^[A-Za-z0-9._/-]+$")
 
 
@@ -257,7 +258,7 @@ def make_receipt(
             "reasoning_effort": "high",
             "recorded_at": recorded_at or datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         },
-        "baseline": {"commit": BASE_COMMIT, "ref": "refs/remotes/origin/development"},
+        "baseline": {"commit": BASE_COMMIT, "tree": BASE_TREE, "ref": "refs/remotes/origin/development"},
         "dependency": dict(PKT24_DEPENDENCY),
         "checkout": checkout_result,
         "provider_source": provider_result,

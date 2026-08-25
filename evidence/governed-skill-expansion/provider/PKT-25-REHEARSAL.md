@@ -25,10 +25,30 @@ and never copied from a merge-ref receipt:
 5. provider repository/ref/commit/tree and the exact owned paths.
 
 The current protected baseline is commit
-`dd8f0548cc32f379bcbf3a6aa60953cf6a7d6ec9`, tree
-`86692eb8c0fb4205bb32d0a3f6aa7d7d6a6c0485`, on
+`21271dffa4ab3a63ee16d0d9a6ce2011f069cf1a`, tree
+`e0ad65a3643d1fdfb1b5df7e2ba6935e67f2fa9e`, on
 `refs/remotes/origin/development`. It is a baseline binding, not a PKT-25
 candidate-pass claim.
+
+## Offline rehearsal command
+
+`offline_provider_rehearsal.py` runs an in-process loopback fake. It exercises
+bounded catalogue discovery, exact package digest verification, disconnect
+handling, redacted buffering, and idempotent replay. It never opens a socket
+or contacts a provider. The resulting receipt is `LOCAL_ONLY` and binds the
+source checkout, package bytes, manifest digest, and result digest. A passing
+local rehearsal cannot clear PKT-24, consumer, hosted, VPS, E2E, or production
+gates.
+
+```bash
+python3 evidence/governed-skill-expansion/provider/offline_provider_rehearsal.py \
+  --output /tmp/pkt25-offline-receipt.json
+```
+
+`package-receipt.template.json` defines the required immutable package and
+receipt fields. `migration-rollback-recovery.template.json` is a handoff
+template only: it does not apply SQL, mutate a shared database, rotate a
+credential, or perform consumer/VPS recovery.
 
 ## Required check matrix
 
