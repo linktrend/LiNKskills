@@ -1,0 +1,11 @@
+{
+  "schema_version":"0.1","role_pack_id":"jane-chief-trading-officer","version":"1.0.0","display_name":"Jane Chief Trading Officer","description":"Reference-only trading operations, strategy, risk governance, and reporting role release selection.",
+  "release_refs":[
+    {"release_id":"operational-reporting@1.0.0","artifact_digest":"sha256:4a513468421190f29570aa7af33b94a077375eb969a1627079c45f781d905224","eligibility_ref":"opaque:eligibility:operational-reporting-1"},
+    {"release_id":"executive-decisions-governance@1.0.0","artifact_digest":"sha256:6d228d2e80ec20541da969305d48960c8177f14d781957b3d6d2a91227088117","eligibility_ref":"opaque:eligibility:executive-decisions-governance-1"}
+  ],
+  "applicability":{"role_class":"trading-chief-officer","task_classes":["trading-operations","strategy","risk-governance","reporting"],"scope":"program","constraints":["No manual-trade or individual-trade skill.","No orders or execution."]},
+  "required_capability_classes":["trading-operations","strategy","risk-governance","reporting"],
+  "compatibility":{"runtime_profiles":["cursor-macos","codex-macos"],"min_contract_version":"0.2"},
+  "activation":{"enabled":false,"activation_owner":"consumer"},"trust_boundary":"linkskills-role-pack"
+}
