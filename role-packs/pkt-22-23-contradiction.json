@@ -15,7 +15,23 @@
     "expected_violation_codes": [
       "eligibility_gate_not_satisfied",
       "eligibility_not_eligible",
-      "release_not_qualified"
+      "incompatible_runtime_profile",
+      "qualification_evidence_missing",
+      "release_not_qualified",
+      "release_not_selectable"
+    ]
+  },
+  "current_head_qualification_repair": {
+    "status": "HOLD",
+    "protected_base": {
+      "ref": "origin/development",
+      "commit": "477918542cb80f479eed66d5a847b40f1e69b73e",
+      "tree": "aeca66cdba4f363d718cc5051455e82df24082e1"
+    },
+    "defects": [
+      "lifecycle_state_is_not_qualification_evidence",
+      "empty_execution_profiles_are_not_selectable",
+      "skills_release_selectability_is_an_independent_gate"
     ]
   },
   "repair_receipt": {
