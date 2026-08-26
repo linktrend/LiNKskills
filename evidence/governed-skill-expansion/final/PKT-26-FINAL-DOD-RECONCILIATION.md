@@ -14,8 +14,8 @@ The identities below are a baseline binding, not a final-reconciliation pass.
 |---|---|
 | Repository | `linktrend/LiNKskills` |
 | Protected ref | `refs/remotes/origin/development` |
-| Base commit | `477918542cb80f479eed66d5a847b40f1e69b73e` |
-| Base tree | `aeca66cdba4f363d718cc5051455e82df24082e1` |
+| Base commit | `667dbfd817114ec6761a6c1a44c129391d2111ac` |
+| Base tree | `e894accdd4c9e86645acf5a928c2f1947fd322a7` |
 | Requested route | `codex-luna-high` / `Codex Luna High` |
 | Effective route readback | Not supplied; no effective model claim is made |
 
