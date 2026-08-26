@@ -1,0 +1,13 @@
+{
+  "schema_version":"0.1","role_pack_id":"lisa-ceo","version":"1.0.0","display_name":"Lisa CEO","description":"Reference-only governance and cross-domain role release selection.",
+  "release_refs":[
+    {"release_id":"executive-decisions-governance@1.0.0","artifact_digest":"sha256:6d228d2e80ec20541da969305d48960c8177f14d781957b3d6d2a91227088117","eligibility_ref":"opaque:eligibility:executive-decisions-governance-1"},
+    {"release_id":"company-planning-performance@1.0.0","artifact_digest":"sha256:3383423c0bab3a693283c71df169ffa9687b1fe646792be8f7a1ed8c2743fbee","eligibility_ref":"opaque:eligibility:company-planning-performance-1"},
+    {"release_id":"agent-workforce-management@1.0.0","artifact_digest":"sha256:9acea243bde5ca3d6ddf9c94ae866010de3a06212c000b1acb557083e8cb962f","eligibility_ref":"opaque:eligibility:agent-workforce-management-1"},
+    {"release_id":"company-incident-continuity@1.0.0","artifact_digest":"sha256:6205eadde4acf974b294d2eed873c40a4e640aa1ad2029e5201155cb1f815399","eligibility_ref":"opaque:eligibility:company-incident-continuity-1"}
+  ],
+  "applicability":{"role_class":"executive-ceo","task_classes":["governance","planning","supervision","delegation","evidence","workforce","incident"],"scope":"organization","constraints":["Private jobs remain instance bindings.","Reference selection never grants authority."]},
+  "required_capability_classes":["governance","planning","supervision","delegation","evidence","workforce","incident","cross-domain-understanding"],
+  "compatibility":{"runtime_profiles":["cursor-macos","codex-macos"],"min_contract_version":"0.2"},
+  "activation":{"enabled":false,"activation_owner":"consumer"},"trust_boundary":"linkskills-role-pack"
+}
