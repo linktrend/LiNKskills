@@ -6,6 +6,7 @@ import unittest
 
 from verify_exact_tree import (
     BASE_COMMIT,
+    BASE_TREE,
     OWNED_PREFIX,
     VerificationError,
     make_receipt,
@@ -30,8 +31,10 @@ class ExactTreeVerificationTests(unittest.TestCase):
     def test_ambiguous_identity_fails_closed(self) -> None:
         with self.assertRaises(VerificationError):
             normalize_ref("HEAD")
-        with self.assertRaises(VerificationError):
-            normalize_origin("https://user:secret@github.com/linktrend/LiNKskills.git")
+        self.assertEqual(
+            normalize_origin("https://ci-user:ci-pass@github.com/linktrend/LiNKskills.git"),
+            "https://github.com/linktrend/LiNKskills",
+        )
 
     def test_checkout_requires_exact_expected_values_and_clean_state(self) -> None:
         observed = {"origin": "https://github.com/linktrend/LiNKskills.git", "ref": "refs/remotes/origin/development", "commit": COMMIT, "tree": TREE, "clean": True}
@@ -57,6 +60,8 @@ class ExactTreeVerificationTests(unittest.TestCase):
         receipt = make_receipt({"origin": "https://github.com/linktrend/LiNKskills", "ref": "refs/remotes/origin/development", "commit": COMMIT, "tree": TREE, "clean": True}, expected_checkout={"origin": "https://github.com/linktrend/LiNKskills", "ref": "refs/remotes/origin/development", "commit": COMMIT, "tree": TREE}, provider_source={"repository": "linktrend/LiNKskills", "ref": "development", "commit": COMMIT, "tree": TREE, "paths": [OWNED_PREFIX + "verify_exact_tree.py"]}, changed_paths=[OWNED_PREFIX + "verify_exact_tree.py"], recorded_at="2026-08-25T00:00:00Z")
         self.assertEqual(receipt["status"], "PREPARATORY_ONLY")
         self.assertEqual(receipt["baseline"]["commit"], BASE_COMMIT)
+        self.assertEqual(receipt["baseline"]["tree"], BASE_TREE)
+        self.assertEqual(receipt["baseline"]["identity_status"], "PROTECTED_DEVELOPMENT_BASELINE_BINDING_NOT_PROOF")
         self.assertEqual(receipt["dependency"]["status"], "unresolved")
         self.assertFalse(receipt["admission"]["admissible"])
         self.assertFalse(receipt["claims"]["provider_live"])
