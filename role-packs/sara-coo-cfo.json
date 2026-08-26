@@ -1,0 +1,13 @@
+{
+  "schema_version":"0.1","role_pack_id":"sara-coo-cfo","version":"1.0.0","display_name":"Sara COO/CFO","description":"Reference-only operations, finance, provider, procurement, and continuity role release selection.",
+  "release_refs":[
+    {"release_id":"finance-accounting-operations@1.0.0","artifact_digest":"sha256:ceee018bf7c88464f58b45078417fce07c9fd68d385e6817e411639866421d14","eligibility_ref":"opaque:eligibility:finance-accounting-operations-1"},
+    {"release_id":"procurement-vendor-management@1.0.0","artifact_digest":"sha256:09efce66793b5209da185ccf50c23ae999a99137f639ff3c4da08de642b5147f","eligibility_ref":"opaque:eligibility:procurement-vendor-management-1"},
+    {"release_id":"agent-workforce-management@1.0.0","artifact_digest":"sha256:9acea243bde5ca3d6ddf9c94ae866010de3a06212c000b1acb557083e8cb962f","eligibility_ref":"opaque:eligibility:agent-workforce-management-1"},
+    {"release_id":"commercial-contracts-legal-operations@1.0.0","artifact_digest":"sha256:d6047ca032b5b525b330119134057f7c532e6175e209a4fa667efff1c8ae2ae8","eligibility_ref":"opaque:eligibility:commercial-contracts-legal-operations-1"}
+  ],
+  "applicability":{"role_class":"operations-finance-coo-cfo","task_classes":["operations","finance","agent-operations","provider-standards","librarian-standards","procurement","continuity","interim-legal","workspace-references"],"scope":"organization","constraints":["No spending or acceptance authority.","Workspace references remain eligible references only."]},
+  "required_capability_classes":["operations","finance","agent-operations","provider-standards","librarian-standards","procurement","continuity","interim-legal","workspace-references"],
+  "compatibility":{"runtime_profiles":["cursor-macos","codex-macos"],"min_contract_version":"0.2"},
+  "activation":{"enabled":false,"activation_owner":"consumer"},"trust_boundary":"linkskills-role-pack"
+}
