@@ -24,8 +24,8 @@ PREPARATORY_ONLY = "PREPARATORY_ONLY"
 PROTECTED_BASE_REF = "refs/remotes/origin/development"
 # Documented protected development tip at this current-head reconciliation.
 # Runtime CLI reads origin/development rather than treating these as a pass.
-BASE_COMMIT = "477918542cb80f479eed66d5a847b40f1e69b73e"
-BASE_TREE = "aeca66cdba4f363d718cc5051455e82df24082e1"
+BASE_COMMIT = "667dbfd817114ec6761a6c1a44c129391d2111ac"
+BASE_TREE = "e894accdd4c9e86645acf5a928c2f1947fd322a7"
 OWNED_PREFIX = "evidence/governed-skill-expansion/provider/"
 GENERATED_OUTPUT_EXCEPTION = ".github/linktrend-secret-scan-fixtures.json"
 PKT24_DEPENDENCY = {

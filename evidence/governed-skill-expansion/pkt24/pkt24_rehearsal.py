@@ -149,6 +149,7 @@ def _normalized_paths(paths: Sequence[str]) -> list[str]:
 def _is_allowed_path(path: str) -> bool:
     exact = {
         ".github/linktrend-secret-scan-fixtures.json",
+        "docs/integrations/PKT-24-PRE-VPS-RECEIPT.json",
         "docs/integrations/PKT-24-REMAINING-DOD.md",
         "tests/integrations/test_pkt24_remaining_dod.py",
     }
