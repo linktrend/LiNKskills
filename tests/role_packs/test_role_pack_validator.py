@@ -43,8 +43,14 @@ class RolePackValidatorTests(unittest.TestCase):
         self.assertFalse(result["admitted"])
         self.assertEqual(result["proof_scope"], "source")
         self.assertEqual(result["release_reference_count"], 7)
+        self.assertFalse(result["claims"]["qualified_release"])
+        self.assertFalse(result["claims"]["qualification_admission"])
+        self.assertFalse(result["claims"]["selectability"])
         codes = [item["code"] for item in result["violations"]]
         self.assertEqual(codes.count("release_not_qualified"), 7)
+        self.assertEqual(codes.count("release_not_selectable"), 7)
+        self.assertEqual(codes.count("qualification_evidence_missing"), 7)
+        self.assertEqual(codes.count("incompatible_runtime_profile"), 7)
         self.assertEqual(codes.count("eligibility_not_eligible"), 7)
         self.assertEqual(codes.count("eligibility_gate_not_satisfied"), 28)
 
@@ -86,6 +92,26 @@ class RolePackValidatorTests(unittest.TestCase):
         )
         self.assertEqual(receipt["generated_output_closure"]["status"], "PASS")
         self.assertEqual(receipt["secret_scan"]["status"], "PASS")
+        self.assertEqual(
+            evidence["validator"]["expected_violation_codes"],
+            [
+                "eligibility_gate_not_satisfied",
+                "eligibility_not_eligible",
+                "incompatible_runtime_profile",
+                "qualification_evidence_missing",
+                "release_not_qualified",
+                "release_not_selectable",
+            ],
+        )
+        self.assertEqual(
+            evidence["current_head_qualification_repair"]["protected_base"],
+            {
+                "ref": "origin/development",
+                "commit": "19a374756835d15a492767b8d5c30de3545786fb",
+                "tree": "0300c548f00b701ebc8efe4c58df681087f76934",
+            },
+        )
+        self.assertEqual(evidence["current_head_qualification_repair"]["status"], "HOLD")
         self.assertFalse(evidence["claims"]["qualification_admission"])
         self.assertFalse(evidence["claims"]["selectability"])
         self.assertFalse(evidence["claims"]["provider_live"])
@@ -168,6 +194,128 @@ class RolePackValidatorTests(unittest.TestCase):
             "conflicting_duplicate_eligibility_identity",
             {item["code"] for item in result["violations"]},
         )
+
+    def test_lifecycle_qualified_without_qualification_evidence_remains_hold(self) -> None:
+        manifest, releases, eligibilities = collection_inputs()
+        target_id = manifest["release_refs"][0]["release_id"]
+        release = next(item for item in releases if item["release_id"] == target_id)
+        release["lifecycle_state"] = "qualified"
+        release["execution_profiles"] = list(manifest["compatibility"]["runtime_profiles"])
+        eligibility = next(item for item in eligibilities if item["release_id"] == target_id)
+        for gate in (
+            "platform_technical_eligibility",
+            "skills_release_selectability",
+            "consumer_profile_activation",
+            "consumer_tool_authority",
+        ):
+            eligibility[gate]["status"] = True
+        eligibility["decision"] = "eligible"
+        eligibility.pop("denial_reasons", None)
+
+        result = validate_role_pack(manifest, releases, eligibilities, [])
+        codes = {item["code"] for item in result["violations"]}
+
+        self.assertEqual(result["status"], "HOLD")
+        self.assertFalse(result["admitted"])
+        self.assertFalse(result["claims"]["qualification_admission"])
+        self.assertFalse(result["claims"]["selectability"])
+        self.assertIn("qualification_evidence_missing", codes)
+        self.assertIn("release_not_qualified", codes)
+        self.assertIn("release_not_selectable", codes)
+
+    def test_missing_qualification_evidence_keeps_exact_release_not_selectable(self) -> None:
+        manifest, releases, eligibilities = collection_inputs()
+        target_ref = copy.deepcopy(manifest["release_refs"][0])
+        manifest["release_refs"] = [target_ref]
+        target_id = target_ref["release_id"]
+        release = next(item for item in releases if item["release_id"] == target_id)
+        release["lifecycle_state"] = "qualified"
+        release["execution_profiles"] = list(manifest["compatibility"]["runtime_profiles"])
+        eligibility = next(item for item in eligibilities if item["release_id"] == target_id)
+        for gate in (
+            "platform_technical_eligibility",
+            "skills_release_selectability",
+            "consumer_profile_activation",
+            "consumer_tool_authority",
+        ):
+            eligibility[gate]["status"] = True
+        eligibility["decision"] = "eligible"
+        eligibility.pop("denial_reasons", None)
+
+        result = validate_role_pack(manifest, [release], [eligibility], [])
+        target_codes = [
+            item["code"]
+            for item in result["violations"]
+            if item["path"] == "$.release_refs[0].release_id"
+        ]
+
+        self.assertEqual(result["status"], "HOLD")
+        self.assertFalse(result["admitted"])
+        self.assertFalse(result["claims"]["qualified_release"])
+        self.assertFalse(result["claims"]["qualification_admission"])
+        self.assertFalse(result["claims"]["selectability"])
+        self.assertIn("qualification_evidence_missing", target_codes)
+        self.assertIn("release_not_selectable", target_codes)
+        self.assertEqual(target_codes.count("release_not_selectable"), 1)
+
+    def test_qualification_identity_mismatch_is_not_substituted(self) -> None:
+        manifest, releases, eligibilities = collection_inputs()
+        target_id = manifest["release_refs"][0]["release_id"]
+        target = next(item for item in releases if item["release_id"] == target_id)
+        qualification = {
+            "release_id": target["release_id"],
+            "bundle_hash": "sha256:" + ("0" * 64),
+            "source_commit": "0" * 40,
+            "status": "certified",
+        }
+
+        result = validate_role_pack(manifest, releases, eligibilities, [qualification])
+        codes = {item["code"] for item in result["violations"]}
+
+        self.assertEqual(result["status"], "HOLD")
+        self.assertFalse(result["admitted"])
+        self.assertIn("qualification_identity_mismatch", codes)
+        self.assertGreaterEqual(sum(item["code"] == "qualification_identity_mismatch" for item in result["violations"]), 1)
+
+    def test_usable_lifecycle_is_not_role_pack_selectable(self) -> None:
+        manifest, releases, eligibilities = collection_inputs()
+        target_id = manifest["release_refs"][0]["release_id"]
+        release = next(item for item in releases if item["release_id"] == target_id)
+        release["lifecycle_state"] = "usable"
+        release["execution_profiles"] = list(manifest["compatibility"]["runtime_profiles"])
+        qualification = {
+            "release_id": target_id,
+            "bundle_hash": release["bundle_hash"],
+            "source_commit": release["source_commit"],
+            "qualification": {"status": "certified", "release_id": target_id, "source_commit": release["source_commit"]},
+        }
+
+        result = validate_role_pack(manifest, releases, eligibilities, [qualification])
+        codes = {item["code"] for item in result["violations"]}
+        self.assertEqual(result["status"], "HOLD")
+        self.assertFalse(result["admitted"])
+        self.assertIn("release_not_qualified", codes)
+        self.assertIn("release_not_selectable", codes)
+
+    def test_runtime_profile_mismatch_is_not_selectable(self) -> None:
+        manifest, releases, eligibilities = collection_inputs()
+        target_id = manifest["release_refs"][0]["release_id"]
+        release = next(item for item in releases if item["release_id"] == target_id)
+        release["lifecycle_state"] = "qualified"
+        release["execution_profiles"] = ["codex-macos"]
+        qualification = {
+            "release_id": target_id,
+            "bundle_hash": release["bundle_hash"],
+            "source_commit": release["source_commit"],
+            "status": "qualified",
+        }
+
+        result = validate_role_pack(manifest, releases, eligibilities, [qualification])
+        codes = {item["code"] for item in result["violations"]}
+        self.assertEqual(result["status"], "HOLD")
+        self.assertFalse(result["admitted"])
+        self.assertIn("incompatible_runtime_profile", codes)
+        self.assertIn("release_not_selectable", codes)
 
     def test_report_is_deterministic_and_inputs_are_not_mutated(self) -> None:
         manifest, releases, eligibilities = collection_inputs()

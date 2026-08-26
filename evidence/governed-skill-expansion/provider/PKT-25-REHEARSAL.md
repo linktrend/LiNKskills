@@ -25,10 +25,13 @@ and never copied from a merge-ref receipt:
 5. provider repository/ref/commit/tree and the exact owned paths.
 
 The current protected baseline is commit
-`21271dffa4ab3a63ee16d0d9a6ce2011f069cf1a`, tree
-`e0ad65a3643d1fdfb1b5df7e2ba6935e67f2fa9e`, on
+`667dbfd817114ec6761a6c1a44c129391d2111ac`, tree
+`e894accdd4c9e86645acf5a928c2f1947fd322a7`, on
 `refs/remotes/origin/development`. It is a baseline binding, not a PKT-25
-candidate-pass claim.
+candidate-pass claim. The verifier reads that identity from the physical
+checkout (`git symbolic-ref HEAD` plus `HEAD` commit/tree) and never from
+`@{upstream}` or a copied merge-ref receipt. Credential-bearing origin URLs
+are stripped before they are stored.
 
 ## Offline rehearsal command
 

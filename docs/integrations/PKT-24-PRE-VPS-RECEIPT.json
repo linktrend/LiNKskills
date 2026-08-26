@@ -19,23 +19,33 @@
   "base": {
     "remote": "origin",
     "ref": "refs/heads/development",
-    "commit_sha": "dd8f0548cc32f379bcbf3a6aa60953cf6a7d6ec9",
-    "tree_sha": "86692eb8c0fb4205bb32d0a3f6aa7d7d6a6c0485"
+    "commit_sha": "667dbfd817114ec6761a6c1a44c129391d2111ac",
+    "tree_sha": "e894accdd4c9e86645acf5a928c2f1947fd322a7"
   },
   "candidate": {
-    "commit_sha": "e7f1b625015083a05ae38afc71290119e9f44fa3",
-    "tree_sha": "a28693b8fa3d949580bbcfdd715907a690974127",
-    "recording_status": "BOUND_TO_ISSUE_227_REPAIR_CHECKPOINT",
-    "note": "Bound to the exact Issue #227 repair checkpoint; this preparatory receipt is not a qualification receipt."
+    "commit_sha": "02d7696bc614efee6785e3e85a423f102f9a037b",
+    "tree_sha": "c30518bcc4f57dda50b639aebf8b0ce3a371bd95",
+    "recording_status": "BOUND_TO_ISSUE_274_RECONCILIATION_CHECKPOINT",
+    "note": "Bound to the exact Issue #274 reconciliation checkpoint; this preparatory receipt is not a qualification receipt."
   },
   "scope": {
-    "allowed_prefixes": ["docs/integrations/"],
+    "allowed_prefixes": [
+      "docs/integrations/",
+      "evidence/governed-skill-expansion/pkt24/",
+      "evidence/governed-skill-expansion/final/",
+      "evidence/governed-skill-expansion/provider/"
+    ],
     "allowed_generated_paths": [
       ".github/linktrend-secret-scan-fixtures.json"
     ],
     "changed_paths_expected": [
-      "docs/integrations/PKT-24-PRE-VPS-PREP.md",
       "docs/integrations/PKT-24-PRE-VPS-RECEIPT.json",
+      "evidence/governed-skill-expansion/pkt24/pkt24_rehearsal.py",
+      "evidence/governed-skill-expansion/final/PKT-26-FINAL-DOD-RECONCILIATION.md",
+      "evidence/governed-skill-expansion/final/pkt-26-final-reconciliation-receipt.template.json",
+      "evidence/governed-skill-expansion/provider/PKT-25-REHEARSAL.md",
+      "evidence/governed-skill-expansion/provider/pkt25-provider-receipt.template.json",
+      "evidence/governed-skill-expansion/provider/verify_exact_tree.py",
       ".github/linktrend-secret-scan-fixtures.json"
     ],
     "forbidden_paths": [

@@ -1,8 +1,16 @@
 # LiNKskills Operations Manual
 
-> **Operational update, 2026-08-11:** The VPS Skills service is healthy and
-> integrated with Lisa. Preserve the root-level `evidence/` path because
-> certification code and migration receipts bind to it directly.
+> **Historical note (2026-08-11):** Earlier repository prose reported that the
+> VPS Skills service was healthy and integrated with Lisa. That report is
+> retained as historical context, not current deployment evidence.
+>
+> **Current state (2026-08-26):** Current evidence establishes source/pre-VPS
+> engineering only. No current evidence establishes provider-live, VPS, stage,
+> consumer-runtime, canary, or production deployment of the Skills service or
+> Lisa integration. Live Platform apply/auth, consumer/VPS deployment, canary,
+> and production acceptance remain **HOLD** until exact source/runtime receipts
+> and independent acceptance exist. Preserve the root-level `evidence/` path
+> because certification code and migration receipts bind to it directly.
 
 **Who this is for:** you — LiNKtrend’s Principal. You make strategic decisions and review escalations. You do not write skills, run validators, or manage servers day to day.
 
