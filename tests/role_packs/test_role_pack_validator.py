@@ -107,8 +107,8 @@ class RolePackValidatorTests(unittest.TestCase):
             evidence["current_head_qualification_repair"]["protected_base"],
             {
                 "ref": "origin/development",
-                "commit": "477918542cb80f479eed66d5a847b40f1e69b73e",
-                "tree": "aeca66cdba4f363d718cc5051455e82df24082e1",
+                "commit": "19a374756835d15a492767b8d5c30de3545786fb",
+                "tree": "0300c548f00b701ebc8efe4c58df681087f76934",
             },
         )
         self.assertEqual(evidence["current_head_qualification_repair"]["status"], "HOLD")
