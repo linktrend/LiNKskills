@@ -27,18 +27,30 @@ class PackageIdentityError(ValueError):
     """Raised when a package or receipt identity is incomplete or invalid."""
 
 
-def normalize_origin(value: Any) -> str:
-    """Normalize an origin while rejecting credentials and ambiguous hosts."""
+def strip_origin_userinfo(value: Any) -> str:
+    """Remove userinfo from a Git origin so receipts never store tokens."""
 
     origin = value.strip() if isinstance(value, str) else ""
-    if not origin or any(character.isspace() for character in origin):
-        raise PackageIdentityError("origin_must_be_nonempty_and_whitespace_free")
-    authority = origin.split("//", 1)[-1].split("/", 1)[0]
-    if "@" in authority and not origin.startswith("git@"):
-        raise PackageIdentityError("origin_must_not_contain_credentials")
-    if origin.startswith("git@") and ":" in origin:
+    if origin.startswith("git@") and ":" in origin[4:]:
         host, path = origin[4:].split(":", 1)
         origin = f"ssh://{host}/{path}"
+    if "://" in origin:
+        scheme, remainder = origin.split("://", 1)
+        slash = remainder.find("/")
+        authority = remainder if slash < 0 else remainder[:slash]
+        path = "" if slash < 0 else remainder[slash:]
+        if "@" in authority:
+            authority = authority.rsplit("@", 1)[1]
+        origin = f"{scheme}://{authority}{path}"
+    return origin
+
+
+def normalize_origin(value: Any) -> str:
+    """Normalize an origin while rejecting empty and host-only values."""
+
+    origin = strip_origin_userinfo(value)
+    if not origin or any(character.isspace() for character in origin):
+        raise PackageIdentityError("origin_must_be_nonempty_and_whitespace_free")
     origin = origin.rstrip("/")
     if origin.endswith(".git"):
         origin = origin[:-4]
@@ -75,7 +87,7 @@ def package_identity(
     """Build and validate an exact source-and-package identity."""
 
     identity = {
-        "repository": repository, "ref": ref, "commit": commit, "tree": tree,
+        "repository": normalize_origin(repository), "ref": ref, "commit": commit, "tree": tree,
         "package_id": package_id, "package_version": package_version,
         "package_sha256": sha256_bytes(package_bytes),
         "manifest_sha256": digest_json(manifest),

@@ -17,6 +17,8 @@ from pkt24_rehearsal import (  # noqa: E402
     MIGRATION_MANIFEST,
     Pkt24RehearsalError,
     bind_preparatory_receipt,
+    read_physical_checkout_ref,
+    sanitize_origin,
     validate_local_fixture,
     validate_migration_manifest,
     validate_receipt,
@@ -26,7 +28,7 @@ from pkt24_rehearsal import (  # noqa: E402
 class Pkt24RemainingDodTests(unittest.TestCase):
     @staticmethod
     def _candidate_ref() -> str:
-        return "refs/heads/issue/258-pkt-24-stale-candidate-identity-test-binding-rep"
+        return read_physical_checkout_ref(ROOT)
 
     @staticmethod
     def _base_commit() -> str:
@@ -83,7 +85,21 @@ class Pkt24RemainingDodTests(unittest.TestCase):
         self.assertEqual(receipt["status"], "PREPARATORY_ONLY")
         self.assertFalse(receipt["admission"]["admissible"])
         self.assertFalse(any(receipt["claims"].values()))
+        self.assertEqual(receipt["candidate"]["ref"], self._candidate_ref())
+        self.assertEqual(receipt["candidate"]["commit"], subprocess.check_output(["git", "-C", str(ROOT), "rev-parse", "HEAD"], text=True).strip())
+        self.assertEqual(receipt["candidate"]["origin"], "https://github.com/linktrend/LiNKskills")
         self.assertEqual(validate_receipt(receipt), [])
+
+    def test_stale_non_checkout_ref_is_rejected(self) -> None:
+        with self.assertRaises(Pkt24RehearsalError) as raised:
+            self._bind(candidate_ref="refs/heads/issue/258-pkt-24-stale-candidate-identity-test-binding-rep")
+        self.assertIn(str(raised.exception), {"git_ref_must_resolve", "candidate_must_match_physical_checkout"})
+
+    def test_credential_userinfo_origin_is_stripped_from_receipts(self) -> None:
+        self.assertEqual(
+            sanitize_origin("https://ci-user:ci-pass@github.com/linktrend/LiNKskills.git"),
+            "https://github.com/linktrend/LiNKskills",
+        )
 
     def test_receipt_claim_mutation_fails_digest_and_claim_guard(self) -> None:
         receipt = self._bind()
@@ -95,10 +111,12 @@ class Pkt24RemainingDodTests(unittest.TestCase):
     def test_receipt_rejects_base_or_changed_path_drift(self) -> None:
         with self.assertRaises(Pkt24RehearsalError):
             self._bind(base_commit="0" * 40)
+        derived = self._changed_paths()
         with self.assertRaises(Pkt24RehearsalError):
-            self._bind(changed_paths=self._changed_paths()[:-1])
-        with self.assertRaises(Pkt24RehearsalError):
-            self._bind(changed_paths=self._changed_paths() + [self._changed_paths()[0]])
+            self._bind(changed_paths=derived + ["configs/pkt24/not-in-diff.json"])
+        if derived:
+            with self.assertRaises(Pkt24RehearsalError):
+                self._bind(changed_paths=derived[:-1])
 
     def test_loopback_host_parsing_is_exact(self) -> None:
         config = json.loads((ROOT / "configs/pkt24/consumer.local-test.example.json").read_text())

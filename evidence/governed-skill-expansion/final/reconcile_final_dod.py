@@ -221,6 +221,16 @@ def _receipt_value(receipt: Mapping[str, Any], *names: str) -> Any:
     return None
 
 
+def _unwrap_identity_source(source: Mapping[str, Any]) -> Mapping[str, Any]:
+    """Prefer nested checkout.observed / *.identity payloads over wrapper objects."""
+
+    for key in ("observed", "identity"):
+        nested = source.get(key)
+        if isinstance(nested, Mapping):
+            return nested
+    return source
+
+
 def _receipt_identity(receipt: Mapping[str, Any]) -> dict[str, Any]:
     """Extract the exact checkout identity and evidence binding from a receipt."""
 
@@ -238,11 +248,12 @@ def _receipt_identity(receipt: Mapping[str, Any]) -> dict[str, Any]:
     for nested in (checkout, provider_source):
         if not isinstance(nested, Mapping):
             continue
+        inner = _unwrap_identity_source(nested)
         if values["repository"] is None:
-            values["repository"] = nested.get("repository", nested.get("origin"))
+            values["repository"] = inner.get("repository", inner.get("origin"))
         for field in ("ref", "commit", "tree"):
             if values[field] is None:
-                values[field] = nested.get(field)
+                values[field] = inner.get(field)
     return values
 
 
@@ -415,6 +426,8 @@ def _validate_rollback(
         for field in ("receipt_ref", "receipt_digest", "identity", "action", "result_digest"):
             if field not in value or value[field] in (None, "", {}):
                 problems.append(f"{label}:{field}_missing")
+        if isinstance(value.get("result_digest"), str) and not SHA256_RE.fullmatch(value["result_digest"]):
+            problems.append(f"{label}:result_digest_invalid")
         identity = value.get("identity")
         if not isinstance(identity, Mapping):
             continue
