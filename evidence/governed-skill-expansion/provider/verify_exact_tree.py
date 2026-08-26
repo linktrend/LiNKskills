@@ -21,8 +21,11 @@ from typing import Any
 
 PACKET = "PKT-25"
 PREPARATORY_ONLY = "PREPARATORY_ONLY"
-BASE_COMMIT = "21271dffa4ab3a63ee16d0d9a6ce2011f069cf1a"
-BASE_TREE = "e0ad65a3643d1fdfb1b5df7e2ba6935e67f2fa9e"
+PROTECTED_BASE_REF = "refs/remotes/origin/development"
+# Documented protected development tip at this current-head reconciliation.
+# Runtime CLI reads origin/development rather than treating these as a pass.
+BASE_COMMIT = "667dbfd817114ec6761a6c1a44c129391d2111ac"
+BASE_TREE = "e894accdd4c9e86645acf5a928c2f1947fd322a7"
 OWNED_PREFIX = "evidence/governed-skill-expansion/provider/"
 GENERATED_OUTPUT_EXCEPTION = ".github/linktrend-secret-scan-fixtures.json"
 PKT24_DEPENDENCY = {
@@ -83,17 +86,30 @@ def _sha(value: Any) -> bool:
     return bool(_HEX_RE.fullmatch(_text(value)))
 
 
+def strip_origin_userinfo(value: Any) -> str:
+    """Remove credentials from a Git origin before identity comparison."""
+
+    origin = _text(value)
+    if origin.startswith("git@") and ":" in origin[4:]:
+        host, path = origin[4:].split(":", 1)
+        origin = f"ssh://{host}/{path}"
+    if "://" in origin:
+        scheme, remainder = origin.split("://", 1)
+        slash = remainder.find("/")
+        authority = remainder if slash < 0 else remainder[:slash]
+        path = "" if slash < 0 else remainder[slash:]
+        if "@" in authority:
+            authority = authority.rsplit("@", 1)[1]
+        origin = f"{scheme}://{authority}{path}"
+    return origin
+
+
 def normalize_origin(value: Any) -> str:
     """Normalize an origin for exact comparison without hiding its host."""
 
-    origin = _text(value)
+    origin = strip_origin_userinfo(value)
     if not origin or any(character.isspace() for character in origin):
         raise VerificationError("origin_must_be_nonempty_and_whitespace_free")
-    if "@" in origin.split("//", 1)[-1].split("/", 1)[0] and not origin.startswith("git@"):
-        raise VerificationError("origin_must_not_contain_credentials")
-    if origin.startswith("git@") and ":" in origin:
-        host, path = origin[4:].split(":", 1)
-        origin = f"ssh://{host}/{path}"
     if origin.endswith("/"):
         origin = origin[:-1]
     if origin.endswith(".git"):
@@ -232,6 +248,7 @@ def make_receipt(
     changed_paths: Sequence[str] | None = None,
     check_statuses: Mapping[str, Any] | None = None,
     recorded_at: str | None = None,
+    baseline: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Build a deterministic preparatory receipt; admission is always false."""
 
@@ -260,7 +277,12 @@ def make_receipt(
             "reasoning_effort": "high",
             "recorded_at": recorded_at or datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         },
-        "baseline": {"commit": BASE_COMMIT, "tree": BASE_TREE, "ref": "refs/remotes/origin/development"},
+        "baseline": {
+            "commit": _text((baseline or {}).get("commit")) or BASE_COMMIT,
+            "tree": _text((baseline or {}).get("tree")) or BASE_TREE,
+            "ref": _text((baseline or {}).get("ref")) or PROTECTED_BASE_REF,
+            "identity_status": "PROTECTED_DEVELOPMENT_BASELINE_BINDING_NOT_PROOF",
+        },
         "dependency": dict(PKT24_DEPENDENCY),
         "checkout": checkout_result,
         "provider_source": provider_result,
@@ -284,14 +306,29 @@ def _git(repo_root: Path, *args: str) -> str:
     return result.stdout.strip()
 
 
+def read_protected_baseline(repo_root: Path) -> dict[str, str]:
+    """Read the protected development commit/tree from the physical checkout."""
+
+    commit = _git(repo_root, "rev-parse", f"{PROTECTED_BASE_REF}^{{commit}}")
+    tree = _git(repo_root, "rev-parse", f"{PROTECTED_BASE_REF}^{{tree}}")
+    if not _sha(commit) or not _sha(tree):
+        raise VerificationError("protected_baseline_malformed")
+    return {"ref": PROTECTED_BASE_REF, "commit": commit, "tree": tree}
+
+
 def read_checkout(repo_root: Path) -> dict[str, Any]:
-    """Read local Git identity for a later exact candidate run."""
+    """Read local Git identity from the physical HEAD, never from @{upstream}."""
 
     status = _git(repo_root, "status", "--porcelain=v1")
-    upstream = _git(repo_root, "rev-parse", "--symbolic-full-name", "--verify", "@{upstream}")
+    try:
+        ref = _git(repo_root, "symbolic-ref", "--quiet", "HEAD")
+    except subprocess.CalledProcessError as exc:
+        raise VerificationError("detached_head_has_no_qualified_ref") from exc
+    if not ref.startswith("refs/"):
+        raise VerificationError("ref_must_be_an_explicit_git_ref")
     return {
-        "origin": _git(repo_root, "remote", "get-url", "origin"),
-        "ref": upstream,
+        "origin": normalize_origin(_git(repo_root, "remote", "get-url", "origin")),
+        "ref": ref,
         "commit": _git(repo_root, "rev-parse", "HEAD"),
         "tree": _git(repo_root, "rev-parse", "HEAD^{tree}"),
         "clean": not bool(status),
@@ -308,14 +345,20 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--output", type=Path)
     args = parser.parse_args(argv)
     checkout = read_checkout(args.repo_root)
+    baseline = read_protected_baseline(args.repo_root)
     expected = {
         "origin": args.expected_origin,
         "ref": args.expected_ref,
         "commit": args.expected_commit,
         "tree": args.expected_tree,
     }
-    changed = _git(args.repo_root, "diff", "--name-only", BASE_COMMIT, "HEAD").splitlines()
-    receipt = make_receipt(checkout, expected_checkout=expected, changed_paths=changed)
+    changed = _git(args.repo_root, "diff", "--name-only", f"{baseline['commit']}..HEAD").splitlines()
+    receipt = make_receipt(
+        checkout,
+        expected_checkout=expected,
+        changed_paths=changed,
+        baseline=baseline,
+    )
     payload = json.dumps(receipt, indent=2, sort_keys=True) + "\n"
     if args.output:
         args.output.write_text(payload, encoding="utf-8")

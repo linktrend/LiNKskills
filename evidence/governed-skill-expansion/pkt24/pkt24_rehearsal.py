@@ -32,6 +32,8 @@ ALLOWED_CHANGED_PATH_PREFIXES = (
     "configs/pkt24/",
     "docs/integrations/PKT-24-REMAINING-DOD.md",
     "evidence/governed-skill-expansion/pkt24/",
+    "evidence/governed-skill-expansion/provider/",
+    "evidence/governed-skill-expansion/final/",
     "tests/integrations/test_pkt24_remaining_dod.py",
 )
 
@@ -86,6 +88,31 @@ def _git(repo_root: Path, *args: str) -> str:
     return result.stdout.strip()
 
 
+def sanitize_origin(value: Any) -> str:
+    """Normalize an origin and strip credentials so receipts never store tokens."""
+
+    origin = _text(value)
+    if not origin or any(character.isspace() for character in origin):
+        raise Pkt24RehearsalError("origin_must_be_nonempty_and_whitespace_free")
+    if origin.startswith("git@") and ":" in origin[4:]:
+        host, path = origin[4:].split(":", 1)
+        origin = f"ssh://{host}/{path}"
+    if "://" in origin:
+        scheme, remainder = origin.split("://", 1)
+        slash = remainder.find("/")
+        authority = remainder if slash < 0 else remainder[:slash]
+        path = "" if slash < 0 else remainder[slash:]
+        if "@" in authority:
+            authority = authority.rsplit("@", 1)[1]
+        origin = f"{scheme.lower()}://{authority}{path}"
+    origin = origin.rstrip("/")
+    if origin.endswith(".git"):
+        origin = origin[:-4]
+    if "/" not in origin.split("://", 1)[-1]:
+        raise Pkt24RehearsalError("origin_must_include_repository_path")
+    return origin
+
+
 def _explicit_ref(value: Any) -> str:
     ref = _text(value)
     if not ref or ref in {"HEAD", "FETCH_HEAD"} or any(c.isspace() for c in ref):
@@ -93,6 +120,16 @@ def _explicit_ref(value: Any) -> str:
     if not ref.startswith("refs/"):
         raise Pkt24RehearsalError("candidate_ref_must_use_full_refs_namespace")
     return ref
+
+
+def read_physical_checkout_ref(repo_root: Path) -> str:
+    """Return the fully-qualified HEAD ref from the physical checkout."""
+
+    try:
+        ref = _git(repo_root, "symbolic-ref", "--quiet", "HEAD")
+    except subprocess.CalledProcessError as exc:
+        raise Pkt24RehearsalError("detached_head_has_no_qualified_ref") from exc
+    return _explicit_ref(ref)
 
 
 def _normalized_paths(paths: Sequence[str]) -> list[str]:
@@ -112,10 +149,16 @@ def _normalized_paths(paths: Sequence[str]) -> list[str]:
 def _is_allowed_path(path: str) -> bool:
     exact = {
         ".github/linktrend-secret-scan-fixtures.json",
+        "docs/integrations/PKT-24-PRE-VPS-RECEIPT.json",
         "docs/integrations/PKT-24-REMAINING-DOD.md",
         "tests/integrations/test_pkt24_remaining_dod.py",
     }
-    directories = ("configs/pkt24/", "evidence/governed-skill-expansion/pkt24/")
+    directories = (
+        "configs/pkt24/",
+        "evidence/governed-skill-expansion/pkt24/",
+        "evidence/governed-skill-expansion/provider/",
+        "evidence/governed-skill-expansion/final/",
+    )
     return path in exact or path.startswith(directories)
 
 
@@ -237,6 +280,10 @@ def bind_preparatory_receipt(
     if supplied_base and supplied_base != derived_base:
         raise Pkt24RehearsalError("base_commit_mismatch")
     commit, tree = _resolve_identity(repo_root, ref)
+    physical_commit = _git(repo_root, "rev-parse", "HEAD")
+    physical_tree = _git(repo_root, "rev-parse", "HEAD^{tree}")
+    if physical_commit != commit or physical_tree != tree:
+        raise Pkt24RehearsalError("candidate_must_match_physical_checkout")
     try:
         subprocess.run(
             ["git", "-C", str(repo_root), "merge-base", "--is-ancestor", derived_base, commit],
@@ -246,8 +293,7 @@ def bind_preparatory_receipt(
         )
     except subprocess.CalledProcessError as exc:
         raise Pkt24RehearsalError("candidate_must_descend_from_protected_base") from exc
-    origin = _git(repo_root, "config", "--get", "remote.origin.url")
-    normalized_origin = origin.removesuffix(".git")
+    normalized_origin = sanitize_origin(_git(repo_root, "config", "--get", "remote.origin.url"))
     if normalized_origin != EXPECTED_ORIGIN:
         raise Pkt24RehearsalError("origin_mismatch")
     if _git(repo_root, "status", "--porcelain"):
@@ -323,6 +369,8 @@ __all__ = [
     "PREPARATORY_ONLY",
     "Pkt24RehearsalError",
     "bind_preparatory_receipt",
+    "read_physical_checkout_ref",
+    "sanitize_origin",
     "validate_local_fixture",
     "validate_migration_manifest",
     "validate_receipt",

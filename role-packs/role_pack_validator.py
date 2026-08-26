@@ -1,11 +1,11 @@
 """Fail-closed source validator for PKT-22 role-pack references.
 
-The validator checks only repository-owned manifest, release, and eligibility
-metadata.  It does not qualify releases, activate consumers, contact a
-provider, or infer hosted/VPS/E2E/production evidence.  A role-pack file being
-present or schema-valid is therefore insufficient for admission: every exact
-reference must resolve to a qualified release and an eligible intersection of
-the independent gates.
+The validator checks only repository-owned manifest, release, eligibility,
+qualification, and runtime-profile metadata.  It does not qualify releases,
+activate consumers, contact a provider, or infer hosted/VPS/E2E/production
+evidence.  A role-pack file being present or schema-valid is therefore
+insufficient for admission: every exact reference must resolve to a qualified
+and selectable release plus an eligible intersection of the independent gates.
 """
 
 from __future__ import annotations
@@ -29,6 +29,23 @@ _ELIGIBILITY_GATES = (
     "skills_release_selectability",
     "consumer_profile_activation",
     "consumer_tool_authority",
+)
+_QUALIFIED_STATUSES = frozenset({"qualified", "certified"})
+_NONSELECTABLE_LIFECYCLES = frozenset(
+    {
+        "deprecated",
+        "retired",
+        "superseded",
+        "withdrawn",
+        "quarantined",
+        "rejected",
+        "incompatible",
+        "unqualified",
+        "draft",
+        "eval_pending",
+        "usable",
+        "published",
+    }
 )
 
 
@@ -101,17 +118,61 @@ def _error(code: str, path: str, detail: str) -> dict[str, str]:
     return {"code": code, "path": path, "detail": detail}
 
 
+def _declared_profiles(value: Any) -> tuple[str, ...]:
+    """Return declared runtime/execution profiles without inventing a wildcard."""
+
+    if isinstance(value, str) and value.strip():
+        return (value.strip(),)
+    if isinstance(value, Sequence) and not isinstance(value, (str, bytes, bytearray)):
+        return tuple(sorted({item.strip() for item in value if isinstance(item, str) and item.strip()}))
+    return ()
+
+
+def _release_source_commit(release: Mapping[str, Any]) -> str:
+    """Copy the exact source commit from provenance, never synthesizing one."""
+
+    provenance = release.get("provenance")
+    if isinstance(provenance, Mapping):
+        commit = provenance.get("source_commit")
+        if isinstance(commit, str) and commit:
+            return commit
+    commit = release.get("source_commit")
+    return commit if isinstance(commit, str) else ""
+
+
+def _release_profiles(release: Mapping[str, Any]) -> tuple[str, ...]:
+    """Prefer execution_profiles, then compatible/runtime aliases if present."""
+
+    for field in ("execution_profiles", "compatible_runtime_profiles", "runtime_profiles"):
+        profiles = _declared_profiles(release.get(field))
+        if profiles:
+            return profiles
+    return ()
+
+
+def _qualification_status(record: Mapping[str, Any]) -> str:
+    nested = record.get("qualification")
+    if isinstance(nested, Mapping):
+        status = nested.get("status")
+        if isinstance(status, str) and status.strip():
+            return status.strip().lower()
+    status = record.get("status")
+    return status.strip().lower() if isinstance(status, str) else ""
+
+
 def validate_role_pack(
     manifest: Mapping[str, Any],
     releases: Mapping[str, Any] | Sequence[Mapping[str, Any]],
     eligibilities: Mapping[str, Any] | Sequence[Mapping[str, Any]],
+    qualifications: Mapping[str, Any] | Sequence[Mapping[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Validate one role pack and return a deterministic source-only receipt.
 
     ``admitted`` is true only when the supplied records independently prove
-    every exact reference.  Missing, malformed, unqualified, incompatible,
-    or mismatched records always produce ``HOLD``; no fallback or substitution
-    is attempted.
+    every exact reference.  Missing, malformed, unqualified, unselectable,
+    incompatible, or mismatched records always produce ``HOLD``; no fallback
+    or substitution is attempted.  Source-only proof never invents
+    qualification, provider, consumer, stage, VPS, or production evidence.
     """
 
     violations: list[dict[str, str]] = []
@@ -119,18 +180,29 @@ def validate_role_pack(
     for schema_error in schema_result.errors:
         violations.append(_error("manifest_schema_invalid", schema_error.path, schema_error.message))
 
+    if qualifications is None:
+        qualifications = ()
     release_index = _records_by_field(releases, "release_id")
     eligibility_index = _records_by_field(eligibilities, "eligibility_id")
+    qualification_index = _records_by_field(qualifications, "release_id")
     violations.extend(
         _conflicting_duplicate_identity_violations(releases, "release_id", "release")
     )
     violations.extend(
         _conflicting_duplicate_identity_violations(eligibilities, "eligibility_id", "eligibility")
     )
+    violations.extend(
+        _conflicting_duplicate_identity_violations(qualifications, "release_id", "qualification")
+    )
     refs = manifest.get("release_refs") if isinstance(manifest, Mapping) else None
 
     if not isinstance(refs, list):
         refs = []
+
+    compatibility = manifest.get("compatibility") if isinstance(manifest, Mapping) else None
+    manifest_profiles = _declared_profiles(
+        compatibility.get("runtime_profiles") if isinstance(compatibility, Mapping) else None
+    )
 
     # Structural schema errors already make admission impossible, but these
     # checks remain bounded and useful for a precise contradiction receipt.
@@ -165,8 +237,79 @@ def validate_role_pack(
             violations.append(_error("release_identity_mismatch", f"{path}.release_id", "record identity does not equal manifest identity"))
         if artifact_digest != release.get("bundle_hash"):
             violations.append(_error("artifact_digest_mismatch", f"{path}.artifact_digest", "manifest digest does not equal the immutable release bundle hash"))
-        if release.get("lifecycle_state") != "qualified":
+
+        lifecycle = release.get("lifecycle_state")
+        lifecycle_qualified = lifecycle == "qualified"
+        if not lifecycle_qualified:
             violations.append(_error("release_not_qualified", f"{path}.release_id", "only lifecycle_state=qualified may be referenced"))
+
+        qualification_evidence_admits = False
+        qualification = qualification_index.get(release_id)
+        if qualification is None:
+            violations.append(_error("qualification_evidence_missing", f"{path}.release_id", "independent qualification evidence is required and is not inferred from lifecycle_state"))
+        else:
+            qualification_identity_ok = True
+            qualification_release_id = qualification.get("release_id")
+            qualification_digest = qualification.get("bundle_hash") or qualification.get("result_digest")
+            qualification_commit = qualification.get("source_commit")
+            nested = qualification.get("qualification")
+            if isinstance(nested, Mapping):
+                qualification_digest = qualification_digest or nested.get("result_digest") or nested.get("bundle_hash")
+                qualification_commit = qualification_commit or nested.get("source_commit")
+                nested_release_id = nested.get("release_id")
+                if nested_release_id not in {None, "", release_id}:
+                    qualification_identity_ok = False
+                    violations.append(_error("qualification_identity_mismatch", f"{path}.release_id", "nested qualification identity does not equal the exact release"))
+            if qualification_release_id != release_id:
+                qualification_identity_ok = False
+                violations.append(_error("qualification_identity_mismatch", f"{path}.release_id", "qualification record is bound to a different release"))
+            if qualification_digest != release.get("bundle_hash"):
+                qualification_identity_ok = False
+                violations.append(_error("qualification_identity_mismatch", f"{path}.release_id", "qualification digest does not equal the immutable release bundle hash"))
+            release_commit = _release_source_commit(release)
+            if not isinstance(qualification_commit, str) or not qualification_commit or qualification_commit != release_commit:
+                qualification_identity_ok = False
+                violations.append(_error("qualification_identity_mismatch", f"{path}.release_id", "qualification source_commit does not equal the exact release source commit"))
+            qualification_status_ok = _qualification_status(qualification) in _QUALIFIED_STATUSES
+            if not qualification_status_ok:
+                violations.append(_error("release_not_qualified", f"{path}.release_id", "qualification status is not qualified or certified"))
+            qualification_evidence_admits = qualification_identity_ok and qualification_status_ok
+
+        release_profiles = _release_profiles(release)
+        profile_selectable = bool(manifest_profiles) and bool(release_profiles) and bool(set(manifest_profiles).intersection(release_profiles))
+        if not profile_selectable:
+            violations.append(_error("incompatible_runtime_profile", f"{path}.release_id", "role-pack runtime profiles do not intersect exact release execution profiles"))
+
+        selectability_gate = None
+        if isinstance(eligibility_ref, str) and eligibility_ref:
+            eligibility_preview = next(
+                (
+                    eligibility_index.get(candidate)
+                    for candidate in _eligibility_candidates(eligibility_ref)
+                    if eligibility_index.get(candidate) is not None
+                ),
+                None,
+            )
+            if isinstance(eligibility_preview, Mapping):
+                selectability_gate = eligibility_preview.get("skills_release_selectability")
+        selectability_true = isinstance(selectability_gate, Mapping) and selectability_gate.get("status") is True
+        # Conjunction of independent gates: missing qualification evidence cannot
+        # be rescued by lifecycle_state, profile intersection, or the selectability flag.
+        if (
+            not qualification_evidence_admits
+            or not lifecycle_qualified
+            or lifecycle in _NONSELECTABLE_LIFECYCLES
+            or not profile_selectable
+            or not selectability_true
+        ):
+            violations.append(
+                _error(
+                    "release_not_selectable",
+                    f"{path}.release_id",
+                    "lifecycle, qualification, runtime profile, and skills_release_selectability must all admit the exact release",
+                )
+            )
+
         if not isinstance(eligibility_ref, str) or not eligibility_ref:
             violations.append(_error("eligibility_reference_missing", f"{path}.eligibility_ref", "exact eligibility reference is required"))
             continue
@@ -200,6 +343,18 @@ def validate_role_pack(
         "release_reference_count": len(refs),
         "proof_scope": "source",
         "violations": violations,
+        "claims": {
+            "qualified_release": False,
+            "qualification_admission": False,
+            "selectability": False,
+            "activation": False,
+            "provider_live": False,
+            "consumer": False,
+            "hosted_stage": False,
+            "vps": False,
+            "e2e": False,
+            "production": False,
+        },
     }
 
 
@@ -207,6 +362,7 @@ def load_role_pack_inputs(
     manifest_path: str | Path,
     release_directory: str | Path,
     eligibility_directory: str | Path,
+    qualification_directory: str | Path | None = None,
 ) -> dict[str, Any]:
     """Load JSON metadata and validate it without mutating the repository."""
 
@@ -217,7 +373,15 @@ def load_role_pack_inputs(
             raise ValueError(f"metadata must be an object: {path}")
         return value
 
+    def read_dir(directory: Path) -> list[Mapping[str, Any]]:
+        if not directory.is_dir():
+            return []
+        return [read(path) for path in sorted(directory.glob("*.json"))]
+
     manifest = read(Path(manifest_path))
-    releases = [read(path) for path in sorted(Path(release_directory).glob("*.json"))]
-    eligibilities = [read(path) for path in sorted(Path(eligibility_directory).glob("*.json"))]
-    return validate_role_pack(manifest, releases, eligibilities)
+    releases = read_dir(Path(release_directory))
+    eligibilities = read_dir(Path(eligibility_directory))
+    if qualification_directory is None:
+        qualification_directory = Path(release_directory).parent / "qualifications"
+    qualifications = read_dir(Path(qualification_directory))
+    return validate_role_pack(manifest, releases, eligibilities, qualifications)
