@@ -23,20 +23,27 @@
     "tree_sha": "e894accdd4c9e86645acf5a928c2f1947fd322a7"
   },
   "candidate": {
-    "commit_sha": null,
-    "tree_sha": null,
-    "recording_status": "PENDING_ISSUE_274_RECONCILIATION_CHECKPOINT",
-    "note": "The exact Issue #274 checkpoint commit/tree must be recorded after the bounded reconciliation; this preparatory receipt is not a qualification receipt."
+    "commit_sha": "55fa252d36ef7acd130c8268d99c5a8feab22cde",
+    "tree_sha": "7ee42a4b82bb1f75e5915d73a1ad3b6916b41e11",
+    "recording_status": "BOUND_TO_ISSUE_274_RECONCILIATION_CHECKPOINT",
+    "note": "Bound to the exact Issue #274 reconciliation checkpoint; this preparatory receipt is not a qualification receipt."
   },
   "scope": {
-    "allowed_prefixes": ["docs/integrations/"],
+    "allowed_prefixes": [
+      "docs/integrations/",
+      "evidence/governed-skill-expansion/final/",
+      "evidence/governed-skill-expansion/provider/"
+    ],
     "allowed_generated_paths": [
       ".github/linktrend-secret-scan-fixtures.json"
     ],
     "changed_paths_expected": [
-      "docs/integrations/PKT-24-PRE-VPS-PREP.md",
       "docs/integrations/PKT-24-PRE-VPS-RECEIPT.json",
-      ".github/linktrend-secret-scan-fixtures.json"
+      "evidence/governed-skill-expansion/final/PKT-26-FINAL-DOD-RECONCILIATION.md",
+      "evidence/governed-skill-expansion/final/pkt-26-final-reconciliation-receipt.template.json",
+      "evidence/governed-skill-expansion/provider/PKT-25-REHEARSAL.md",
+      "evidence/governed-skill-expansion/provider/pkt25-provider-receipt.template.json",
+      "evidence/governed-skill-expansion/provider/verify_exact_tree.py"
     ],
     "forbidden_paths": [
       "catalog/index.json",
