@@ -26,7 +26,7 @@ from pkt24_rehearsal import (  # noqa: E402
 class Pkt24RemainingDodTests(unittest.TestCase):
     @staticmethod
     def _candidate_ref() -> str:
-        return "refs/heads/issue/245-repair-pkt-24-receipt-binding-and-loopback-fixtu"
+        return "refs/heads/issue/258-pkt-24-stale-candidate-identity-test-binding-rep"
 
     @staticmethod
     def _base_commit() -> str:
