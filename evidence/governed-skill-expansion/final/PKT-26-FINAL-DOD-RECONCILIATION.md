@@ -7,14 +7,15 @@
 
 ## Admission identity and dependencies
 
-The preparation was created from the exact protected development base:
+The preparation was created from the exact protected development base.
+The identities below are a baseline binding, not a final-reconciliation pass.
 
 | Field | Value |
 |---|---|
 | Repository | `linktrend/LiNKskills` |
 | Protected ref | `refs/remotes/origin/development` |
-| Base commit | `dd8f0548cc32f379bcbf3a6aa60953cf6a7d6ec9` |
-| Base tree | `86692eb8c0fb4205bb32d0a3f6aa7d7d6a6c0485` |
+| Base commit | `477918542cb80f479eed66d5a847b40f1e69b73e` |
+| Base tree | `aeca66cdba4f363d718cc5051455e82df24082e1` |
 | Requested route | `codex-luna-high` / `Codex Luna High` |
 | Effective route readback | Not supplied; no effective model claim is made |
 

@@ -44,6 +44,14 @@ class OfflineProviderRehearsalTests(unittest.TestCase):
                                checkout_identity=IDENTITY, provider_identity={**IDENTITY, "repository": IDENTITY["repository"] + ".git"})
         self.assertEqual(receipt["source_binding"]["checkout"]["repository"], IDENTITY["repository"])
 
+    def test_credential_userinfo_origin_is_stripped_for_source_binding(self) -> None:
+        userinfo_url = "https://ci-user:ci-pass@github.com/linktrend/LiNKskills.git"
+        identity = package_identity(**{**IDENTITY, "repository": userinfo_url}, package_id="x", package_version="1.0.0", package_bytes=b"x", manifest={})
+        receipt = bind_receipt({"status": "LOCAL_ONLY"}, identity, result_digest="c" * 64,
+                               checkout_identity={**IDENTITY, "repository": userinfo_url}, provider_identity=IDENTITY)
+        self.assertEqual(receipt["identity"]["repository"], IDENTITY["repository"])
+        self.assertEqual(receipt["source_binding"]["checkout"]["repository"], IDENTITY["repository"])
+
     def test_receipt_ref_rejects_whitespace(self) -> None:
         identity = package_identity(**IDENTITY, package_id="x", package_version="1.0.0", package_bytes=b"x", manifest={})
         with self.assertRaises(PackageIdentityError):

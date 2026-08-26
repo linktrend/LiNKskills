@@ -250,12 +250,54 @@ class FinalDodReconciliationTests(unittest.TestCase):
                     "tree": "also-short",
                 },
                 "action": "restore",
-                "result_digest": "b" * 64,
+                "result_digest": "not-a-digest",
             }
         )
         report = reconcile(payload)
         self.assertIn("rollback:source:identity_commit_invalid", report["blockers"])
         self.assertIn("rollback:source:identity_tree_invalid", report["blockers"])
+        self.assertIn("rollback:source:result_digest_invalid", report["blockers"])
+
+    def test_pkt25_nested_checkout_observed_identity_is_read(self) -> None:
+        payload = json.loads(TEMPLATE.read_text(encoding="utf-8"))
+        commit = "a" * 40
+        tree = "b" * 40
+        with tempfile.TemporaryDirectory() as directory:
+            receipt, digest = self._write_receipt(
+                directory,
+                "pkt25.json",
+                {
+                    "packet": "PKT-25",
+                    "evidence_class": "source",
+                    "checkout": {
+                        "observed": {
+                            "origin": "https://github.com/linktrend/LiNKskills",
+                            "ref": "refs/heads/exact",
+                            "commit": commit,
+                            "tree": tree,
+                        }
+                    },
+                    "provider_source": {
+                        "identity": {
+                            "repository": "https://github.com/linktrend/LiNKskills",
+                            "ref": "refs/heads/exact",
+                            "commit": commit,
+                            "tree": tree,
+                        }
+                    },
+                },
+            )
+            payload["dependencies"]["PKT-25"].update(
+                {
+                    "admission": "ADMITTED",
+                    "receipt_ref": receipt.name,
+                    "receipt_digest": digest,
+                }
+            )
+            report = reconcile(payload, receipt_root=Path(directory))
+        self.assertNotIn("PKT-25:receipt_commit_missing", report["dependency_problems"])
+        self.assertNotIn("PKT-25:receipt_tree_missing", report["dependency_problems"])
+        self.assertNotIn("PKT-25:receipt_repository_missing", report["dependency_problems"])
 
     def test_dependency_receipt_reference_and_digest_are_verified(self) -> None:
         payload = json.loads(TEMPLATE.read_text(encoding="utf-8"))
