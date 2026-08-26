@@ -23,7 +23,7 @@ import os
 import re
 import subprocess
 import sys
-from urllib.parse import urlparse
+from urllib.parse import urlsplit
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -623,6 +623,43 @@ def cmd_review_ready(args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def github_owner_repo_from_remote(url: str) -> str | None:
+    """Return ``owner/repo`` only for an exact GitHub HTTPS or SSH remote."""
+    raw = (url or "").strip()
+    scp_match = re.fullmatch(
+        r"git@github\.com:([A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+(?:\.git)?)",
+        raw,
+    )
+    if scp_match:
+        path = scp_match.group(1)
+    else:
+        try:
+            parsed = urlsplit(raw)
+            port = parsed.port
+        except ValueError:
+            return None
+        if parsed.scheme not in {"https", "ssh"} or parsed.hostname != "github.com":
+            return None
+        if parsed.scheme == "https" and port not in {None, 443}:
+            return None
+        if parsed.scheme == "ssh" and (parsed.username != "git" or port not in {None, 22}):
+            return None
+        if parsed.query or parsed.fragment:
+            return None
+        path = parsed.path.removeprefix("/")
+
+    if path.endswith(".git"):
+        path = path[:-4]
+    parts = path.split("/")
+    if (
+        len(parts) != 2
+        or any(part in {"", ".", ".."} for part in parts)
+        or any(re.fullmatch(r"[A-Za-z0-9_.-]+", part) is None for part in parts)
+    ):
+        return None
+    return "/".join(parts)
+
+
 def resolve_repository(workdir: Path) -> tuple[str | None, str]:
     """Resolve owner/repo for durable repair records without printing secrets.
 
@@ -651,36 +688,9 @@ def resolve_repository(workdir: Path) -> tuple[str | None, str]:
         origin = run(["git", "remote", "get-url", "origin"], cwd=workdir)
     if origin.returncode != 0:
         return None, "missing_origin_remote"
-    url = (origin.stdout or "").strip()
-    # Strip credentials if present in URL without echoing them
-    # e.g. https://user:token@github.com/owner/repo.git
-    sanitized = url
-    owner_repo = ""
-    scp_match = re.fullmatch(r"[A-Za-z0-9._-]+@github\.com:(.+)", sanitized)
-    if scp_match:
-        # GitHub supports both git@github.com and certificate-authority SSH
-        # usernames such as org-123@github.com.
-        owner_repo = scp_match.group(1)
-    elif "://" in sanitized:
-        parsed = urlparse(sanitized)
-        if parsed.hostname != "github.com":
-            return None, "origin_not_github_or_unrecognized"
-        owner_repo = parsed.path.lstrip("/")
-    elif sanitized.startswith("github.com:"):
-        owner_repo = sanitized.split("github.com:", 1)[1]
-    else:
+    owner_repo = github_owner_repo_from_remote(origin.stdout or "")
+    if owner_repo is None:
         return None, "origin_not_github_or_unrecognized"
-    owner_repo = owner_repo.strip()
-    if owner_repo.endswith(".git"):
-        owner_repo = owner_repo[:-4]
-    owner_repo = owner_repo.strip("/")
-    segments = owner_repo.split("/")
-    if (
-        len(segments) != 2
-        or any(segment in {"", ".", ".."} for segment in segments)
-        or any(not re.fullmatch(r"[A-Za-z0-9_.-]+", segment) for segment in segments)
-    ):
-        return None, "origin_ambiguous_owner_repo"
     # Reject if both origin and upstream exist and disagree (ambiguous fork layout)
     upstream = run(["git", "remote", "get-url", "upstream"], cwd=workdir)
     if upstream.returncode == 0:

@@ -49,9 +49,12 @@ production, or qualification gates.
 
 ## Receipt binding and holds
 
-Receipt identity is read from the physical checkout using an explicit full Git
-ref. `HEAD`, copied merge-ref identities, dirty checkouts, mismatched tree
-digests, or changed paths outside this package are not admissible inputs. The
-receipt binder never substitutes an identity and never changes a false claim to
-true. PKT-22, PKT-23, Platform, OpenClaw, LiNKautowork, VPS/deployment, and
+Receipt identity is read from the physical checkout using that checkout's
+fully-qualified HEAD ref (`git symbolic-ref HEAD`). `HEAD`, copied merge-ref
+identities, dirty checkouts, mismatched tree digests, a candidate that does
+not match the physical HEAD commit/tree, or changed paths outside the
+PKT-24/25/26 evidence lanes are not admissible inputs. Credential-bearing
+`origin` URLs are stripped before binding so receipts never store tokens.
+The receipt binder never substitutes an identity and never changes a false
+claim to true. PKT-22, PKT-23, Platform, OpenClaw, LiNKautowork, VPS/deployment, and
 independent-verification evidence remain separate unresolved proof classes.

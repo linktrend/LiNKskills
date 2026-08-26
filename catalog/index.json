@@ -1,11 +1,22 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-09T12:53:41.124015+00:00",
+  "generated_at": "2026-08-26T01:22:03.576441+00:00",
   "repo_root_marker": "LiNKskills",
-  "git_sha": "af70f7ff04b2f148d04fe450a4e20c88df06fc36",
-  "source_tree_sha256": "fd4e17edf08e88ff976f504749f0f0235c4b4b53db02db24260c07d1f25e1788",
-  "skill_count": 35,
+  "git_sha": "19dd3f6e8305aaea66c0ba4a853fb7a486410669",
+  "source_tree_sha256": "145a8cca1ad0cc2a06a790bc1c507f6220d9d2957de4a7fa3f396b6bc8732961",
+  "skill_count": 51,
   "skills": [
+    {
+      "skill_id": "agent-workforce-management",
+      "version": "1.0.0",
+      "path": "skills/agent-workforce-management",
+      "description": "An evidence-bounded method for defining reusable agent roles, selecting supplied Brain rules, drafting capability and delegation requests, monitoring workload and quality, and proposing safe suspension or retirement without granting authority.",
+      "format_profile": "simple",
+      "eval_suite_ref": "skills/agent-workforce-management/references/eval-suite.yaml",
+      "certification_state": "draft",
+      "min_reasoning_tier": "high",
+      "usage_trigger": "Use for a synthetic, redacted, or public workforce matter that needs a role definition, applicable-rule selection, capability request, domain delegation plan, workload/blocker review, quality evaluation, or owner-review suspend/retire proposal."
+    },
     {
       "skill_id": "audit-protocol",
       "version": "1.0.0",
@@ -62,6 +73,50 @@
       "certification_state": "draft",
       "min_reasoning_tier": "high",
       "usage_trigger": "Use when outputs require high trust and each claim must be linked to Memory, Search, or File evidence."
+    },
+    {
+      "skill_id": "commercial-contracts-legal-operations",
+      "version": "1.0.0",
+      "path": "skills/commercial-contracts-legal-operations",
+      "description": "Evidence-grounded commercial-contract and legal-operations preparation for intake, plain-English summaries, obligations, renewals, playbook comparisons, and lawyer or Principal escalation.",
+      "format_profile": "heavy",
+      "eval_suite_ref": "skills/commercial-contracts-legal-operations/references/eval-suite.yaml",
+      "certification_state": "draft",
+      "min_reasoning_tier": "high",
+      "usage_trigger": "Use when a supplied commercial or legal matter needs structured intake, sourced explanation, obligation review, playbook comparison, or an approval-bound escalation without final legal authority."
+    },
+    {
+      "skill_id": "company-communication",
+      "version": "1.0.0",
+      "path": "skills/company-communication",
+      "description": "Reusable audience-aware company communication guidance that starts in plain English, stays concise and mobile-readable, and keeps evidence, uncertainty, decisions, and transport boundaries explicit.",
+      "format_profile": "simple",
+      "eval_suite_ref": "skills/company-communication/references/eval-suite.yaml",
+      "certification_state": "draft",
+      "min_reasoning_tier": "high",
+      "usage_trigger": "Use when a Principal needs a concise company update, decision request, approval or rejection message, or audience-adapted explanation."
+    },
+    {
+      "skill_id": "company-incident-continuity",
+      "version": "1.0.0",
+      "path": "skills/company-incident-continuity",
+      "description": "An evidence-bounded incident and continuity coordination method for outage, security, recovery, communication, evidence capture, and closure review.",
+      "format_profile": "heavy",
+      "eval_suite_ref": "skills/company-incident-continuity/references/eval-suite.yaml",
+      "certification_state": "draft",
+      "min_reasoning_tier": "high",
+      "usage_trigger": "Use for synthetic, redacted, or public incident evidence when an owner needs a concise outage/security/continuity review or recovery and closure proposal without deployment, communication, credential, or authority mutation."
+    },
+    {
+      "skill_id": "company-planning-performance",
+      "version": "1.0.0",
+      "path": "skills/company-planning-performance",
+      "description": "An evidence-bounded planning and performance review method for company horizons, objectives, KPI variance, delivery signals, and owner-reviewed reprioritization.",
+      "format_profile": "heavy",
+      "eval_suite_ref": "skills/company-planning-performance/references/eval-suite.yaml",
+      "certification_state": "draft",
+      "min_reasoning_tier": "high",
+      "usage_trigger": "Use for synthetic, redacted, or public planning evidence when a consumer needs a concise horizon plan, KPI review, forecast-versus-actual comparison, blocker/late/obsolete detection, or evidence-backed reprioritization draft without mutating Program or Task state."
     },
     {
       "skill_id": "compliance-guardian",
@@ -130,6 +185,17 @@
       "usage_trigger": "Use when channel performance signals need to be translated into actionable strategic updates for Marketing and Growth."
     },
     {
+      "skill_id": "executive-decisions-governance",
+      "version": "1.0.0",
+      "path": "skills/executive-decisions-governance",
+      "description": "An evidence-bounded executive decision and governance brief method that separates choices, recommendation, rule impact, implementation tracking, and owner authority.",
+      "format_profile": "simple",
+      "eval_suite_ref": "skills/executive-decisions-governance/references/eval-suite.yaml",
+      "certification_state": "draft",
+      "min_reasoning_tier": "high",
+      "usage_trigger": "Use for a synthetic, redacted, or public matter that needs a mobile-readable decision brief, choice set, rule-impact record, or implementation-tracking draft without approving, activating, scheduling, or mutating anything."
+    },
+    {
       "skill_id": "executive-sync-8am",
       "version": "1.0.0",
       "path": "skills/executive-sync-8am",
@@ -141,6 +207,17 @@
       "usage_trigger": "Use for daily executive standup preparation and structured morning briefing consolidation for studio leadership."
     },
     {
+      "skill_id": "finance-accounting-operations",
+      "version": "1.0.0",
+      "path": "skills/finance-accounting-operations",
+      "description": "Read-only finance and accounting operations for cash-flow forecasts, budget versus actuals, invoice/payment/expense tracking, close preparation, runway risk, and approval-boundary decisions from an approved Odoo contract.",
+      "format_profile": "heavy",
+      "eval_suite_ref": "skills/finance-accounting-operations/references/eval-suite.yaml",
+      "certification_state": "draft",
+      "min_reasoning_tier": "high",
+      "usage_trigger": "Use when a Principal needs an evidence-labeled finance operations brief from supplied Odoo contract data, without changing accounting records or invoking a connector."
+    },
+    {
       "skill_id": "git-safeguard",
       "version": "1.1.0",
       "path": "skills/git-safeguard",
@@ -150,6 +227,17 @@
       "certification_state": "draft",
       "min_reasoning_tier": "balanced",
       "usage_trigger": "Use when preparing any git push or remote branch publication."
+    },
+    {
+      "skill_id": "governed-browser-use",
+      "version": "1.0.0",
+      "path": "skills/governed-browser-use",
+      "description": "Classifies browser tasks and produces an approval-aware, fail-closed action plan without implementing or invoking a browser runtime.",
+      "format_profile": "heavy",
+      "eval_suite_ref": "skills/governed-browser-use/references/eval-suite.yaml",
+      "certification_state": "draft",
+      "min_reasoning_tier": "high",
+      "usage_trigger": "Use when a task may need browser interaction and the operator needs a safe action class, approval boundary, or refusal reason before a consumer-owned browser adapter acts."
     },
     {
       "skill_id": "lead-engineer",
@@ -185,6 +273,28 @@
       "usage_trigger": "Use when a product PRD must be translated into an executable growth plan across SEO, paid, and lifecycle channels."
     },
     {
+      "skill_id": "meeting-management",
+      "version": "1.0.0",
+      "path": "skills/meeting-management",
+      "description": "Evidence-bounded meeting preparation, notes processing, decision routing, and follow-up verification without retaining private transcripts or owning destination systems.",
+      "format_profile": "heavy",
+      "eval_suite_ref": "skills/meeting-management/references/eval-suite.yaml",
+      "certification_state": "draft",
+      "min_reasoning_tier": "high",
+      "usage_trigger": "Use when a supplied meeting needs an agenda, private pre-brief, redacted notes, decision and commitment extraction, routing references, or follow-up verification."
+    },
+    {
+      "skill_id": "operational-reporting",
+      "version": "1.0.0",
+      "path": "skills/operational-reporting",
+      "description": "Reusable multi-mode operational reporting that produces concise, evidence-bounded mobile reports without sending, scheduling, or reading private systems by itself.",
+      "format_profile": "simple",
+      "eval_suite_ref": "skills/operational-reporting/references/eval-suite.yaml",
+      "certification_state": "draft",
+      "min_reasoning_tier": "high",
+      "usage_trigger": "Use when an operator needs an Executive Digest, Flash Report, concise no-material-change line, supervised-agent summary, or maintenance-result input."
+    },
+    {
       "skill_id": "persistent-qa",
       "version": "1.0.0",
       "path": "skills/persistent-qa",
@@ -194,6 +304,17 @@
       "certification_state": "draft",
       "min_reasoning_tier": "high",
       "usage_trigger": "Use when validating delivered work independently and tracking recurring technical debt across projects and sessions."
+    },
+    {
+      "skill_id": "personal-compliance",
+      "version": "1.0.0",
+      "path": "skills/personal-compliance",
+      "description": "Configurable selfie-compliance state transitions and privacy-preserving adaptive battery preparation with uncertainty-aware image correction.",
+      "format_profile": "heavy",
+      "eval_suite_ref": "skills/personal-compliance/references/eval-suite.yaml",
+      "certification_state": "draft",
+      "min_reasoning_tier": "high",
+      "usage_trigger": "Use when a consumer-owned private workflow needs a reusable selfie window, battery estimate, bundled measurement, or image-extraction correction plan without storing personal data or sending reminders."
     },
     {
       "skill_id": "prd-architect",
@@ -207,6 +328,28 @@
       "usage_trigger": "Use when a project starts from a high-level idea and needs a production-grade technical specification before implementation."
     },
     {
+      "skill_id": "private-health-wellbeing",
+      "version": "1.0.0",
+      "path": "skills/private-health-wellbeing",
+      "description": "A private-domain health tracking and reporting method that preserves not-reported values, separates routine measures, labels estimates, and exposes only an optional capacity state.",
+      "format_profile": "heavy",
+      "eval_suite_ref": "skills/private-health-wellbeing/references/eval-suite.yaml",
+      "certification_state": "draft",
+      "min_reasoning_tier": "high",
+      "usage_trigger": "Use for a synthetic or redacted private health tracking, checkpoint, measurement, nutrition, sleep, treatment/appointment, or image-correction request without diagnosing, changing treatment, or exporting detailed health data."
+    },
+    {
+      "skill_id": "procurement-vendor-management",
+      "version": "1.0.0",
+      "path": "skills/procurement-vendor-management",
+      "description": "Evidence-grounded supplier comparison, pricing verification, contract and renewal review, performance tracking, continuity-risk assessment, and approval-brief preparation.",
+      "format_profile": "heavy",
+      "eval_suite_ref": "skills/procurement-vendor-management/references/eval-suite.yaml",
+      "certification_state": "draft",
+      "min_reasoning_tier": "high",
+      "usage_trigger": "Use when supplied procurement or vendor evidence needs structured comparison, risk review, or an approval brief without spending, acceptance, or vendor-system action."
+    },
+    {
       "skill_id": "repository-manager",
       "version": "1.0.0",
       "path": "skills/repository-manager",
@@ -218,6 +361,17 @@
       "usage_trigger": "Use when a task changes repository files, branches, commits, or requires end-of-session handoff updates."
     },
     {
+      "skill_id": "research",
+      "version": "1.0.0",
+      "path": "skills/research",
+      "description": "Canonical evidence-first research workflow for current, source-grounded answers with proportionate search, conflict handling, privacy controls, and citation enforcement.",
+      "format_profile": "heavy",
+      "eval_suite_ref": "skills/research/references/eval-suite.yaml",
+      "certification_state": "draft",
+      "min_reasoning_tier": "high",
+      "usage_trigger": "Use when a Principal needs a research brief, source comparison, or evidence-backed decision input and the answer may require current public research."
+    },
+    {
       "skill_id": "revenue-adapter-base",
       "version": "1.0.0",
       "path": "skills/revenue-adapter-base",
@@ -227,6 +381,17 @@
       "certification_state": "draft",
       "min_reasoning_tier": "high",
       "usage_trigger": "Use when finance operations need standardized transaction-format outputs from mixed revenue sources."
+    },
+    {
+      "skill_id": "sales-customer-management",
+      "version": "1.0.0",
+      "path": "skills/sales-customer-management",
+      "description": "Evidence-backed lead, pipeline, proposal, onboarding, renewal, customer-risk, and founder-escalation preparation with explicit Odoo and LiNKreach ownership boundaries.",
+      "format_profile": "heavy",
+      "eval_suite_ref": "skills/sales-customer-management/references/eval-suite.yaml",
+      "certification_state": "draft",
+      "min_reasoning_tier": "high",
+      "usage_trigger": "Use for a sales or customer-management decision when supplied evidence must be qualified, prepared for an owning CRM, handed off, or escalated without live business side effects."
     },
     {
       "skill_id": "search-strategy",
@@ -329,14 +494,14 @@
     },
     {
       "skill_id": "studio-controller",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "path": "skills/studio-controller",
-      "description": "Financial oversight skill implementing GAAP reporting (P&L, Balance Sheet, Cashflow, AR/AP, Budget vs Actual) with Supabase lsl_finance logging and reconciliation controls.",
+      "description": "Reusable finance review and close-control primitive for checking evidence, variances, assumptions, and escalation boundaries without owning a ledger, connector, or accounting system.",
       "format_profile": "heavy",
       "eval_suite_ref": "skills/studio-controller/references/eval-suite.yaml",
       "certification_state": "draft",
       "min_reasoning_tier": "high",
-      "usage_trigger": "Use when executive finance reporting, reconciliation, and transaction oversight are required across revenue and expense systems."
+      "usage_trigger": "Use when a finance operations brief needs controller-style review, close preparation, variance escalation, or separation of observation from approval."
     },
     {
       "skill_id": "studio-health-reporting",
@@ -359,6 +524,17 @@
       "certification_state": "draft",
       "min_reasoning_tier": "high",
       "usage_trigger": "Use when a task is complex, ambiguous, or multi-domain and needs structured decomposition before execution."
+    },
+    {
+      "skill_id": "time-management",
+      "version": "1.0.0",
+      "path": "skills/time-management",
+      "description": "Plans confirmed and provisional work from intake through monthly reporting without owning consumer task state.",
+      "format_profile": "heavy",
+      "eval_suite_ref": "skills/time-management/references/eval-suite.yaml",
+      "certification_state": "draft",
+      "min_reasoning_tier": "high",
+      "usage_trigger": "Use when the consumer needs store-independent intake, prioritisation, capacity planning, review, evidence reconciliation, or a standing-rule proposal."
     },
     {
       "skill_id": "tool-architect",
