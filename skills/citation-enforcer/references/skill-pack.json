@@ -3,7 +3,7 @@
   "skill_id": "citation-enforcer",
   "display_name": "Citation Enforcer",
   "version": "1.1.0",
-  "description": "Enforces evidence-first reasoning by requiring source attribution for every material claim.",
+  "description": "Enforces evidence-first reasoning with citation methods, negative-evidence classification, and cyclic-graph blocking.",
   "capability_category": "internal_launch",
   "lifecycle_state": "draft",
   "format_profile": "simple",
@@ -12,10 +12,11 @@
   ],
   "min_capability_tier": "balanced",
   "routing": {
-    "when_to_use": "Use when outputs require high trust and each claim must be linked to Memory, Search, or File evidence.",
+    "when_to_use": "Use when outputs require high trust and each claim must be linked to Memory, Search, or File evidence with supports/contradicts/qualifies/cites methods.",
     "when_not_to_use": [
       "Do not treat YAML-only validation as launch readiness",
-      "Do not claim usable/certified without sealed receipts"
+      "Do not claim usable/certified without sealed receipts",
+      "Do not treat missing evidence as observed absence"
     ],
     "tags": [
       "reasoning",
@@ -63,7 +64,8 @@
   },
   "eval": {
     "suite_path": "references/eval-suite.json",
-    "suite_schema_version": "0.1"
+    "suite_schema_version": "0.1",
+    "suite_hash": "sha256:f32599b1b4b9e8bb36a3ab1b0d5d00758951dde0a58e729fc19b9d53a97ca21c"
   },
   "telemetry": {
     "classification": "public_internal",
