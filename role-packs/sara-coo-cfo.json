@@ -1,13 +1,75 @@
 {
-  "schema_version":"0.1","role_pack_id":"sara-coo-cfo","version":"1.0.0","display_name":"Sara COO/CFO","description":"Reference-only operations, finance, provider, procurement, and continuity role release selection.",
-  "release_refs":[
-    {"release_id":"finance-accounting-operations@1.0.0","artifact_digest":"sha256:ceee018bf7c88464f58b45078417fce07c9fd68d385e6817e411639866421d14","eligibility_ref":"opaque:eligibility:finance-accounting-operations-1"},
-    {"release_id":"procurement-vendor-management@1.0.0","artifact_digest":"sha256:09efce66793b5209da185ccf50c23ae999a99137f639ff3c4da08de642b5147f","eligibility_ref":"opaque:eligibility:procurement-vendor-management-1"},
-    {"release_id":"agent-workforce-management@1.0.0","artifact_digest":"sha256:9acea243bde5ca3d6ddf9c94ae866010de3a06212c000b1acb557083e8cb962f","eligibility_ref":"opaque:eligibility:agent-workforce-management-1"},
-    {"release_id":"commercial-contracts-legal-operations@1.0.0","artifact_digest":"sha256:d6047ca032b5b525b330119134057f7c532e6175e209a4fa667efff1c8ae2ae8","eligibility_ref":"opaque:eligibility:commercial-contracts-legal-operations-1"}
+  "activation": {
+    "activation_owner": "consumer",
+    "enabled": false
+  },
+  "applicability": {
+    "constraints": [
+      "No spending or acceptance authority.",
+      "Workspace references remain eligible references only."
+    ],
+    "role_class": "operations-finance-coo-cfo",
+    "scope": "organization",
+    "task_classes": [
+      "operations",
+      "finance",
+      "agent-operations",
+      "provider-standards",
+      "librarian-standards",
+      "procurement",
+      "continuity",
+      "interim-legal",
+      "workspace-references"
+    ]
+  },
+  "compatibility": {
+    "min_contract_version": "0.2",
+    "runtime_profiles": [
+      "cursor-macos",
+      "codex-macos"
+    ]
+  },
+  "description": "Reference-only operations, finance, provider, procurement, and continuity role release selection.",
+  "display_name": "Sara COO/CFO",
+  "release_refs": [
+    {
+      "artifact_digest": "sha256:1c2bf02fb468c555540d4569f5732c51d7733fce993132f0cad337b6dbc1bb07",
+      "eligibility_ref": "opaque:eligibility:finance-accounting-operations-1",
+      "release_id": "finance-accounting-operations@1.0.0",
+      "required": true
+    },
+    {
+      "artifact_digest": "sha256:fe58334b069bad56caf32a9f15e6fa3da02a325dbb3764d0dd910ee6021e3be6",
+      "eligibility_ref": "opaque:eligibility:procurement-vendor-management-1",
+      "release_id": "procurement-vendor-management@1.0.0",
+      "required": true
+    },
+    {
+      "artifact_digest": "sha256:3548dda64017d9364f28d262cf7012050c34a52ded842b4b4f2d9d5e43b9738a",
+      "eligibility_ref": "opaque:eligibility:agent-workforce-management-1",
+      "release_id": "agent-workforce-management@1.0.0",
+      "required": true
+    },
+    {
+      "artifact_digest": "sha256:5b1d7ff7668435076fcdc83a979e05e523479eba83fe5149bdae435a4746ed2d",
+      "eligibility_ref": "opaque:eligibility:commercial-contracts-legal-operations-1",
+      "release_id": "commercial-contracts-legal-operations@1.0.0",
+      "required": true
+    }
   ],
-  "applicability":{"role_class":"operations-finance-coo-cfo","task_classes":["operations","finance","agent-operations","provider-standards","librarian-standards","procurement","continuity","interim-legal","workspace-references"],"scope":"organization","constraints":["No spending or acceptance authority.","Workspace references remain eligible references only."]},
-  "required_capability_classes":["operations","finance","agent-operations","provider-standards","librarian-standards","procurement","continuity","interim-legal","workspace-references"],
-  "compatibility":{"runtime_profiles":["cursor-macos","codex-macos"],"min_contract_version":"0.2"},
-  "activation":{"enabled":false,"activation_owner":"consumer"},"trust_boundary":"linkskills-role-pack"
+  "required_capability_classes": [
+    "operations",
+    "finance",
+    "agent-operations",
+    "provider-standards",
+    "librarian-standards",
+    "procurement",
+    "continuity",
+    "interim-legal",
+    "workspace-references"
+  ],
+  "role_pack_id": "sara-coo-cfo",
+  "schema_version": "0.1",
+  "trust_boundary": "linkskills-role-pack",
+  "version": "1.0.0"
 }
