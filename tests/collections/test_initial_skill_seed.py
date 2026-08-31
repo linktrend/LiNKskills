@@ -191,6 +191,10 @@ class InitialSkillSeedTests(unittest.TestCase):
             self.assertFalse(manifest["live_apply"])
             self.assertFalse(manifest["stable_qualification_claimed"])
             self.assertTrue(set(manifest["permitted_release_ids"]) <= approved)
+            for adapter in manifest["adapter_releases"]:
+                bundle = build_skill_bundle_manifest(ROOT / "skills" / adapter["skill_id"])
+                self.assertEqual(adapter["version"], bundle["version"])
+                self.assertEqual(adapter["bundle_hash"], bundle["bundle_hash"])
 
     def test_generated_admission_artifacts_are_current(self) -> None:
         completed = subprocess.run(

@@ -18,6 +18,9 @@ from typing import Any
 
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "packages" / "core"))
+
+from linkskills_core.hashing import build_skill_bundle_manifest  # noqa: E402
 DECIDED_AT = "2026-08-31T12:00:00Z"
 AUDITOR = "linkskills-issue-299-initial-canary-audit"
 
@@ -370,11 +373,21 @@ def build_activation_manifests(
             and item["skill_id"] not in policy["exclude"]
         ]
         adapters = sorted({item["adapter_skill_id"] for item in permitted})
+        adapter_releases = []
+        for adapter_id in adapters:
+            bundle = build_skill_bundle_manifest(ROOT / "skills" / adapter_id)
+            adapter_releases.append(
+                {
+                    "bundle_hash": bundle["bundle_hash"],
+                    "skill_id": adapter_id,
+                    "version": bundle["version"],
+                }
+            )
         writer.json(
             ROOT / "configs/consumer-activation" / f"{consumer_id}-internal-canary.json",
             {
                 "activation": {"activation_owner": "consumer", "enabled": False},
-                "adapter_skill_ids": adapters,
+                "adapter_releases": adapter_releases,
                 "consumer_id": consumer_id,
                 "consumer_apply_required": True,
                 "generated_from": "opaque:evidence:issue-299-initial-skill-seed-classification",
