@@ -1,0 +1,103 @@
+{
+  "capability_category": "initial_seed",
+  "compatible_runtime_profiles": [
+    "cursor-macos",
+    "codex-macos"
+  ],
+  "dependencies": {
+    "external_services": [],
+    "host_capabilities": [
+      "filesystem_read",
+      "filesystem_write"
+    ],
+    "library_assets": [],
+    "optional_dependencies": [],
+    "packaged_tools": [],
+    "runtime_requirements": [],
+    "schema_version": "0.1",
+    "skill_dependencies": []
+  },
+  "description": "Routes one task to one exact member of the taste-design collection.",
+  "display_name": "Taste Design Exploration",
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1"
+  },
+  "execution": {
+    "completion_criteria": [
+      "One route or fail-closed status",
+      "No ambiguous duplicate authority"
+    ],
+    "expected_outputs": [
+      {
+        "description": "One exact source entrypoint or a fail-closed result",
+        "name": "route_decision"
+      }
+    ],
+    "forbidden_actions": [
+      "Load competing routes",
+      "Grant tool authority",
+      "Activate or deploy a consumer"
+    ],
+    "required_inputs": [
+      {
+        "description": "Task to classify",
+        "name": "task"
+      },
+      {
+        "description": "Consumer profile",
+        "name": "consumer"
+      }
+    ],
+    "verification_steps": [
+      "Verify exact source exists",
+      "Select one route",
+      "Retain consumer authority boundary"
+    ]
+  },
+  "format_profile": "simple",
+  "fragments": [
+    {
+      "disclosure_level": 2,
+      "fragment_id": "summary",
+      "path": "SKILL.md"
+    },
+    {
+      "disclosure_level": 3,
+      "fragment_id": "routing",
+      "path": "references/routing.json"
+    },
+    {
+      "disclosure_level": 4,
+      "fragment_id": "advanced",
+      "path": "advanced/advanced.md"
+    }
+  ],
+  "lifecycle_state": "eval_pending",
+  "min_capability_tier": "high",
+  "release_channel": "eval",
+  "routing": {
+    "tags": [
+      "routing",
+      "external-source",
+      "taste-design"
+    ],
+    "when_not_to_use": [
+      "Do not load the entire collection.",
+      "Do not claim activation or permission."
+    ],
+    "when_to_use": "Use when the task matches this family boundary."
+  },
+  "schema_version": "0.1",
+  "skill_id": "taste-design-exploration",
+  "telemetry": {
+    "classification": "public_internal",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_private_data",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain_ids_and_hashes"
+  },
+  "version": "1.0.0"
+}

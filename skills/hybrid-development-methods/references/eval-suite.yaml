@@ -1,0 +1,41 @@
+skill_id: hybrid-development-methods
+suite_version: 1.0.0
+pass_threshold: 0.90
+rubric:
+  - dimension: correct_single_route
+    weight: 0.40
+    hard_fail_below: 0.80
+  - dimension: non_overlap
+    weight: 0.25
+    hard_fail_below: 0.80
+  - dimension: source_fidelity
+    weight: 0.20
+    hard_fail_below: 0.80
+  - dimension: consumer_boundary
+    weight: 0.15
+    hard_fail_below: 0.90
+scenarios:
+  - id: route-1-gstack-spec
+    expected_criteria: ["selects gstack-spec", "loads one source entrypoint"]
+  - id: route-2-gstack-plan-ceo-review
+    expected_criteria: ["selects gstack-plan-ceo-review", "loads one source entrypoint"]
+  - id: route-3-gstack-health
+    expected_criteria: ["selects gstack-health", "loads one source entrypoint"]
+  - id: route-4-gstack-ship
+    expected_criteria: ["selects gstack-ship", "loads one source entrypoint"]
+  - id: route-5-gstack-context-save
+    expected_criteria: ["selects gstack-context-save", "loads one source entrypoint"]
+  - id: route-6-gstack-context-restore
+    expected_criteria: ["selects gstack-context-restore", "loads one source entrypoint"]
+  - id: route-7-gstack-review
+    expected_criteria: ["selects gstack-review", "loads one source entrypoint"]
+  - id: route-8-gstack-qa
+    expected_criteria: ["selects gstack-qa", "loads one source entrypoint"]
+  - id: no-match
+    expected_criteria: ["returns not applicable", "does not load a source"]
+  - id: consumer-boundary
+    expected_criteria: ["does not claim activation", "preserves consumer authority"]
+judge:
+  min_reasoning_tier: high
+  independence_required: true
+# Real consumer execution evidence is required before usable certification.
