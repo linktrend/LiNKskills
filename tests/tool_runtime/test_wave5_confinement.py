@@ -8,6 +8,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 os.environ.setdefault(
     "LINKSKILLS_EVAL_RUNNER_ISSUER_KEY",
@@ -32,6 +33,7 @@ from linkskills_tool_runtime.adapters import ServerAdapter  # noqa: E402
 from linkskills_tool_runtime.confined_exec import (  # noqa: E402
     ConfinedExecutionError,
     assert_within_boundary,
+    collect_runtime_read_paths,
     run_confined,
 )
 from linkskills_tool_runtime.invoke import invoke_tool  # noqa: E402
@@ -65,6 +67,23 @@ class ConfinedExecTests(unittest.TestCase):
         )
         self.assertIn("confined-ok", result.stdout)
         self.assertIn(result.network_isolation, {"denied", "unproven"})
+
+    def test_runtime_allowlist_binds_executable_parent_not_symlink(self) -> None:
+        runtime_bin = self.workspace / "runtime-bin"
+        runtime_bin.mkdir()
+        real_python = runtime_bin / "python-real"
+        real_python.write_text("binary", encoding="utf-8")
+        python_link = runtime_bin / "python3"
+        python_link.symlink_to(real_python)
+
+        with mock.patch(
+            "linkskills_tool_runtime.confined_exec.shutil.which",
+            return_value=str(python_link),
+        ):
+            paths = collect_runtime_read_paths(["python3"], workspace=self.workspace)
+
+        self.assertIn(runtime_bin, paths)
+        self.assertNotIn(python_link, paths)
 
     def test_sandbox_profile_does_not_allow_global_file_read(self) -> None:
         from linkskills_tool_runtime.confined_exec import (

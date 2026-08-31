@@ -50,9 +50,12 @@ class RolePackValidatorTests(unittest.TestCase):
         self.assertEqual(codes.count("release_not_qualified"), 7)
         self.assertEqual(codes.count("release_not_selectable"), 7)
         self.assertEqual(codes.count("qualification_evidence_missing"), 7)
-        self.assertEqual(codes.count("incompatible_runtime_profile"), 7)
+        # Source-compatible gws-consumer profiles are now declared, while the
+        # independent release, qualification, activation, and authority gates
+        # continue to hold the pack closed.
+        self.assertEqual(codes.count("incompatible_runtime_profile"), 0)
         self.assertEqual(codes.count("eligibility_not_eligible"), 7)
-        self.assertEqual(codes.count("eligibility_gate_not_satisfied"), 28)
+        self.assertEqual(codes.count("eligibility_gate_not_satisfied"), 21)
 
     def test_committed_contradiction_evidence_is_explicitly_non_admitting(self) -> None:
         evidence = read(ROOT / "role-packs" / "pkt-22-23-contradiction.json")
