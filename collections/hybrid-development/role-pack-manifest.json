@@ -1,0 +1,154 @@
+{
+  "activation": {
+    "activation_owner": "consumer",
+    "enabled": false
+  },
+  "applicability": {
+    "constraints": [
+      "Select only the exact task-matched release.",
+      "This role pack grants no tool, deployment, or mutation authority."
+    ],
+    "role_class": "design-and-development-consumer",
+    "scope": "organization",
+    "task_classes": [
+      "specification",
+      "planning",
+      "tdd",
+      "debugging",
+      "review",
+      "shipping"
+    ]
+  },
+  "compatibility": {
+    "min_contract_version": "0.2",
+    "runtime_profiles": [
+      "cursor-macos",
+      "codex-macos"
+    ]
+  },
+  "description": "Reference-only exact releases; consumer activation remains false until qualification and consumer proof.",
+  "display_name": "LiNKtrend Hybrid Development System reference pack",
+  "release_refs": [
+    {
+      "artifact_digest": "sha256:01f5abeb353d26302fd50ef518d160ab8dafc3892f3c3f4d53edd894598e4679",
+      "eligibility_ref": "opaque:eligibility:gstack-context-restore-ineligible",
+      "release_id": "gstack-context-restore@1.0.0",
+      "required": false
+    },
+    {
+      "artifact_digest": "sha256:472b94fc502107dd31ff269d949dd3d581f00a901be048953f0e259a4d55b3d9",
+      "eligibility_ref": "opaque:eligibility:gstack-context-save-ineligible",
+      "release_id": "gstack-context-save@1.0.0",
+      "required": false
+    },
+    {
+      "artifact_digest": "sha256:d25e1aeddc159a668c721d24ca1fb51e505a3450f18d055a959c7d08257b6863",
+      "eligibility_ref": "opaque:eligibility:gstack-health-ineligible",
+      "release_id": "gstack-health@1.0.0",
+      "required": false
+    },
+    {
+      "artifact_digest": "sha256:6903453c0326af108b959fd5361883b38125b45596ff2f12afe4d63e30f3bdf4",
+      "eligibility_ref": "opaque:eligibility:gstack-learn-ineligible",
+      "release_id": "gstack-learn@1.0.0",
+      "required": false
+    },
+    {
+      "artifact_digest": "sha256:007216c0ee593c0267aee0d52924c42de4513960b6d46587691724a948347cd0",
+      "eligibility_ref": "opaque:eligibility:gstack-plan-ceo-review-ineligible",
+      "release_id": "gstack-plan-ceo-review@1.0.0",
+      "required": false
+    },
+    {
+      "artifact_digest": "sha256:090e87d9b62ddb0c42ad00f43a682880c411666d386d9016d4c01a12e5917704",
+      "eligibility_ref": "opaque:eligibility:gstack-qa-ineligible",
+      "release_id": "gstack-qa@1.0.0",
+      "required": false
+    },
+    {
+      "artifact_digest": "sha256:92c9314411ab75809bf6ee92876b6bf9ba4f2d03e8fede13ab34daffc0b4c7be",
+      "eligibility_ref": "opaque:eligibility:gstack-retro-ineligible",
+      "release_id": "gstack-retro@1.0.0",
+      "required": false
+    },
+    {
+      "artifact_digest": "sha256:5e97fac5286488bc433c031eea90ff16cdf2c8d1b11c9517f30f8f05580b7e0d",
+      "eligibility_ref": "opaque:eligibility:gstack-review-ineligible",
+      "release_id": "gstack-review@1.0.0",
+      "required": false
+    },
+    {
+      "artifact_digest": "sha256:533c23de8f5fa6916115b2c055342d0914f23a6a1f63fb994f55b05b24695f43",
+      "eligibility_ref": "opaque:eligibility:gstack-ship-ineligible",
+      "release_id": "gstack-ship@1.0.0",
+      "required": false
+    },
+    {
+      "artifact_digest": "sha256:734e96662747b3bf2dc186b853ddd60224ce47d16bd10da3bc9d632b5713cfba",
+      "eligibility_ref": "opaque:eligibility:gstack-spec-ineligible",
+      "release_id": "gstack-spec@1.0.0",
+      "required": false
+    },
+    {
+      "artifact_digest": "sha256:f715a42f84f864223b6f106bfa56d189a62f710d38033de0f0116b5355918a51",
+      "eligibility_ref": "opaque:eligibility:mattpocock-diagnosing-bugs-ineligible",
+      "release_id": "mattpocock-diagnosing-bugs@1.0.0",
+      "required": false
+    },
+    {
+      "artifact_digest": "sha256:35e3ea328b44a7e7477f69b3d10612d20e78ebde3a1a3078562917723f160dab",
+      "eligibility_ref": "opaque:eligibility:mattpocock-grill-with-docs-ineligible",
+      "release_id": "mattpocock-grill-with-docs@1.0.0",
+      "required": false
+    },
+    {
+      "artifact_digest": "sha256:13c2f51d9550cd7c3114a104277bf0824f317b5e49c4fd6e3f8d03d809cb562c",
+      "eligibility_ref": "opaque:eligibility:mattpocock-improve-codebase-architecture-ineligible",
+      "release_id": "mattpocock-improve-codebase-architecture@1.0.0",
+      "required": false
+    },
+    {
+      "artifact_digest": "sha256:1d465ff213b00ab1ab1030ef9f07b4c792f495840f9024826c13b6c054d2f6a2",
+      "eligibility_ref": "opaque:eligibility:mattpocock-research-ineligible",
+      "release_id": "mattpocock-research@1.0.0",
+      "required": false
+    },
+    {
+      "artifact_digest": "sha256:16cae1bbca3ad221ea058e07ceec7f26821dd19976b4007dfbe91a44b45411d0",
+      "eligibility_ref": "opaque:eligibility:mattpocock-setup-matt-pocock-skills-ineligible",
+      "release_id": "mattpocock-setup-matt-pocock-skills@1.0.0",
+      "required": false
+    },
+    {
+      "artifact_digest": "sha256:07cb2712aac5fb1329b2011c6059d82224d4c8b95f5f1fa5d3dc606bc90c406e",
+      "eligibility_ref": "opaque:eligibility:mattpocock-tdd-ineligible",
+      "release_id": "mattpocock-tdd@1.0.0",
+      "required": false
+    },
+    {
+      "artifact_digest": "sha256:1d636b1a6e7c17ca8c4870ebafe46588e30daba58d8842c97f91022f162ad00c",
+      "eligibility_ref": "opaque:eligibility:mattpocock-to-spec-ineligible",
+      "release_id": "mattpocock-to-spec@1.0.0",
+      "required": false
+    },
+    {
+      "artifact_digest": "sha256:2c556de65d0c8cf6838410588213588d2039a5f394598bac60e69d3c56461897",
+      "eligibility_ref": "opaque:eligibility:mattpocock-to-tickets-ineligible",
+      "release_id": "mattpocock-to-tickets@1.0.0",
+      "required": false
+    },
+    {
+      "artifact_digest": "sha256:9c9e4aae2188866125a04c59b39723c7d08a716946e77f86e0f993542c2d6acf",
+      "eligibility_ref": "opaque:eligibility:mattpocock-triage-ineligible",
+      "release_id": "mattpocock-triage@1.0.0",
+      "required": false
+    }
+  ],
+  "required_capability_classes": [
+    "development.hybrid"
+  ],
+  "role_pack_id": "hybrid-development-reference",
+  "schema_version": "0.1",
+  "trust_boundary": "linkskills-role-pack",
+  "version": "1.0.0"
+}

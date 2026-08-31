@@ -1,0 +1,42 @@
+{
+  "capability_category": "productivity",
+  "compatible_runtime_profiles": ["gws-consumer"],
+  "dependencies": {
+    "external_services": ["Google Workspace"],
+    "host_capabilities": ["filesystem_read", "shell_exec"],
+    "library_assets": [],
+    "optional_dependencies": [],
+    "packaged_tools": ["gws"],
+    "runtime_requirements": ["consumer-provided Google Workspace authorization"],
+    "schema_version": "0.1",
+    "skill_dependencies": []
+  },
+  "description": "Routes one authorized Google Workspace task to one exact preserved gws source member.",
+  "display_name": "Google Workspace Operations",
+  "eval": {"suite_path": "references/eval-suite.json", "suite_schema_version": "0.1"},
+  "execution": {
+    "completion_criteria": ["One admitted route or a fail-closed status", "No credential or authority claim"],
+    "expected_outputs": [{"description": "One exact source entrypoint or fail-closed result", "name": "route_decision"}],
+    "forbidden_actions": ["Grant Google authorization", "Activate a consumer", "Execute an unapproved write", "Load competing routes"],
+    "required_inputs": [{"description": "Google Workspace task", "name": "task"}, {"description": "Consumer profile", "name": "consumer"}],
+    "verification_steps": ["Verify exact source exists", "Verify member admission", "Retain consumer authority boundary"]
+  },
+  "format_profile": "simple",
+  "fragments": [
+    {"disclosure_level": 2, "fragment_id": "summary", "path": "SKILL.md"},
+    {"disclosure_level": 3, "fragment_id": "routing", "path": "references/routing.json"},
+    {"disclosure_level": 4, "fragment_id": "advanced", "path": "advanced/advanced.md"}
+  ],
+  "lifecycle_state": "eval_pending",
+  "min_capability_tier": "high",
+  "release_channel": "canary",
+  "routing": {
+    "tags": ["google-workspace", "gws", "routing", "external-source"],
+    "when_not_to_use": ["Do not use without consumer-provided Google authorization.", "Do not use a generic route when the operation remains ambiguous."],
+    "when_to_use": "Use to identify one exact Google Workspace source operation after the consumer supplies a concrete task."
+  },
+  "schema_version": "0.1",
+  "skill_id": "google-workspace-operations",
+  "telemetry": {"classification": "restricted", "redaction_rules": ["strip_secrets", "strip_private_data", "strip_reasoning"], "retention_policy": "retain_ids_and_hashes"},
+  "version": "1.0.0"
+}
