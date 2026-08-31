@@ -76,8 +76,10 @@ against all five native family skills on 2026-08-31. The four design-family
 adapters correctly remained `draft` with reason code `suite_not_executable`:
 their current suites describe judged scenarios but do not execute a consumer
 agent. The hybrid adapter now has a 22-case executable routing-conformance suite
-using the runner's confined `skill_script` adapter. All 22 cases pass locally,
-but the run remains uncertified because local network isolation is unproven.
+using the runner's confined `skill_script` adapter. All 22 cases pass in the
+sealed Linux executor with network isolation denied and a weighted score of
+1.0. The explicitly non-promoting run forces the result to `eval_pending`,
+writes no sealed release evidence, and performs no catalog or ledger promotion.
 
 This executable hybrid suite proves only deterministic selection and fail-closed
 routing for the adapter. It does not qualify any of the 19 underlying workflow

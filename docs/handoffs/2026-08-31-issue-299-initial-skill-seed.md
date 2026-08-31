@@ -4,7 +4,7 @@
 
 **Branch:** `issue/299-admit-qualify-and-prepare-activation-routing-for`
 
-**Current evidence source checkpoint:** `78c5dab2cae0adc29049506ed33cbb169c27dc23`
+**Current evidence source checkpoint:** `d507a656ae110eca7eb67eb6d165c6c40bb39035`
 
 ## Completed
 
@@ -39,8 +39,13 @@ this intake.
 - Added a confined `skill_script` Eval Runner adapter that stages an immutable
   skill release, rejects unsafe paths and symlinks, and emits execution receipts.
 - The hybrid adapter's executable routing-conformance suite passed all 22 cases
-  locally with a weighted score of 1.0. The run remained uncertified because
-  local network isolation was unproven; it does not qualify the 19 members.
+  in the sealed Linux executor with network isolation denied, 22 execution
+  receipts, and a weighted score of 1.0. The non-promoting run correctly forced
+  `eval_pending`, wrote no sealed release evidence, and performed no catalog or
+  ledger promotion. This adapter result does not qualify the 19 members.
+- Repaired the confined executor's Linux handling of container Python symlinks;
+  it now binds the governed executable directory instead of attempting a
+  redundant Bubblewrap mount onto a symlink destination.
 - Non-promoting runs for the four design-family adapters returned
   `suite_not_executable`. This is the correct fail-closed outcome because their
   current evaluations do not execute consumer agents.
