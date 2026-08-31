@@ -1,0 +1,136 @@
+{
+  "schema_version": "0.1",
+  "kind": "independent-review",
+  "packet": "ISSUE-304",
+  "subject": "secret-scan-fixture-restamp",
+  "verdict": "PASS",
+  "reviewed_at": "2026-08-31T10:20:00Z",
+  "reviewer": {
+    "role": "independent-reviewer",
+    "actor": "cursor-cloud-agent",
+    "run": "bc-5f0ce147-c2aa-4ffd-8a5c-ecfe0d7a21bd",
+    "branch": "issue/305-independent-review-of-issue-304-secret-scan-fixt"
+  },
+  "preceding_worker": {
+    "run": "bc-edddfad4-e466-4422-afce-978f1971bccf",
+    "name": "DASHBOARD-MAX-LiNKskills-20260831",
+    "issue": 304,
+    "commit": "5f9c0dbfe82609c9b35f5796c5e8894d6fa513b9",
+    "tree": "b63a85523a79fc6f88ec5b70767098558a26f044",
+    "named_next_slice": "independent-review-of-issue-304-restamp-sha"
+  },
+  "reviewed_checkpoint": {
+    "ref": "origin/issue/304-restamp-secret-scan-fixture-candidate-tree-for-i",
+    "commit": "5f9c0dbfe82609c9b35f5796c5e8894d6fa513b9",
+    "tree": "b63a85523a79fc6f88ec5b70767098558a26f044",
+    "content_tree": "e068e0ea6125435c6ac16a3696472b64becaf288",
+    "parent": "3bf03be717c865f7bcb8660d15d9df6b30d7175f",
+    "parent_tree": "1a36a9a31a25f2b6d41c770037fcb0a7c3580b22",
+    "message": "fix(gitops): restamp secret-scan fixture tree for issue 299 hybrid tip",
+    "hybrid_tip": "3bf03be717c865f7bcb8660d15d9df6b30d7175f",
+    "independent_review_of_hybrid": "1f96d2a96773059982655ee9183f5cacce7b0359"
+  },
+  "protected_base": {
+    "ref": "origin/development",
+    "commit": "b45e961c319991919724a9b289121f7d4ef16aa9",
+    "tree": "f321f4b9ee4765bdf56d48c9d77fd60e3f284c7b",
+    "fetched": true,
+    "is_ancestor_of_reviewed_checkpoint": true
+  },
+  "ide_package": {
+    "version": "2.5.2",
+    "managed_files_edited": false,
+    "diff_vs_development": "empty"
+  },
+  "claims": {
+    "qualified_release": false,
+    "qualification_admission": false,
+    "selectability": false,
+    "activation": false,
+    "provider_live": false,
+    "consumer": false,
+    "hosted_stage": false,
+    "vps": false,
+    "e2e": false,
+    "production": false,
+    "secret_scan_fixture_restamp": true
+  },
+  "restamp_observations": {
+    "files_changed_on_restamp_commit": [".github/linktrend-secret-scan-fixtures.json"],
+    "candidate_tree_before": "dba996a4a68dabd8f55c2281e29639658f2a4e69",
+    "candidate_tree_after": "e068e0ea6125435c6ac16a3696472b64becaf288",
+    "computed_candidate_source_tree_matches": true,
+    "fixture_rows_equal_to_development": true,
+    "fixture_count": 39,
+    "production_true_count": 0,
+    "scanner_policy_version": "secret-scan-policy/v1",
+    "schema_version": 1
+  },
+  "named_holds_reused_not_reanalyzed": [
+    "qualification_evidence_missing",
+    "suite_not_executable",
+    "consumer_activation_disabled",
+    "pkt22_packager_credentials"
+  ],
+  "packet_admission": "HOLD",
+  "findings": [],
+  "checks": [
+    {
+      "cmd": "python3 candidate_source_tree == declared candidateTree",
+      "exitCode": 0,
+      "result": "match e068e0ea6125435c6ac16a3696472b64becaf288"
+    },
+    {
+      "cmd": "python3 scripts/gitops/secret_scan.py --repo . --json-output /tmp/issue-304-review/secret-scan.json",
+      "exitCode": 0,
+      "ok": true,
+      "candidateTree": "e068e0ea6125435c6ac16a3696472b64becaf288",
+      "approvedSyntheticFixtureCount": 39,
+      "blockingFindingCount": 0,
+      "skippedInputCount": 1,
+      "skippedInput": "tools/gws/vendor/link-gws-cli/art/qr.txt"
+    },
+    {
+      "cmd": "python3 -m unittest tests.collections.test_initial_skill_seed tests.collections.google_workspace.test_google_workspace_collection",
+      "exitCode": 0,
+      "tests": 11,
+      "result": "OK"
+    },
+    {
+      "cmd": "git diff --stat origin/development...5f9c0db -- .ide-development/ core/managed-core/ .agents/ AGENTS.md",
+      "exitCode": 0,
+      "result": "empty"
+    },
+    {
+      "cmd": "git show --name-only --pretty=format: 5f9c0db",
+      "exitCode": 0,
+      "result": ".github/linktrend-secret-scan-fixtures.json only"
+    },
+    {
+      "cmd": "gh pr list --state open",
+      "exitCode": 0,
+      "result": "none"
+    },
+    {
+      "cmd": "gh api repos/linktrend/LiNKskills/commits/5f9c0dbfe82609c9b35f5796c5e8894d6fa513b9/check-runs",
+      "exitCode": 0,
+      "result": "total=0"
+    }
+  ],
+  "prohibited_actions": {
+    "merge": false,
+    "publication": false,
+    "deploy": false,
+    "review_ready_publish": false,
+    "qualification_admission": false,
+    "consumer_activation": false,
+    "ide_v252_managed_file_edit": false,
+    "pkt22_restamp": false,
+    "implementer_pr": false
+  },
+  "residual_risk": [
+    "Qualification, selectability, and consumer activation remain HOLD on the reviewed hybrid intake; this packet only accepts the secret-scan generated-output restamp of that tip.",
+    "PKT-22 / packager credential HOLD on protected development is unchanged and was not restamped.",
+    "Packager-owned packaging of the independently reviewed #299 hybrid plus #304 restamp is outside this implementer/reviewer slice."
+  ]
+}
