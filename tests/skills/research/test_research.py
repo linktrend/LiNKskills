@@ -79,7 +79,7 @@ class ResearchSkillTests(unittest.TestCase):
     def test_eval_covers_required_adversarial_classes(self) -> None:
         suite = json.loads((RESEARCH / "references" / "eval-suite.json").read_text(encoding="utf-8"))
         case_ids = {case["case_id"] for case in suite["cases"]}
-        for required in ("primary-current-source-brief", "conflicting-dated-sources", "prompt-injection-in-retrieved-content", "private-data-request", "deep-brief-approval-gate", "citation-enforcer-circular-summary", "stable-supplied-evidence-no-search", "legacy-search-strategy-migration"):
+        for required in ("primary-current-source-brief", "conflicting-dated-sources", "prompt-injection-in-retrieved-content", "private-data-request", "deep-brief-approval-gate", "citation-enforcer-circular-summary", "stable-supplied-evidence-no-search", "legacy-search-strategy-migration", "acyclic-claim-graph", "negative-evidence-observed-absence", "provider-neutral-no-named-vendor", "legacy-research-router-excluded"):
             self.assertIn(required, case_ids)
 
     def test_explicit_overlap_migration_keeps_legacy_releases_immutable(self) -> None:
@@ -88,7 +88,11 @@ class ResearchSkillTests(unittest.TestCase):
         self.assertIn("immutable", migration)
         self.assertIn("supersed", migration)
         self.assertIn("citation-enforcer", migration)
+        self.assertIn("one-way", migration)
         self.assertIn("tools/research", migration)
+        pack = json.loads((RESEARCH / "references/skill-pack.json").read_text(encoding="utf-8"))
+        self.assertEqual(pack["dependencies"]["skill_dependencies"], ["citation-enforcer"])
+        self.assertNotIn("search-strategy", pack["dependencies"]["skill_dependencies"])
 
     def test_local_helper_is_deterministic_and_has_no_effects(self) -> None:
         payload = {"claims": [{"claim_id": "c1", "claim_text": "A"}], "sources": [{"source_type": "file", "pointer": "brief.md"}]}
@@ -107,6 +111,79 @@ class ResearchSkillTests(unittest.TestCase):
         self.assertIn("prompt injection", skill)
         self.assertIn("raw sensitive", skill)
         self.assertIn("do not follow", (RESEARCH / "advanced/advanced.md").read_text(encoding="utf-8").lower())
+
+    def test_lr_wp_002_vocabulary_pin_is_frozen(self) -> None:
+        vocab = json.loads((RESEARCH / "references/lr-wp-002-vocabulary.json").read_text(encoding="utf-8"))
+        self.assertEqual(vocab["packet"], "LR-WP-002")
+        self.assertTrue(vocab["frozen"])
+        sys.path.insert(0, str(RESEARCH / "scripts"))
+        from methodology import assert_vocabulary_pin  # noqa: E402
+
+        self.assertEqual(assert_vocabulary_pin(vocab), [])
+
+    def test_methodology_accepts_acyclic_graph_and_rejects_cycles(self) -> None:
+        good = {
+            "intake_kind": "question",
+            "workstreams": [
+                {"kind": "collect", "sequence": 1},
+                {"kind": "extract", "sequence": 2},
+                {"kind": "claim", "sequence": 3},
+                {"kind": "verify", "sequence": 4},
+                {"kind": "synthesize", "sequence": 5},
+            ],
+            "claims": [
+                {"claim_id": "c1", "claim_text": "Official limit is 100.", "source_pointers": ["https://example.com/a"], "rel": "cites"},
+                {"claim_id": "c2", "claim_text": "The limit is not 50.", "source_pointers": ["https://example.com/b"], "rel": "contradicts", "evidence_class": "observed_absence"},
+            ],
+            "claim_links": [
+                {"claim_id": "c1", "rel": "cites", "target_kind": "source-version", "target_id": "sv1"},
+                {"claim_id": "c2", "rel": "contradicts", "target_kind": "source-version", "target_id": "sv2"},
+            ],
+            "conflict_sets": [{"claim_ids": ["c1", "c2"], "status": "open"}],
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "good.json"
+            path.write_text(json.dumps(good), encoding="utf-8")
+            result = subprocess.run([sys.executable, str(RESEARCH / "scripts/helper_tool.py"), "--mode", "methodology", "--input", str(path)], capture_output=True, text=True, check=True)
+        output = json.loads(result.stdout)
+        self.assertEqual(output["status"], "SUCCESS")
+        cyclic = {
+            "workstreams": [{"kind": "claim", "sequence": 1}],
+            "claims": [
+                {"claim_id": "a", "claim_text": "A", "source_pointers": ["https://example.com/a"]},
+                {"claim_id": "b", "claim_text": "B", "source_pointers": ["https://example.com/b"]},
+            ],
+            "claim_links": [
+                {"claim_id": "a", "rel": "supports", "target_kind": "claim", "target_id": "b"},
+                {"claim_id": "b", "rel": "supports", "target_kind": "claim", "target_id": "a"},
+            ],
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "cyclic.json"
+            path.write_text(json.dumps(cyclic), encoding="utf-8")
+            result = subprocess.run([sys.executable, str(RESEARCH / "scripts/helper_tool.py"), "--mode", "methodology", "--input", str(path)], capture_output=True, text=True)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("acyclic", result.stdout.lower())
+
+    def test_legacy_router_and_named_provider_are_rejected(self) -> None:
+        payload = {
+            "workstreams": [{"kind": "collect", "sequence": 1}],
+            "claims": [{"claim_id": "c1", "claim_text": "Use Exa via /tools/research", "source_pointers": ["https://example.com"]}],
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "bad.json"
+            path.write_text(json.dumps(payload), encoding="utf-8")
+            result = subprocess.run([sys.executable, str(RESEARCH / "scripts/helper_tool.py"), "--mode", "methodology", "--input", str(path)], capture_output=True, text=True)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("exa", result.stdout.lower())
+        self.assertIn("tools/research", result.stdout.lower())
+
+    def test_skill_frontmatter_has_no_search_strategy_dependency(self) -> None:
+        skill = (RESEARCH / "SKILL.md").read_text(encoding="utf-8")
+        self.assertIn("dependencies: [citation-enforcer]", skill)
+        self.assertNotIn("dependencies: [search-strategy, citation-enforcer]", skill)
+        self.assertIn("provider-neutral", skill.lower())
+        self.assertIn("tools/research", skill.lower())
 
 
 if __name__ == "__main__":

@@ -1,0 +1,42 @@
+{
+  "packet": "LR-WP-002",
+  "status": "protected-accepted",
+  "schemaFamily": "linkresearch.domain",
+  "domainVersion": "1.0.0",
+  "schemaVersion": 1,
+  "frozen": true,
+  "consumer": "LiNKskills",
+  "authorityBoundary": "linkresearch-program",
+  "source": {
+    "repository": "linktrend/LiNKresearch",
+    "commit": "a613b2f2317e8d9607551c6c4dfd6d1bf85130aa",
+    "tree": "c3449ed36c30a1b0f2c205e984f5a9819a0fa35b",
+    "paths": [
+      "packages/contracts/src/domain/intake-vocabulary.schema.json",
+      "packages/contracts/src/domain/plan.schema.json",
+      "packages/contracts/src/domain/claim.schema.json",
+      "packages/contracts/src/domain/claim-link.schema.json",
+      "packages/contracts/src/domain/conflict-set.schema.json",
+      "packages/contracts/src/domain/source.schema.json",
+      "docs/data/OWNERSHIP-AND-INVARIANTS.md"
+    ]
+  },
+  "enums": {
+    "intakeKind": ["audit", "comparison", "hypothesis", "question", "refresh"],
+    "workstreamKind": ["claim", "collect", "extract", "refresh", "synthesize", "verify"],
+    "claimLinkRel": ["cites", "contradicts", "qualifies", "supports"],
+    "claimLinkTargetKind": ["claim", "evidence-excerpt", "source-version"],
+    "sourceKind": ["api", "dataset", "document", "interview", "notebook", "url"],
+    "conflictStatus": ["deferred", "open", "resolved"],
+    "claimStatus": ["asserted", "withdrawn"],
+    "verificationOutcome": ["fail", "inconclusive", "pass"],
+    "verificationMethod": ["graph", "manual-record", "schema"]
+  },
+  "invariants": [
+    "claim-to-claim links must be acyclic",
+    "claim cannot supersede itself",
+    "claim cannot link to itself",
+    "conflict sets contain at least two distinct claims",
+    "workstream sequence must be unique"
+  ]
+}

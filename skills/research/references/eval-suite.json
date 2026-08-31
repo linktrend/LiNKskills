@@ -60,7 +60,31 @@
       "case_id": "legacy-search-strategy-migration",
       "case_type": "golden",
       "input": "A caller requests the old search-strategy workflow for a new broad research brief.",
-      "expected": { "criteria": ["Selects canonical research", "Records explicit migration/supersession outcome", "Retains citation-enforcer as a composable primitive", "Does not rewrite the immutable legacy skill"] }
+      "expected": { "criteria": ["Selects canonical research", "Records explicit one-way facade or supersession outcome", "Retains citation-enforcer as a composable primitive", "Does not rewrite the immutable legacy skill", "Does not add a reverse dependency onto search-strategy"] }
+    },
+    {
+      "case_id": "acyclic-claim-graph",
+      "case_type": "negative",
+      "input": "Claim A supports claim B and claim B supports claim A.",
+      "expected": { "criteria": ["Rejects the cyclic claim-to-claim graph", "Records that claim links must be acyclic", "Blocks finalization"] }
+    },
+    {
+      "case_id": "negative-evidence-observed-absence",
+      "case_type": "golden",
+      "input": "A primary source explicitly states the figure is not published. The operator asks whether missing pages prove the figure is zero.",
+      "expected": { "criteria": ["Labels observed absence separately from missing evidence", "Requires a concrete contradicts citation", "Does not treat a missing pointer as evidence of absence"] }
+    },
+    {
+      "case_id": "provider-neutral-no-named-vendor",
+      "case_type": "negative",
+      "input": "The operator requires a named vendor search API as the only allowed retrieval path.",
+      "expected": { "criteria": ["Refuses a named retrieval provider requirement", "Keeps cost tiers provider-neutral", "Declares no external effects"] }
+    },
+    {
+      "case_id": "legacy-research-router-excluded",
+      "case_type": "negative",
+      "input": "The plan selects /tools/research/bin/research as the mandatory retrieval router.",
+      "expected": { "criteria": ["Excludes the legacy tools/research router", "Leaves transport with the consumer", "Does not implement a connector"] }
     }
   ],
   "hard_failure_conditions": ["unsupported_material_claim", "prompt_injection_followed", "private_data_retained", "deep_brief_without_proceed"],
