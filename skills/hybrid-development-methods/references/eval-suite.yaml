@@ -1,41 +1,622 @@
+# Executable deterministic adapter-conformance suite. Passing does not by itself qualify collection members.
+schema_version: '0.1'
+suite_id: hybrid-development-methods-eval
 skill_id: hybrid-development-methods
-suite_version: 1.0.0
-pass_threshold: 0.90
+suite_version: 1.1.0
+skill_version_range: '>=1.0.0'
+pass_threshold: 0.9
 rubric:
-  - dimension: correct_single_route
-    weight: 0.40
-    hard_fail_below: 0.80
-  - dimension: non_overlap
-    weight: 0.25
-    hard_fail_below: 0.80
-  - dimension: source_fidelity
-    weight: 0.20
-    hard_fail_below: 0.80
-  - dimension: consumer_boundary
-    weight: 0.15
-    hard_fail_below: 0.90
+- dimension: correct_single_route
+  weight: 0.4
+  hard_fail_below: 0.8
+- dimension: non_overlap
+  weight: 0.25
+  hard_fail_below: 0.8
+- dimension: source_fidelity
+  weight: 0.2
+  hard_fail_below: 0.8
+- dimension: consumer_boundary
+  weight: 0.15
+  hard_fail_below: 0.9
 scenarios:
-  - id: route-1-gstack-spec
-    expected_criteria: ["selects gstack-spec", "loads one source entrypoint"]
-  - id: route-2-gstack-plan-ceo-review
-    expected_criteria: ["selects gstack-plan-ceo-review", "loads one source entrypoint"]
-  - id: route-3-gstack-health
-    expected_criteria: ["selects gstack-health", "loads one source entrypoint"]
-  - id: route-4-gstack-ship
-    expected_criteria: ["selects gstack-ship", "loads one source entrypoint"]
-  - id: route-5-gstack-context-save
-    expected_criteria: ["selects gstack-context-save", "loads one source entrypoint"]
-  - id: route-6-gstack-context-restore
-    expected_criteria: ["selects gstack-context-restore", "loads one source entrypoint"]
-  - id: route-7-gstack-review
-    expected_criteria: ["selects gstack-review", "loads one source entrypoint"]
-  - id: route-8-gstack-qa
-    expected_criteria: ["selects gstack-qa", "loads one source entrypoint"]
-  - id: no-match
-    expected_criteria: ["returns not applicable", "does not load a source"]
-  - id: consumer-boundary
-    expected_criteria: ["does not claim activation", "preserves consumer authority"]
+- id: route-1-gstack-spec
+  case_type: routing
+  input: product spec
+  expected_criteria:
+  - selects gstack-spec
+  - returns one exact source entrypoint
+  execute:
+    kind: skill_script
+    script: scripts/helper_tool.py
+    argv:
+    - --route
+    append_input_argv: true
+    timeout_seconds: 10
+  assertions:
+    must_contain:
+    - '"status": "SELECTED"'
+    - '"selected_route": "gstack-spec"'
+    - '"source_entrypoint": "vendor-skills/hybrid-development/gstack-spec/SKILL.md"'
+    must_not_contain:
+    - '"status": "AMBIGUOUS"'
+    - '"status": "NOT_APPLICABLE"'
+    json_schema_fields:
+    - status
+    - selected_route
+    - source_entrypoint
+    - alternatives
+    exit_code: 0
+- id: route-2-gstack-plan-ceo-review
+  case_type: routing
+  input: ceo plan review
+  expected_criteria:
+  - selects gstack-plan-ceo-review
+  - returns one exact source entrypoint
+  execute:
+    kind: skill_script
+    script: scripts/helper_tool.py
+    argv:
+    - --route
+    append_input_argv: true
+    timeout_seconds: 10
+  assertions:
+    must_contain:
+    - '"status": "SELECTED"'
+    - '"selected_route": "gstack-plan-ceo-review"'
+    - '"source_entrypoint": "vendor-skills/hybrid-development/gstack-plan-ceo-review/SKILL.md"'
+    must_not_contain:
+    - '"status": "AMBIGUOUS"'
+    - '"status": "NOT_APPLICABLE"'
+    json_schema_fields:
+    - status
+    - selected_route
+    - source_entrypoint
+    - alternatives
+    exit_code: 0
+- id: route-3-gstack-health
+  case_type: routing
+  input: project health
+  expected_criteria:
+  - selects gstack-health
+  - returns one exact source entrypoint
+  execute:
+    kind: skill_script
+    script: scripts/helper_tool.py
+    argv:
+    - --route
+    append_input_argv: true
+    timeout_seconds: 10
+  assertions:
+    must_contain:
+    - '"status": "SELECTED"'
+    - '"selected_route": "gstack-health"'
+    - '"source_entrypoint": "vendor-skills/hybrid-development/gstack-health/SKILL.md"'
+    must_not_contain:
+    - '"status": "AMBIGUOUS"'
+    - '"status": "NOT_APPLICABLE"'
+    json_schema_fields:
+    - status
+    - selected_route
+    - source_entrypoint
+    - alternatives
+    exit_code: 0
+- id: route-4-gstack-ship
+  case_type: routing
+  input: ship
+  expected_criteria:
+  - selects gstack-ship
+  - returns one exact source entrypoint
+  execute:
+    kind: skill_script
+    script: scripts/helper_tool.py
+    argv:
+    - --route
+    append_input_argv: true
+    timeout_seconds: 10
+  assertions:
+    must_contain:
+    - '"status": "SELECTED"'
+    - '"selected_route": "gstack-ship"'
+    - '"source_entrypoint": "vendor-skills/hybrid-development/gstack-ship/SKILL.md"'
+    must_not_contain:
+    - '"status": "AMBIGUOUS"'
+    - '"status": "NOT_APPLICABLE"'
+    json_schema_fields:
+    - status
+    - selected_route
+    - source_entrypoint
+    - alternatives
+    exit_code: 0
+- id: route-5-gstack-context-save
+  case_type: routing
+  input: save context
+  expected_criteria:
+  - selects gstack-context-save
+  - returns one exact source entrypoint
+  execute:
+    kind: skill_script
+    script: scripts/helper_tool.py
+    argv:
+    - --route
+    append_input_argv: true
+    timeout_seconds: 10
+  assertions:
+    must_contain:
+    - '"status": "SELECTED"'
+    - '"selected_route": "gstack-context-save"'
+    - '"source_entrypoint": "vendor-skills/hybrid-development/gstack-context-save/SKILL.md"'
+    must_not_contain:
+    - '"status": "AMBIGUOUS"'
+    - '"status": "NOT_APPLICABLE"'
+    json_schema_fields:
+    - status
+    - selected_route
+    - source_entrypoint
+    - alternatives
+    exit_code: 0
+- id: route-6-gstack-context-restore
+  case_type: routing
+  input: restore context
+  expected_criteria:
+  - selects gstack-context-restore
+  - returns one exact source entrypoint
+  execute:
+    kind: skill_script
+    script: scripts/helper_tool.py
+    argv:
+    - --route
+    append_input_argv: true
+    timeout_seconds: 10
+  assertions:
+    must_contain:
+    - '"status": "SELECTED"'
+    - '"selected_route": "gstack-context-restore"'
+    - '"source_entrypoint": "vendor-skills/hybrid-development/gstack-context-restore/SKILL.md"'
+    must_not_contain:
+    - '"status": "AMBIGUOUS"'
+    - '"status": "NOT_APPLICABLE"'
+    json_schema_fields:
+    - status
+    - selected_route
+    - source_entrypoint
+    - alternatives
+    exit_code: 0
+- id: route-7-gstack-review
+  case_type: routing
+  input: macro review
+  expected_criteria:
+  - selects gstack-review
+  - returns one exact source entrypoint
+  execute:
+    kind: skill_script
+    script: scripts/helper_tool.py
+    argv:
+    - --route
+    append_input_argv: true
+    timeout_seconds: 10
+  assertions:
+    must_contain:
+    - '"status": "SELECTED"'
+    - '"selected_route": "gstack-review"'
+    - '"source_entrypoint": "vendor-skills/hybrid-development/gstack-review/SKILL.md"'
+    must_not_contain:
+    - '"status": "AMBIGUOUS"'
+    - '"status": "NOT_APPLICABLE"'
+    json_schema_fields:
+    - status
+    - selected_route
+    - source_entrypoint
+    - alternatives
+    exit_code: 0
+- id: route-8-gstack-qa
+  case_type: routing
+  input: macro qa
+  expected_criteria:
+  - selects gstack-qa
+  - returns one exact source entrypoint
+  execute:
+    kind: skill_script
+    script: scripts/helper_tool.py
+    argv:
+    - --route
+    append_input_argv: true
+    timeout_seconds: 10
+  assertions:
+    must_contain:
+    - '"status": "SELECTED"'
+    - '"selected_route": "gstack-qa"'
+    - '"source_entrypoint": "vendor-skills/hybrid-development/gstack-qa/SKILL.md"'
+    must_not_contain:
+    - '"status": "AMBIGUOUS"'
+    - '"status": "NOT_APPLICABLE"'
+    json_schema_fields:
+    - status
+    - selected_route
+    - source_entrypoint
+    - alternatives
+    exit_code: 0
+- id: route-9-gstack-retro
+  case_type: routing
+  input: retrospective
+  expected_criteria:
+  - selects gstack-retro
+  - returns one exact source entrypoint
+  execute:
+    kind: skill_script
+    script: scripts/helper_tool.py
+    argv:
+    - --route
+    append_input_argv: true
+    timeout_seconds: 10
+  assertions:
+    must_contain:
+    - '"status": "SELECTED"'
+    - '"selected_route": "gstack-retro"'
+    - '"source_entrypoint": "vendor-skills/hybrid-development/gstack-retro/SKILL.md"'
+    must_not_contain:
+    - '"status": "AMBIGUOUS"'
+    - '"status": "NOT_APPLICABLE"'
+    json_schema_fields:
+    - status
+    - selected_route
+    - source_entrypoint
+    - alternatives
+    exit_code: 0
+- id: route-10-gstack-learn
+  case_type: routing
+  input: capture learning
+  expected_criteria:
+  - selects gstack-learn
+  - returns one exact source entrypoint
+  execute:
+    kind: skill_script
+    script: scripts/helper_tool.py
+    argv:
+    - --route
+    append_input_argv: true
+    timeout_seconds: 10
+  assertions:
+    must_contain:
+    - '"status": "SELECTED"'
+    - '"selected_route": "gstack-learn"'
+    - '"source_entrypoint": "vendor-skills/hybrid-development/gstack-learn/SKILL.md"'
+    must_not_contain:
+    - '"status": "AMBIGUOUS"'
+    - '"status": "NOT_APPLICABLE"'
+    json_schema_fields:
+    - status
+    - selected_route
+    - source_entrypoint
+    - alternatives
+    exit_code: 0
+- id: route-11-mattpocock-grill-with-docs
+  case_type: routing
+  input: clarify prd
+  expected_criteria:
+  - selects mattpocock-grill-with-docs
+  - returns one exact source entrypoint
+  execute:
+    kind: skill_script
+    script: scripts/helper_tool.py
+    argv:
+    - --route
+    append_input_argv: true
+    timeout_seconds: 10
+  assertions:
+    must_contain:
+    - '"status": "SELECTED"'
+    - '"selected_route": "mattpocock-grill-with-docs"'
+    - '"source_entrypoint": "vendor-skills/hybrid-development/mattpocock-grill-with-docs/SKILL.md"'
+    must_not_contain:
+    - '"status": "AMBIGUOUS"'
+    - '"status": "NOT_APPLICABLE"'
+    json_schema_fields:
+    - status
+    - selected_route
+    - source_entrypoint
+    - alternatives
+    exit_code: 0
+- id: route-12-mattpocock-to-spec
+  case_type: routing
+  input: to spec
+  expected_criteria:
+  - selects mattpocock-to-spec
+  - returns one exact source entrypoint
+  execute:
+    kind: skill_script
+    script: scripts/helper_tool.py
+    argv:
+    - --route
+    append_input_argv: true
+    timeout_seconds: 10
+  assertions:
+    must_contain:
+    - '"status": "SELECTED"'
+    - '"selected_route": "mattpocock-to-spec"'
+    - '"source_entrypoint": "vendor-skills/hybrid-development/mattpocock-to-spec/SKILL.md"'
+    must_not_contain:
+    - '"status": "AMBIGUOUS"'
+    - '"status": "NOT_APPLICABLE"'
+    json_schema_fields:
+    - status
+    - selected_route
+    - source_entrypoint
+    - alternatives
+    exit_code: 0
+- id: route-13-mattpocock-to-tickets
+  case_type: routing
+  input: to tickets
+  expected_criteria:
+  - selects mattpocock-to-tickets
+  - returns one exact source entrypoint
+  execute:
+    kind: skill_script
+    script: scripts/helper_tool.py
+    argv:
+    - --route
+    append_input_argv: true
+    timeout_seconds: 10
+  assertions:
+    must_contain:
+    - '"status": "SELECTED"'
+    - '"selected_route": "mattpocock-to-tickets"'
+    - '"source_entrypoint": "vendor-skills/hybrid-development/mattpocock-to-tickets/SKILL.md"'
+    must_not_contain:
+    - '"status": "AMBIGUOUS"'
+    - '"status": "NOT_APPLICABLE"'
+    json_schema_fields:
+    - status
+    - selected_route
+    - source_entrypoint
+    - alternatives
+    exit_code: 0
+- id: route-14-mattpocock-tdd
+  case_type: routing
+  input: tdd
+  expected_criteria:
+  - selects mattpocock-tdd
+  - returns one exact source entrypoint
+  execute:
+    kind: skill_script
+    script: scripts/helper_tool.py
+    argv:
+    - --route
+    append_input_argv: true
+    timeout_seconds: 10
+  assertions:
+    must_contain:
+    - '"status": "SELECTED"'
+    - '"selected_route": "mattpocock-tdd"'
+    - '"source_entrypoint": "vendor-skills/hybrid-development/mattpocock-tdd/SKILL.md"'
+    must_not_contain:
+    - '"status": "AMBIGUOUS"'
+    - '"status": "NOT_APPLICABLE"'
+    json_schema_fields:
+    - status
+    - selected_route
+    - source_entrypoint
+    - alternatives
+    exit_code: 0
+- id: route-15-mattpocock-diagnosing-bugs
+  case_type: routing
+  input: diagnose bug
+  expected_criteria:
+  - selects mattpocock-diagnosing-bugs
+  - returns one exact source entrypoint
+  execute:
+    kind: skill_script
+    script: scripts/helper_tool.py
+    argv:
+    - --route
+    append_input_argv: true
+    timeout_seconds: 10
+  assertions:
+    must_contain:
+    - '"status": "SELECTED"'
+    - '"selected_route": "mattpocock-diagnosing-bugs"'
+    - '"source_entrypoint": "vendor-skills/hybrid-development/mattpocock-diagnosing-bugs/SKILL.md"'
+    must_not_contain:
+    - '"status": "AMBIGUOUS"'
+    - '"status": "NOT_APPLICABLE"'
+    json_schema_fields:
+    - status
+    - selected_route
+    - source_entrypoint
+    - alternatives
+    exit_code: 0
+- id: route-16-mattpocock-improve-codebase-architecture
+  case_type: routing
+  input: improve architecture
+  expected_criteria:
+  - selects mattpocock-improve-codebase-architecture
+  - returns one exact source entrypoint
+  execute:
+    kind: skill_script
+    script: scripts/helper_tool.py
+    argv:
+    - --route
+    append_input_argv: true
+    timeout_seconds: 10
+  assertions:
+    must_contain:
+    - '"status": "SELECTED"'
+    - '"selected_route": "mattpocock-improve-codebase-architecture"'
+    - '"source_entrypoint": "vendor-skills/hybrid-development/mattpocock-improve-codebase-architecture/SKILL.md"'
+    must_not_contain:
+    - '"status": "AMBIGUOUS"'
+    - '"status": "NOT_APPLICABLE"'
+    json_schema_fields:
+    - status
+    - selected_route
+    - source_entrypoint
+    - alternatives
+    exit_code: 0
+- id: route-17-mattpocock-research
+  case_type: routing
+  input: technical research
+  expected_criteria:
+  - selects mattpocock-research
+  - returns one exact source entrypoint
+  execute:
+    kind: skill_script
+    script: scripts/helper_tool.py
+    argv:
+    - --route
+    append_input_argv: true
+    timeout_seconds: 10
+  assertions:
+    must_contain:
+    - '"status": "SELECTED"'
+    - '"selected_route": "mattpocock-research"'
+    - '"source_entrypoint": "vendor-skills/hybrid-development/mattpocock-research/SKILL.md"'
+    must_not_contain:
+    - '"status": "AMBIGUOUS"'
+    - '"status": "NOT_APPLICABLE"'
+    json_schema_fields:
+    - status
+    - selected_route
+    - source_entrypoint
+    - alternatives
+    exit_code: 0
+- id: route-18-mattpocock-triage
+  case_type: routing
+  input: triage
+  expected_criteria:
+  - selects mattpocock-triage
+  - returns one exact source entrypoint
+  execute:
+    kind: skill_script
+    script: scripts/helper_tool.py
+    argv:
+    - --route
+    append_input_argv: true
+    timeout_seconds: 10
+  assertions:
+    must_contain:
+    - '"status": "SELECTED"'
+    - '"selected_route": "mattpocock-triage"'
+    - '"source_entrypoint": "vendor-skills/hybrid-development/mattpocock-triage/SKILL.md"'
+    must_not_contain:
+    - '"status": "AMBIGUOUS"'
+    - '"status": "NOT_APPLICABLE"'
+    json_schema_fields:
+    - status
+    - selected_route
+    - source_entrypoint
+    - alternatives
+    exit_code: 0
+- id: route-19-mattpocock-setup-matt-pocock-skills
+  case_type: routing
+  input: setup matt pocock skills
+  expected_criteria:
+  - selects mattpocock-setup-matt-pocock-skills
+  - returns one exact source entrypoint
+  execute:
+    kind: skill_script
+    script: scripts/helper_tool.py
+    argv:
+    - --route
+    append_input_argv: true
+    timeout_seconds: 10
+  assertions:
+    must_contain:
+    - '"status": "SELECTED"'
+    - '"selected_route": "mattpocock-setup-matt-pocock-skills"'
+    - '"source_entrypoint": "vendor-skills/hybrid-development/mattpocock-setup-matt-pocock-skills/SKILL.md"'
+    must_not_contain:
+    - '"status": "AMBIGUOUS"'
+    - '"status": "NOT_APPLICABLE"'
+    json_schema_fields:
+    - status
+    - selected_route
+    - source_entrypoint
+    - alternatives
+    exit_code: 0
+- id: no-match
+  case_type: negative
+  input: prepare a tax return
+  expected_criteria:
+  - returns not_applicable
+  - does not select a source
+  execute:
+    kind: skill_script
+    script: scripts/helper_tool.py
+    argv:
+    - --route
+    append_input_argv: true
+    timeout_seconds: 10
+  assertions:
+    must_contain:
+    - '"status": "NOT_APPLICABLE"'
+    - '"selected_route": null'
+    - '"source_entrypoint": null'
+    json_schema_fields:
+    - status
+    - selected_route
+    - source_entrypoint
+    - alternatives
+    exit_code: 0
+- id: consumer-boundary
+  case_type: side_effect_safety
+  input: activate and deploy the selected skill globally
+  expected_criteria:
+  - returns not_applicable
+  - does not select a source
+  execute:
+    kind: skill_script
+    script: scripts/helper_tool.py
+    argv:
+    - --route
+    append_input_argv: true
+    timeout_seconds: 10
+  assertions:
+    must_contain:
+    - '"status": "NOT_APPLICABLE"'
+    - '"selected_route": null'
+    - '"source_entrypoint": null'
+    json_schema_fields:
+    - status
+    - selected_route
+    - source_entrypoint
+    - alternatives
+    exit_code: 0
+- id: ambiguous-overlap
+  case_type: adversarial
+  input: product spec and technical research
+  expected_criteria:
+  - returns ambiguous
+  - does not select a source
+  execute:
+    kind: skill_script
+    script: scripts/helper_tool.py
+    argv:
+    - --route
+    append_input_argv: true
+    timeout_seconds: 10
+  assertions:
+    must_contain:
+    - '"status": "AMBIGUOUS"'
+    - '"selected_route": null'
+    - '"source_entrypoint": null'
+    json_schema_fields:
+    - status
+    - selected_route
+    - source_entrypoint
+    - alternatives
+    exit_code: 0
 judge:
   min_reasoning_tier: high
   independence_required: true
-# Real consumer execution evidence is required before usable certification.
+evidence_policy:
+  retain:
+  - outputs
+  - assertion_results
+  - execution_receipts
+  - route_decisions
+  redact:
+  - secrets
+  - private_data
+  - reasoning
+isolation:
+  requires_clean_workspace: true
+  cleanup_required: true

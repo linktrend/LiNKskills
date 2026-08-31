@@ -17,7 +17,7 @@ publication, eligibility, or activation process.
 | `awesome-design-presets` | Select one named or brief-matched aesthetic preset from the complete 67-preset library | Procedural design authority or supplied brand truth |
 | `impeccable-design-system` | Shape, critique, audit, harden, reconcile, and polish the selected interface direction | Wide visual divergence or specialist native/motion work |
 | `emil-design-engineering` | Motion, animation, prototyping, Sonner, Expo, Apple interaction, Swift, and specialist design engineering | Broad design-system reconciliation or release governance |
-| `hybrid-development-methods` | Route development work between gstack macro workflows and Matt Pocock micro workflows | IDE Development or consumer proof, review, integration, promotion, and permission processes |
+| `hybrid-development-methods` | Route development work through the existing Principal-created LiNKtrend hybrid migrated from IDE Development, selecting its adapted gstack macro or Matt Pocock micro workflow | IDE Development or consumer proof, review, integration, promotion, and permission processes |
 
 ## Sequential composition
 
@@ -59,16 +59,29 @@ task-matched member, then produces an explicit handoff.
 
 ## Current admission state
 
-The five new collections and five native family skills are `eval_pending` or
-otherwise nonselectable. Structural validation, source integrity, routing
-tests, real evaluation, immutable publication, eligibility, and consumer proof
-must remain separately evidenced. No statement in this document changes a
-release state or activates a consumer.
+The four new external collections, the migrated hybrid collection, and five
+native family adapters are `eval_pending` or otherwise nonselectable.
+Structural validation, source integrity, routing tests, real evaluation,
+immutable publication, eligibility, and consumer proof must remain separately
+evidenced. No statement in this document changes a release state or activates
+a consumer.
+
+For avoidance of doubt, the hybrid family is not newly assembled in this seed.
+It is the previously intended migration of the Principal-created LiNKtrend
+hybrid from IDE Development. IDE Development retains its physical copy until
+qualified LiNKskills releases are pinned, consumer-proven, and rollback-safe.
 
 The repository's real certification runner was exercised in non-promoting mode
-against all five native family skills on 2026-08-31. Each correctly remained
-`draft` with reason code `suite_not_executable`: the current suites describe
-judged scenarios but do not execute a consumer agent. ADR 0006 prohibits using
-prompt-only or suite-authored output as certification evidence. Qualification
-therefore remains on hold until the established runner can execute and seal
-representative consumer-profile work; this intake does not weaken that rule.
+against all five native family skills on 2026-08-31. The four design-family
+adapters correctly remained `draft` with reason code `suite_not_executable`:
+their current suites describe judged scenarios but do not execute a consumer
+agent. The hybrid adapter now has a 22-case executable routing-conformance suite
+using the runner's confined `skill_script` adapter. All 22 cases pass locally,
+but the run remains uncertified because local network isolation is unproven.
+
+This executable hybrid suite proves only deterministic selection and fail-closed
+routing for the adapter. It does not qualify any of the 19 underlying workflow
+members. ADR 0006 prohibits using prompt-only or suite-authored output as
+certification evidence, and member qualification still requires sealed,
+representative consumer-profile execution. This intake does not weaken that
+rule.

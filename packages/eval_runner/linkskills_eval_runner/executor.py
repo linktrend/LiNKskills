@@ -335,6 +335,101 @@ def _execute_command(
     return exit_code, stdout, stderr, call, [stdout_path, stderr_path], network_isolation
 
 
+def _execute_skill_script(
+    spec: Mapping[str, Any],
+    *,
+    case: EvalCase,
+    workspace: EvalWorkspace,
+    skill_dir: Path,
+) -> tuple[int | None, str, str, ToolCallRecord, list[Path], str]:
+    """Stage and execute one script owned by the immutable skill release."""
+    from linkskills_tool_runtime.confined_exec import (
+        ConfinedExecutionError,
+        run_confined,
+    )
+
+    source_root = skill_dir.resolve()
+    if not source_root.is_dir():
+        raise FileNotFoundError(f"skill directory not found: {source_root}")
+
+    script_value = str(spec.get("script") or "").strip()
+    script_rel = Path(script_value)
+    if (
+        not script_value
+        or script_rel.is_absolute()
+        or any(part in {"", ".", ".."} for part in script_rel.parts)
+    ):
+        raise ValueError("execute.skill_script requires a safe relative script path")
+
+    source_script = (source_root / script_rel).resolve()
+    try:
+        source_script.relative_to(source_root)
+    except ValueError as exc:
+        raise ValueError("execute.skill_script script escapes the skill directory") from exc
+    if not source_script.is_file() or source_script.is_symlink():
+        raise FileNotFoundError(f"skill script is missing or unsafe: {script_rel.as_posix()}")
+
+    unsafe_link = next((path for path in source_root.rglob("*") if path.is_symlink()), None)
+    if unsafe_link is not None:
+        relative_link = unsafe_link.relative_to(source_root).as_posix()
+        raise ValueError(
+            "execute.skill_script cannot stage a skill release containing symlinks: "
+            f"{relative_link}"
+        )
+
+    staged_root = workspace.root / "skill"
+    if not staged_root.exists():
+        shutil.copytree(source_root, staged_root, symlinks=False)
+    staged_script = staged_root / script_rel
+    if not staged_script.is_file() or staged_script.is_symlink():
+        raise FileNotFoundError(f"staged skill script is missing or unsafe: {script_rel.as_posix()}")
+
+    script_argv = [str(value) for value in (spec.get("argv") or [])]
+    if spec.get("append_input_argv") and case.input:
+        script_argv.append(case.input.strip())
+    actual_argv = [sys.executable, staged_script.relative_to(workspace.root).as_posix(), *script_argv]
+    timeout = float(spec.get("timeout_seconds") or 30)
+    try:
+        confined = run_confined(
+            actual_argv,
+            workspace=workspace.root,
+            cwd=workspace.root,
+            env={str(k): str(v) for k, v in dict(spec.get("env") or {}).items()},
+            timeout_seconds=timeout,
+            input_text=str(spec["stdin"]) if spec.get("stdin") is not None else None,
+        )
+        exit_code = confined.exit_code
+        stdout = confined.stdout
+        stderr = confined.stderr
+        timed_out = confined.timed_out
+        error = confined.error
+        network_isolation = confined.network_isolation
+    except ConfinedExecutionError as exc:
+        exit_code = None
+        stdout = ""
+        stderr = ""
+        timed_out = False
+        error = str(exc)
+        network_isolation = "unavailable"
+
+    stdout_path = workspace.write_output(f"{case.id}.stdout", stdout)
+    stderr_path = workspace.outputs_dir / f"{case.id}.stderr.txt"
+    stderr_path.write_text(stderr, encoding="utf-8")
+    call = ToolCallRecord(
+        tool_id=str(spec.get("name") or f"{skill_dir.name}:{script_rel.as_posix()}"),
+        version=str(spec.get("version") or "skill-release"),
+        tool_hash=_file_hash(staged_script),
+        adapter_kind="confined_skill_script",
+        argv=["python", f"skill/{script_rel.as_posix()}", *script_argv],
+        exit_code=exit_code,
+        stdout_hash=sha256_text(stdout),
+        stderr_hash=sha256_text(stderr),
+        timed_out=timed_out,
+        error=error,
+    )
+    return exit_code, stdout, stderr, call, [stdout_path, stderr_path], network_isolation
+
+
 def execute_case(
     case: EvalCase,
     *,
@@ -384,6 +479,15 @@ def execute_case(
                 execute,
                 case=case,
                 workspace=workspace,
+            )
+        elif kind == "skill_script":
+            if skill_dir is None:
+                raise ValueError("execute.skill_script requires the immutable skill directory")
+            exit_code, stdout, stderr, call, artifacts, network_isolation = _execute_skill_script(
+                execute,
+                case=case,
+                workspace=workspace,
+                skill_dir=Path(skill_dir),
             )
         else:
             finished = _utc_now()

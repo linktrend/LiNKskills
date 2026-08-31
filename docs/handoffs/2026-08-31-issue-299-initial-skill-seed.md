@@ -9,8 +9,11 @@
 ## Completed
 
 - Preserved exact, commit-bound source for Impeccable, Taste, Emil Kowalski,
-  Awesome Design Skills, and the IDE Development Matt Pocock plus gstack
-  hybrid.
+  and Awesome Design Skills.
+- Began the previously intended migration of the existing Principal-created
+  LiNKtrend hybrid from IDE Development. The hybrid was not newly assembled by
+  this issue; its adapted gstack and Matt Pocock components were preserved
+  byte-for-byte from protected IDE Development source.
 - Added five fail-closed collection inventories containing 112 member releases.
 - Added five LiNKskills-native family adapters with non-overlapping routing.
 - Preserved upstream licence and notice texts.
@@ -33,8 +36,13 @@ this intake.
   warnings.
 - Catalog generation and provenance check passed at 56 catalog skills and zero
   usable skills.
-- A non-promoting real certification run returned `suite_not_executable` for
-  all five new adapters. This is the correct fail-closed outcome because their
+- Added a confined `skill_script` Eval Runner adapter that stages an immutable
+  skill release, rejects unsafe paths and symlinks, and emits execution receipts.
+- The hybrid adapter's executable routing-conformance suite passed all 22 cases
+  locally with a weighted score of 1.0. The run remained uncertified because
+  local network isolation was unproven; it does not qualify the 19 members.
+- Non-promoting runs for the four design-family adapters returned
+  `suite_not_executable`. This is the correct fail-closed outcome because their
   current evaluations do not execute consumer agents.
 - The repository-wide secret scan found no finding in any new path. Its overall
   result remained blocked because the pre-existing synthetic-fixture declaration
@@ -42,8 +50,9 @@ this intake.
 
 ## Remaining gates
 
-1. Add real, consumer-profile agent execution to the established Eval Runner;
-   prompt-only or suite-authored output cannot qualify these skills.
+1. Add real, consumer-profile agent execution for the four design adapters and
+   each underlying hybrid member; adapter routing conformance alone cannot
+   qualify content.
 2. Run the qualifying cases on the sealed Linux executor with an external
    issuer key and digest-pinned image.
 3. Publish exact eligible releases only for members that pass.
@@ -52,3 +61,7 @@ this intake.
 
 No consumer activation, protected integration, staging promotion, or production
 claim is authorized by this handoff.
+
+IDE Development's physical hybrid copy remains the rollback source until the
+LiNKskills releases are qualified, pinned, consumer-proven, and safe to cut
+over. Its removal is not authorized by this checkpoint.

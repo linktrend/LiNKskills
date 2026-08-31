@@ -1,11 +1,11 @@
 ---
 name: hybrid-development-methods
-description: "Routes software-development work through LiNKtrend's exact combined gstack macro workflows and Matt Pocock micro workflows while remaining subordinate to each consumer's delivery process."
+description: "Routes software-development work through the Principal-created LiNKtrend hybrid migrated from IDE Development, selecting its adapted gstack macro or Matt Pocock micro workflow while preserving consumer delivery gates."
 usage_trigger: "Use when IDE Development, LiNKdeveloper, or another software consumer needs specification, PRD clarification, issue decomposition, TDD, debugging, architecture improvement, project health, QA, review, retrospective, context continuity, or shipping assessment."
 version: 1.0.0
 release_tag: v1.0.0
 created: 2026-08-31
-author: LiNKskills Library
+author: LiNKtrend Principal; migrated and packaged by LiNKskills
 tags: [development, gstack, mattpocock, specification, tdd, debugging]
 engine:
   min_reasoning_tier: high
@@ -24,11 +24,13 @@ format_profile: simple
 last_updated: 2026-08-31
 ---
 
-# Hybrid Development Methods
+# LiNKtrend Hybrid Development Methods
 
-This is the centralized LiNKskills release of the combined system already
-adapted by IDE Development. gstack owns macro product and delivery workflows;
-Matt Pocock skills own focused clarification and execution techniques.
+This is the centralized LiNKskills release of the Principal-created LiNKtrend
+hybrid already assembled and adapted inside IDE Development. It is a migration
+of that existing company system, not a new upstream combination. gstack owns
+macro product and delivery workflows; Matt Pocock skills own focused
+clarification and execution techniques.
 
 ## Route by responsibility
 
