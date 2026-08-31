@@ -107,11 +107,19 @@ class RolePackValidatorTests(unittest.TestCase):
             evidence["current_head_qualification_repair"]["protected_base"],
             {
                 "ref": "origin/development",
-                "commit": "19a374756835d15a492767b8d5c30de3545786fb",
-                "tree": "0300c548f00b701ebc8efe4c58df681087f76934",
+                "commit": "1289f9a374c38115d3f4dcfac31439a9904d74c6",
+                "tree": "8d3312b21ccfa92102233211f8224d50fb07ac88",
             },
         )
         self.assertEqual(evidence["current_head_qualification_repair"]["status"], "HOLD")
+        self.assertEqual(
+            evidence["current_head_qualification_repair"]["source_receipt"],
+            "role-packs/pkt-22-source-receipt.json",
+        )
+        self.assertIn(
+            "qualification_evidence_missing",
+            evidence["current_head_qualification_repair"]["defects"],
+        )
         self.assertFalse(evidence["claims"]["qualification_admission"])
         self.assertFalse(evidence["claims"]["selectability"])
         self.assertFalse(evidence["claims"]["provider_live"])
