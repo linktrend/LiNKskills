@@ -13,11 +13,14 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "packages" / "contracts"))
+sys.path.insert(0, str(ROOT / "packages" / "core"))
 
 from linkskills_contracts import validate_instance  # noqa: E402
+from linkskills_core.hashing import build_skill_bundle_manifest  # noqa: E402
 
 
 COLLECTION_COUNTS = {
+    "google-workspace": 95,
     "impeccable": 1,
     "taste-design": 13,
     "emil-design": 12,
@@ -26,6 +29,7 @@ COLLECTION_COUNTS = {
 }
 
 ADAPTERS = {
+    "google-workspace-operations": "google-workspace",
     "impeccable-design-system": "impeccable",
     "taste-design-exploration": "taste-design",
     "emil-design-engineering": "emil-design",
@@ -78,12 +82,22 @@ class InitialSkillSeedTests(unittest.TestCase):
                 ):
                     validation = validate_instance(payload, schema)
                     self.assertTrue(validation.ok, f"{collection_id}/{skill_id}: {validation.errors}")
-                self.assertEqual(release["lifecycle_state"], "unqualified")
+                decision = {
+                    "taste-gpt-tasteskill": "needs_correction",
+                    "taste-output-skill": "needs_correction",
+                    "taste-taste-skill-v1": "superseded",
+                }.get(skill_id, "approved_internal_canary")
+                expected_lifecycle = "eval_pending" if decision == "approved_internal_canary" else ("superseded" if decision == "superseded" else "unqualified")
+                self.assertEqual(release["lifecycle_state"], expected_lifecycle)
                 self.assertEqual(eligibility["decision"], "ineligible")
                 self.assertFalse(eligibility["consumer_profile_activation"]["status"])
 
     def test_vendor_inventory_and_release_digests_match_preserved_bytes(self) -> None:
         for collection_id in COLLECTION_COUNTS:
+            if collection_id == "google-workspace":
+                # This collection uses its original single-file artifact hash
+                # convention and has a dedicated integrity test module.
+                continue
             collection = ROOT / "collections" / collection_id
             manifest = load(collection / "collection-manifest.json")
             collection_entries = []
@@ -147,6 +161,57 @@ class InitialSkillSeedTests(unittest.TestCase):
             result = json.loads(completed.stdout)
             self.assertEqual(result["status"], "SELECTED", (adapter, result))
             self.assertEqual(result["selected_route"], expected, (adapter, result))
+
+    def test_non_admitted_members_are_rejected_before_source_disclosure(self) -> None:
+        helper = ROOT / "skills" / "taste-design-exploration" / "scripts" / "helper_tool.py"
+        for route_id, state in (
+            ("taste-output-skill", "needs_correction"),
+            ("taste-gpt-tasteskill", "needs_correction"),
+            ("taste-taste-skill-v1", "superseded"),
+        ):
+            completed = subprocess.run(
+                [sys.executable, str(helper), "--route-id", route_id],
+                check=True,
+                text=True,
+                capture_output=True,
+            )
+            result = load_json(completed.stdout)
+            self.assertEqual(result["status"], "NOT_ELIGIBLE")
+            self.assertEqual(result["admission_state"], state)
+            self.assertIsNone(result["source_entrypoint"])
+
+    def test_activation_manifests_are_exact_and_consumer_owned(self) -> None:
+        audit = load(ROOT / "evidence" / "initial-skill-seed" / "member-classification.json")
+        self.assertEqual(audit["summary"]["total"], 207)
+        self.assertEqual(audit["summary"]["counts"], {"approved_internal_canary": 204, "needs_correction": 2, "superseded": 1})
+        approved = {item["release_id"] for item in audit["members"] if item["decision"] == "approved_internal_canary"}
+        for path in sorted((ROOT / "configs" / "consumer-activation").glob("*-internal-canary.json")):
+            manifest = load(path)
+            self.assertEqual(manifest["activation"], {"activation_owner": "consumer", "enabled": False})
+            self.assertFalse(manifest["live_apply"])
+            self.assertFalse(manifest["stable_qualification_claimed"])
+            self.assertTrue(set(manifest["permitted_release_ids"]) <= approved)
+
+    def test_generated_admission_artifacts_are_current(self) -> None:
+        completed = subprocess.run(
+            [sys.executable, str(ROOT / "scripts" / "prepare_initial_canary_admission.py"), "--check"],
+            text=True,
+            capture_output=True,
+        )
+        self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
+
+    def test_canary_publication_receipt_binds_exact_adapter_bundles(self) -> None:
+        receipt = load(ROOT / "evidence" / "initial-skill-seed" / "canary-publication-receipt.json")
+        self.assertEqual(len(receipt["releases"]), 6)
+        self.assertFalse(receipt["consumer_activation"])
+        self.assertFalse(receipt["current_pointer_changed"])
+        self.assertFalse(receipt["live_provider_publication"])
+        self.assertFalse(receipt["ordinary_selectability"])
+        self.assertFalse(receipt["stable_qualification"])
+        for release in receipt["releases"]:
+            bundle = build_skill_bundle_manifest(ROOT / "skills" / release["skill_id"])
+            self.assertEqual(release["bundle_hash"], bundle["bundle_hash"])
+            self.assertEqual(release["release_hash"], bundle["bundle_hash"].removeprefix("sha256:"))
 
     def test_unknown_task_does_not_select_a_design_or_development_source(self) -> None:
         for adapter in ADAPTERS:

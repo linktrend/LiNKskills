@@ -1,34 +1,32 @@
 {
   "consumer_profile_activation": {
-    "evaluated_by": "linkskills-issue-299-intake",
-    "evidence_ref": "opaque:evidence:awesome-codex-consumer-inactive",
+    "evaluated_by": "linkskills-issue-299-initial-canary-audit",
+    "evidence_ref": "opaque:evidence:issue-299-awesome-codex-consumer-inactive",
     "status": false
   },
   "consumer_tool_authority": {
-    "evaluated_by": "linkskills-issue-299-intake",
-    "evidence_ref": "opaque:evidence:awesome-codex-tool-authority-pending",
+    "evaluated_by": "linkskills-issue-299-initial-canary-audit",
+    "evidence_ref": "opaque:evidence:issue-299-awesome-codex-tool-unauthorized",
     "status": false
   },
   "decision": "ineligible",
   "denial_reasons": [
-    "missing_platform_evidence",
     "release_not_selectable",
     "profile_not_activated",
-    "tool_not_authorized",
-    "unqualified"
+    "tool_not_authorized"
   ],
   "eligibility_id": "awesome-codex-ineligible",
-  "evaluated_at": "2026-08-31T08:00:00Z",
+  "evaluated_at": "2026-08-31T12:00:00Z",
   "platform_technical_eligibility": {
-    "evaluated_by": "linkskills-issue-299-intake",
-    "evidence_ref": "opaque:evidence:awesome-codex-platform-pending",
-    "status": false
+    "evaluated_by": "linkskills-issue-299-initial-canary-audit",
+    "evidence_ref": "opaque:evidence:issue-299-awesome-codex-source-audit",
+    "status": true
   },
   "release_id": "awesome-codex@1.0.0",
   "schema_version": "0.1",
   "skills_release_selectability": {
-    "evaluated_by": "linkskills-issue-299-intake",
-    "evidence_ref": "opaque:evidence:awesome-codex-eval-pending",
+    "evaluated_by": "linkskills-issue-299-initial-canary-audit",
+    "evidence_ref": "opaque:evidence:issue-299-awesome-codex-not-selectable",
     "status": false
   },
   "trust_boundary": "linkskills-eligibility"

@@ -32,15 +32,30 @@
     "output": {
       "additionalProperties": false,
       "properties": {
+        "admission_state": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
         "alternatives": {
           "items": {
             "type": "string"
           },
           "type": "array"
         },
+        "ordinary_selectable": {
+          "type": "boolean"
+        },
         "reason": {
           "minLength": 1,
           "type": "string"
+        },
+        "release_id": {
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "selected_route": {
           "type": [
@@ -58,7 +73,8 @@
           "enum": [
             "SELECTED",
             "AMBIGUOUS",
-            "NOT_APPLICABLE"
+            "NOT_APPLICABLE",
+            "NOT_ELIGIBLE"
           ],
           "type": "string"
         }
@@ -68,7 +84,10 @@
         "selected_route",
         "source_entrypoint",
         "reason",
-        "alternatives"
+        "alternatives",
+        "admission_state",
+        "ordinary_selectable",
+        "release_id"
       ],
       "type": "object"
     }

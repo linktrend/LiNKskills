@@ -70,3 +70,32 @@ claim is authorized by this handoff.
 IDE Development's physical hybrid copy remains the rollback source until the
 LiNKskills releases are qualified, pinned, consumer-proven, and safe to cut
 over. Its removal is not authorized by this checkpoint.
+
+## Approved initial-canary admission completion
+
+The Principal subsequently approved the lean initial-seed route: make the
+source members compliant, classify and admit suitable members for internal
+canary use, publish immutable adapter bundles through the existing LiNKskills
+publisher, and leave behavioral improvement to real consumer use. The proposed
+temporary consumer evaluation harness was rejected and was not built.
+
+- Audited all 207 source members across the six collections.
+- Approved 204 for internal canary use, blocked two Taste members pending
+  correction, and marked the backward-compatibility Taste v1 member
+  superseded. No exact duplicate or already-retired source member was found.
+- Kept all 207 global eligibility decisions `ineligible`: consumer activation,
+  ordinary selectability, and tool authority remain false.
+- Added per-route admission gates to all six family adapters. A blocked member
+  returns `NOT_ELIGIBLE` without disclosing a source entrypoint.
+- Added the missing `google-workspace-operations` adapter over all 95 preserved
+  Google Workspace members.
+- Produced disabled, consumer-owned exact activation manifests for IDE
+  Development, LiNKdeveloper, LiNKsites, and Google Workspace.
+- Registered six immutable canary adapter bundles using the existing SQLite
+  publisher path. This is a local canary publication receipt, not a live VPS,
+  current-pointer, stable-qualification, or consumer-activation claim.
+
+The next authorized work is outside LiNKskills: each consumer applies its exact
+disabled manifest, activates only the routes and tool permissions it owns, and
+returns real-use telemetry/evidence through the existing LiNKskills evaluation
+loop. Stable qualification remains evidence-dependent.
