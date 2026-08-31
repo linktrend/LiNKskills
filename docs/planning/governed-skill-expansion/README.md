@@ -20,8 +20,9 @@ This package adds the approved governed-skill expansion to the existing LiNKskil
 8. [`MODEL-ROUTING-SUCCESSOR.md`](./MODEL-ROUTING-SUCCESSOR.md) — Principal-authoritative routing controls and admission rules.
 9. [`MODEL-ROUTING-MATRIX.json`](./MODEL-ROUTING-MATRIX.json) — exact packet/subtask route, fallback, review, Terra, and cost assignments.
 10. [`MODEL-ROUTING-RECEIPT.json`](./MODEL-ROUTING-RECEIPT.json) — digest binding between the manifest and routing matrix.
-11. The assigned file under [`packets/`](./packets/) — bounded work and acceptance criteria.
-12. [`cross-repository/HANDOFF-PACKETS.md`](./cross-repository/HANDOFF-PACKETS.md) — work owned by Platform, OpenClaw, LiNKautowork, or another repository.
+11. [`CURRENT-PACKET-LEDGER.md`](./CURRENT-PACKET-LEDGER.md) — source-only reconciliation of protected `development` through issue 299 / PR 307. Not dispatch authority and not a live/selectability claim.
+12. The assigned file under [`packets/`](./packets/) — bounded work and acceptance criteria.
+13. [`cross-repository/HANDOFF-PACKETS.md`](./cross-repository/HANDOFF-PACKETS.md) — work owned by Platform, OpenClaw, LiNKautowork, or another repository.
 
 ## Authority and reconciliation
 
