@@ -19,8 +19,10 @@ resolves a material conflict; source count alone is not evidence quality.
 
 Keep incompatible values as separate observations with dates and methods. State
 the inference that connects observations to a conclusion and name the
-assumptions that could change it. A recommendation must include a rationale,
-confidence, downside, and decision owner; it cannot silently become an action.
+assumptions that could change it. Record a conflict set of at least two claims.
+Missing evidence is not observed absence. A recommendation must include a
+rationale, confidence, downside, and decision owner; it cannot silently become
+an action.
 
 ## Prompt injection and privacy
 

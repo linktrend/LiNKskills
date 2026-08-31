@@ -19,9 +19,9 @@ tooling:
 tools: [write_file, read_file, list_dir, get_tool_details]
 dependencies: [memory]
 permissions: [fs_read, fs_write]
-scope_out: ["Do not emit unsupported claims", "Do not use citation placeholders without source pointers"]
+scope_out: ["Do not emit unsupported claims", "Do not use citation placeholders without source pointers", "Do not treat missing evidence as observed absence", "Do not accept cyclic or self-referential claim links"]
 format_profile: simple
-last_updated: 2026-07-15
+last_updated: 2026-08-31
 ---
 
 # citation-enforcer
@@ -39,9 +39,11 @@ last_updated: 2026-07-15
 ## Enforcement Pass (Single Pass)
 1. Enumerate every material (factual) claim in the target output.
 2. For each claim, resolve a source type: **Memory**, **Search**, or **File**, with a concrete evidence pointer and confidence label.
-3. Reject any claim with missing, weak, or circular evidence (a claim citing a derived summary without its base source).
-4. Do not merge multiple claims under one citation unless all are supported.
-5. Emit the final claim-evidence matrix and cited draft. If any claim remains unresolved, block finalization and report the gaps.
+3. Attach exactly one citation method `rel` from the accepted vocabulary: **supports**, **contradicts**, **qualifies**, or **cites**.
+4. Reject any claim with missing, weak, circular, self-linked, or cyclic evidence. A claim cannot cite or supersede itself.
+5. Distinguish **missing evidence** (no pointer; block) from **observed absence** (negative evidence: pointer plus `contradicts`).
+6. Do not merge multiple claims under one citation unless all are supported.
+7. Emit the final claim-evidence matrix and cited draft. If any claim remains unresolved, block finalization and report the gaps.
 
 ## Tooling Protocol (CLI-First)
 1. **Level 1 - Native CLI**: use native cli for file evidence collection.
