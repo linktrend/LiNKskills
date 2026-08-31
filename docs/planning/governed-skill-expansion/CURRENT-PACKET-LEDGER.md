@@ -1,8 +1,8 @@
 # Current exact packet ledger
 
-**Worker:** SKILLS-CURRENT-LEDGER  
-**Kind:** source/internal synthetic reconciliation only  
-**Decision:** `HOLD` for qualification, ordinary selectability, provider-live, consumer activation, hosted/stage, VPS, E2E, and production  
+**Worker:** SKILLS-CURRENT-LEDGER
+**Kind:** source/internal synthetic reconciliation only
+**Decision:** `HOLD` for qualification, ordinary selectability, provider-live, consumer activation, hosted/stage, VPS, E2E, and production
 **Not authorized by this ledger:** mutating `EXECUTION-MANIFEST.json`, re-implementing landed packets, live publication, consumer activation, or reserved protocol/migration/production actions
 
 This ledger reconciles **protected source completions** through GitHub issue `#299` / pull request `#307` onto the exact protected `development` identity below. File presence and merged source are not qualification, selectability, or live proof. The planning manifest remains `PLAN` and is not edited here; no founder `APPROVED` record bound to its digest is manufactured.
