@@ -80,9 +80,11 @@ publisher, and leave behavioral improvement to real consumer use. The proposed
 temporary consumer evaluation harness was rejected and was not built.
 
 - Audited all 207 source members across the six collections.
-- Approved 204 for internal canary use, blocked two Taste members pending
-  correction, and marked the backward-compatibility Taste v1 member
-  superseded. No exact duplicate or already-retired source member was found.
+- Approved 182 for internal canary use, kept 22 high-authority Google
+  Workspace members quarantined pending focused review, blocked two Taste
+  members pending correction, and marked the backward-compatibility Taste v1
+  member superseded. No exact duplicate or already-retired source member was
+  found.
 - Kept all 207 global eligibility decisions `ineligible`: consumer activation,
   ordinary selectability, and tool authority remain false.
 - Added per-route admission gates to all six family adapters. A blocked member

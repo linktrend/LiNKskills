@@ -48,6 +48,13 @@ EXCEPTIONS = {
     ),
 }
 
+GOOGLE_WORKSPACE_QUARANTINE = frozenset(
+    load_id
+    for load_id in json.loads(
+        (ROOT / "collections/google-workspace/review.json").read_text(encoding="utf-8")
+    )["quarantine_candidates"]
+)
+
 CONSUMERS = {
     "ide-development": {
         "runtime_profiles": ["cursor-macos", "codex-macos"],
@@ -115,7 +122,17 @@ class Writer:
             path.write_bytes(value)
 
 
-def classification(skill_id: str) -> tuple[str, list[str]]:
+def classification(collection_id: str, skill_id: str) -> tuple[str, list[str]]:
+    if collection_id == "google-workspace" and skill_id in GOOGLE_WORKSPACE_QUARANTINE:
+        return (
+            "needs_focused_review",
+            [
+                "source_integrity_verified",
+                "license_reviewed_compatible",
+                "quarantine_policy_requires_focused_review",
+                "high_authority_operation_not_admitted",
+            ],
+        )
     return EXCEPTIONS.get(
         skill_id,
         (
@@ -147,7 +164,7 @@ def update_collection_records(
 
         for member in sorted(manifest["members"], key=lambda item: item["skill_id"]):
             skill_id = member["skill_id"]
-            decision, reasons = classification(skill_id)
+            decision, reasons = classification(collection_id, skill_id)
             approved = decision == "approved_internal_canary"
             release_path = collection_root / "releases" / f"{skill_id}.json"
             release = load(release_path)
@@ -319,7 +336,7 @@ def update_adapters(writer: Writer) -> None:
         routed_admission = []
         for route in routing["routes"]:
             source_member = Path(route["source_entrypoint"]).parts[2]
-            decision, _ = classification(source_member)
+            decision, _ = classification(collection_id, source_member)
             routed_admission.append(
                 {
                     "admission_state": decision,

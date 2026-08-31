@@ -28,6 +28,12 @@ COLLECTION_COUNTS = {
     "hybrid-development": 19,
 }
 
+GOOGLE_WORKSPACE_QUARANTINE = set(
+    json.loads(
+        (ROOT / "collections" / "google-workspace" / "review.json").read_text()
+    )["quarantine_candidates"]
+)
+
 ADAPTERS = {
     "google-workspace-operations": "google-workspace",
     "impeccable-design-system": "impeccable",
@@ -86,7 +92,12 @@ class InitialSkillSeedTests(unittest.TestCase):
                     "taste-gpt-tasteskill": "needs_correction",
                     "taste-output-skill": "needs_correction",
                     "taste-taste-skill-v1": "superseded",
-                }.get(skill_id, "approved_internal_canary")
+                }.get(
+                    skill_id,
+                    "needs_focused_review"
+                    if collection_id == "google-workspace" and skill_id in GOOGLE_WORKSPACE_QUARANTINE
+                    else "approved_internal_canary",
+                )
                 expected_lifecycle = "eval_pending" if decision == "approved_internal_canary" else ("superseded" if decision == "superseded" else "unqualified")
                 self.assertEqual(release["lifecycle_state"], expected_lifecycle)
                 self.assertEqual(eligibility["decision"], "ineligible")
@@ -180,10 +191,31 @@ class InitialSkillSeedTests(unittest.TestCase):
             self.assertEqual(result["admission_state"], state)
             self.assertIsNone(result["source_entrypoint"])
 
+        google_helper = ROOT / "skills" / "google-workspace-operations" / "scripts" / "helper_tool.py"
+        for route_id in sorted(GOOGLE_WORKSPACE_QUARANTINE):
+            completed = subprocess.run(
+                [sys.executable, str(google_helper), "--route-id", route_id],
+                check=True,
+                text=True,
+                capture_output=True,
+            )
+            result = load_json(completed.stdout)
+            self.assertEqual(result["status"], "NOT_ELIGIBLE")
+            self.assertEqual(result["admission_state"], "needs_focused_review")
+            self.assertIsNone(result["source_entrypoint"])
+
     def test_activation_manifests_are_exact_and_consumer_owned(self) -> None:
         audit = load(ROOT / "evidence" / "initial-skill-seed" / "member-classification.json")
         self.assertEqual(audit["summary"]["total"], 207)
-        self.assertEqual(audit["summary"]["counts"], {"approved_internal_canary": 204, "needs_correction": 2, "superseded": 1})
+        self.assertEqual(
+            audit["summary"]["counts"],
+            {
+                "approved_internal_canary": 182,
+                "needs_correction": 2,
+                "needs_focused_review": 22,
+                "superseded": 1,
+            },
+        )
         approved = {item["release_id"] for item in audit["members"] if item["decision"] == "approved_internal_canary"}
         for path in sorted((ROOT / "configs" / "consumer-activation").glob("*-internal-canary.json")):
             manifest = load(path)
