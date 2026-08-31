@@ -64,3 +64,11 @@ otherwise nonselectable. Structural validation, source integrity, routing
 tests, real evaluation, immutable publication, eligibility, and consumer proof
 must remain separately evidenced. No statement in this document changes a
 release state or activates a consumer.
+
+The repository's real certification runner was exercised in non-promoting mode
+against all five native family skills on 2026-08-31. Each correctly remained
+`draft` with reason code `suite_not_executable`: the current suites describe
+judged scenarios but do not execute a consumer agent. ADR 0006 prohibits using
+prompt-only or suite-authored output as certification evidence. Qualification
+therefore remains on hold until the established runner can execute and seal
+representative consumer-profile work; this intake does not weaken that rule.
