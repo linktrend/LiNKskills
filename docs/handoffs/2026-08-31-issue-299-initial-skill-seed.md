@@ -4,7 +4,7 @@
 
 **Branch:** `issue/299-admit-qualify-and-prepare-activation-routing-for`
 
-**Source checkpoint:** `d3682ea993573609b3c0ac53fc3af43851b7bf2b`
+**Current evidence source checkpoint:** `78c5dab2cae0adc29049506ed33cbb169c27dc23`
 
 ## Completed
 
