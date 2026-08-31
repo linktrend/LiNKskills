@@ -1,0 +1,41 @@
+skill_id: emil-design-engineering
+suite_version: 1.0.0
+pass_threshold: 0.90
+rubric:
+  - dimension: correct_single_route
+    weight: 0.40
+    hard_fail_below: 0.80
+  - dimension: non_overlap
+    weight: 0.25
+    hard_fail_below: 0.80
+  - dimension: source_fidelity
+    weight: 0.20
+    hard_fail_below: 0.80
+  - dimension: consumer_boundary
+    weight: 0.15
+    hard_fail_below: 0.90
+scenarios:
+  - id: route-1-emil-animate-expo
+    expected_criteria: ["selects emil-animate-expo", "loads one source entrypoint"]
+  - id: route-2-emil-animate
+    expected_criteria: ["selects emil-animate", "loads one source entrypoint"]
+  - id: route-3-emil-animation-vocabulary
+    expected_criteria: ["selects emil-animation-vocabulary", "loads one source entrypoint"]
+  - id: route-4-emil-apple-design
+    expected_criteria: ["selects emil-apple-design", "loads one source entrypoint"]
+  - id: route-5-emil-ask-sonner
+    expected_criteria: ["selects emil-ask-sonner", "loads one source entrypoint"]
+  - id: route-6-emil-emil-design-eng
+    expected_criteria: ["selects emil-emil-design-eng", "loads one source entrypoint"]
+  - id: route-7-emil-find-animation-opportunities
+    expected_criteria: ["selects emil-find-animation-opportunities", "loads one source entrypoint"]
+  - id: route-8-emil-improve-animations
+    expected_criteria: ["selects emil-improve-animations", "loads one source entrypoint"]
+  - id: no-match
+    expected_criteria: ["returns not applicable", "does not load a source"]
+  - id: consumer-boundary
+    expected_criteria: ["does not claim activation", "preserves consumer authority"]
+judge:
+  min_reasoning_tier: high
+  independence_required: true
+# Real consumer execution evidence is required before usable certification.

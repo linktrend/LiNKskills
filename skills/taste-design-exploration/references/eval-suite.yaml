@@ -1,0 +1,41 @@
+skill_id: taste-design-exploration
+suite_version: 1.0.0
+pass_threshold: 0.90
+rubric:
+  - dimension: correct_single_route
+    weight: 0.40
+    hard_fail_below: 0.80
+  - dimension: non_overlap
+    weight: 0.25
+    hard_fail_below: 0.80
+  - dimension: source_fidelity
+    weight: 0.20
+    hard_fail_below: 0.80
+  - dimension: consumer_boundary
+    weight: 0.15
+    hard_fail_below: 0.90
+scenarios:
+  - id: route-1-taste-taste-skill
+    expected_criteria: ["selects taste-taste-skill", "loads one source entrypoint"]
+  - id: route-2-taste-taste-skill-v1
+    expected_criteria: ["selects taste-taste-skill-v1", "loads one source entrypoint"]
+  - id: route-3-taste-gpt-tasteskill
+    expected_criteria: ["selects taste-gpt-tasteskill", "loads one source entrypoint"]
+  - id: route-4-taste-image-to-code-skill
+    expected_criteria: ["selects taste-image-to-code-skill", "loads one source entrypoint"]
+  - id: route-5-taste-imagegen-frontend-web
+    expected_criteria: ["selects taste-imagegen-frontend-web", "loads one source entrypoint"]
+  - id: route-6-taste-imagegen-frontend-mobile
+    expected_criteria: ["selects taste-imagegen-frontend-mobile", "loads one source entrypoint"]
+  - id: route-7-taste-redesign-skill
+    expected_criteria: ["selects taste-redesign-skill", "loads one source entrypoint"]
+  - id: route-8-taste-output-skill
+    expected_criteria: ["selects taste-output-skill", "loads one source entrypoint"]
+  - id: no-match
+    expected_criteria: ["returns not applicable", "does not load a source"]
+  - id: consumer-boundary
+    expected_criteria: ["does not claim activation", "preserves consumer authority"]
+judge:
+  min_reasoning_tier: high
+  independence_required: true
+# Real consumer execution evidence is required before usable certification.
