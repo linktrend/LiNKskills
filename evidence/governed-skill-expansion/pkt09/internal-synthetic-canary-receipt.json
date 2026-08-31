@@ -1,0 +1,102 @@
+{
+  "admitted_packets": [
+    "PKT-09"
+  ],
+  "broad_full_suite": false,
+  "candidate": {
+    "commit": "7fe43b3339e0972d2e839c019a6c70b3996e0c5d",
+    "origin": "https://github.com/linktrend/LiNKskills",
+    "ref": "refs/heads/issue/310-execute-pkt-09-internal-synthetic-canary-with-ho",
+    "tree": "39a826ed1f9119e75431d148bccc13462ed6f354"
+  },
+  "claims": {
+    "activation": false,
+    "consumer": false,
+    "current_pointer": false,
+    "e2e": false,
+    "hosted_stage": false,
+    "ordinary_selectability": false,
+    "production": false,
+    "provider_live": false,
+    "qualification_admission": false,
+    "vps": false
+  },
+  "completion_claimed": false,
+  "decision": "HOLD",
+  "development_head": "7fe43b3339e0972d2e839c019a6c70b3996e0c5d",
+  "eligibility": {
+    "approved_internal_canary": 182,
+    "ineligible_count": 207,
+    "member_count": 207,
+    "needs_correction": 2,
+    "needs_focused_review": 22,
+    "ordinary_selectable_count": 0,
+    "stable_qualified_count": 0,
+    "superseded": 1
+  },
+  "executor": {
+    "one_executor_per_packet": true,
+    "packet_id": "PKT-09",
+    "packet_title": "Operational Reporting skill family"
+  },
+  "focused_checks": [
+    {
+      "command": [
+        "python3",
+        "validator.py",
+        "--repo-root",
+        ".",
+        "--path",
+        "skills/operational-reporting"
+      ],
+      "name": "validator",
+      "returncode": 0,
+      "status": "PASS"
+    },
+    {
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/skills/operational_reporting",
+        "-v"
+      ],
+      "name": "pkt09_contracts",
+      "returncode": 0,
+      "status": "PASS"
+    },
+    {
+      "command": [
+        "python3",
+        "evidence/governed-skill-expansion/test_current_packet_ledger.py"
+      ],
+      "name": "current_packet_ledger",
+      "returncode": 0,
+      "status": "PASS"
+    }
+  ],
+  "implementation_status": "SOURCE_LANDED_DO_NOT_DUPLICATE",
+  "kind": "linkskills.internal-synthetic-canary-execution",
+  "ledger_admission": {
+    "decision": "HOLD",
+    "first_packet": "PKT-09",
+    "implementation_status": "SOURCE_LANDED_DO_NOT_DUPLICATE",
+    "wave": 2
+  },
+  "ledger_candidate": {
+    "commit": "5c091a75c364a723e5364f883898fa26da6dc491",
+    "protected": true,
+    "reason": "named_phase_candidate_landed_on_development_do_not_mutate",
+    "tree": "ac57fbee285851e32f420b0bd48c61bffc59b657"
+  },
+  "live_vps_staging_main_production": false,
+  "packet": "PKT-09",
+  "proof_scope": "source_synthetic",
+  "receipt_digest": "sha256:5238fb499e6ba3a35ab8b72c3212e9b6109d61ecb1fd10e3fa8f48caaf52aa01",
+  "schema_version": "0.1",
+  "skill_source_reimplemented": false,
+  "status": "INTERNAL_SYNTHETIC_CANARY_HOLD",
+  "wave": 2
+}
