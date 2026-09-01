@@ -1,0 +1,272 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "definitions": {
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ref",
+        "status"
+      ],
+      "properties": {
+        "ref": {
+          "type": "string",
+          "pattern": "^(fixture|source|consumer):[^\\s]+$",
+          "maxLength": 256
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "confirmed",
+            "reported",
+            "not_reported"
+          ]
+        }
+      }
+    },
+    "criterion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "criterion_id",
+        "field",
+        "operator",
+        "expected",
+        "evidence_ref"
+      ],
+      "properties": {
+        "criterion_id": {
+          "type": "string",
+          "pattern": "^criterion:[^\\s]+$"
+        },
+        "field": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "operator": {
+          "type": "string",
+          "enum": [
+            "equals",
+            "not_equals",
+            "contains",
+            "in",
+            "gte",
+            "lte"
+          ]
+        },
+        "expected": {
+          "type": [
+            "string",
+            "number",
+            "boolean"
+          ]
+        },
+        "evidence_ref": {
+          "type": "string",
+          "pattern": "^(fixture|source|consumer):[^\\s]+$"
+        }
+      }
+    },
+    "item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "item_ref",
+        "criterion_results",
+        "evidence_refs"
+      ],
+      "properties": {
+        "item_ref": {
+          "type": "string",
+          "pattern": "^(segment|candidate):[^\\s]+$"
+        },
+        "criterion_results": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "criterion_id",
+              "result"
+            ],
+            "properties": {
+              "criterion_id": {
+                "type": "string",
+                "pattern": "^criterion:[^\\s]+$"
+              },
+              "result": {
+                "type": "string",
+                "enum": [
+                  "met",
+                  "not_met",
+                  "unknown"
+                ]
+              }
+            }
+          }
+        },
+        "evidence_refs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^(fixture|source|consumer):[^\\s]+$"
+          }
+        }
+      }
+    },
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "privacy_classification",
+        "matter_ref",
+        "source_evidence",
+        "criteria"
+      ],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": [
+            "define_target",
+            "segment_population"
+          ]
+        },
+        "privacy_classification": {
+          "type": "string",
+          "enum": [
+            "synthetic",
+            "redacted",
+            "public"
+          ]
+        },
+        "matter_ref": {
+          "type": "string",
+          "pattern": "^target-matter:[A-Za-z0-9._:-]+$"
+        },
+        "source_evidence": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/definitions/evidence"
+          }
+        },
+        "criteria": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/definitions/criterion"
+          }
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/item"
+          }
+        },
+        "requested_action": {
+          "type": "string",
+          "enum": [
+            "draft",
+            "record",
+            "select",
+            "activate",
+            "contact",
+            "publish",
+            "certify",
+            "mutate_linktarget",
+            "claim_program_authority",
+            "claim_live_platform_use",
+            "infer_sensitive_traits"
+          ]
+        }
+      }
+    },
+    "effects": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "messages_sent",
+        "external_calls",
+        "selections",
+        "mutations"
+      ],
+      "properties": {
+        "messages_sent": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "external_calls": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "selections": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "mutations": {
+          "type": "array",
+          "maxItems": 0
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "matter_ref",
+        "items",
+        "uncertainty",
+        "effects",
+        "lifecycle_state",
+        "certification_state",
+        "selectable"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "READY_FOR_OWNER",
+            "DRAFT",
+            "BLOCKED"
+          ]
+        },
+        "matter_ref": {
+          "type": "string",
+          "pattern": "^target-matter:[A-Za-z0-9._:-]+$"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/item"
+          }
+        },
+        "uncertainty": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "effects": {
+          "$ref": "#/definitions/effects"
+        },
+        "lifecycle_state": {
+          "const": "draft"
+        },
+        "certification_state": {
+          "const": "uncertified"
+        },
+        "selectable": {
+          "const": false
+        }
+      }
+    }
+  }
+}

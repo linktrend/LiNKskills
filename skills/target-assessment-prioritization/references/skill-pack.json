@@ -1,0 +1,56 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "target-assessment-prioritization",
+  "display_name": "Target Assessment and Prioritization",
+  "version": "0.1.0",
+  "description": "Evidence-bounded assessment and deterministic prioritization of supplied target candidates using declared criteria, uncertainty, and owner-review recommendations without selection or LiNKtarget mutation.",
+  "lifecycle_state": "draft",
+  "certification_state": "uncertified",
+  "selectable": false,
+  "availability": "source_only",
+  "routing": {
+    "when_to_use": "Use when supplied synthetic, redacted, or public target candidates need a transparent assessment or deterministic priority draft based only on declared, evidence-backed criteria.",
+    "when_not_to_use": [
+      "It does not define the source population, select or contact a target, activate a priority, publish a ranking, grant authority, call a connector, or create or mutate LiNKtarget state.",
+      "Do not use where publication, certification, Program authority, or live Platform availability is required."
+    ],
+    "tags": [
+      "targeting",
+      "assessment",
+      "prioritization",
+      "evidence",
+      "ranking"
+    ],
+    "related_skills": [
+      "target-definition-segmentation"
+    ]
+  },
+  "fragments": [
+    {
+      "fragment_id": "summary",
+      "disclosure_level": 1,
+      "path": "SKILL.md"
+    },
+    {
+      "fragment_id": "advanced",
+      "disclosure_level": 2,
+      "path": "advanced/advanced.md"
+    },
+    {
+      "fragment_id": "schemas",
+      "disclosure_level": 3,
+      "path": "references/schemas.json"
+    },
+    {
+      "fragment_id": "evals",
+      "disclosure_level": 4,
+      "path": "references/eval-suite.json"
+    }
+  ],
+  "effects": {
+    "messages_sent": [],
+    "external_calls": [],
+    "selections": [],
+    "mutations": []
+  }
+}

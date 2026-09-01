@@ -1,0 +1,56 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "target-definition-segmentation",
+  "display_name": "Target Definition and Segmentation",
+  "version": "0.1.0",
+  "description": "Evidence-bounded target definition and segmentation for explicit populations, criteria, exclusions, uncertainty, and owner-reviewed segment drafts without selecting records or mutating LiNKtarget.",
+  "lifecycle_state": "draft",
+  "certification_state": "uncertified",
+  "selectable": false,
+  "availability": "source_only",
+  "routing": {
+    "when_to_use": "Use when supplied synthetic, redacted, or public evidence needs a reviewable target definition or segment draft with explicit inclusion, exclusion, evidence, and uncertainty boundaries.",
+    "when_not_to_use": [
+      "It does not select people or accounts, score or rank targets, activate a segment, publish an audience, grant authority, call a connector, or create or mutate LiNKtarget state.",
+      "Do not use where publication, certification, Program authority, or live Platform availability is required."
+    ],
+    "tags": [
+      "targeting",
+      "segmentation",
+      "criteria",
+      "evidence",
+      "privacy"
+    ],
+    "related_skills": [
+      "target-assessment-prioritization"
+    ]
+  },
+  "fragments": [
+    {
+      "fragment_id": "summary",
+      "disclosure_level": 1,
+      "path": "SKILL.md"
+    },
+    {
+      "fragment_id": "advanced",
+      "disclosure_level": 2,
+      "path": "advanced/advanced.md"
+    },
+    {
+      "fragment_id": "schemas",
+      "disclosure_level": 3,
+      "path": "references/schemas.json"
+    },
+    {
+      "fragment_id": "evals",
+      "disclosure_level": 4,
+      "path": "references/eval-suite.json"
+    }
+  ],
+  "effects": {
+    "messages_sent": [],
+    "external_calls": [],
+    "selections": [],
+    "mutations": []
+  }
+}
