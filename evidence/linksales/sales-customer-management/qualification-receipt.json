@@ -1,0 +1,48 @@
+{
+  "schema_version": "1.0",
+  "packet_id": "LSALES-WP-005",
+  "release_id": "sales-customer-management@1.1.0",
+  "certification_state": "eval_pending",
+  "architecture_disposition": {
+    "conflict_id": "AC-LSALES-001",
+    "status": "RESOLVED BY MASTER ARCHITECT",
+    "pre_conversion_owner": "LiNKsales",
+    "post_conversion_owner": "LiNKclient",
+    "decision_reopened": false
+  },
+  "review": {
+    "overlap_licence_security_maintenance": "passed",
+    "record": "skills/sales-customer-management/references/api-specs.md",
+    "execution_authority_granted": false
+  },
+  "eval": {
+    "suite": "skills/sales-customer-management/references/eval-suite.json",
+    "focused_test": "tests/skills/sales-customer-management/test_release.py",
+    "state": "passed_uncertified",
+    "command": "python3 -m unittest discover -s tests/skills/sales-customer-management -p 'test_*.py' -v",
+    "real_runner_receipt": "evidence/linksales/sales-customer-management/eval-runner-receipt.json"
+  },
+  "publication": {
+    "contract": "EXT-F5-SKILLS-PUBLICATION-V1",
+    "catalog_fragment": "catalog/fragments/programs/linksales-sales-customer-management.json",
+    "availability": "HOLD",
+    "mutable_aliases_accepted": false,
+    "hold_reason": "Eval execution passed, but sealed isolation and live publication/consumer acceptance are unavailable"
+  },
+  "authority_limits": [
+    "no-send",
+    "no-Odoo",
+    "no-payment",
+    "no-CRM-mutation",
+    "no-live-sales-authority"
+  ],
+  "source": {
+    "implementation_commit": "3b1e27ae8827924b3492a18109fa560609d61b7a",
+    "implementation_tree": "4e07e8d1cc17158235ca5adc8e3fc7a133940cb9"
+  },
+  "release": {
+    "tag": "sales-customer-management-v1.1.0",
+    "content_digest": "skill-release:cf4533d190b3c66ad4b260d317f0657db682b698b723f7a6249445d1e940d912",
+    "manifest": "evidence/linksales/sales-customer-management/release-manifest.json"
+  }
+}

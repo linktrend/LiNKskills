@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0",
+  "program": "LiNKsales",
+  "skill_id": "sales-customer-management",
+  "release": {
+    "version": "1.1.0",
+    "tag": "sales-customer-management-v1.1.0",
+    "content_digest": "skill-release:cf4533d190b3c66ad4b260d317f0657db682b698b723f7a6249445d1e940d912",
+    "immutable": true,
+    "qualification": "eval_pending",
+    "availability": "hold",
+    "hold_reason": "sealed isolation proof and live Skills publication/consumer receipt unavailable"
+  },
+  "consumer_contract": {
+    "consumer": "LiNKsales",
+    "selector": {
+      "version": "1.1.0",
+      "content_digest": "skill-release:cf4533d190b3c66ad4b260d317f0657db682b698b723f7a6249445d1e940d912"
+    },
+    "reject_selectors": [
+      "draft",
+      "latest",
+      "mutable",
+      "unavailable"
+    ],
+    "execution_authority": false,
+    "pre_conversion_owner": "LiNKsales",
+    "post_conversion_owner": "LiNKclient",
+    "accepted": false
+  },
+  "rollback": {
+    "action": "withdraw_release_pointer_only",
+    "restore_prior_catalogue": true,
+    "keep_consumer_dependency_disabled": true
+  }
+}

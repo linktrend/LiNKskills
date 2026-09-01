@@ -8,6 +8,8 @@ Normalize each request into `request_id`, `workflow`, `source_evidence`, `author
 
 Qualification is one of `unqualified`, `needs-evidence`, `qualified`, `disqualified`, or `escalate`. `qualified` requires evidence for the requested segment and need plus an owner-confirmed authority boundary. Missing consent, contradictory fit evidence, or unverified claims means `needs-evidence` or `escalate`. No result changes a CRM record.
 
+Priority is a separate recommendation, never a qualification shortcut. Assign `high`, `medium`, `low`, or `unranked` only after qualification is `qualified`, using supplied evidence for urgency, expected impact, and readiness. Missing or contradictory priority signals yield `unranked`; equal scores sort by stable `lead_ref`. A high priority cannot change qualification, consent, authority, or conversion state.
+
 ## Odoo pipeline preparation
 
 The output is a capability request, not an Odoo call. It may contain a synthetic lead/opportunity reference, proposed stage, reason, evidence references, idempotency key, and owner. The proposed action must be `read` or `write`; the execution mode is always `prepare`. A write request is `PENDING_APPROVAL` and names the owning integration/consumer. A missing capability receipt, connector, credential owner, or approval is `blocked` with a safe next action. Never claim that Odoo accepted or persisted a value.
@@ -18,13 +20,13 @@ The idempotency key is derived from the request reference, workflow, and evidenc
 
 Produce a draft containing audience, purpose, evidence references, open questions, proposed next step, and an explicit `send: false`. Do not include an email address, phone number, private company detail, legal clause, final price, discount, or promise unless a redacted, owner-approved fixture is supplied. Any request to send, accept, negotiate, or commit becomes `PENDING_APPROVAL` and is escalated.
 
-## Onboarding and LiNKreach handoff
+## Conversion and LiNKclient handoff
 
-An onboarding packet reports readiness for scope, owner, prerequisites, evidence, unresolved risks, and handoff questions. LiNKreach owns customer-service and relationship operations; this skill does not open tickets, schedule calls, message a customer, or alter a customer record. Missing owner, consent, implementation dependency, or support boundary is `needs-evidence`.
+LiNKsales owns prospect work before conversion. Conversion exists only when the consumer supplies an immutable conversion reference and evidence that the prospect became a client; the skill cannot create or approve conversion. The handoff packet reports that reference, consent status, scope, receiving LiNKclient owner, prerequisites, evidence, unresolved risks, and handoff questions, and always sets `accepted: false`. LiNKclient owns onboarding, service, relationship, renewal execution, and account management after conversion. Missing conversion evidence, receiving owner, consent, implementation dependency, or support boundary is `needs-evidence`. This skill does not open tickets, schedule calls, message a customer, alter a record, accept the handoff, or perform post-conversion work.
 
 ## Renewals and customer risk
 
-Assess only supplied signals in five dimensions: adoption, fit, relationship, dependency, and payment. Each signal is `confirmed`, `inferred`, or `not_reported`; `not_reported` is never a positive or negative assumption. Output `low`, `medium`, `high`, or `unknown` risk with rationale and evidence references. High risk, payment/legal uncertainty, adverse privacy facts, or conflicting owners routes to founder escalation. A risk report never renews, cancels, changes price, or promises service.
+Pre-conversion risk assessment uses only supplied signals for fit, readiness, dependency, and commercial uncertainty. Post-conversion renewal and customer-risk work belongs to LiNKclient and must be handed off or refused here. Each signal is `confirmed`, `inferred`, or `not_reported`; `not_reported` is never a positive or negative assumption. High risk, payment/legal uncertainty, adverse privacy facts, or conflicting owners routes to founder escalation. A risk report never charges, renews, cancels, changes price, or promises service.
 
 ## Founder escalation and `Other — specify`
 
