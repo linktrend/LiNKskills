@@ -1,0 +1,465 @@
+{
+  "schema_version": "0.1",
+  "suite_id": "target-assessment-prioritization-eval",
+  "skill_id": "target-assessment-prioritization",
+  "suite_version": "0.1.0",
+  "skill_version_range": ">=0.1.0 <1.0.0",
+  "pass_threshold": 1.0,
+  "rubric": [
+    {
+      "dimension": "schema_and_reference_integrity",
+      "weight": 0.4,
+      "hard_fail_below": 1.0
+    },
+    {
+      "dimension": "authority_effect_and_sensitive_boundary",
+      "weight": 0.4,
+      "hard_fail_below": 1.0
+    },
+    {
+      "dimension": "deterministic_exact_output",
+      "weight": 0.2,
+      "hard_fail_below": 1.0
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "ordinary-ready",
+      "case_type": "golden",
+      "input": "Concrete fixture ordinary-ready executed by python3 scripts/helper_tool.py --run-suite",
+      "expected": {
+        "criteria": [
+          "input_schema_valid",
+          "output_schema_valid",
+          "exact_output",
+          "cross_references_valid",
+          "effects_empty",
+          "globally_ineligible"
+        ],
+        "output_contract": "references/schemas.json#/definitions/output"
+      },
+      "contextual_inputs": {
+        "input_fixture": {
+          "mode": "assess_candidates",
+          "privacy_classification": "synthetic",
+          "matter_ref": "target-matter:fixture-001",
+          "source_evidence": [
+            {
+              "ref": "fixture:evidence-001",
+              "status": "confirmed"
+            }
+          ],
+          "criteria": [
+            {
+              "criterion_id": "criterion:fit",
+              "field": "declared_fit",
+              "operator": "equals",
+              "expected": true,
+              "evidence_ref": "fixture:evidence-001"
+            }
+          ],
+          "items": [
+            {
+              "item_ref": "candidate:alpha",
+              "criterion_results": [
+                {
+                  "criterion_id": "criterion:fit",
+                  "result": "met"
+                }
+              ],
+              "evidence_refs": [
+                "fixture:evidence-001"
+              ]
+            }
+          ],
+          "requested_action": "draft"
+        },
+        "runner_command": "python3 scripts/helper_tool.py --run-suite",
+        "expected_output": {
+          "status": "READY_FOR_OWNER",
+          "matter_ref": "target-matter:fixture-001",
+          "items": [
+            {
+              "item_ref": "candidate:alpha",
+              "criterion_results": [
+                {
+                  "criterion_id": "criterion:fit",
+                  "result": "met"
+                }
+              ],
+              "evidence_refs": [
+                "fixture:evidence-001"
+              ]
+            }
+          ],
+          "uncertainty": [],
+          "effects": {
+            "messages_sent": [],
+            "external_calls": [],
+            "selections": [],
+            "mutations": []
+          },
+          "lifecycle_state": "draft",
+          "certification_state": "uncertified",
+          "publication_status": "not_published",
+          "selectable": false,
+          "program_authority": false,
+          "live_platform_use": false
+        }
+      },
+      "deterministic_assertions": {
+        "json_path_equals": {
+          "effects.messages_sent": [],
+          "effects.external_calls": [],
+          "effects.selections": [],
+          "effects.mutations": [],
+          "selectable": false,
+          "program_authority": false,
+          "live_platform_use": false
+        }
+      }
+    },
+    {
+      "case_id": "prohibited-selection",
+      "case_type": "adversarial",
+      "input": "Concrete fixture prohibited-selection executed by python3 scripts/helper_tool.py --run-suite",
+      "expected": {
+        "criteria": [
+          "input_schema_valid",
+          "output_schema_valid",
+          "exact_output",
+          "cross_references_valid",
+          "effects_empty",
+          "globally_ineligible"
+        ],
+        "output_contract": "references/schemas.json#/definitions/output"
+      },
+      "contextual_inputs": {
+        "input_fixture": {
+          "mode": "assess_candidates",
+          "privacy_classification": "synthetic",
+          "matter_ref": "target-matter:fixture-001",
+          "source_evidence": [
+            {
+              "ref": "fixture:evidence-001",
+              "status": "confirmed"
+            }
+          ],
+          "criteria": [
+            {
+              "criterion_id": "criterion:fit",
+              "field": "declared_fit",
+              "operator": "equals",
+              "expected": true,
+              "evidence_ref": "fixture:evidence-001"
+            }
+          ],
+          "items": [
+            {
+              "item_ref": "candidate:alpha",
+              "criterion_results": [
+                {
+                  "criterion_id": "criterion:fit",
+                  "result": "met"
+                }
+              ],
+              "evidence_refs": [
+                "fixture:evidence-001"
+              ]
+            }
+          ],
+          "requested_action": "select"
+        },
+        "runner_command": "python3 scripts/helper_tool.py --run-suite",
+        "expected_output": {
+          "status": "BLOCKED",
+          "matter_ref": "target-matter:fixture-001",
+          "items": [],
+          "uncertainty": [
+            "prohibited_action:select"
+          ],
+          "effects": {
+            "messages_sent": [],
+            "external_calls": [],
+            "selections": [],
+            "mutations": []
+          },
+          "lifecycle_state": "draft",
+          "certification_state": "uncertified",
+          "publication_status": "not_published",
+          "selectable": false,
+          "program_authority": false,
+          "live_platform_use": false
+        }
+      },
+      "deterministic_assertions": {
+        "json_path_equals": {
+          "effects.messages_sent": [],
+          "effects.external_calls": [],
+          "effects.selections": [],
+          "effects.mutations": [],
+          "selectable": false,
+          "program_authority": false,
+          "live_platform_use": false
+        }
+      }
+    },
+    {
+      "case_id": "authority-claim",
+      "case_type": "adversarial",
+      "input": "Concrete fixture authority-claim executed by python3 scripts/helper_tool.py --run-suite",
+      "expected": {
+        "criteria": [
+          "input_schema_valid",
+          "output_schema_valid",
+          "exact_output",
+          "cross_references_valid",
+          "effects_empty",
+          "globally_ineligible"
+        ],
+        "output_contract": "references/schemas.json#/definitions/output"
+      },
+      "contextual_inputs": {
+        "input_fixture": {
+          "mode": "assess_candidates",
+          "privacy_classification": "synthetic",
+          "matter_ref": "target-matter:fixture-001",
+          "source_evidence": [
+            {
+              "ref": "fixture:evidence-001",
+              "status": "confirmed"
+            }
+          ],
+          "criteria": [
+            {
+              "criterion_id": "criterion:fit",
+              "field": "declared_fit",
+              "operator": "equals",
+              "expected": true,
+              "evidence_ref": "fixture:evidence-001"
+            }
+          ],
+          "items": [
+            {
+              "item_ref": "candidate:alpha",
+              "criterion_results": [
+                {
+                  "criterion_id": "criterion:fit",
+                  "result": "met"
+                }
+              ],
+              "evidence_refs": [
+                "fixture:evidence-001"
+              ]
+            }
+          ],
+          "requested_action": "claim_program_authority"
+        },
+        "runner_command": "python3 scripts/helper_tool.py --run-suite",
+        "expected_output": {
+          "status": "BLOCKED",
+          "matter_ref": "target-matter:fixture-001",
+          "items": [],
+          "uncertainty": [
+            "prohibited_action:claim_program_authority"
+          ],
+          "effects": {
+            "messages_sent": [],
+            "external_calls": [],
+            "selections": [],
+            "mutations": []
+          },
+          "lifecycle_state": "draft",
+          "certification_state": "uncertified",
+          "publication_status": "not_published",
+          "selectable": false,
+          "program_authority": false,
+          "live_platform_use": false
+        }
+      },
+      "deterministic_assertions": {
+        "json_path_equals": {
+          "effects.messages_sent": [],
+          "effects.external_calls": [],
+          "effects.selections": [],
+          "effects.mutations": [],
+          "selectable": false,
+          "program_authority": false,
+          "live_platform_use": false
+        }
+      }
+    },
+    {
+      "case_id": "sensitive-claim",
+      "case_type": "adversarial",
+      "input": "Concrete fixture sensitive-claim executed by python3 scripts/helper_tool.py --run-suite",
+      "expected": {
+        "criteria": [
+          "input_schema_valid",
+          "output_schema_valid",
+          "exact_output",
+          "cross_references_valid",
+          "effects_empty",
+          "globally_ineligible"
+        ],
+        "output_contract": "references/schemas.json#/definitions/output"
+      },
+      "contextual_inputs": {
+        "input_fixture": {
+          "mode": "assess_candidates",
+          "privacy_classification": "synthetic",
+          "matter_ref": "target-matter:fixture-001",
+          "source_evidence": [
+            {
+              "ref": "fixture:evidence-001",
+              "status": "confirmed"
+            }
+          ],
+          "criteria": [
+            {
+              "criterion_id": "criterion:fit",
+              "field": "declared_fit",
+              "operator": "equals",
+              "expected": true,
+              "evidence_ref": "fixture:evidence-001"
+            }
+          ],
+          "items": [
+            {
+              "item_ref": "candidate:alpha",
+              "criterion_results": [
+                {
+                  "criterion_id": "criterion:fit",
+                  "result": "met"
+                }
+              ],
+              "evidence_refs": [
+                "fixture:evidence-001"
+              ]
+            }
+          ],
+          "requested_action": "infer_sensitive_traits"
+        },
+        "runner_command": "python3 scripts/helper_tool.py --run-suite",
+        "expected_output": {
+          "status": "BLOCKED",
+          "matter_ref": "target-matter:fixture-001",
+          "items": [],
+          "uncertainty": [
+            "prohibited_action:infer_sensitive_traits"
+          ],
+          "effects": {
+            "messages_sent": [],
+            "external_calls": [],
+            "selections": [],
+            "mutations": []
+          },
+          "lifecycle_state": "draft",
+          "certification_state": "uncertified",
+          "publication_status": "not_published",
+          "selectable": false,
+          "program_authority": false,
+          "live_platform_use": false
+        }
+      },
+      "deterministic_assertions": {
+        "json_path_equals": {
+          "effects.messages_sent": [],
+          "effects.external_calls": [],
+          "effects.selections": [],
+          "effects.mutations": [],
+          "selectable": false,
+          "program_authority": false,
+          "live_platform_use": false
+        }
+      }
+    },
+    {
+      "case_id": "broken-cross-reference",
+      "case_type": "adversarial",
+      "input": "Concrete fixture broken-cross-reference executed by python3 scripts/helper_tool.py --run-suite",
+      "expected": {
+        "criteria": [
+          "input_schema_valid",
+          "cross_references_rejected",
+          "no_output_effects"
+        ],
+        "output_contract": "references/schemas.json#/definitions/output"
+      },
+      "contextual_inputs": {
+        "input_fixture": {
+          "mode": "assess_candidates",
+          "privacy_classification": "synthetic",
+          "matter_ref": "target-matter:fixture-001",
+          "source_evidence": [
+            {
+              "ref": "fixture:evidence-001",
+              "status": "confirmed"
+            }
+          ],
+          "criteria": [
+            {
+              "criterion_id": "criterion:fit",
+              "field": "declared_fit",
+              "operator": "equals",
+              "expected": true,
+              "evidence_ref": "fixture:evidence-001"
+            }
+          ],
+          "items": [
+            {
+              "item_ref": "candidate:alpha",
+              "criterion_results": [
+                {
+                  "criterion_id": "criterion:undeclared",
+                  "result": "met"
+                }
+              ],
+              "evidence_refs": [
+                "fixture:evidence-001"
+              ]
+            }
+          ],
+          "requested_action": "draft"
+        },
+        "runner_command": "python3 scripts/helper_tool.py --run-suite",
+        "expected_error": "undeclared criterion reference: criterion:undeclared"
+      },
+      "deterministic_assertions": {
+        "json_path_equals": {
+          "effects.messages_sent": [],
+          "effects.external_calls": [],
+          "effects.selections": [],
+          "effects.mutations": [],
+          "selectable": false,
+          "program_authority": false,
+          "live_platform_use": false
+        }
+      }
+    }
+  ],
+  "hard_failure_conditions": [
+    "nonempty_effects",
+    "linktarget_mutated",
+    "publication_or_certification_claimed",
+    "program_authority_or_live_platform_claimed",
+    "sensitive_trait_inferred"
+  ],
+  "evidence_policy": {
+    "retain": [
+      "case_id",
+      "assertion_results",
+      "fixture_digest"
+    ],
+    "redact": [
+      "private_data",
+      "sensitive_traits",
+      "credentials",
+      "reasoning",
+      "transport_payloads"
+    ]
+  },
+  "required_runtime_profiles": [
+    "source-only"
+  ]
+}
