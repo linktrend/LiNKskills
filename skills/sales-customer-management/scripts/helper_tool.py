@@ -17,7 +17,6 @@ PRIVATE_FIELD_MARKER = re.compile(
 ROLLBACK_TARGET = (
     "ABSENT@c89bad5ce3bc91340cf388b923d2befecb406546/"
     "tree:9d0be7cedb0fc4ec42bf382735ede36d100f8614"
-    " (no prior qualified PKT-16 release)"
 )
 EFFECTS = {"sent": False, "applied": False, "mutated_records": False}
 

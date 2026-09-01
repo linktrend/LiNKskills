@@ -15,6 +15,7 @@ MANIFEST = ROOT / "evidence/linksales/sales-customer-management/release-manifest
 for package in ("contracts", "core", "gateway"):
     sys.path.insert(0, str(ROOT / "packages" / package))
 
+from linkskills_contracts import validate_instance  # noqa: E402
 from linkskills_gateway.auth import ActorClaims  # noqa: E402
 from linkskills_gateway.persistence import InMemoryGatewayStore  # noqa: E402
 from linkskills_gateway.service import ServiceError, SkillsGatewayService  # noqa: E402
@@ -79,6 +80,42 @@ class SalesMethodologyReleaseTests(unittest.TestCase):
                 )
         self.assertFalse(fragment["consumer_contract"]["accepted"])
         self.assertFalse(fragment["consumer_contract"]["execution_authority"])
+
+    def test_review_schema_rejects_null_or_malformed_contract_fields(self):
+        schema = load_json(SKILL / "references/schemas.json")
+        valid_input = {
+            "request_id": "scm-review-001",
+            "workflow": "qualification",
+            "source_evidence": [{
+                "ref": "fixture:lead-review-001",
+                "claim": "synthetic fit claim",
+                "status": "confirmed",
+                "provenance": "owner-fixture",
+                "licence": "internal",
+            }],
+            "authority": {"status": "confirmed", "owner": "LiNKsales"},
+            "privacy_classification": "synthetic",
+        }
+        input_schema = {**schema, "$ref": "#/definitions/input"}
+        output_schema = {**schema, "$ref": "#/definitions/output"}
+        self.assertTrue(validate_instance(valid_input, input_schema).ok)
+        for malformed in (
+            {**valid_input, "source_evidence": [None]},
+            {**valid_input, "authority": None},
+            {**valid_input, "request_id": "scm-"},
+            {**valid_input, "source_evidence": [{**valid_input["source_evidence"][0], "licence": ""}]},
+        ):
+            result = validate_instance(malformed, input_schema)
+            self.assertFalse(result.ok, malformed)
+
+        helper = load_helper()
+        output = helper.normalize_request({
+            "workflow": "qualification",
+            "privacy_classification": "synthetic",
+            "source_evidence": [{"ref": "fixture:lead-review-001", "status": "confirmed"}],
+        })
+        output_result = validate_instance(output, output_schema)
+        self.assertTrue(output_result.ok, [str(error) for error in output_result.errors])
 
     def test_settled_boundary_has_no_stale_owner(self):
         stale_owner = "LiNK" + "reach"

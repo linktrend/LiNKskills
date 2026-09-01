@@ -1,7 +1,7 @@
 # LiNKsales consumer handoff
 
 Pin `sales-customer-management@1.1.0` together with content digest
-`skill-release:cf4533d190b3c66ad4b260d317f0657db682b698b723f7a6249445d1e940d912`.
+`skill-release:790e849c4fa5a1bdd6ce5eaee7dc38e8850e4c5937846f79c057d963092bded0`.
 The Skills gateway must require both values and must reject draft, `latest`,
 mutable, digest-mismatched, unqualified, or unavailable releases without
 fallback.

@@ -15,7 +15,7 @@
       "properties": {
         "request_id": {
           "type": "string",
-          "pattern": "^scm-[a-z0-9-]+$"
+          "pattern": "^scm-[a-z0-9]+(?:-[a-z0-9]+)*$"
         },
         "workflow": {
           "type": "string",
@@ -45,6 +45,7 @@
           ],
           "properties": {
             "status": {
+              "type": "string",
               "enum": [
                 "confirmed",
                 "provisional",
@@ -52,10 +53,12 @@
               ]
             },
             "owner": {
-              "type": "string"
+              "type": "string",
+              "minLength": 1
             },
             "approved_actions": {
               "type": "array",
+              "uniqueItems": true,
               "items": {
                 "enum": [
                   "read",
@@ -77,11 +80,12 @@
         },
         "other_specify": {
           "type": "string",
+          "minLength": 1,
           "maxLength": 240
         },
         "lead_ref": {
           "type": "string",
-          "pattern": "^lead-[a-z0-9-]+$"
+          "pattern": "^lead-[a-z0-9]+(?:-[a-z0-9]+)*$"
         },
         "priority_signals": {
           "type": "object",
@@ -105,14 +109,17 @@
         "ref",
         "claim",
         "status",
-        "provenance"
+        "provenance",
+        "licence"
       ],
       "properties": {
         "ref": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         },
         "claim": {
           "type": "string",
+          "minLength": 1,
           "maxLength": 500
         },
         "status": {
@@ -123,10 +130,12 @@
           ]
         },
         "provenance": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         },
         "licence": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         }
       },
       "additionalProperties": false
@@ -146,7 +155,8 @@
         "effects",
         "qualification",
         "priority",
-        "handoff"
+        "handoff",
+        "rollback"
       ],
       "properties": {
         "status": {
@@ -159,7 +169,17 @@
           ]
         },
         "workflow": {
-          "type": "string"
+          "type": "string",
+          "enum": [
+            "lead_intake",
+            "qualification",
+            "pipeline",
+            "proposal_follow_up",
+            "onboarding",
+            "renewal_risk",
+            "founder_escalation",
+            "other"
+          ]
         },
         "decision": {
           "type": "object",
@@ -170,10 +190,12 @@
           ],
           "properties": {
             "disposition": {
-              "type": "string"
+              "type": "string",
+              "minLength": 1
             },
             "rationale": {
-              "type": "string"
+              "type": "string",
+              "minLength": 1
             },
             "confidence": {
               "enum": [
@@ -247,7 +269,7 @@
           "additionalProperties": false
         },
         "rollback": {
-          "type": "string"
+          "const": "ABSENT@c89bad5ce3bc91340cf388b923d2befecb406546/tree:9d0be7cedb0fc4ec42bf382735ede36d100f8614"
         },
         "qualification": {
           "type": "object",

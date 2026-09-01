@@ -18,7 +18,9 @@
   "eval": {
     "suite": "skills/sales-customer-management/references/eval-suite.json",
     "focused_test": "tests/skills/sales-customer-management/test_release.py",
-    "state": "passed_uncertified",
+    "state": "prior_receipt_stale_after_review_schema_repair",
+    "prior_receipt_release_hash": "skill-release:cf4533d190b3c66ad4b260d317f0657db682b698b723f7a6249445d1e940d912",
+    "recheck_required": true,
     "command": "python3 -m unittest discover -s tests/skills/sales-customer-management -p 'test_*.py' -v",
     "real_runner_receipt": "evidence/linksales/sales-customer-management/eval-runner-receipt.json"
   },
@@ -42,7 +44,7 @@
   },
   "release": {
     "tag": "sales-customer-management-v1.1.0",
-    "content_digest": "skill-release:cf4533d190b3c66ad4b260d317f0657db682b698b723f7a6249445d1e940d912",
+    "content_digest": "skill-release:790e849c4fa5a1bdd6ce5eaee7dc38e8850e4c5937846f79c057d963092bded0",
     "manifest": "evidence/linksales/sales-customer-management/release-manifest.json"
   }
 }
