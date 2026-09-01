@@ -50,9 +50,12 @@ class RolePackValidatorTests(unittest.TestCase):
         self.assertEqual(codes.count("release_not_qualified"), 7)
         self.assertEqual(codes.count("release_not_selectable"), 7)
         self.assertEqual(codes.count("qualification_evidence_missing"), 7)
-        self.assertEqual(codes.count("incompatible_runtime_profile"), 7)
+        # Source-compatible gws-consumer profiles are now declared, while the
+        # independent release, qualification, activation, and authority gates
+        # continue to hold the pack closed.
+        self.assertEqual(codes.count("incompatible_runtime_profile"), 0)
         self.assertEqual(codes.count("eligibility_not_eligible"), 7)
-        self.assertEqual(codes.count("eligibility_gate_not_satisfied"), 28)
+        self.assertEqual(codes.count("eligibility_gate_not_satisfied"), 21)
 
     def test_committed_contradiction_evidence_is_explicitly_non_admitting(self) -> None:
         evidence = read(ROOT / "role-packs" / "pkt-22-23-contradiction.json")
@@ -107,11 +110,19 @@ class RolePackValidatorTests(unittest.TestCase):
             evidence["current_head_qualification_repair"]["protected_base"],
             {
                 "ref": "origin/development",
-                "commit": "19a374756835d15a492767b8d5c30de3545786fb",
-                "tree": "0300c548f00b701ebc8efe4c58df681087f76934",
+                "commit": "1289f9a374c38115d3f4dcfac31439a9904d74c6",
+                "tree": "8d3312b21ccfa92102233211f8224d50fb07ac88",
             },
         )
         self.assertEqual(evidence["current_head_qualification_repair"]["status"], "HOLD")
+        self.assertEqual(
+            evidence["current_head_qualification_repair"]["source_receipt"],
+            "role-packs/pkt-22-source-receipt.json",
+        )
+        self.assertIn(
+            "qualification_evidence_missing",
+            evidence["current_head_qualification_repair"]["defects"],
+        )
         self.assertFalse(evidence["claims"]["qualification_admission"])
         self.assertFalse(evidence["claims"]["selectability"])
         self.assertFalse(evidence["claims"]["provider_live"])

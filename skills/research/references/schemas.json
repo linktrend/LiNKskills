@@ -15,7 +15,13 @@
         "depth": { "type": "string", "enum": ["single_pass", "comparative", "deep"] },
         "operator_approval": { "type": "string", "enum": ["NOT_REQUIRED", "PROCEED", "DENIED"] },
         "privacy_classification": { "type": "string", "enum": ["public", "synthetic", "redacted", "private"] },
-        "source_scope": { "type": "array", "items": { "type": "string", "minLength": 1 }, "maxItems": 32 }
+        "source_scope": { "type": "array", "items": { "type": "string", "minLength": 1 }, "maxItems": 32 },
+        "intake_kind": { "type": "string", "enum": ["question", "hypothesis", "comparison", "audit", "refresh"] },
+        "requested_workstreams": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["collect", "extract", "claim", "verify", "synthesize", "refresh"] },
+          "maxItems": 16
+        }
       }
     },
     "source": {
@@ -46,7 +52,10 @@
         "published_at": { "type": "string", "maxLength": 64 },
         "retrieved_at": { "type": "string", "maxLength": 64 },
         "conflict_note": { "type": "string", "maxLength": 2000 },
-        "assumptions": { "type": "array", "items": { "type": "string", "maxLength": 512 }, "maxItems": 16 }
+        "assumptions": { "type": "array", "items": { "type": "string", "maxLength": 512 }, "maxItems": 16 },
+        "rel": { "type": "string", "enum": ["supports", "contradicts", "qualifies", "cites"] },
+        "supersedes_claim_id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$" },
+        "negative_evidence": { "type": "string", "enum": ["missing", "observed_absence", "observed_presence"] }
       }
     },
     "output": {
@@ -72,7 +81,10 @@
               "published_at": { "type": "string", "maxLength": 64 },
               "retrieved_at": { "type": "string", "maxLength": 64 },
               "conflict_note": { "type": "string", "maxLength": 2000 },
-              "assumptions": { "type": "array", "items": { "type": "string", "maxLength": 512 }, "maxItems": 16 }
+              "assumptions": { "type": "array", "items": { "type": "string", "maxLength": 512 }, "maxItems": 16 },
+              "rel": { "type": "string", "enum": ["supports", "contradicts", "qualifies", "cites"] },
+              "supersedes_claim_id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$" },
+              "negative_evidence": { "type": "string", "enum": ["missing", "observed_absence", "observed_presence"] }
             }
           }
         },
@@ -96,6 +108,49 @@
           }
         },
         "uncertainties": { "type": "array", "items": { "type": "string", "maxLength": 1000 }, "maxItems": 64 },
+        "workstreams": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["kind", "sequence"],
+            "properties": {
+              "kind": { "type": "string", "enum": ["collect", "extract", "claim", "verify", "synthesize", "refresh"] },
+              "sequence": { "type": "integer", "minimum": 1 },
+              "status": { "type": "string", "enum": ["pending", "active", "complete", "skipped"] }
+            }
+          },
+          "maxItems": 16
+        },
+        "claim_links": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["claim_id", "rel", "target_kind", "target_id"],
+            "properties": {
+              "claim_id": { "type": "string", "minLength": 1 },
+              "rel": { "type": "string", "enum": ["supports", "contradicts", "qualifies", "cites"] },
+              "target_kind": { "type": "string", "enum": ["source-version", "evidence-excerpt", "claim"] },
+              "target_id": { "type": "string", "minLength": 1 }
+            }
+          },
+          "maxItems": 256
+        },
+        "conflict_sets": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["claim_ids", "status"],
+            "properties": {
+              "claim_ids": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 2, "uniqueItems": true },
+              "status": { "type": "string", "enum": ["open", "resolved", "deferred"] },
+              "note": { "type": "string", "maxLength": 2000 }
+            }
+          },
+          "maxItems": 32
+        },
         "effects": {
           "type": "object",
           "additionalProperties": false,

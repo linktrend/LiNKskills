@@ -1,13 +1,77 @@
 {
-  "schema_version":"0.1","role_pack_id":"david-cpo","version":"1.0.0","display_name":"David CPO","description":"Reference-only product, market, launch, and customer role release selection.",
-  "release_refs":[
-    {"release_id":"software-pm@1.0.0","artifact_digest":"sha256:b3b1ff07a2837b0d85891443dd14ba9b85c1d060926503f185d4b0991b05ece2","eligibility_ref":"opaque:eligibility:software-pm-1"},
-    {"release_id":"market-analyst@1.0.0","artifact_digest":"sha256:df16dcdbc301ddf11e41a23428e7ccea4e8b3fd7072333b0d9f5c685def90194","eligibility_ref":"opaque:eligibility:market-analyst-1"},
-    {"release_id":"marketing-strategist@1.0.0","artifact_digest":"sha256:63987b58d015a5e66f855defb0a0e38255b23fb824357a253eef88032cfe8de2","eligibility_ref":"opaque:eligibility:marketing-strategist-1"},
-    {"release_id":"sales-customer-management@1.0.0","artifact_digest":"sha256:bbcf9d4b0b82174d4b2b827e2857be77b4317821ceda3d12507462e3b7b83437","eligibility_ref":"opaque:eligibility:sales-customer-management-1"}
+  "activation": {
+    "activation_owner": "consumer",
+    "enabled": false
+  },
+  "applicability": {
+    "constraints": [
+      "No account or customer-system mutation.",
+      "Reference selection never grants authority."
+    ],
+    "role_class": "product-cpo",
+    "scope": "organization",
+    "task_classes": [
+      "product",
+      "market",
+      "feasibility",
+      "strategy",
+      "requirements",
+      "launch",
+      "marketing",
+      "acquisition",
+      "service",
+      "success"
+    ]
+  },
+  "compatibility": {
+    "min_contract_version": "0.2",
+    "runtime_profiles": [
+      "cursor-macos",
+      "codex-macos"
+    ]
+  },
+  "description": "Reference-only product, market, launch, and customer role release selection.",
+  "display_name": "David CPO",
+  "release_refs": [
+    {
+      "artifact_digest": "sha256:d42e47746499d2f1260353f664abf600dc92dbd80ce2a7b387dab07efbd821ed",
+      "eligibility_ref": "opaque:eligibility:software-pm-1",
+      "release_id": "software-pm@1.0.0",
+      "required": true
+    },
+    {
+      "artifact_digest": "sha256:2ad72d31d3473192c694443df92ee4cea7c8ec6c7d861313386dc895e208fe55",
+      "eligibility_ref": "opaque:eligibility:market-analyst-1",
+      "release_id": "market-analyst@1.0.0",
+      "required": true
+    },
+    {
+      "artifact_digest": "sha256:a6779605d78a21a6c01437f593a99dbf243158e3a8c08f27daf5df7145a8c694",
+      "eligibility_ref": "opaque:eligibility:marketing-strategist-1",
+      "release_id": "marketing-strategist@1.0.0",
+      "required": true
+    },
+    {
+      "artifact_digest": "sha256:42d041217ef0ea877aa8852a423fc016387c6286126a496f63872fb398eebca6",
+      "eligibility_ref": "opaque:eligibility:sales-customer-management-1",
+      "release_id": "sales-customer-management@1.0.0",
+      "required": true
+    }
   ],
-  "applicability":{"role_class":"product-cpo","task_classes":["product","market","feasibility","strategy","requirements","launch","marketing","acquisition","service","success"],"scope":"organization","constraints":["No account or customer-system mutation.","Reference selection never grants authority."]},
-  "required_capability_classes":["product","market","feasibility","strategy","requirements","launch","marketing","acquisition","service","success"],
-  "compatibility":{"runtime_profiles":["cursor-macos","codex-macos"],"min_contract_version":"0.2"},
-  "activation":{"enabled":false,"activation_owner":"consumer"},"trust_boundary":"linkskills-role-pack"
+  "required_capability_classes": [
+    "product",
+    "market",
+    "feasibility",
+    "strategy",
+    "requirements",
+    "launch",
+    "marketing",
+    "acquisition",
+    "service",
+    "success"
+  ],
+  "role_pack_id": "david-cpo",
+  "schema_version": "0.1",
+  "trust_boundary": "linkskills-role-pack",
+  "version": "1.0.0"
 }

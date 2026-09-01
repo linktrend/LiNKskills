@@ -1,13 +1,67 @@
 {
-  "schema_version":"0.1","role_pack_id":"eric-cto","version":"1.0.0","display_name":"Eric CTO","description":"Reference-only technical development and operations role release selection.",
-  "release_refs":[
-    {"release_id":"lead-engineer@1.0.0","artifact_digest":"sha256:cc5b65711a017155e4b2c41e1002bb8d50955bc526b5355f32b3abe841d1f95a","eligibility_ref":"opaque:eligibility:lead-engineer-1"},
-    {"release_id":"devops-sre@1.0.0","artifact_digest":"sha256:1aa2f5f12b31208545630163174a6145ad50321432ef94e3aae1fa2fb109512b","eligibility_ref":"opaque:eligibility:devops-sre-1"},
-    {"release_id":"company-planning-performance@1.0.0","artifact_digest":"sha256:3383423c0bab3a693283c71df169ffa9687b1fe646792be8f7a1ed8c2743fbee","eligibility_ref":"opaque:eligibility:company-planning-performance-1"},
-    {"release_id":"company-incident-continuity@1.0.0","artifact_digest":"sha256:6205eadde4acf974b294d2eed873c40a4e640aa1ad2029e5201155cb1f815399","eligibility_ref":"opaque:eligibility:company-incident-continuity-1"}
+  "activation": {
+    "activation_owner": "consumer",
+    "enabled": false
+  },
+  "applicability": {
+    "constraints": [
+      "Cannot approve own changes.",
+      "Reference selection never grants authority."
+    ],
+    "role_class": "technical-cto",
+    "scope": "organization",
+    "task_classes": [
+      "development",
+      "technical-operations",
+      "architecture",
+      "release",
+      "incident"
+    ]
+  },
+  "compatibility": {
+    "min_contract_version": "0.2",
+    "runtime_profiles": [
+      "cursor-macos",
+      "codex-macos"
+    ]
+  },
+  "description": "Reference-only technical development and operations role release selection.",
+  "display_name": "Eric CTO",
+  "release_refs": [
+    {
+      "artifact_digest": "sha256:84935f44a07e5b76da34bb7abb0b2ae97e531b9d016b4110b3d4b7888c766f56",
+      "eligibility_ref": "opaque:eligibility:lead-engineer-1",
+      "release_id": "lead-engineer@1.0.0",
+      "required": true
+    },
+    {
+      "artifact_digest": "sha256:5cada6a00acbae17c1f7f2ff526ad458247d5bff28936116597f050aa56c0e94",
+      "eligibility_ref": "opaque:eligibility:devops-sre-1",
+      "release_id": "devops-sre@1.0.0",
+      "required": true
+    },
+    {
+      "artifact_digest": "sha256:609e473d7798e7830925f4f7fdc4ea445737c8c33e74aad77920d3c4bcc5c881",
+      "eligibility_ref": "opaque:eligibility:company-planning-performance-1",
+      "release_id": "company-planning-performance@1.0.0",
+      "required": true
+    },
+    {
+      "artifact_digest": "sha256:4833f50eee8105aab324f56c0da1ae6f04d54b3ee78f675d0adb3f9518338292",
+      "eligibility_ref": "opaque:eligibility:company-incident-continuity-1",
+      "release_id": "company-incident-continuity@1.0.0",
+      "required": true
+    }
   ],
-  "applicability":{"role_class":"technical-cto","task_classes":["development","technical-operations","architecture","release","incident"],"scope":"organization","constraints":["Cannot approve own changes.","Reference selection never grants authority."]},
-  "required_capability_classes":["development","technical-operations","architecture","release","incident"],
-  "compatibility":{"runtime_profiles":["cursor-macos","codex-macos"],"min_contract_version":"0.2"},
-  "activation":{"enabled":false,"activation_owner":"consumer"},"trust_boundary":"linkskills-role-pack"
+  "required_capability_classes": [
+    "development",
+    "technical-operations",
+    "architecture",
+    "release",
+    "incident"
+  ],
+  "role_pack_id": "eric-cto",
+  "schema_version": "0.1",
+  "trust_boundary": "linkskills-role-pack",
+  "version": "1.0.0"
 }
