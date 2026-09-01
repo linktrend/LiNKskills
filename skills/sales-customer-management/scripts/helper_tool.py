@@ -17,7 +17,6 @@ PRIVATE_FIELD_MARKER = re.compile(
 ROLLBACK_TARGET = (
     "ABSENT@c89bad5ce3bc91340cf388b923d2befecb406546/"
     "tree:9d0be7cedb0fc4ec42bf382735ede36d100f8614"
-    " (no prior qualified PKT-16 release)"
 )
 EFFECTS = {"sent": False, "applied": False, "mutated_records": False}
 
@@ -42,6 +41,10 @@ def _result(
     escalation_reason: str,
     owner: str,
     idempotency_key: str,
+    qualification: str = "needs-evidence",
+    priority: str = "unranked",
+    handoff_required: bool = False,
+    conversion_ref: str | None = None,
 ) -> dict[str, Any]:
     """Return an output-contract-complete, redacted preparation result."""
     return {
@@ -62,6 +65,14 @@ def _result(
             "owner": owner,
         },
         "effects": dict(EFFECTS),
+        "qualification": {"status": qualification, "basis": evidence_refs},
+        "priority": {"level": priority, "basis": []},
+        "handoff": {
+            "required": handoff_required,
+            "recipient": "LiNKclient",
+            "conversion_ref": conversion_ref,
+            "accepted": False,
+        },
         "rollback": ROLLBACK_TARGET,
     }
 
@@ -139,10 +150,34 @@ def normalize_request(request: dict[str, Any]) -> dict[str, Any]:
             owner=owner,
             idempotency_key=idempotency_key,
         )
+    conversion_ref = request.get("conversion_ref")
+    post_conversion = workflow in {"onboarding", "renewal_risk"}
+    if post_conversion and not isinstance(conversion_ref, str):
+        return _result(
+            status="PENDING_APPROVAL",
+            workflow=workflow,
+            disposition="needs-evidence",
+            rationale="Post-conversion work belongs to LiNKclient and requires an evidenced conversion reference for handoff.",
+            confidence="high",
+            evidence_refs=refs,
+            next_actions=["Prepare a LiNKclient handoff with an immutable conversion reference."],
+            escalation_required=True,
+            escalation_reason="The pre-conversion boundary has been reached without complete handoff evidence.",
+            owner="LiNKclient",
+            idempotency_key=idempotency_key,
+            handoff_required=True,
+        )
     if workflow in {"pipeline", "proposal_follow_up", "onboarding", "renewal_risk", "founder_escalation", "other"}:
         status = "PENDING_APPROVAL"
     else:
         status = "COMPLETED"
+    priority = "unranked"
+    priority_signals = request.get("priority_signals")
+    if workflow == "qualification" and isinstance(priority_signals, dict):
+        values = [priority_signals.get(name) for name in ("urgency", "impact", "readiness")]
+        if all(isinstance(value, int) and not isinstance(value, bool) and 0 <= value <= 2 for value in values):
+            score = sum(values)
+            priority = "high" if score >= 5 else "medium" if score >= 3 else "low"
     return _result(
         status=status,
         workflow=workflow,
@@ -155,6 +190,10 @@ def normalize_request(request: dict[str, Any]) -> dict[str, Any]:
         escalation_reason="External action remains owner-gated." if status == "PENDING_APPROVAL" else "No external action requested.",
         owner=owner,
         idempotency_key=idempotency_key,
+        qualification="qualified" if workflow == "qualification" else "needs-evidence",
+        priority=priority,
+        handoff_required=post_conversion,
+        conversion_ref=conversion_ref if isinstance(conversion_ref, str) else None,
     )
 
 
