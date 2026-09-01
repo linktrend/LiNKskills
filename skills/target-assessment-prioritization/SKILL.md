@@ -9,11 +9,16 @@ author: LiNKskills Library
 tags: [targeting, assessment, prioritization, evidence, ranking]
 engine:
   min_reasoning_tier: high
-  preferred_model: gpt-5.6-luna
+  preferred_model: gpt-5
   context_required: 128000
-tools: [read_file, list_dir, get_tool_details]
+tooling:
+  policy: cli-first
+  jit_enabled_if: generalist_or_gt10_tools
+  jit_tool_threshold: 10
+  require_get_tool_details: true
+tools: [write_file, read_file, list_dir, get_tool_details]
 dependencies: [target-definition-segmentation]
-permissions: [fs_read]
+permissions: [fs_read, fs_write]
 scope_out: ["No publication or certification claim", "No Program authority or live Platform use", "No target selection, activation, contact, connector call, or LiNKtarget mutation", "No invented evidence, sensitive-trait inference, or private-data retention"]
 format_profile: simple
 persistence:
@@ -38,9 +43,18 @@ Evidence-bounded assessment and deterministic prioritization of supplied target 
 
 - **Level 1 — route:** use this summary to decide whether the supplied matter matches the skill.
 - **Level 2 — apply:** read [`advanced/advanced.md`](advanced/advanced.md) for criterion, uncertainty, ordering, and refusal rules.
-- **Level 3 — integrate:** read [`references/schemas.json`](references/schemas.json), [`references/skill-pack.json`](references/skill-pack.json), and [`references/eval-suite.json`](references/eval-suite.json) before adapting a consumer.
+- **Level 3 — integrate:** read [`references/schemas.json`](references/schemas.json), [`references/skill-pack.json`](references/skill-pack.json), and [`references/eval-suite.json`](references/eval-suite.json) before adapting a consumer. Input and output contracts are `./references/schemas.json#/definitions/input` and `./references/schemas.json#/definitions/output`.
 - **Level 4 — verify:** run the deterministic package tests and review [`references/catalog-fragment.json`](references/catalog-fragment.json). The fragment is a draft discovery input, not publication or certification.
 
 ## Global ineligibility
 
 This package is **globally ineligible and non-selectable**. Its lifecycle and certification states are `draft` and `uncertified`. A consumer must not interpret package presence, an evaluation fixture, a catalog entry, or `READY_FOR_OWNER` as publication, certification, Program authority, live Platform availability, or permission to mutate LiNKtarget.
+
+## Tooling protocol (CLI-first)
+
+1. **Native CLI:** inspect only supplied synthetic, redacted, or public fixture files.
+2. **CLI wrapper:** run `scripts/helper_tool.py` for deterministic validation and evaluation.
+3. **Direct API:** prohibited; this package has no network or service authority.
+4. **MCP:** prohibited for execution; no live Platform or Program capability is available.
+
+Writes are limited to caller-selected, task-local source-validation results. They never publish, certify, select, activate, contact, or mutate LiNKtarget.

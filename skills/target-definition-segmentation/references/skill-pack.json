@@ -4,30 +4,84 @@
   "display_name": "Target Definition and Segmentation",
   "version": "0.1.0",
   "description": "Evidence-bounded target definition and segmentation for explicit populations, criteria, exclusions, uncertainty, and owner-reviewed segment drafts without selecting records or mutating LiNKtarget.",
+  "capability_category": "target_definition_segmentation",
   "lifecycle_state": "draft",
-  "certification_state": "uncertified",
-  "selectable": false,
-  "availability": "source_only",
+  "format_profile": "simple",
+  "compatible_runtime_profiles": [
+    "source-only"
+  ],
+  "min_capability_tier": "high",
   "routing": {
-    "when_to_use": "Use when supplied synthetic, redacted, or public evidence needs a reviewable target definition or segment draft with explicit inclusion, exclusion, evidence, and uncertainty boundaries.",
+    "when_to_use": "Use only for bounded source methodology over supplied synthetic, redacted, or public inputs.",
     "when_not_to_use": [
-      "It does not select people or accounts, score or rank targets, activate a segment, publish an audience, grant authority, call a connector, or create or mutate LiNKtarget state.",
-      "Do not use where publication, certification, Program authority, or live Platform availability is required."
+      "No publication, certification, selection, activation, contact, Program authority, live Platform use, or LiNKtarget mutation"
     ],
     "tags": [
       "targeting",
-      "segmentation",
-      "criteria",
-      "evidence",
-      "privacy"
+      "source-only",
+      "draft"
     ],
-    "related_skills": [
-      "target-assessment-prioritization"
+    "related_skills": []
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "validated_fixture",
+        "description": "Schema-valid supplied source-only matter, evidence, criteria, and items"
+      }
+    ],
+    "expected_outputs": [
+      {
+        "name": "owner_review_draft",
+        "description": "Deterministic draft with explicit uncertainty and empty effects"
+      }
+    ],
+    "forbidden_actions": [
+      "Select, activate, contact, publish, certify, infer sensitive traits, claim authority, or mutate LiNKtarget"
+    ],
+    "verification_steps": [
+      "Validate schemas and cross-reference integrity",
+      "Run exact fixtures and empty-effects assertions"
+    ],
+    "completion_criteria": [
+      "All deterministic source-validation cases pass"
+    ],
+    "known_limitations": [
+      "Globally ineligible, uncertified, unpublished, and non-selectable"
     ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [
+      "scripts/helper_tool.py"
+    ],
+    "host_capabilities": [
+      "filesystem_read",
+      "filesystem_write"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.yaml",
+    "suite_schema_version": "0.1",
+    "suite_hash": "sha256:7e70d09fef33d8393d09daf6d4d875ec45d54853efe5106cb10a61ba400586e9"
+  },
+  "telemetry": {
+    "classification": "public_internal",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_sensitive_traits",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain_source_validation_ids_assertions_and_hashes"
   },
   "fragments": [
     {
-      "fragment_id": "summary",
+      "fragment_id": "skill-md",
       "disclosure_level": 1,
       "path": "SKILL.md"
     },
@@ -47,10 +101,5 @@
       "path": "references/eval-suite.json"
     }
   ],
-  "effects": {
-    "messages_sent": [],
-    "external_calls": [],
-    "selections": [],
-    "mutations": []
-  }
+  "release_channel": "canary"
 }

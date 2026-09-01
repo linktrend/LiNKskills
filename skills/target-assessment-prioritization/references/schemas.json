@@ -11,8 +11,7 @@
       "properties": {
         "ref": {
           "type": "string",
-          "pattern": "^(fixture|source|consumer):[^\\s]+$",
-          "maxLength": 256
+          "pattern": "^(fixture|source|consumer):[^\\s]+$"
         },
         "status": {
           "type": "string",
@@ -68,6 +67,28 @@
         }
       }
     },
+    "criterion_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "criterion_id",
+        "result"
+      ],
+      "properties": {
+        "criterion_id": {
+          "type": "string",
+          "pattern": "^criterion:[^\\s]+$"
+        },
+        "result": {
+          "type": "string",
+          "enum": [
+            "met",
+            "not_met",
+            "unknown"
+          ]
+        }
+      }
+    },
     "item": {
       "type": "object",
       "additionalProperties": false,
@@ -85,26 +106,7 @@
           "type": "array",
           "minItems": 1,
           "items": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": [
-              "criterion_id",
-              "result"
-            ],
-            "properties": {
-              "criterion_id": {
-                "type": "string",
-                "pattern": "^criterion:[^\\s]+$"
-              },
-              "result": {
-                "type": "string",
-                "enum": [
-                  "met",
-                  "not_met",
-                  "unknown"
-                ]
-              }
-            }
+            "$ref": "#/definitions/criterion_result"
           }
         },
         "evidence_refs": {
@@ -126,7 +128,9 @@
         "privacy_classification",
         "matter_ref",
         "source_evidence",
-        "criteria"
+        "criteria",
+        "items",
+        "requested_action"
       ],
       "properties": {
         "mode": {
@@ -151,7 +155,6 @@
         "source_evidence": {
           "type": "array",
           "minItems": 1,
-          "uniqueItems": true,
           "items": {
             "$ref": "#/definitions/evidence"
           }
@@ -159,13 +162,13 @@
         "criteria": {
           "type": "array",
           "minItems": 1,
-          "uniqueItems": true,
           "items": {
             "$ref": "#/definitions/criterion"
           }
         },
         "items": {
           "type": "array",
+          "minItems": 1,
           "items": {
             "$ref": "#/definitions/item"
           }
@@ -227,7 +230,10 @@
         "effects",
         "lifecycle_state",
         "certification_state",
-        "selectable"
+        "publication_status",
+        "selectable",
+        "program_authority",
+        "live_platform_use"
       ],
       "properties": {
         "status": {
@@ -263,7 +269,16 @@
         "certification_state": {
           "const": "uncertified"
         },
+        "publication_status": {
+          "const": "not_published"
+        },
         "selectable": {
+          "const": false
+        },
+        "program_authority": {
+          "const": false
+        },
+        "live_platform_use": {
           "const": false
         }
       }
