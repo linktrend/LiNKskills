@@ -1,0 +1,109 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "target-assessment-prioritization",
+  "display_name": "Target Assessment and Prioritization",
+  "version": "0.1.0",
+  "description": "Evidence-bounded assessment and deterministic prioritization of supplied target candidates using declared criteria, uncertainty, and owner-review recommendations without selection or LiNKtarget mutation.",
+  "capability_category": "target_assessment_prioritization",
+  "lifecycle_state": "draft",
+  "format_profile": "simple",
+  "compatible_runtime_profiles": [
+    "source-only"
+  ],
+  "min_capability_tier": "high",
+  "routing": {
+    "when_to_use": "Use only for bounded source methodology over supplied synthetic, redacted, or public inputs.",
+    "when_not_to_use": [
+      "No publication, certification, selection, activation, contact, Program authority, live Platform use, or LiNKtarget mutation"
+    ],
+    "tags": [
+      "targeting",
+      "source-only",
+      "draft"
+    ],
+    "related_skills": [
+      "target-definition-segmentation"
+    ]
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "validated_fixture",
+        "description": "Schema-valid supplied source-only matter, evidence, criteria, and items"
+      }
+    ],
+    "expected_outputs": [
+      {
+        "name": "owner_review_draft",
+        "description": "Deterministic draft with explicit uncertainty and empty effects"
+      }
+    ],
+    "forbidden_actions": [
+      "Select, activate, contact, publish, certify, infer sensitive traits, claim authority, or mutate LiNKtarget"
+    ],
+    "verification_steps": [
+      "Validate schemas and cross-reference integrity",
+      "Run exact fixtures and empty-effects assertions"
+    ],
+    "completion_criteria": [
+      "All deterministic source-validation cases pass"
+    ],
+    "known_limitations": [
+      "Globally ineligible, uncertified, unpublished, and non-selectable"
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [
+      "target-definition-segmentation"
+    ],
+    "packaged_tools": [
+      "scripts/helper_tool.py"
+    ],
+    "host_capabilities": [
+      "filesystem_read",
+      "filesystem_write"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.yaml",
+    "suite_schema_version": "0.1",
+    "suite_hash": "sha256:90de8bab08f63ce99383e5b2fc7bad16e06a96a3204b6946791abe439a0ff22f"
+  },
+  "telemetry": {
+    "classification": "public_internal",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_sensitive_traits",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain_source_validation_ids_assertions_and_hashes"
+  },
+  "fragments": [
+    {
+      "fragment_id": "skill-md",
+      "disclosure_level": 1,
+      "path": "SKILL.md"
+    },
+    {
+      "fragment_id": "advanced",
+      "disclosure_level": 2,
+      "path": "advanced/advanced.md"
+    },
+    {
+      "fragment_id": "schemas",
+      "disclosure_level": 3,
+      "path": "references/schemas.json"
+    },
+    {
+      "fragment_id": "evals",
+      "disclosure_level": 4,
+      "path": "references/eval-suite.json"
+    }
+  ],
+  "release_channel": "canary"
+}
