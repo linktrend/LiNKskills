@@ -1,0 +1,46 @@
+{
+  "schema_version": "0.1",
+  "work_package": "LT-WP-007",
+  "methodology_sources": [
+    {
+      "source_id": "docs/LINKSKILLS-INTENT.md",
+      "version": "repository-local intent@2026-09-01",
+      "digest": "sha256:966b079ba62401b09c65cafae61e98330d7d0d9c485aade9e9d845eaa08f93b2"
+    },
+    {
+      "source_id": "docs/LINKSKILLS-TECHNICAL-PRD.md",
+      "version": "repository-local technical-prd@2026-09-01",
+      "digest": "sha256:91e79214b9bf2914249d30b5bc17052a5dbaac29998402b7997d72e0e32d3aa8"
+    },
+    {
+      "source_id": "docs/adr/0001-retire-logic-engine-governance-layer.md",
+      "version": "ADR-0001",
+      "digest": "sha256:d2c7bfaa4357ca7e8d1c96027c0e267b6122612ef818f417b051e7f13162416c"
+    }
+  ],
+  "mapping": [
+    {
+      "source_ids": [
+        "docs/LINKSKILLS-INTENT.md",
+        "docs/LINKSKILLS-TECHNICAL-PRD.md",
+        "docs/adr/0001-retire-logic-engine-governance-layer.md"
+      ],
+      "applies_to": [
+        "SKILL.md",
+        "advanced/advanced.md",
+        "references/schemas.json",
+        "references/eval-suite.json"
+      ],
+      "decisions": [
+        "source-only catalog boundary",
+        "no Program governance authority",
+        "closed evidence-bounded contracts",
+        "deterministic non-mutating evaluation"
+      ]
+    }
+  ],
+  "candidate_source_commit": "ae6b8c0c9b73ba49cd57ee9b420032397e068132",
+  "classification": "source_validation_only",
+  "certification_status": "uncertified",
+  "publication_status": "not_published"
+}

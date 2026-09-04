@@ -2,6 +2,7 @@
   "definitions": {
     "input": {
       "type": "object",
+      "additionalProperties": false,
       "required": ["claims"],
       "properties": {
         "claims": {
@@ -11,7 +12,28 @@
             "required": ["claim_id", "claim_text"],
             "properties": {
               "claim_id": { "type": "string" },
-              "claim_text": { "type": "string", "minLength": 3 }
+              "claim_text": { "type": "string", "minLength": 3 },
+              "source_type": { "type": "string", "enum": ["memory", "search", "file"] },
+              "source_pointer": { "type": "string" },
+              "source_pointers": { "type": "array", "items": { "type": "string" } },
+              "rel": { "type": "string", "enum": ["supports", "contradicts", "qualifies", "cites"] },
+              "confidence": { "type": ["string", "number"] },
+              "circular": { "type": "boolean" },
+              "supersedes_claim_id": { "type": "string" },
+              "evidence_class": { "type": "string" }
+            }
+          }
+        },
+        "claim_links": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["claim_id", "rel", "target_kind", "target_id"],
+            "properties": {
+              "claim_id": { "type": "string" },
+              "rel": { "type": "string", "enum": ["supports", "contradicts", "qualifies", "cites"] },
+              "target_kind": { "type": "string", "enum": ["source-version", "evidence-excerpt", "claim"] },
+              "target_id": { "type": "string" }
             }
           }
         }
@@ -19,6 +41,7 @@
     },
     "output": {
       "type": "object",
+      "additionalProperties": false,
       "required": ["status", "citations"],
       "properties": {
         "status": { "type": "string", "enum": ["SUCCESS", "FAILED"] },
@@ -30,11 +53,18 @@
             "properties": {
               "claim_id": { "type": "string" },
               "source_type": { "type": "string", "enum": ["memory", "search", "file"] },
-              "source_pointer": { "type": "string", "minLength": 1 },
-              "confidence": { "type": "string" }
+              "source_pointer": { "type": "string" },
+              "rel": { "type": "string", "enum": ["supports", "contradicts", "qualifies", "cites"] },
+              "negative_evidence": { "type": "string", "enum": ["missing", "observed_absence", "observed_presence"] },
+              "confidence": { "type": ["string", "number"] }
             }
           }
-        }
+        },
+        "errors": { "type": "array", "items": { "type": "string" } },
+        "blocked": { "type": "boolean" },
+        "claim_ids": { "type": "array", "items": { "type": "string" } },
+        "external_calls": { "type": "array", "maxItems": 0 },
+        "mutations": { "type": "array", "maxItems": 0 }
       }
     },
     "state": {

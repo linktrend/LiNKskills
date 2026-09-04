@@ -1,34 +1,32 @@
 {
   "consumer_profile_activation": {
-    "evaluated_by": "linkskills-pkt-05-admission",
-    "evidence_ref": "opaque:evidence:gws-gmail-forward-consumer-inactive",
+    "evaluated_by": "linkskills-issue-299-initial-canary-audit",
+    "evidence_ref": "opaque:evidence:issue-299-gws-gmail-forward-consumer-inactive",
     "status": false
   },
   "consumer_tool_authority": {
-    "evaluated_by": "linkskills-pkt-05-admission",
-    "evidence_ref": "opaque:evidence:gws-gmail-forward-tool-authority-pending",
+    "evaluated_by": "linkskills-issue-299-initial-canary-audit",
+    "evidence_ref": "opaque:evidence:issue-299-gws-gmail-forward-tool-unauthorized",
     "status": false
   },
   "decision": "ineligible",
   "denial_reasons": [
-    "missing_platform_evidence",
     "release_not_selectable",
     "profile_not_activated",
-    "tool_not_authorized",
-    "unqualified"
+    "tool_not_authorized"
   ],
   "eligibility_id": "gws-gmail-forward-ineligible",
-  "evaluated_at": "2026-08-24T00:00:00Z",
+  "evaluated_at": "2026-08-31T12:00:00Z",
   "platform_technical_eligibility": {
-    "evaluated_by": "linkskills-pkt-05-admission",
-    "evidence_ref": "opaque:evidence:gws-gmail-forward-unqualified",
-    "status": false
+    "evaluated_by": "linkskills-issue-299-initial-canary-audit",
+    "evidence_ref": "opaque:evidence:issue-299-gws-gmail-forward-source-audit",
+    "status": true
   },
   "release_id": "gws-gmail-forward@0.22.5",
   "schema_version": "0.1",
   "skills_release_selectability": {
-    "evaluated_by": "linkskills-pkt-05-admission",
-    "evidence_ref": "opaque:evidence:gws-gmail-forward-unqualified",
+    "evaluated_by": "linkskills-issue-299-initial-canary-audit",
+    "evidence_ref": "opaque:evidence:issue-299-gws-gmail-forward-not-selectable",
     "status": false
   },
   "trust_boundary": "linkskills-eligibility"

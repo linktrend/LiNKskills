@@ -1,0 +1,524 @@
+{
+  "claims": {
+    "activation": false,
+    "consumer": false,
+    "current_pointer": false,
+    "e2e": false,
+    "hosted_stage": false,
+    "ordinary_selectability": false,
+    "production": false,
+    "provider_live": false,
+    "qualification_admission": false,
+    "vps": false
+  },
+  "completion_claimed": false,
+  "decision": "HOLD",
+  "duplicate_implementation": "forbidden_for_SOURCE_LANDED_packets",
+  "first_dependency_ready_internal_canary": {
+    "implementation_status": "SOURCE_LANDED_DO_NOT_DUPLICATE",
+    "next_authorized_skills_mutation": "none",
+    "packet_id": "PKT-09",
+    "reason": "First Wave-2 Lisa internal-canary packet whose DAG dependencies have source landed on protected development. Source already merged through issue 196. Re-implementation is prohibited. Qualification, ordinary selectability, and provider-live remain HOLD.",
+    "title": "Operational Reporting skill family",
+    "wave": 2
+  },
+  "human_ledger": "docs/planning/governed-skill-expansion/CURRENT-PACKET-LEDGER.md",
+  "issue_299_overlay": {
+    "approved_internal_canary": 182,
+    "issue": 299,
+    "member_count": 207,
+    "needs_correction": 2,
+    "needs_focused_review": 22,
+    "next_authorized_work_owner": "consumer",
+    "notes": "Local canary adapter publication only. Does not close PKT-23/25/26 or authorize live/selectability.",
+    "ordinary_selectable_count": 0,
+    "pull_request": 307,
+    "source_classification": "SOURCE_LANDED_OVERLAY",
+    "stable_qualified_count": 0,
+    "superseded": 1
+  },
+  "kind": "linkskills.current-packet-ledger",
+  "managed_core": {
+    "mutation": "read_only",
+    "package_name": "ide-development-managed-core",
+    "package_version": "2.5.2"
+  },
+  "missing_authority": [
+    "Literal Principal APPROVED bound to planning-manifest digest c14c3ccdb612d9bee2be2a4d4ff71358e98cff63e6f09c9f58ac9e49816e7263, or a new digest-bound receipt after an authorized manifest refresh.",
+    "Independent qualification evidence that can change PKT-22 qualification_admission without inferring from lifecycle file presence.",
+    "Consumer-owner receipts for issue 299 disabled-manifest application.",
+    "PKT-25 exact provider source receipt plus XPKT-04 and XPKT-05 identities before any live or hosted canary claim.",
+    "Platform-owned live migration apply receipts before any shared-database claim."
+  ],
+  "packets": [
+    {
+      "consumer_activation": false,
+      "dependency_ready": true,
+      "github_issues": [
+        150
+      ],
+      "id": "PKT-00",
+      "notes": "Architecture record present; founder dispatch approval not recorded.",
+      "ordinary_selectability": false,
+      "provider_live": false,
+      "qualification_admission": false,
+      "source_classification": "SOURCE_LANDED",
+      "title": "Baseline reconciliation and architecture approvals"
+    },
+    {
+      "consumer_activation": false,
+      "dependency_ready": true,
+      "github_issues": [
+        153
+      ],
+      "id": "PKT-01",
+      "notes": "Contracts and fixtures present; live schema/protocol apply HOLD.",
+      "ordinary_selectability": false,
+      "provider_live": false,
+      "qualification_admission": false,
+      "source_classification": "SOURCE_LANDED",
+      "title": "Provider taxonomy and release metadata contracts"
+    },
+    {
+      "consumer_activation": false,
+      "dependency_ready": true,
+      "github_issues": [
+        156
+      ],
+      "id": "PKT-02",
+      "notes": "Source provider path present; provider-live HOLD.",
+      "ordinary_selectability": false,
+      "provider_live": false,
+      "qualification_admission": false,
+      "source_classification": "SOURCE_LANDED",
+      "title": "Standard MCP v2 family discovery and exact resource retrieval"
+    },
+    {
+      "consumer_activation": false,
+      "dependency_ready": true,
+      "github_issues": [
+        161,
+        168
+      ],
+      "id": "PKT-03",
+      "notes": "Source lifecycle present; Platform live migration apply HOLD.",
+      "ordinary_selectability": false,
+      "provider_live": false,
+      "qualification_admission": false,
+      "source_classification": "SOURCE_LANDED",
+      "title": "External collection vendor adaptation and update lifecycle"
+    },
+    {
+      "consumer_activation": false,
+      "dependency_ready": true,
+      "github_issues": [
+        183
+      ],
+      "id": "PKT-04",
+      "ordinary_selectability": false,
+      "provider_live": false,
+      "qualification_admission": false,
+      "source_classification": "SOURCE_LANDED",
+      "title": "External content security privacy and evaluation controls"
+    },
+    {
+      "consumer_activation": false,
+      "dependency_ready": true,
+      "github_issues": [
+        189
+      ],
+      "id": "PKT-05",
+      "notes": "95 members; eval_pending; inactive_by_default true.",
+      "ordinary_selectability": false,
+      "provider_live": false,
+      "qualification_admission": false,
+      "source_classification": "SOURCE_LANDED",
+      "title": "Governed Google Workspace collection admission"
+    },
+    {
+      "consumer_activation": false,
+      "dependency_ready": true,
+      "github_issues": [
+        190
+      ],
+      "id": "PKT-06",
+      "ordinary_selectability": false,
+      "provider_live": false,
+      "qualification_admission": false,
+      "source_classification": "SOURCE_LANDED",
+      "title": "Canonical reusable research workflow"
+    },
+    {
+      "consumer_activation": false,
+      "dependency_ready": true,
+      "github_issues": [
+        191
+      ],
+      "id": "PKT-07",
+      "ordinary_selectability": false,
+      "provider_live": false,
+      "qualification_admission": false,
+      "source_classification": "SOURCE_LANDED",
+      "title": "Safe governed browser-use skill"
+    },
+    {
+      "consumer_activation": false,
+      "dependency_ready": true,
+      "github_issues": [
+        193
+      ],
+      "id": "PKT-08",
+      "ordinary_selectability": false,
+      "provider_live": false,
+      "qualification_admission": false,
+      "source_classification": "SOURCE_LANDED",
+      "title": "Reusable company communication skill"
+    },
+    {
+      "consumer_activation": false,
+      "dependency_ready": true,
+      "github_issues": [
+        196
+      ],
+      "id": "PKT-09",
+      "internal_canary_wave": 2,
+      "notes": "First Wave-2 internal canary packet; already landed; do not duplicate.",
+      "ordinary_selectability": false,
+      "provider_live": false,
+      "qualification_admission": false,
+      "source_classification": "SOURCE_LANDED",
+      "title": "Operational Reporting skill family"
+    },
+    {
+      "consumer_activation": false,
+      "dependency_ready": true,
+      "github_issues": [
+        197
+      ],
+      "id": "PKT-10",
+      "internal_canary_wave": 2,
+      "ordinary_selectability": false,
+      "provider_live": false,
+      "qualification_admission": false,
+      "source_classification": "SOURCE_LANDED",
+      "title": "Personal Compliance skill family"
+    },
+    {
+      "consumer_activation": false,
+      "dependency_ready": true,
+      "github_issues": [
+        200
+      ],
+      "id": "PKT-11",
+      "internal_canary_wave": 2,
+      "ordinary_selectability": false,
+      "provider_live": false,
+      "qualification_admission": false,
+      "source_classification": "SOURCE_LANDED",
+      "title": "Time Management skill family"
+    },
+    {
+      "consumer_activation": false,
+      "dependency_ready": true,
+      "github_issues": [
+        198
+      ],
+      "id": "PKT-12",
+      "internal_canary_wave": 2,
+      "ordinary_selectability": false,
+      "provider_live": false,
+      "qualification_admission": false,
+      "source_classification": "SOURCE_LANDED",
+      "title": "Private Health and Wellbeing skill family"
+    },
+    {
+      "consumer_activation": false,
+      "dependency_ready": true,
+      "github_issues": [
+        201
+      ],
+      "id": "PKT-13",
+      "ordinary_selectability": false,
+      "provider_live": false,
+      "qualification_admission": false,
+      "source_classification": "SOURCE_LANDED",
+      "title": "Executive Decisions and Governance family"
+    },
+    {
+      "consumer_activation": false,
+      "dependency_ready": true,
+      "github_issues": [
+        207
+      ],
+      "id": "PKT-14",
+      "ordinary_selectability": false,
+      "provider_live": false,
+      "qualification_admission": false,
+      "source_classification": "SOURCE_LANDED",
+      "title": "Company Planning and Performance family"
+    },
+    {
+      "consumer_activation": false,
+      "dependency_ready": true,
+      "github_issues": [
+        187
+      ],
+      "id": "PKT-15",
+      "ordinary_selectability": false,
+      "provider_live": false,
+      "qualification_admission": false,
+      "source_classification": "SOURCE_LANDED",
+      "title": "Finance and Accounting Operations family"
+    },
+    {
+      "consumer_activation": false,
+      "dependency_ready": true,
+      "github_issues": [
+        172
+      ],
+      "id": "PKT-16",
+      "ordinary_selectability": false,
+      "provider_live": false,
+      "qualification_admission": false,
+      "source_classification": "SOURCE_LANDED",
+      "title": "Sales and Customer Management family"
+    },
+    {
+      "consumer_activation": false,
+      "dependency_ready": true,
+      "github_issues": [
+        173
+      ],
+      "id": "PKT-17",
+      "ordinary_selectability": false,
+      "provider_live": false,
+      "qualification_admission": false,
+      "source_classification": "SOURCE_LANDED",
+      "title": "Commercial Contracts and Legal Operations family"
+    },
+    {
+      "consumer_activation": false,
+      "dependency_ready": true,
+      "github_issues": [
+        202
+      ],
+      "id": "PKT-18",
+      "ordinary_selectability": false,
+      "provider_live": false,
+      "qualification_admission": false,
+      "source_classification": "SOURCE_LANDED",
+      "title": "Meeting Management family"
+    },
+    {
+      "consumer_activation": false,
+      "dependency_ready": true,
+      "github_issues": [
+        178
+      ],
+      "id": "PKT-19",
+      "ordinary_selectability": false,
+      "provider_live": false,
+      "qualification_admission": false,
+      "source_classification": "SOURCE_LANDED",
+      "title": "Procurement and Vendor Management family"
+    },
+    {
+      "consumer_activation": false,
+      "dependency_ready": true,
+      "github_issues": [
+        208
+      ],
+      "id": "PKT-20",
+      "ordinary_selectability": false,
+      "provider_live": false,
+      "qualification_admission": false,
+      "source_classification": "SOURCE_LANDED",
+      "title": "Agent Workforce Management family"
+    },
+    {
+      "consumer_activation": false,
+      "dependency_ready": true,
+      "github_issues": [
+        210
+      ],
+      "id": "PKT-21",
+      "ordinary_selectability": false,
+      "provider_live": false,
+      "qualification_admission": false,
+      "source_classification": "SOURCE_LANDED",
+      "title": "Company Incident and Continuity Management family"
+    },
+    {
+      "consumer_activation": false,
+      "dependency_ready": false,
+      "github_issues": [
+        216,
+        269,
+        238
+      ],
+      "id": "PKT-22",
+      "merged_pull_requests": [
+        295
+      ],
+      "notes": "Source manifests landed; qualification and selectability HOLD per pkt-22-source-receipt.json.",
+      "ordinary_selectability": false,
+      "provider_live": false,
+      "qualification_admission": false,
+      "source_classification": "SOURCE_LANDED_HOLD",
+      "title": "Reusable role-pack manifests"
+    },
+    {
+      "blocked_on": [
+        "PKT-22"
+      ],
+      "consumer_activation": false,
+      "dependency_ready": false,
+      "github_issues": [
+        217
+      ],
+      "id": "PKT-23",
+      "notes": "Preparatory harness only; PKT-22 unresolved.",
+      "ordinary_selectability": false,
+      "provider_live": false,
+      "qualification_admission": false,
+      "source_classification": "PREPARATORY_ONLY",
+      "title": "Cross-source evaluation and qualification evidence"
+    },
+    {
+      "blocked_on": [
+        "PKT-23"
+      ],
+      "consumer_activation": false,
+      "dependency_ready": false,
+      "github_issues": [
+        219,
+        274,
+        268
+      ],
+      "id": "PKT-24",
+      "ordinary_selectability": false,
+      "provider_live": false,
+      "qualification_admission": false,
+      "source_classification": "PREPARATORY_ONLY",
+      "title": "Catalogue generation supersession mappings and documentation integration"
+    },
+    {
+      "blocked_on": [
+        "PKT-24"
+      ],
+      "consumer_activation": false,
+      "dependency_ready": false,
+      "github_issues": [
+        220,
+        248
+      ],
+      "id": "PKT-25",
+      "ordinary_selectability": false,
+      "provider_live": false,
+      "qualification_admission": false,
+      "source_classification": "PREPARATORY_ONLY",
+      "title": "Exact-tree provider source verification"
+    },
+    {
+      "blocked_on": [
+        "PKT-25",
+        "XPKT-04",
+        "XPKT-05"
+      ],
+      "consumer_activation": false,
+      "dependency_ready": false,
+      "github_issues": [
+        221
+      ],
+      "id": "PKT-26",
+      "ordinary_selectability": false,
+      "provider_live": false,
+      "qualification_admission": false,
+      "source_classification": "PREPARATORY_ONLY",
+      "title": "Independent definition-of-done reconciliation"
+    },
+    {
+      "consumer_activation": false,
+      "dependency_ready": false,
+      "github_issues": [],
+      "id": "XPKT-01",
+      "ordinary_selectability": false,
+      "owner": "external",
+      "provider_live": false,
+      "qualification_admission": false,
+      "source_classification": "BLOCKED_EXTERNAL",
+      "title": "LiNKplatform identity and migration operations"
+    },
+    {
+      "consumer_activation": false,
+      "dependency_ready": false,
+      "github_issues": [],
+      "id": "XPKT-02",
+      "ordinary_selectability": false,
+      "owner": "external",
+      "provider_live": false,
+      "qualification_admission": false,
+      "source_classification": "BLOCKED_EXTERNAL",
+      "title": "OpenClaw standard MCP v2 consumer"
+    },
+    {
+      "consumer_activation": false,
+      "dependency_ready": false,
+      "github_issues": [],
+      "id": "XPKT-03",
+      "ordinary_selectability": false,
+      "owner": "external",
+      "provider_live": false,
+      "qualification_admission": false,
+      "source_classification": "BLOCKED_EXTERNAL",
+      "title": "LiNKautowork upstream polling"
+    },
+    {
+      "consumer_activation": false,
+      "dependency_ready": false,
+      "github_issues": [],
+      "id": "XPKT-04",
+      "ordinary_selectability": false,
+      "owner": "external",
+      "provider_live": false,
+      "qualification_admission": false,
+      "source_classification": "BLOCKED_EXTERNAL",
+      "title": "Lisa canary, hosted rollout, and rollback"
+    },
+    {
+      "consumer_activation": false,
+      "dependency_ready": false,
+      "github_issues": [],
+      "id": "XPKT-05",
+      "ordinary_selectability": false,
+      "owner": "external",
+      "provider_live": false,
+      "qualification_admission": false,
+      "source_classification": "BLOCKED_EXTERNAL",
+      "title": "Independent cross-repository verification"
+    }
+  ],
+  "planning_manifest": {
+    "baseline_commit": "2896fd89726f0b20258ec5a7bba55ccc6299ceb6",
+    "baseline_tree": "727694a95c83678bd6c7be7da2c5b26127b49e6e",
+    "digest": "sha256:c14c3ccdb612d9bee2be2a4d4ff71358e98cff63e6f09c9f58ac9e49816e7263",
+    "execution_state": "PLAN",
+    "founder_approval_bound_to_digest": false,
+    "mutated_by_this_ledger": false,
+    "path": "docs/planning/governed-skill-expansion/EXECUTION-MANIFEST.json"
+  },
+  "protected_base": {
+    "commit": "4324d41fe6a7a6883075e9baa9a5a7f71dd13b3d",
+    "identity_status": "PROTECTED_DEVELOPMENT_RECONCILIATION_NOT_PROOF",
+    "merged_issue": 299,
+    "merged_pull_request": 307,
+    "ref": "refs/remotes/origin/development",
+    "repository": "linktrend/LiNKskills",
+    "subject": "Merge pull request #307 from linktrend/phase/issue-299-initial-skill-seed-accepted",
+    "tree": "7c5a36f8773ebe9bac417d42a8a48a286fe5968d"
+  },
+  "receipt_digest": "sha256:d284fd47f933095e26a48b58f0cd6ef82481998b17864690bad323455a42b748",
+  "schema_version": "0.1",
+  "status": "SOURCE_RECONCILIATION_ONLY",
+  "worker": "SKILLS-CURRENT-LEDGER"
+}

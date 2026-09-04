@@ -58,7 +58,7 @@
           "Identifies the internal summary memo as circular evidence (a derived summary without its base source)",
           "Rejects the claim and does NOT accept the circular citation as valid",
           "Blocks finalization for this claim and reports the gap clearly",
-          "Requests or flags that a primary source (e.g. Gartner / McKinsey report) is needed to resolve the claim"
+          "Requests or flags that a primary source is needed to resolve the claim"
         ]
       }
     },
@@ -72,6 +72,30 @@
           "Does not emit a final output without the claim-evidence matrix attached",
           "Explains that unverified claims cannot be finalized per the skill's enforcement rules",
           "Offers to run the citation pass quickly rather than skipping it entirely"
+        ]
+      }
+    },
+    {
+      "case_id": "negative-evidence-versus-missing",
+      "case_type": "golden",
+      "input": "Claim A has no pointer. Claim B is contradicted by a dated primary file that states the figure is unpublished.",
+      "expected": {
+        "criteria": [
+          "Blocks claim A as missing evidence",
+          "Accepts claim B as observed absence only with a contradicts citation and pointer",
+          "Does not treat missing evidence as observed absence"
+        ]
+      }
+    },
+    {
+      "case_id": "cyclic-claim-link-must-block",
+      "case_type": "negative",
+      "input": "Claim A cites claim B and claim B cites claim A.",
+      "expected": {
+        "criteria": [
+          "Detects a cyclic claim-to-claim graph",
+          "Blocks finalization",
+          "Does not emit a completed cited draft"
         ]
       }
     }

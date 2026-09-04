@@ -1,0 +1,863 @@
+{
+  "routes": [
+    {
+      "description": "Google Workspace Admin SDK: Audit logs and usage reports.",
+      "keywords": [
+        "admin reports",
+        "gws-admin-reports"
+      ],
+      "route_id": "gws-admin-reports",
+      "source_entrypoint": "vendor-skills/google-workspace/gws-admin-reports/SKILL.md"
+    },
+    {
+      "description": "Google Calendar: Manage calendars and events.",
+      "keywords": [
+        "calendar",
+        "gws-calendar"
+      ],
+      "route_id": "gws-calendar",
+      "source_entrypoint": "vendor-skills/google-workspace/gws-calendar/SKILL.md"
+    },
+    {
+      "description": "Google Calendar: Show upcoming events across all calendars.",
+      "keywords": [
+        "calendar agenda",
+        "gws-calendar-agenda"
+      ],
+      "route_id": "gws-calendar-agenda",
+      "source_entrypoint": "vendor-skills/google-workspace/gws-calendar-agenda/SKILL.md"
+    },
+    {
+      "description": "Google Calendar: Create a new event.",
+      "keywords": [
+        "calendar insert",
+        "gws-calendar-insert"
+      ],
+      "route_id": "gws-calendar-insert",
+      "source_entrypoint": "vendor-skills/google-workspace/gws-calendar-insert/SKILL.md"
+    },
+    {
+      "description": "Google Chat: Manage Chat spaces and messages.",
+      "keywords": [
+        "chat",
+        "gws-chat"
+      ],
+      "route_id": "gws-chat",
+      "source_entrypoint": "vendor-skills/google-workspace/gws-chat/SKILL.md"
+    },
+    {
+      "description": "Google Chat: Send a message to a space.",
+      "keywords": [
+        "chat send",
+        "gws-chat-send"
+      ],
+      "route_id": "gws-chat-send",
+      "source_entrypoint": "vendor-skills/google-workspace/gws-chat-send/SKILL.md"
+    },
+    {
+      "description": "Google Classroom: Manage classes, rosters, and coursework.",
+      "keywords": [
+        "classroom",
+        "gws-classroom"
+      ],
+      "route_id": "gws-classroom",
+      "source_entrypoint": "vendor-skills/google-workspace/gws-classroom/SKILL.md"
+    },
+    {
+      "description": "Read and write Google Docs.",
+      "keywords": [
+        "docs",
+        "gws-docs"
+      ],
+      "route_id": "gws-docs",
+      "source_entrypoint": "vendor-skills/google-workspace/gws-docs/SKILL.md"
+    },
+    {
+      "description": "Google Docs: Append text to a document.",
+      "keywords": [
+        "docs write",
+        "gws-docs-write"
+      ],
+      "route_id": "gws-docs-write",
+      "source_entrypoint": "vendor-skills/google-workspace/gws-docs-write/SKILL.md"
+    },
+    {
+      "description": "Google Drive: Manage files, folders, and shared drives.",
+      "keywords": [
+        "drive",
+        "gws-drive"
+      ],
+      "route_id": "gws-drive",
+      "source_entrypoint": "vendor-skills/google-workspace/gws-drive/SKILL.md"
+    },
+    {
+      "description": "Google Drive: Upload a file with automatic metadata.",
+      "keywords": [
+        "drive upload",
+        "gws-drive-upload"
+      ],
+      "route_id": "gws-drive-upload",
+      "source_entrypoint": "vendor-skills/google-workspace/gws-drive-upload/SKILL.md"
+    },
+    {
+      "description": "Subscribe to Google Workspace events.",
+      "keywords": [
+        "events",
+        "gws-events"
+      ],
+      "route_id": "gws-events",
+      "source_entrypoint": "vendor-skills/google-workspace/gws-events/SKILL.md"
+    },
+    {
+      "description": "Google Workspace Events: Renew/reactivate Workspace Events subscriptions.",
+      "keywords": [
+        "events renew",
+        "gws-events-renew"
+      ],
+      "route_id": "gws-events-renew",
+      "source_entrypoint": "vendor-skills/google-workspace/gws-events-renew/SKILL.md"
+    },
+    {
+      "description": "Google Workspace Events: Subscribe to Workspace events and stream them as NDJSON.",
+      "keywords": [
+        "events subscribe",
+        "gws-events-subscribe"
+      ],
+      "route_id": "gws-events-subscribe",
+      "source_entrypoint": "vendor-skills/google-workspace/gws-events-subscribe/SKILL.md"
+    },
+    {
+      "description": "Read and write Google Forms.",
+      "keywords": [
+        "forms",
+        "gws-forms"
+      ],
+      "route_id": "gws-forms",
+      "source_entrypoint": "vendor-skills/google-workspace/gws-forms/SKILL.md"
+    },
+    {
+      "description": "Gmail: Send, read, and manage email.",
+      "keywords": [
+        "gmail",
+        "gws-gmail"
+      ],
+      "route_id": "gws-gmail",
+      "source_entrypoint": "vendor-skills/google-workspace/gws-gmail/SKILL.md"
+    },
+    {
+      "description": "Gmail: Forward a message to new recipients.",
+      "keywords": [
+        "gmail forward",
+        "gws-gmail-forward"
+      ],
+      "route_id": "gws-gmail-forward",
+      "source_entrypoint": "vendor-skills/google-workspace/gws-gmail-forward/SKILL.md"
+    },
+    {
+      "description": "Gmail: Read a message and extract its body or headers.",
+      "keywords": [
+        "gmail read",
+        "gws-gmail-read"
+      ],
+      "route_id": "gws-gmail-read",
+      "source_entrypoint": "vendor-skills/google-workspace/gws-gmail-read/SKILL.md"
+    },
+    {
+      "description": "Gmail: Reply to a message (handles threading automatically).",
+      "keywords": [
+        "gmail reply",
+        "gws-gmail-reply"
+      ],
+      "route_id": "gws-gmail-reply",
+      "source_entrypoint": "vendor-skills/google-workspace/gws-gmail-reply/SKILL.md"
+    },
+    {
+      "description": "Gmail: Reply-all to a message (handles threading automatically).",
+      "keywords": [
+        "gmail reply all",
+        "gws-gmail-reply-all"
+      ],
+      "route_id": "gws-gmail-reply-all",
+      "source_entrypoint": "vendor-skills/google-workspace/gws-gmail-reply-all/SKILL.md"
+    },
+    {
+      "description": "Gmail: Send an email.",
+      "keywords": [
+        "gmail send",
+        "gws-gmail-send"
+      ],
+      "route_id": "gws-gmail-send",
+      "source_entrypoint": "vendor-skills/google-workspace/gws-gmail-send/SKILL.md"
+    },
+    {
+      "description": "Gmail: Show unread inbox summary (sender, subject, date).",
+      "keywords": [
+        "gmail triage",
+        "gws-gmail-triage"
+      ],
+      "route_id": "gws-gmail-triage",
+      "source_entrypoint": "vendor-skills/google-workspace/gws-gmail-triage/SKILL.md"
+    },
+    {
+      "description": "Gmail: Watch for new emails and stream them as NDJSON.",
+      "keywords": [
+        "gmail watch",
+        "gws-gmail-watch"
+      ],
+      "route_id": "gws-gmail-watch",
+      "source_entrypoint": "vendor-skills/google-workspace/gws-gmail-watch/SKILL.md"
+    },
+    {
+      "description": "Manage Google Keep notes.",
+      "keywords": [
+        "keep",
+        "gws-keep"
+      ],
+      "route_id": "gws-keep",
+      "source_entrypoint": "vendor-skills/google-workspace/gws-keep/SKILL.md"
+    },
+    {
+      "description": "Manage Google Meet conferences.",
+      "keywords": [
+        "meet",
+        "gws-meet"
+      ],
+      "route_id": "gws-meet",
+      "source_entrypoint": "vendor-skills/google-workspace/gws-meet/SKILL.md"
+    },
+    {
+      "description": "Google Model Armor: Filter user-generated content for safety.",
+      "keywords": [
+        "modelarmor",
+        "gws-modelarmor"
+      ],
+      "route_id": "gws-modelarmor",
+      "source_entrypoint": "vendor-skills/google-workspace/gws-modelarmor/SKILL.md"
+    },
+    {
+      "description": "Google Model Armor: Create a new Model Armor template.",
+      "keywords": [
+        "modelarmor create template",
+        "gws-modelarmor-create-template"
+      ],
+      "route_id": "gws-modelarmor-create-template",
+      "source_entrypoint": "vendor-skills/google-workspace/gws-modelarmor-create-template/SKILL.md"
+    },
+    {
+      "description": "Google Model Armor: Sanitize a user prompt through a Model Armor template.",
+      "keywords": [
+        "modelarmor sanitize prompt",
+        "gws-modelarmor-sanitize-prompt"
+      ],
+      "route_id": "gws-modelarmor-sanitize-prompt",
+      "source_entrypoint": "vendor-skills/google-workspace/gws-modelarmor-sanitize-prompt/SKILL.md"
+    },
+    {
+      "description": "Google Model Armor: Sanitize a model response through a Model Armor template.",
+      "keywords": [
+        "modelarmor sanitize response",
+        "gws-modelarmor-sanitize-response"
+      ],
+      "route_id": "gws-modelarmor-sanitize-response",
+      "source_entrypoint": "vendor-skills/google-workspace/gws-modelarmor-sanitize-response/SKILL.md"
+    },
+    {
+      "description": "Google People: Manage contacts and profiles.",
+      "keywords": [
+        "people",
+        "gws-people"
+      ],
+      "route_id": "gws-people",
+      "source_entrypoint": "vendor-skills/google-workspace/gws-people/SKILL.md"
+    },
+    {
+      "description": "Manage Google Apps Script projects.",
+      "keywords": [
+        "script",
+        "gws-script"
+      ],
+      "route_id": "gws-script",
+      "source_entrypoint": "vendor-skills/google-workspace/gws-script/SKILL.md"
+    },
+    {
+      "description": "Google Apps Script: Upload local files to an Apps Script project.",
+      "keywords": [
+        "script push",
+        "gws-script-push"
+      ],
+      "route_id": "gws-script-push",
+      "source_entrypoint": "vendor-skills/google-workspace/gws-script-push/SKILL.md"
+    },
+    {
+      "description": "gws CLI: Shared patterns for authentication, global flags, and output formatting.",
+      "keywords": [
+        "shared",
+        "gws-shared"
+      ],
+      "route_id": "gws-shared",
+      "source_entrypoint": "vendor-skills/google-workspace/gws-shared/SKILL.md"
+    },
+    {
+      "description": "Google Sheets: Read and write spreadsheets.",
+      "keywords": [
+        "sheets",
+        "gws-sheets"
+      ],
+      "route_id": "gws-sheets",
+      "source_entrypoint": "vendor-skills/google-workspace/gws-sheets/SKILL.md"
+    },
+    {
+      "description": "Google Sheets: Append a row to a spreadsheet.",
+      "keywords": [
+        "sheets append",
+        "gws-sheets-append"
+      ],
+      "route_id": "gws-sheets-append",
+      "source_entrypoint": "vendor-skills/google-workspace/gws-sheets-append/SKILL.md"
+    },
+    {
+      "description": "Google Sheets: Read values from a spreadsheet.",
+      "keywords": [
+        "sheets read",
+        "gws-sheets-read"
+      ],
+      "route_id": "gws-sheets-read",
+      "source_entrypoint": "vendor-skills/google-workspace/gws-sheets-read/SKILL.md"
+    },
+    {
+      "description": "Google Slides: Read and write presentations.",
+      "keywords": [
+        "slides",
+        "gws-slides"
+      ],
+      "route_id": "gws-slides",
+      "source_entrypoint": "vendor-skills/google-workspace/gws-slides/SKILL.md"
+    },
+    {
+      "description": "Google Tasks: Manage task lists and tasks.",
+      "keywords": [
+        "tasks",
+        "gws-tasks"
+      ],
+      "route_id": "gws-tasks",
+      "source_entrypoint": "vendor-skills/google-workspace/gws-tasks/SKILL.md"
+    },
+    {
+      "description": "Google Workflow: Cross-service productivity workflows.",
+      "keywords": [
+        "workflow",
+        "gws-workflow"
+      ],
+      "route_id": "gws-workflow",
+      "source_entrypoint": "vendor-skills/google-workspace/gws-workflow/SKILL.md"
+    },
+    {
+      "description": "Google Workflow: Convert a Gmail message into a Google Tasks entry.",
+      "keywords": [
+        "workflow email to task",
+        "gws-workflow-email-to-task"
+      ],
+      "route_id": "gws-workflow-email-to-task",
+      "source_entrypoint": "vendor-skills/google-workspace/gws-workflow-email-to-task/SKILL.md"
+    },
+    {
+      "description": "Google Workflow: Announce a Drive file in a Chat space.",
+      "keywords": [
+        "workflow file announce",
+        "gws-workflow-file-announce"
+      ],
+      "route_id": "gws-workflow-file-announce",
+      "source_entrypoint": "vendor-skills/google-workspace/gws-workflow-file-announce/SKILL.md"
+    },
+    {
+      "description": "Google Workflow: Prepare for your next meeting: agenda, attendees, and linked docs.",
+      "keywords": [
+        "workflow meeting prep",
+        "gws-workflow-meeting-prep"
+      ],
+      "route_id": "gws-workflow-meeting-prep",
+      "source_entrypoint": "vendor-skills/google-workspace/gws-workflow-meeting-prep/SKILL.md"
+    },
+    {
+      "description": "Google Workflow: Today's meetings + open tasks as a standup summary.",
+      "keywords": [
+        "workflow standup report",
+        "gws-workflow-standup-report"
+      ],
+      "route_id": "gws-workflow-standup-report",
+      "source_entrypoint": "vendor-skills/google-workspace/gws-workflow-standup-report/SKILL.md"
+    },
+    {
+      "description": "Google Workflow: Weekly summary: this week's meetings + unread email count.",
+      "keywords": [
+        "workflow weekly digest",
+        "gws-workflow-weekly-digest"
+      ],
+      "route_id": "gws-workflow-weekly-digest",
+      "source_entrypoint": "vendor-skills/google-workspace/gws-workflow-weekly-digest/SKILL.md"
+    },
+    {
+      "description": "Create, organize, and distribute content across Workspace.",
+      "keywords": [
+        "persona content creator",
+        "persona-content-creator"
+      ],
+      "route_id": "persona-content-creator",
+      "source_entrypoint": "vendor-skills/google-workspace/persona-content-creator/SKILL.md"
+    },
+    {
+      "description": "Manage customer support \u2014 track tickets, respond, escalate issues.",
+      "keywords": [
+        "persona customer support",
+        "persona-customer-support"
+      ],
+      "route_id": "persona-customer-support",
+      "source_entrypoint": "vendor-skills/google-workspace/persona-customer-support/SKILL.md"
+    },
+    {
+      "description": "Plan and manage events \u2014 scheduling, invitations, and logistics.",
+      "keywords": [
+        "persona event coordinator",
+        "persona-event-coordinator"
+      ],
+      "route_id": "persona-event-coordinator",
+      "source_entrypoint": "vendor-skills/google-workspace/persona-event-coordinator/SKILL.md"
+    },
+    {
+      "description": "Manage an executive's schedule, inbox, and communications.",
+      "keywords": [
+        "persona exec assistant",
+        "persona-exec-assistant"
+      ],
+      "route_id": "persona-exec-assistant",
+      "source_entrypoint": "vendor-skills/google-workspace/persona-exec-assistant/SKILL.md"
+    },
+    {
+      "description": "Handle HR workflows \u2014 onboarding, announcements, and employee comms.",
+      "keywords": [
+        "persona hr coordinator",
+        "persona-hr-coordinator"
+      ],
+      "route_id": "persona-hr-coordinator",
+      "source_entrypoint": "vendor-skills/google-workspace/persona-hr-coordinator/SKILL.md"
+    },
+    {
+      "description": "Administer IT \u2014 monitor security and configure Workspace.",
+      "keywords": [
+        "persona it admin",
+        "persona-it-admin"
+      ],
+      "route_id": "persona-it-admin",
+      "source_entrypoint": "vendor-skills/google-workspace/persona-it-admin/SKILL.md"
+    },
+    {
+      "description": "Coordinate projects \u2014 track tasks, schedule meetings, and share docs.",
+      "keywords": [
+        "persona project manager",
+        "persona-project-manager"
+      ],
+      "route_id": "persona-project-manager",
+      "source_entrypoint": "vendor-skills/google-workspace/persona-project-manager/SKILL.md"
+    },
+    {
+      "description": "Organize research \u2014 manage references, notes, and collaboration.",
+      "keywords": [
+        "persona researcher",
+        "persona-researcher"
+      ],
+      "route_id": "persona-researcher",
+      "source_entrypoint": "vendor-skills/google-workspace/persona-researcher/SKILL.md"
+    },
+    {
+      "description": "Manage sales workflows \u2014 track deals, schedule calls, client comms.",
+      "keywords": [
+        "persona sales ops",
+        "persona-sales-ops"
+      ],
+      "route_id": "persona-sales-ops",
+      "source_entrypoint": "vendor-skills/google-workspace/persona-sales-ops/SKILL.md"
+    },
+    {
+      "description": "Lead a team \u2014 run standups, coordinate tasks, and communicate.",
+      "keywords": [
+        "persona team lead",
+        "persona-team-lead"
+      ],
+      "route_id": "persona-team-lead",
+      "source_entrypoint": "vendor-skills/google-workspace/persona-team-lead/SKILL.md"
+    },
+    {
+      "description": "Export a Google Sheets spreadsheet as a CSV file for local backup or processing.",
+      "keywords": [
+        "recipe backup sheet as csv",
+        "recipe-backup-sheet-as-csv"
+      ],
+      "route_id": "recipe-backup-sheet-as-csv",
+      "source_entrypoint": "vendor-skills/google-workspace/recipe-backup-sheet-as-csv/SKILL.md"
+    },
+    {
+      "description": "Add a list of attendees to an existing Google Calendar event and send notifications.",
+      "keywords": [
+        "recipe batch invite to event",
+        "recipe-batch-invite-to-event"
+      ],
+      "route_id": "recipe-batch-invite-to-event",
+      "source_entrypoint": "vendor-skills/google-workspace/recipe-batch-invite-to-event/SKILL.md"
+    },
+    {
+      "description": "Create recurring focus time blocks on Google Calendar to protect deep work hours.",
+      "keywords": [
+        "recipe block focus time",
+        "recipe-block-focus-time"
+      ],
+      "route_id": "recipe-block-focus-time",
+      "source_entrypoint": "vendor-skills/google-workspace/recipe-block-focus-time/SKILL.md"
+    },
+    {
+      "description": "List and download all files from a Google Drive folder.",
+      "keywords": [
+        "recipe bulk download folder",
+        "recipe-bulk-download-folder"
+      ],
+      "route_id": "recipe-bulk-download-folder",
+      "source_entrypoint": "vendor-skills/google-workspace/recipe-bulk-download-folder/SKILL.md"
+    },
+    {
+      "description": "Retrieve and review responses from a Google Form.",
+      "keywords": [
+        "recipe collect form responses",
+        "recipe-collect-form-responses"
+      ],
+      "route_id": "recipe-collect-form-responses",
+      "source_entrypoint": "vendor-skills/google-workspace/recipe-collect-form-responses/SKILL.md"
+    },
+    {
+      "description": "Read data from two tabs in a Google Sheet to compare and identify differences.",
+      "keywords": [
+        "recipe compare sheet tabs",
+        "recipe-compare-sheet-tabs"
+      ],
+      "route_id": "recipe-compare-sheet-tabs",
+      "source_entrypoint": "vendor-skills/google-workspace/recipe-compare-sheet-tabs/SKILL.md"
+    },
+    {
+      "description": "Duplicate a Google Sheets template tab for a new month of tracking.",
+      "keywords": [
+        "recipe copy sheet for new month",
+        "recipe-copy-sheet-for-new-month"
+      ],
+      "route_id": "recipe-copy-sheet-for-new-month",
+      "source_entrypoint": "vendor-skills/google-workspace/recipe-copy-sheet-for-new-month/SKILL.md"
+    },
+    {
+      "description": "Create a Google Classroom course and invite students.",
+      "keywords": [
+        "recipe create classroom course",
+        "recipe-create-classroom-course"
+      ],
+      "route_id": "recipe-create-classroom-course",
+      "source_entrypoint": "vendor-skills/google-workspace/recipe-create-classroom-course/SKILL.md"
+    },
+    {
+      "description": "Copy a Google Docs template, fill in content, and share with collaborators.",
+      "keywords": [
+        "recipe create doc from template",
+        "recipe-create-doc-from-template"
+      ],
+      "route_id": "recipe-create-doc-from-template",
+      "source_entrypoint": "vendor-skills/google-workspace/recipe-create-doc-from-template/SKILL.md"
+    },
+    {
+      "description": "Read event data from a Google Sheets spreadsheet and create Google Calendar entries for each row.",
+      "keywords": [
+        "recipe create events from sheet",
+        "recipe-create-events-from-sheet"
+      ],
+      "route_id": "recipe-create-events-from-sheet",
+      "source_entrypoint": "vendor-skills/google-workspace/recipe-create-events-from-sheet/SKILL.md"
+    },
+    {
+      "description": "Set up a Google Sheets spreadsheet for tracking expenses with headers and initial entries.",
+      "keywords": [
+        "recipe create expense tracker",
+        "recipe-create-expense-tracker"
+      ],
+      "route_id": "recipe-create-expense-tracker",
+      "source_entrypoint": "vendor-skills/google-workspace/recipe-create-expense-tracker/SKILL.md"
+    },
+    {
+      "description": "Create a Google Form for feedback and share it via Gmail.",
+      "keywords": [
+        "recipe create feedback form",
+        "recipe-create-feedback-form"
+      ],
+      "route_id": "recipe-create-feedback-form",
+      "source_entrypoint": "vendor-skills/google-workspace/recipe-create-feedback-form/SKILL.md"
+    },
+    {
+      "description": "Create a Gmail filter to automatically label, star, or categorize incoming messages.",
+      "keywords": [
+        "recipe create gmail filter",
+        "recipe-create-gmail-filter"
+      ],
+      "route_id": "recipe-create-gmail-filter",
+      "source_entrypoint": "vendor-skills/google-workspace/recipe-create-gmail-filter/SKILL.md"
+    },
+    {
+      "description": "Create a Google Meet meeting space and share the join link.",
+      "keywords": [
+        "recipe create meet space",
+        "recipe-create-meet-space"
+      ],
+      "route_id": "recipe-create-meet-space",
+      "source_entrypoint": "vendor-skills/google-workspace/recipe-create-meet-space/SKILL.md"
+    },
+    {
+      "description": "Create a new Google Slides presentation and add initial slides.",
+      "keywords": [
+        "recipe create presentation",
+        "recipe-create-presentation"
+      ],
+      "route_id": "recipe-create-presentation",
+      "source_entrypoint": "vendor-skills/google-workspace/recipe-create-presentation/SKILL.md"
+    },
+    {
+      "description": "Create a Google Shared Drive and add members with appropriate roles.",
+      "keywords": [
+        "recipe create shared drive",
+        "recipe-create-shared-drive"
+      ],
+      "route_id": "recipe-create-shared-drive",
+      "source_entrypoint": "vendor-skills/google-workspace/recipe-create-shared-drive/SKILL.md"
+    },
+    {
+      "description": "Set up a new Google Tasks list with initial tasks.",
+      "keywords": [
+        "recipe create task list",
+        "recipe-create-task-list"
+      ],
+      "route_id": "recipe-create-task-list",
+      "source_entrypoint": "vendor-skills/google-workspace/recipe-create-task-list/SKILL.md"
+    },
+    {
+      "description": "Enable a Gmail out-of-office auto-reply with a custom message and date range.",
+      "keywords": [
+        "recipe create vacation responder",
+        "recipe-create-vacation-responder"
+      ],
+      "route_id": "recipe-create-vacation-responder",
+      "source_entrypoint": "vendor-skills/google-workspace/recipe-create-vacation-responder/SKILL.md"
+    },
+    {
+      "description": "Read content from a Google Doc and use it as the body of a Gmail message.",
+      "keywords": [
+        "recipe draft email from doc",
+        "recipe-draft-email-from-doc"
+      ],
+      "route_id": "recipe-draft-email-from-doc",
+      "source_entrypoint": "vendor-skills/google-workspace/recipe-draft-email-from-doc/SKILL.md"
+    },
+    {
+      "description": "Share a Google Drive file and email the link with a message to recipients.",
+      "keywords": [
+        "recipe email drive link",
+        "recipe-email-drive-link"
+      ],
+      "route_id": "recipe-email-drive-link",
+      "source_entrypoint": "vendor-skills/google-workspace/recipe-email-drive-link/SKILL.md"
+    },
+    {
+      "description": "Query Google Calendar free/busy status for multiple users to find a meeting slot.",
+      "keywords": [
+        "recipe find free time",
+        "recipe-find-free-time"
+      ],
+      "route_id": "recipe-find-free-time",
+      "source_entrypoint": "vendor-skills/google-workspace/recipe-find-free-time/SKILL.md"
+    },
+    {
+      "description": "Identify large Google Drive files consuming storage quota.",
+      "keywords": [
+        "recipe find large files",
+        "recipe-find-large-files"
+      ],
+      "route_id": "recipe-find-large-files",
+      "source_entrypoint": "vendor-skills/google-workspace/recipe-find-large-files/SKILL.md"
+    },
+    {
+      "description": "Find Gmail messages with a specific label and forward them to another address.",
+      "keywords": [
+        "recipe forward labeled emails",
+        "recipe-forward-labeled-emails"
+      ],
+      "route_id": "recipe-forward-labeled-emails",
+      "source_entrypoint": "vendor-skills/google-workspace/recipe-forward-labeled-emails/SKILL.md"
+    },
+    {
+      "description": "Read data from a Google Sheet and create a formatted Google Docs report.",
+      "keywords": [
+        "recipe generate report from sheet",
+        "recipe-generate-report-from-sheet"
+      ],
+      "route_id": "recipe-generate-report-from-sheet",
+      "source_entrypoint": "vendor-skills/google-workspace/recipe-generate-report-from-sheet/SKILL.md"
+    },
+    {
+      "description": "Apply Gmail labels to matching messages and archive them to keep your inbox clean.",
+      "keywords": [
+        "recipe label and archive emails",
+        "recipe-label-and-archive-emails"
+      ],
+      "route_id": "recipe-label-and-archive-emails",
+      "source_entrypoint": "vendor-skills/google-workspace/recipe-label-and-archive-emails/SKILL.md"
+    },
+    {
+      "description": "Append a deal status update to a Google Sheets sales tracking spreadsheet.",
+      "keywords": [
+        "recipe log deal update",
+        "recipe-log-deal-update"
+      ],
+      "route_id": "recipe-log-deal-update",
+      "source_entrypoint": "vendor-skills/google-workspace/recipe-log-deal-update/SKILL.md"
+    },
+    {
+      "description": "Create a Google Drive folder structure and move files into the right locations.",
+      "keywords": [
+        "recipe organize drive folder",
+        "recipe-organize-drive-folder"
+      ],
+      "route_id": "recipe-organize-drive-folder",
+      "source_entrypoint": "vendor-skills/google-workspace/recipe-organize-drive-folder/SKILL.md"
+    },
+    {
+      "description": "Review your Google Calendar week, identify gaps, and add events to fill them.",
+      "keywords": [
+        "recipe plan weekly schedule",
+        "recipe-plan-weekly-schedule"
+      ],
+      "route_id": "recipe-plan-weekly-schedule",
+      "source_entrypoint": "vendor-skills/google-workspace/recipe-plan-weekly-schedule/SKILL.md"
+    },
+    {
+      "description": "Create a Google Docs post-mortem, schedule a Google Calendar review, and notify via Chat.",
+      "keywords": [
+        "recipe post mortem setup",
+        "recipe-post-mortem-setup"
+      ],
+      "route_id": "recipe-post-mortem-setup",
+      "source_entrypoint": "vendor-skills/google-workspace/recipe-post-mortem-setup/SKILL.md"
+    },
+    {
+      "description": "Move a Google Calendar event to a new time and automatically notify all attendees.",
+      "keywords": [
+        "recipe reschedule meeting",
+        "recipe-reschedule-meeting"
+      ],
+      "route_id": "recipe-reschedule-meeting",
+      "source_entrypoint": "vendor-skills/google-workspace/recipe-reschedule-meeting/SKILL.md"
+    },
+    {
+      "description": "Review who attended a Google Meet conference and for how long.",
+      "keywords": [
+        "recipe review meet participants",
+        "recipe-review-meet-participants"
+      ],
+      "route_id": "recipe-review-meet-participants",
+      "source_entrypoint": "vendor-skills/google-workspace/recipe-review-meet-participants/SKILL.md"
+    },
+    {
+      "description": "Find Google Tasks that are past due and need attention.",
+      "keywords": [
+        "recipe review overdue tasks",
+        "recipe-review-overdue-tasks"
+      ],
+      "route_id": "recipe-review-overdue-tasks",
+      "source_entrypoint": "vendor-skills/google-workspace/recipe-review-overdue-tasks/SKILL.md"
+    },
+    {
+      "description": "Find Gmail messages with attachments and save them to a Google Drive folder.",
+      "keywords": [
+        "recipe save email attachments",
+        "recipe-save-email-attachments"
+      ],
+      "route_id": "recipe-save-email-attachments",
+      "source_entrypoint": "vendor-skills/google-workspace/recipe-save-email-attachments/SKILL.md"
+    },
+    {
+      "description": "Save a Gmail message body into a Google Doc for archival or reference.",
+      "keywords": [
+        "recipe save email to doc",
+        "recipe-save-email-to-doc"
+      ],
+      "route_id": "recipe-save-email-to-doc",
+      "source_entrypoint": "vendor-skills/google-workspace/recipe-save-email-to-doc/SKILL.md"
+    },
+    {
+      "description": "Create a recurring Google Calendar event with attendees.",
+      "keywords": [
+        "recipe schedule recurring event",
+        "recipe-schedule-recurring-event"
+      ],
+      "route_id": "recipe-schedule-recurring-event",
+      "source_entrypoint": "vendor-skills/google-workspace/recipe-schedule-recurring-event/SKILL.md"
+    },
+    {
+      "description": "Send a team announcement via both Gmail and a Google Chat space.",
+      "keywords": [
+        "recipe send team announcement",
+        "recipe-send-team-announcement"
+      ],
+      "route_id": "recipe-send-team-announcement",
+      "source_entrypoint": "vendor-skills/google-workspace/recipe-send-team-announcement/SKILL.md"
+    },
+    {
+      "description": "Share a Google Docs document with edit access and email collaborators the link.",
+      "keywords": [
+        "recipe share doc and notify",
+        "recipe-share-doc-and-notify"
+      ],
+      "route_id": "recipe-share-doc-and-notify",
+      "source_entrypoint": "vendor-skills/google-workspace/recipe-share-doc-and-notify/SKILL.md"
+    },
+    {
+      "description": "Share Google Drive files with all attendees of a Google Calendar event.",
+      "keywords": [
+        "recipe share event materials",
+        "recipe-share-event-materials"
+      ],
+      "route_id": "recipe-share-event-materials",
+      "source_entrypoint": "vendor-skills/google-workspace/recipe-share-event-materials/SKILL.md"
+    },
+    {
+      "description": "Share a Google Drive folder and all its contents with a list of collaborators.",
+      "keywords": [
+        "recipe share folder with team",
+        "recipe-share-folder-with-team"
+      ],
+      "route_id": "recipe-share-folder-with-team",
+      "source_entrypoint": "vendor-skills/google-workspace/recipe-share-folder-with-team/SKILL.md"
+    },
+    {
+      "description": "Export Google Contacts directory to a Google Sheets spreadsheet.",
+      "keywords": [
+        "recipe sync contacts to sheet",
+        "recipe-sync-contacts-to-sheet"
+      ],
+      "route_id": "recipe-sync-contacts-to-sheet",
+      "source_entrypoint": "vendor-skills/google-workspace/recipe-sync-contacts-to-sheet/SKILL.md"
+    },
+    {
+      "description": "Subscribe to change notifications on a Google Drive file or folder.",
+      "keywords": [
+        "recipe watch drive changes",
+        "recipe-watch-drive-changes"
+      ],
+      "route_id": "recipe-watch-drive-changes",
+      "source_entrypoint": "vendor-skills/google-workspace/recipe-watch-drive-changes/SKILL.md"
+    }
+  ],
+  "schema_version": "0.1",
+  "selection_rule": "Prefer an explicit route id; fail closed on no match, ambiguity, or blocked admission.",
+  "skill_id": "google-workspace-operations",
+  "source_collection": "google-workspace"
+}

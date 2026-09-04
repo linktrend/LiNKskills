@@ -1,0 +1,121 @@
+{
+  "admitted": false,
+  "admitted_role_pack_ids": [],
+  "claims": {
+    "activation": false,
+    "consumer": false,
+    "e2e": false,
+    "hosted_stage": false,
+    "production": false,
+    "provider_live": false,
+    "qualification_admission": false,
+    "qualified_release": false,
+    "selectability": false,
+    "vps": false
+  },
+  "hold_role_pack_ids": [
+    "lisa-ceo",
+    "eric-cto",
+    "david-cpo",
+    "sara-coo-cfo",
+    "jane-chief-trading-officer"
+  ],
+  "named_holds": [
+    "qualification_evidence_missing",
+    "lifecycle_state_is_not_qualification_evidence",
+    "skills_release_selectability_is_an_independent_gate",
+    "undeclared_or_non_intersecting_runtime_profiles"
+  ],
+  "packet": "PKT-22",
+  "proof_scope": "source",
+  "protected_base": {
+    "commit": "1289f9a374c38115d3f4dcfac31439a9904d74c6",
+    "ref": "origin/development",
+    "tree": "8d3312b21ccfa92102233211f8224d50fb07ac88"
+  },
+  "qualification_directory": "role-packs/qualifications",
+  "qualification_records_present": false,
+  "receipt_digest": "sha256:7dd534e28bd6593b76482fbeaf7dc3b21612570b2c99d37380b72dcf7c68c5d0",
+  "release_reference_count": 18,
+  "role_pack_count": 5,
+  "role_packs": [
+    {
+      "admitted": false,
+      "release_reference_count": 4,
+      "role_pack_id": "lisa-ceo",
+      "status": "HOLD",
+      "violation_codes": [
+        "eligibility_gate_not_satisfied",
+        "eligibility_not_eligible",
+        "qualification_evidence_missing",
+        "release_not_qualified",
+        "release_not_selectable"
+      ]
+    },
+    {
+      "admitted": false,
+      "release_reference_count": 4,
+      "role_pack_id": "eric-cto",
+      "status": "HOLD",
+      "violation_codes": [
+        "eligibility_gate_not_satisfied",
+        "eligibility_not_eligible",
+        "incompatible_runtime_profile",
+        "qualification_evidence_missing",
+        "release_not_qualified",
+        "release_not_selectable"
+      ]
+    },
+    {
+      "admitted": false,
+      "release_reference_count": 4,
+      "role_pack_id": "david-cpo",
+      "status": "HOLD",
+      "violation_codes": [
+        "eligibility_gate_not_satisfied",
+        "eligibility_not_eligible",
+        "incompatible_runtime_profile",
+        "qualification_evidence_missing",
+        "release_not_qualified",
+        "release_not_selectable"
+      ]
+    },
+    {
+      "admitted": false,
+      "release_reference_count": 4,
+      "role_pack_id": "sara-coo-cfo",
+      "status": "HOLD",
+      "violation_codes": [
+        "eligibility_gate_not_satisfied",
+        "eligibility_not_eligible",
+        "qualification_evidence_missing",
+        "release_not_qualified",
+        "release_not_selectable"
+      ]
+    },
+    {
+      "admitted": false,
+      "release_reference_count": 2,
+      "role_pack_id": "jane-chief-trading-officer",
+      "status": "HOLD",
+      "violation_codes": [
+        "eligibility_gate_not_satisfied",
+        "eligibility_not_eligible",
+        "qualification_evidence_missing",
+        "release_not_qualified",
+        "release_not_selectable"
+      ]
+    }
+  ],
+  "schema_version": "0.1",
+  "status": "HOLD",
+  "unique_release_count": 14,
+  "violation_codes": [
+    "eligibility_gate_not_satisfied",
+    "eligibility_not_eligible",
+    "incompatible_runtime_profile",
+    "qualification_evidence_missing",
+    "release_not_qualified",
+    "release_not_selectable"
+  ]
+}

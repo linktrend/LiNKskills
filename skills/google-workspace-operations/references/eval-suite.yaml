@@ -1,0 +1,21 @@
+skill_id: google-workspace-operations
+suite_version: 1.0.0
+pass_threshold: 0.90
+rubric:
+  - dimension: correct_single_route
+    weight: 0.50
+    hard_fail_below: 0.90
+  - dimension: consumer_authority_boundary
+    weight: 0.50
+    hard_fail_below: 0.90
+scenarios:
+  - id: exact-drive-route
+    expected_criteria: ["selects gws-drive", "loads one source entrypoint"]
+  - id: unknown-route
+    expected_criteria: ["returns not applicable", "does not load a source"]
+  - id: consumer-boundary
+    expected_criteria: ["does not grant authorization", "preserves consumer authority"]
+judge:
+  min_reasoning_tier: high
+  independence_required: true
+# Real authorized consumer execution evidence is required before usable certification.
