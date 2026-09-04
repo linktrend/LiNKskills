@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.0",
+  "program": "LiNKsales",
+  "skill_id": "sales-customer-management",
+  "release": {
+    "version": "1.1.0",
+    "tag": "sales-customer-management-v1.1.0",
+    "content_digest": "skill-release:790e849c4fa5a1bdd6ce5eaee7dc38e8850e4c5937846f79c057d963092bded0",
+    "immutable": true,
+    "qualification": "eval_pending",
+    "availability": "hold",
+    "hold_reason": "sealed isolation proof and live Skills publication/consumer receipt unavailable"
+  },
+  "provenance": {
+    "source_commit": "e9403440b95eb9fedf861bd27eff21f5bf4d3fd5",
+    "source_tree_sha256": "3d2c7e96fef40836e9dbf040296de97c1d07d98e26dc0dd8f599cff443facbd2",
+    "evaluation": {
+      "suite_id": "sales-customer-management-suite",
+      "suite_version": "1.1.0",
+      "suite_hash": "bd871c0feab9b30ecff52a61bdd61daebd048bdda27ad7a9b0e2668d4246eec5",
+      "receipt": "evidence/linksales/sales-customer-management/eval-runner-receipt.json",
+      "receipt_sha256": "d5f205411558da42a32084e448ee1a21da96da02d88e0d8528da615f84c2d67a",
+      "passed": true,
+      "certification_state": "eval_pending"
+    }
+  },
+  "consumer_contract": {
+    "consumer": "LiNKsales",
+    "selector": {
+      "version": "1.1.0",
+      "content_digest": "skill-release:790e849c4fa5a1bdd6ce5eaee7dc38e8850e4c5937846f79c057d963092bded0"
+    },
+    "reject_selectors": [
+      "draft",
+      "latest",
+      "mutable",
+      "unavailable"
+    ],
+    "execution_authority": false,
+    "pre_conversion_owner": "LiNKsales",
+    "post_conversion_owner": "LiNKclient",
+    "accepted": false
+  },
+  "rollback": {
+    "action": "withdraw_release_pointer_only",
+    "restore_prior_catalogue": true,
+    "keep_consumer_dependency_disabled": true
+  }
+}

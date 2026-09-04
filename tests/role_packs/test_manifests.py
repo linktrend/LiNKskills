@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[2]
 ROLE_PACKS = ROOT / "role-packs"
 MANIFESTS = sorted(ROLE_PACKS.glob("*.json"))
 EXPECTED_ROLES = {"lisa-ceo", "eric-cto", "david-cpo", "sara-coo-cfo", "jane-chief-trading-officer"}
-REFERENCE_ONLY = {"qualification-closure", "pkt-22-23-contradiction"}
+REFERENCE_ONLY = {"qualification-closure", "pkt-22-23-contradiction", "pkt-22-source-receipt"}
 DIGEST_RE = re.compile(r"^sha256:[0-9a-f]{64}$")
 OPAQUE_RE = re.compile(r"^opaque:[A-Za-z0-9][A-Za-z0-9._:/-]{1,158}$")
 

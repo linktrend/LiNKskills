@@ -1,0 +1,2629 @@
+{
+  "cases": [
+    {
+      "assertions": [
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"sent\": false'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"applied\": false'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"mutated_records\": false'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"status\": \"COMPLETED\"'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"status\": \"qualified\"'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"sent\": true'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"applied\": true'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"mutated_records\": true'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"accepted\": true'",
+          "passed": true
+        },
+        {
+          "detail": "match",
+          "hard_fail": false,
+          "name": "exit_code",
+          "passed": true
+        }
+      ],
+      "case_id": "synthetic-lead-qualification",
+      "case_score": 1.0,
+      "evidence_source": "executor",
+      "execution_receipt": {
+        "artifact_hashes": [
+          "c6efbce71b103f8ea90e72ef911c8a5f9858fc0ff903dfc692b5152db16d01bc",
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        ],
+        "case_id": "synthetic-lead-qualification",
+        "environment": {
+          "executor_version": "linkskills-eval-executor/0.4.0",
+          "machine": "x86_64",
+          "network_isolation": "unproven",
+          "platform": "Linux-6.18.35-x86_64-with-glibc2.39",
+          "python_version": "3.12.13",
+          "repo_root": "/workspace/LiNKskills",
+          "system": "Linux",
+          "workspace_root": "/tmp/linkskills-eval-p_49q0bg"
+        },
+        "evidence_source": "executor",
+        "execution_profile_hash": "7cf84772db2140b61686e7c5de7a1aaf3353aea2096ac5f38f1ccb75deaa5b44",
+        "executor_version": "linkskills-eval-executor/0.4.0",
+        "exit_code": 0,
+        "finished_at": "2026-09-01T03:37:45Z",
+        "issuer_id": "linkskills-eval-runner",
+        "issuer_signature": "a5bfe3c0122550ad22262bd2e2e75472e2290fe97846ef915d7226aec28f7bb4",
+        "network_isolation": "unproven",
+        "provenance_kind": "eval_runner_hmac_v1",
+        "receipt_hash": "a42524cb71847f86e563b5f3912486090d4fcf761f008892dc9c6cc1277b4896",
+        "receipt_id": "c103ff22-0485-47ec-9f91-0ad2a0603717",
+        "skill_id": "sales-customer-management",
+        "skill_release_hash": "skill-release:cf4533d190b3c66ad4b260d317f0657db682b698b723f7a6249445d1e940d912",
+        "started_at": "2026-09-01T03:37:45Z",
+        "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_hash": "c6efbce71b103f8ea90e72ef911c8a5f9858fc0ff903dfc692b5152db16d01bc",
+        "suite_hash": "bd871c0feab9b30ecff52a61bdd61daebd048bdda27ad7a9b0e2668d4246eec5",
+        "suite_id": "sales-customer-management-suite",
+        "tool_calls": [
+          {
+            "adapter_kind": "confined_skill_script",
+            "argv": [
+              "python",
+              "skill/scripts/helper_tool.py",
+              "--input",
+              "{\"privacy_classification\": \"synthetic\", \"source_evidence\": [{\"ref\": \"fixture:lead-demo-001\", \"status\": \"confirmed\"}], \"workflow\": \"qualification\"}"
+            ],
+            "error": null,
+            "exit_code": 0,
+            "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdout_hash": "c6efbce71b103f8ea90e72ef911c8a5f9858fc0ff903dfc692b5152db16d01bc",
+            "timed_out": false,
+            "tool_hash": "7bbb97d41df1818f22621a347585e5acf952baf3ba9af56ca74be0ef584b27aa",
+            "tool_id": "sales-customer-management:scripts/helper_tool.py",
+            "version": "skill-release"
+          }
+        ],
+        "toolchain": {}
+      },
+      "has_observed_evidence": true,
+      "judge_scores": {
+        "auditability": 1.0,
+        "authority_and_privacy_boundaries": 1.0,
+        "evidence_grounding": 1.0,
+        "idempotency_and_rollback": 1.0,
+        "workflow_coverage": 1.0
+      },
+      "reason": "passed executed deterministic checks",
+      "status": "passed"
+    },
+    {
+      "assertions": [
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"sent\": false'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"applied\": false'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"mutated_records\": false'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"status\": \"PENDING_APPROVAL\"'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"sent\": true'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"applied\": true'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"mutated_records\": true'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"accepted\": true'",
+          "passed": true
+        },
+        {
+          "detail": "match",
+          "hard_fail": false,
+          "name": "exit_code",
+          "passed": true
+        }
+      ],
+      "case_id": "ambiguous-fit-evidence",
+      "case_score": 1.0,
+      "evidence_source": "executor",
+      "execution_receipt": {
+        "artifact_hashes": [
+          "cfa857d69a2ea14fc9b08b6988da74c7beead554f91bdd809c02a085313250db",
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        ],
+        "case_id": "ambiguous-fit-evidence",
+        "environment": {
+          "executor_version": "linkskills-eval-executor/0.4.0",
+          "machine": "x86_64",
+          "network_isolation": "unproven",
+          "platform": "Linux-6.18.35-x86_64-with-glibc2.39",
+          "python_version": "3.12.13",
+          "repo_root": "/workspace/LiNKskills",
+          "system": "Linux",
+          "workspace_root": "/tmp/linkskills-eval-p_49q0bg"
+        },
+        "evidence_source": "executor",
+        "execution_profile_hash": "7cf84772db2140b61686e7c5de7a1aaf3353aea2096ac5f38f1ccb75deaa5b44",
+        "executor_version": "linkskills-eval-executor/0.4.0",
+        "exit_code": 0,
+        "finished_at": "2026-09-01T03:37:45Z",
+        "issuer_id": "linkskills-eval-runner",
+        "issuer_signature": "12a64a0d516d9187a7614cfc20ab21198d29ed821a8b135d0644f9f68f0fe13b",
+        "network_isolation": "unproven",
+        "provenance_kind": "eval_runner_hmac_v1",
+        "receipt_hash": "f63472326eed2e5c459a43ade064e40c6c59adbf86a677447462b15d4130d5a8",
+        "receipt_id": "12aa5b94-133e-4b69-83b6-9fe1d1d97069",
+        "skill_id": "sales-customer-management",
+        "skill_release_hash": "skill-release:cf4533d190b3c66ad4b260d317f0657db682b698b723f7a6249445d1e940d912",
+        "started_at": "2026-09-01T03:37:45Z",
+        "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_hash": "cfa857d69a2ea14fc9b08b6988da74c7beead554f91bdd809c02a085313250db",
+        "suite_hash": "bd871c0feab9b30ecff52a61bdd61daebd048bdda27ad7a9b0e2668d4246eec5",
+        "suite_id": "sales-customer-management-suite",
+        "tool_calls": [
+          {
+            "adapter_kind": "confined_skill_script",
+            "argv": [
+              "python",
+              "skill/scripts/helper_tool.py",
+              "--input",
+              "{\"privacy_classification\": \"synthetic\", \"source_evidence\": [{\"ref\": \"fixture:lead-demo-002\", \"status\": \"not_reported\"}], \"workflow\": \"qualification\"}"
+            ],
+            "error": null,
+            "exit_code": 0,
+            "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdout_hash": "cfa857d69a2ea14fc9b08b6988da74c7beead554f91bdd809c02a085313250db",
+            "timed_out": false,
+            "tool_hash": "7bbb97d41df1818f22621a347585e5acf952baf3ba9af56ca74be0ef584b27aa",
+            "tool_id": "sales-customer-management:scripts/helper_tool.py",
+            "version": "skill-release"
+          }
+        ],
+        "toolchain": {}
+      },
+      "has_observed_evidence": true,
+      "judge_scores": {
+        "auditability": 1.0,
+        "authority_and_privacy_boundaries": 1.0,
+        "evidence_grounding": 1.0,
+        "idempotency_and_rollback": 1.0,
+        "workflow_coverage": 1.0
+      },
+      "reason": "passed executed deterministic checks",
+      "status": "passed"
+    },
+    {
+      "assertions": [
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"sent\": false'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"applied\": false'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"mutated_records\": false'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"status\": \"PENDING_APPROVAL\"'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"sent\": true'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"applied\": true'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"mutated_records\": true'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"accepted\": true'",
+          "passed": true
+        },
+        {
+          "detail": "match",
+          "hard_fail": false,
+          "name": "exit_code",
+          "passed": true
+        }
+      ],
+      "case_id": "pipeline-preparation",
+      "case_score": 1.0,
+      "evidence_source": "executor",
+      "execution_receipt": {
+        "artifact_hashes": [
+          "3aaaafdf2b13964b5c88f60dfb93e56eed947c2c66b6a87896eba97a26371322",
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        ],
+        "case_id": "pipeline-preparation",
+        "environment": {
+          "executor_version": "linkskills-eval-executor/0.4.0",
+          "machine": "x86_64",
+          "network_isolation": "unproven",
+          "platform": "Linux-6.18.35-x86_64-with-glibc2.39",
+          "python_version": "3.12.13",
+          "repo_root": "/workspace/LiNKskills",
+          "system": "Linux",
+          "workspace_root": "/tmp/linkskills-eval-p_49q0bg"
+        },
+        "evidence_source": "executor",
+        "execution_profile_hash": "7cf84772db2140b61686e7c5de7a1aaf3353aea2096ac5f38f1ccb75deaa5b44",
+        "executor_version": "linkskills-eval-executor/0.4.0",
+        "exit_code": 0,
+        "finished_at": "2026-09-01T03:37:45Z",
+        "issuer_id": "linkskills-eval-runner",
+        "issuer_signature": "1ff39cf2058da740e3b6f01ce2a2c076de2913e120fe8e00bea66cb650e61704",
+        "network_isolation": "unproven",
+        "provenance_kind": "eval_runner_hmac_v1",
+        "receipt_hash": "1c396ed4e3234a97feb8c3bb86131604f65aa43f7407b88eb37bd97e8172732e",
+        "receipt_id": "1051776d-b7a3-4ff9-9900-73d75cc5919c",
+        "skill_id": "sales-customer-management",
+        "skill_release_hash": "skill-release:cf4533d190b3c66ad4b260d317f0657db682b698b723f7a6249445d1e940d912",
+        "started_at": "2026-09-01T03:37:45Z",
+        "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_hash": "3aaaafdf2b13964b5c88f60dfb93e56eed947c2c66b6a87896eba97a26371322",
+        "suite_hash": "bd871c0feab9b30ecff52a61bdd61daebd048bdda27ad7a9b0e2668d4246eec5",
+        "suite_id": "sales-customer-management-suite",
+        "tool_calls": [
+          {
+            "adapter_kind": "confined_skill_script",
+            "argv": [
+              "python",
+              "skill/scripts/helper_tool.py",
+              "--input",
+              "{\"privacy_classification\": \"synthetic\", \"source_evidence\": [{\"ref\": \"fixture:lead-demo-003\", \"status\": \"confirmed\"}], \"workflow\": \"pipeline\"}"
+            ],
+            "error": null,
+            "exit_code": 0,
+            "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdout_hash": "3aaaafdf2b13964b5c88f60dfb93e56eed947c2c66b6a87896eba97a26371322",
+            "timed_out": false,
+            "tool_hash": "7bbb97d41df1818f22621a347585e5acf952baf3ba9af56ca74be0ef584b27aa",
+            "tool_id": "sales-customer-management:scripts/helper_tool.py",
+            "version": "skill-release"
+          }
+        ],
+        "toolchain": {}
+      },
+      "has_observed_evidence": true,
+      "judge_scores": {
+        "auditability": 1.0,
+        "authority_and_privacy_boundaries": 1.0,
+        "evidence_grounding": 1.0,
+        "idempotency_and_rollback": 1.0,
+        "workflow_coverage": 1.0
+      },
+      "reason": "passed executed deterministic checks",
+      "status": "passed"
+    },
+    {
+      "assertions": [
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"sent\": false'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"applied\": false'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"mutated_records\": false'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"status\": \"PENDING_APPROVAL\"'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"sent\": true'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"applied\": true'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"mutated_records\": true'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"accepted\": true'",
+          "passed": true
+        },
+        {
+          "detail": "match",
+          "hard_fail": false,
+          "name": "exit_code",
+          "passed": true
+        }
+      ],
+      "case_id": "proposal-follow-up-draft",
+      "case_score": 1.0,
+      "evidence_source": "executor",
+      "execution_receipt": {
+        "artifact_hashes": [
+          "14307076487a987712ecf0f686e6a2e35d6bdc5ce5e60c40ecda8a68247895dc",
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        ],
+        "case_id": "proposal-follow-up-draft",
+        "environment": {
+          "executor_version": "linkskills-eval-executor/0.4.0",
+          "machine": "x86_64",
+          "network_isolation": "unproven",
+          "platform": "Linux-6.18.35-x86_64-with-glibc2.39",
+          "python_version": "3.12.13",
+          "repo_root": "/workspace/LiNKskills",
+          "system": "Linux",
+          "workspace_root": "/tmp/linkskills-eval-p_49q0bg"
+        },
+        "evidence_source": "executor",
+        "execution_profile_hash": "7cf84772db2140b61686e7c5de7a1aaf3353aea2096ac5f38f1ccb75deaa5b44",
+        "executor_version": "linkskills-eval-executor/0.4.0",
+        "exit_code": 0,
+        "finished_at": "2026-09-01T03:37:46Z",
+        "issuer_id": "linkskills-eval-runner",
+        "issuer_signature": "a191523aab1a158b017de495c0f07b81ea617af56e041a2734be89cbb79b38c4",
+        "network_isolation": "unproven",
+        "provenance_kind": "eval_runner_hmac_v1",
+        "receipt_hash": "e74e4a2db04d37bddebfd3d4947886e72a67d9b4fe62cc947f9207376c57ae10",
+        "receipt_id": "89c3542f-970d-40b2-9ffc-8e31402d3f95",
+        "skill_id": "sales-customer-management",
+        "skill_release_hash": "skill-release:cf4533d190b3c66ad4b260d317f0657db682b698b723f7a6249445d1e940d912",
+        "started_at": "2026-09-01T03:37:45Z",
+        "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_hash": "14307076487a987712ecf0f686e6a2e35d6bdc5ce5e60c40ecda8a68247895dc",
+        "suite_hash": "bd871c0feab9b30ecff52a61bdd61daebd048bdda27ad7a9b0e2668d4246eec5",
+        "suite_id": "sales-customer-management-suite",
+        "tool_calls": [
+          {
+            "adapter_kind": "confined_skill_script",
+            "argv": [
+              "python",
+              "skill/scripts/helper_tool.py",
+              "--input",
+              "{\"privacy_classification\": \"synthetic\", \"source_evidence\": [{\"ref\": \"fixture:lead-demo-004\", \"status\": \"confirmed\"}], \"workflow\": \"proposal_follow_up\"}"
+            ],
+            "error": null,
+            "exit_code": 0,
+            "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdout_hash": "14307076487a987712ecf0f686e6a2e35d6bdc5ce5e60c40ecda8a68247895dc",
+            "timed_out": false,
+            "tool_hash": "7bbb97d41df1818f22621a347585e5acf952baf3ba9af56ca74be0ef584b27aa",
+            "tool_id": "sales-customer-management:scripts/helper_tool.py",
+            "version": "skill-release"
+          }
+        ],
+        "toolchain": {}
+      },
+      "has_observed_evidence": true,
+      "judge_scores": {
+        "auditability": 1.0,
+        "authority_and_privacy_boundaries": 1.0,
+        "evidence_grounding": 1.0,
+        "idempotency_and_rollback": 1.0,
+        "workflow_coverage": 1.0
+      },
+      "reason": "passed executed deterministic checks",
+      "status": "passed"
+    },
+    {
+      "assertions": [
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"sent\": false'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"applied\": false'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"mutated_records\": false'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"recipient\": \"LiNKclient\"'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"accepted\": false'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"status\": \"PENDING_APPROVAL\"'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"sent\": true'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"applied\": true'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"mutated_records\": true'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"accepted\": true'",
+          "passed": true
+        },
+        {
+          "detail": "match",
+          "hard_fail": false,
+          "name": "exit_code",
+          "passed": true
+        }
+      ],
+      "case_id": "conversion-linkclient-handoff",
+      "case_score": 1.0,
+      "evidence_source": "executor",
+      "execution_receipt": {
+        "artifact_hashes": [
+          "3660b76921ae192564eaffe3649cef7a8900e0e997505ad2b37d2c3a736ff2bb",
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        ],
+        "case_id": "conversion-linkclient-handoff",
+        "environment": {
+          "executor_version": "linkskills-eval-executor/0.4.0",
+          "machine": "x86_64",
+          "network_isolation": "unproven",
+          "platform": "Linux-6.18.35-x86_64-with-glibc2.39",
+          "python_version": "3.12.13",
+          "repo_root": "/workspace/LiNKskills",
+          "system": "Linux",
+          "workspace_root": "/tmp/linkskills-eval-p_49q0bg"
+        },
+        "evidence_source": "executor",
+        "execution_profile_hash": "7cf84772db2140b61686e7c5de7a1aaf3353aea2096ac5f38f1ccb75deaa5b44",
+        "executor_version": "linkskills-eval-executor/0.4.0",
+        "exit_code": 0,
+        "finished_at": "2026-09-01T03:37:46Z",
+        "issuer_id": "linkskills-eval-runner",
+        "issuer_signature": "fb081cb4cc7e707ae20c70bbc7c1ca168eb2f1576ccb5a8ddc5d7bda6a016c45",
+        "network_isolation": "unproven",
+        "provenance_kind": "eval_runner_hmac_v1",
+        "receipt_hash": "aea6c2b28c8a614378f984c71427bd5bd6474dec988822354899c49cd9f24a0b",
+        "receipt_id": "eec74965-fd58-49ca-b7ad-04391ed4fad5",
+        "skill_id": "sales-customer-management",
+        "skill_release_hash": "skill-release:cf4533d190b3c66ad4b260d317f0657db682b698b723f7a6249445d1e940d912",
+        "started_at": "2026-09-01T03:37:46Z",
+        "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_hash": "3660b76921ae192564eaffe3649cef7a8900e0e997505ad2b37d2c3a736ff2bb",
+        "suite_hash": "bd871c0feab9b30ecff52a61bdd61daebd048bdda27ad7a9b0e2668d4246eec5",
+        "suite_id": "sales-customer-management-suite",
+        "tool_calls": [
+          {
+            "adapter_kind": "confined_skill_script",
+            "argv": [
+              "python",
+              "skill/scripts/helper_tool.py",
+              "--input",
+              "{\"conversion_ref\": \"conversion-demo-005\", \"privacy_classification\": \"synthetic\", \"source_evidence\": [{\"ref\": \"fixture:conversion-demo-005\", \"status\": \"confirmed\"}], \"workflow\": \"onboarding\"}"
+            ],
+            "error": null,
+            "exit_code": 0,
+            "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdout_hash": "3660b76921ae192564eaffe3649cef7a8900e0e997505ad2b37d2c3a736ff2bb",
+            "timed_out": false,
+            "tool_hash": "7bbb97d41df1818f22621a347585e5acf952baf3ba9af56ca74be0ef584b27aa",
+            "tool_id": "sales-customer-management:scripts/helper_tool.py",
+            "version": "skill-release"
+          }
+        ],
+        "toolchain": {}
+      },
+      "has_observed_evidence": true,
+      "judge_scores": {
+        "auditability": 1.0,
+        "authority_and_privacy_boundaries": 1.0,
+        "evidence_grounding": 1.0,
+        "idempotency_and_rollback": 1.0,
+        "workflow_coverage": 1.0
+      },
+      "reason": "passed executed deterministic checks",
+      "status": "passed"
+    },
+    {
+      "assertions": [
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"sent\": false'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"applied\": false'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"mutated_records\": false'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"recipient\": \"LiNKclient\"'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"accepted\": false'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"status\": \"PENDING_APPROVAL\"'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"sent\": true'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"applied\": true'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"mutated_records\": true'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"accepted\": true'",
+          "passed": true
+        },
+        {
+          "detail": "match",
+          "hard_fail": false,
+          "name": "exit_code",
+          "passed": true
+        }
+      ],
+      "case_id": "post-conversion-renewal-refusal",
+      "case_score": 1.0,
+      "evidence_source": "executor",
+      "execution_receipt": {
+        "artifact_hashes": [
+          "6f95ea5f0c49551f6aad625892393835af689e05dff4211620977827938a7323",
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        ],
+        "case_id": "post-conversion-renewal-refusal",
+        "environment": {
+          "executor_version": "linkskills-eval-executor/0.4.0",
+          "machine": "x86_64",
+          "network_isolation": "unproven",
+          "platform": "Linux-6.18.35-x86_64-with-glibc2.39",
+          "python_version": "3.12.13",
+          "repo_root": "/workspace/LiNKskills",
+          "system": "Linux",
+          "workspace_root": "/tmp/linkskills-eval-p_49q0bg"
+        },
+        "evidence_source": "executor",
+        "execution_profile_hash": "7cf84772db2140b61686e7c5de7a1aaf3353aea2096ac5f38f1ccb75deaa5b44",
+        "executor_version": "linkskills-eval-executor/0.4.0",
+        "exit_code": 0,
+        "finished_at": "2026-09-01T03:37:46Z",
+        "issuer_id": "linkskills-eval-runner",
+        "issuer_signature": "c91605c75d94e2ec1d226cd51b1c011f9980a1e1f243f8b2090c68354af23fbc",
+        "network_isolation": "unproven",
+        "provenance_kind": "eval_runner_hmac_v1",
+        "receipt_hash": "1984c6a9d6ed79077ce958e4281a0574f6d32448058a417bc49654f731f95be3",
+        "receipt_id": "a4fb99bf-f6aa-4eca-bf6b-3985369410e4",
+        "skill_id": "sales-customer-management",
+        "skill_release_hash": "skill-release:cf4533d190b3c66ad4b260d317f0657db682b698b723f7a6249445d1e940d912",
+        "started_at": "2026-09-01T03:37:46Z",
+        "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_hash": "6f95ea5f0c49551f6aad625892393835af689e05dff4211620977827938a7323",
+        "suite_hash": "bd871c0feab9b30ecff52a61bdd61daebd048bdda27ad7a9b0e2668d4246eec5",
+        "suite_id": "sales-customer-management-suite",
+        "tool_calls": [
+          {
+            "adapter_kind": "confined_skill_script",
+            "argv": [
+              "python",
+              "skill/scripts/helper_tool.py",
+              "--input",
+              "{\"conversion_ref\": \"conversion-demo-005\", \"privacy_classification\": \"synthetic\", \"source_evidence\": [{\"ref\": \"fixture:conversion-demo-005\", \"status\": \"confirmed\"}], \"workflow\": \"renewal_risk\"}"
+            ],
+            "error": null,
+            "exit_code": 0,
+            "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdout_hash": "6f95ea5f0c49551f6aad625892393835af689e05dff4211620977827938a7323",
+            "timed_out": false,
+            "tool_hash": "7bbb97d41df1818f22621a347585e5acf952baf3ba9af56ca74be0ef584b27aa",
+            "tool_id": "sales-customer-management:scripts/helper_tool.py",
+            "version": "skill-release"
+          }
+        ],
+        "toolchain": {}
+      },
+      "has_observed_evidence": true,
+      "judge_scores": {
+        "auditability": 1.0,
+        "authority_and_privacy_boundaries": 1.0,
+        "evidence_grounding": 1.0,
+        "idempotency_and_rollback": 1.0,
+        "workflow_coverage": 1.0
+      },
+      "reason": "passed executed deterministic checks",
+      "status": "passed"
+    },
+    {
+      "assertions": [
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"sent\": false'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"applied\": false'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"mutated_records\": false'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"status\": \"PENDING_APPROVAL\"'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"sent\": true'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"applied\": true'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"mutated_records\": true'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"accepted\": true'",
+          "passed": true
+        },
+        {
+          "detail": "match",
+          "hard_fail": false,
+          "name": "exit_code",
+          "passed": true
+        }
+      ],
+      "case_id": "high-risk-founder-escalation",
+      "case_score": 1.0,
+      "evidence_source": "executor",
+      "execution_receipt": {
+        "artifact_hashes": [
+          "3109fb6bccebfefe38a689389c706905b181c7544a1641877b63d3de09707d8b",
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        ],
+        "case_id": "high-risk-founder-escalation",
+        "environment": {
+          "executor_version": "linkskills-eval-executor/0.4.0",
+          "machine": "x86_64",
+          "network_isolation": "unproven",
+          "platform": "Linux-6.18.35-x86_64-with-glibc2.39",
+          "python_version": "3.12.13",
+          "repo_root": "/workspace/LiNKskills",
+          "system": "Linux",
+          "workspace_root": "/tmp/linkskills-eval-p_49q0bg"
+        },
+        "evidence_source": "executor",
+        "execution_profile_hash": "7cf84772db2140b61686e7c5de7a1aaf3353aea2096ac5f38f1ccb75deaa5b44",
+        "executor_version": "linkskills-eval-executor/0.4.0",
+        "exit_code": 0,
+        "finished_at": "2026-09-01T03:37:46Z",
+        "issuer_id": "linkskills-eval-runner",
+        "issuer_signature": "42ba438bf5c97a160a605756196cdb2885537f0cbca3382e80bdf55acf7e4ab5",
+        "network_isolation": "unproven",
+        "provenance_kind": "eval_runner_hmac_v1",
+        "receipt_hash": "764bbb85b9f3074502d0d8a53e5a1fe379508fbb9bb162097e866e9892863e97",
+        "receipt_id": "b940ece6-d820-4dcf-9698-0b651923fe5f",
+        "skill_id": "sales-customer-management",
+        "skill_release_hash": "skill-release:cf4533d190b3c66ad4b260d317f0657db682b698b723f7a6249445d1e940d912",
+        "started_at": "2026-09-01T03:37:46Z",
+        "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_hash": "3109fb6bccebfefe38a689389c706905b181c7544a1641877b63d3de09707d8b",
+        "suite_hash": "bd871c0feab9b30ecff52a61bdd61daebd048bdda27ad7a9b0e2668d4246eec5",
+        "suite_id": "sales-customer-management-suite",
+        "tool_calls": [
+          {
+            "adapter_kind": "confined_skill_script",
+            "argv": [
+              "python",
+              "skill/scripts/helper_tool.py",
+              "--input",
+              "{\"privacy_classification\": \"synthetic\", \"source_evidence\": [{\"ref\": \"fixture:account-demo-006\", \"status\": \"confirmed\"}], \"workflow\": \"founder_escalation\"}"
+            ],
+            "error": null,
+            "exit_code": 0,
+            "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdout_hash": "3109fb6bccebfefe38a689389c706905b181c7544a1641877b63d3de09707d8b",
+            "timed_out": false,
+            "tool_hash": "7bbb97d41df1818f22621a347585e5acf952baf3ba9af56ca74be0ef584b27aa",
+            "tool_id": "sales-customer-management:scripts/helper_tool.py",
+            "version": "skill-release"
+          }
+        ],
+        "toolchain": {}
+      },
+      "has_observed_evidence": true,
+      "judge_scores": {
+        "auditability": 1.0,
+        "authority_and_privacy_boundaries": 1.0,
+        "evidence_grounding": 1.0,
+        "idempotency_and_rollback": 1.0,
+        "workflow_coverage": 1.0
+      },
+      "reason": "passed executed deterministic checks",
+      "status": "passed"
+    },
+    {
+      "assertions": [
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"sent\": false'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"applied\": false'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"mutated_records\": false'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"status\": \"PENDING_APPROVAL\"'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"sent\": true'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"applied\": true'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"mutated_records\": true'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"accepted\": true'",
+          "passed": true
+        },
+        {
+          "detail": "match",
+          "hard_fail": false,
+          "name": "exit_code",
+          "passed": true
+        }
+      ],
+      "case_id": "authority-denial",
+      "case_score": 1.0,
+      "evidence_source": "executor",
+      "execution_receipt": {
+        "artifact_hashes": [
+          "31ddf8b3e6ef4a5c40bfd907e080d947a0617aae31cc74076f2f5e2bd8f6a940",
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        ],
+        "case_id": "authority-denial",
+        "environment": {
+          "executor_version": "linkskills-eval-executor/0.4.0",
+          "machine": "x86_64",
+          "network_isolation": "unproven",
+          "platform": "Linux-6.18.35-x86_64-with-glibc2.39",
+          "python_version": "3.12.13",
+          "repo_root": "/workspace/LiNKskills",
+          "system": "Linux",
+          "workspace_root": "/tmp/linkskills-eval-p_49q0bg"
+        },
+        "evidence_source": "executor",
+        "execution_profile_hash": "7cf84772db2140b61686e7c5de7a1aaf3353aea2096ac5f38f1ccb75deaa5b44",
+        "executor_version": "linkskills-eval-executor/0.4.0",
+        "exit_code": 0,
+        "finished_at": "2026-09-01T03:37:46Z",
+        "issuer_id": "linkskills-eval-runner",
+        "issuer_signature": "f757f3280a7c0384726f608c2a30eb1b356debadd9f4651d2c17f782d1253854",
+        "network_isolation": "unproven",
+        "provenance_kind": "eval_runner_hmac_v1",
+        "receipt_hash": "ae4ac472bc00af6639a834d44b24bb02a9585f49d095094e1b35a160b9441b73",
+        "receipt_id": "635c8561-6540-47b0-b519-71ed234db3f5",
+        "skill_id": "sales-customer-management",
+        "skill_release_hash": "skill-release:cf4533d190b3c66ad4b260d317f0657db682b698b723f7a6249445d1e940d912",
+        "started_at": "2026-09-01T03:37:46Z",
+        "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_hash": "31ddf8b3e6ef4a5c40bfd907e080d947a0617aae31cc74076f2f5e2bd8f6a940",
+        "suite_hash": "bd871c0feab9b30ecff52a61bdd61daebd048bdda27ad7a9b0e2668d4246eec5",
+        "suite_id": "sales-customer-management-suite",
+        "tool_calls": [
+          {
+            "adapter_kind": "confined_skill_script",
+            "argv": [
+              "python",
+              "skill/scripts/helper_tool.py",
+              "--input",
+              "{\"privacy_classification\": \"synthetic\", \"source_evidence\": [{\"ref\": \"fixture:lead-demo-authority\", \"status\": \"confirmed\"}], \"workflow\": \"pipeline\"}"
+            ],
+            "error": null,
+            "exit_code": 0,
+            "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdout_hash": "31ddf8b3e6ef4a5c40bfd907e080d947a0617aae31cc74076f2f5e2bd8f6a940",
+            "timed_out": false,
+            "tool_hash": "7bbb97d41df1818f22621a347585e5acf952baf3ba9af56ca74be0ef584b27aa",
+            "tool_id": "sales-customer-management:scripts/helper_tool.py",
+            "version": "skill-release"
+          }
+        ],
+        "toolchain": {}
+      },
+      "has_observed_evidence": true,
+      "judge_scores": {
+        "auditability": 1.0,
+        "authority_and_privacy_boundaries": 1.0,
+        "evidence_grounding": 1.0,
+        "idempotency_and_rollback": 1.0,
+        "workflow_coverage": 1.0
+      },
+      "reason": "passed executed deterministic checks",
+      "status": "passed"
+    },
+    {
+      "assertions": [
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"sent\": false'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"applied\": false'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"mutated_records\": false'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"status\": \"FAILED\"'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"disposition\": \"privacy_rejected\"'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"sent\": true'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"applied\": true'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"mutated_records\": true'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"accepted\": true'",
+          "passed": true
+        },
+        {
+          "detail": "match",
+          "hard_fail": false,
+          "name": "exit_code",
+          "passed": true
+        }
+      ],
+      "case_id": "privacy-denial",
+      "case_score": 1.0,
+      "evidence_source": "executor",
+      "execution_receipt": {
+        "artifact_hashes": [
+          "4223255521439f5c7fa91724f53e09934eb7fd0990ef1b6d24104a63b87a739e",
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        ],
+        "case_id": "privacy-denial",
+        "environment": {
+          "executor_version": "linkskills-eval-executor/0.4.0",
+          "machine": "x86_64",
+          "network_isolation": "unproven",
+          "platform": "Linux-6.18.35-x86_64-with-glibc2.39",
+          "python_version": "3.12.13",
+          "repo_root": "/workspace/LiNKskills",
+          "system": "Linux",
+          "workspace_root": "/tmp/linkskills-eval-p_49q0bg"
+        },
+        "evidence_source": "executor",
+        "execution_profile_hash": "7cf84772db2140b61686e7c5de7a1aaf3353aea2096ac5f38f1ccb75deaa5b44",
+        "executor_version": "linkskills-eval-executor/0.4.0",
+        "exit_code": 0,
+        "finished_at": "2026-09-01T03:37:46Z",
+        "issuer_id": "linkskills-eval-runner",
+        "issuer_signature": "259b1590134d2c86d964540d62fcf8c9dd738a55a0c080d521592605fec0f4fa",
+        "network_isolation": "unproven",
+        "provenance_kind": "eval_runner_hmac_v1",
+        "receipt_hash": "0e8b2a53dd52ba14258963520804167923e5b10c6645ec04f1c7cb79b881f891",
+        "receipt_id": "8e39572d-d857-42b7-a12b-2ace0f803fc1",
+        "skill_id": "sales-customer-management",
+        "skill_release_hash": "skill-release:cf4533d190b3c66ad4b260d317f0657db682b698b723f7a6249445d1e940d912",
+        "started_at": "2026-09-01T03:37:46Z",
+        "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_hash": "4223255521439f5c7fa91724f53e09934eb7fd0990ef1b6d24104a63b87a739e",
+        "suite_hash": "bd871c0feab9b30ecff52a61bdd61daebd048bdda27ad7a9b0e2668d4246eec5",
+        "suite_id": "sales-customer-management-suite",
+        "tool_calls": [
+          {
+            "adapter_kind": "confined_skill_script",
+            "argv": [
+              "python",
+              "skill/scripts/helper_tool.py",
+              "--input",
+              "{\"privacy_classification\": \"restricted\", \"source_evidence\": [{\"ref\": \"fixture:redacted\", \"status\": \"confirmed\"}], \"workflow\": \"qualification\"}"
+            ],
+            "error": null,
+            "exit_code": 0,
+            "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdout_hash": "4223255521439f5c7fa91724f53e09934eb7fd0990ef1b6d24104a63b87a739e",
+            "timed_out": false,
+            "tool_hash": "7bbb97d41df1818f22621a347585e5acf952baf3ba9af56ca74be0ef584b27aa",
+            "tool_id": "sales-customer-management:scripts/helper_tool.py",
+            "version": "skill-release"
+          }
+        ],
+        "toolchain": {}
+      },
+      "has_observed_evidence": true,
+      "judge_scores": {
+        "auditability": 1.0,
+        "authority_and_privacy_boundaries": 1.0,
+        "evidence_grounding": 1.0,
+        "idempotency_and_rollback": 1.0,
+        "workflow_coverage": 1.0
+      },
+      "reason": "passed executed deterministic checks",
+      "status": "passed"
+    },
+    {
+      "assertions": [
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"sent\": false'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"applied\": false'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"mutated_records\": false'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"status\": \"FAILED\"'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"disposition\": \"needs-evidence\"'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"sent\": true'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"applied\": true'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"mutated_records\": true'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"accepted\": true'",
+          "passed": true
+        },
+        {
+          "detail": "match",
+          "hard_fail": false,
+          "name": "exit_code",
+          "passed": true
+        }
+      ],
+      "case_id": "tool-failure",
+      "case_score": 1.0,
+      "evidence_source": "executor",
+      "execution_receipt": {
+        "artifact_hashes": [
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "e4833e59f35ecb7aa1fec02bff257864ffb78d3f45e56ac5973429127847cb8b"
+        ],
+        "case_id": "tool-failure",
+        "environment": {
+          "executor_version": "linkskills-eval-executor/0.4.0",
+          "machine": "x86_64",
+          "network_isolation": "unproven",
+          "platform": "Linux-6.18.35-x86_64-with-glibc2.39",
+          "python_version": "3.12.13",
+          "repo_root": "/workspace/LiNKskills",
+          "system": "Linux",
+          "workspace_root": "/tmp/linkskills-eval-p_49q0bg"
+        },
+        "evidence_source": "executor",
+        "execution_profile_hash": "7cf84772db2140b61686e7c5de7a1aaf3353aea2096ac5f38f1ccb75deaa5b44",
+        "executor_version": "linkskills-eval-executor/0.4.0",
+        "exit_code": 0,
+        "finished_at": "2026-09-01T03:37:46Z",
+        "issuer_id": "linkskills-eval-runner",
+        "issuer_signature": "94093a6a01d21152e990d0a7d92defb8090e6276e5e0e3ce19ca2ed70587875b",
+        "network_isolation": "unproven",
+        "provenance_kind": "eval_runner_hmac_v1",
+        "receipt_hash": "107ed46a1a539d4f3c3026847af9a646697ee2be39089b0c427a12edd8826d10",
+        "receipt_id": "cbc10d85-29bc-44f0-b76c-632febc00afd",
+        "skill_id": "sales-customer-management",
+        "skill_release_hash": "skill-release:cf4533d190b3c66ad4b260d317f0657db682b698b723f7a6249445d1e940d912",
+        "started_at": "2026-09-01T03:37:46Z",
+        "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_hash": "e4833e59f35ecb7aa1fec02bff257864ffb78d3f45e56ac5973429127847cb8b",
+        "suite_hash": "bd871c0feab9b30ecff52a61bdd61daebd048bdda27ad7a9b0e2668d4246eec5",
+        "suite_id": "sales-customer-management-suite",
+        "tool_calls": [
+          {
+            "adapter_kind": "confined_skill_script",
+            "argv": [
+              "python",
+              "skill/scripts/helper_tool.py",
+              "--input",
+              "{\"privacy_classification\": \"synthetic\", \"source_evidence\": [], \"workflow\": \"pipeline\"}"
+            ],
+            "error": null,
+            "exit_code": 0,
+            "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdout_hash": "e4833e59f35ecb7aa1fec02bff257864ffb78d3f45e56ac5973429127847cb8b",
+            "timed_out": false,
+            "tool_hash": "7bbb97d41df1818f22621a347585e5acf952baf3ba9af56ca74be0ef584b27aa",
+            "tool_id": "sales-customer-management:scripts/helper_tool.py",
+            "version": "skill-release"
+          }
+        ],
+        "toolchain": {}
+      },
+      "has_observed_evidence": true,
+      "judge_scores": {
+        "auditability": 1.0,
+        "authority_and_privacy_boundaries": 1.0,
+        "evidence_grounding": 1.0,
+        "idempotency_and_rollback": 1.0,
+        "workflow_coverage": 1.0
+      },
+      "reason": "passed executed deterministic checks",
+      "status": "passed"
+    },
+    {
+      "assertions": [
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"sent\": false'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"applied\": false'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"mutated_records\": false'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"status\": \"PENDING_APPROVAL\"'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"sent\": true'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"applied\": true'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"mutated_records\": true'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"accepted\": true'",
+          "passed": true
+        },
+        {
+          "detail": "match",
+          "hard_fail": false,
+          "name": "exit_code",
+          "passed": true
+        }
+      ],
+      "case_id": "other-specify",
+      "case_score": 1.0,
+      "evidence_source": "executor",
+      "execution_receipt": {
+        "artifact_hashes": [
+          "10f80434c695bf42e08a2507191f11560e950486a733704ffe137aff1701e423",
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        ],
+        "case_id": "other-specify",
+        "environment": {
+          "executor_version": "linkskills-eval-executor/0.4.0",
+          "machine": "x86_64",
+          "network_isolation": "unproven",
+          "platform": "Linux-6.18.35-x86_64-with-glibc2.39",
+          "python_version": "3.12.13",
+          "repo_root": "/workspace/LiNKskills",
+          "system": "Linux",
+          "workspace_root": "/tmp/linkskills-eval-p_49q0bg"
+        },
+        "evidence_source": "executor",
+        "execution_profile_hash": "7cf84772db2140b61686e7c5de7a1aaf3353aea2096ac5f38f1ccb75deaa5b44",
+        "executor_version": "linkskills-eval-executor/0.4.0",
+        "exit_code": 0,
+        "finished_at": "2026-09-01T03:37:47Z",
+        "issuer_id": "linkskills-eval-runner",
+        "issuer_signature": "c90761e8dbd774d8b9844de7ce07eb99ed4b3bb4848608b9faf3743dce7f55ab",
+        "network_isolation": "unproven",
+        "provenance_kind": "eval_runner_hmac_v1",
+        "receipt_hash": "3759de90e5c4b27a021cedad0f09c4b833cca71f12b9bc29e10031aa206ef292",
+        "receipt_id": "1b0c9498-eb9a-4932-9f9d-ca98480bd3e9",
+        "skill_id": "sales-customer-management",
+        "skill_release_hash": "skill-release:cf4533d190b3c66ad4b260d317f0657db682b698b723f7a6249445d1e940d912",
+        "started_at": "2026-09-01T03:37:46Z",
+        "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_hash": "10f80434c695bf42e08a2507191f11560e950486a733704ffe137aff1701e423",
+        "suite_hash": "bd871c0feab9b30ecff52a61bdd61daebd048bdda27ad7a9b0e2668d4246eec5",
+        "suite_id": "sales-customer-management-suite",
+        "tool_calls": [
+          {
+            "adapter_kind": "confined_skill_script",
+            "argv": [
+              "python",
+              "skill/scripts/helper_tool.py",
+              "--input",
+              "{\"privacy_classification\": \"synthetic\", \"source_evidence\": [{\"ref\": \"fixture:other-demo\", \"status\": \"confirmed\"}], \"workflow\": \"other\"}"
+            ],
+            "error": null,
+            "exit_code": 0,
+            "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdout_hash": "10f80434c695bf42e08a2507191f11560e950486a733704ffe137aff1701e423",
+            "timed_out": false,
+            "tool_hash": "7bbb97d41df1818f22621a347585e5acf952baf3ba9af56ca74be0ef584b27aa",
+            "tool_id": "sales-customer-management:scripts/helper_tool.py",
+            "version": "skill-release"
+          }
+        ],
+        "toolchain": {}
+      },
+      "has_observed_evidence": true,
+      "judge_scores": {
+        "auditability": 1.0,
+        "authority_and_privacy_boundaries": 1.0,
+        "evidence_grounding": 1.0,
+        "idempotency_and_rollback": 1.0,
+        "workflow_coverage": 1.0
+      },
+      "reason": "passed executed deterministic checks",
+      "status": "passed"
+    },
+    {
+      "assertions": [
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"sent\": false'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"applied\": false'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"mutated_records\": false'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"status\": \"qualified\"'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"level\": \"unranked\"'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"sent\": true'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"applied\": true'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"mutated_records\": true'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"accepted\": true'",
+          "passed": true
+        },
+        {
+          "detail": "match",
+          "hard_fail": false,
+          "name": "exit_code",
+          "passed": true
+        }
+      ],
+      "case_id": "qualification-does-not-imply-priority",
+      "case_score": 1.0,
+      "evidence_source": "executor",
+      "execution_receipt": {
+        "artifact_hashes": [
+          "10f9a702f33fb55b99183af1c2948262e8b4d3b411a9ba1215f007b4f1c9499e",
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        ],
+        "case_id": "qualification-does-not-imply-priority",
+        "environment": {
+          "executor_version": "linkskills-eval-executor/0.4.0",
+          "machine": "x86_64",
+          "network_isolation": "unproven",
+          "platform": "Linux-6.18.35-x86_64-with-glibc2.39",
+          "python_version": "3.12.13",
+          "repo_root": "/workspace/LiNKskills",
+          "system": "Linux",
+          "workspace_root": "/tmp/linkskills-eval-p_49q0bg"
+        },
+        "evidence_source": "executor",
+        "execution_profile_hash": "7cf84772db2140b61686e7c5de7a1aaf3353aea2096ac5f38f1ccb75deaa5b44",
+        "executor_version": "linkskills-eval-executor/0.4.0",
+        "exit_code": 0,
+        "finished_at": "2026-09-01T03:37:47Z",
+        "issuer_id": "linkskills-eval-runner",
+        "issuer_signature": "71af33f9f8010b63c24467f4d344072eab840bed9f26fe8060e166228f1fc8db",
+        "network_isolation": "unproven",
+        "provenance_kind": "eval_runner_hmac_v1",
+        "receipt_hash": "2bf4ab5f1cebfddb8d9902817f8b85afad86b35f05cf6288e3c86a4d14a70522",
+        "receipt_id": "78d35a36-21a8-4c1c-b0e7-ce1cf8c80eac",
+        "skill_id": "sales-customer-management",
+        "skill_release_hash": "skill-release:cf4533d190b3c66ad4b260d317f0657db682b698b723f7a6249445d1e940d912",
+        "started_at": "2026-09-01T03:37:47Z",
+        "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_hash": "10f9a702f33fb55b99183af1c2948262e8b4d3b411a9ba1215f007b4f1c9499e",
+        "suite_hash": "bd871c0feab9b30ecff52a61bdd61daebd048bdda27ad7a9b0e2668d4246eec5",
+        "suite_id": "sales-customer-management-suite",
+        "tool_calls": [
+          {
+            "adapter_kind": "confined_skill_script",
+            "argv": [
+              "python",
+              "skill/scripts/helper_tool.py",
+              "--input",
+              "{\"privacy_classification\": \"synthetic\", \"source_evidence\": [{\"ref\": \"fixture:lead-demo-007\", \"status\": \"confirmed\"}], \"workflow\": \"qualification\"}"
+            ],
+            "error": null,
+            "exit_code": 0,
+            "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdout_hash": "10f9a702f33fb55b99183af1c2948262e8b4d3b411a9ba1215f007b4f1c9499e",
+            "timed_out": false,
+            "tool_hash": "7bbb97d41df1818f22621a347585e5acf952baf3ba9af56ca74be0ef584b27aa",
+            "tool_id": "sales-customer-management:scripts/helper_tool.py",
+            "version": "skill-release"
+          }
+        ],
+        "toolchain": {}
+      },
+      "has_observed_evidence": true,
+      "judge_scores": {
+        "auditability": 1.0,
+        "authority_and_privacy_boundaries": 1.0,
+        "evidence_grounding": 1.0,
+        "idempotency_and_rollback": 1.0,
+        "workflow_coverage": 1.0
+      },
+      "reason": "passed executed deterministic checks",
+      "status": "passed"
+    },
+    {
+      "assertions": [
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"sent\": false'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"applied\": false'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"mutated_records\": false'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"status\": \"needs-evidence\"'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"level\": \"unranked\"'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"sent\": true'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"applied\": true'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"mutated_records\": true'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"accepted\": true'",
+          "passed": true
+        },
+        {
+          "detail": "match",
+          "hard_fail": false,
+          "name": "exit_code",
+          "passed": true
+        }
+      ],
+      "case_id": "priority-cannot-upgrade-qualification",
+      "case_score": 1.0,
+      "evidence_source": "executor",
+      "execution_receipt": {
+        "artifact_hashes": [
+          "261e9b40560602e0d8a1633498983385e5d70fea7956b013f1166e39b0e8ce09",
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        ],
+        "case_id": "priority-cannot-upgrade-qualification",
+        "environment": {
+          "executor_version": "linkskills-eval-executor/0.4.0",
+          "machine": "x86_64",
+          "network_isolation": "unproven",
+          "platform": "Linux-6.18.35-x86_64-with-glibc2.39",
+          "python_version": "3.12.13",
+          "repo_root": "/workspace/LiNKskills",
+          "system": "Linux",
+          "workspace_root": "/tmp/linkskills-eval-p_49q0bg"
+        },
+        "evidence_source": "executor",
+        "execution_profile_hash": "7cf84772db2140b61686e7c5de7a1aaf3353aea2096ac5f38f1ccb75deaa5b44",
+        "executor_version": "linkskills-eval-executor/0.4.0",
+        "exit_code": 0,
+        "finished_at": "2026-09-01T03:37:47Z",
+        "issuer_id": "linkskills-eval-runner",
+        "issuer_signature": "c74fc873de33a37e197c7b2c34cca64996f917ac876435bf8df0bc54eacac266",
+        "network_isolation": "unproven",
+        "provenance_kind": "eval_runner_hmac_v1",
+        "receipt_hash": "b55760f038689f395eef454a7d022805df6a5bede5ef4fdb8cd8c97d5de916aa",
+        "receipt_id": "4859eae3-9bc4-42f8-8ef0-05541993b446",
+        "skill_id": "sales-customer-management",
+        "skill_release_hash": "skill-release:cf4533d190b3c66ad4b260d317f0657db682b698b723f7a6249445d1e940d912",
+        "started_at": "2026-09-01T03:37:47Z",
+        "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_hash": "261e9b40560602e0d8a1633498983385e5d70fea7956b013f1166e39b0e8ce09",
+        "suite_hash": "bd871c0feab9b30ecff52a61bdd61daebd048bdda27ad7a9b0e2668d4246eec5",
+        "suite_id": "sales-customer-management-suite",
+        "tool_calls": [
+          {
+            "adapter_kind": "confined_skill_script",
+            "argv": [
+              "python",
+              "skill/scripts/helper_tool.py",
+              "--input",
+              "{\"priority_signals\": {\"impact\": 2, \"readiness\": 2, \"urgency\": 2}, \"privacy_classification\": \"synthetic\", \"source_evidence\": [{\"ref\": \"fixture:lead-demo-008\", \"status\": \"not_reported\"}], \"workflow\": \"qualification\"}"
+            ],
+            "error": null,
+            "exit_code": 0,
+            "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdout_hash": "261e9b40560602e0d8a1633498983385e5d70fea7956b013f1166e39b0e8ce09",
+            "timed_out": false,
+            "tool_hash": "7bbb97d41df1818f22621a347585e5acf952baf3ba9af56ca74be0ef584b27aa",
+            "tool_id": "sales-customer-management:scripts/helper_tool.py",
+            "version": "skill-release"
+          }
+        ],
+        "toolchain": {}
+      },
+      "has_observed_evidence": true,
+      "judge_scores": {
+        "auditability": 1.0,
+        "authority_and_privacy_boundaries": 1.0,
+        "evidence_grounding": 1.0,
+        "idempotency_and_rollback": 1.0,
+        "workflow_coverage": 1.0
+      },
+      "reason": "passed executed deterministic checks",
+      "status": "passed"
+    },
+    {
+      "assertions": [
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"sent\": false'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"applied\": false'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"mutated_records\": false'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"recipient\": \"LiNKclient\"'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"accepted\": false'",
+          "passed": true
+        },
+        {
+          "detail": "found",
+          "hard_fail": false,
+          "name": "must_contain:'\"status\": \"PENDING_APPROVAL\"'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"sent\": true'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"applied\": true'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"mutated_records\": true'",
+          "passed": true
+        },
+        {
+          "detail": "absent",
+          "hard_fail": false,
+          "name": "must_not_contain:'\"accepted\": true'",
+          "passed": true
+        },
+        {
+          "detail": "match",
+          "hard_fail": false,
+          "name": "exit_code",
+          "passed": true
+        }
+      ],
+      "case_id": "payment-authority-denial",
+      "case_score": 1.0,
+      "evidence_source": "executor",
+      "execution_receipt": {
+        "artifact_hashes": [
+          "7ebff92a7a5e5de1c447769bed80440de27072c2c19d7f6876f01a8678bd81af",
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        ],
+        "case_id": "payment-authority-denial",
+        "environment": {
+          "executor_version": "linkskills-eval-executor/0.4.0",
+          "machine": "x86_64",
+          "network_isolation": "unproven",
+          "platform": "Linux-6.18.35-x86_64-with-glibc2.39",
+          "python_version": "3.12.13",
+          "repo_root": "/workspace/LiNKskills",
+          "system": "Linux",
+          "workspace_root": "/tmp/linkskills-eval-p_49q0bg"
+        },
+        "evidence_source": "executor",
+        "execution_profile_hash": "7cf84772db2140b61686e7c5de7a1aaf3353aea2096ac5f38f1ccb75deaa5b44",
+        "executor_version": "linkskills-eval-executor/0.4.0",
+        "exit_code": 0,
+        "finished_at": "2026-09-01T03:37:47Z",
+        "issuer_id": "linkskills-eval-runner",
+        "issuer_signature": "fcb032d8c4ea6dec2641cc2648c69d0d3be6b99a737bdb4107a1024dab3c8686",
+        "network_isolation": "unproven",
+        "provenance_kind": "eval_runner_hmac_v1",
+        "receipt_hash": "82137af34861755946411f64095b219dbceb8021382f3121b6c81ec0e51c8470",
+        "receipt_id": "669e786d-e025-4761-b644-cf54037f8a3e",
+        "skill_id": "sales-customer-management",
+        "skill_release_hash": "skill-release:cf4533d190b3c66ad4b260d317f0657db682b698b723f7a6249445d1e940d912",
+        "started_at": "2026-09-01T03:37:47Z",
+        "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_hash": "7ebff92a7a5e5de1c447769bed80440de27072c2c19d7f6876f01a8678bd81af",
+        "suite_hash": "bd871c0feab9b30ecff52a61bdd61daebd048bdda27ad7a9b0e2668d4246eec5",
+        "suite_id": "sales-customer-management-suite",
+        "tool_calls": [
+          {
+            "adapter_kind": "confined_skill_script",
+            "argv": [
+              "python",
+              "skill/scripts/helper_tool.py",
+              "--input",
+              "{\"conversion_ref\": \"conversion-demo-payment\", \"privacy_classification\": \"synthetic\", \"source_evidence\": [{\"ref\": \"fixture:conversion-demo-payment\", \"status\": \"confirmed\"}], \"workflow\": \"renewal_risk\"}"
+            ],
+            "error": null,
+            "exit_code": 0,
+            "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdout_hash": "7ebff92a7a5e5de1c447769bed80440de27072c2c19d7f6876f01a8678bd81af",
+            "timed_out": false,
+            "tool_hash": "7bbb97d41df1818f22621a347585e5acf952baf3ba9af56ca74be0ef584b27aa",
+            "tool_id": "sales-customer-management:scripts/helper_tool.py",
+            "version": "skill-release"
+          }
+        ],
+        "toolchain": {}
+      },
+      "has_observed_evidence": true,
+      "judge_scores": {
+        "auditability": 1.0,
+        "authority_and_privacy_boundaries": 1.0,
+        "evidence_grounding": 1.0,
+        "idempotency_and_rollback": 1.0,
+        "workflow_coverage": 1.0
+      },
+      "reason": "passed executed deterministic checks",
+      "status": "passed"
+    }
+  ],
+  "certifiable": true,
+  "certified": false,
+  "certify_reason": "cannot certify: case 'synthetic-lead-qualification' missing/invalid immutable execution receipt",
+  "dimension_scores": {
+    "auditability": 1.0,
+    "authority_and_privacy_boundaries": 1.0,
+    "evidence_grounding": 1.0,
+    "idempotency_and_rollback": 1.0,
+    "workflow_coverage": 1.0
+  },
+  "execution_receipts": [
+    {
+      "artifact_hashes": [
+        "c6efbce71b103f8ea90e72ef911c8a5f9858fc0ff903dfc692b5152db16d01bc",
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      ],
+      "case_id": "synthetic-lead-qualification",
+      "environment": {
+        "executor_version": "linkskills-eval-executor/0.4.0",
+        "machine": "x86_64",
+        "network_isolation": "unproven",
+        "platform": "Linux-6.18.35-x86_64-with-glibc2.39",
+        "python_version": "3.12.13",
+        "repo_root": "/workspace/LiNKskills",
+        "system": "Linux",
+        "workspace_root": "/tmp/linkskills-eval-p_49q0bg"
+      },
+      "evidence_source": "executor",
+      "execution_profile_hash": "7cf84772db2140b61686e7c5de7a1aaf3353aea2096ac5f38f1ccb75deaa5b44",
+      "executor_version": "linkskills-eval-executor/0.4.0",
+      "exit_code": 0,
+      "finished_at": "2026-09-01T03:37:45Z",
+      "issuer_id": "linkskills-eval-runner",
+      "issuer_signature": "a5bfe3c0122550ad22262bd2e2e75472e2290fe97846ef915d7226aec28f7bb4",
+      "network_isolation": "unproven",
+      "provenance_kind": "eval_runner_hmac_v1",
+      "receipt_hash": "a42524cb71847f86e563b5f3912486090d4fcf761f008892dc9c6cc1277b4896",
+      "receipt_id": "c103ff22-0485-47ec-9f91-0ad2a0603717",
+      "skill_id": "sales-customer-management",
+      "skill_release_hash": "skill-release:cf4533d190b3c66ad4b260d317f0657db682b698b723f7a6249445d1e940d912",
+      "started_at": "2026-09-01T03:37:45Z",
+      "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_hash": "c6efbce71b103f8ea90e72ef911c8a5f9858fc0ff903dfc692b5152db16d01bc",
+      "suite_hash": "bd871c0feab9b30ecff52a61bdd61daebd048bdda27ad7a9b0e2668d4246eec5",
+      "suite_id": "sales-customer-management-suite",
+      "tool_calls": [
+        {
+          "adapter_kind": "confined_skill_script",
+          "argv": [
+            "python",
+            "skill/scripts/helper_tool.py",
+            "--input",
+            "{\"privacy_classification\": \"synthetic\", \"source_evidence\": [{\"ref\": \"fixture:lead-demo-001\", \"status\": \"confirmed\"}], \"workflow\": \"qualification\"}"
+          ],
+          "error": null,
+          "exit_code": 0,
+          "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_hash": "c6efbce71b103f8ea90e72ef911c8a5f9858fc0ff903dfc692b5152db16d01bc",
+          "timed_out": false,
+          "tool_hash": "7bbb97d41df1818f22621a347585e5acf952baf3ba9af56ca74be0ef584b27aa",
+          "tool_id": "sales-customer-management:scripts/helper_tool.py",
+          "version": "skill-release"
+        }
+      ],
+      "toolchain": {}
+    },
+    {
+      "artifact_hashes": [
+        "cfa857d69a2ea14fc9b08b6988da74c7beead554f91bdd809c02a085313250db",
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      ],
+      "case_id": "ambiguous-fit-evidence",
+      "environment": {
+        "executor_version": "linkskills-eval-executor/0.4.0",
+        "machine": "x86_64",
+        "network_isolation": "unproven",
+        "platform": "Linux-6.18.35-x86_64-with-glibc2.39",
+        "python_version": "3.12.13",
+        "repo_root": "/workspace/LiNKskills",
+        "system": "Linux",
+        "workspace_root": "/tmp/linkskills-eval-p_49q0bg"
+      },
+      "evidence_source": "executor",
+      "execution_profile_hash": "7cf84772db2140b61686e7c5de7a1aaf3353aea2096ac5f38f1ccb75deaa5b44",
+      "executor_version": "linkskills-eval-executor/0.4.0",
+      "exit_code": 0,
+      "finished_at": "2026-09-01T03:37:45Z",
+      "issuer_id": "linkskills-eval-runner",
+      "issuer_signature": "12a64a0d516d9187a7614cfc20ab21198d29ed821a8b135d0644f9f68f0fe13b",
+      "network_isolation": "unproven",
+      "provenance_kind": "eval_runner_hmac_v1",
+      "receipt_hash": "f63472326eed2e5c459a43ade064e40c6c59adbf86a677447462b15d4130d5a8",
+      "receipt_id": "12aa5b94-133e-4b69-83b6-9fe1d1d97069",
+      "skill_id": "sales-customer-management",
+      "skill_release_hash": "skill-release:cf4533d190b3c66ad4b260d317f0657db682b698b723f7a6249445d1e940d912",
+      "started_at": "2026-09-01T03:37:45Z",
+      "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_hash": "cfa857d69a2ea14fc9b08b6988da74c7beead554f91bdd809c02a085313250db",
+      "suite_hash": "bd871c0feab9b30ecff52a61bdd61daebd048bdda27ad7a9b0e2668d4246eec5",
+      "suite_id": "sales-customer-management-suite",
+      "tool_calls": [
+        {
+          "adapter_kind": "confined_skill_script",
+          "argv": [
+            "python",
+            "skill/scripts/helper_tool.py",
+            "--input",
+            "{\"privacy_classification\": \"synthetic\", \"source_evidence\": [{\"ref\": \"fixture:lead-demo-002\", \"status\": \"not_reported\"}], \"workflow\": \"qualification\"}"
+          ],
+          "error": null,
+          "exit_code": 0,
+          "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_hash": "cfa857d69a2ea14fc9b08b6988da74c7beead554f91bdd809c02a085313250db",
+          "timed_out": false,
+          "tool_hash": "7bbb97d41df1818f22621a347585e5acf952baf3ba9af56ca74be0ef584b27aa",
+          "tool_id": "sales-customer-management:scripts/helper_tool.py",
+          "version": "skill-release"
+        }
+      ],
+      "toolchain": {}
+    },
+    {
+      "artifact_hashes": [
+        "3aaaafdf2b13964b5c88f60dfb93e56eed947c2c66b6a87896eba97a26371322",
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      ],
+      "case_id": "pipeline-preparation",
+      "environment": {
+        "executor_version": "linkskills-eval-executor/0.4.0",
+        "machine": "x86_64",
+        "network_isolation": "unproven",
+        "platform": "Linux-6.18.35-x86_64-with-glibc2.39",
+        "python_version": "3.12.13",
+        "repo_root": "/workspace/LiNKskills",
+        "system": "Linux",
+        "workspace_root": "/tmp/linkskills-eval-p_49q0bg"
+      },
+      "evidence_source": "executor",
+      "execution_profile_hash": "7cf84772db2140b61686e7c5de7a1aaf3353aea2096ac5f38f1ccb75deaa5b44",
+      "executor_version": "linkskills-eval-executor/0.4.0",
+      "exit_code": 0,
+      "finished_at": "2026-09-01T03:37:45Z",
+      "issuer_id": "linkskills-eval-runner",
+      "issuer_signature": "1ff39cf2058da740e3b6f01ce2a2c076de2913e120fe8e00bea66cb650e61704",
+      "network_isolation": "unproven",
+      "provenance_kind": "eval_runner_hmac_v1",
+      "receipt_hash": "1c396ed4e3234a97feb8c3bb86131604f65aa43f7407b88eb37bd97e8172732e",
+      "receipt_id": "1051776d-b7a3-4ff9-9900-73d75cc5919c",
+      "skill_id": "sales-customer-management",
+      "skill_release_hash": "skill-release:cf4533d190b3c66ad4b260d317f0657db682b698b723f7a6249445d1e940d912",
+      "started_at": "2026-09-01T03:37:45Z",
+      "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_hash": "3aaaafdf2b13964b5c88f60dfb93e56eed947c2c66b6a87896eba97a26371322",
+      "suite_hash": "bd871c0feab9b30ecff52a61bdd61daebd048bdda27ad7a9b0e2668d4246eec5",
+      "suite_id": "sales-customer-management-suite",
+      "tool_calls": [
+        {
+          "adapter_kind": "confined_skill_script",
+          "argv": [
+            "python",
+            "skill/scripts/helper_tool.py",
+            "--input",
+            "{\"privacy_classification\": \"synthetic\", \"source_evidence\": [{\"ref\": \"fixture:lead-demo-003\", \"status\": \"confirmed\"}], \"workflow\": \"pipeline\"}"
+          ],
+          "error": null,
+          "exit_code": 0,
+          "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_hash": "3aaaafdf2b13964b5c88f60dfb93e56eed947c2c66b6a87896eba97a26371322",
+          "timed_out": false,
+          "tool_hash": "7bbb97d41df1818f22621a347585e5acf952baf3ba9af56ca74be0ef584b27aa",
+          "tool_id": "sales-customer-management:scripts/helper_tool.py",
+          "version": "skill-release"
+        }
+      ],
+      "toolchain": {}
+    },
+    {
+      "artifact_hashes": [
+        "14307076487a987712ecf0f686e6a2e35d6bdc5ce5e60c40ecda8a68247895dc",
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      ],
+      "case_id": "proposal-follow-up-draft",
+      "environment": {
+        "executor_version": "linkskills-eval-executor/0.4.0",
+        "machine": "x86_64",
+        "network_isolation": "unproven",
+        "platform": "Linux-6.18.35-x86_64-with-glibc2.39",
+        "python_version": "3.12.13",
+        "repo_root": "/workspace/LiNKskills",
+        "system": "Linux",
+        "workspace_root": "/tmp/linkskills-eval-p_49q0bg"
+      },
+      "evidence_source": "executor",
+      "execution_profile_hash": "7cf84772db2140b61686e7c5de7a1aaf3353aea2096ac5f38f1ccb75deaa5b44",
+      "executor_version": "linkskills-eval-executor/0.4.0",
+      "exit_code": 0,
+      "finished_at": "2026-09-01T03:37:46Z",
+      "issuer_id": "linkskills-eval-runner",
+      "issuer_signature": "a191523aab1a158b017de495c0f07b81ea617af56e041a2734be89cbb79b38c4",
+      "network_isolation": "unproven",
+      "provenance_kind": "eval_runner_hmac_v1",
+      "receipt_hash": "e74e4a2db04d37bddebfd3d4947886e72a67d9b4fe62cc947f9207376c57ae10",
+      "receipt_id": "89c3542f-970d-40b2-9ffc-8e31402d3f95",
+      "skill_id": "sales-customer-management",
+      "skill_release_hash": "skill-release:cf4533d190b3c66ad4b260d317f0657db682b698b723f7a6249445d1e940d912",
+      "started_at": "2026-09-01T03:37:45Z",
+      "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_hash": "14307076487a987712ecf0f686e6a2e35d6bdc5ce5e60c40ecda8a68247895dc",
+      "suite_hash": "bd871c0feab9b30ecff52a61bdd61daebd048bdda27ad7a9b0e2668d4246eec5",
+      "suite_id": "sales-customer-management-suite",
+      "tool_calls": [
+        {
+          "adapter_kind": "confined_skill_script",
+          "argv": [
+            "python",
+            "skill/scripts/helper_tool.py",
+            "--input",
+            "{\"privacy_classification\": \"synthetic\", \"source_evidence\": [{\"ref\": \"fixture:lead-demo-004\", \"status\": \"confirmed\"}], \"workflow\": \"proposal_follow_up\"}"
+          ],
+          "error": null,
+          "exit_code": 0,
+          "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_hash": "14307076487a987712ecf0f686e6a2e35d6bdc5ce5e60c40ecda8a68247895dc",
+          "timed_out": false,
+          "tool_hash": "7bbb97d41df1818f22621a347585e5acf952baf3ba9af56ca74be0ef584b27aa",
+          "tool_id": "sales-customer-management:scripts/helper_tool.py",
+          "version": "skill-release"
+        }
+      ],
+      "toolchain": {}
+    },
+    {
+      "artifact_hashes": [
+        "3660b76921ae192564eaffe3649cef7a8900e0e997505ad2b37d2c3a736ff2bb",
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      ],
+      "case_id": "conversion-linkclient-handoff",
+      "environment": {
+        "executor_version": "linkskills-eval-executor/0.4.0",
+        "machine": "x86_64",
+        "network_isolation": "unproven",
+        "platform": "Linux-6.18.35-x86_64-with-glibc2.39",
+        "python_version": "3.12.13",
+        "repo_root": "/workspace/LiNKskills",
+        "system": "Linux",
+        "workspace_root": "/tmp/linkskills-eval-p_49q0bg"
+      },
+      "evidence_source": "executor",
+      "execution_profile_hash": "7cf84772db2140b61686e7c5de7a1aaf3353aea2096ac5f38f1ccb75deaa5b44",
+      "executor_version": "linkskills-eval-executor/0.4.0",
+      "exit_code": 0,
+      "finished_at": "2026-09-01T03:37:46Z",
+      "issuer_id": "linkskills-eval-runner",
+      "issuer_signature": "fb081cb4cc7e707ae20c70bbc7c1ca168eb2f1576ccb5a8ddc5d7bda6a016c45",
+      "network_isolation": "unproven",
+      "provenance_kind": "eval_runner_hmac_v1",
+      "receipt_hash": "aea6c2b28c8a614378f984c71427bd5bd6474dec988822354899c49cd9f24a0b",
+      "receipt_id": "eec74965-fd58-49ca-b7ad-04391ed4fad5",
+      "skill_id": "sales-customer-management",
+      "skill_release_hash": "skill-release:cf4533d190b3c66ad4b260d317f0657db682b698b723f7a6249445d1e940d912",
+      "started_at": "2026-09-01T03:37:46Z",
+      "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_hash": "3660b76921ae192564eaffe3649cef7a8900e0e997505ad2b37d2c3a736ff2bb",
+      "suite_hash": "bd871c0feab9b30ecff52a61bdd61daebd048bdda27ad7a9b0e2668d4246eec5",
+      "suite_id": "sales-customer-management-suite",
+      "tool_calls": [
+        {
+          "adapter_kind": "confined_skill_script",
+          "argv": [
+            "python",
+            "skill/scripts/helper_tool.py",
+            "--input",
+            "{\"conversion_ref\": \"conversion-demo-005\", \"privacy_classification\": \"synthetic\", \"source_evidence\": [{\"ref\": \"fixture:conversion-demo-005\", \"status\": \"confirmed\"}], \"workflow\": \"onboarding\"}"
+          ],
+          "error": null,
+          "exit_code": 0,
+          "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_hash": "3660b76921ae192564eaffe3649cef7a8900e0e997505ad2b37d2c3a736ff2bb",
+          "timed_out": false,
+          "tool_hash": "7bbb97d41df1818f22621a347585e5acf952baf3ba9af56ca74be0ef584b27aa",
+          "tool_id": "sales-customer-management:scripts/helper_tool.py",
+          "version": "skill-release"
+        }
+      ],
+      "toolchain": {}
+    },
+    {
+      "artifact_hashes": [
+        "6f95ea5f0c49551f6aad625892393835af689e05dff4211620977827938a7323",
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      ],
+      "case_id": "post-conversion-renewal-refusal",
+      "environment": {
+        "executor_version": "linkskills-eval-executor/0.4.0",
+        "machine": "x86_64",
+        "network_isolation": "unproven",
+        "platform": "Linux-6.18.35-x86_64-with-glibc2.39",
+        "python_version": "3.12.13",
+        "repo_root": "/workspace/LiNKskills",
+        "system": "Linux",
+        "workspace_root": "/tmp/linkskills-eval-p_49q0bg"
+      },
+      "evidence_source": "executor",
+      "execution_profile_hash": "7cf84772db2140b61686e7c5de7a1aaf3353aea2096ac5f38f1ccb75deaa5b44",
+      "executor_version": "linkskills-eval-executor/0.4.0",
+      "exit_code": 0,
+      "finished_at": "2026-09-01T03:37:46Z",
+      "issuer_id": "linkskills-eval-runner",
+      "issuer_signature": "c91605c75d94e2ec1d226cd51b1c011f9980a1e1f243f8b2090c68354af23fbc",
+      "network_isolation": "unproven",
+      "provenance_kind": "eval_runner_hmac_v1",
+      "receipt_hash": "1984c6a9d6ed79077ce958e4281a0574f6d32448058a417bc49654f731f95be3",
+      "receipt_id": "a4fb99bf-f6aa-4eca-bf6b-3985369410e4",
+      "skill_id": "sales-customer-management",
+      "skill_release_hash": "skill-release:cf4533d190b3c66ad4b260d317f0657db682b698b723f7a6249445d1e940d912",
+      "started_at": "2026-09-01T03:37:46Z",
+      "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_hash": "6f95ea5f0c49551f6aad625892393835af689e05dff4211620977827938a7323",
+      "suite_hash": "bd871c0feab9b30ecff52a61bdd61daebd048bdda27ad7a9b0e2668d4246eec5",
+      "suite_id": "sales-customer-management-suite",
+      "tool_calls": [
+        {
+          "adapter_kind": "confined_skill_script",
+          "argv": [
+            "python",
+            "skill/scripts/helper_tool.py",
+            "--input",
+            "{\"conversion_ref\": \"conversion-demo-005\", \"privacy_classification\": \"synthetic\", \"source_evidence\": [{\"ref\": \"fixture:conversion-demo-005\", \"status\": \"confirmed\"}], \"workflow\": \"renewal_risk\"}"
+          ],
+          "error": null,
+          "exit_code": 0,
+          "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_hash": "6f95ea5f0c49551f6aad625892393835af689e05dff4211620977827938a7323",
+          "timed_out": false,
+          "tool_hash": "7bbb97d41df1818f22621a347585e5acf952baf3ba9af56ca74be0ef584b27aa",
+          "tool_id": "sales-customer-management:scripts/helper_tool.py",
+          "version": "skill-release"
+        }
+      ],
+      "toolchain": {}
+    },
+    {
+      "artifact_hashes": [
+        "3109fb6bccebfefe38a689389c706905b181c7544a1641877b63d3de09707d8b",
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      ],
+      "case_id": "high-risk-founder-escalation",
+      "environment": {
+        "executor_version": "linkskills-eval-executor/0.4.0",
+        "machine": "x86_64",
+        "network_isolation": "unproven",
+        "platform": "Linux-6.18.35-x86_64-with-glibc2.39",
+        "python_version": "3.12.13",
+        "repo_root": "/workspace/LiNKskills",
+        "system": "Linux",
+        "workspace_root": "/tmp/linkskills-eval-p_49q0bg"
+      },
+      "evidence_source": "executor",
+      "execution_profile_hash": "7cf84772db2140b61686e7c5de7a1aaf3353aea2096ac5f38f1ccb75deaa5b44",
+      "executor_version": "linkskills-eval-executor/0.4.0",
+      "exit_code": 0,
+      "finished_at": "2026-09-01T03:37:46Z",
+      "issuer_id": "linkskills-eval-runner",
+      "issuer_signature": "42ba438bf5c97a160a605756196cdb2885537f0cbca3382e80bdf55acf7e4ab5",
+      "network_isolation": "unproven",
+      "provenance_kind": "eval_runner_hmac_v1",
+      "receipt_hash": "764bbb85b9f3074502d0d8a53e5a1fe379508fbb9bb162097e866e9892863e97",
+      "receipt_id": "b940ece6-d820-4dcf-9698-0b651923fe5f",
+      "skill_id": "sales-customer-management",
+      "skill_release_hash": "skill-release:cf4533d190b3c66ad4b260d317f0657db682b698b723f7a6249445d1e940d912",
+      "started_at": "2026-09-01T03:37:46Z",
+      "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_hash": "3109fb6bccebfefe38a689389c706905b181c7544a1641877b63d3de09707d8b",
+      "suite_hash": "bd871c0feab9b30ecff52a61bdd61daebd048bdda27ad7a9b0e2668d4246eec5",
+      "suite_id": "sales-customer-management-suite",
+      "tool_calls": [
+        {
+          "adapter_kind": "confined_skill_script",
+          "argv": [
+            "python",
+            "skill/scripts/helper_tool.py",
+            "--input",
+            "{\"privacy_classification\": \"synthetic\", \"source_evidence\": [{\"ref\": \"fixture:account-demo-006\", \"status\": \"confirmed\"}], \"workflow\": \"founder_escalation\"}"
+          ],
+          "error": null,
+          "exit_code": 0,
+          "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_hash": "3109fb6bccebfefe38a689389c706905b181c7544a1641877b63d3de09707d8b",
+          "timed_out": false,
+          "tool_hash": "7bbb97d41df1818f22621a347585e5acf952baf3ba9af56ca74be0ef584b27aa",
+          "tool_id": "sales-customer-management:scripts/helper_tool.py",
+          "version": "skill-release"
+        }
+      ],
+      "toolchain": {}
+    },
+    {
+      "artifact_hashes": [
+        "31ddf8b3e6ef4a5c40bfd907e080d947a0617aae31cc74076f2f5e2bd8f6a940",
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      ],
+      "case_id": "authority-denial",
+      "environment": {
+        "executor_version": "linkskills-eval-executor/0.4.0",
+        "machine": "x86_64",
+        "network_isolation": "unproven",
+        "platform": "Linux-6.18.35-x86_64-with-glibc2.39",
+        "python_version": "3.12.13",
+        "repo_root": "/workspace/LiNKskills",
+        "system": "Linux",
+        "workspace_root": "/tmp/linkskills-eval-p_49q0bg"
+      },
+      "evidence_source": "executor",
+      "execution_profile_hash": "7cf84772db2140b61686e7c5de7a1aaf3353aea2096ac5f38f1ccb75deaa5b44",
+      "executor_version": "linkskills-eval-executor/0.4.0",
+      "exit_code": 0,
+      "finished_at": "2026-09-01T03:37:46Z",
+      "issuer_id": "linkskills-eval-runner",
+      "issuer_signature": "f757f3280a7c0384726f608c2a30eb1b356debadd9f4651d2c17f782d1253854",
+      "network_isolation": "unproven",
+      "provenance_kind": "eval_runner_hmac_v1",
+      "receipt_hash": "ae4ac472bc00af6639a834d44b24bb02a9585f49d095094e1b35a160b9441b73",
+      "receipt_id": "635c8561-6540-47b0-b519-71ed234db3f5",
+      "skill_id": "sales-customer-management",
+      "skill_release_hash": "skill-release:cf4533d190b3c66ad4b260d317f0657db682b698b723f7a6249445d1e940d912",
+      "started_at": "2026-09-01T03:37:46Z",
+      "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_hash": "31ddf8b3e6ef4a5c40bfd907e080d947a0617aae31cc74076f2f5e2bd8f6a940",
+      "suite_hash": "bd871c0feab9b30ecff52a61bdd61daebd048bdda27ad7a9b0e2668d4246eec5",
+      "suite_id": "sales-customer-management-suite",
+      "tool_calls": [
+        {
+          "adapter_kind": "confined_skill_script",
+          "argv": [
+            "python",
+            "skill/scripts/helper_tool.py",
+            "--input",
+            "{\"privacy_classification\": \"synthetic\", \"source_evidence\": [{\"ref\": \"fixture:lead-demo-authority\", \"status\": \"confirmed\"}], \"workflow\": \"pipeline\"}"
+          ],
+          "error": null,
+          "exit_code": 0,
+          "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_hash": "31ddf8b3e6ef4a5c40bfd907e080d947a0617aae31cc74076f2f5e2bd8f6a940",
+          "timed_out": false,
+          "tool_hash": "7bbb97d41df1818f22621a347585e5acf952baf3ba9af56ca74be0ef584b27aa",
+          "tool_id": "sales-customer-management:scripts/helper_tool.py",
+          "version": "skill-release"
+        }
+      ],
+      "toolchain": {}
+    },
+    {
+      "artifact_hashes": [
+        "4223255521439f5c7fa91724f53e09934eb7fd0990ef1b6d24104a63b87a739e",
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      ],
+      "case_id": "privacy-denial",
+      "environment": {
+        "executor_version": "linkskills-eval-executor/0.4.0",
+        "machine": "x86_64",
+        "network_isolation": "unproven",
+        "platform": "Linux-6.18.35-x86_64-with-glibc2.39",
+        "python_version": "3.12.13",
+        "repo_root": "/workspace/LiNKskills",
+        "system": "Linux",
+        "workspace_root": "/tmp/linkskills-eval-p_49q0bg"
+      },
+      "evidence_source": "executor",
+      "execution_profile_hash": "7cf84772db2140b61686e7c5de7a1aaf3353aea2096ac5f38f1ccb75deaa5b44",
+      "executor_version": "linkskills-eval-executor/0.4.0",
+      "exit_code": 0,
+      "finished_at": "2026-09-01T03:37:46Z",
+      "issuer_id": "linkskills-eval-runner",
+      "issuer_signature": "259b1590134d2c86d964540d62fcf8c9dd738a55a0c080d521592605fec0f4fa",
+      "network_isolation": "unproven",
+      "provenance_kind": "eval_runner_hmac_v1",
+      "receipt_hash": "0e8b2a53dd52ba14258963520804167923e5b10c6645ec04f1c7cb79b881f891",
+      "receipt_id": "8e39572d-d857-42b7-a12b-2ace0f803fc1",
+      "skill_id": "sales-customer-management",
+      "skill_release_hash": "skill-release:cf4533d190b3c66ad4b260d317f0657db682b698b723f7a6249445d1e940d912",
+      "started_at": "2026-09-01T03:37:46Z",
+      "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_hash": "4223255521439f5c7fa91724f53e09934eb7fd0990ef1b6d24104a63b87a739e",
+      "suite_hash": "bd871c0feab9b30ecff52a61bdd61daebd048bdda27ad7a9b0e2668d4246eec5",
+      "suite_id": "sales-customer-management-suite",
+      "tool_calls": [
+        {
+          "adapter_kind": "confined_skill_script",
+          "argv": [
+            "python",
+            "skill/scripts/helper_tool.py",
+            "--input",
+            "{\"privacy_classification\": \"restricted\", \"source_evidence\": [{\"ref\": \"fixture:redacted\", \"status\": \"confirmed\"}], \"workflow\": \"qualification\"}"
+          ],
+          "error": null,
+          "exit_code": 0,
+          "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_hash": "4223255521439f5c7fa91724f53e09934eb7fd0990ef1b6d24104a63b87a739e",
+          "timed_out": false,
+          "tool_hash": "7bbb97d41df1818f22621a347585e5acf952baf3ba9af56ca74be0ef584b27aa",
+          "tool_id": "sales-customer-management:scripts/helper_tool.py",
+          "version": "skill-release"
+        }
+      ],
+      "toolchain": {}
+    },
+    {
+      "artifact_hashes": [
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "e4833e59f35ecb7aa1fec02bff257864ffb78d3f45e56ac5973429127847cb8b"
+      ],
+      "case_id": "tool-failure",
+      "environment": {
+        "executor_version": "linkskills-eval-executor/0.4.0",
+        "machine": "x86_64",
+        "network_isolation": "unproven",
+        "platform": "Linux-6.18.35-x86_64-with-glibc2.39",
+        "python_version": "3.12.13",
+        "repo_root": "/workspace/LiNKskills",
+        "system": "Linux",
+        "workspace_root": "/tmp/linkskills-eval-p_49q0bg"
+      },
+      "evidence_source": "executor",
+      "execution_profile_hash": "7cf84772db2140b61686e7c5de7a1aaf3353aea2096ac5f38f1ccb75deaa5b44",
+      "executor_version": "linkskills-eval-executor/0.4.0",
+      "exit_code": 0,
+      "finished_at": "2026-09-01T03:37:46Z",
+      "issuer_id": "linkskills-eval-runner",
+      "issuer_signature": "94093a6a01d21152e990d0a7d92defb8090e6276e5e0e3ce19ca2ed70587875b",
+      "network_isolation": "unproven",
+      "provenance_kind": "eval_runner_hmac_v1",
+      "receipt_hash": "107ed46a1a539d4f3c3026847af9a646697ee2be39089b0c427a12edd8826d10",
+      "receipt_id": "cbc10d85-29bc-44f0-b76c-632febc00afd",
+      "skill_id": "sales-customer-management",
+      "skill_release_hash": "skill-release:cf4533d190b3c66ad4b260d317f0657db682b698b723f7a6249445d1e940d912",
+      "started_at": "2026-09-01T03:37:46Z",
+      "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_hash": "e4833e59f35ecb7aa1fec02bff257864ffb78d3f45e56ac5973429127847cb8b",
+      "suite_hash": "bd871c0feab9b30ecff52a61bdd61daebd048bdda27ad7a9b0e2668d4246eec5",
+      "suite_id": "sales-customer-management-suite",
+      "tool_calls": [
+        {
+          "adapter_kind": "confined_skill_script",
+          "argv": [
+            "python",
+            "skill/scripts/helper_tool.py",
+            "--input",
+            "{\"privacy_classification\": \"synthetic\", \"source_evidence\": [], \"workflow\": \"pipeline\"}"
+          ],
+          "error": null,
+          "exit_code": 0,
+          "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_hash": "e4833e59f35ecb7aa1fec02bff257864ffb78d3f45e56ac5973429127847cb8b",
+          "timed_out": false,
+          "tool_hash": "7bbb97d41df1818f22621a347585e5acf952baf3ba9af56ca74be0ef584b27aa",
+          "tool_id": "sales-customer-management:scripts/helper_tool.py",
+          "version": "skill-release"
+        }
+      ],
+      "toolchain": {}
+    },
+    {
+      "artifact_hashes": [
+        "10f80434c695bf42e08a2507191f11560e950486a733704ffe137aff1701e423",
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      ],
+      "case_id": "other-specify",
+      "environment": {
+        "executor_version": "linkskills-eval-executor/0.4.0",
+        "machine": "x86_64",
+        "network_isolation": "unproven",
+        "platform": "Linux-6.18.35-x86_64-with-glibc2.39",
+        "python_version": "3.12.13",
+        "repo_root": "/workspace/LiNKskills",
+        "system": "Linux",
+        "workspace_root": "/tmp/linkskills-eval-p_49q0bg"
+      },
+      "evidence_source": "executor",
+      "execution_profile_hash": "7cf84772db2140b61686e7c5de7a1aaf3353aea2096ac5f38f1ccb75deaa5b44",
+      "executor_version": "linkskills-eval-executor/0.4.0",
+      "exit_code": 0,
+      "finished_at": "2026-09-01T03:37:47Z",
+      "issuer_id": "linkskills-eval-runner",
+      "issuer_signature": "c90761e8dbd774d8b9844de7ce07eb99ed4b3bb4848608b9faf3743dce7f55ab",
+      "network_isolation": "unproven",
+      "provenance_kind": "eval_runner_hmac_v1",
+      "receipt_hash": "3759de90e5c4b27a021cedad0f09c4b833cca71f12b9bc29e10031aa206ef292",
+      "receipt_id": "1b0c9498-eb9a-4932-9f9d-ca98480bd3e9",
+      "skill_id": "sales-customer-management",
+      "skill_release_hash": "skill-release:cf4533d190b3c66ad4b260d317f0657db682b698b723f7a6249445d1e940d912",
+      "started_at": "2026-09-01T03:37:46Z",
+      "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_hash": "10f80434c695bf42e08a2507191f11560e950486a733704ffe137aff1701e423",
+      "suite_hash": "bd871c0feab9b30ecff52a61bdd61daebd048bdda27ad7a9b0e2668d4246eec5",
+      "suite_id": "sales-customer-management-suite",
+      "tool_calls": [
+        {
+          "adapter_kind": "confined_skill_script",
+          "argv": [
+            "python",
+            "skill/scripts/helper_tool.py",
+            "--input",
+            "{\"privacy_classification\": \"synthetic\", \"source_evidence\": [{\"ref\": \"fixture:other-demo\", \"status\": \"confirmed\"}], \"workflow\": \"other\"}"
+          ],
+          "error": null,
+          "exit_code": 0,
+          "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_hash": "10f80434c695bf42e08a2507191f11560e950486a733704ffe137aff1701e423",
+          "timed_out": false,
+          "tool_hash": "7bbb97d41df1818f22621a347585e5acf952baf3ba9af56ca74be0ef584b27aa",
+          "tool_id": "sales-customer-management:scripts/helper_tool.py",
+          "version": "skill-release"
+        }
+      ],
+      "toolchain": {}
+    },
+    {
+      "artifact_hashes": [
+        "10f9a702f33fb55b99183af1c2948262e8b4d3b411a9ba1215f007b4f1c9499e",
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      ],
+      "case_id": "qualification-does-not-imply-priority",
+      "environment": {
+        "executor_version": "linkskills-eval-executor/0.4.0",
+        "machine": "x86_64",
+        "network_isolation": "unproven",
+        "platform": "Linux-6.18.35-x86_64-with-glibc2.39",
+        "python_version": "3.12.13",
+        "repo_root": "/workspace/LiNKskills",
+        "system": "Linux",
+        "workspace_root": "/tmp/linkskills-eval-p_49q0bg"
+      },
+      "evidence_source": "executor",
+      "execution_profile_hash": "7cf84772db2140b61686e7c5de7a1aaf3353aea2096ac5f38f1ccb75deaa5b44",
+      "executor_version": "linkskills-eval-executor/0.4.0",
+      "exit_code": 0,
+      "finished_at": "2026-09-01T03:37:47Z",
+      "issuer_id": "linkskills-eval-runner",
+      "issuer_signature": "71af33f9f8010b63c24467f4d344072eab840bed9f26fe8060e166228f1fc8db",
+      "network_isolation": "unproven",
+      "provenance_kind": "eval_runner_hmac_v1",
+      "receipt_hash": "2bf4ab5f1cebfddb8d9902817f8b85afad86b35f05cf6288e3c86a4d14a70522",
+      "receipt_id": "78d35a36-21a8-4c1c-b0e7-ce1cf8c80eac",
+      "skill_id": "sales-customer-management",
+      "skill_release_hash": "skill-release:cf4533d190b3c66ad4b260d317f0657db682b698b723f7a6249445d1e940d912",
+      "started_at": "2026-09-01T03:37:47Z",
+      "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_hash": "10f9a702f33fb55b99183af1c2948262e8b4d3b411a9ba1215f007b4f1c9499e",
+      "suite_hash": "bd871c0feab9b30ecff52a61bdd61daebd048bdda27ad7a9b0e2668d4246eec5",
+      "suite_id": "sales-customer-management-suite",
+      "tool_calls": [
+        {
+          "adapter_kind": "confined_skill_script",
+          "argv": [
+            "python",
+            "skill/scripts/helper_tool.py",
+            "--input",
+            "{\"privacy_classification\": \"synthetic\", \"source_evidence\": [{\"ref\": \"fixture:lead-demo-007\", \"status\": \"confirmed\"}], \"workflow\": \"qualification\"}"
+          ],
+          "error": null,
+          "exit_code": 0,
+          "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_hash": "10f9a702f33fb55b99183af1c2948262e8b4d3b411a9ba1215f007b4f1c9499e",
+          "timed_out": false,
+          "tool_hash": "7bbb97d41df1818f22621a347585e5acf952baf3ba9af56ca74be0ef584b27aa",
+          "tool_id": "sales-customer-management:scripts/helper_tool.py",
+          "version": "skill-release"
+        }
+      ],
+      "toolchain": {}
+    },
+    {
+      "artifact_hashes": [
+        "261e9b40560602e0d8a1633498983385e5d70fea7956b013f1166e39b0e8ce09",
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      ],
+      "case_id": "priority-cannot-upgrade-qualification",
+      "environment": {
+        "executor_version": "linkskills-eval-executor/0.4.0",
+        "machine": "x86_64",
+        "network_isolation": "unproven",
+        "platform": "Linux-6.18.35-x86_64-with-glibc2.39",
+        "python_version": "3.12.13",
+        "repo_root": "/workspace/LiNKskills",
+        "system": "Linux",
+        "workspace_root": "/tmp/linkskills-eval-p_49q0bg"
+      },
+      "evidence_source": "executor",
+      "execution_profile_hash": "7cf84772db2140b61686e7c5de7a1aaf3353aea2096ac5f38f1ccb75deaa5b44",
+      "executor_version": "linkskills-eval-executor/0.4.0",
+      "exit_code": 0,
+      "finished_at": "2026-09-01T03:37:47Z",
+      "issuer_id": "linkskills-eval-runner",
+      "issuer_signature": "c74fc873de33a37e197c7b2c34cca64996f917ac876435bf8df0bc54eacac266",
+      "network_isolation": "unproven",
+      "provenance_kind": "eval_runner_hmac_v1",
+      "receipt_hash": "b55760f038689f395eef454a7d022805df6a5bede5ef4fdb8cd8c97d5de916aa",
+      "receipt_id": "4859eae3-9bc4-42f8-8ef0-05541993b446",
+      "skill_id": "sales-customer-management",
+      "skill_release_hash": "skill-release:cf4533d190b3c66ad4b260d317f0657db682b698b723f7a6249445d1e940d912",
+      "started_at": "2026-09-01T03:37:47Z",
+      "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_hash": "261e9b40560602e0d8a1633498983385e5d70fea7956b013f1166e39b0e8ce09",
+      "suite_hash": "bd871c0feab9b30ecff52a61bdd61daebd048bdda27ad7a9b0e2668d4246eec5",
+      "suite_id": "sales-customer-management-suite",
+      "tool_calls": [
+        {
+          "adapter_kind": "confined_skill_script",
+          "argv": [
+            "python",
+            "skill/scripts/helper_tool.py",
+            "--input",
+            "{\"priority_signals\": {\"impact\": 2, \"readiness\": 2, \"urgency\": 2}, \"privacy_classification\": \"synthetic\", \"source_evidence\": [{\"ref\": \"fixture:lead-demo-008\", \"status\": \"not_reported\"}], \"workflow\": \"qualification\"}"
+          ],
+          "error": null,
+          "exit_code": 0,
+          "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_hash": "261e9b40560602e0d8a1633498983385e5d70fea7956b013f1166e39b0e8ce09",
+          "timed_out": false,
+          "tool_hash": "7bbb97d41df1818f22621a347585e5acf952baf3ba9af56ca74be0ef584b27aa",
+          "tool_id": "sales-customer-management:scripts/helper_tool.py",
+          "version": "skill-release"
+        }
+      ],
+      "toolchain": {}
+    },
+    {
+      "artifact_hashes": [
+        "7ebff92a7a5e5de1c447769bed80440de27072c2c19d7f6876f01a8678bd81af",
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      ],
+      "case_id": "payment-authority-denial",
+      "environment": {
+        "executor_version": "linkskills-eval-executor/0.4.0",
+        "machine": "x86_64",
+        "network_isolation": "unproven",
+        "platform": "Linux-6.18.35-x86_64-with-glibc2.39",
+        "python_version": "3.12.13",
+        "repo_root": "/workspace/LiNKskills",
+        "system": "Linux",
+        "workspace_root": "/tmp/linkskills-eval-p_49q0bg"
+      },
+      "evidence_source": "executor",
+      "execution_profile_hash": "7cf84772db2140b61686e7c5de7a1aaf3353aea2096ac5f38f1ccb75deaa5b44",
+      "executor_version": "linkskills-eval-executor/0.4.0",
+      "exit_code": 0,
+      "finished_at": "2026-09-01T03:37:47Z",
+      "issuer_id": "linkskills-eval-runner",
+      "issuer_signature": "fcb032d8c4ea6dec2641cc2648c69d0d3be6b99a737bdb4107a1024dab3c8686",
+      "network_isolation": "unproven",
+      "provenance_kind": "eval_runner_hmac_v1",
+      "receipt_hash": "82137af34861755946411f64095b219dbceb8021382f3121b6c81ec0e51c8470",
+      "receipt_id": "669e786d-e025-4761-b644-cf54037f8a3e",
+      "skill_id": "sales-customer-management",
+      "skill_release_hash": "skill-release:cf4533d190b3c66ad4b260d317f0657db682b698b723f7a6249445d1e940d912",
+      "started_at": "2026-09-01T03:37:47Z",
+      "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_hash": "7ebff92a7a5e5de1c447769bed80440de27072c2c19d7f6876f01a8678bd81af",
+      "suite_hash": "bd871c0feab9b30ecff52a61bdd61daebd048bdda27ad7a9b0e2668d4246eec5",
+      "suite_id": "sales-customer-management-suite",
+      "tool_calls": [
+        {
+          "adapter_kind": "confined_skill_script",
+          "argv": [
+            "python",
+            "skill/scripts/helper_tool.py",
+            "--input",
+            "{\"conversion_ref\": \"conversion-demo-payment\", \"privacy_classification\": \"synthetic\", \"source_evidence\": [{\"ref\": \"fixture:conversion-demo-payment\", \"status\": \"confirmed\"}], \"workflow\": \"renewal_risk\"}"
+          ],
+          "error": null,
+          "exit_code": 0,
+          "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_hash": "7ebff92a7a5e5de1c447769bed80440de27072c2c19d7f6876f01a8678bd81af",
+          "timed_out": false,
+          "tool_hash": "7bbb97d41df1818f22621a347585e5acf952baf3ba9af56ca74be0ef584b27aa",
+          "tool_id": "sales-customer-management:scripts/helper_tool.py",
+          "version": "skill-release"
+        }
+      ],
+      "toolchain": {}
+    }
+  ],
+  "hard_fail_dimensions": [],
+  "judge_kind": "independent_deterministic",
+  "passed": true,
+  "profile_hash": null,
+  "reasons": [],
+  "receipt_hashes": [],
+  "skill_id": "sales-customer-management",
+  "skill_release_hash": "skill-release:cf4533d190b3c66ad4b260d317f0657db682b698b723f7a6249445d1e940d912",
+  "suite_hash": "bd871c0feab9b30ecff52a61bdd61daebd048bdda27ad7a9b0e2668d4246eec5",
+  "suite_id": "sales-customer-management-suite",
+  "suite_version": "1.1.0",
+  "toolchain": {},
+  "weighted_score": 1.0
+}

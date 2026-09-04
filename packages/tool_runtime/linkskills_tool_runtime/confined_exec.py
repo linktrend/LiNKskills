@@ -261,7 +261,10 @@ def collect_runtime_read_paths(
     exe = str(argv[0])
     resolved_exe = shutil.which(exe) if not os.path.isabs(exe) else exe
     if resolved_exe:
-        add(resolved_exe)
+        # Bind the executable's directory, not the executable path itself.
+        # Container Python commonly exposes /usr/local/bin/python* as symlinks;
+        # bwrap rejects a nested bind whose destination is a symlink even when
+        # the already-bound parent directory contains the executable safely.
         add(Path(resolved_exe).parent)
     for prefix in (sys.prefix, getattr(sys, "base_prefix", sys.prefix), sys.exec_prefix):
         add(prefix)

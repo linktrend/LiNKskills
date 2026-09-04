@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0",
+  "packet_id": "LSALES-WP-005",
+  "release_id": "sales-customer-management@1.1.0",
+  "certification_state": "eval_pending",
+  "architecture_disposition": {
+    "conflict_id": "AC-LSALES-001",
+    "status": "RESOLVED BY MASTER ARCHITECT",
+    "pre_conversion_owner": "LiNKsales",
+    "post_conversion_owner": "LiNKclient",
+    "decision_reopened": false
+  },
+  "review": {
+    "overlap_licence_security_maintenance": "passed",
+    "record": "skills/sales-customer-management/references/api-specs.md",
+    "execution_authority_granted": false
+  },
+  "eval": {
+    "suite": "skills/sales-customer-management/references/eval-suite.json",
+    "focused_test": "tests/skills/sales-customer-management/test_release.py",
+    "state": "prior_receipt_stale_after_review_schema_repair",
+    "prior_receipt_release_hash": "skill-release:cf4533d190b3c66ad4b260d317f0657db682b698b723f7a6249445d1e940d912",
+    "recheck_required": true,
+    "command": "python3 -m unittest discover -s tests/skills/sales-customer-management -p 'test_*.py' -v",
+    "real_runner_receipt": "evidence/linksales/sales-customer-management/eval-runner-receipt.json"
+  },
+  "publication": {
+    "contract": "EXT-F5-SKILLS-PUBLICATION-V1",
+    "catalog_fragment": "catalog/fragments/programs/linksales-sales-customer-management.json",
+    "availability": "HOLD",
+    "mutable_aliases_accepted": false,
+    "hold_reason": "Eval execution passed, but sealed isolation and live publication/consumer acceptance are unavailable"
+  },
+  "authority_limits": [
+    "no-send",
+    "no-Odoo",
+    "no-payment",
+    "no-CRM-mutation",
+    "no-live-sales-authority"
+  ],
+  "source": {
+    "implementation_commit": "e9403440b95eb9fedf861bd27eff21f5bf4d3fd5",
+    "implementation_tree": "58007ea8b8523b6dd52505d0a235ebb95347e3d6"
+  },
+  "release": {
+    "tag": "sales-customer-management-v1.1.0",
+    "content_digest": "skill-release:790e849c4fa5a1bdd6ce5eaee7dc38e8850e4c5937846f79c057d963092bded0",
+    "manifest": "evidence/linksales/sales-customer-management/release-manifest.json"
+  }
+}

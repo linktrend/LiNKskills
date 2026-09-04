@@ -1,0 +1,22 @@
+# Canonical baseline; concrete fixtures and runner binding are in eval-suite.json.
+skill_id: target-definition-segmentation
+suite_version: 0.1.0
+rubric:
+  - dimension: schema_and_reference_integrity
+    weight: 0.40
+    hard_fail_below: 1.0
+  - dimension: authority_effect_and_sensitive_boundary
+    weight: 0.40
+    hard_fail_below: 1.0
+  - dimension: deterministic_exact_output
+    weight: 0.20
+    hard_fail_below: 1.0
+pass_threshold: 1.0
+scenarios:
+  - id: concrete-fixtures-bound-to-runner
+    class: deterministic
+    input: references/eval-suite.json
+    expected_criteria:
+      - exact outputs and assertions pass through scripts/helper_tool.py --run-suite
+judge:
+  min_reasoning_tier: high

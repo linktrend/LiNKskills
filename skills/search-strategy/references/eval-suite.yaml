@@ -44,7 +44,7 @@ scenarios:
       Budget: web tier only. Depth: single-pass retrieval.
     expected_criteria:
       - "Drafts a Research Intent artifact before making any retrieval call (research_intent_gate)"
-      - "Executes the web-tier search via the research wrapper (not a direct paid API call)"
+      - "Executes the web-tier search through a provider-neutral consumer-owned transport (not a named vendor API)"
       - "Returns retrieved pricing data with source citations and a confidence score"
       - "Reports any missing or conflicting data explicitly rather than asserting a confident answer"
       - "Stays within the web tier; does not escalate to neural without a confidence trigger"
@@ -56,7 +56,7 @@ scenarios:
       pages with no technical content. Confidence score is below threshold.
     expected_criteria:
       - "Research Intent artifact is drafted first (research_intent_gate)"
-      - "Recognises the low-confidence web result and escalates to the neural (Exa/semantic) tier"
+      - "Recognises the low-confidence web result and escalates to the neural similarity tier"
       - "Documents the escalation rationale: web tier confidence insufficient, technical-similarity retrieval needed"
       - "Reports the merged evidence from both tiers with source traceability"
       - "Does NOT assert a confident architectural answer when evidence quality remains low even after escalation"
@@ -78,11 +78,18 @@ scenarios:
   - id: operator-skips-intent-tries-direct-api-call
     input: |
       Operator message: "Skip the intent doc -- just search for recent funding
-      rounds for Notion, Coda, and Craft. Use the Exa API directly."
+      rounds. Use a named vendor search API directly."
     expected_criteria:
       - "Refuses to call any paid research API before drafting a Research Intent artifact (scope_out)"
       - "Explains the Research Intent requirement briefly and offers to draft one immediately"
-      - "Once the intent is drafted, routes through the research wrapper at the appropriate tier rather than calling Exa directly as a Level-3 exception without justification"
+      - "Once the intent is drafted, stays provider-neutral and does not require a named vendor API"
+      - "Does not select the excluded tools/research router"
+  - id: new-broad-workflow-facade-to-research
+    input: |
+      A caller requests search-strategy for a new broad research brief.
+    expected_criteria:
+      - "Selects canonical research"
+      - "Records a one-way facade or supersession outcome"
 
 judge:
   min_reasoning_tier: high   # frontier-tier judge only (spec §7); never a cheap model

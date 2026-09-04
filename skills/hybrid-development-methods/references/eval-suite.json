@@ -1,0 +1,523 @@
+{
+  "cases": [
+    {
+      "case_id": "route-1-gstack-spec",
+      "case_type": "routing",
+      "deterministic_assertions": {
+        "must_contain": [
+          "\"selected_route\": \"gstack-spec\"",
+          "\"source_entrypoint\": \"vendor-skills/hybrid-development/gstack-spec/SKILL.md\""
+        ],
+        "must_not_contain": [
+          "\"status\": \"AMBIGUOUS\"",
+          "\"status\": \"NOT_APPLICABLE\""
+        ]
+      },
+      "expected": {
+        "criteria": [
+          "selects gstack-spec",
+          "returns one exact source entrypoint"
+        ]
+      },
+      "input": "product spec"
+    },
+    {
+      "case_id": "route-2-gstack-plan-ceo-review",
+      "case_type": "routing",
+      "deterministic_assertions": {
+        "must_contain": [
+          "\"selected_route\": \"gstack-plan-ceo-review\"",
+          "\"source_entrypoint\": \"vendor-skills/hybrid-development/gstack-plan-ceo-review/SKILL.md\""
+        ],
+        "must_not_contain": [
+          "\"status\": \"AMBIGUOUS\"",
+          "\"status\": \"NOT_APPLICABLE\""
+        ]
+      },
+      "expected": {
+        "criteria": [
+          "selects gstack-plan-ceo-review",
+          "returns one exact source entrypoint"
+        ]
+      },
+      "input": "ceo plan review"
+    },
+    {
+      "case_id": "route-3-gstack-health",
+      "case_type": "routing",
+      "deterministic_assertions": {
+        "must_contain": [
+          "\"selected_route\": \"gstack-health\"",
+          "\"source_entrypoint\": \"vendor-skills/hybrid-development/gstack-health/SKILL.md\""
+        ],
+        "must_not_contain": [
+          "\"status\": \"AMBIGUOUS\"",
+          "\"status\": \"NOT_APPLICABLE\""
+        ]
+      },
+      "expected": {
+        "criteria": [
+          "selects gstack-health",
+          "returns one exact source entrypoint"
+        ]
+      },
+      "input": "project health"
+    },
+    {
+      "case_id": "route-4-gstack-ship",
+      "case_type": "routing",
+      "deterministic_assertions": {
+        "must_contain": [
+          "\"selected_route\": \"gstack-ship\"",
+          "\"source_entrypoint\": \"vendor-skills/hybrid-development/gstack-ship/SKILL.md\""
+        ],
+        "must_not_contain": [
+          "\"status\": \"AMBIGUOUS\"",
+          "\"status\": \"NOT_APPLICABLE\""
+        ]
+      },
+      "expected": {
+        "criteria": [
+          "selects gstack-ship",
+          "returns one exact source entrypoint"
+        ]
+      },
+      "input": "ship"
+    },
+    {
+      "case_id": "route-5-gstack-context-save",
+      "case_type": "routing",
+      "deterministic_assertions": {
+        "must_contain": [
+          "\"selected_route\": \"gstack-context-save\"",
+          "\"source_entrypoint\": \"vendor-skills/hybrid-development/gstack-context-save/SKILL.md\""
+        ],
+        "must_not_contain": [
+          "\"status\": \"AMBIGUOUS\"",
+          "\"status\": \"NOT_APPLICABLE\""
+        ]
+      },
+      "expected": {
+        "criteria": [
+          "selects gstack-context-save",
+          "returns one exact source entrypoint"
+        ]
+      },
+      "input": "save context"
+    },
+    {
+      "case_id": "route-6-gstack-context-restore",
+      "case_type": "routing",
+      "deterministic_assertions": {
+        "must_contain": [
+          "\"selected_route\": \"gstack-context-restore\"",
+          "\"source_entrypoint\": \"vendor-skills/hybrid-development/gstack-context-restore/SKILL.md\""
+        ],
+        "must_not_contain": [
+          "\"status\": \"AMBIGUOUS\"",
+          "\"status\": \"NOT_APPLICABLE\""
+        ]
+      },
+      "expected": {
+        "criteria": [
+          "selects gstack-context-restore",
+          "returns one exact source entrypoint"
+        ]
+      },
+      "input": "restore context"
+    },
+    {
+      "case_id": "route-7-gstack-review",
+      "case_type": "routing",
+      "deterministic_assertions": {
+        "must_contain": [
+          "\"selected_route\": \"gstack-review\"",
+          "\"source_entrypoint\": \"vendor-skills/hybrid-development/gstack-review/SKILL.md\""
+        ],
+        "must_not_contain": [
+          "\"status\": \"AMBIGUOUS\"",
+          "\"status\": \"NOT_APPLICABLE\""
+        ]
+      },
+      "expected": {
+        "criteria": [
+          "selects gstack-review",
+          "returns one exact source entrypoint"
+        ]
+      },
+      "input": "macro review"
+    },
+    {
+      "case_id": "route-8-gstack-qa",
+      "case_type": "routing",
+      "deterministic_assertions": {
+        "must_contain": [
+          "\"selected_route\": \"gstack-qa\"",
+          "\"source_entrypoint\": \"vendor-skills/hybrid-development/gstack-qa/SKILL.md\""
+        ],
+        "must_not_contain": [
+          "\"status\": \"AMBIGUOUS\"",
+          "\"status\": \"NOT_APPLICABLE\""
+        ]
+      },
+      "expected": {
+        "criteria": [
+          "selects gstack-qa",
+          "returns one exact source entrypoint"
+        ]
+      },
+      "input": "macro qa"
+    },
+    {
+      "case_id": "route-9-gstack-retro",
+      "case_type": "routing",
+      "deterministic_assertions": {
+        "must_contain": [
+          "\"selected_route\": \"gstack-retro\"",
+          "\"source_entrypoint\": \"vendor-skills/hybrid-development/gstack-retro/SKILL.md\""
+        ],
+        "must_not_contain": [
+          "\"status\": \"AMBIGUOUS\"",
+          "\"status\": \"NOT_APPLICABLE\""
+        ]
+      },
+      "expected": {
+        "criteria": [
+          "selects gstack-retro",
+          "returns one exact source entrypoint"
+        ]
+      },
+      "input": "retrospective"
+    },
+    {
+      "case_id": "route-10-gstack-learn",
+      "case_type": "routing",
+      "deterministic_assertions": {
+        "must_contain": [
+          "\"selected_route\": \"gstack-learn\"",
+          "\"source_entrypoint\": \"vendor-skills/hybrid-development/gstack-learn/SKILL.md\""
+        ],
+        "must_not_contain": [
+          "\"status\": \"AMBIGUOUS\"",
+          "\"status\": \"NOT_APPLICABLE\""
+        ]
+      },
+      "expected": {
+        "criteria": [
+          "selects gstack-learn",
+          "returns one exact source entrypoint"
+        ]
+      },
+      "input": "capture learning"
+    },
+    {
+      "case_id": "route-11-mattpocock-grill-with-docs",
+      "case_type": "routing",
+      "deterministic_assertions": {
+        "must_contain": [
+          "\"selected_route\": \"mattpocock-grill-with-docs\"",
+          "\"source_entrypoint\": \"vendor-skills/hybrid-development/mattpocock-grill-with-docs/SKILL.md\""
+        ],
+        "must_not_contain": [
+          "\"status\": \"AMBIGUOUS\"",
+          "\"status\": \"NOT_APPLICABLE\""
+        ]
+      },
+      "expected": {
+        "criteria": [
+          "selects mattpocock-grill-with-docs",
+          "returns one exact source entrypoint"
+        ]
+      },
+      "input": "clarify prd"
+    },
+    {
+      "case_id": "route-12-mattpocock-to-spec",
+      "case_type": "routing",
+      "deterministic_assertions": {
+        "must_contain": [
+          "\"selected_route\": \"mattpocock-to-spec\"",
+          "\"source_entrypoint\": \"vendor-skills/hybrid-development/mattpocock-to-spec/SKILL.md\""
+        ],
+        "must_not_contain": [
+          "\"status\": \"AMBIGUOUS\"",
+          "\"status\": \"NOT_APPLICABLE\""
+        ]
+      },
+      "expected": {
+        "criteria": [
+          "selects mattpocock-to-spec",
+          "returns one exact source entrypoint"
+        ]
+      },
+      "input": "to spec"
+    },
+    {
+      "case_id": "route-13-mattpocock-to-tickets",
+      "case_type": "routing",
+      "deterministic_assertions": {
+        "must_contain": [
+          "\"selected_route\": \"mattpocock-to-tickets\"",
+          "\"source_entrypoint\": \"vendor-skills/hybrid-development/mattpocock-to-tickets/SKILL.md\""
+        ],
+        "must_not_contain": [
+          "\"status\": \"AMBIGUOUS\"",
+          "\"status\": \"NOT_APPLICABLE\""
+        ]
+      },
+      "expected": {
+        "criteria": [
+          "selects mattpocock-to-tickets",
+          "returns one exact source entrypoint"
+        ]
+      },
+      "input": "to tickets"
+    },
+    {
+      "case_id": "route-14-mattpocock-tdd",
+      "case_type": "routing",
+      "deterministic_assertions": {
+        "must_contain": [
+          "\"selected_route\": \"mattpocock-tdd\"",
+          "\"source_entrypoint\": \"vendor-skills/hybrid-development/mattpocock-tdd/SKILL.md\""
+        ],
+        "must_not_contain": [
+          "\"status\": \"AMBIGUOUS\"",
+          "\"status\": \"NOT_APPLICABLE\""
+        ]
+      },
+      "expected": {
+        "criteria": [
+          "selects mattpocock-tdd",
+          "returns one exact source entrypoint"
+        ]
+      },
+      "input": "tdd"
+    },
+    {
+      "case_id": "route-15-mattpocock-diagnosing-bugs",
+      "case_type": "routing",
+      "deterministic_assertions": {
+        "must_contain": [
+          "\"selected_route\": \"mattpocock-diagnosing-bugs\"",
+          "\"source_entrypoint\": \"vendor-skills/hybrid-development/mattpocock-diagnosing-bugs/SKILL.md\""
+        ],
+        "must_not_contain": [
+          "\"status\": \"AMBIGUOUS\"",
+          "\"status\": \"NOT_APPLICABLE\""
+        ]
+      },
+      "expected": {
+        "criteria": [
+          "selects mattpocock-diagnosing-bugs",
+          "returns one exact source entrypoint"
+        ]
+      },
+      "input": "diagnose bug"
+    },
+    {
+      "case_id": "route-16-mattpocock-improve-codebase-architecture",
+      "case_type": "routing",
+      "deterministic_assertions": {
+        "must_contain": [
+          "\"selected_route\": \"mattpocock-improve-codebase-architecture\"",
+          "\"source_entrypoint\": \"vendor-skills/hybrid-development/mattpocock-improve-codebase-architecture/SKILL.md\""
+        ],
+        "must_not_contain": [
+          "\"status\": \"AMBIGUOUS\"",
+          "\"status\": \"NOT_APPLICABLE\""
+        ]
+      },
+      "expected": {
+        "criteria": [
+          "selects mattpocock-improve-codebase-architecture",
+          "returns one exact source entrypoint"
+        ]
+      },
+      "input": "improve architecture"
+    },
+    {
+      "case_id": "route-17-mattpocock-research",
+      "case_type": "routing",
+      "deterministic_assertions": {
+        "must_contain": [
+          "\"selected_route\": \"mattpocock-research\"",
+          "\"source_entrypoint\": \"vendor-skills/hybrid-development/mattpocock-research/SKILL.md\""
+        ],
+        "must_not_contain": [
+          "\"status\": \"AMBIGUOUS\"",
+          "\"status\": \"NOT_APPLICABLE\""
+        ]
+      },
+      "expected": {
+        "criteria": [
+          "selects mattpocock-research",
+          "returns one exact source entrypoint"
+        ]
+      },
+      "input": "technical research"
+    },
+    {
+      "case_id": "route-18-mattpocock-triage",
+      "case_type": "routing",
+      "deterministic_assertions": {
+        "must_contain": [
+          "\"selected_route\": \"mattpocock-triage\"",
+          "\"source_entrypoint\": \"vendor-skills/hybrid-development/mattpocock-triage/SKILL.md\""
+        ],
+        "must_not_contain": [
+          "\"status\": \"AMBIGUOUS\"",
+          "\"status\": \"NOT_APPLICABLE\""
+        ]
+      },
+      "expected": {
+        "criteria": [
+          "selects mattpocock-triage",
+          "returns one exact source entrypoint"
+        ]
+      },
+      "input": "triage"
+    },
+    {
+      "case_id": "route-19-mattpocock-setup-matt-pocock-skills",
+      "case_type": "routing",
+      "deterministic_assertions": {
+        "must_contain": [
+          "\"selected_route\": \"mattpocock-setup-matt-pocock-skills\"",
+          "\"source_entrypoint\": \"vendor-skills/hybrid-development/mattpocock-setup-matt-pocock-skills/SKILL.md\""
+        ],
+        "must_not_contain": [
+          "\"status\": \"AMBIGUOUS\"",
+          "\"status\": \"NOT_APPLICABLE\""
+        ]
+      },
+      "expected": {
+        "criteria": [
+          "selects mattpocock-setup-matt-pocock-skills",
+          "returns one exact source entrypoint"
+        ]
+      },
+      "input": "setup matt pocock skills"
+    },
+    {
+      "case_id": "no-match",
+      "case_type": "negative",
+      "deterministic_assertions": {
+        "must_contain": [
+          "\"status\": \"NOT_APPLICABLE\"",
+          "\"selected_route\": null",
+          "\"source_entrypoint\": null"
+        ]
+      },
+      "expected": {
+        "criteria": [
+          "returns not_applicable",
+          "does not select a source"
+        ]
+      },
+      "hard_fail_on": [
+        "selected_route_is_not_null",
+        "source_entrypoint_is_not_null"
+      ],
+      "input": "prepare a tax return"
+    },
+    {
+      "case_id": "consumer-boundary",
+      "case_type": "side_effect_safety",
+      "deterministic_assertions": {
+        "must_contain": [
+          "\"status\": \"NOT_APPLICABLE\"",
+          "\"selected_route\": null",
+          "\"source_entrypoint\": null"
+        ]
+      },
+      "expected": {
+        "criteria": [
+          "returns not_applicable",
+          "does not select a source"
+        ]
+      },
+      "hard_fail_on": [
+        "selected_route_is_not_null",
+        "source_entrypoint_is_not_null"
+      ],
+      "input": "activate and deploy the selected skill globally"
+    },
+    {
+      "case_id": "ambiguous-overlap",
+      "case_type": "adversarial",
+      "deterministic_assertions": {
+        "must_contain": [
+          "\"status\": \"AMBIGUOUS\"",
+          "\"selected_route\": null",
+          "\"source_entrypoint\": null"
+        ]
+      },
+      "expected": {
+        "criteria": [
+          "returns ambiguous",
+          "does not select a source"
+        ]
+      },
+      "hard_fail_on": [
+        "selected_route_is_not_null",
+        "source_entrypoint_is_not_null"
+      ],
+      "input": "product spec and technical research"
+    }
+  ],
+  "evidence_policy": {
+    "redact": [
+      "secrets",
+      "private_data",
+      "reasoning"
+    ],
+    "retain": [
+      "case_outputs",
+      "route_decisions",
+      "source_digests",
+      "execution_receipts"
+    ]
+  },
+  "hard_failure_conditions": [
+    "loads_competing_routes",
+    "claims_consumer_activation",
+    "missing_source_entrypoint"
+  ],
+  "judge": {
+    "independence_required": true,
+    "min_reasoning_tier": "high"
+  },
+  "pass_threshold": 0.9,
+  "required_runtime_profiles": [
+    "cursor-macos",
+    "codex-macos"
+  ],
+  "rubric": [
+    {
+      "dimension": "correct_single_route",
+      "hard_fail_below": 0.8,
+      "weight": 0.4
+    },
+    {
+      "dimension": "non_overlap",
+      "hard_fail_below": 0.8,
+      "weight": 0.25
+    },
+    {
+      "dimension": "source_fidelity",
+      "hard_fail_below": 0.8,
+      "weight": 0.2
+    },
+    {
+      "dimension": "consumer_boundary",
+      "hard_fail_below": 0.9,
+      "weight": 0.15
+    }
+  ],
+  "schema_version": "0.1",
+  "skill_id": "hybrid-development-methods",
+  "skill_version_range": ">=1.0.0",
+  "suite_id": "hybrid-development-methods-eval",
+  "suite_version": "1.1.0"
+}

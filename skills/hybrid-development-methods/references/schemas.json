@@ -1,0 +1,95 @@
+{
+  "definitions": {
+    "input": {
+      "additionalProperties": false,
+      "properties": {
+        "consumer": {
+          "enum": [
+            "ide-development",
+            "linkdeveloper-web",
+            "linkdeveloper-apps",
+            "linksites",
+            "general"
+          ],
+          "type": "string"
+        },
+        "explicit_route": {
+          "maxLength": 96,
+          "type": "string"
+        },
+        "task": {
+          "maxLength": 12000,
+          "minLength": 3,
+          "type": "string"
+        }
+      },
+      "required": [
+        "task",
+        "consumer"
+      ],
+      "type": "object"
+    },
+    "output": {
+      "additionalProperties": false,
+      "properties": {
+        "admission_state": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "alternatives": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "ordinary_selectable": {
+          "type": "boolean"
+        },
+        "reason": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "release_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "selected_route": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_entrypoint": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "status": {
+          "enum": [
+            "SELECTED",
+            "AMBIGUOUS",
+            "NOT_APPLICABLE",
+            "NOT_ELIGIBLE"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "selected_route",
+        "source_entrypoint",
+        "reason",
+        "alternatives",
+        "admission_state",
+        "ordinary_selectable",
+        "release_id"
+      ],
+      "type": "object"
+    }
+  }
+}
