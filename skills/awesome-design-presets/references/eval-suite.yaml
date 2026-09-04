@@ -1,0 +1,41 @@
+skill_id: awesome-design-presets
+suite_version: 1.0.0
+pass_threshold: 0.90
+rubric:
+  - dimension: correct_single_route
+    weight: 0.40
+    hard_fail_below: 0.80
+  - dimension: non_overlap
+    weight: 0.25
+    hard_fail_below: 0.80
+  - dimension: source_fidelity
+    weight: 0.20
+    hard_fail_below: 0.80
+  - dimension: consumer_boundary
+    weight: 0.15
+    hard_fail_below: 0.90
+scenarios:
+  - id: route-1-awesome-agentic
+    expected_criteria: ["selects awesome-agentic", "loads one source entrypoint"]
+  - id: route-2-awesome-ant
+    expected_criteria: ["selects awesome-ant", "loads one source entrypoint"]
+  - id: route-3-awesome-artistic
+    expected_criteria: ["selects awesome-artistic", "loads one source entrypoint"]
+  - id: route-4-awesome-basic
+    expected_criteria: ["selects awesome-basic", "loads one source entrypoint"]
+  - id: route-5-awesome-bento
+    expected_criteria: ["selects awesome-bento", "loads one source entrypoint"]
+  - id: route-6-awesome-bold
+    expected_criteria: ["selects awesome-bold", "loads one source entrypoint"]
+  - id: route-7-awesome-brutalism
+    expected_criteria: ["selects awesome-brutalism", "loads one source entrypoint"]
+  - id: route-8-awesome-cafe
+    expected_criteria: ["selects awesome-cafe", "loads one source entrypoint"]
+  - id: no-match
+    expected_criteria: ["returns not applicable", "does not load a source"]
+  - id: consumer-boundary
+    expected_criteria: ["does not claim activation", "preserves consumer authority"]
+judge:
+  min_reasoning_tier: high
+  independence_required: true
+# Real consumer execution evidence is required before usable certification.

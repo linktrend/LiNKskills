@@ -3,7 +3,7 @@
   "skill_id": "search-strategy",
   "display_name": "Search Strategy",
   "version": "1.0.0",
-  "description": "Defines research intent, tiered escalation, and HITL controls for cost-aware evidence retrieval workflows.",
+  "description": "One-way facade that supersedes new broad research workflows onto canonical research.",
   "capability_category": "internal_launch",
   "lifecycle_state": "draft",
   "format_profile": "heavy",
@@ -12,10 +12,12 @@
   ],
   "min_capability_tier": "balanced",
   "routing": {
-    "when_to_use": "Use when planning or executing research tasks that require confidence-based search tier escalation and operator-controlled deep research.",
+    "when_to_use": "Use only as a one-way facade or legacy alias; new broad research briefs select canonical research.",
     "when_not_to_use": [
       "Do not treat YAML-only validation as launch readiness",
-      "Do not claim usable/certified without sealed receipts"
+      "Do not claim usable/certified without sealed receipts",
+      "Do not implement a second research methodology",
+      "Do not select tools/research or a named retrieval provider"
     ],
     "tags": [
       "research",
@@ -51,7 +53,9 @@
   },
   "dependencies": {
     "schema_version": "0.1",
-    "skill_dependencies": [],
+    "skill_dependencies": [
+      "research"
+    ],
     "packaged_tools": [],
     "host_capabilities": [
       "filesystem_read"
@@ -63,7 +67,8 @@
   },
   "eval": {
     "suite_path": "references/eval-suite.json",
-    "suite_schema_version": "0.1"
+    "suite_schema_version": "0.1",
+    "suite_hash": "sha256:a37ecfb217b6f74b33bba2863e7989596a5f2c3ac7fcd44412c59abca4736b16"
   },
   "telemetry": {
     "classification": "public_internal",

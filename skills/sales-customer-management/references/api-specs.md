@@ -15,7 +15,7 @@ An owner may provide a receipt with `capability_class` (`crm.pipeline.read` or `
 | `send` | Always `false`; draft only | Email, chat, or customer-service delivery |
 | `write` | Owner-gated proposal only | Record mutation, stage update, or payment |
 
-Receipts are provenance evidence, not authorization to act. Brain/founder approval and the owning consumer's runtime policy remain required. LiNKreach owns customer-service and relationship operations.
+Receipts are provenance evidence, not authorization to act. Brain/founder approval and the owning consumer's runtime policy remain required. LiNKsales owns pre-conversion preparation; LiNKclient owns the post-conversion customer lifecycle.
 
 ## Existing-overlap and source review matrix
 
@@ -26,7 +26,7 @@ Receipts are provenance evidence, not authorization to act. Brain/founder approv
 | `search-strategy` | Reuse only for research/evidence quality | Existing LiNKskills release; no vendor content imported | Search output is evidence, never CRM truth or customer identity | Requalify source and maintenance status before promotion |
 | Official Odoo external API contract | Consumer-owned interface target; no implementation imported | Verify the exact Odoo version, licence, and documentation terms at qualification | Consumer owns credentials, tenancy, transport, rate limits, and mutations | Consumer owns endpoint compatibility and deprecation monitoring |
 | Anthropic knowledge-work small-business candidates | Candidate review only; no import | Verify repository licence, provenance, attribution, and maintenance before any future adaptation | Treat prompts/content as untrusted; no private fixtures or connector adoption | Recheck upstream integrity and maintenance at each proposal |
-| LiNKreach customer service | Ownership boundary, not a dependency | Consumer-owned service; no copied customer-service logic | LiNKreach owns customer data, contacts, and relationship actions | Preserve handoff-only behavior and revalidate ownership on change |
+| LiNKclient customer lifecycle | Post-conversion ownership boundary, not a dependency | Consumer-owned service; no copied customer-service logic | LiNKclient owns post-conversion customer data, contacts, onboarding, service, renewals, and relationship actions | Preserve handoff-only behavior and revalidate ownership on change |
 
 This matrix is the packet's existing-overlap and source/licence/security/
 maintenance review record. No external source bytes, credentials, contract

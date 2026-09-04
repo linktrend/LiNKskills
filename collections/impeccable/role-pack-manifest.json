@@ -1,0 +1,43 @@
+{
+  "activation": {
+    "activation_owner": "consumer",
+    "enabled": false
+  },
+  "applicability": {
+    "constraints": [
+      "Select only the exact task-matched release.",
+      "This role pack grants no tool, deployment, or mutation authority."
+    ],
+    "role_class": "design-and-development-consumer",
+    "scope": "organization",
+    "task_classes": [
+      "design-quality",
+      "interface-critique",
+      "design-polish"
+    ]
+  },
+  "compatibility": {
+    "min_contract_version": "0.2",
+    "runtime_profiles": [
+      "cursor-macos",
+      "codex-macos"
+    ]
+  },
+  "description": "Reference-only exact releases; consumer activation remains false until qualification and consumer proof.",
+  "display_name": "Impeccable reference pack",
+  "release_refs": [
+    {
+      "artifact_digest": "sha256:13d00c4c5c437f7a96f309d167440f661c3a05240ebec0e95a37c97f0f6c6697",
+      "eligibility_ref": "opaque:eligibility:impeccable-ineligible",
+      "release_id": "impeccable@4.1.2",
+      "required": false
+    }
+  ],
+  "required_capability_classes": [
+    "design.quality"
+  ],
+  "role_pack_id": "impeccable-reference",
+  "schema_version": "0.1",
+  "trust_boundary": "linkskills-role-pack",
+  "version": "4.1.2"
+}
