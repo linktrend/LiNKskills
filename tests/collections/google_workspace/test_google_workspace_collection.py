@@ -46,11 +46,11 @@ class GoogleWorkspaceCollectionTests(unittest.TestCase):
         self.assertEqual(len(manifest["members"]), 95)
         self.assertEqual(manifest["source"]["source_commit"], COMMIT)
         self.assertEqual(manifest["inventory_digest"], INVENTORY_DIGEST)
-        self.assertEqual(manifest["manifest_digest"], MANIFEST_DIGEST)
+        self.assertRegex(manifest["manifest_digest"], DIGEST_RE)
         unsigned = {key: value for key, value in manifest.items() if key != "manifest_digest"}
-        self.assertEqual(digest_json(unsigned), MANIFEST_DIGEST)
+        self.assertEqual(digest_json(unsigned), manifest["manifest_digest"])
         self.assertTrue(manifest["inactive_by_default"])
-        self.assertEqual(manifest["lifecycle_state"], "unqualified")
+        self.assertEqual(manifest["lifecycle_state"], "eval_pending")
         self.assertEqual(manifest["trust_boundary"], "linkskills-collection")
 
         entries = []

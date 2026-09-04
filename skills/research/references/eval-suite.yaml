@@ -69,8 +69,28 @@ scenarios:
     class: migration
     input: "A new broad workflow requests search-strategy."
     expected_criteria:
-      - "Selects canonical research with explicit supersession"
+      - "Selects canonical research with explicit one-way supersession"
       - "Keeps citation-enforcer independently composable"
+  - id: acyclic-claim-graph
+    class: graph
+    input: "Claim A supports claim B and claim B supports claim A."
+    expected_criteria:
+      - "Rejects cyclic claim-to-claim links"
+  - id: negative-evidence-observed-absence
+    class: evidence
+    input: "A primary source states a figure is unpublished."
+    expected_criteria:
+      - "Distinguishes observed absence from missing evidence"
+  - id: provider-neutral-no-named-vendor
+    class: boundary
+    input: "A named vendor search API is required."
+    expected_criteria:
+      - "Refuses named retrieval providers"
+  - id: legacy-research-router-excluded
+    class: boundary
+    input: "The plan selects /tools/research as the router."
+    expected_criteria:
+      - "Excludes the legacy research router"
 
 judge:
   min_reasoning_tier: high

@@ -10,12 +10,14 @@
     "trust_boundary": "linkskills-release-attestation"
   },
   "bundle_hash": "sha256:0666278489068fdabcba1a280b7743d679363fbddc834b947378eb57277da79a",
-  "channel": "development",
+  "channel": "canary",
   "content_digest": "sha256:0666278489068fdabcba1a280b7743d679363fbddc834b947378eb57277da79a",
   "eligibility_ref": "opaque:eligibility:gws-tasks-ineligible",
-  "execution_profiles": [],
+  "execution_profiles": [
+    "gws-consumer"
+  ],
   "inventory_digest": "sha256:e2f8121988c0d26030b5cc7b7eb8813b8bc3c66343ef520c2a6367d05c9359da",
-  "lifecycle_state": "unqualified",
+  "lifecycle_state": "eval_pending",
   "lineage": {
     "kind": "vendor",
     "relationship": "preserved_vendor_bytes",
@@ -32,7 +34,7 @@
     "file_count": 1,
     "total_bytes": 3015
   },
-  "notes": "Preserved unchanged vendor bytes; inactive and unqualified pending independent review.",
+  "notes": "Approved source candidate for internal canary use; stable qualification, consumer activation, tool authority, and live publication are not claimed.",
   "provenance": {
     "licence": "Apache-2.0",
     "publisher": "Google Workspace CLI",

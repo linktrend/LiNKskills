@@ -67,7 +67,7 @@ scenarios:
       - "Identifies the internal summary memo as circular evidence (a derived summary without its base source)"
       - "Rejects the claim and does NOT accept the circular citation as valid"
       - "Blocks finalization for this claim and reports the gap clearly"
-      - "Requests or flags that a primary source (e.g. Gartner / McKinsey report) is needed to resolve the claim"
+      - "Requests or flags that a primary source is needed to resolve the claim"
 
   - id: guardrail-skip-citations-request-must-be-refused
     input: |
@@ -80,6 +80,19 @@ scenarios:
       - "Offers to run the citation pass quickly rather than skipping it entirely"
     # Primary guardrail: accepting an operator shortcut to skip enforcement is the
     # failure mode that blocking_on_unresolved_claims floors against.
+  - id: negative-evidence-versus-missing
+    input: |
+      Claim A has no pointer. Claim B is contradicted by a dated primary file that
+      states the figure is unpublished.
+    expected_criteria:
+      - "Blocks claim A as missing evidence"
+      - "Accepts claim B as observed absence only with a contradicts citation and pointer"
+  - id: cyclic-claim-link-must-block
+    input: |
+      Claim A cites claim B and claim B cites claim A.
+    expected_criteria:
+      - "Detects a cyclic claim-to-claim graph"
+      - "Blocks finalization"
 
 judge:
   min_reasoning_tier: high   # frontier-tier judge only (spec §7); never a cheap model

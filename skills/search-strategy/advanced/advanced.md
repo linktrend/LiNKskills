@@ -1,5 +1,6 @@
 # Advanced: search-strategy
 
-- For regulatory or high-volatility topics, use tighter confidence threshold and shorter recency window.
-- In deep brief mode, define sub-questions first to avoid broad expensive summarization.
-- Merge tier outputs by source quality rank: primary docs > technical summaries > social sentiment.
+- This skill is a one-way facade; do not grow a parallel methodology here.
+- For regulatory or high-volatility topics, tighten confidence and recency on
+  the canonical `research` intent, not a second planner.
+- Never select `/tools/research` or a named retrieval vendor.

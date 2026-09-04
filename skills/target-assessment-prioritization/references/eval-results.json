@@ -1,0 +1,81 @@
+{
+  "certification_status": "uncertified",
+  "evidence_kind": "source_validation_only",
+  "linktarget_mutated": false,
+  "live_platform_use": false,
+  "passed": true,
+  "program_authority": false,
+  "publication_status": "not_published",
+  "results": [
+    {
+      "assertions": [
+        "input_schema_valid",
+        "output_schema_valid",
+        "exact_output",
+        "cross_references_valid",
+        "effects_empty",
+        "globally_ineligible"
+      ],
+      "case_id": "ordinary-ready",
+      "detail": "exact_output",
+      "fixture_digest": "sha256:daca1bce8ffad8b28424099a4832bb047b3df7a3e1d7e5a57a081f4e128a5c6f",
+      "passed": true
+    },
+    {
+      "assertions": [
+        "input_schema_valid",
+        "output_schema_valid",
+        "exact_output",
+        "cross_references_valid",
+        "effects_empty",
+        "globally_ineligible"
+      ],
+      "case_id": "prohibited-selection",
+      "detail": "exact_output",
+      "fixture_digest": "sha256:45bcfc5dbbd53c958264e85cb0c86b7007cc4447d6f6118c74145244f9949043",
+      "passed": true
+    },
+    {
+      "assertions": [
+        "input_schema_valid",
+        "output_schema_valid",
+        "exact_output",
+        "cross_references_valid",
+        "effects_empty",
+        "globally_ineligible"
+      ],
+      "case_id": "authority-claim",
+      "detail": "exact_output",
+      "fixture_digest": "sha256:bfeae829f1ca73252406f21355fec8751dd95afcb7374754115e69faa8b5ea6b",
+      "passed": true
+    },
+    {
+      "assertions": [
+        "input_schema_valid",
+        "output_schema_valid",
+        "exact_output",
+        "cross_references_valid",
+        "effects_empty",
+        "globally_ineligible"
+      ],
+      "case_id": "sensitive-claim",
+      "detail": "exact_output",
+      "fixture_digest": "sha256:08bcc05ca4c2ee9a80511a87f180f85da1d60a7b1b653becf14428ce0e044b2f",
+      "passed": true
+    },
+    {
+      "assertions": [
+        "input_schema_valid",
+        "cross_references_rejected",
+        "no_output_effects"
+      ],
+      "case_id": "broken-cross-reference",
+      "detail": "undeclared criterion reference: criterion:undeclared",
+      "fixture_digest": "sha256:3e95350c9d664999796d556cda0171f5bd7f1f9044e3cd03463f75389bbe3d97",
+      "passed": true
+    }
+  ],
+  "selectable": false,
+  "skill_id": "target-assessment-prioritization",
+  "suite_version": "0.1.0"
+}

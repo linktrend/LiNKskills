@@ -2,6 +2,7 @@
   "definitions": {
     "input": {
       "type": "object",
+      "additionalProperties": false,
       "required": ["question", "confidence_threshold", "max_cost_tier"],
       "properties": {
         "question": { "type": "string", "minLength": 5 },
@@ -10,11 +11,15 @@
           "type": "string",
           "enum": ["web", "neural", "brief", "social"]
         },
-        "deep_research": { "type": "boolean" }
+        "deep_research": { "type": "boolean" },
+        "requested_skill": { "type": "string" },
+        "new_broad_workflow": { "type": "boolean" },
+        "use_legacy_router": { "type": "boolean" }
       }
     },
     "output": {
       "type": "object",
+      "additionalProperties": false,
       "required": ["status", "tier_used", "confidence", "findings"],
       "properties": {
         "status": { "type": "string", "enum": ["SUCCESS", "FAILED"] },
@@ -31,7 +36,16 @@
             }
           }
         },
-        "hitl_approval": { "type": "string" }
+        "hitl_approval": { "type": "string" },
+        "selected_skill": { "type": "string" },
+        "requested_skill": { "type": "string" },
+        "outcome": { "type": "string", "enum": ["supersession", "facade", "direct"] },
+        "direction": { "type": "string", "enum": ["one-way"] },
+        "legacy_skill_rewritten": { "type": "boolean" },
+        "citation_enforcer": { "type": "string" },
+        "errors": { "type": "array", "items": { "type": "string" } },
+        "external_calls": { "type": "array", "maxItems": 0 },
+        "mutations": { "type": "array", "maxItems": 0 }
       }
     },
     "state": {
