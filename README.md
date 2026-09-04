@@ -1,5 +1,7 @@
 # LiNKskills
 
+> Production status: the pre-configuration engineering baseline is complete. See [the production-readiness index](docs/PRODUCTION-READINESS.md) for remaining configuration, staging, deployment, and operational acceptance work.
+
 LiNKskills is LiNKtrend's **centralized skill catalog and procedural-capability platform**. It provides progressive-disclosure skills, a mandatory per-skill eval suite executed by a real Eval Runner, published delivery through a `skills_*` MCP/HTTP Gateway, usage telemetry, and Librarian curation — and deliberately does **not** own governance or permission-to-act.
 
 ## Start here (source of truth)
