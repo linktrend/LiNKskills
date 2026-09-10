@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "headSha": "65e50bcebfeb4338c4ce98b6da46fef92694e728",
+  "classification": "tests",
+  "acceptance": "ED-01 exact pushed durable-store migration package independently reviewed PASS on PostgreSQL 17.11; ordered migration digests, least-privilege grants, RLS isolation, idempotency, forward verification, rollback/reapply, redacted diagnostics, and zero-new-secret delta accepted; live Platform apply, credentials, backup receipt, and Server01 readiness remain external HOLDs",
+  "commands": [
+    {
+      "cmd": "Cursor ED-01 implementation run FINISHED with pushed exact candidate",
+      "exitCode": 0,
+      "evidencePath": "/Users/linktrend/Documents/Codex/2026-09-09/files-pasted-by-the-user-i/outputs/cursor-cloud/state/LINKSKILLS-ED-01-325-001.latest.json"
+    },
+    {
+      "cmd": "Cursor bounded scanner-fixture repair FINISHED with one-path pushed candidate",
+      "exitCode": 0,
+      "evidencePath": "/Users/linktrend/Documents/Codex/2026-09-09/files-pasted-by-the-user-i/outputs/cursor-cloud/state/LINKSKILLS-ED-01-325-REPAIR-001.latest.json"
+    },
+    {
+      "cmd": "Independent Grok exact-head ED-01 review PASS with PostgreSQL 17.11 proof",
+      "exitCode": 0,
+      "evidencePath": "/Users/linktrend/Documents/Codex/2026-09-09/files-pasted-by-the-user-i/outputs/cursor-cloud/state/LINKSKILLS-ED-01-325-REVIEW-001.latest.json"
+    },
+    {
+      "cmd": "python3 -m pytest -q tests/migrations packages/persistence/tests (64 passed, 59 skipped locally)",
+      "exitCode": 0
+    },
+    {
+      "cmd": "python3 validator.py --repo-root . --scan-all",
+      "exitCode": 0
+    },
+    {
+      "cmd": "git diff --check 2e169966df46efd6e7724df8ce34bb5506665aee..65e50bcebfeb4338c4ce98b6da46fef92694e728",
+      "exitCode": 0
+    },
+    {
+      "cmd": "python3 scripts/gitops/secret_scan.py (unchanged admitted baseline only; zero new ED-01 findings)",
+      "exitCode": 1
+    }
+  ],
+  "at": "2026-09-10T08:56:09Z",
+  "kind": "v25-issue-checkpoint",
+  "amendment": "V25_BOOTSTRAP_LEAN",
+  "gitTree": "52fb05856c965f4880d82fddc70ae88e12d1fd60",
+  "pushed": true,
+  "scopedDiff": true,
+  "focusedTests": {
+    "passed": true
+  },
+  "independentNarrowReview": {
+    "accepted": true,
+    "headSha": "65e50bcebfeb4338c4ce98b6da46fef92694e728",
+    "gitTree": "52fb05856c965f4880d82fddc70ae88e12d1fd60",
+    "paths": [
+      "declared-checkpoint-scope"
+    ],
+    "reviewer": {
+      "actor": "routed-independent-reviewer",
+      "role": "reviewer"
+    },
+    "implementerActor": "checkpoint-implementer"
+  },
+  "manifestEvidence": true,
+  "proofClass": "hosted"
+}
