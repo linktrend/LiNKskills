@@ -38,7 +38,7 @@ def _lock_stanzas() -> list[tuple[str, str, list[str]]]:
     stanzas: list[tuple[str, str, list[str]]] = []
     current: tuple[str, str, list[str]] | None = None
     for raw in _lock_text().splitlines():
-        if raw.startswith("#") or not raw.strip():
+        if not raw.strip() or raw.lstrip().startswith("#"):
             continue
         req = REQ_LINE.match(raw)
         if req:
@@ -109,9 +109,9 @@ def test_cloud_execution_doc_records_install_order_and_pythonpath_only() -> None
     assert positions == sorted(positions)
     umbrella = text.index("pip install --no-deps -e .")
     assert umbrella > positions[-1]
-    assert "packages/contracts" in text and "PYTHONPATH" in text
+    assert "packages/contracts" in text and "PYTHONPATH-only" in text
     assert "packages/persistence" in text
-    assert "not pip-installable" in text
+    assert "are **not** pip-installable" in text
 
 
 def test_contracts_and_persistence_remain_pythonpath_only() -> None:
