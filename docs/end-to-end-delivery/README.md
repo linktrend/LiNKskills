@@ -1,8 +1,10 @@
 # LiNKskills end-to-end delivery
 
-**Status:** `PLAN_READY` — planning is complete; implementation, provider mutation,
-consumer activation, live migration, deployment, and production acceptance await a
-literal `APPROVE` in the owning task.
+**Status:** `PLANNING_INTERFACE_READY / ED-00_READY_AFTER_APPROVE / GROK_QUEUE_HOLD`
+— the package is a review candidate; implementation, provider mutation,
+consumer activation, live migration, deployment, and production acceptance
+await a literal `APPROVE` in the owning task. The first Grok worker, ENV-00,
+also awaits current-task queue ownership.
 
 **Planning issue:** [linktrend/LiNKskills#323](https://github.com/linktrend/LiNKskills/issues/323)
 
@@ -54,6 +56,7 @@ but this delivery does not bulk-qualify, globally enable, or activate them.
 | [Starting position](./STARTING-POSITION.md) | Evidence-classified source, installed configuration, and demonstrated-live baseline. |
 | [Work packets](./WORK-PACKETS.md) | Atomic implementation, configuration, integration, deployment, recovery, and acceptance packets. |
 | [Execution manifest](./EXECUTION-MANIFEST.json) | IDE Development 2.5.2 / Coding Execution Protocol 1.0.1 packet graph. |
+| [Execution route](./EXECUTION-ROUTE.md) | Operative REST dispatcher, authenticated read-only proof, exact packet contract, and first executable packet. |
 | [OSS inventory](./OSS-INVENTORY.md) | Existing versus required software, sole owners, configuration, and connections. |
 | [Readiness report](./READINESS-REPORT.md) | Planning completeness, factual reliability, route practicality, and remaining gates. |
 
@@ -101,3 +104,7 @@ Planning documents may be committed and pushed under issue `#323`. Before
 accounts, provider state, consumer configuration, server services, protected
 branches, or production routes may be changed. Platform remains solely owned by
 the separate LiNKserver 01 Deployment Recovery task.
+
+Deployment Advisor acceptance releases this package for downstream planning
+only. It never supplies founder `APPROVE`, queue ownership, implementation
+authority, live mutation authority, or production acceptance.
