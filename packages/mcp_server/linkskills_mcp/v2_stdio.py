@@ -25,6 +25,7 @@ def identity_from_claims(claims: Any) -> TrustedIdentity:
             "skills.write",
             "skills.feedback",
             "execute",
+            "skills:run",
         )
     ):
         caps.add("skills.feedback")

@@ -285,3 +285,33 @@ class GovernedV2ProviderTests(unittest.TestCase):
         self.assertTrue(created["ok"])
         owner_sees_forged = call("org-a", "skills_use_report_status_get", {"report_id": "opaque:report:forged"})
         self.assertEqual(owner_sees_forged["error"], "not_found")
+
+
+class SkillsRunScopeParityTests(unittest.TestCase):
+    def test_skills_run_alias_maps_write_feedback_without_legacy_execution(self) -> None:
+        from linkskills_gateway.auth import ActorClaims
+        from linkskills_gateway.v2_http import identity_from_claims as http_identity_from_claims
+        from linkskills_mcp.v2_stdio import identity_from_claims as mcp_identity_from_claims
+
+        claims = ActorClaims(
+            actor_id="actor-run",
+            actor_kind="service",
+            org_id="org-run",
+            scopes=frozenset({"skills:run"}),
+        )
+        expected = frozenset({"skills.read", "skills.write", "skills.feedback"})
+        http_identity = http_identity_from_claims(claims)
+        mcp_identity = mcp_identity_from_claims(claims)
+        self.assertEqual(http_identity.capabilities, expected)
+        self.assertEqual(mcp_identity.capabilities, expected)
+        self.assertEqual(http_identity.capabilities, mcp_identity.capabilities)
+
+        def verify(token):
+            if token != "trusted":
+                raise ValueError("bad token")
+            return mcp_identity
+
+        provider = V2Provider(verify)
+        base = {"protocol_version": "2026-07-28", "authorization": "trusted"}
+        self.assertEqual(provider.handle(dict(base, operation="skills_run_start"))["error"], "legacy_execution_disabled")
+        self.assertEqual(provider.handle(dict(base, operation="skills_tool_invoke"))["error"], "legacy_execution_disabled")
