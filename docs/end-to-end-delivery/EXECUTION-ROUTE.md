@@ -119,6 +119,16 @@ policy refuses this exact approved mapping, XP-00 returns that specific failure
 to the founder; it does not delete `SUSPENDED`, bypass the dispatcher, or create
 another route.
 
+The current dispatcher deliberately permits only one live cloud writer per
+repository. That is the executable capacity, not the intended plan. XP-05 is a
+single shared coordinator deliverable owned by the Deployment Advisor: extend
+the dispatcher to admit one writer per explicitly bound lane while rejecting
+overlapping/shared/broad scopes and preserving suspension, owner, global
+capacity, stable-ID, and ambiguous-run controls. LiNKskills does not implement
+or bypass that extension. Sequential ready work may begin after approval and
+XP-00; safe same-repository parallel waves begin only after XP-05's focused
+offline receipt.
+
 ## Exact admitted packet and request
 
 Every Grok packet and every input the worker needs must first exist in GitHub at
@@ -326,6 +336,8 @@ execution steps and do not create additional founder decisions.
   project-scoped.
 - XP-03: Codex consumer owner applies and proves its exact pin.
 - XP-04: Lisa/OpenClaw owner applies and proves its exact pin.
+- XP-05: Deployment Advisor's shared lane-aware dispatcher extension before
+  same-repository parallel workers; sequential capacity remains available.
 - Founder-reserved gates: live provider mutation, Server 01 deployment,
   production acceptance, and any change of model route or initial skill set.
 

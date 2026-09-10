@@ -133,7 +133,57 @@
       "ownedPaths": ["evidence/end-to-end-delivery/ed-10/", "docs/end-to-end-delivery/ACCEPTANCE.md"],
       "prohibitedPaths": ["collections/", "vendor-skills/", "supabase/migrations/", "configs/consumer-activation/"],
       "verificationCommands": [["python3", "-m", "json.tool", "evidence/end-to-end-delivery/ed-10/final-acceptance.json"], ["git", "diff", "--check"]],
-      "dependencies": ["ED-03", "ED-04", "ED-07", "ED-08", "ED-09"],
+      "dependencies": ["ED-03", "ED-04", "ED-07", "ED-08", "ED-09", "FIXGS-00", "FIXPQ-00", "FIXRM-00", "FIXST-00", "FIXTA-00"],
+      "executionState": "PLAN"
+    },
+    {
+      "id": "FIXGS-00",
+      "title": "Conditionally correct git safeguard from one real canary failure",
+      "issues": ["ISS-12"],
+      "ownedPaths": ["skills/git-safeguard/", "tests/regression/git-safeguard/", "evidence/end-to-end-delivery/fixgs-00/"],
+      "prohibitedPaths": ["packages/", "collections/", "vendor-skills/", "supabase/migrations/", "configs/consumer-activation/"],
+      "verificationCommands": [["python3", "validator.py", "--repo-root", ".", "--scan-all"], ["python3", "-m", "pytest", "-q", "tests/regression/git-safeguard"]],
+      "dependencies": ["ED-09"],
+      "executionState": "PLAN"
+    },
+    {
+      "id": "FIXPQ-00",
+      "title": "Conditionally correct persistent QA from one real canary failure",
+      "issues": ["ISS-13"],
+      "ownedPaths": ["skills/persistent-qa/", "tests/regression/persistent-qa/", "evidence/end-to-end-delivery/fixpq-00/"],
+      "prohibitedPaths": ["packages/", "collections/", "vendor-skills/", "supabase/migrations/", "configs/consumer-activation/"],
+      "verificationCommands": [["python3", "validator.py", "--repo-root", ".", "--scan-all"], ["python3", "-m", "pytest", "-q", "tests/regression/persistent-qa"]],
+      "dependencies": ["ED-09"],
+      "executionState": "PLAN"
+    },
+    {
+      "id": "FIXRM-00",
+      "title": "Conditionally correct repository manager from one real canary failure",
+      "issues": ["ISS-14"],
+      "ownedPaths": ["skills/repository-manager/", "tests/regression/repository-manager/", "evidence/end-to-end-delivery/fixrm-00/"],
+      "prohibitedPaths": ["packages/", "collections/", "vendor-skills/", "supabase/migrations/", "configs/consumer-activation/"],
+      "verificationCommands": [["python3", "validator.py", "--repo-root", ".", "--scan-all"], ["python3", "-m", "pytest", "-q", "tests/regression/repository-manager"]],
+      "dependencies": ["ED-09"],
+      "executionState": "PLAN"
+    },
+    {
+      "id": "FIXST-00",
+      "title": "Conditionally correct skill template from one real canary failure",
+      "issues": ["ISS-15"],
+      "ownedPaths": ["skills/skill-template/", "tests/regression/skill-template/", "evidence/end-to-end-delivery/fixst-00/"],
+      "prohibitedPaths": ["packages/", "collections/", "vendor-skills/", "supabase/migrations/", "configs/consumer-activation/"],
+      "verificationCommands": [["python3", "validator.py", "--repo-root", ".", "--scan-all"], ["python3", "-m", "pytest", "-q", "tests/regression/skill-template"]],
+      "dependencies": ["ED-09"],
+      "executionState": "PLAN"
+    },
+    {
+      "id": "FIXTA-00",
+      "title": "Conditionally correct tool architect from one real canary failure",
+      "issues": ["ISS-16"],
+      "ownedPaths": ["skills/tool-architect/", "tests/regression/tool-architect/", "evidence/end-to-end-delivery/fixta-00/"],
+      "prohibitedPaths": ["packages/", "collections/", "vendor-skills/", "supabase/migrations/", "configs/consumer-activation/"],
+      "verificationCommands": [["python3", "validator.py", "--repo-root", ".", "--scan-all"], ["python3", "-m", "pytest", "-q", "tests/regression/tool-architect"]],
+      "dependencies": ["ED-09"],
       "executionState": "PLAN"
     }
   ],
@@ -149,7 +199,12 @@
     {"id": "ISS-08", "packetId": "ED-08", "title": "Deploy and verify on Server 01"},
     {"id": "ISS-09", "packetId": "ED-09", "title": "Run actor canaries and multi day Cursor use"},
     {"id": "ISS-10", "packetId": "ED-10", "title": "Prove release loop assurance cost and acceptance"},
-    {"id": "ISS-11", "packetId": "ENV-00", "title": "Pin a reproducible cloud execution environment"}
+    {"id": "ISS-11", "packetId": "ENV-00", "title": "Pin a reproducible cloud execution environment"},
+    {"id": "ISS-12", "packetId": "FIXGS-00", "title": "Conditionally correct git safeguard"},
+    {"id": "ISS-13", "packetId": "FIXPQ-00", "title": "Conditionally correct persistent QA"},
+    {"id": "ISS-14", "packetId": "FIXRM-00", "title": "Conditionally correct repository manager"},
+    {"id": "ISS-15", "packetId": "FIXST-00", "title": "Conditionally correct skill template"},
+    {"id": "ISS-16", "packetId": "FIXTA-00", "title": "Conditionally correct tool architect"}
   ],
   "controls": {
     "exactCandidateInvalidation": {"enabled": true, "identityFields": ["repository", "commit", "tree", "workflowDigest", "profileDigest"]},

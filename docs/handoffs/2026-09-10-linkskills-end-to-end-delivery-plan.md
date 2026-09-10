@@ -49,8 +49,9 @@ specific runtime dependency, not a planning blocker.
 
 The manifest passed the installed Coding Execution Protocol 1.0.1 /
 `V25_BOOTSTRAP_LEAN` schema and semantic validator. Package links resolve,
-owned-path prefix collisions are absent, JSON parsing passes, and
-`git diff --check` passes. The pushed planning commit/tree and independent
+concurrent owned-path collisions are absent, intentional later L-FIX ownership
+is dependency-ordered after ED-03/09, JSON parsing and `git diff --check` pass.
+The pushed planning commit/tree and independent
 narrow-review result are appended to the task evidence after checkpointing.
 
 No product code, dependency, credential, database, provider, consumer, server,
@@ -67,6 +68,12 @@ this task as owner, so ENV-00 is not executable until a governed ownership hando
 founder-authorised resume-scope update. The dispatcher suite had 7 PASS and 3
 fixture cases stopped early at that guard; it was not bypassed. XP-01 through
 XP-04 remain later Platform and consumer gates.
+
+The repository lane table targets the graph-derived safe maximum: one writer
+with the current dispatcher, then up to three disjoint LiNKskills writers after
+the Deployment Advisor's single shared XP-05 lane-aware extension passes. The
+current task is integration owner; shared manifests, migrations, interfaces,
+and server mutations remain serialized under their named packet/owner.
 
 Deployment Advisor acceptance releases downstream planning only. It is not
 founder `APPROVE` and authorises no implementation, provider call, queue change,

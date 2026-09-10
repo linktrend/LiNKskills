@@ -29,6 +29,46 @@ server state, active leases, and consumer state immediately before work.
   two attempts at one exact candidate. Code/test failure returns to a new
   identity; retries never weaken acceptance.
 
+## Implementation lanes and maximum safe parallelism
+
+Each lane has at most one active implementation worker on its own issue branch
+and isolated checkout. The integration owner is deployment task
+`01a089cb-ee73-7c52-9e62-4f9654114eba`; it collects pushed checkpoints and
+hands logical groups to the installed Phase Packager/Coordinator. Shared files
+move between lanes only after the preceding lease/checkpoint closes.
+
+| Lane | Outcome / packets | Exact owned paths | Prohibited or shared paths | Upstream input / entry | Worker | Wave maximum | Complete / destination |
+|---|---|---|---|---|---|---:|---|
+| L-BASE | Freeze interfaces (`ED-00`) | Manifest-listed planning docs and `evidence/end-to-end-delivery/ed-00/` | All product, Skill, migration, deploy, consumer paths | `APPROVE`; refresh protected identities | Luna High / Codex CLI | 1 | Reviewed planning/interface checkpoint → integration owner |
+| L-ENV | Reproducible environment (`ENV-00`) | `requirements-dev.txt`, `requirements-dev.lock`, `.github/workflows/ci.yml`, `docs/development/CLOUD-EXECUTION.md`, `tests/environment/` | Product packages, Skills, migrations, deploy | ED-00 + XP-00 owner/route receipt | Grok 4.6 Medium, Fast off | 1 | Hash-locked clean install + cloud/CI receipts → Phase environment group |
+| L-DATA | Durable store/migrations (`ED-01`) | `packages/persistence/`, `supabase/migrations/`, `docs/migrations/`, `tests/migrations/` | Provider/Skill/consumer paths; migration files are exclusive | ENV-00 + ED-00 | Grok 4.6 Medium, Fast off | 1 | Migration package/review → provider and Platform handoff |
+| L-PROVIDER | Provider-v2 Gateway/MCP (`ED-02`) | `packages/contracts/`, `packages/core/`, `packages/gateway/`, `packages/mcp_server/`, `packages/client/`, `tests/contracts/`, `tests/core/`, `tests/gateway/`, `tests/mcp_server/`, `tests/client/` | Skills, migrations, consumer config | ED-01 contract accepted | Grok 4.6 Medium, Fast off | 1 | Provider artifact/review → provider Phase group |
+| L-QUAL | Initial qualification (`ED-03`) | `packages/eval_runner/`, `skills/git-safeguard/`, `skills/persistent-qa/`, `skills/repository-manager/`, `skills/skill-template/`, `skills/tool-architect/`, `tests/eval_runner/`, `evidence/end-to-end-delivery/ed-03/` | Other Skills, collections, vendor Skills, consumer config, catalog index | ED-02 accepted | Grok 4.6 Medium, Fast off | 2 with L-DEPLOY | Five profile receipts → release lane |
+| L-RELEASE | Publication/selectability (`ED-04`) | `packages/publisher/`, `tests/publisher/`, `evidence/end-to-end-delivery/ed-04/` | Skills, collections, vendor Skills, consumer config | ED-03 accepted; XP-01 for live apply | Grok 4.6 Medium, Fast off | 2 with L-DEPLOY | Reviewed publisher checkpoint; live receipt → consumers |
+| L-CONSUMER | Consumer packs (`ED-05`) | `configs/fragments/`, `configs/consumer-activation/`, `docs/integrations/`, `tests/integrations/`, `evidence/end-to-end-delivery/ed-05/` | Skills, migrations, external consumer repos | ED-04 accepted | Grok 4.6 Medium, Fast off | 3 with L-DEPLOY and L-OBS | Three disabled owner packets → XP-02/03/04 |
+| L-DEPLOY | Server candidate (`ED-06`) | `deploy/vps/`, `docs/deploy/`, `docs/runbooks/PRODUCTION_OPERATIONS.md`, `tests/deploy/`, `evidence/end-to-end-delivery/ed-06/` | Live compose, migrations, Skills, consumer config | ED-01 + ED-02 | Grok 4.6 Medium, Fast off | 3 with L-CONSUMER and L-OBS | Image/digest/SBOM/rollback pack → Platform owner |
+| L-OBS | Librarian/telemetry (`ED-07`) | `packages/librarian_domain/`, `global_evaluator.py`, `tests/librarian_domain/`, `evidence/end-to-end-delivery/ed-07/` | Platform runner, migrations, consumer config | ED-01 + ED-02 + ED-04 | Grok 4.6 Medium, Fast off | 3 with L-CONSUMER and L-DEPLOY | Reviewed worker contract → Platform owner |
+| L-LIVE | Server deployment (`ED-08`) | `evidence/end-to-end-delivery/ed-08/`; Platform owns live state | All concurrent shared migrations/server mutations | ED-01–07 + XP-01 + founder live gate | Privileged Platform owner; Luna only if directed | 1 | Production source/provider/live receipt → canary lane |
+| L-CANARY | Ordered consumers (`ED-09`) | `evidence/end-to-end-delivery/ed-09/` | Consumer repos/config remain XP owners | ED-05/07/08 + consumer receipts | Coordinator; consumers execute in owner tasks | 1 | Cursor → Codex → Lisa receipts → correction/acceptance |
+| L-FIX | One real failure correction (one of `FIXGS-00`, `FIXPQ-00`, `FIXRM-00`, `FIXST-00`, `FIXTA-00`) | One exact named initial Skill directory, its regression directory, and packet evidence | Every other Skill; no shared publisher/eval source mutation | ED-09 accepted real failure selects exactly one packet | Grok 4.6 Medium, Fast off | 1 | Corrected immutable release/requalification receipt → ED-10 |
+| L-ACCEPT | Assurance/final decision (`ED-10`) | `evidence/end-to-end-delivery/ed-10/`, `docs/end-to-end-delivery/ACCEPTANCE.md` | All source, Skills, migrations, consumer and deploy paths | ED-09 + exactly one accepted L-FIX receipt | Coordinator / independent reviewer | 1 | Final cross-surface decision → governed promotion/deploy owner |
+
+The dependency graph—not an arbitrary worker quota—sets the planned maximum.
+Before the shared XP-05 dispatcher extension, executable capacity is one cloud
+writer for this repository. After XP-05, the highest safe wave is three
+simultaneous workers: L-CONSUMER, L-DEPLOY, and L-OBS. Earlier safe waves are
+L-QUAL + L-DEPLOY (two), then L-RELEASE + L-DEPLOY (two). Store/interface
+freeze, provider integration, live deployment, ordered actor canaries, the one
+selected correction, and final reconciliation serialize because each supplies
+an input or mutates shared state required by the next lane.
+
+The coordinator recomputes readiness on every completion, invalidation, or
+capacity change and immediately admits every dependency-ready disjoint lane up
+to the lower of the safe-wave count and live account capacity. It preserves a
+lane's pushed checkpoint through repairs/reviewer feedback; replacement workers
+resume from that checkpoint rather than restarting discovery. Broad or unknown
+scope remains exclusive.
+
 ## ED-00 — Freeze current identity, interfaces, and acceptance
 
 **Owner/scope:** LiNKskills planner/implementer. Only `docs/README.md`,
@@ -188,8 +228,8 @@ real consumer-profile driver; retain observed artifacts/checks and signed
 receipts; classify each release/profile independently. Prompt-only or fake
 evidence remains non-certifying.
 
-**Dependencies:** ED-00 and ED-02 contract; profile fixtures from XP-02/XP-03
-may arrive incrementally. **Output:** five immutable release manifests and a
+**Dependencies:** ED-00 and ED-02 contract; profile fixtures from
+XP-02/XP-03/XP-04 may arrive incrementally. **Output:** five immutable release manifests and a
 profile qualification matrix; a failure of one does not promote or block an
 unrelated passing release.
 
@@ -245,7 +285,7 @@ own files.
 **Requirements and inputs:** exact ED-02 provider contract and ED-04 releases;
 Platform claim contract from the ED-00 published handoff; approved actor order
 Cursor → Codex → Lisa; consumer capability/tool-authority declarations from the
-ED-00 handoff and later XP-02/XP-03 receipts.
+ED-00 handoff and later XP-02/XP-03/XP-04 receipts.
 
 **Work:** generate disabled-by-default, exact-release/digest pins for the five
 initial Skills; define private endpoint, token mint, resource retrieval,
@@ -401,27 +441,30 @@ systemic, disable all pins and execute ED-08 rollback.
 
 ## ED-10 — Prove the improvement loop, assurance, cost, and final acceptance
 
-**Owner/scope:** LiNKskills owns a bounded regression-eval/release change only in
-the one affected initial skill and its exact tests/evidence; final assurance and
-acceptance records live under `evidence/end-to-end-delivery/ed-10/` and
-`docs/end-to-end-delivery/ACCEPTANCE.md`. Any discovered failure determines the
-single affected skill path; other skills and later expansion are prohibited.
+**Owner/scope:** ED-10 is coordination-only. It owns final assurance and
+acceptance records under `evidence/end-to-end-delivery/ed-10/` and
+`docs/end-to-end-delivery/ACCEPTANCE.md`; it may not edit source, Skills,
+publisher/eval code, migrations, consumer configuration, or deploy files.
 
 **Requirements and inputs:** ED-09 real-use evidence; approved internal-launch
 definition of done; exact tool dependency/reverse-dependency graph; provider,
 database, request, model, storage, and evaluation cost measurements; SBOM,
 vulnerability, secret, privacy, auth/RLS, and supply-chain evidence.
 
-**Work:** select one real observed failure/correction from the accepted canary;
-turn it into an executable regression eval; improve and republish one immutable
-release through ED-03/04 controls; prove the new version fixes the failure.
-Make or simulate through an immutable fixture one exact tool-version change,
+**Work:** select one real observed failure/correction from the accepted canary
+and activate exactly one conditional L-FIX packet below. Require its executable
+regression, correction, requalification through the existing ED-03 controls,
+and improved immutable publication through existing ED-04 controls; those
+controls are read-only tooling here, not reopened source ownership. Then prove
+the new release fixes the failure. Make or simulate through an immutable fixture one exact tool-version change,
 prove affected-profile invalidation/revalidation, prove unaffected profiles stay
 valid, and roll the tool/release pointer back. Reconcile measured cost per run
 for founder acceptance. Complete security/privacy/supply-chain review and the
 full source/provider/consumer/server/production matrix.
 
-**Dependencies:** ED-03, ED-04, ED-07, ED-08, and ED-09. **Output:** regression
+**Dependencies:** ED-03, ED-04, ED-07, ED-08, ED-09, one accepted conditional
+L-FIX receipt, and archive-confirmed no-dispatch receipts for the other four.
+**Output:** regression
 eval, improved immutable release receipt, tool blast-radius/rollback receipt,
 accepted cost record, assurance report, 59-entry classification inventory, and
 final acceptance decision.
@@ -438,6 +481,28 @@ aggregate percentage substitutes for proof. Commit
 governed promotion/release procedures. **Recovery:** revoke the improved release
 or restore its prior pointer/tool pin; retain regression and failed evidence;
 disable consumers or execute ED-08 rollback if the defect is systemic.
+
+### Conditional L-FIX packets
+
+Exactly one packet below is activated after ED-09 identifies the first accepted
+real failure. Its GitHub issue branch, exact paths, commit/tree, and admission
+are frozen before dispatch. The other four transition from `PLAN` to
+`ARCHIVE_CONFIRMED` with no-dispatch/no-mutation evidence. Ownership transfers
+only after ED-03 and ED-09 leases are closed; no concurrent Skill writer is allowed.
+
+| Packet | Exact source/test/evidence ownership |
+|---|---|
+| `FIXGS-00` | `skills/git-safeguard/`, `tests/regression/git-safeguard/`, `evidence/end-to-end-delivery/fixgs-00/` |
+| `FIXPQ-00` | `skills/persistent-qa/`, `tests/regression/persistent-qa/`, `evidence/end-to-end-delivery/fixpq-00/` |
+| `FIXRM-00` | `skills/repository-manager/`, `tests/regression/repository-manager/`, `evidence/end-to-end-delivery/fixrm-00/` |
+| `FIXST-00` | `skills/skill-template/`, `tests/regression/skill-template/`, `evidence/end-to-end-delivery/fixst-00/` |
+| `FIXTA-00` | `skills/tool-architect/`, `tests/regression/tool-architect/`, `evidence/end-to-end-delivery/fixta-00/` |
+
+Each selected packet reproduces the failure before the fix, changes only its
+owned Skill/tests, reruns the relevant existing eval and publisher controls,
+publishes a new immutable version without rewriting the old one, proves the
+fix, and records revocation/pointer rollback. It commits/pushes and receives an
+exact-head independent review before ED-10 may accept it.
 
 ## External dependency packets — recorded, not dispatched
 
@@ -522,14 +587,32 @@ or future collection is activated by this packet. Owned paths are
 Skills runbooks, plus their focused extension tests; live Lisa configuration and
 SecretRefs remain OpenClaw/Server 01-owned state, never LiNKskills files.
 
+### XP-05 — Shared lane-aware dispatcher extension
+
+**Sole owner:** Deployment Advisor. This is one coordinator-side extension to
+the established dispatcher, not LiNKskills product work and not an IDE
+Development change. It binds repository + lane + branch + baseline + allowed
+paths to each stable packet; admits one active writer per lane; rejects
+overlapping/shared/broad scopes; serializes admission changes; preserves the
+global 20-job/16-writer ceilings, suspension and owner map; and reconciles
+active/ambiguous provider state before releasing a reservation.
+
+Focused offline cases cover disjoint same-repository admission, overlap denial,
+duplicate/ambiguous creation, suspension, and global limits. Until that exact
+extension is verified, LiNKskills executable capacity remains one cloud writer.
+After it passes, the coordinator may admit the disjoint waves in the lane table
+up to live account capacity. No repository implements or bypasses this shared
+change, and no paid probe is required for its offline acceptance.
+
 ## Logical integration and promotion sequence
 
 1. Phase A: ED-00 through the founder Gate-0 route; XP-00 performs the narrowly
    authorised coordinator owner transition and route preflight after approval.
 2. Environment phase: ENV-00 is the first Grok worker and produces the frozen
-   cloud/CI dependency basis.
-3. Phase B after ED-00, XP-00, and ENV-00: ED-01, followed by dependency-safe
-   ED-02 and ED-03 preparation where paths are disjoint.
+   cloud/CI dependency basis. It may proceed at one-writer capacity while XP-05
+   is pending.
+3. Phase B after ED-00, XP-00, and ENV-00: ED-01, then ED-02. After ED-02,
+   L-QUAL and L-DEPLOY may run as the first disjoint parallel wave if XP-05 is accepted.
 4. Phase C: ED-03 evidence completion → ED-04 publication source → ED-05 consumer
    packs; ED-06 image; ED-07 worker/telemetry.
 5. Platform dependency group: XP-01 consumes ED-01/06/07 and returns receipts.
@@ -540,6 +623,6 @@ SecretRefs remain OpenClaw/Server 01-owned state, never LiNKskills files.
 8. Assurance group: ED-10 proves the real failure-to-improvement loop, tool
    blast radius/rollback, accepted run cost, security/privacy/supply-chain
    clearance, and final classification/acceptance.
-8. Protected source moves `issue/*` → Phase PR → `development` → `staging` →
+9. Protected source moves `issue/*` → Phase PR → `development` → `staging` →
    `main`; production deployment uses only an accepted immutable source/image
    and is never inferred from branch promotion.
