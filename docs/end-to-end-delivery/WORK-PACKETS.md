@@ -442,9 +442,10 @@ bounded fields; unrelated consumers and later skills remain disabled.
 
 **Acceptance/checkpoint:** `FUNCTIONAL_ACCEPTED` is available when all three actor
 flows pass at compatible identities. `INTERNAL_LAUNCH_COMPLETE` remains HOLD
-until the 48-hour Cursor observation also passes. The internal-launch plan at
-`docs/LINKSKILLS-INTERNAL-LAUNCH-DETAILED-DEVELOPMENT-PLAN.md` §§13.10 and
-15.4 requires multi-day real use; the 48-hour minimum is this package's explicit
+until the 48-hour Cursor observation also passes. Phase 7 under §23 and the §31
+definition in
+`docs/LINKSKILLS-INTERNAL-LAUNCH-DETAILED-DEVELOPMENT-PLAN.md` require
+multi-day real use; the 48-hour minimum is this package's explicit
 interpretation of that otherwise unspecified duration. The single `APPROVE`
 authorizes this bounded observation as documented work; it is not a second
 approval gate. Commit
