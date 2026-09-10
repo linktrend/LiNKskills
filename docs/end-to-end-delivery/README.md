@@ -48,6 +48,13 @@ initial-seed collection adapters, and all 207 external collection members are
 classification, quarantine, and disabled activation manifests are preserved,
 but this delivery does not bulk-qualify, globally enable, or activate them.
 
+Functional usability and strict internal-launch completion are reported
+separately. `FUNCTIONAL_ACCEPTED` requires the three ordered representative
+actor flows. The binding internal-launch plan also requires multi-day Cursor
+use, so `INTERNAL_LAUNCH_COMPLETE` remains HOLD until a 48-hour observation
+spanning at least two Asia/Taipei dates passes; continuous paid activity is not
+required.
+
 ## Package index
 
 | Document | Authority and use |
@@ -108,3 +115,9 @@ the separate LiNKserver 01 Deployment Recovery task.
 Deployment Advisor acceptance releases this package for downstream planning
 only. It never supplies founder `APPROVE`, queue ownership, implementation
 authority, live mutation authority, or production acceptance.
+
+Once recorded, the single literal `APPROVE` covers all documented execution,
+publication, consumer activation, Server 01 deployment, observation, promotion,
+and production-acceptance actions. No second packet-stage approval is required.
+Only materially changed scope, access, spend, or destructive action beyond the
+documented recovery procedures requires fresh founder direction.

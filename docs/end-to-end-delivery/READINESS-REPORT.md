@@ -15,8 +15,9 @@
 - Atomic packets include inputs, exact path ownership, dependencies, outputs,
   checks, acceptance, checkpoint/handoff, deployment, and recovery.
 - The lane table derives maximum safe parallelism from dependencies and write
-  scopes: current executable capacity is one writer; after Advisor-owned XP-05,
-  the maximum safe LiNKskills wave is three disjoint writers.
+  scopes. Advisor-owned XP-05 is independently accepted; after `APPROVE`, XP-00
+  owner admission, and dependency readiness, the maximum safe LiNKskills wave is
+  three disjoint writers.
 - The manifest uses installed Coding Execution Protocol 1.0.1 with
   `V25_BOOTSTRAP_LEAN`; it is schema/semantic validated as planning state.
 - OSS reuse, secret/account provisioning, consumer ownership, server ownership,
@@ -54,7 +55,8 @@ production acceptance.
   required release/config/migration/deploy/probe/recovery work.
 - Delivery: issue checkpoints are committed/pushed; Packager/Coordinator owns
   Phase PR creation; delivery controller owns protected `development` merge;
-  production deploy and live provider mutation remain founder-reserved actions.
+  the single recorded `APPROVE` covers the documented production deploy, live
+  provider mutation, consumer activation, observation, and promotion actions.
 
 The operative standard-library REST dispatcher and guide are digest-pinned. Its
 existing Keychain-backed account passed safe reads of `/v1/me`, `/v1/models`,
@@ -63,8 +65,10 @@ available, and `linktrend/LiNKskills` is visible. No agent was created. The
 installed `cursor-cloud-dispatch-v2` SDK surface remains a reviewed future
 interface because `cursor-sdk` is not installed, but that is not a blocker to
 the operative REST route. The global suspension file does not admit this task as
-an owner, however, so ED-01 cannot currently dispatch. The dispatcher suite had
-7 PASS and 3 cases stopped early at that guard; the guard was not bypassed. See
+an owner, however, so ED-01 cannot currently dispatch. Existing transport
+evidence is reused; synthetic fixture-owner guard stops are not a product or
+startup blocker. XP-00 refreshes only actual route/account/repository/identity
+and owner admission, while XP-05 owns focused extension tests. See
 `EXECUTION-ROUTE.md`.
 
 ## Material uncertainties and gates
@@ -85,12 +89,12 @@ an owner, however, so ED-01 cannot currently dispatch. The dispatcher suite had
 
 5. XP-00 must refresh the operative route digest, GitHub packet identity, and
    rate-limit-aware authenticated account/model/repository proof immediately
-   before ENV-00 dispatch. It must also return exact queue-owner admission and a
-   clean isolated transport-suite receipt. Authentication is ready; task
-   ownership is not.
-6. XP-05 is the Deployment Advisor-owned, shared lane-aware dispatcher
-   extension. Its absence limits execution to one writer but does not block
-   sequential ENV-00/ED-01 work after approval and XP-00.
+   before ENV-00 dispatch. It must also return exact queue-owner admission.
+   Authentication is ready; task ownership is not. No unrelated transport-suite
+   repair is an ENV-00 prerequisite.
+6. XP-05 is complete: the shared lane-aware dispatcher and verification receipt
+   are digest-bound, with 23 focused offline tests and independent review PASS.
+   It grants no owner admission and launches no work; XP-00 remains required.
 
 None of these prevents complete planning. ED-00 is ready after `APPROVE` as a
 no-provider-cost identity/interface refresh through the founder Gate-0 route;
@@ -99,6 +103,13 @@ ED-00 plus a fresh XP-00 route and queue-ownership receipt. ED-01 follows its
 reproducible environment checkpoint. Any change to the five-skill initial
 set, three-consumer order, provider-v2/local-execution boundary, Platform
 ownership, or single-server posture is material and returns to the founder.
+
+The single literal `APPROVE` covers every documented execution, publication,
+consumer, deployment, observation, promotion, and production-acceptance action.
+Fresh direction is required only for materially changed scope, access, spend,
+or destructive action beyond this package. Functional acceptance is available
+after the three bounded actor flows; strict internal-launch completion remains
+HOLD until the documented 48-hour Cursor observation closes successfully.
 
 ## Planning artifact identity
 

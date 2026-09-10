@@ -194,9 +194,12 @@ All of the following must be true at the same accepted identities:
    only through intended consumer pins.
 5. Cursor, Codex, and Lisa complete representative end-to-end use in order,
    including local execution and bounded evidence submission. Identity-backed
-   read and a safe non-destructive workflow are both demonstrated; Cursor also
-   completes the approved multi-day canary window without disrupting other
-   active sessions.
+   read and a safe non-destructive workflow are both demonstrated. This is the
+   functional-acceptance boundary. Cursor then completes the minimum unambiguous
+   multi-day observation: 48 consecutive hours spanning at least two
+   Asia/Taipei calendar dates, with start/midpoint/end evidence and no disruption
+   to other active sessions. Functional usability may be reported before that
+   observation closes, but strict internal-launch completion may not.
 6. Wrong identity/scope, revoked/tampered content, store outage, provider outage,
    and disabled-consumer scenarios fail closed without unsafe fallback.
 7. Metrics, logs, alerts, founder report, Librarian status, backup, restore,
@@ -204,9 +207,15 @@ All of the following must be true at the same accepted identities:
 8. Brain/Skills separation, privacy/redaction, least privilege, and consumer
    tool authority remain intact.
 9. At least one real observed failure/correction becomes a regression eval and
-   one improved immutable version completes the governed release loop. An exact
-   tool change proves blast-radius invalidation, affected-profile revalidation,
-   and rollback without disturbing unaffected profiles.
+   one improved immutable version completes the governed release loop. The
+   primary evidence is the existing real Mac Mini PACI canary issuer-policy
+   correction `6a2101d132b42010162595a2bab2c72fee6282da` and its three
+   executable regression cases. It is replayed against the accepted candidate,
+   enters the trace-to-eval workflow, and is traced through the exact immutable
+   corrected provider image/release and accepted consumer canary. Successful new
+   software does not wait for or invent a fresh defect. An exact tool change proves blast-radius invalidation,
+   affected-profile revalidation, and rollback without disturbing unaffected
+   profiles.
 10. Database, request, model, storage, and evaluation cost per accepted run are
     measured and founder-accepted; security, privacy, and supply-chain review has
     no unresolved launch blocker.

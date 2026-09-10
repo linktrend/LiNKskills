@@ -49,8 +49,9 @@ specific runtime dependency, not a planning blocker.
 
 The manifest passed the installed Coding Execution Protocol 1.0.1 /
 `V25_BOOTSTRAP_LEAN` schema and semantic validator. Package links resolve,
-concurrent owned-path collisions are absent, intentional later L-FIX ownership
-is dependency-ordered after ED-03/09, JSON parsing and `git diff --check` pass.
+concurrent owned-path collisions are absent, IMP-00 is evidence-only, and any
+later L-FIX ownership is conditional and dependency-ordered after ED-03/09.
+JSON parsing and `git diff --check` pass.
 The pushed planning commit/tree and independent
 narrow-review result are appended to the task evidence after checkpointing.
 
@@ -64,16 +65,36 @@ Grok 4.6 Medium with Fast off is available and `linktrend/LiNKskills` is visible
 No job was launched. ED-00 is the first executable no-provider-cost packet after
 `APPROVE`; ENV-00 is the first Grok worker and follows ED-00 plus a fresh XP-00
 preflight. ED-01 follows ENV-00. The current queue suspension does not admit
-this task as owner, so ENV-00 is not executable until a governed ownership handoff or
-founder-authorised resume-scope update. The dispatcher suite had 7 PASS and 3
-fixture cases stopped early at that guard; it was not bypassed. XP-01 through
-XP-04 remain later Platform and consumer gates.
+this task as owner, so ENV-00 is not executable until the documented narrow
+resume-scope update. Existing transport evidence is reused; fixture-only guard
+stops are not a startup blocker. XP-00 refreshes actual route/account/repository/
+identity and owner admission only; XP-05's accepted receipt already supplies
+focused extension-test evidence.
+XP-01 through XP-04 remain later Platform and consumer dependencies.
 
-The repository lane table targets the graph-derived safe maximum: one writer
-with the current dispatcher, then up to three disjoint LiNKskills writers after
-the Deployment Advisor's single shared XP-05 lane-aware extension passes. The
-current task is integration owner; shared manifests, migrations, interfaces,
-and server mutations remain serialized under their named packet/owner.
+The single recorded `APPROVE` covers every action documented by this package,
+including publication, consumer activation, Server 01 deployment, the 48-hour
+Cursor observation, governed promotion, and production acceptance. There is no
+second founder gate. Only materially changed scope, access, spend, or destructive
+action outside the documented recovery procedures requires fresh direction.
+
+The improvement loop reuses the repository's real Mac Mini PACI canary
+issuer-policy correction at `6a2101d132b42010162595a2bab2c72fee6282da`
+and its three executable regression cases. Conditional new-defect packets remain
+unexecuted in `PLAN` when no new defect exists; no fictitious archive API receipt
+is required. Functional
+acceptance may be reported after the three representative actor flows. The
+approved internal-launch plan's multi-day requirement remains explicit: strict
+`INTERNAL_LAUNCH_COMPLETE` waits for a 48-hour Cursor observation spanning at
+least two Asia/Taipei dates, without requiring continuous paid activity.
+
+The Deployment Advisor's shared XP-05 lane-aware dispatcher extension is now
+independently accepted: dispatcher SHA-256 `9c5b5486842e695e47f32896728ec15568237f304ea86115cde50997e419c260`,
+verification SHA-256 `0a8dfbcd5f8d31157b454204e7a9fa57458c0c53f0f59558cf5f9f51718289ba`,
+23 focused offline tests PASS, no provider job or live mutation. After `APPROVE`,
+XP-00 owner admission, and dependency readiness, the graph-derived safe maximum
+is three disjoint LiNKskills writers. The current task is integration owner;
+shared manifests, migrations, interfaces, and server mutations remain serialized.
 
 Deployment Advisor acceptance releases downstream planning only. It is not
 founder `APPROVE` and authorises no implementation, provider call, queue change,

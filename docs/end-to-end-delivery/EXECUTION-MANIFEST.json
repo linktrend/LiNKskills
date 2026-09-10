@@ -133,7 +133,17 @@
       "ownedPaths": ["evidence/end-to-end-delivery/ed-10/", "docs/end-to-end-delivery/ACCEPTANCE.md"],
       "prohibitedPaths": ["collections/", "vendor-skills/", "supabase/migrations/", "configs/consumer-activation/"],
       "verificationCommands": [["python3", "-m", "json.tool", "evidence/end-to-end-delivery/ed-10/final-acceptance.json"], ["git", "diff", "--check"]],
-      "dependencies": ["ED-03", "ED-04", "ED-07", "ED-08", "ED-09", "FIXGS-00", "FIXPQ-00", "FIXRM-00", "FIXST-00", "FIXTA-00"],
+      "dependencies": ["ED-03", "ED-04", "ED-07", "ED-08", "ED-09", "IMP-00"],
+      "executionState": "PLAN"
+    },
+    {
+      "id": "IMP-00",
+      "title": "Replay an existing real canary correction through the improvement loop",
+      "issues": ["ISS-17"],
+      "ownedPaths": ["evidence/end-to-end-delivery/imp-00/"],
+      "prohibitedPaths": ["packages/", "skills/", "collections/", "vendor-skills/", "supabase/migrations/", "configs/consumer-activation/"],
+      "verificationCommands": [["env", "PYTHONPATH=packages/gateway:packages/contracts:packages/catalog:packages/core:.", "python3", "-m", "pytest", "-q", "tests/gateway/test_paci_adversarial.py", "-k", "ResolveClaimsVerifierPaciIssuerPolicyTests"], ["python3", "-m", "json.tool", "evidence/end-to-end-delivery/imp-00/improvement-loop-receipt.json"], ["git", "diff", "--check"]],
+      "dependencies": ["ED-06", "ED-07", "ED-08", "ED-09"],
       "executionState": "PLAN"
     },
     {
@@ -204,7 +214,8 @@
     {"id": "ISS-13", "packetId": "FIXPQ-00", "title": "Conditionally correct persistent QA"},
     {"id": "ISS-14", "packetId": "FIXRM-00", "title": "Conditionally correct repository manager"},
     {"id": "ISS-15", "packetId": "FIXST-00", "title": "Conditionally correct skill template"},
-    {"id": "ISS-16", "packetId": "FIXTA-00", "title": "Conditionally correct tool architect"}
+    {"id": "ISS-16", "packetId": "FIXTA-00", "title": "Conditionally correct tool architect"},
+    {"id": "ISS-17", "packetId": "IMP-00", "title": "Replay the existing PACI canary regression through the improvement loop"}
   ],
   "controls": {
     "exactCandidateInvalidation": {"enabled": true, "identityFields": ["repository", "commit", "tree", "workflowDigest", "profileDigest"]},
