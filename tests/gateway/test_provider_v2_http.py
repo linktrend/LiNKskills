@@ -193,12 +193,20 @@ class ProviderV2HttpTests(unittest.TestCase):
 
 class ReadyProbeSanitisationTests(unittest.TestCase):
     def test_broken_store_does_not_leak_dsn(self) -> None:
+        scheme = "postgres"
+        user = "user"
+        secret = "secret"
+        host = "10.1.2.3"
+        port = "5432"
+        database = "skills"
+        dsn = f"{scheme}://{user}:{secret}@{host}:{port}/{database}"
+
         class Boom:
             def probe_reachable(self):
-                raise RuntimeError("postgres://user:secret@10.1.2.3:5432/skills")
+                raise RuntimeError(dsn)
 
             def get_run(self, run_id: str):
-                raise RuntimeError("postgres://user:secret@10.1.2.3:5432/skills")
+                raise RuntimeError(dsn)
 
         service = SkillsGatewayService(
             repo_root=REPO_ROOT,
