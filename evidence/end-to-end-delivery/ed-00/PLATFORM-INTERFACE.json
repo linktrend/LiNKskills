@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 1,
+  "kind": "linkskills-platform-interface",
+  "status": "CONTRACT_FROZEN_LIVE_DEPENDENCY_HOLD",
+  "observedAt": "2026-09-10T15:41:06+08:00",
+  "ownership": {
+    "platformAuthority": "LiNKplatform owns canonical actor identity, organisation membership, authentication, credentials, shared live migration control, hosting, and generic Librarian hosting.",
+    "skillsAuthority": "LiNKskills owns the Skills catalogue, provider contracts, Skills-domain worker, qualification evidence, and consumer contract fragments.",
+    "liveRecoveryOwner": "01a0843c-0df9-74e2-907a-05c5f736d6ed",
+    "boundary": "LiNKskills does not create a competing identity authority, apply shared live migrations, mutate Platform runtime state, or own consumer runtime configuration."
+  },
+  "repositoryIdentities": {
+    "linktrend/LiNKskills": {
+      "development": {
+        "ref": "refs/heads/development",
+        "commit": "7a813f529f7b25a40fd3e88f74fb0e86c7c728d5",
+        "tree": "d0bb392351994810173f730c47b63112c31e391b"
+      },
+      "main": {
+        "ref": "refs/heads/main",
+        "commit": "7067716fef5189a1427a7cf9b0847cec898e19de",
+        "tree": "d0bb392351994810173f730c47b63112c31e391b"
+      }
+    },
+    "linktrend/LiNKplatform": {
+      "development": {
+        "ref": "refs/heads/development",
+        "commit": "f6373fccc89732cbb88bb18562daa69cc031a2e3",
+        "tree": "83feddf7d935561cfede60df456ea616a021d726"
+      },
+      "main": {
+        "ref": "refs/heads/main",
+        "commit": "a0058e749b2530c4abf8deadb09f2fd4add1ee4f",
+        "tree": "cc3ac1e0436a0a15a3ce790c4b0ca6d8e2541b71"
+      }
+    }
+  },
+  "authoritativePlatformSources": [
+    {
+      "repository": "linktrend/LiNKplatform",
+      "ref": "refs/heads/development",
+      "commit": "f6373fccc89732cbb88bb18562daa69cc031a2e3",
+      "tree": "83feddf7d935561cfede60df456ea616a021d726",
+      "path": "docs/LINKPLATFORM-SHARED-FOUNDATION-DETAILED-IMPLEMENTATION-PLAN.md",
+      "gitBlob": "7477a17d4189f0dad950ca326ea42c89b0e8c072",
+      "sha256": "b942f0a9a94875379b0f63222df719fc6a04ee6f05b0bac78775e6d5e8dc61e0",
+      "use": "Ownership and migration/hosting interface authority; unchanged blob despite the protected development ref advancing."
+    },
+    {
+      "repository": "linktrend/LiNKplatform",
+      "ref": "refs/heads/development",
+      "commit": "f6373fccc89732cbb88bb18562daa69cc031a2e3",
+      "tree": "83feddf7d935561cfede60df456ea616a021d726",
+      "path": "packages/contracts/schemas/platform-auth-claims.v1.1.0.json",
+      "gitBlob": "4f62d303a88e4ba8b13c62f0c3b1d1a865f91f8f",
+      "sha256": "c2e8bc68b3feb9a3dacc497f5a5d497b466c400804fb4f9e41734c10772ddfa1",
+      "use": "Consumed AuthClaims schema; LiNKskills does not edit it."
+    },
+    {
+      "repository": "linktrend/LiNKplatform",
+      "ref": "refs/heads/development",
+      "commit": "f6373fccc89732cbb88bb18562daa69cc031a2e3",
+      "tree": "83feddf7d935561cfede60df456ea616a021d726",
+      "path": "packages/contracts/schemas/platform-auth-token-envelope.v0.1.0.json",
+      "gitBlob": "73ea06164acb6dc89ed7270c1c7b5e8167d83d5f",
+      "sha256": "7173b9f9bca59ce8a0e3e3dc2b78b680dd07fdd2451215e3ecd97ff3dd463eed",
+      "use": "Consumed token-envelope schema; LiNKskills does not edit it."
+    }
+  ],
+  "skillsConsumerContract": {
+    "audience": "lskills-api",
+    "requiredScope": "lskills",
+    "identitySource": "Platform-issued identity and credentials",
+    "providerExecutionBoundary": "Consumers retrieve exact immutable Skills content and execute locally under their own tool authority.",
+    "failClosedRules": [
+      "Reject missing, invalid, expired, wrong-audience, and wrong-scope credentials.",
+      "Reject revoked, quarantined, unavailable, incompatible, tampered, stale, and unsupported releases without fallback.",
+      "Do not copy Brain conversations, private memory, secrets, or raw tool output into Skills telemetry."
+    ],
+    "liveCredentialValues": "withheld; no secret value is part of this evidence"
+  },
+  "currentRecoveryEvidence": [
+    {
+      "path": "local:/Users/linktrend/Documents/Codex/2026-09-09/linkserver-01-deployment-recovery/work/S01-PLATFORM-ISSUE-238-SUPABASE-PG17-EVIDENCE.json",
+      "sha256": "b199c77889dec7620ea052a8983d6e575a8e80d59ba1cd4427f89e55f58567be",
+      "observedFact": "Protected Platform candidate 4ace77cb5ff0a55d958b0fcaa7eaaf010ba01c36 / tree 83feddf7d935561cfede60df456ea616a021d726 has focused PASS and a real Server 01 encrypted production-checkpoint isolated restore PASS with exact fingerprint match, network none, and cleanup true."
+    },
+    {
+      "path": "local:/Users/linktrend/Documents/Codex/2026-09-09/files-pasted-by-the-user-i/outputs/SERVER01-INDEPENDENT-CLOSURE-2026-09-10.md",
+      "sha256": "89ef667ed14adc01f344371a939f17b404151bf268a3c19a9982f0907180ebd1",
+      "observedFact": "Platform/Server 01 recovery retains unresolved live activation gates for target-only backup/restore receipt use, authenticated svc_platform migration control, live PACI identity/trust, distinct bindings and SecretRefs, and admitted endpoints/overlays."
+    }
+  ],
+  "driftAssessment": {
+    "materialScopeOrInterfaceDrift": false,
+    "knownPlannedGap": "The live Server 01 container exposes legacy skills.api.v0.1 while the accepted delivery target is resource-first skills.api.v0.2; ED-02 owns reconciliation and no compatibility is inferred here.",
+    "provenanceHold": "The embedded catalog/index.json reports git_sha e9403440b95eb9fedf861bd27eff21f5bf4d3fd5 and source_tree_sha256 3d2c7e96fef40836e9dbf040296de97c1d07d98e26dc0dd8f599cff443facbd2, while the image release marker is LiNKskills main 7067716fef5189a1427a7cf9b0847cec898e19de / tree d0bb392351994810173f730c47b63112c31e391b. This pre-existing generated-artifact provenance discrepancy is held for later reconciliation."
+  }
+}
