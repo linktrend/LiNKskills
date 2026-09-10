@@ -24,11 +24,11 @@ class V2ProviderTests(unittest.TestCase):
     def test_catalog_has_snapshot_but_release_is_exact(self):
         catalog = self.call("skills_catalog_list", limit=2); self.assertTrue(catalog["ok"]); self.assertIn("snapshot_id", catalog)
         self.assertTrue(self.call("skills_catalog_search")["ok"])
-        self.assertEqual(self.call("skills_release_describe")["error"], "exact_release_required")
+        self.assertEqual(self.call("skills_release_describe")["error"], "validation_failed")
         missing = self.call("skills_release_describe", skill_id="safe", version="1.0.0", cursor=catalog["cursor"])
         self.assertEqual(missing["error"], "catalog_unavailable")
     def test_cursor_protocol_legacy_and_bounds_fail_closed(self):
-        for extra, expected in (({"cursor":"bad"},"cursor_snapshot_mismatch"),({"cursor":"snapshot:wrong:0"},"cursor_snapshot_mismatch"),({"limit":101},"validation_failed"),({"session_id":"x"},"session_not_supported"),({"protocol_version":"2024-11-05"},"contract_incompatible")):
+        for extra, expected in (({"cursor":"bad"},"validation_failed"),({"cursor":"snapshot:wrong:0"},"validation_failed"),({"limit":101},"validation_failed"),({"session_id":"x"},"contract_incompatible"),({"protocol_version":"2024-11-05"},"contract_incompatible")):
             self.assertEqual(self.p.handle(dict(self.base, operation="skills_catalog_list", **extra))["error"], expected)
         self.assertEqual(self.call("skills_run_start")["error"], "legacy_execution_disabled")
         self.assertEqual(self.call("skills_tool_invoke")["error"], "legacy_execution_disabled")
@@ -46,7 +46,7 @@ class V2ProviderTests(unittest.TestCase):
         self.assertEqual(injected["result"]["error"], "contract_incompatible")
         negotiated = server.handle_rpc({"id":1,"method":"initialize","params":{"protocolVersion":"2026-07-28"}})
         self.assertEqual(negotiated["result"]["protocolVersion"], "2026-07-28")
-        listed = server.handle_rpc({"id":2,"method":"resources/list","params":{"authorization":"trusted"}})
+        listed = server.handle_rpc({"id":2,"method":"resources/list","params":{"_meta":{"authorization":"trusted"}}})
         self.assertEqual(len(listed["result"]["resources"]),13)
 
 
@@ -91,7 +91,7 @@ class GovernedV2ProviderTests(unittest.TestCase):
         second = self.call("skills_catalog_list", limit=2, cursor=first["next_cursor"])
         self.assertEqual([item["family_id"] for item in second["items"]], ["operations"])
         self.assertFalse(second["has_more"])
-        self.assertEqual(self.call("skills_catalog_list", limit=2, cursor="snapshot:other:0")["error"], "cursor_snapshot_mismatch")
+        self.assertEqual(self.call("skills_catalog_list", limit=2, cursor="snapshot:other:0")["error"], "validation_failed")
 
     def test_exact_resource_returns_immutable_bytes_and_digest(self):
         result = self.call("skills_release_resource_get", skill_id="research", version="1.0.0", resource_id="entrypoint")
@@ -105,10 +105,10 @@ class GovernedV2ProviderTests(unittest.TestCase):
     def test_role_and_profile_gates_fail_closed(self):
         denied_role = TrustedIdentity("org-a", "actor-a", "lskills-api", frozenset({"skills.read", "web.read"}), "binding", runtime_profiles=frozenset({"codex-macos"}), activated_release_ids=frozenset({"research@1.0.0"}))
         provider = V2Provider(lambda _: denied_role, releases=[self.release], families=self.families)
-        self.assertEqual(provider.handle(dict(self.base, operation="skills_release_describe", skill_id="research", version="1.0.0"))["error"], "role_not_authorized")
+        self.assertEqual(provider.handle(dict(self.base, operation="skills_release_describe", skill_id="research", version="1.0.0"))["error"], "forbidden")
         profile_denied = dict(self.release, consumer_profile_activation=False)
         provider = V2Provider(self.identity, releases=[profile_denied], families=self.families)
-        self.assertEqual(provider.handle(dict(self.base, operation="skills_release_describe", skill_id="research", version="1.0.0"))["error"], "consumer_profile_activation")
+        self.assertEqual(provider.handle(dict(self.base, operation="skills_release_describe", skill_id="research", version="1.0.0"))["error"], "forbidden")
 
     def test_standard_initialize_and_client_verifies_exact_read(self):
         server = ModernSkillsMcpServer(self.provider)
@@ -211,3 +211,77 @@ class GovernedV2ProviderTests(unittest.TestCase):
         self.assertEqual(denied["error"], "forbidden")
         reader_status = call("reader", "skills_use_report_status_get", {"report_id": "opaque:report:shared"})
         self.assertEqual(reader_status["status"], "accepted")
+
+        injected = server.handle_rpc(
+            {
+                "id": 99,
+                "method": "resources/read",
+                "params": {
+                    "uri": "skills://catalog",
+                    "operation": "skills_use_report_submit",
+                    "report": report,
+                    "client_idempotency_key": "k-inject",
+                    "_meta": {"authorization": "org-a"},
+                },
+            }
+        )
+        injected_body = injected["result"]["structuredContent"]
+        self.assertTrue(injected_body.get("ok"))
+        self.assertEqual(injected_body.get("operation"), "skills_catalog_list")
+        self.assertNotIn("receipt_id", injected_body)
+        unmapped = server.handle_rpc(
+            {
+                "id": 100,
+                "method": "resources/read",
+                "params": {
+                    "uri": "skills://tool/skills_use_report_submit",
+                    "operation": "skills_use_report_submit",
+                    "arguments": {"report": report},
+                    "_meta": {"authorization": "org-a"},
+                },
+            }
+        )
+        self.assertTrue(unmapped["result"]["isError"])
+        self.assertEqual(unmapped["result"]["structuredContent"]["error"], "unsupported_operation")
+        forged = call(
+            "org-a",
+            "skills_use_report_status_get",
+            {
+                "report_id": "opaque:report:shared",
+                "authorization": "org-b",
+                "org_id": "org-b",
+                "actor_id": "actor-b",
+            },
+        )
+        self.assertEqual(forged["status"], "accepted")
+        exclusive = call(
+            "org-a",
+            "skills_use_report_submit",
+            {"report": dict(report, report_id="opaque:report:a-only"), "client_idempotency_key": "k-a-only"},
+        )
+        self.assertTrue(exclusive["ok"])
+        stolen = call(
+            "org-b",
+            "skills_use_report_status_get",
+            {
+                "report_id": "opaque:report:a-only",
+                "authorization": "org-a",
+                "org_id": "org-a",
+                "actor_id": "actor-a",
+            },
+        )
+        self.assertEqual(stolen["error"], "not_found")
+        created = call(
+            "org-b",
+            "skills_use_report_submit",
+            {
+                "report": dict(report, report_id="opaque:report:forged"),
+                "client_idempotency_key": "k-forge",
+                "authorization": "org-a",
+                "org_id": "org-a",
+                "actor_id": "actor-a",
+            },
+        )
+        self.assertTrue(created["ok"])
+        owner_sees_forged = call("org-a", "skills_use_report_status_get", {"report_id": "opaque:report:forged"})
+        self.assertEqual(owner_sees_forged["error"], "not_found")

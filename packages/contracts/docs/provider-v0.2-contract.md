@@ -109,9 +109,23 @@ ED-02 implements the production HTTP and MCP adapters over the shared
 One installable domain (`SkillsApiV2` / `V2Provider`) is shared by:
 
 - HTTP: `linkskills-gateway` serving `GET /health`, `GET /ready`,
-  `GET /v2/openapi.json`, `GET /v2/capabilities`, `POST /v2/{operation}`
+  `GET /v2/openapi.json`, `GET /v2/capabilities`, `GET /v2/mcp-capabilities`,
+  `POST /v2/{operation}`
 - MCP: `linkskills-mcp-v2` requiring explicit protocol `2026-07-28` on
-  `initialize`, with sessionless per-request authorization thereafter
+  `initialize`, with sessionless per-request authorization thereafter.
+  Transport ``_meta.authorization`` (HTTP ``Authorization``) is the only
+  identity source. Caller ``operation``, ``authorization``, ``org_id``,
+  ``actor_id``, and equivalent identity fields are stripped. MCP
+  ``resources/read`` derives its operation exclusively from the server-owned
+  URI map.
+
+Public domain errors are the closed ``skills.api.v0.2`` vocabulary in
+``fixtures/mcp/v0.2-policy.json`` ``typed_errors``. Internal role, store,
+integrity, cursor, and lifecycle reasons project onto that vocabulary and
+are never returned as public codes. ``GET /v2/capabilities`` and
+``GET /v2/mcp-capabilities`` return one live document; the committed MCP
+capability fixture is the deterministic static projection of that document
+(every field except runtime ``catalog_ready``).
 
 Business rules (gates, pagination snapshot, exact bytes/digests, privacy,
 idempotency, legacy execution denial) live only in the core domain.

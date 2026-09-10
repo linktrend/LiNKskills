@@ -13,13 +13,18 @@ from urllib.parse import parse_qs, urlparse
 from linkskills_core.provider_v2 import (
     CATALOG_OPERATIONS,
     CONTRACT_VERSION,
+    MCP_SERVER_INFO,
     PROTOCOL_VERSION,
     RESOURCE_OPERATIONS,
+    RESOURCE_READ_PARAM_KEYS,
     TOOLS,
     InMemoryProviderStore,
     SkillsApiV2,
     TrustedIdentity,
     V2Provider,
+    bind_trusted_request,
+    operation_from_resource_uri,
+    strip_untrusted_identity,
 )
 
 __all__ = [
@@ -47,9 +52,11 @@ class ModernSkillsMcpServer:
 
     @staticmethod
     def _authorization(params: Mapping[str, Any]) -> Any:
-        """Extract transport metadata authorization, never caller claims."""
+        """Extract transport ``_meta`` authorization only; never caller claims."""
         meta = params.get("_meta")
-        return meta.get("authorization") if isinstance(meta, Mapping) else params.get("authorization")
+        if not isinstance(meta, Mapping):
+            return None
+        return meta.get("authorization")
 
     def handle_rpc(self, message: Mapping[str, Any]) -> dict[str, Any] | None:
         """Handle one JSON-RPC request or return ``None`` for notifications."""
@@ -60,7 +67,7 @@ class ModernSkillsMcpServer:
             requested = params.get("protocolVersion")
             authorization = self._authorization(params)
             if any(key in params for key in ("session", "session_id")):
-                return self._error(req_id, "session_not_supported")
+                return self._error(req_id, "contract_incompatible")
             if requested != self.protocol_version:
                 return self._result(req_id, {"ok": False, "error": "contract_incompatible"})
             if authorization is not None:
@@ -82,7 +89,7 @@ class ModernSkillsMcpServer:
                         "resources": {"listChanged": False, "subscribe": False},
                         "tools": {},
                     },
-                    "serverInfo": {"name": "linkskills-mcp-v2", "version": "2.0.0"},
+                    "serverInfo": dict(MCP_SERVER_INFO),
                 },
             )
         if method == "notifications/initialized":
@@ -109,14 +116,27 @@ class ModernSkillsMcpServer:
             )
             return self._result(req_id, {"tools": list(self.provider.tools())} if auth["ok"] else auth)
         if method == "resources/read":
-            request = dict(self._params_from_uri(params.get("uri")))
-            request.update(params)
-            request.update(
-                {
-                    "protocol_version": self.protocol_version,
-                    "authorization": self._authorization(params),
-                    "operation": request.get("operation") or self._operation_from_uri(request.get("uri")),
-                }
+            uri = params.get("uri")
+            operation = operation_from_resource_uri(uri)
+            if operation is None:
+                return self._result(
+                    req_id,
+                    {
+                        "contents": [],
+                        "structuredContent": {"ok": False, "error": "unsupported_operation"},
+                        "isError": True,
+                    },
+                )
+            extras = {
+                key: params[key]
+                for key in RESOURCE_READ_PARAM_KEYS
+                if key in params and key != "uri"
+            }
+            request = bind_trusted_request(
+                {**self._params_from_uri(uri), **extras},
+                operation=operation,
+                authorization=self._authorization(params),
+                protocol_version=self.protocol_version,
             )
             response = self.provider.handle(request)
             if not response["ok"]:
@@ -136,47 +156,21 @@ class ModernSkillsMcpServer:
             return self._result(req_id, {"contents": contents, "structuredContent": response})
         if method == "tools/call":
             arguments = params.get("arguments") if isinstance(params.get("arguments"), Mapping) else {}
-            request = {"protocol_version": self.protocol_version, "authorization": self._authorization(params)}
-            request.update(arguments)
-            request["operation"] = params.get("name")
+            cleaned = strip_untrusted_identity(arguments)
+            request = bind_trusted_request(
+                cleaned,
+                operation=str(params.get("name") or ""),
+                authorization=self._authorization(params),
+                protocol_version=self.protocol_version,
+            )
             response = self.provider.handle(request)
             return self._result(req_id, {"structuredContent": response, "isError": not response["ok"]})
         return self._error(req_id, "unsupported_operation")
 
     @staticmethod
     def _operation_from_uri(uri: Any) -> str | None:
-        """Map standard resource URIs to the provider operation name."""
-        if not isinstance(uri, str) or not uri.startswith("skills://"):
-            return None
-        if uri.startswith("skills://guide/domains/"):
-            return "skills_capabilities_get"
-        if uri.startswith("skills://guide/capabilities"):
-            return "skills_capabilities_get"
-        if uri.startswith("skills://catalog/search"):
-            return "skills_catalog_search"
-        if uri.startswith("skills://catalog"):
-            return "skills_catalog_list"
-        if uri.endswith("/entrypoint") or uri.endswith("/manifest"):
-            return "skills_release_entrypoint_get"
-        if "/section/" in uri or "/fragment/" in uri:
-            return "skills_release_section_get"
-        if "/resource/" in uri:
-            return "skills_release_resource_get"
-        if "/content/" in uri:
-            return "skills_release_content_get"
-        if uri.endswith("/package"):
-            return "skills_release_package_get"
-        if "/sections" in uri:
-            return "skills_release_sections_list"
-        if uri.endswith("/resources") or "/resources?" in uri:
-            return "skills_release_resources_list"
-        if uri.endswith("/summary"):
-            return "skills_release_describe"
-        if uri.endswith("/qualification"):
-            return "skills_qualification_get"
-        if uri.startswith("skills://release/"):
-            return "skills_release_list"
-        return None
+        """Map standard resource URIs using the server-owned template table."""
+        return operation_from_resource_uri(uri)
 
     @classmethod
     def _params_from_uri(cls, uri: Any) -> dict[str, Any]:

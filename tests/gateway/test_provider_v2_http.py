@@ -121,7 +121,15 @@ class ProviderV2HttpTests(unittest.TestCase):
         conn.request("GET", "/v2/capabilities")
         caps = json.loads(conn.getresponse().read().decode())
         conn.close()
+        conn = self._conn()
+        conn.request("GET", "/v2/mcp-capabilities")
+        mcp_caps = json.loads(conn.getresponse().read().decode())
+        conn.close()
         self.assertEqual(caps["mcp_protocol"], "2026-07-28")
+        self.assertEqual(caps["serverInfo"]["name"], "linkskills-mcp-v2")
+        self.assertEqual(caps["denied_on_v2"], ["skills_run_*", "skills_tool_*"])
+        self.assertEqual(caps["initialize_protocol_version"], "2026-07-28")
+        self.assertEqual(caps, mcp_caps)
         self.assertFalse(caps["legacy_execution"])
         self.assertIn("retained_v0_1_image", LEGACY_REMOVAL_GATE)
         conn = self._conn()
@@ -129,6 +137,7 @@ class ProviderV2HttpTests(unittest.TestCase):
         spec = json.loads(conn.getresponse().read().decode())
         conn.close()
         self.assertEqual(spec["openapi"], "3.1.0")
+        self.assertIn("/v2/mcp-capabilities", spec["paths"])
 
     def test_http_conformance_and_legacy_denial(self) -> None:
         headers = {
@@ -371,6 +380,49 @@ class TenantBoundReceiptHttpTests(unittest.TestCase):
         )
         self.assertEqual(status, 200)
         self.assertEqual(own["status"], "accepted")
+        forged_token = mint_test_bearer(
+            {
+                "actor_id": "actor-b",
+                "actor_kind": "human",
+                "org_id": "org-b",
+                "scopes": ["skills:read", "skills:write"],
+                "exp": int(time.time()) + 3600,
+            }
+        )
+        status, spoofed = self._post(
+            org_a,
+            "skills_use_report_status_get",
+            {
+                "report_id": "opaque:report:http-shared",
+                "authorization": f"Bearer {forged_token}",
+                "org_id": "org-b",
+                "actor_id": "actor-b",
+            },
+        )
+        self.assertEqual(status, 200)
+        self.assertEqual(spoofed["status"], "accepted")
+        status, exclusive = self._post(
+            org_a,
+            "skills_use_report_submit",
+            {
+                "report": dict(report, report_id="opaque:report:http-a-only"),
+                "client_idempotency_key": "k-a-only",
+            },
+        )
+        self.assertEqual(status, 200)
+        self.assertTrue(exclusive["ok"])
+        status, cannot_steal = self._post(
+            org_b,
+            "skills_use_report_status_get",
+            {
+                "report_id": "opaque:report:http-a-only",
+                "authorization": f"Bearer {org_a}",
+                "org_id": "org-a",
+                "actor_id": "actor-a",
+            },
+        )
+        self.assertEqual(status, 404)
+        self.assertEqual(cannot_steal["error"], "not_found")
 
 
 class ReadyProbeSanitisationTests(unittest.TestCase):

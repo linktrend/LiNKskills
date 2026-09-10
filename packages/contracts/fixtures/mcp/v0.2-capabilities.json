@@ -29,5 +29,85 @@
     "skills_feedback_status_get",
     "skills_librarian_status_get"
   ],
-  "denied_on_v2": ["skills_run_*", "skills_tool_*"]
+  "denied_on_v2": ["skills_run_*", "skills_tool_*"],
+  "uri_templates": {
+    "skills_capabilities_get": [
+      "skills://guide/capabilities",
+      "skills://guide/domains/{domain}"
+    ],
+    "skills_catalog_list": ["skills://catalog?cursor={cursor}&limit={limit}"],
+    "skills_catalog_search": [
+      "skills://catalog/search?query={query}&cursor={cursor}&limit={limit}"
+    ],
+    "skills_release_list": ["skills://release/{skill_id}?cursor={cursor}&limit={limit}"],
+    "skills_release_describe": ["skills://release/{skill_id}/{version}/summary"],
+    "skills_qualification_get": [
+      "skills://release/{skill_id}/{version}/qualification"
+    ],
+    "skills_release_entrypoint_get": [
+      "skills://release/{skill_id}/{version}/manifest",
+      "skills://release/{skill_id}/{version}/entrypoint"
+    ],
+    "skills_release_sections_list": [
+      "skills://release/{skill_id}/{version}/sections?cursor={cursor}&limit={limit}"
+    ],
+    "skills_release_section_get": [
+      "skills://release/{skill_id}/{version}/section/{section_id}?cursor={cursor}&limit={limit}",
+      "skills://release/{skill_id}/{version}/fragment/{fragment_id}?cursor={cursor}&limit={limit}"
+    ],
+    "skills_release_resources_list": [
+      "skills://release/{skill_id}/{version}/resources?cursor={cursor}&limit={limit}"
+    ],
+    "skills_release_resource_get": [
+      "skills://release/{skill_id}/{version}/resource/{resource_id}?cursor={cursor}&limit={limit}"
+    ],
+    "skills_release_content_get": [
+      "skills://release/{skill_id}/{version}/content/{content_id}"
+    ],
+    "skills_release_package_get": ["skills://release/{skill_id}/{version}/package"]
+  },
+  "typed_errors": [
+    "contract_incompatible",
+    "auth_required",
+    "auth_invalid",
+    "forbidden",
+    "not_found",
+    "catalog_unavailable",
+    "validation_failed",
+    "idempotency_conflict",
+    "legacy_execution_disabled",
+    "unsupported_operation",
+    "expired_release",
+    "revoked_release",
+    "not_qualified"
+  ],
+  "compatibility": {
+    "legacy_adapter": "POST /v1/{operation} plus newline JSON-RPC MCP 2024-11-05",
+    "legacy_execution_on_v2": "legacy_execution_disabled",
+    "removal_criterion": "Remove the v0.1 adapter only after every admitted consumer uses skills.api.v0.2, Server 01 has rolled back or drained the v0.1 image at least once, and no live v0.1 client remains.",
+    "rollback": "Drain the v2 candidate and restore the retained v0.1 image/compose projection. Immutable releases are never rewritten.",
+    "retained_v0_1_image": "sha256:7cf2780a82c2c37c113b2d55b787a4e72a7098063cf434ea0654826c3719257f",
+    "retained_v0_1_release": "7067716fef5189a1427a7cf9b0847cec898e19de"
+  },
+  "operations": [
+    "skills_capabilities_get",
+    "skills_catalog_list",
+    "skills_catalog_search",
+    "skills_release_list",
+    "skills_release_describe",
+    "skills_qualification_get",
+    "skills_release_entrypoint_get",
+    "skills_release_sections_list",
+    "skills_release_section_get",
+    "skills_release_resources_list",
+    "skills_release_resource_get",
+    "skills_release_content_get",
+    "skills_release_package_get",
+    "skills_release_verify",
+    "skills_use_report_submit",
+    "skills_use_report_status_get",
+    "skills_feedback_submit",
+    "skills_feedback_status_get",
+    "skills_librarian_status_get"
+  ]
 }

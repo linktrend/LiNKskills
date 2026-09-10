@@ -100,6 +100,7 @@ class V2ContractTests(unittest.TestCase):
         openapi = load_fixture("openapi", "skills-api-v0.2.json")
         self.assertEqual(openapi["openapi"], "3.1.0")
         self.assertIn("/v2/{operation}", openapi["paths"])
+        self.assertIn("/v2/mcp-capabilities", openapi["paths"])
 
     def test_metadata_vocabularies_and_informational_authority(self) -> None:
         payload = load_fixture("metadata", "valid-informational.json")

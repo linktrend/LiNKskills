@@ -14,12 +14,16 @@ from typing import Any, Mapping, Optional
 
 from linkskills_core.provider_v2 import (
     CONTRACT_VERSION,
+    DENIED_ON_V2,
+    MCP_SERVER_INFO,
     PROTOCOL_VERSION,
+    PUBLIC_TYPED_ERRORS,
     RESOURCE_OPERATIONS,
     TOOLS,
     SkillsApiV2,
     TrustedIdentity,
     V2Provider,
+    bind_trusted_request,
 )
 
 LEGACY_REMOVAL_GATE = {
@@ -118,6 +122,8 @@ def load_openapi() -> dict[str, Any]:
         "paths": {
             "/health": {"get": {"summary": "Liveness"}},
             "/ready": {"get": {"summary": "Readiness; never proves consumer execution"}},
+            "/v2/capabilities": {"get": {"summary": "HTTP/MCP capability record"}},
+            "/v2/mcp-capabilities": {"get": {"summary": "Same capability record as /v2/capabilities"}},
             "/v2/{operation}": {"post": {"summary": "skills.api.v0.2 operations"}},
         },
     }
@@ -125,32 +131,23 @@ def load_openapi() -> dict[str, Any]:
 
 def capability_record(provider: SkillsApiV2) -> dict[str, Any]:
     """Machine-readable MCP/HTTP capability advertisement."""
+    resources = [item["name"] for item in provider.resources()]
+    tools = list(provider.tools())
     return {
         "contract_version": CONTRACT_VERSION,
         "mcp_protocol": PROTOCOL_VERSION,
         "sessionless": True,
-        "legacy_execution": False,
-        "resources": [item["name"] for item in provider.resources()],
-        "tools": list(provider.tools()),
         "initialize_required": False,
+        "initialize_protocol_version": PROTOCOL_VERSION,
+        "legacy_execution": False,
+        "serverInfo": dict(MCP_SERVER_INFO),
+        "resources": resources,
+        "tools": tools,
+        "denied_on_v2": list(DENIED_ON_V2),
         "uri_templates": {
             item["name"]: item["uri_templates"] for item in provider.resources()
         },
-        "typed_errors": [
-            "contract_incompatible",
-            "auth_required",
-            "auth_invalid",
-            "forbidden",
-            "not_found",
-            "catalog_unavailable",
-            "validation_failed",
-            "idempotency_conflict",
-            "legacy_execution_disabled",
-            "unsupported_operation",
-            "expired_release",
-            "revoked_release",
-            "not_qualified",
-        ],
+        "typed_errors": list(PUBLIC_TYPED_ERRORS),
         "compatibility": LEGACY_REMOVAL_GATE,
         "operations": list(RESOURCE_OPERATIONS + TOOLS),
         "catalog_ready": bool(provider.catalog_ready),

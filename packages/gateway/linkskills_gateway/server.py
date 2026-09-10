@@ -38,6 +38,8 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any, Callable, Dict, Mapping, Optional, Tuple, Type
 from urllib.parse import urlparse
 
+from linkskills_core.provider_v2 import bind_trusted_request
+
 from .auth import (
     AuthConfigurationError,
     AuthError,
@@ -264,10 +266,11 @@ def make_handler(
                 assert body is not None
                 authorization = self.headers.get("Authorization")
                 params = body.get("params") if isinstance(body.get("params"), dict) else body
-                request = dict(params)
-                request["operation"] = operation
-                request["protocol_version"] = request.get("protocol_version") or "2026-07-28"
-                request["authorization"] = authorization or request.get("authorization")
+                request = bind_trusted_request(
+                    params if isinstance(params, dict) else {},
+                    operation=operation,
+                    authorization=authorization,
+                )
                 stats.begin_work()
                 try:
                     result = skills_v2.handle(request)

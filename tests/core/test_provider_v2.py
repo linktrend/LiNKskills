@@ -75,7 +75,7 @@ class ProviderV2DomainTests(unittest.TestCase):
         )
         self.assertEqual(
             self.provider.handle(dict(self.base, operation="skills_catalog_list", session_id="x"))["error"],
-            "session_not_supported",
+            "contract_incompatible",
         )
 
     def test_legacy_execution_has_no_provider_route(self) -> None:
@@ -94,17 +94,17 @@ class ProviderV2DomainTests(unittest.TestCase):
         self.assertTrue(page["has_more"])
         self.assertEqual(
             self.call("skills_catalog_list", limit=1, cursor="snapshot:deadbeefdeadbeef:1")["error"],
-            "cursor_snapshot_mismatch",
+            "validation_failed",
         )
         self.assertEqual(
             self.call("skills_catalog_list", limit=1, cursor=page["snapshot_id"] + ":not-an-int")["error"],
-            "cursor_invalid",
+            "validation_failed",
         )
 
     def test_unqualified_inactive_revoked_expired_fail_closed(self) -> None:
         for extra, expected in (
             ({"qualification": "eval_pending"}, "not_qualified"),
-            ({"skills_release_selectability": False}, "skills_release_selectability"),
+            ({"skills_release_selectability": False}, "not_qualified"),
             ({"lifecycle_state": "revoked"}, "revoked_release"),
             ({"lifecycle_state": "expired"}, "expired_release"),
         ):
@@ -130,7 +130,7 @@ class ProviderV2DomainTests(unittest.TestCase):
                 resource_id="entrypoint",
                 expected_digest="sha256:" + "0" * 64,
             )["error"],
-            "integrity_mismatch",
+            "validation_failed",
         )
         exact = self.call(
             "skills_release_resource_get",
@@ -365,9 +365,123 @@ class ProviderV2DomainTests(unittest.TestCase):
             "skills_feedback_submit",
             feedback={"skill_id": "research", "feedback_id": "opaque:fb:1", "kind": "friction"},
         )
-        self.assertEqual(result["error"], "store_unavailable")
-        self.assertTrue(result["store"]["fail_closed"])
+        self.assertEqual(result["error"], "catalog_unavailable")
+        self.assertTrue(result["fail_closed"])
+        self.assertNotIn("store", result)
         self.assertNotIn("postgres://", json_dump(result))
+
+    def test_every_public_error_is_declared(self) -> None:
+        from linkskills_core.provider_v2 import PUBLIC_TYPED_ERRORS, RESOURCE_OPERATIONS, TOOLS
+
+        declared = set(PUBLIC_TYPED_ERRORS)
+        seen: set[str] = set()
+
+        def record(result: dict) -> None:
+            self.assertFalse(result.get("ok", True))
+            self.assertIn(result["error"], declared, msg=result)
+            seen.add(result["error"])
+
+        record(self.provider.handle(dict(self.base, operation="skills_catalog_list", protocol_version="nope")))
+        record(self.provider.handle(dict(self.base, operation="skills_catalog_list", session_id="x")))
+        record(self.call("skills_run_start"))
+        record(self.call("not_a_real_op"))
+        record(self.provider.handle({"protocol_version": "2026-07-28", "authorization": None, "operation": "skills_catalog_list"}))
+        strict = V2Provider(
+            lambda token: _identity() if token == "trusted" else (_ for _ in ()).throw(ValueError("bad")),
+            releases=[RELEASE],
+            store=self.store,
+        )
+        record(strict.handle(dict(self.base, operation="skills_catalog_list", authorization="forged")))
+        record(self.call("skills_catalog_list", limit=0))
+        record(self.call("skills_catalog_list", cursor="bad"))
+        record(self.call("skills_release_describe"))
+        record(self.call("skills_release_describe", skill_id="research", version="9.9.9"))
+        record(
+            self.call(
+                "skills_release_resource_get",
+                skill_id="research",
+                version="1.0.0",
+                resource_id="entrypoint",
+                expected_digest="sha256:" + "0" * 64,
+            )
+        )
+        record(self.call("skills_use_report_status_get"))
+        record(self.call("skills_use_report_status_get", report_id="missing"))
+        empty = V2Provider(lambda _: _identity(), store=self.store)
+        record(
+            empty.handle(
+                dict(self.base, operation="skills_release_describe", skill_id="research", version="1.0.0")
+            )
+        )
+        role_denied = TrustedIdentity(
+            "org-a",
+            "actor-a",
+            "lskills-api",
+            frozenset({"skills.read", "skills.feedback"}),
+            "runtime-binding",
+            runtime_profiles=frozenset({"codex-macos"}),
+            activated_release_ids=frozenset({"research@1.0.0"}),
+        )
+        record(
+            V2Provider(lambda _: role_denied, releases=[RELEASE], store=self.store).handle(
+                dict(self.base, operation="skills_release_describe", skill_id="research", version="1.0.0")
+            )
+        )
+        for extra, _expected in (
+            ({"lifecycle_state": "revoked"}, "revoked_release"),
+            ({"lifecycle_state": "expired"}, "expired_release"),
+            ({"qualification": "eval_pending"}, "not_qualified"),
+        ):
+            record(
+                V2Provider(lambda _: _identity(), releases=[dict(RELEASE, **extra)], store=self.store).handle(
+                    dict(self.base, operation="skills_release_describe", skill_id="research", version="1.0.0")
+                )
+            )
+        report = {
+            "schema_version": "0.2",
+            "report_kind": "completed_use",
+            "report_id": "opaque:report:vocab",
+            "occurred_at": "2026-08-13T00:00:00Z",
+            "skill_id": "research",
+            "skill_release_ref": "opaque:release:research:1.0.0",
+            "consumer_class": "codex",
+            "actor_ref": "opaque:actor:a",
+            "runtime_profile_ref": "opaque:runtime:codex",
+            "outcome": "use_succeeded",
+            "opaque_refs": ["opaque:program:run-1"],
+            "idempotency_source": "server",
+            "score": 10,
+        }
+        self.call("skills_use_report_submit", report=report, client_idempotency_key="vocab")
+        record(
+            self.call(
+                "skills_use_report_submit",
+                report=dict(report, outcome="use_failed"),
+                client_idempotency_key="vocab",
+            )
+        )
+        reader = V2Provider(
+            lambda _: _identity(capabilities=frozenset({"skills.read"})),
+            releases=[RELEASE],
+            store=self.store,
+        )
+        record(reader.handle(dict(self.base, operation="skills_use_report_submit", report=report)))
+        self.store.available = False
+        record(
+            self.call(
+                "skills_feedback_submit",
+                feedback={"skill_id": "research", "feedback_id": "opaque:fb:vocab", "kind": "friction"},
+            )
+        )
+        self.store.available = True
+        for operation in RESOURCE_OPERATIONS + TOOLS:
+            record(
+                self.provider.handle(
+                    {"protocol_version": "2026-07-28", "authorization": None, "operation": operation}
+                )
+            )
+        self.assertTrue(seen.issubset(declared))
+        self.assertGreaterEqual(len(seen), 8)
 
 
 def json_dump(value) -> str:

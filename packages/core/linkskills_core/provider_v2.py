@@ -7,6 +7,7 @@ immutable; identity comes only from a trusted verifier result.
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from hashlib import sha256 as _sha256
 from typing import Any, Callable, Iterable, Mapping, Protocol
@@ -46,6 +47,91 @@ CATALOG_OPERATIONS = frozenset(
 )
 WRITE_TOOLS = frozenset({"skills_use_report_submit", "skills_feedback_submit"})
 LEGACY_EXECUTION_PREFIXES = ("skills_run_", "skills_tool_")
+PUBLIC_TYPED_ERRORS = (
+    "contract_incompatible",
+    "auth_required",
+    "auth_invalid",
+    "forbidden",
+    "not_found",
+    "catalog_unavailable",
+    "validation_failed",
+    "idempotency_conflict",
+    "legacy_execution_disabled",
+    "unsupported_operation",
+    "expired_release",
+    "revoked_release",
+    "not_qualified",
+)
+MCP_SERVER_INFO = {"name": "linkskills-mcp-v2", "version": "2.0.0"}
+DENIED_ON_V2 = ("skills_run_*", "skills_tool_*")
+UNTRUSTED_IDENTITY_KEYS = frozenset(
+    {
+        "authorization",
+        "org_id",
+        "actor_id",
+        "actor_kind",
+        "scopes",
+        "capabilities",
+        "binding",
+        "audience",
+        "credential_id",
+        "platform_actor_id",
+        "actor",
+        "identity",
+        "claims",
+        "platform_claims",
+        "roles",
+        "role",
+        "role_class",
+        "task_class",
+        "runtime_profile",
+        "runtime_profiles",
+        "activated_release_ids",
+        "tool_capabilities",
+        "permitted_operations",
+        "exp",
+        "token",
+        "bearer",
+        "access_token",
+        "refresh_token",
+        "subject",
+        "sub",
+        "tenant_id",
+        "tenant",
+        "org",
+        "user_id",
+        "session",
+        "session_id",
+    }
+)
+RESOURCE_READ_PARAM_KEYS = frozenset(
+    {"uri", "expected_digest", "content_digest", "cursor", "limit", "query"}
+)
+_INTERNAL_TO_PUBLIC = {
+    "session_not_supported": "contract_incompatible",
+    "cursor_snapshot_mismatch": "validation_failed",
+    "cursor_invalid": "validation_failed",
+    "exact_release_required": "validation_failed",
+    "exact_resource_required": "validation_failed",
+    "integrity_mismatch": "validation_failed",
+    "contract_invalid": "contract_incompatible",
+    "store_unavailable": "catalog_unavailable",
+    "role_not_authorized": "forbidden",
+    "task_not_authorized": "forbidden",
+    "profile_not_compatible": "forbidden",
+    "capability_not_authorized": "forbidden",
+    "profile_not_activated": "forbidden",
+    "consumer_profile_activation": "forbidden",
+    "consumer_tool_authority": "forbidden",
+    "platform_technical_eligibility": "forbidden",
+    "skills_release_selectability": "not_qualified",
+    "release_not_selectable": "not_qualified",
+    "release_not_qualified": "not_qualified",
+    "invalid_resource_body": "validation_failed",
+    "invalid_release": "validation_failed",
+    "invalid_release_identity": "validation_failed",
+    "verifier_required": "auth_invalid",
+}
 _URI_TEMPLATES: dict[str, tuple[str, ...]] = {
     "skills_capabilities_get": (
         "skills://guide/capabilities",
@@ -85,6 +171,15 @@ _URI_TEMPLATES: dict[str, tuple[str, ...]] = {
 _TYPED_GATE = {
     "release_not_qualified": "not_qualified",
     "release_not_selectable": "not_qualified",
+    "skills_release_selectability": "not_qualified",
+    "role_not_authorized": "forbidden",
+    "task_not_authorized": "forbidden",
+    "profile_not_compatible": "forbidden",
+    "capability_not_authorized": "forbidden",
+    "profile_not_activated": "forbidden",
+    "consumer_profile_activation": "forbidden",
+    "consumer_tool_authority": "forbidden",
+    "platform_technical_eligibility": "forbidden",
 }
 USE_REPORT_KEYS = {
     "schema_version",
@@ -245,6 +340,59 @@ def _set(value: Any) -> frozenset[str]:
 def _digest(body: bytes) -> str:
     """Return the repository digest spelling used by PKT-01 contracts."""
     return "sha256:" + _sha256(body).hexdigest()
+
+
+def public_error(code: str) -> str:
+    """Map an internal reason onto the closed skills.api.v0.2 error vocabulary."""
+    if code in PUBLIC_TYPED_ERRORS:
+        return code
+    return _INTERNAL_TO_PUBLIC.get(code, "validation_failed")
+
+
+def strip_untrusted_identity(payload: Mapping[str, Any] | None) -> dict[str, Any]:
+    """Drop caller-supplied identity fields before a trusted merge."""
+    if not isinstance(payload, Mapping):
+        return {}
+    return {key: value for key, value in payload.items() if key not in UNTRUSTED_IDENTITY_KEYS}
+
+
+def bind_trusted_request(
+    payload: Mapping[str, Any] | None,
+    *,
+    operation: str,
+    authorization: Any,
+    protocol_version: str = PROTOCOL_VERSION,
+) -> dict[str, Any]:
+    """Merge untrusted fields, then force transport identity and operation."""
+    request = strip_untrusted_identity(payload)
+    request.pop("operation", None)
+    request["protocol_version"] = request.get("protocol_version") or protocol_version
+    request["authorization"] = authorization
+    request["operation"] = operation
+    return request
+
+
+def _template_path_regex(template: str) -> re.Pattern[str]:
+    """Compile one URI template into an exact path matcher."""
+    path = template.split("?", 1)[0]
+    pattern = re.sub(r"\\\{[^}]+\\\}", r"[^/?]+", re.escape(path))
+    return re.compile(f"^{pattern}$")
+
+
+def operation_from_resource_uri(uri: Any) -> str | None:
+    """Return the server-owned resource operation for ``uri``, or ``None``."""
+    if not isinstance(uri, str) or not uri.startswith("skills://"):
+        return None
+    path = uri.split("?", 1)[0]
+    ranked: list[tuple[int, str]] = []
+    for operation, templates in _URI_TEMPLATES.items():
+        for template in templates:
+            if _template_path_regex(template).fullmatch(path):
+                ranked.append((len(template.split("?", 1)[0]), operation))
+    if not ranked:
+        return None
+    ranked.sort(reverse=True)
+    return ranked[0][1]
 
 
 def server_idempotency_key(
@@ -546,14 +694,14 @@ class SkillsApiV2:
             raise ValueError("expired_release")
         denials = gate_denials(
             release,
-            roles=request.get("role") or request.get("role_class") or identity.roles,
-            task_class=request.get("task_class") or identity.task_classes,
-            runtime_profile=request.get("runtime_profile") or identity.runtime_profiles,
+            roles=identity.roles,
+            task_class=identity.task_classes,
+            runtime_profile=identity.runtime_profiles,
             capabilities=identity.capabilities | identity.tool_capabilities,
             activated_release_ids=identity.activated_release_ids,
         )
         if denials:
-            raise ValueError(_TYPED_GATE.get(denials[0], denials[0]))
+            raise ValueError(public_error(_TYPED_GATE.get(denials[0], denials[0])))
 
     def _descriptor(self, descriptor: Mapping[str, Any]) -> None:
         """Optionally validate against the PKT-01 descriptor contract."""
@@ -753,7 +901,7 @@ class SkillsApiV2:
         if request.get("protocol_version") != PROTOCOL_VERSION:
             return {"ok": False, "error": "contract_incompatible"}
         if any(key in request for key in ("session", "session_id")):
-            return {"ok": False, "error": "session_not_supported"}
+            return {"ok": False, "error": "contract_incompatible"}
         operation = request.get("operation")
         if not isinstance(operation, str):
             return {"ok": False, "error": "unsupported_operation"}
@@ -898,7 +1046,7 @@ class SkillsApiV2:
                 if operation == "skills_release_section_get":
                     resource_id = request.get("section_id") or request.get("fragment_id")
                 if not isinstance(resource_id, str) or not resource_id:
-                    return {"ok": False, "error": "exact_resource_required"}
+                    return {"ok": False, "error": "validation_failed"}
                 return self._resource_result(
                     operation,
                     release,
@@ -921,14 +1069,10 @@ class SkillsApiV2:
                 )
             return {"ok": False, "error": "unsupported_operation"}
         except ValueError as exc:
-            payload = {"ok": False, "error": str(exc)}
+            payload = {"ok": False, "error": public_error(str(exc))}
             diagnosis = getattr(exc, "diagnosis", None)
             if isinstance(diagnosis, Mapping):
-                payload["store"] = {
-                    "code": diagnosis.get("code"),
-                    "redacted_error": diagnosis.get("redacted_error"),
-                    "fail_closed": True,
-                }
+                payload["fail_closed"] = True
             return payload
 
 
@@ -962,15 +1106,24 @@ def V2Provider(
 __all__ = [
     "CATALOG_OPERATIONS",
     "CONTRACT_VERSION",
+    "DENIED_ON_V2",
     "InMemoryProviderStore",
+    "MCP_SERVER_INFO",
     "PROTOCOL_VERSION",
+    "PUBLIC_TYPED_ERRORS",
     "ProviderV2Store",
     "RESOURCE_OPERATIONS",
+    "RESOURCE_READ_PARAM_KEYS",
     "SkillsApiV2",
     "TOOLS",
     "TrustedIdentity",
+    "UNTRUSTED_IDENTITY_KEYS",
     "V2Provider",
     "WRITE_TOOLS",
+    "bind_trusted_request",
     "diagnose_store_failure",
+    "operation_from_resource_uri",
+    "public_error",
     "server_idempotency_key",
+    "strip_untrusted_identity",
 ]
