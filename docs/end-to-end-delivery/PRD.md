@@ -194,14 +194,25 @@ All of the following must be true at the same accepted identities:
    only through intended consumer pins.
 5. Cursor, Codex, and Lisa complete representative end-to-end use in order,
    including local execution and bounded evidence submission. Identity-backed
-   read and a safe non-destructive workflow are both demonstrated.
+   read and a safe non-destructive workflow are both demonstrated; Cursor also
+   completes the approved multi-day canary window without disrupting other
+   active sessions.
 6. Wrong identity/scope, revoked/tampered content, store outage, provider outage,
    and disabled-consumer scenarios fail closed without unsafe fallback.
 7. Metrics, logs, alerts, founder report, Librarian status, backup, restore,
    restart, drain, and rollback evidence pass.
 8. Brain/Skills separation, privacy/redaction, least privilege, and consumer
    tool authority remain intact.
-9. Independent narrow reviews and the final cross-surface acceptance reconcile
-   source, provider/selectability, consumer, server/live, and production proof.
-10. Later expansion remains disabled/unqualified except for any release
+9. At least one real observed failure/correction becomes a regression eval and
+   one improved immutable version completes the governed release loop. An exact
+   tool change proves blast-radius invalidation, affected-profile revalidation,
+   and rollback without disturbing unaffected profiles.
+10. Database, request, model, storage, and evaluation cost per accepted run are
+    measured and founder-accepted; security, privacy, and supply-chain review has
+    no unresolved launch blocker.
+11. Every one of the 59 current source-catalogue entries is deliberately
+    classified even though only the five initial releases may become selectable.
+12. Independent narrow reviews and the final cross-surface acceptance reconcile
+    source, provider/selectability, consumer, server/live, and production proof.
+13. Later expansion remains disabled/unqualified except for any release
     separately approved through a material scope change.

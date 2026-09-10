@@ -6,9 +6,14 @@ server state, active leases, and consumer state immediately before work.
 
 ## Common execution contract
 
-- LiNKskills source packets use one governed `issue/*` branch each, direct Cursor
-  SDK/API Grok 4.6 Medium with Fast off and explicit `repos[]`, frequent pushed
-  checkpoints, focused checks, and one exact-head independent narrow review.
+- LiNKskills source packets use one governed `issue/*` branch each and the
+  operative direct REST Cursor route with Grok 4.6 Medium, Fast off, explicit
+  `repos[]`, frequent pushed checkpoints, focused checks, and one exact-head
+  independent narrow review. The installed SDK control is a future interface,
+  not the current transport.
+- Every packet and required worker input must be committed and pushed at its
+  exact GitHub repository/ref/commit/tree/path before dispatch. Mac-only files,
+  conversation history, and prompt-only requirements are not worker inputs.
 - The implementer does not open a delivery PR, self-review, self-merge, promote
   protected refs, deploy production, mutate live providers, or prefer incoming.
 - Packager/Coordinator opens logical Phase PRs; delivery controller merges to
@@ -16,17 +21,19 @@ server state, active leases, and consumer state immediately before work.
   gates. A staging branch is not another server.
 - Evidence always separates source, qualification/selectability, consumer,
   server/live, and production acceptance.
-- Secrets are referenced by GSM name/path only. No secret value may appear in
-  Git, chat, command arguments, process listings, test fixtures, logs, or
-  receipts.
+- Product/server secrets are referenced by GSM name/path only. The operative
+  coordinator route reads its existing named macOS Keychain item locally. No
+  secret value may appear in Git, chat, packets, worker prompts, command
+  arguments, process listings, test fixtures, logs, or receipts.
 - Ordinary repair is bounded to three source repairs. Infrastructure has at most
   two attempts at one exact candidate. Code/test failure returns to a new
   identity; retries never weaken acceptance.
 
 ## ED-00 — Freeze current identity, interfaces, and acceptance
 
-**Owner/scope:** LiNKskills planner/implementer. Only
-`docs/end-to-end-delivery/` and a new issue evidence directory.
+**Owner/scope:** LiNKskills planner/implementer. Only `docs/README.md`,
+`docs/end-to-end-delivery/`, this delivery's `docs/handoffs/` record, and a new
+issue evidence directory.
 
 **Requirements and inputs:** Package README/PRD; provider-v2 documents; ADRs
 0001, 0003, 0005, 0006, 0008; current protected refs; current Server 01 and
@@ -35,7 +42,11 @@ Platform recovery snapshots.
 **Work:** refresh exact LiNKskills/Platform revisions; confirm the five initial
 provider releases and local-adapter exception; record the provider-v2/local
 execution boundary; classify any drift; update manifest baseline and packet
-paths. A material scope/interface change is returned to the founder.
+paths. Publish versioned non-secret `PLATFORM-INTERFACE.json` and
+`CONSUMER-INTERFACES.json` handoffs under the ED-00 evidence directory, each
+bound to upstream repository/ref/commit/tree/path/blob digest. Copy interface
+facts only, never another repository's implementation or secrets. A material
+scope/interface change is returned to the founder.
 
 **Dependencies:** none. **Output:** immutable execution baseline and acceptance
 matrix under `evidence/end-to-end-delivery/ed-00/`.
@@ -57,10 +68,10 @@ checkpoint; no runtime state exists.
 tests. ED-02 alone owns the Gateway store adapter. Platform alone applies live
 DDL and owns `svc_lskills_runtime` issuance.
 
-**Requirements and inputs:** Technical PRD §§8–9; Platform plan §§13–14 and
-Phase 6; current `lskills` migration files; production `/ready` evidence showing
-`OperationalError`; exact Platform migration/identity/backup receipts when
-available.
+**Requirements and inputs:** Technical PRD §§8–9; the accepted ED-00
+`PLATFORM-INTERFACE.json` handoff derived from Platform plan §§13–14 and Phase 6;
+current `lskills` migration files; production `/ready` evidence showing
+`OperationalError`; exact Platform migration/identity/backup receipts when available.
 
 **Work:** inventory expected versus live migration fingerprints without printing
 DSNs; produce one versioned/hash-bound migration package with prerequisites,
@@ -68,8 +79,8 @@ least-privilege grants/RLS, forward verification, rollback/forward-fix, backup
 scope, and compatibility; make the store return sanitised actionable readiness
 diagnostics while preserving fail-closed behavior. Do not apply live DDL.
 
-**Dependencies:** ED-00; live apply waits for XP-01. **Output:** Skills-owned
-migration artifact and Platform-consumable handoff.
+**Dependencies:** ED-00, ENV-00, and the XP-00 route receipt; live apply waits for XP-01.
+**Output:** Skills-owned migration artifact and Platform-consumable handoff.
 
 **Minimum validation:** focused migration schema/RLS/idempotency tests against
 an ephemeral Postgres version compatible with production; store readiness and
@@ -84,6 +95,45 @@ handoff to XP-01. **Deployment/recovery:** Platform takes a governed backup,
 applies in order, verifies fingerprints/grants/RLS, and issues receipt; on
 failure stop writes and use the packaged forward-fix/rollback under Platform
 authority.
+
+## ENV-00 — Pin the reproducible cloud execution environment
+
+**Owner/scope:** LiNKskills owns `requirements-dev.txt`, a generated
+`requirements-dev.lock`, `.github/workflows/ci.yml`,
+`docs/development/CLOUD-EXECUTION.md`, and focused `tests/environment/`. It does
+not change product dependencies, product packages, deploy files, or Skills.
+
+**Requirements and inputs:** accepted ED-00 identity; current root and package
+`pyproject.toml` files; current CI (`ubuntu-24.04-arm`, Python 3.11); the
+completed LiNKskills cloud qualification receipt (Linux x86_64, Python 3.12.3,
+Node 22.14.0); and XP-00 owner/route receipt. The repository has no submodules,
+no Node package manifest, no private Python package source, and currently uses
+range-only `requirements-dev.txt`.
+
+**Work:** on the disposable cloud VM, attest OS/architecture/Python/pip; install
+the matching `venv`/development headers if absent; create and activate an
+isolated venv; resolve only the existing public-PyPI requirements plus local
+packages; generate and verify an exact-version, artifact-hash lock; teach CI to
+install it with hash enforcement; document the local-package-before-umbrella
+order and `PYTHONPATH`-only `packages/contracts` and `packages/persistence`.
+Do not add a product dependency or use production credentials/data. Node and a
+JavaScript package manager are not required for this packet.
+
+**Dependencies:** ED-00 and XP-00. **Output:** one pushed, independently
+reviewed environment checkpoint that later packets can install without an
+unbounded resolver.
+
+**Minimum validation:** clean initial/final Git identity; lock regeneration is
+stable; `python -m pip install --require-hashes -r requirements-dev.lock` in a
+new venv; current catalog gates and focused environment tests on the cloud
+x86_64 worker; protected CI repeats its Python 3.11 Ubuntu 24.04 ARM matrix;
+secret scan and `git diff --check`.
+
+**Acceptance/checkpoint:** exact interpreter, OS/architecture, lock digest,
+installation order, tests, and CI receipt are recorded. Commit
+`build(deps): pin cloud execution environment`, push, exact-head review, then
+handoff the immutable lock to ED-01 onward. **Recovery:** revert the checkpoint
+and restore the preceding CI install line; no server or production state exists.
 
 ## ED-02 — Ship the provider-v2 Gateway/MCP artifact
 
@@ -103,8 +153,8 @@ Librarian status; ensure `skills_run_*` and `skills_tool_*` return
 `legacy_execution_disabled` on v2; define the observed legacy adapter and
 removal gate; preserve stable error envelopes, pagination, identity and privacy.
 
-**Dependencies:** ED-00 and ED-01 contract (can develop against fakes while
-XP-01 is pending). **Output:** installable provider-v2 image/package contract,
+**Dependencies:** ED-00 and ED-01. Source work may use the accepted ED-01
+contract while live XP-01 application remains pending. **Output:** installable provider-v2 image/package contract,
 client fixtures, OpenAPI/MCP capability record, and upgrade/rollback notes.
 
 **Minimum validation:** contract, core, Gateway, MCP, client, pagination,
@@ -193,8 +243,9 @@ fixtures/tests. ED-02 alone owns `packages/client/`. Consumer owners apply their
 own files.
 
 **Requirements and inputs:** exact ED-02 provider contract and ED-04 releases;
-Platform claim contract; approved actor order Cursor → Codex → Lisa; consumer
-capability/tool-authority declarations from XP-02/XP-03.
+Platform claim contract from the ED-00 published handoff; approved actor order
+Cursor → Codex → Lisa; consumer capability/tool-authority declarations from the
+ED-00 handoff and later XP-02/XP-03 receipts.
 
 **Work:** generate disabled-by-default, exact-release/digest pins for the five
 initial Skills; define private endpoint, token mint, resource retrieval,
@@ -255,7 +306,8 @@ feedback contracts, privacy validators, `global_evaluator.py`, and focused tests
 Platform owns generic host, queue/schedule/credentials/alerts and shared config.
 
 **Requirements and inputs:** Technical PRD §§5, 7, 17–18; ADR 0008; ED-01 store;
-ED-02 provider; current Platform domain-worker contract.
+ED-02 provider; the accepted ED-00 versioned handoff for the current Platform
+domain-worker contract.
 
 **Work:** bind use/feedback receipts to exact release/profile and opaque consumer
 correlation; enforce forbidden payload rejection and retention; version the
@@ -311,37 +363,81 @@ push, independent operations review. **Recovery:** drain, disable consumer
 activation, restore previous compose/image/release/config/pointers, verify store
 compatibility and health, retain failed state/evidence.
 
-## ED-09 — Run ordered consumer canaries and close production acceptance
+## ED-09 — Run ordered consumer canaries and multi-day Cursor use
 
-**Owner/scope:** LiNKskills coordinates evidence only. Cursor/Codex owners execute
-XP-02; OpenClaw owner executes XP-03. LiNKskills writes only
-`evidence/end-to-end-delivery/ed-09/` and final operator documentation.
+**Owner/scope:** LiNKskills owns the project-scoped Cursor integration/template,
+conformance, canary, and cross-consumer evidence. A shared/global Cursor mutation,
+if unavoidable, is applied only by the shared configuration owner in XP-02.
+The Codex owner executes XP-03; OpenClaw owner executes XP-04. LiNKskills writes
+only its approved integration surfaces and `evidence/end-to-end-delivery/ed-09/`.
 
 **Requirements and inputs:** ED-08 production provider PASS; exact consumer pins;
 valid Platform identities; per-consumer local tool authority; rollback ready;
 initial releases only.
 
-**Work:** enable Cursor canary, run discover → retrieve → verify → local execute
-→ report; observe and disable/rollback on failure. Repeat for Codex only after
-Cursor acceptance, then Lisa after Codex. Exercise wrong scope, revoked release,
-tampered/stale cache, provider/store outage, and consumer-disable negatives.
-Reconcile qualification, provider, consumer, server, observability, Librarian,
-backup/recovery, and rollback evidence.
+**Work:** enable the isolated/project-scoped Cursor canary, run discover →
+retrieve → verify → local execute → report, then operate it for the approved
+multi-day window while recording availability, failure, cost, and non-disruption
+evidence; disable/rollback on failure. Repeat the acceptance flow for Codex only
+after Cursor acceptance, then Lisa after Codex. Exercise wrong scope, revoked
+release, tampered/stale cache, provider/store outage, and consumer-disable
+negatives. Reconcile qualification, provider, consumer, server, observability,
+Librarian, backup/recovery, and rollback evidence.
 
-**Dependencies:** ED-05, ED-07, ED-08, XP-02, XP-03. **Output:** three exact
-canary receipts, negative-path matrix, founder walkthrough, and final acceptance
-record.
+**Dependencies:** ED-05, ED-07, ED-08, XP-02 when shared Cursor mutation is
+required, XP-03, and XP-04. **Output:** three exact canary receipts,
+negative-path matrix, founder walkthrough, and final acceptance inputs.
 
 **Minimum validation:** each consumer uses one safe representative task and one
-negative case; exact release/profile/tool/consumer/provider identities match;
-telemetry contains only allowed bounded fields; unrelated consumers and later
-skills remain disabled; final independent cross-surface review.
+negative case; Cursor additionally passes the multi-day window; exact release/
+profile/tool/consumer/provider identities match; telemetry contains only allowed
+bounded fields; unrelated consumers and later skills remain disabled.
+
+**Acceptance/checkpoint:** all three actor flows and the Cursor multi-day gate are
+PASS at compatible identities. Commit
+`test(canary): prove initial skills consumers`, push, review, and hand the exact
+receipts to ED-10. **Recovery:** disable only the failing consumer first; if
+systemic, disable all pins and execute ED-08 rollback.
+
+## ED-10 — Prove the improvement loop, assurance, cost, and final acceptance
+
+**Owner/scope:** LiNKskills owns a bounded regression-eval/release change only in
+the one affected initial skill and its exact tests/evidence; final assurance and
+acceptance records live under `evidence/end-to-end-delivery/ed-10/` and
+`docs/end-to-end-delivery/ACCEPTANCE.md`. Any discovered failure determines the
+single affected skill path; other skills and later expansion are prohibited.
+
+**Requirements and inputs:** ED-09 real-use evidence; approved internal-launch
+definition of done; exact tool dependency/reverse-dependency graph; provider,
+database, request, model, storage, and evaluation cost measurements; SBOM,
+vulnerability, secret, privacy, auth/RLS, and supply-chain evidence.
+
+**Work:** select one real observed failure/correction from the accepted canary;
+turn it into an executable regression eval; improve and republish one immutable
+release through ED-03/04 controls; prove the new version fixes the failure.
+Make or simulate through an immutable fixture one exact tool-version change,
+prove affected-profile invalidation/revalidation, prove unaffected profiles stay
+valid, and roll the tool/release pointer back. Reconcile measured cost per run
+for founder acceptance. Complete security/privacy/supply-chain review and the
+full source/provider/consumer/server/production matrix.
+
+**Dependencies:** ED-03, ED-04, ED-07, ED-08, and ED-09. **Output:** regression
+eval, improved immutable release receipt, tool blast-radius/rollback receipt,
+accepted cost record, assurance report, 59-entry classification inventory, and
+final acceptance decision.
+
+**Minimum validation:** reproduce-before/fix-after case; exact release/eval/tool
+digests; reverse-dependency and unaffected-profile assertions; pointer rollback;
+cost calculation inputs and plausibility check; security/privacy/RLS/auth/
+supply-chain/secret scans; final independent cross-surface review.
 
 **Acceptance/checkpoint:** every PRD Definition of Done item is PASS at compatible
-identities. Any missing class remains HOLD; no percentage substitutes for proof.
-Commit `docs(acceptance): record linkskills production evidence`, push, review,
-then use governed release/promotion procedures. **Recovery:** disable only the
-failing consumer first; if systemic, disable all pins and execute ED-08 rollback.
+identities and no assurance blocker remains. Any missing item stays HOLD; no
+aggregate percentage substitutes for proof. Commit
+`docs(acceptance): close linkskills production delivery`, push, review, then use
+governed promotion/release procedures. **Recovery:** revoke the improved release
+or restore its prior pointer/tool pin; retain regression and failed evidence;
+disable consumers or execute ED-08 rollback if the defect is systemic.
 
 ## External dependency packets — recorded, not dispatched
 
@@ -353,10 +449,27 @@ plan, current Server 01 inspection, and installed IDE Development 2.5.2
 protocol/schema were reviewed and pinned. A future revision change requires
 refresh/reconciliation but does not make this plan incomplete.
 
-Runtime dependencies are XP-01 through XP-03. They are needed for live database,
-identity, generic-host, consumer, and production acceptance. `PLAN_READY` for any
-dependency never means deployed, configured, or accepted; only its exact
+Runtime dependencies are XP-00 through XP-04. They are needed for executable
+ordinary routing, live database,
+identity, generic-host, consumer, and production acceptance. Planning-ready for
+any dependency never means deployed, configured, or accepted; only its exact
 execution receipt can satisfy a downstream gate.
+
+### XP-00 — Direct Cursor execution-route preflight
+
+**Sole owner:** local coordinator / Cursor account owner. Re-hash the operative
+standard-library REST dispatcher, prove the GitHub issue branch/commit/tree,
+then perform one rate-limit-aware account/model/repository read using the
+existing Keychain reference. The receipt must prove Grok 4.6 Medium, Fast off,
+explicit LiNKskills `repos[]`, status/result retrieval controls, exact identity
+attestation, fail-closed mismatch behavior, and the controlled reconciliation/
+archive procedure for a rejected created agent. It must also prove this task's
+exact owner is admitted by the current global queue and run the transport suite
+in an isolated accepted context; the 2026-09-10 baseline was 7 PASS with 3
+fixture cases stopped early by the live suspension guard. No agent is created during this
+preflight. ED-00 may run without XP-00 through the founder Gate-0 Luna High
+route; ED-01 and all ordinary post-Gate-0 Cursor work wait for its fresh XP-00
+receipt. See `EXECUTION-ROUTE.md`.
 
 ### XP-01 — Platform foundation and live data plane
 
@@ -372,20 +485,33 @@ contracts pass without broad credentials. Owned live surfaces include
 control/receipts, and `LiNKplatform/packages/librarian-runner/`. LiNKskills must
 not repair Platform.
 
-### XP-02 — Cursor and Codex consumer application
+### XP-02 — Shared/global Cursor configuration, only if required
 
-**Sole owners:** IDE Development/shared configuration owners for Cursor/Codex.
-Apply ED-05 pins through project/provider configuration, preserve local
-`agentsetup`/`agentcomply`, use separate credentials, execute locally, return
-exact conformance and rollback receipts. Cursor runs first; Codex second. No
-physical skill removal occurs until provider retrieval and rollback are proven.
-Owned repository paths are `core/link-integrations/skills-loader.mjs`,
-`core/link-integrations/skills.mjs`, `core/link-integrations/skills-lock.json`,
-`core/managed-core/platforms/{cursor,codex}/skills-{loader.mjs,lock.json}`, and
-their `tests/link-integrations/` coverage; installed consumer projections are
-updated only by the official installer/rollout path.
+**Sole owner:** IDE Development/shared Cursor configuration owner. LiNKskills
+owns the project-scoped template, installer, conformance, and canary under ED-05/
+ED-09. XP-02 exists only if a shared/global Cursor change is unavoidable; it
+applies that exact change in a maintenance window and returns non-disruption and
+rollback evidence. Owned repository paths are
+`core/link-integrations/skills-loader.mjs`, `core/link-integrations/skills.mjs`,
+`core/link-integrations/skills-lock.json`,
+`core/managed-core/platforms/cursor/skills-{loader.mjs,lock.json}`, and their
+`tests/link-integrations/` coverage. Installed projections change only through
+the official installer/rollout path. Preserve local `agentsetup`/`agentcomply`;
+no physical skill removal occurs until retrieval and rollback are proven.
 
-### XP-03 — Lisa/OpenClaw consumer application
+### XP-03 — Codex consumer application
+
+**Sole owner:** LiNKbrain shared Codex configuration owner unless the founder
+assigns a dedicated integration owner. LiNKskills supplies the independently
+named Skills fragment and conformance; the owner applies the separate Skills
+entry to shared `config.toml`, common hooks, and lifecycle scripts, uses a
+separate credential, executes locally, and returns exact conformance/rollback
+receipts. Relevant IDE source paths are
+`core/managed-core/platforms/codex/skills-{loader.mjs,lock.json}` and focused
+`tests/link-integrations/`; the live user/project config path is resolved and
+recorded immediately before apply.
+
+### XP-04 — Lisa/OpenClaw consumer application
 
 **Sole owner:** OpenClaw Prime/Lisa. Apply ED-05 Skills-only config to the native
 bridge, preserve Brain separation and consumer tool authority, execute the third
@@ -398,14 +524,22 @@ SecretRefs remain OpenClaw/Server 01-owned state, never LiNKskills files.
 
 ## Logical integration and promotion sequence
 
-1. Phase A: ED-00.
-2. Phase B in parallel where paths are disjoint: ED-01, ED-02, ED-03 preparation.
-3. Phase C: ED-03 evidence completion → ED-04 publication source → ED-05 consumer
+1. Phase A: ED-00 through the founder Gate-0 route; XP-00 performs the narrowly
+   authorised coordinator owner transition and route preflight after approval.
+2. Environment phase: ENV-00 is the first Grok worker and produces the frozen
+   cloud/CI dependency basis.
+3. Phase B after ED-00, XP-00, and ENV-00: ED-01, followed by dependency-safe
+   ED-02 and ED-03 preparation where paths are disjoint.
+4. Phase C: ED-03 evidence completion → ED-04 publication source → ED-05 consumer
    packs; ED-06 image; ED-07 worker/telemetry.
-4. Platform dependency group: XP-01 consumes ED-01/06/07 and returns receipts.
-5. Production group: ED-08 only after accepted source/artifacts, XP-01, resource
+5. Platform dependency group: XP-01 consumes ED-01/06/07 and returns receipts.
+6. Production group: ED-08 only after accepted source/artifacts, XP-01, resource
    preflight, and founder-reserved production approvals.
-6. Consumer group: XP-02 Cursor then Codex; XP-03 Lisa; ED-09 reconciles.
-7. Protected source moves `issue/*` → Phase PR → `development` → `staging` →
+7. Consumer group: ED-09 Cursor (XP-02 only if shared mutation is required),
+   then XP-03 Codex, then XP-04 Lisa; ED-09 reconciles actor evidence.
+8. Assurance group: ED-10 proves the real failure-to-improvement loop, tool
+   blast radius/rollback, accepted run cost, security/privacy/supply-chain
+   clearance, and final classification/acceptance.
+8. Protected source moves `issue/*` → Phase PR → `development` → `staging` →
    `main`; production deployment uses only an accepted immutable source/image
    and is never inferred from branch promotion.

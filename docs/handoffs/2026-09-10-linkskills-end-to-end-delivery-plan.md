@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-10
 
-**Status:** `PLAN_READY / AWAITING APPROVE`
+**Status:** `PLANNING_INTERFACE_READY / ED-00_READY_AFTER_APPROVE / GROK_QUEUE_HOLD / AWAITING ADVISOR ACCEPTANCE AND APPROVE`
 
 **Planning issue:** `#323`
 
@@ -15,6 +15,7 @@
 - Evidence baseline: `docs/end-to-end-delivery/STARTING-POSITION.md`
 - Atomic packets and dependency order: `docs/end-to-end-delivery/WORK-PACKETS.md`
 - Protocol manifest: `docs/end-to-end-delivery/EXECUTION-MANIFEST.json`
+- Governed route/start gate: `docs/end-to-end-delivery/EXECUTION-ROUTE.md`
 - OSS inventory: `docs/end-to-end-delivery/OSS-INVENTORY.md`
 - Readiness decision: `docs/end-to-end-delivery/READINESS-REPORT.md`
 
@@ -55,3 +56,18 @@ narrow-review result are appended to the task evidence after checkpointing.
 No product code, dependency, credential, database, provider, consumer, server,
 deployment, protected branch, or production state was changed. Implementation
 begins only after a literal `APPROVE` in this task.
+
+The operative standard-library REST dispatcher is digest-pinned. Its existing
+Keychain-backed account passed safe authenticated account/model/repository reads:
+Grok 4.6 Medium with Fast off is available and `linktrend/LiNKskills` is visible.
+No job was launched. ED-00 is the first executable no-provider-cost packet after
+`APPROVE`; ENV-00 is the first Grok worker and follows ED-00 plus a fresh XP-00
+preflight. ED-01 follows ENV-00. The current queue suspension does not admit
+this task as owner, so ENV-00 is not executable until a governed ownership handoff or
+founder-authorised resume-scope update. The dispatcher suite had 7 PASS and 3
+fixture cases stopped early at that guard; it was not bypassed. XP-01 through
+XP-04 remain later Platform and consumer gates.
+
+Deployment Advisor acceptance releases downstream planning only. It is not
+founder `APPROVE` and authorises no implementation, provider call, queue change,
+deployment, consumer activation, or production mutation.

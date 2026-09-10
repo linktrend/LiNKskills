@@ -21,7 +21,7 @@
       "id": "ED-00",
       "title": "Freeze current identity interfaces and acceptance",
       "issues": ["ISS-00"],
-      "ownedPaths": ["docs/README.md", "docs/end-to-end-delivery/README.md", "docs/end-to-end-delivery/PRD.md", "docs/end-to-end-delivery/STARTING-POSITION.md", "docs/end-to-end-delivery/WORK-PACKETS.md", "docs/end-to-end-delivery/EXECUTION-MANIFEST.json", "docs/end-to-end-delivery/OSS-INVENTORY.md", "docs/end-to-end-delivery/READINESS-REPORT.md", "docs/handoffs/2026-09-10-linkskills-end-to-end-delivery-plan.md", "evidence/end-to-end-delivery/ed-00/"],
+      "ownedPaths": ["docs/README.md", "docs/end-to-end-delivery/README.md", "docs/end-to-end-delivery/PRD.md", "docs/end-to-end-delivery/STARTING-POSITION.md", "docs/end-to-end-delivery/WORK-PACKETS.md", "docs/end-to-end-delivery/EXECUTION-MANIFEST.json", "docs/end-to-end-delivery/EXECUTION-ROUTE.md", "docs/end-to-end-delivery/OSS-INVENTORY.md", "docs/end-to-end-delivery/READINESS-REPORT.md", "docs/handoffs/2026-09-10-linkskills-end-to-end-delivery-plan.md", "evidence/end-to-end-delivery/ed-00/"],
       "prohibitedPaths": ["packages/", "skills/", "supabase/migrations/", "deploy/"],
       "verificationCommands": [["python3", "-m", "json.tool", "docs/end-to-end-delivery/EXECUTION-MANIFEST.json"], ["git", "diff", "--check"]],
       "executionState": "PLAN"
@@ -33,6 +33,16 @@
       "ownedPaths": ["packages/persistence/", "supabase/migrations/", "docs/migrations/", "tests/migrations/"],
       "prohibitedPaths": ["skills/", "packages/mcp_server/", "configs/consumer-activation/"],
       "verificationCommands": [["python3", "-m", "pytest", "-q", "tests/migrations"]],
+      "dependencies": ["ED-00", "ENV-00"],
+      "executionState": "PLAN"
+    },
+    {
+      "id": "ENV-00",
+      "title": "Pin the reproducible cloud execution environment",
+      "issues": ["ISS-11"],
+      "ownedPaths": ["requirements-dev.txt", "requirements-dev.lock", ".github/workflows/ci.yml", "docs/development/CLOUD-EXECUTION.md", "tests/environment/"],
+      "prohibitedPaths": ["packages/", "skills/", "supabase/migrations/", "deploy/"],
+      "verificationCommands": [["python", "-m", "pip", "install", "--require-hashes", "-r", "requirements-dev.lock"], ["python3", "validator.py", "--repo-root", ".", "--scan-all"], ["python3", "-m", "pytest", "-q", "tests/environment"]],
       "dependencies": ["ED-00"],
       "executionState": "PLAN"
     },
@@ -43,7 +53,7 @@
       "ownedPaths": ["packages/contracts/", "packages/core/", "packages/gateway/", "packages/mcp_server/", "packages/client/", "tests/contracts/", "tests/core/", "tests/gateway/", "tests/mcp_server/", "tests/client/"],
       "prohibitedPaths": ["skills/", "supabase/migrations/", "configs/consumer-activation/"],
       "verificationCommands": [["python3", "-m", "pytest", "-q", "tests/contracts", "tests/core", "tests/gateway", "tests/mcp_server", "tests/client"]],
-      "dependencies": ["ED-00"],
+      "dependencies": ["ED-00", "ED-01"],
       "executionState": "PLAN"
     },
     {
@@ -80,7 +90,7 @@
       "id": "ED-06",
       "title": "Build and prepare the Server 01 deployment candidate",
       "issues": ["ISS-06"],
-      "ownedPaths": ["deploy/vps/", "docs/deploy/", "docs/runbooks/PRODUCTION_OPERATIONS.md", "evidence/end-to-end-delivery/ed-06/"],
+      "ownedPaths": ["deploy/vps/", "docs/deploy/", "docs/runbooks/PRODUCTION_OPERATIONS.md", "tests/deploy/", "evidence/end-to-end-delivery/ed-06/"],
       "prohibitedPaths": ["deploy/production/", "supabase/migrations/", "skills/", "configs/consumer-activation/"],
       "verificationCommands": [["python3", "-m", "pytest", "-q", "tests/deploy"]],
       "dependencies": ["ED-01", "ED-02"],
@@ -108,12 +118,22 @@
     },
     {
       "id": "ED-09",
-      "title": "Run ordered consumer canaries and close production acceptance",
+      "title": "Run ordered consumer canaries and multi day Cursor use",
       "issues": ["ISS-09"],
-      "ownedPaths": ["evidence/end-to-end-delivery/ed-09/", "docs/end-to-end-delivery/ACCEPTANCE.md"],
+      "ownedPaths": ["evidence/end-to-end-delivery/ed-09/"],
       "prohibitedPaths": ["packages/", "skills/", "supabase/migrations/", "configs/consumer-activation/"],
       "verificationCommands": [["python3", "-m", "json.tool", "evidence/end-to-end-delivery/ed-09/final-acceptance.json"], ["git", "diff", "--check"]],
       "dependencies": ["ED-05", "ED-07", "ED-08"],
+      "executionState": "PLAN"
+    },
+    {
+      "id": "ED-10",
+      "title": "Prove improvement loop assurance cost and final acceptance",
+      "issues": ["ISS-10"],
+      "ownedPaths": ["evidence/end-to-end-delivery/ed-10/", "docs/end-to-end-delivery/ACCEPTANCE.md"],
+      "prohibitedPaths": ["collections/", "vendor-skills/", "supabase/migrations/", "configs/consumer-activation/"],
+      "verificationCommands": [["python3", "-m", "json.tool", "evidence/end-to-end-delivery/ed-10/final-acceptance.json"], ["git", "diff", "--check"]],
+      "dependencies": ["ED-03", "ED-04", "ED-07", "ED-08", "ED-09"],
       "executionState": "PLAN"
     }
   ],
@@ -127,7 +147,9 @@
     {"id": "ISS-06", "packetId": "ED-06", "title": "Build the Server 01 candidate"},
     {"id": "ISS-07", "packetId": "ED-07", "title": "Operationalize telemetry and Librarian"},
     {"id": "ISS-08", "packetId": "ED-08", "title": "Deploy and verify on Server 01"},
-    {"id": "ISS-09", "packetId": "ED-09", "title": "Run actor canaries and acceptance"}
+    {"id": "ISS-09", "packetId": "ED-09", "title": "Run actor canaries and multi day Cursor use"},
+    {"id": "ISS-10", "packetId": "ED-10", "title": "Prove release loop assurance cost and acceptance"},
+    {"id": "ISS-11", "packetId": "ENV-00", "title": "Pin a reproducible cloud execution environment"}
   ],
   "controls": {
     "exactCandidateInvalidation": {"enabled": true, "identityFields": ["repository", "commit", "tree", "workflowDigest", "profileDigest"]},
