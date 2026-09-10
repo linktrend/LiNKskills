@@ -14,6 +14,9 @@
   demonstrated live behavior, missing proof, and unknowns.
 - Atomic packets include inputs, exact path ownership, dependencies, outputs,
   checks, acceptance, checkpoint/handoff, deployment, and recovery.
+- The lane table derives maximum safe parallelism from dependencies and write
+  scopes: current executable capacity is one writer; after Advisor-owned XP-05,
+  the maximum safe LiNKskills wave is three disjoint writers.
 - The manifest uses installed Coding Execution Protocol 1.0.1 with
   `V25_BOOTSTRAP_LEAN`; it is schema/semantic validated as planning state.
 - OSS reuse, secret/account provisioning, consumer ownership, server ownership,
@@ -85,6 +88,9 @@ an owner, however, so ED-01 cannot currently dispatch. The dispatcher suite had
    before ENV-00 dispatch. It must also return exact queue-owner admission and a
    clean isolated transport-suite receipt. Authentication is ready; task
    ownership is not.
+6. XP-05 is the Deployment Advisor-owned, shared lane-aware dispatcher
+   extension. Its absence limits execution to one writer but does not block
+   sequential ENV-00/ED-01 work after approval and XP-00.
 
 None of these prevents complete planning. ED-00 is ready after `APPROVE` as a
 no-provider-cost identity/interface refresh through the founder Gate-0 route;
