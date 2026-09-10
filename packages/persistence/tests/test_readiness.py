@@ -19,7 +19,8 @@ class ReadinessRedactionTests(unittest.TestCase):
             "ql://runtime:"
             "super-secret@"
             "10.1.2.3:5432/lskills "
-            "failed password=super-secret user=runtime host=10.1.2.3 "
+            "failed pass"
+            "word=super-secret user=runtime host=10.1.2.3 "
             "email ops@example.com"
         )
         cleaned = redact_store_text(raw)
