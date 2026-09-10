@@ -1,0 +1,186 @@
+{
+  "schemaVersion": 1,
+  "protocol": {
+    "id": "coding-execution-protocol",
+    "version": "1.0.1",
+    "amendment": "V25_BOOTSTRAP_LEAN"
+  },
+  "program": {
+    "id": "linkskills-end-to-end-delivery",
+    "name": "LiNKskills Server 01 End-to-End Delivery",
+    "targetRelease": "initial-provider-production"
+  },
+  "baseline": {
+    "repository": "linktrend/LiNKskills",
+    "commit": "7a813f529f7b25a40fd3e88f74fb0e86c7c728d5",
+    "tree": "d0bb392351994810173f730c47b63112c31e391b",
+    "ref": "refs/remotes/origin/development"
+  },
+  "packets": [
+    {
+      "id": "ED-00",
+      "title": "Freeze current identity interfaces and acceptance",
+      "issues": ["ISS-00"],
+      "ownedPaths": ["docs/README.md", "docs/end-to-end-delivery/README.md", "docs/end-to-end-delivery/PRD.md", "docs/end-to-end-delivery/STARTING-POSITION.md", "docs/end-to-end-delivery/WORK-PACKETS.md", "docs/end-to-end-delivery/EXECUTION-MANIFEST.json", "docs/end-to-end-delivery/OSS-INVENTORY.md", "docs/end-to-end-delivery/READINESS-REPORT.md", "docs/handoffs/2026-09-10-linkskills-end-to-end-delivery-plan.md", "evidence/end-to-end-delivery/ed-00/"],
+      "prohibitedPaths": ["packages/", "skills/", "supabase/migrations/", "deploy/"],
+      "verificationCommands": [["python3", "-m", "json.tool", "docs/end-to-end-delivery/EXECUTION-MANIFEST.json"], ["git", "diff", "--check"]],
+      "executionState": "PLAN"
+    },
+    {
+      "id": "ED-01",
+      "title": "Reconcile durable provider store and migration package",
+      "issues": ["ISS-01"],
+      "ownedPaths": ["packages/persistence/", "supabase/migrations/", "docs/migrations/", "tests/migrations/"],
+      "prohibitedPaths": ["skills/", "packages/mcp_server/", "configs/consumer-activation/"],
+      "verificationCommands": [["python3", "-m", "pytest", "-q", "tests/migrations"]],
+      "dependencies": ["ED-00"],
+      "executionState": "PLAN"
+    },
+    {
+      "id": "ED-02",
+      "title": "Ship the provider v2 Gateway and MCP artifact",
+      "issues": ["ISS-02"],
+      "ownedPaths": ["packages/contracts/", "packages/core/", "packages/gateway/", "packages/mcp_server/", "packages/client/", "tests/contracts/", "tests/core/", "tests/gateway/", "tests/mcp_server/", "tests/client/"],
+      "prohibitedPaths": ["skills/", "supabase/migrations/", "configs/consumer-activation/"],
+      "verificationCommands": [["python3", "-m", "pytest", "-q", "tests/contracts", "tests/core", "tests/gateway", "tests/mcp_server", "tests/client"]],
+      "dependencies": ["ED-00"],
+      "executionState": "PLAN"
+    },
+    {
+      "id": "ED-03",
+      "title": "Qualify the five initial release profile combinations",
+      "issues": ["ISS-03"],
+      "ownedPaths": ["packages/eval_runner/", "skills/git-safeguard/", "skills/persistent-qa/", "skills/repository-manager/", "skills/skill-template/", "skills/tool-architect/", "tests/eval_runner/", "evidence/end-to-end-delivery/ed-03/"],
+      "prohibitedPaths": ["collections/", "vendor-skills/", "configs/consumer-activation/", "catalog/index.json"],
+      "verificationCommands": [["python3", "validator.py", "--repo-root", ".", "--scan-all"], ["python3", "-m", "pytest", "-q", "tests/eval_runner"]],
+      "dependencies": ["ED-00", "ED-02"],
+      "executionState": "PLAN"
+    },
+    {
+      "id": "ED-04",
+      "title": "Publish exact initial releases and enforce selectability",
+      "issues": ["ISS-04"],
+      "ownedPaths": ["packages/publisher/", "tests/publisher/", "evidence/end-to-end-delivery/ed-04/"],
+      "prohibitedPaths": ["collections/", "vendor-skills/", "configs/consumer-activation/", "skills/"],
+      "verificationCommands": [["python3", "-m", "pytest", "-q", "tests/publisher"]],
+      "dependencies": ["ED-01", "ED-02", "ED-03"],
+      "executionState": "PLAN"
+    },
+    {
+      "id": "ED-05",
+      "title": "Produce consumer pins adapters and conformance fixtures",
+      "issues": ["ISS-05"],
+      "ownedPaths": ["configs/fragments/", "configs/consumer-activation/", "docs/integrations/", "tests/integrations/", "evidence/end-to-end-delivery/ed-05/"],
+      "prohibitedPaths": ["skills/", "collections/", "vendor-skills/", "supabase/migrations/"],
+      "verificationCommands": [["python3", "-m", "pytest", "-q", "tests/integrations"]],
+      "dependencies": ["ED-02", "ED-04"],
+      "executionState": "PLAN"
+    },
+    {
+      "id": "ED-06",
+      "title": "Build and prepare the Server 01 deployment candidate",
+      "issues": ["ISS-06"],
+      "ownedPaths": ["deploy/vps/", "docs/deploy/", "docs/runbooks/PRODUCTION_OPERATIONS.md", "evidence/end-to-end-delivery/ed-06/"],
+      "prohibitedPaths": ["deploy/production/", "supabase/migrations/", "skills/", "configs/consumer-activation/"],
+      "verificationCommands": [["python3", "-m", "pytest", "-q", "tests/deploy"]],
+      "dependencies": ["ED-01", "ED-02"],
+      "executionState": "PLAN"
+    },
+    {
+      "id": "ED-07",
+      "title": "Integrate telemetry Librarian and operator visibility",
+      "issues": ["ISS-07"],
+      "ownedPaths": ["packages/librarian_domain/", "global_evaluator.py", "tests/librarian_domain/", "evidence/end-to-end-delivery/ed-07/"],
+      "prohibitedPaths": ["packages/gateway/", "packages/mcp_server/", "skills/", "supabase/migrations/"],
+      "verificationCommands": [["python3", "-m", "pytest", "-q", "tests/librarian_domain"]],
+      "dependencies": ["ED-01", "ED-02", "ED-04"],
+      "executionState": "PLAN"
+    },
+    {
+      "id": "ED-08",
+      "title": "Deploy and verify the provider on LiNKserver 01",
+      "issues": ["ISS-08"],
+      "ownedPaths": ["evidence/end-to-end-delivery/ed-08/"],
+      "prohibitedPaths": ["packages/", "skills/", "supabase/migrations/", "configs/consumer-activation/"],
+      "verificationCommands": [["python3", "-m", "json.tool", "evidence/end-to-end-delivery/ed-08/deployment-receipt.json"]],
+      "dependencies": ["ED-01", "ED-02", "ED-03", "ED-04", "ED-05", "ED-06", "ED-07"],
+      "executionState": "PLAN"
+    },
+    {
+      "id": "ED-09",
+      "title": "Run ordered consumer canaries and close production acceptance",
+      "issues": ["ISS-09"],
+      "ownedPaths": ["evidence/end-to-end-delivery/ed-09/", "docs/end-to-end-delivery/ACCEPTANCE.md"],
+      "prohibitedPaths": ["packages/", "skills/", "supabase/migrations/", "configs/consumer-activation/"],
+      "verificationCommands": [["python3", "-m", "json.tool", "evidence/end-to-end-delivery/ed-09/final-acceptance.json"], ["git", "diff", "--check"]],
+      "dependencies": ["ED-05", "ED-07", "ED-08"],
+      "executionState": "PLAN"
+    }
+  ],
+  "issues": [
+    {"id": "ISS-00", "packetId": "ED-00", "title": "Freeze baseline and acceptance"},
+    {"id": "ISS-01", "packetId": "ED-01", "title": "Reconcile durable store and migrations"},
+    {"id": "ISS-02", "packetId": "ED-02", "title": "Package provider v2 Gateway and MCP"},
+    {"id": "ISS-03", "packetId": "ED-03", "title": "Qualify the initial five releases"},
+    {"id": "ISS-04", "packetId": "ED-04", "title": "Publish the qualified initial set"},
+    {"id": "ISS-05", "packetId": "ED-05", "title": "Prepare exact consumer pins"},
+    {"id": "ISS-06", "packetId": "ED-06", "title": "Build the Server 01 candidate"},
+    {"id": "ISS-07", "packetId": "ED-07", "title": "Operationalize telemetry and Librarian"},
+    {"id": "ISS-08", "packetId": "ED-08", "title": "Deploy and verify on Server 01"},
+    {"id": "ISS-09", "packetId": "ED-09", "title": "Run actor canaries and acceptance"}
+  ],
+  "controls": {
+    "exactCandidateInvalidation": {"enabled": true, "identityFields": ["repository", "commit", "tree", "workflowDigest", "profileDigest"]},
+    "boundedRetry": {"ordinarySourceRepairs": 3, "infrastructureAttemptsPerCandidate": 2, "codeFailureRetries": 0},
+    "orchestrationLease": {"required": true, "scope": "packet-repository", "ttlSeconds": 3600},
+    "resourceUncertainty": {"failClosed": true, "unknownIsBlocking": true},
+    "automaticApproval": {
+      "checkpoint": "automatic",
+      "stagingPromote": "automatic-on-receipt-identity",
+      "reservedActions": ["main_promote", "publish_release", "deploy_production", "github_protection_change", "provider_live_mutation"],
+      "forbiddenActors": ["self_review", "self_merge", "prefer_incoming"]
+    },
+    "gitAuthority": {
+      "workBranchPattern": "issue/<n>-<slug>",
+      "protectedRefs": ["development", "staging", "main"],
+      "implementerMayOpenPr": false,
+      "implementerMayMerge": false,
+      "nestedSelfInstall": false
+    },
+    "publisherAuthority": {
+      "canonicalForV25": "none",
+      "legacyPublishers": ["linktrend-review-ready-publisher", "mark-review-ready.sh-as-publisher", "review-ready.json", "user-pat-publisher"],
+      "missingOrFailedClassification": "WAIVED_LEGACY_GATE"
+    },
+    "autoworkDiscovery": {"requiredWhenCallable": true, "unavailableIsHold": true},
+    "issueCheckpoint": {
+      "acceptWithoutReviewReady": true,
+      "acceptWithoutToken": true,
+      "requiredEvidence": ["exact_pushed_commit_tree", "scoped_diff", "focused_tests", "independent_narrow_review", "manifest_evidence"]
+    },
+    "administratorRecovery": {"namedExceptionOnly": true, "afterReplacementProof": true, "allowedOperations": ["protection_snapshot", "restore", "readback"]},
+    "durableHeartbeat": {"writeReadbackRequired": true, "persistBeforeMutation": true},
+    "checkoutBoundVerification": {"bindToCheckout": true, "forbidMergeRefIdentity": true},
+    "retryExhaustion": {"diagnoseBeforeRecovery": true, "forbidSilentRetry": true, "ordinaryRecovery": "new_identity", "infrastructureRecovery": "hold", "codeFailureRecovery": "new_identity"},
+    "hostedCapacityScheduler": {
+      "requireCompleteSnapshot": true,
+      "busyIsNotDiagnosis": true,
+      "unknownIsBlocking": true,
+      "hostedConcurrencyAuthority": "execution-protocol",
+      "maxAdmittedSlots": {"local": 1},
+      "adaptiveConcurrency": {
+        "mode": "minimum_of_live_evidence",
+        "capacityEvidence": "authenticated_cursor_account",
+        "identityFields": ["accountId", "apiKeyName", "teamId", "programRunId"],
+        "spendCeilingEvidence": "required",
+        "safetyConstraintEvidence": "required",
+        "evidenceMaxAgeSeconds": 900
+      },
+      "unknownProbeSeconds": 600,
+      "backstopSeconds": 600,
+      "prioritization": ["priority", "dependencyReady", "fifo"],
+      "utilizationGapEvent": "UTILIZATION_GAP",
+      "recomputeOnEvents": ["admission", "completion", "invalidation", "probe_timeout", "api_rejection", "utilization_gap_repair"]
+    }
+  }
+}
