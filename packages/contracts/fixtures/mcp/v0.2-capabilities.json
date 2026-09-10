@@ -1,0 +1,18 @@
+{
+  "contract_version": "skills.api.v0.2",
+  "mcp_protocol": "2026-07-28",
+  "sessionless": true,
+  "initialize_required": false,
+  "legacy_execution": false,
+  "serverInfo": { "name": "linkskills-mcp-v2", "version": "2.0.0" },
+  "resources": true,
+  "tools": [
+    "skills_release_verify",
+    "skills_use_report_submit",
+    "skills_use_report_status_get",
+    "skills_feedback_submit",
+    "skills_feedback_status_get",
+    "skills_librarian_status_get"
+  ],
+  "denied_on_v2": ["skills_run_*", "skills_tool_*"]
+}

@@ -31,6 +31,12 @@ class V2ProviderTests(unittest.TestCase):
             self.assertEqual(self.p.handle(dict(self.base, operation="skills_catalog_list", **extra))["error"], expected)
         self.assertEqual(self.call("skills_run_start")["error"], "legacy_execution_disabled")
         self.assertEqual(self.call("skills_tool_invoke")["error"], "legacy_execution_disabled")
+        rpc = ModernSkillsMcpServer(self.p)
+        denied = rpc.handle_rpc(
+            {"id": 9, "method": "tools/call", "params": {"name": "skills_tool_invoke", "authorization": "trusted"}}
+        )
+        self.assertTrue(denied["result"]["isError"])
+        self.assertEqual(denied["result"]["structuredContent"]["error"], "legacy_execution_disabled")
     def test_modern_rpc_is_sessionless(self):
         server = ModernSkillsMcpServer(self.p)
         self.assertEqual(server.handle_rpc({"id":1,"method":"initialize"})["error"]["message"], "session_not_supported")

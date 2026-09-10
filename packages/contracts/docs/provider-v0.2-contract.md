@@ -91,9 +91,41 @@ data, trading orders, portfolios, and raw input/output. Skills metadata is
 informational: it cannot execute, select, grant identity/data access, approve,
 escalate, or confer domain authority.
 
-No MCP SDK is pinned in this slice. Official support for modern MCP `2026-07-28`
-was verified in the [official Python SDK](https://github.com/modelcontextprotocol/python-sdk),
-its [v2 behavior notes](https://github.com/modelcontextprotocol/python-sdk/blob/main/docs/whats-new.md),
-and the [Streamable HTTP specification](https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/docs/specification/2026-07-28/basic/transports/streamable-http.mdx).
-Pinning and transport implementation remain separate HOLDs until their package,
-conformance, and deployment decisions are implemented and tested.
+No MCP SDK is pinned. Official support for modern MCP `2026-07-28` was
+verified in the [official Python SDK](https://github.com/modelcontextprotocol/python-sdk).
+ED-02 implements the production HTTP and MCP adapters over the shared
+`linkskills_core.provider_v2` domain (`POST /v2/{operation}`,
+`linkskills-mcp-v2`). The Python MCP SDK remains unpinned.
+
+## Production entrypoint (ED-02)
+
+One installable domain (`SkillsApiV2` / `V2Provider`) is shared by:
+
+- HTTP: `linkskills-gateway` serving `GET /health`, `GET /ready`,
+  `GET /v2/openapi.json`, `GET /v2/capabilities`, `POST /v2/{operation}`
+- MCP: `linkskills-mcp-v2` negotiating protocol `2026-07-28` sessionlessly
+
+Business rules (gates, pagination snapshot, exact bytes/digests, privacy,
+idempotency, legacy execution denial) live only in the core domain.
+
+## Observed v0.1 compatibility adapter, removal gate, and rollback
+
+The observed live compatibility adapter remains `POST /v1/{operation}` and
+newline-delimited JSON-RPC MCP `2024-11-05` (`linkskills-mcp-server`) with the
+15 legacy tools and no resources. Machine evidence:
+`fixtures/mcp/legacy-v0.1-compatibility.json`.
+
+On the v2 surface every `skills_run_*` and `skills_tool_*` name fails closed
+with `legacy_execution_disabled` and HTTP 410. There is no provider execution
+or tool-invoke route on v2.
+
+Removal gate: drop the v0.1 adapter only after every admitted consumer uses
+`skills.api.v0.2`, a rollback drill has restored the retained v0.1 image, and
+no live v0.1 client remains. Until then v0.1 is preserved, observable, and
+not a second long-term authority.
+
+Rollback: drain the v2 candidate and restore the retained v0.1 image
+`sha256:7cf2780a82c2c37c113b2d55b787a4e72a7098063cf434ea0654826c3719257f`
+(release `7067716fef5189a1427a7cf9b0847cec898e19de`) and its compose
+projection. Immutable releases are never rewritten. Live compose remains
+Platform/Server 01 owned (ED-06/ED-08).

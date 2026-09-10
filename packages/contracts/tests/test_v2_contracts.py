@@ -83,6 +83,14 @@ class V2ContractTests(unittest.TestCase):
         self.assert_valid(policy, "mcp-policy-v0.2.json")
         self.assert_valid(legacy, "compatibility-evidence-v0.2.json")
 
+    def test_production_capability_and_openapi_records_exist(self) -> None:
+        capabilities = load_fixture("mcp", "v0.2-capabilities.json")
+        self.assertEqual(capabilities["mcp_protocol"], "2026-07-28")
+        self.assertFalse(capabilities["legacy_execution"])
+        openapi = load_fixture("openapi", "skills-api-v0.2.json")
+        self.assertEqual(openapi["openapi"], "3.1.0")
+        self.assertIn("/v2/{operation}", openapi["paths"])
+
     def test_metadata_vocabularies_and_informational_authority(self) -> None:
         payload = load_fixture("metadata", "valid-informational.json")
         self.assert_valid(payload, "provider-metadata-v0.2.json")

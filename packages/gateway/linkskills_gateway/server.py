@@ -45,6 +45,12 @@ from .ops import (
     store_probe_configured,
 )
 from .service import OPERATIONS, ServiceError, SkillsGatewayService
+from .v2_http import (
+    capability_record,
+    encode_v2_result,
+    load_openapi,
+    provider_from_verifier,
+)
 
 
 def _json_bytes(payload: Dict[str, Any]) -> bytes:
@@ -58,12 +64,14 @@ def make_handler(
     metrics: Optional[GatewayMetrics] = None,
     drain: Optional[DrainState] = None,
     environ: Optional[Mapping[str, str]] = None,
+    v2_provider: Optional[Any] = None,
 ) -> Type[BaseHTTPRequestHandler]:
     # Never default to unsigned decoding. Missing production authenticator fails closed.
     auth = resolve_claims_verifier(verifier=verifier)
     stats = metrics if metrics is not None else GatewayMetrics()
     drain_state = drain if drain is not None else drain_from_environ(environ)
     env = environ if environ is not None else os.environ
+    skills_v2 = v2_provider if v2_provider is not None else provider_from_verifier(auth)
 
     class LiNKskillsGateway(BaseHTTPRequestHandler):
         server_version = "LiNKskillsGateway/0.1"
@@ -152,6 +160,12 @@ def make_handler(
                     },
                 )
                 return
+            if path == "/v2/openapi.json":
+                self._send(200, load_openapi())
+                return
+            if path in {"/v2/capabilities", "/v2/mcp-capabilities"}:
+                self._send(200, capability_record(skills_v2))
+                return
             self._send(
                 404,
                 {
@@ -208,6 +222,62 @@ def make_handler(
                         "in_flight": stats.snapshot()["in_flight"],
                     },
                 )
+                return
+
+            if path.startswith("/v2/"):
+                draining, drain_reason = drain_state.snapshot()
+                if draining:
+                    stats.inc_drain_reject()
+                    self._send(
+                        503,
+                        {
+                            "error": {
+                                "code": "draining",
+                                "message": "Gateway is draining; rejecting new work",
+                                "retryable": True,
+                                "reason": drain_reason,
+                            }
+                        },
+                    )
+                    return
+                operation = path[len("/v2/") :]
+                body, err = self._read_json()
+                if err:
+                    self._send(
+                        400,
+                        {
+                            "ok": False,
+                            "error": err,
+                            "retryable": False,
+                        },
+                    )
+                    return
+                assert body is not None
+                authorization = self.headers.get("Authorization")
+                params = body.get("params") if isinstance(body.get("params"), dict) else body
+                request = dict(params)
+                request["operation"] = operation
+                request["protocol_version"] = request.get("protocol_version") or "2026-07-28"
+                request["authorization"] = authorization or request.get("authorization")
+                stats.begin_work()
+                try:
+                    result = skills_v2.handle(request)
+                    encoded = encode_v2_result(result)
+                    error = encoded.get("error")
+                    status = 200
+                    if not encoded.get("ok", True):
+                        status = {
+                            "auth_required": 401,
+                            "auth_invalid": 401,
+                            "forbidden": 403,
+                            "not_found": 404,
+                            "idempotency_conflict": 409,
+                            "legacy_execution_disabled": 410,
+                            "store_unavailable": 503,
+                        }.get(str(error), 400)
+                    self._send(status, encoded)
+                finally:
+                    stats.end_work()
                 return
 
             prefix = "/v1/"
@@ -405,6 +475,7 @@ def create_server(
     metrics: Optional[GatewayMetrics] = None,
     drain: Optional[DrainState] = None,
     environ: Optional[Mapping[str, str]] = None,
+    v2_provider: Optional[Any] = None,
 ) -> ThreadingHTTPServer:
     svc = service or SkillsGatewayService()
     handler = make_handler(
@@ -413,6 +484,7 @@ def create_server(
         metrics=metrics,
         drain=drain,
         environ=environ,
+        v2_provider=v2_provider,
     )
     httpd = ThreadingHTTPServer((host, port), handler)
     # Attach runtime handles for signal/drain shutdown (tests may override).
