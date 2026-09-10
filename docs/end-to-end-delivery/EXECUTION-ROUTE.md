@@ -17,8 +17,9 @@ Its adjacent operating guide is `README.md`. These coordinator-side files are
 not worker inputs and do not replace repository governance. Their pinned
 SHA-256 digests are:
 
-- dispatcher: `0cf61dc9b2f6b7f6c6b34ddf94a7c751229e9838d50ed9c1b468f5327e39e2e8`
-- guide: `7626c9bacbeaa9b62d1912da2e0c1bdaf3cdd6a3179164aacb8dd70bb405f1e0`
+- dispatcher: `9c5b5486842e695e47f32896728ec15568237f304ea86115cde50997e419c260`
+- guide: `16474821f05b766ffd397f37178790cc0ccfd77b0554dd89cd975b0b81a12ed6`
+- lane verification: `0a8dfbcd5f8d31157b454204e7a9fa57458c0c53f0f59558cf5f9f51718289ba`
 
 The dispatcher uses only the Python standard library, so it has no separately
 installed SDK version. It reads the existing macOS Keychain item identified by
@@ -57,11 +58,14 @@ owner. The dispatcher therefore blocks a packet owned by this task before any
 Cursor request. No owner may be borrowed or invented. A governed handoff or an
 updated founder-authorised resume scope is required before ED-01 can dispatch.
 
-The transport suite produced 7 PASS and 3 tests stopped early at this live
-suspension guard. Those three expected to exercise uncertain-create and capacity
-logic with fixture owner `test`; the guard rejected that owner first. This does
-not prove a transport defect, but full 10/10 runtime acceptance remains part of
-the pre-dispatch receipt. The guard was not bypassed or changed.
+Existing transport evidence remains usable. Three fixture-only cases previously
+stopped at the live suspension guard because their synthetic owner `test` was
+not admitted; that result does not identify a product defect and is not a
+startup criterion. XP-00 does not rerun or repair those irrelevant fixtures.
+It refreshes only the actual dispatcher digest, account/model/repository reads,
+GitHub ref/commit/tree, and current task owner admission. XP-05's accepted
+receipt already supplies the focused extension-test evidence. The live guard is
+never bypassed.
 
 ## Current owner and overlap inventory
 
@@ -119,15 +123,14 @@ policy refuses this exact approved mapping, XP-00 returns that specific failure
 to the founder; it does not delete `SUSPENDED`, bypass the dispatcher, or create
 another route.
 
-The current dispatcher deliberately permits only one live cloud writer per
-repository. That is the executable capacity, not the intended plan. XP-05 is a
-single shared coordinator deliverable owned by the Deployment Advisor: extend
-the dispatcher to admit one writer per explicitly bound lane while rejecting
-overlapping/shared/broad scopes and preserving suspension, owner, global
-capacity, stable-ID, and ambiguous-run controls. LiNKskills does not implement
-or bypass that extension. Sequential ready work may begin after approval and
-XP-00; safe same-repository parallel waves begin only after XP-05's focused
-offline receipt.
+XP-05 is complete at the identities above. The Advisor-owned shared dispatcher
+passed 23 focused offline tests plus independent review and now admits one writer
+per explicitly bound `lane_id` + `lane_plan_sha256`, while rejecting overlap,
+shared/broad scopes, mismatched owner/plan, duplicate branches, suspension, and
+global-capacity violations. No provider job or live probe was used. LiNKskills
+does not implement or rerun this shared extension. After `APPROVE`, XP-00 owner
+admission, and dependency readiness, safe same-repository waves may use the
+lane-table maximum; legacy or broad/shared packets remain repository-exclusive.
 
 ## Exact admitted packet and request
 
@@ -187,6 +190,8 @@ Complete non-secret template for the first Grok worker, ENV-00:
     "docs/development/CLOUD-EXECUTION.md",
     "tests/environment/"
   ],
+  "lane_id": "L-ENV",
+  "lane_plan_sha256": "<sha256 of the frozen lane plan and exact owned paths>",
   "acceptance_commands": [
     "python -m pip install --require-hashes -r requirements-dev.lock",
     "python3 validator.py --repo-root . --scan-all",
@@ -321,12 +326,16 @@ layers coexist. Preserve the current image digest for rollback. XP-01 alone
 owns shared database migration, backup/restore, PACI/
 service identity, runtime SecretRefs, and concurrent migration exclusion.
 
-The only unavoidable founder action before work is literal `APPROVE`. A new
-purchase, account consent, model substitution, broadened initial Skill set,
-live deployment/provider mutation, or production acceptance returns to the
-founder. Ordinary issue creation, narrow owner-map transition, environment
-setup, artifact preparation, testing, and checkpoint delivery are scheduled
-execution steps and do not create additional founder decisions.
+The only unavoidable founder action before work is literal `APPROVE`. That one
+recorded approval covers every action documented in this package, including the
+narrow owner-map transition, paid model use within the existing account and
+controls, publication, consumer activation, Server 01 deployment, the 48-hour
+Cursor observation, production acceptance, and governed promotion. No second
+approval is required merely because a later packet reaches one of those actions.
+A materially changed scope, new access or account consent not described here,
+new purchase or materially higher spend, destructive action outside the stated
+rollback procedures, model substitution, or broadened initial Skill set requires
+fresh founder direction.
 
 ## Later live prerequisites
 
@@ -336,10 +345,11 @@ execution steps and do not create additional founder decisions.
   project-scoped.
 - XP-03: Codex consumer owner applies and proves its exact pin.
 - XP-04: Lisa/OpenClaw owner applies and proves its exact pin.
-- XP-05: Deployment Advisor's shared lane-aware dispatcher extension before
-  same-repository parallel workers; sequential capacity remains available.
-- Founder-reserved gates: live provider mutation, Server 01 deployment,
-  production acceptance, and any change of model route or initial skill set.
+- XP-05: complete shared lane-aware dispatcher extension; each parallel packet
+  still requires exact lane metadata, dependency readiness, and owner admission.
+- Approval binding: the single recorded `APPROVE` covers live provider mutation,
+  Server 01 deployment, production acceptance, and the documented route and
+  initial set. Only a material change under the rule above needs fresh direction.
 
 Planning/interface maturity and an executable coordinator route do not satisfy
 these later production prerequisites.

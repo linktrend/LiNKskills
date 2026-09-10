@@ -48,18 +48,20 @@ move between lanes only after the preceding lease/checkpoint closes.
 | L-CONSUMER | Consumer packs (`ED-05`) | `configs/fragments/`, `configs/consumer-activation/`, `docs/integrations/`, `tests/integrations/`, `evidence/end-to-end-delivery/ed-05/` | Skills, migrations, external consumer repos | ED-04 accepted | Grok 4.6 Medium, Fast off | 3 with L-DEPLOY and L-OBS | Three disabled owner packets → XP-02/03/04 |
 | L-DEPLOY | Server candidate (`ED-06`) | `deploy/vps/`, `docs/deploy/`, `docs/runbooks/PRODUCTION_OPERATIONS.md`, `tests/deploy/`, `evidence/end-to-end-delivery/ed-06/` | Live compose, migrations, Skills, consumer config | ED-01 + ED-02 | Grok 4.6 Medium, Fast off | 3 with L-CONSUMER and L-OBS | Image/digest/SBOM/rollback pack → Platform owner |
 | L-OBS | Librarian/telemetry (`ED-07`) | `packages/librarian_domain/`, `global_evaluator.py`, `tests/librarian_domain/`, `evidence/end-to-end-delivery/ed-07/` | Platform runner, migrations, consumer config | ED-01 + ED-02 + ED-04 | Grok 4.6 Medium, Fast off | 3 with L-CONSUMER and L-DEPLOY | Reviewed worker contract → Platform owner |
-| L-LIVE | Server deployment (`ED-08`) | `evidence/end-to-end-delivery/ed-08/`; Platform owns live state | All concurrent shared migrations/server mutations | ED-01–07 + XP-01 + founder live gate | Privileged Platform owner; Luna only if directed | 1 | Production source/provider/live receipt → canary lane |
+| L-LIVE | Server deployment (`ED-08`) | `evidence/end-to-end-delivery/ed-08/`; Platform owns live state | All concurrent shared migrations/server mutations | ED-01–07 + XP-01 + the single recorded `APPROVE` | Privileged Platform owner; Luna only if directed | 1 | Production source/provider/live receipt → canary lane |
 | L-CANARY | Ordered consumers (`ED-09`) | `evidence/end-to-end-delivery/ed-09/` | Consumer repos/config remain XP owners | ED-05/07/08 + consumer receipts | Coordinator; consumers execute in owner tasks | 1 | Cursor → Codex → Lisa receipts → correction/acceptance |
-| L-FIX | One real failure correction (one of `FIXGS-00`, `FIXPQ-00`, `FIXRM-00`, `FIXST-00`, `FIXTA-00`) | One exact named initial Skill directory, its regression directory, and packet evidence | Every other Skill; no shared publisher/eval source mutation | ED-09 accepted real failure selects exactly one packet | Grok 4.6 Medium, Fast off | 1 | Corrected immutable release/requalification receipt → ED-10 |
-| L-ACCEPT | Assurance/final decision (`ED-10`) | `evidence/end-to-end-delivery/ed-10/`, `docs/end-to-end-delivery/ACCEPTANCE.md` | All source, Skills, migrations, consumer and deploy paths | ED-09 + exactly one accepted L-FIX receipt | Coordinator / independent reviewer | 1 | Final cross-surface decision → governed promotion/deploy owner |
+| L-IMPROVE | Existing real correction replay (`IMP-00`) | `evidence/end-to-end-delivery/imp-00/` | All source, Skills, migrations, consumer and deploy paths | ED-06/07/08/09; verified historical correction provenance | Coordinator / independent reviewer | 1 | Regression/provider-release/canary receipt → ED-10 |
+| L-FIX | Conditional new-defect repair (zero or one of `FIXGS-00`, `FIXPQ-00`, `FIXRM-00`, `FIXST-00`, `FIXTA-00`) | One exact named initial Skill directory, its regression directory, and packet evidence | Every other Skill; no shared publisher/eval source mutation | Only an actual new ED-09 failure selects one packet | Grok 4.6 Medium, Fast off | 1 | Optional corrected release receipt; not an ED-10 prerequisite |
+| L-ACCEPT | Assurance/final decision (`ED-10`) | `evidence/end-to-end-delivery/ed-10/`, `docs/end-to-end-delivery/ACCEPTANCE.md` | All source, Skills, migrations, consumer and deploy paths | ED-09 + accepted IMP-00 receipt | Coordinator / independent reviewer | 1 | Final cross-surface decision → governed promotion/deploy owner |
 
 The dependency graph—not an arbitrary worker quota—sets the planned maximum.
-Before the shared XP-05 dispatcher extension, executable capacity is one cloud
-writer for this repository. After XP-05, the highest safe wave is three
+The shared XP-05 dispatcher extension is independently accepted. After
+`APPROVE`, XP-00 owner admission, and dependency readiness, the highest safe
+wave is three
 simultaneous workers: L-CONSUMER, L-DEPLOY, and L-OBS. Earlier safe waves are
 L-QUAL + L-DEPLOY (two), then L-RELEASE + L-DEPLOY (two). Store/interface
-freeze, provider integration, live deployment, ordered actor canaries, the one
-selected correction, and final reconciliation serialize because each supplies
+freeze, provider integration, live deployment, ordered actor canaries, any
+selected new-defect correction, and final reconciliation serialize because each supplies
 an input or mutates shared state required by the next lane.
 
 The coordinator recomputes readiness on every completion, invalidation, or
@@ -96,7 +98,8 @@ check; `git diff --check`; no product path changes; independent document review
 bound to exact commit/tree.
 
 **Acceptance/checkpoint:** current identities, contracts, initial set, proof
-classes, dependencies, and founder-reserved actions agree across every package
+classes, dependencies, and actions covered by the single recorded `APPROVE`
+agree across every package
 file. Commit `docs(delivery): freeze end-to-end baseline`, push, write evidence,
 and publish the exact checkpoint handoff. **Recovery:** revert the documentation
 checkpoint; no runtime state exists.
@@ -272,7 +275,8 @@ later catalogue entries remain unchanged and nonselectable.
 version/digest and each ineligible profile is denied; ordinary selectable count
 equals the explicitly accepted initial set, never an aggregate source count.
 Commit `feat(publisher): publish initial qualified set`, push, review, then
-founder-reserved live publication with receipt. **Recovery:** atomically restore
+live publication covered by the single recorded `APPROVE`, with receipt.
+**Recovery:** atomically restore
 the prior pointer or revoke the new release; preserve immutable rows/artifacts.
 
 ## ED-05 — Produce consumer pins, adapters, and conformance fixtures
@@ -376,7 +380,8 @@ evidence, and keep provider reads independent.
 LiNKskills owner observes domain conformance and records sanitized evidence under
 `evidence/end-to-end-delivery/ed-08/`. No separate staging server is created.
 
-**Requirements and inputs:** founder approval for deploy/provider mutation;
+**Requirements and inputs:** the single recorded `APPROVE`, which covers the
+documented deploy/provider mutation;
 Platform accepted migration/backup/identity receipts; ED-04 releases; ED-06
 image; complete server resource snapshot; current rollback image/config/state.
 
@@ -416,10 +421,12 @@ valid Platform identities; per-consumer local tool authority; rollback ready;
 initial releases only.
 
 **Work:** enable the isolated/project-scoped Cursor canary, run discover →
-retrieve → verify → local execute → report, then operate it for the approved
-multi-day window while recording availability, failure, cost, and non-disruption
-evidence; disable/rollback on failure. Repeat the acceptance flow for Codex only
-after Cursor acceptance, then Lisa after Codex. Exercise wrong scope, revoked
+retrieve → verify → local execute → report, then operate it for 48 consecutive
+hours spanning at least two Asia/Taipei calendar dates. Record start, midpoint,
+and end availability, failure, cost, and non-disruption evidence; continuous
+paid activity is not required. Disable/rollback on failure. Repeat the functional
+acceptance flow for Codex after Cursor functional acceptance, then Lisa after
+Codex. Exercise wrong scope, revoked
 release, tampered/stale cache, provider/store outage, and consumer-disable
 negatives. Reconcile qualification, provider, consumer, server, observability,
 Librarian, backup/recovery, and rollback evidence.
@@ -433,8 +440,14 @@ negative case; Cursor additionally passes the multi-day window; exact release/
 profile/tool/consumer/provider identities match; telemetry contains only allowed
 bounded fields; unrelated consumers and later skills remain disabled.
 
-**Acceptance/checkpoint:** all three actor flows and the Cursor multi-day gate are
-PASS at compatible identities. Commit
+**Acceptance/checkpoint:** `FUNCTIONAL_ACCEPTED` is available when all three actor
+flows pass at compatible identities. `INTERNAL_LAUNCH_COMPLETE` remains HOLD
+until the 48-hour Cursor observation also passes. The internal-launch plan at
+`docs/LINKSKILLS-INTERNAL-LAUNCH-DETAILED-DEVELOPMENT-PLAN.md` §§13.10 and
+15.4 requires multi-day real use; the 48-hour minimum is this package's explicit
+interpretation of that otherwise unspecified duration. The single `APPROVE`
+authorizes this bounded observation as documented work; it is not a second
+approval gate. Commit
 `test(canary): prove initial skills consumers`, push, review, and hand the exact
 receipts to ED-10. **Recovery:** disable only the failing consumer first; if
 systemic, disable all pins and execute ED-08 rollback.
@@ -451,19 +464,26 @@ definition of done; exact tool dependency/reverse-dependency graph; provider,
 database, request, model, storage, and evaluation cost measurements; SBOM,
 vulnerability, secret, privacy, auth/RLS, and supply-chain evidence.
 
-**Work:** select one real observed failure/correction from the accepted canary
-and activate exactly one conditional L-FIX packet below. Require its executable
-regression, correction, requalification through the existing ED-03 controls,
-and improved immutable publication through existing ED-04 controls; those
-controls are read-only tooling here, not reopened source ownership. Then prove
-the new release fixes the failure. Make or simulate through an immutable fixture one exact tool-version change,
+**Work:** consume IMP-00's replay of the existing real Mac Mini PACI canary
+issuer-policy correction at commit
+`6a2101d132b42010162595a2bab2c72fee6282da`. Its existing
+`ResolveClaimsVerifierPaciIssuerPolicyTests` cases in
+`tests/gateway/test_paci_adversarial.py` are the regression; IMP-00
+re-executes them against the accepted candidate, records the redacted
+trace-to-eval candidate through ED-07's supervised Librarian flow. The Librarian
+must deduplicate it against the existing correction and record `already_corrected`
+rather than propose unnecessary source work. IMP-00 then binds the correction to the exact
+immutable provider image/release from ED-06/08 plus the accepted ED-09 consumer
+canary. This satisfies the approved
+internal-launch plan's real failure/correction requirement without waiting for
+or fabricating a new defect. Make or simulate through an immutable fixture one exact tool-version change,
 prove affected-profile invalidation/revalidation, prove unaffected profiles stay
 valid, and roll the tool/release pointer back. Reconcile measured cost per run
 for founder acceptance. Complete security/privacy/supply-chain review and the
 full source/provider/consumer/server/production matrix.
 
-**Dependencies:** ED-03, ED-04, ED-07, ED-08, ED-09, one accepted conditional
-L-FIX receipt, and archive-confirmed no-dispatch receipts for the other four.
+**Dependencies:** ED-03, ED-04, ED-06, ED-07, ED-08, ED-09, and one accepted IMP-00
+receipt. Conditional L-FIX packets are not dependencies.
 **Output:** regression
 eval, improved immutable release receipt, tool blast-radius/rollback receipt,
 accepted cost record, assurance report, 59-entry classification inventory, and
@@ -482,13 +502,27 @@ governed promotion/release procedures. **Recovery:** revoke the improved release
 or restore its prior pointer/tool pin; retain regression and failed evidence;
 disable consumers or execute ED-08 rollback if the defect is systemic.
 
-### Conditional L-FIX packets
+### IMP-00 and conditional L-FIX packets
 
-Exactly one packet below is activated after ED-09 identifies the first accepted
-real failure. Its GitHub issue branch, exact paths, commit/tree, and admission
-are frozen before dispatch. The other four transition from `PLAN` to
-`ARCHIVE_CONFIRMED` with no-dispatch/no-mutation evidence. Ownership transfers
-only after ED-03 and ED-09 leases are closed; no concurrent Skill writer is allowed.
+IMP-00 is the required no-source-mutation improvement packet. It verifies that
+the historical correction commit is an ancestor of the accepted candidate,
+replays the checked-in PACI canary regression, records its redacted
+trace-to-eval disposition, and binds the exact corrected source/test/provider
+image/release/consumer-canary identities in
+`evidence/end-to-end-delivery/imp-00/improvement-loop-receipt.json`. If that
+historical provenance cannot be verified, IMP-00 may demonstrate the mechanism
+with a controlled, reproducible nonproduction fixture, but the strict real-
+failure criterion remains `OBSERVATION_PENDING`; it may not be reported as the
+legacy internal-launch definition of done. Functional acceptance may still be
+reported separately.
+
+The five packets below are conditional recovery capacity only. They remain in
+the installed supported no-work state `PLAN` when ED-09 finds no new defect; no
+agent, issue, lease, archive transition, or mutation is created for them. If
+ED-09 finds an actual new failure in one named Skill, exactly that packet may be
+activated after its GitHub issue branch, exact paths, commit/tree, and admission
+are frozen. Ownership transfers only after ED-03 and ED-09 leases are closed;
+no concurrent Skill writer is allowed.
 
 | Packet | Exact source/test/evidence ownership |
 |---|---|
@@ -498,13 +532,13 @@ only after ED-03 and ED-09 leases are closed; no concurrent Skill writer is allo
 | `FIXST-00` | `skills/skill-template/`, `tests/regression/skill-template/`, `evidence/end-to-end-delivery/fixst-00/` |
 | `FIXTA-00` | `skills/tool-architect/`, `tests/regression/tool-architect/`, `evidence/end-to-end-delivery/fixta-00/` |
 
-Each selected packet reproduces the failure before the fix, changes only its
+Any selected packet reproduces the failure before the fix, changes only its
 owned Skill/tests, reruns the relevant existing eval and publisher controls,
 publishes a new immutable version without rewriting the old one, proves the
 fix, and records revocation/pointer rollback. It commits/pushes and receives an
 exact-head independent review before ED-10 may accept it.
 
-The selected packet then transitions to `COMPLETE` only with all semantic
+An activated packet then transitions to `COMPLETE` only with all semantic
 lifecycle fields: one or more terminal attempts and no nonterminal attempt; an
 inactive write lock; exact `acceptedCommit`/`acceptedTree`; non-event
 `completionEvidence.kind=packet_completion` whose commit/tree and non-empty
@@ -512,16 +546,9 @@ summary match; and a checkout-bound `verificationReceipt` with the exact ref,
 commit, tree, repository lease identity, and `promotableIdentity=true`. Any
 retry exhaustion is diagnosed in `retryExhaustion`; it is never silently reset.
 
-Each unselected packet transitions to `ARCHIVE_CONFIRMED` at the unchanged
-accepted ED-09 commit/tree. It records a terminal `selection_not_chosen` /
-`no_dispatch` attempt, inactive write lock, matching
-`completionEvidence.kind=packet_completion` explaining that no source/provider
-mutation occurred, and a checkout-bound verification receipt. It additionally
-requires `archiveEvidence.apiReadback=true` with a non-empty lifecycle archive
-API readback proving no agent, active lease, or write lock exists. A local note
-or absent Cursor receipt is not archive proof. ED-10 admission requires exactly
-one valid `COMPLETE` and four valid `ARCHIVE_CONFIRMED` packets at compatible
-identities; the installed semantic lifecycle validator must return `ok=true`.
+Unselected packets remain `PLAN`. The plan makes no archive API claim for an
+agent that was never created, and ED-10 does not count no-work packets as
+completed work.
 
 ## External dependency packets — recorded, not dispatched
 
@@ -548,10 +575,11 @@ existing Keychain reference. The receipt must prove Grok 4.6 Medium, Fast off,
 explicit LiNKskills `repos[]`, status/result retrieval controls, exact identity
 attestation, fail-closed mismatch behavior, and the controlled reconciliation/
 archive procedure for a rejected created agent. It must also prove this task's
-exact owner is admitted by the current global queue and run the transport suite
-in an isolated accepted context; the 2026-09-10 baseline was 7 PASS with 3
-fixture cases stopped early by the live suspension guard. No agent is created during this
-preflight. ED-00 may run without XP-00 through the founder Gate-0 Luna High
+exact owner is admitted by the current global queue. Reuse the already verified
+transport evidence; the three fixture-only guard stops are not a product or
+startup blocker and are not rerun. XP-05's accepted receipt supplies the focused
+offline extension-test evidence. No agent is created during this preflight.
+ED-00 may run without XP-00 through the founder Gate-0 Luna High
 route; ED-01 and all ordinary post-Gate-0 Cursor work wait for its fresh XP-00
 receipt. See `EXECUTION-ROUTE.md`.
 
@@ -623,23 +651,33 @@ After it passes, the coordinator may admit the disjoint waves in the lane table
 up to live account capacity. No repository implements or bypasses this shared
 change, and no paid probe is required for its offline acceptance.
 
+**Current receipt:** complete. Dispatcher SHA-256
+`9c5b5486842e695e47f32896728ec15568237f304ea86115cde50997e419c260`;
+`LANE-VERIFICATION.json` SHA-256
+`0a8dfbcd5f8d31157b454204e7a9fa57458c0c53f0f59558cf5f9f51718289ba`;
+23 focused offline tests PASS and separate independent review PASS. Packets opt
+in with `lane_id` and `lane_plan_sha256`. No live provider job, owner admission,
+product change, control change, or server mutation occurred.
+
 ## Logical integration and promotion sequence
 
 1. Phase A: ED-00 through the founder Gate-0 route; XP-00 performs the narrowly
    authorised coordinator owner transition and route preflight after approval.
 2. Environment phase: ENV-00 is the first Grok worker and produces the frozen
-   cloud/CI dependency basis. It may proceed at one-writer capacity while XP-05
-   is pending.
+   cloud/CI dependency basis after XP-00 owner admission.
 3. Phase B after ED-00, XP-00, and ENV-00: ED-01, then ED-02. After ED-02,
-   L-QUAL and L-DEPLOY may run as the first disjoint parallel wave if XP-05 is accepted.
+   L-QUAL and L-DEPLOY may run as the first disjoint parallel wave using the
+   accepted XP-05 lane controls.
 4. Phase C: ED-03 evidence completion → ED-04 publication source → ED-05 consumer
    packs; ED-06 image; ED-07 worker/telemetry.
 5. Platform dependency group: XP-01 consumes ED-01/06/07 and returns receipts.
 6. Production group: ED-08 only after accepted source/artifacts, XP-01, resource
-   preflight, and founder-reserved production approvals.
+   preflight, and the single recorded `APPROVE`; no second production approval
+   is required for the documented actions.
 7. Consumer group: ED-09 Cursor (XP-02 only if shared mutation is required),
    then XP-03 Codex, then XP-04 Lisa; ED-09 reconciles actor evidence.
-8. Assurance group: ED-10 proves the real failure-to-improvement loop, tool
+8. Assurance group: IMP-00 replays the existing real correction; ED-10 proves
+   the failure-to-improvement loop, tool
    blast radius/rollback, accepted run cost, security/privacy/supply-chain
    clearance, and final classification/acceptance.
 9. Protected source moves `issue/*` → Phase PR → `development` → `staging` →
