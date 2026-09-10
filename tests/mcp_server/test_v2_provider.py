@@ -211,4 +211,3 @@ class GovernedV2ProviderTests(unittest.TestCase):
         self.assertEqual(denied["error"], "forbidden")
         reader_status = call("reader", "skills_use_report_status_get", {"report_id": "opaque:report:shared"})
         self.assertEqual(reader_status["status"], "accepted")
-
