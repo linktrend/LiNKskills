@@ -504,6 +504,25 @@ publishes a new immutable version without rewriting the old one, proves the
 fix, and records revocation/pointer rollback. It commits/pushes and receives an
 exact-head independent review before ED-10 may accept it.
 
+The selected packet then transitions to `COMPLETE` only with all semantic
+lifecycle fields: one or more terminal attempts and no nonterminal attempt; an
+inactive write lock; exact `acceptedCommit`/`acceptedTree`; non-event
+`completionEvidence.kind=packet_completion` whose commit/tree and non-empty
+summary match; and a checkout-bound `verificationReceipt` with the exact ref,
+commit, tree, repository lease identity, and `promotableIdentity=true`. Any
+retry exhaustion is diagnosed in `retryExhaustion`; it is never silently reset.
+
+Each unselected packet transitions to `ARCHIVE_CONFIRMED` at the unchanged
+accepted ED-09 commit/tree. It records a terminal `selection_not_chosen` /
+`no_dispatch` attempt, inactive write lock, matching
+`completionEvidence.kind=packet_completion` explaining that no source/provider
+mutation occurred, and a checkout-bound verification receipt. It additionally
+requires `archiveEvidence.apiReadback=true` with a non-empty lifecycle archive
+API readback proving no agent, active lease, or write lock exists. A local note
+or absent Cursor receipt is not archive proof. ED-10 admission requires exactly
+one valid `COMPLETE` and four valid `ARCHIVE_CONFIRMED` packets at compatible
+identities; the installed semantic lifecycle validator must return `ok=true`.
+
 ## External dependency packets — recorded, not dispatched
 
 ### Planning dependencies versus runtime dependencies
