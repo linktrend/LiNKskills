@@ -1,6 +1,6 @@
 # Planning readiness report
 
-**Decision:** `PLAN_READY / IMPLEMENTATION_NOT_AUTHORIZED`
+**Decision:** `PLANNING_INTERFACE_READY / ED-00_READY_AFTER_APPROVE / GROK_QUEUE_HOLD / IMPLEMENTATION_NOT_AUTHORIZED`
 
 ## Completeness
 
@@ -39,10 +39,12 @@ production acceptance.
 - Planning: current task, issue `#323`, documentation-only checkpoint.
 - Gate 0 / planning review: Luna High through Codex CLI only where the installed
   founder-bootstrap route requires it.
-- Ordinary post-approval implementation: direct Cursor SDK/API with Grok 4.6
-  Medium, Fast off, explicit `repos[]` binding to `linktrend/LiNKskills` and the
-  requested starting ref. Repository/ref/40-character commit/tree/effective
-  model readback is mandatory; mismatch fails closed and archives the run.
+- Ordinary post-approval implementation: the operative direct Cursor REST
+  dispatcher with Grok 4.6 Medium, Fast off, explicit `repos[]` binding to
+  `linktrend/LiNKskills` and the requested starting ref. GitHub preflight,
+  transport readback, and worker repository/ref/40-character commit/tree/model
+  attestation are all mandatory. Mismatch fails closed; a rejected created
+  agent is reconciled and archived before another dispatch.
 - Independent review: one narrow provider-independent review per exact issue
   checkpoint; no self-review.
 - Heavy builds/tests: hosted CI or cloud worker. Server execution is limited to
@@ -50,6 +52,17 @@ production acceptance.
 - Delivery: issue checkpoints are committed/pushed; Packager/Coordinator owns
   Phase PR creation; delivery controller owns protected `development` merge;
   production deploy and live provider mutation remain founder-reserved actions.
+
+The operative standard-library REST dispatcher and guide are digest-pinned. Its
+existing Keychain-backed account passed safe reads of `/v1/me`, `/v1/models`,
+and `/v1/repositories`: the account is exact, Grok 4.6 Medium with Fast off is
+available, and `linktrend/LiNKskills` is visible. No agent was created. The
+installed `cursor-cloud-dispatch-v2` SDK surface remains a reviewed future
+interface because `cursor-sdk` is not installed, but that is not a blocker to
+the operative REST route. The global suspension file does not admit this task as
+an owner, however, so ED-01 cannot currently dispatch. The dispatcher suite had
+7 PASS and 3 cases stopped early at that guard; the guard was not bypassed. See
+`EXECUTION-ROUTE.md`.
 
 ## Material uncertainties and gates
 
@@ -67,7 +80,17 @@ production acceptance.
    confirmed against real consumer tasks without capturing forbidden private
    payloads.
 
-None of these prevents complete planning. Any change to the five-skill initial
+5. XP-00 must refresh the operative route digest, GitHub packet identity, and
+   rate-limit-aware authenticated account/model/repository proof immediately
+   before ENV-00 dispatch. It must also return exact queue-owner admission and a
+   clean isolated transport-suite receipt. Authentication is ready; task
+   ownership is not.
+
+None of these prevents complete planning. ED-00 is ready after `APPROVE` as a
+no-provider-cost identity/interface refresh through the founder Gate-0 route;
+ENV-00 is the first Grok worker but is not executable now; it follows accepted
+ED-00 plus a fresh XP-00 route and queue-ownership receipt. ED-01 follows its
+reproducible environment checkpoint. Any change to the five-skill initial
 set, three-consumer order, provider-v2/local-execution boundary, Platform
 ownership, or single-server posture is material and returns to the founder.
 
