@@ -57,11 +57,11 @@ class ModernSkillsMcpServer:
         method, raw_params = message.get("method"), message.get("params") or {}
         params = raw_params if isinstance(raw_params, Mapping) else {}
         if method == "initialize":
-            requested = params.get("protocolVersion", params.get("protocol_version"))
+            requested = params.get("protocolVersion")
             authorization = self._authorization(params)
-            if requested is None and authorization is None:
+            if any(key in params for key in ("session", "session_id")):
                 return self._error(req_id, "session_not_supported")
-            if requested not in (None, self.protocol_version):
+            if requested != self.protocol_version:
                 return self._result(req_id, {"ok": False, "error": "contract_incompatible"})
             if authorization is not None:
                 auth = self.provider.handle(

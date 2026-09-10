@@ -43,7 +43,19 @@ def identity_from_claims(claims: Any) -> TrustedIdentity:
     """Map Gateway ActorClaims onto the v2 trusted identity record."""
     caps = {"skills.read"}
     scopes = set(getattr(claims, "scopes", ()) or ())
-    if any(token in scopes for token in ("skills:write", "skills:feedback", "execute", "skills:run")):
+    permitted = set(getattr(claims, "permitted_operations", ()) or ())
+    tokens = scopes | permitted
+    if any(
+        token in tokens
+        for token in (
+            "skills:write",
+            "skills:feedback",
+            "skills.write",
+            "skills.feedback",
+            "execute",
+            "skills:run",
+        )
+    ):
         caps.add("skills.feedback")
         caps.add("skills.write")
     return TrustedIdentity(
@@ -72,7 +84,11 @@ def encode_v2_result(result: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def provider_from_verifier(verifier: Any, **kwargs: Any) -> SkillsApiV2:
-    """Bind a Gateway claims verifier to the shared v2 domain."""
+    """Bind a Gateway claims verifier to the shared v2 domain.
+
+    Production defaults load no releases. Exact retrieval then fails closed
+    with ``catalog_unavailable`` until a real registry is supplied.
+    """
 
     def _verify(token: str) -> TrustedIdentity:
         header = token if token.lower().startswith("bearer ") else f"Bearer {token}"
@@ -83,6 +99,7 @@ def provider_from_verifier(verifier: Any, **kwargs: Any) -> SkillsApiV2:
         )
         return identity_from_claims(claims)
 
+    kwargs.setdefault("releases", None)
     return V2Provider(_verify, **kwargs)
 
 
@@ -115,6 +132,7 @@ def capability_record(provider: SkillsApiV2) -> dict[str, Any]:
         "legacy_execution": False,
         "resources": [item["name"] for item in provider.resources()],
         "tools": list(provider.tools()),
+        "initialize_required": False,
         "uri_templates": {
             item["name"]: item["uri_templates"] for item in provider.resources()
         },
@@ -124,6 +142,7 @@ def capability_record(provider: SkillsApiV2) -> dict[str, Any]:
             "auth_invalid",
             "forbidden",
             "not_found",
+            "catalog_unavailable",
             "validation_failed",
             "idempotency_conflict",
             "legacy_execution_disabled",
@@ -134,4 +153,5 @@ def capability_record(provider: SkillsApiV2) -> dict[str, Any]:
         ],
         "compatibility": LEGACY_REMOVAL_GATE,
         "operations": list(RESOURCE_OPERATIONS + TOOLS),
+        "catalog_ready": bool(provider.catalog_ready),
     }

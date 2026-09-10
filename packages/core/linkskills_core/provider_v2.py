@@ -125,18 +125,28 @@ class ProviderV2Store(Protocol):
     def probe(self) -> Mapping[str, Any]:
         """Return a non-secret reachability snapshot or raise."""
 
-    def put(self, kind: str, receipt_id: str, record: Mapping[str, Any]) -> Mapping[str, Any]:
-        """Insert or replay a receipt. Conflict must fail closed."""
+    def put(
+        self,
+        kind: str,
+        receipt_id: str,
+        record: Mapping[str, Any],
+        *,
+        org_id: str,
+        actor_id: str,
+    ) -> Mapping[str, Any]:
+        """Insert or replay a receipt bound to org and actor. Conflict must fail closed."""
 
-    def get(self, kind: str, receipt_id: str) -> Mapping[str, Any] | None:
-        """Return a previously stored receipt, or ``None``."""
+    def get(
+        self, kind: str, receipt_id: str, *, org_id: str, actor_id: str
+    ) -> Mapping[str, Any] | None:
+        """Return a receipt for this org and actor, or ``None``."""
 
 
 class InMemoryProviderStore:
     """Ephemeral receipts for source proof. Not a production store."""
 
     def __init__(self) -> None:
-        self._rows: dict[tuple[str, str], dict[str, Any]] = {}
+        self._rows: dict[tuple[str, str, str, str], dict[str, Any]] = {}
         self.available = True
 
     def probe(self) -> Mapping[str, Any]:
@@ -144,23 +154,39 @@ class InMemoryProviderStore:
             raise RuntimeError("OperationalError")
         return {"ready": False, "code": "store_memory_not_production", "fail_closed": True}
 
-    def put(self, kind: str, receipt_id: str, record: Mapping[str, Any]) -> Mapping[str, Any]:
+    def put(
+        self,
+        kind: str,
+        receipt_id: str,
+        record: Mapping[str, Any],
+        *,
+        org_id: str,
+        actor_id: str,
+    ) -> Mapping[str, Any]:
         if not self.available:
             raise RuntimeError("OperationalError")
-        key = (kind, receipt_id)
+        if not org_id or not actor_id:
+            raise ValueError("validation_failed")
+        key = (kind, org_id, actor_id, receipt_id)
         existing = self._rows.get(key)
         if existing is not None:
             if existing.get("request_hash") != record.get("request_hash"):
                 raise ValueError("idempotency_conflict")
             return existing
         stored = dict(record)
+        stored["org_id"] = org_id
+        stored["actor_id"] = actor_id
         self._rows[key] = stored
         return stored
 
-    def get(self, kind: str, receipt_id: str) -> Mapping[str, Any] | None:
+    def get(
+        self, kind: str, receipt_id: str, *, org_id: str, actor_id: str
+    ) -> Mapping[str, Any] | None:
         if not self.available:
             raise RuntimeError("OperationalError")
-        return self._rows.get((kind, receipt_id))
+        if not org_id or not actor_id:
+            raise ValueError("validation_failed")
+        return self._rows.get((kind, org_id, actor_id, receipt_id))
 
 
 def diagnose_store_failure(exc: BaseException) -> dict[str, Any]:
@@ -256,8 +282,7 @@ def _normalize_resource(resource_id: str, value: Any, release: Mapping[str, Any]
         raw = value.get("body", value.get("bytes", value.get("content")))
         body = raw.encode("utf-8") if isinstance(raw, str) else raw
     else:
-        body = b""
-        metadata = {}
+        raise ValueError("invalid_resource_body")
     if not isinstance(body, bytes):
         raise ValueError("invalid_resource_body")
     declared_digest = metadata.get("content_digest")
@@ -382,6 +407,11 @@ class SkillsApiV2:
         object.__setattr__(self, "_families", self._normalize_families(self.families))
         object.__setattr__(self, "_store", self.store if self.store is not None else InMemoryProviderStore())
 
+    @property
+    def catalog_ready(self) -> bool:
+        """True only when at least one exact release is loaded."""
+        return bool(self._has_registry)
+
     def _normalize_families(
         self, families: Iterable[Mapping[str, Any]] | None
     ) -> tuple[dict[str, Any], ...]:
@@ -502,16 +532,14 @@ class SkillsApiV2:
         if not isinstance(skill_id, str) or not skill_id or not isinstance(version, str) or not version:
             raise ValueError("exact_release_required")
         release = self._registry.get(f"{skill_id}@{version}")
-        if self._has_registry and release is None:
-            raise ValueError("not_found")
+        if release is None:
+            raise ValueError("catalog_unavailable" if not self._has_registry else "not_found")
         return release
 
     def _authorize_release(
         self, release: Any, identity: TrustedIdentity, request: Mapping[str, Any]
     ) -> None:
         """Apply independent Platform, Skills, profile, role, and tool gates."""
-        if release is None:
-            return
         if release.lifecycle_state in {"revoked", "withdrawn"}:
             raise ValueError("revoked_release")
         if release.lifecycle_state == "expired":
@@ -543,17 +571,6 @@ class SkillsApiV2:
         expected_digest: Any = None,
     ) -> dict[str, Any]:
         """Return one exact descriptor and exact bytes for a selected release."""
-        if release is None:
-            body = b""
-            digest = _digest(body)
-            if expected_digest not in (None, "", digest):
-                raise ValueError("integrity_mismatch")
-            return {
-                "ok": True,
-                "resource_id": resource_id,
-                "bytes": body,
-                "content_digest": digest,
-            }
         resource = release.resource(resource_id)
         if resource is None:
             raise ValueError("not_found")
@@ -596,7 +613,7 @@ class SkillsApiV2:
         """Bounded verify / use / feedback / Librarian tools. No execution route."""
         if operation in WRITE_TOOLS:
             write_caps = identity.capabilities | identity.tool_capabilities
-            if not write_caps.intersection({"skills.feedback", "skills.write", "skills.read"}):
+            if not write_caps.intersection({"skills.feedback", "skills.write"}):
                 raise ValueError("forbidden")
         if operation == "skills_librarian_status_get":
             status = self.store_status()
@@ -618,13 +635,9 @@ class SkillsApiV2:
         if operation == "skills_release_verify":
             release = self._release(request.get("skill_id"), request.get("version"))
             self._authorize_release(release, identity, request)
-            if release is None:
-                body = b""
-                digest = _digest(body)
-            else:
-                body = b"".join(resource.body for resource in release.resources)
-                digest = _digest(body)
-                release.verify_inventory()
+            body = b"".join(resource.body for resource in release.resources)
+            digest = _digest(body)
+            release.verify_inventory()
             expected = request.get("expected_digest") or request.get("package_digest")
             if expected not in (None, "", digest):
                 raise ValueError("integrity_mismatch")
@@ -648,7 +661,11 @@ class SkillsApiV2:
             receipt_id = request.get("report_id") or request.get("feedback_id") or request.get("receipt_id")
             if not isinstance(receipt_id, str) or not receipt_id:
                 raise ValueError("validation_failed")
-            record = self._store_call(lambda: self._store.get(kind, receipt_id))
+            record = self._store_call(
+                lambda: self._store.get(
+                    kind, receipt_id, org_id=identity.org_id, actor_id=identity.actor_id
+                )
+            )
             if record is None:
                 raise ValueError("not_found")
             return {
@@ -707,8 +724,20 @@ class SkillsApiV2:
             "request_hash": key,
             "payload": canonical,
         }
-        previous = self._store_call(lambda: self._store.get(kind, receipt_id))
-        stored = self._store_call(lambda: self._store.put(kind, receipt_id, record))
+        previous = self._store_call(
+            lambda: self._store.get(
+                kind, receipt_id, org_id=identity.org_id, actor_id=identity.actor_id
+            )
+        )
+        stored = self._store_call(
+            lambda: self._store.put(
+                kind,
+                receipt_id,
+                record,
+                org_id=identity.org_id,
+                actor_id=identity.actor_id,
+            )
+        )
         return {
             "ok": True,
             "kind": "tool",
@@ -762,6 +791,7 @@ class SkillsApiV2:
                         "resources": list(self.resources()),
                         "tools": list(self.tools()),
                         "legacy_execution": False,
+                        "catalog_ready": self.catalog_ready,
                     }
                 )
                 if domain:
@@ -830,37 +860,28 @@ class SkillsApiV2:
             if operation == "skills_release_describe":
                 result.update(
                     {
-                        "skill_id": request["skill_id"],
-                        "version": request["version"],
-                        "release_id": f"{request['skill_id']}@{request['version']}",
+                        "skill_id": release.skill_id,
+                        "version": release.version,
+                        "release_id": release.release_id,
+                        "family_id": release.family_id,
+                        "subcategory_id": release.subcategory_id,
+                        "lifecycle_state": release.lifecycle_state,
+                        "qualification": release.qualification,
+                        "provenance": dict(release.provenance),
                     }
                 )
-                if release is not None:
-                    result.update(
-                        {
-                            "family_id": release.family_id,
-                            "subcategory_id": release.subcategory_id,
-                            "lifecycle_state": release.lifecycle_state,
-                            "qualification": release.qualification,
-                            "provenance": dict(release.provenance),
-                        }
-                    )
                 return result
             if operation == "skills_qualification_get":
-                return dict(
-                    result,
-                    qualification=(release.qualification if release else "qualified"),
-                )
+                return dict(result, qualification=release.qualification)
             if operation in {"skills_release_resources_list", "skills_release_sections_list"}:
                 descriptors = []
-                if release is not None:
-                    wanted_kind = "section" if operation == "skills_release_sections_list" else None
-                    for resource in release.resources:
-                        if wanted_kind and resource.resource_kind not in {wanted_kind, "entrypoint"}:
-                            continue
-                        descriptor = resource.descriptor(release.skill_id, release.version)
-                        self._descriptor(descriptor)
-                        descriptors.append(descriptor)
+                wanted_kind = "section" if operation == "skills_release_sections_list" else None
+                for resource in release.resources:
+                    if wanted_kind and resource.resource_kind not in {wanted_kind, "entrypoint"}:
+                        continue
+                    descriptor = resource.descriptor(release.skill_id, release.version)
+                    self._descriptor(descriptor)
+                    descriptors.append(descriptor)
                 result.update(self._page(descriptors, offset, limit))
                 return result
             if operation in {
@@ -885,10 +906,7 @@ class SkillsApiV2:
                     expected_digest=request.get("expected_digest") or request.get("content_digest"),
                 )
             if operation == "skills_release_package_get":
-                if release is None:
-                    body = b""
-                else:
-                    body = b"".join(resource.body for resource in release.resources)
+                body = b"".join(resource.body for resource in release.resources)
                 digest = _digest(body)
                 expected = request.get("expected_digest") or request.get("content_digest")
                 if expected not in (None, "", digest):
@@ -899,7 +917,7 @@ class SkillsApiV2:
                     byte_size=len(body),
                     content_digest=digest,
                     immutable=True,
-                    resource_count=0 if release is None else len(release.resources),
+                    resource_count=len(release.resources),
                 )
             return {"ok": False, "error": "unsupported_operation"}
         except ValueError as exc:

@@ -15,7 +15,18 @@ def identity_from_claims(claims: Any) -> TrustedIdentity:
     """Map Gateway ActorClaims onto the v2 trusted identity record."""
     caps = {"skills.read"}
     scopes = set(getattr(claims, "scopes", ()) or ())
-    if any(token in scopes for token in ("skills:write", "skills:feedback", "execute")):
+    permitted = set(getattr(claims, "permitted_operations", ()) or ())
+    tokens = scopes | permitted
+    if any(
+        token in tokens
+        for token in (
+            "skills:write",
+            "skills:feedback",
+            "skills.write",
+            "skills.feedback",
+            "execute",
+        )
+    ):
         caps.add("skills.feedback")
         caps.add("skills.write")
     return TrustedIdentity(
@@ -28,8 +39,12 @@ def identity_from_claims(claims: Any) -> TrustedIdentity:
     )
 
 
-def build_provider(verifier: Any | None = None) -> Any:
-    """Construct the shared domain bound to Platform-verified bearers."""
+def build_provider(verifier: Any | None = None, **kwargs: Any) -> Any:
+    """Construct the shared domain bound to Platform-verified bearers.
+
+    Production defaults load no releases. Exact retrieval then fails closed
+    with ``catalog_unavailable`` until a real registry is supplied.
+    """
     auth = verifier or resolve_claims_verifier()
 
     def _verify(token: str) -> TrustedIdentity:
@@ -37,7 +52,8 @@ def build_provider(verifier: Any | None = None) -> Any:
         claims = auth.verify(header, request_payload={}, required_operation="skills_list")
         return identity_from_claims(claims)
 
-    return V2Provider(_verify)
+    kwargs.setdefault("releases", None)
+    return V2Provider(_verify, **kwargs)
 
 
 def serve_stdio(

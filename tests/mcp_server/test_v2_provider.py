@@ -25,7 +25,8 @@ class V2ProviderTests(unittest.TestCase):
         catalog = self.call("skills_catalog_list", limit=2); self.assertTrue(catalog["ok"]); self.assertIn("snapshot_id", catalog)
         self.assertTrue(self.call("skills_catalog_search")["ok"])
         self.assertEqual(self.call("skills_release_describe")["error"], "exact_release_required")
-        release = self.call("skills_release_describe", skill_id="safe", version="1.0.0", cursor=catalog["cursor"]); self.assertTrue(release["ok"])
+        missing = self.call("skills_release_describe", skill_id="safe", version="1.0.0", cursor=catalog["cursor"])
+        self.assertEqual(missing["error"], "catalog_unavailable")
     def test_cursor_protocol_legacy_and_bounds_fail_closed(self):
         for extra, expected in (({"cursor":"bad"},"cursor_snapshot_mismatch"),({"cursor":"snapshot:wrong:0"},"cursor_snapshot_mismatch"),({"limit":101},"validation_failed"),({"session_id":"x"},"session_not_supported"),({"protocol_version":"2024-11-05"},"contract_incompatible")):
             self.assertEqual(self.p.handle(dict(self.base, operation="skills_catalog_list", **extra))["error"], expected)
@@ -39,7 +40,12 @@ class V2ProviderTests(unittest.TestCase):
         self.assertEqual(denied["result"]["structuredContent"]["error"], "legacy_execution_disabled")
     def test_modern_rpc_is_sessionless(self):
         server = ModernSkillsMcpServer(self.p)
-        self.assertEqual(server.handle_rpc({"id":1,"method":"initialize"})["error"]["message"], "session_not_supported")
+        omitted = server.handle_rpc({"id":1,"method":"initialize"})
+        self.assertEqual(omitted["result"]["error"], "contract_incompatible")
+        injected = server.handle_rpc({"id":1,"method":"initialize","params":{"protocol_version":"2026-07-28"}})
+        self.assertEqual(injected["result"]["error"], "contract_incompatible")
+        negotiated = server.handle_rpc({"id":1,"method":"initialize","params":{"protocolVersion":"2026-07-28"}})
+        self.assertEqual(negotiated["result"]["protocolVersion"], "2026-07-28")
         listed = server.handle_rpc({"id":2,"method":"resources/list","params":{"authorization":"trusted"}})
         self.assertEqual(len(listed["result"]["resources"]),13)
 
@@ -114,3 +120,95 @@ class GovernedV2ProviderTests(unittest.TestCase):
         self.assertTrue(digest.startswith("sha256:"))
         with self.assertRaises(McpV2Error):
             client.read_exact("skills://release/research/1.0.0/resource/entrypoint", expected_digest="sha256:" + "0" * 64)
+
+    def test_empty_registry_exact_ops_fail_closed(self) -> None:
+        empty = V2Provider(self.identity)
+        for operation, extra in (
+            ("skills_release_describe", {"skill_id": "research", "version": "1.0.0"}),
+            ("skills_qualification_get", {"skill_id": "research", "version": "1.0.0"}),
+            ("skills_release_resource_get", {"skill_id": "research", "version": "1.0.0", "resource_id": "entrypoint"}),
+            ("skills_release_content_get", {"skill_id": "research", "version": "1.0.0", "content_id": "blob"}),
+            ("skills_release_package_get", {"skill_id": "research", "version": "1.0.0"}),
+            ("skills_release_verify", {"skill_id": "research", "version": "1.0.0"}),
+        ):
+            result = empty.handle(dict(self.base, operation=operation, **extra))
+            self.assertEqual(result["error"], "catalog_unavailable", msg=operation)
+            self.assertNotIn("bytes", result)
+
+    def test_mcp_receipts_are_tenant_bound_and_write_requires_report_scope(self) -> None:
+        from linkskills_core.provider_v2 import InMemoryProviderStore
+
+        store = InMemoryProviderStore()
+
+        def verify(token: str):
+            if token == "org-a":
+                return TrustedIdentity(
+                    "org-a", "actor-a", "lskills-api",
+                    frozenset({"skills.read", "skills.feedback"}), "binding",
+                )
+            if token == "org-b":
+                return TrustedIdentity(
+                    "org-b", "actor-b", "lskills-api",
+                    frozenset({"skills.read", "skills.feedback"}), "binding",
+                )
+            if token == "actor-c":
+                return TrustedIdentity(
+                    "org-a", "actor-c", "lskills-api",
+                    frozenset({"skills.read", "skills.feedback"}), "binding",
+                )
+            if token == "reader":
+                return TrustedIdentity(
+                    "org-a", "actor-a", "lskills-api", frozenset({"skills.read"}), "binding",
+                )
+            raise ValueError("bad")
+
+        provider = V2Provider(verify, releases=[self.release], families=self.families, store=store)
+        server = ModernSkillsMcpServer(provider)
+        report = {
+            "schema_version": "0.2",
+            "report_kind": "completed_use",
+            "report_id": "opaque:report:shared",
+            "occurred_at": "2026-08-13T00:00:00Z",
+            "skill_id": "research",
+            "skill_release_ref": "opaque:release:research:1.0.0",
+            "consumer_class": "codex",
+            "actor_ref": "opaque:actor:a",
+            "runtime_profile_ref": "opaque:runtime:codex",
+            "outcome": "use_succeeded",
+            "opaque_refs": ["opaque:program:run-1"],
+            "idempotency_source": "server",
+            "score": 10,
+        }
+
+        def call(token, name, arguments):
+            return server.handle_rpc(
+                {
+                    "id": 1,
+                    "method": "tools/call",
+                    "params": {
+                        "name": name,
+                        "arguments": arguments,
+                        "_meta": {"authorization": token},
+                    },
+                }
+            )["result"]["structuredContent"]
+
+        first = call("org-a", "skills_use_report_submit", {"report": report, "client_idempotency_key": "k-a"})
+        self.assertTrue(first["ok"])
+        self.assertFalse(first["replay"])
+        cross_org = call("org-b", "skills_use_report_status_get", {"report_id": "opaque:report:shared"})
+        self.assertEqual(cross_org["error"], "not_found")
+        cross_actor = call("actor-c", "skills_use_report_status_get", {"report_id": "opaque:report:shared"})
+        self.assertEqual(cross_actor["error"], "not_found")
+        collision = call("org-b", "skills_use_report_submit", {"report": report, "client_idempotency_key": "k-b"})
+        self.assertTrue(collision["ok"])
+        self.assertFalse(collision["replay"])
+        own = call("org-a", "skills_use_report_status_get", {"report_id": "opaque:report:shared"})
+        self.assertEqual(own["status"], "accepted")
+        replay = call("org-a", "skills_use_report_submit", {"report": report, "client_idempotency_key": "k-a"})
+        self.assertTrue(replay["replay"])
+        denied = call("reader", "skills_use_report_submit", {"report": report, "client_idempotency_key": "k-read"})
+        self.assertEqual(denied["error"], "forbidden")
+        reader_status = call("reader", "skills_use_report_status_get", {"report_id": "opaque:report:shared"})
+        self.assertEqual(reader_status["status"], "accepted")
+

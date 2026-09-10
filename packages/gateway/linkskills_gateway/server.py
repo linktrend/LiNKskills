@@ -7,7 +7,16 @@ Routes:
   GET  /drain
   POST /drain
   POST /drain/cancel
+  GET  /v2/openapi.json
+  GET  /v2/capabilities
+  GET  /v2/mcp-capabilities
+  POST /v2/{operation}
   POST /v1/{operation}
+
+Production ``skills.api.v0.2`` is ``POST /v2/{operation}`` plus MCP
+``linkskills-mcp-v2``. Legacy ``POST /v1/{operation}`` remains the observed
+compatibility adapter. Empty-registry production defaults fail closed on
+exact retrieval with ``catalog_unavailable``.
 
 Compatibility note: ``packages/client/linkskills_client/compat.py`` wraps
 ``lib.skill_runtime`` so existing Python consumers can migrate toward this
@@ -271,6 +280,7 @@ def make_handler(
                             "auth_invalid": 401,
                             "forbidden": 403,
                             "not_found": 404,
+                            "catalog_unavailable": 503,
                             "idempotency_conflict": 409,
                             "legacy_execution_disabled": 410,
                             "store_unavailable": 503,

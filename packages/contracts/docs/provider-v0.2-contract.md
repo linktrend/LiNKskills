@@ -1,8 +1,11 @@
 # Provider-only v0.2 contract foundation
 
-This P0 slice is additive. It preserves the v0.1 schemas and records the
-legacy surface; it does not change gateway, MCP, client, runtime, persistence,
-publisher, evaluator, or consumer code.
+This contract is additive to v0.1. It preserves the v0.1 schemas and the
+observed legacy HTTP/MCP adapter. Production ``skills.api.v0.2`` is served
+by Gateway ``POST /v2/{operation}`` and MCP ``linkskills-mcp-v2`` over the
+shared ``linkskills_core.provider_v2`` domain. Empty-registry production
+defaults fail closed on exact retrieval; they do not synthesize qualified
+releases or empty-byte digests.
 
 ## Legacy compatibility evidence
 
@@ -34,11 +37,15 @@ ready or currently deployed.
 
 ## v0.2 policy
 
-The v0.2 policy is transport-independent and deliberately does not implement a
-new transport. It is stateless and sessionless, authenticates every request,
-does not require or rely on `initialize` or a session, and has a closed tool
-and resource map. Unsupported versions fail with `contract_incompatible`;
-there is no silent downgrade to the v1 execution-era surface.
+The v0.2 policy is transport-independent and is implemented by HTTP
+``POST /v2/{operation}`` and MCP ``linkskills-mcp-v2``. It is stateless and
+sessionless, authenticates every request, does not rely on a session, and has
+a closed tool and resource map. MCP ``initialize`` requires an explicit
+``protocolVersion`` of ``2026-07-28``; omission and HTTP-side
+``protocol_version`` injection are not negotiation. Domain operations remain
+usable without an MCP session. Unsupported versions fail with
+``contract_incompatible``; there is no silent downgrade to the v1
+execution-era surface.
 
 The provider exposes read-only guides, catalogue/release metadata, qualification,
 entrypoint instructions, sections, and bounded resources as MCP **resources**.
@@ -103,7 +110,8 @@ One installable domain (`SkillsApiV2` / `V2Provider`) is shared by:
 
 - HTTP: `linkskills-gateway` serving `GET /health`, `GET /ready`,
   `GET /v2/openapi.json`, `GET /v2/capabilities`, `POST /v2/{operation}`
-- MCP: `linkskills-mcp-v2` negotiating protocol `2026-07-28` sessionlessly
+- MCP: `linkskills-mcp-v2` requiring explicit protocol `2026-07-28` on
+  `initialize`, with sessionless per-request authorization thereafter
 
 Business rules (gates, pagination snapshot, exact bytes/digests, privacy,
 idempotency, legacy execution denial) live only in the core domain.

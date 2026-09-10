@@ -206,6 +206,159 @@ class ProviderV2DomainTests(unittest.TestCase):
         librarian = self.call("skills_librarian_status_get")
         self.assertIn("librarian", librarian)
 
+    def test_empty_registry_does_not_synthesize_qualified_or_empty_bytes(self) -> None:
+        empty = V2Provider(lambda _: _identity(), store=self.store)
+        for operation, extra in (
+            ("skills_release_describe", {"skill_id": "research", "version": "1.0.0"}),
+            ("skills_qualification_get", {"skill_id": "research", "version": "1.0.0"}),
+            (
+                "skills_release_resource_get",
+                {"skill_id": "research", "version": "1.0.0", "resource_id": "entrypoint"},
+            ),
+            (
+                "skills_release_content_get",
+                {"skill_id": "research", "version": "1.0.0", "content_id": "blob"},
+            ),
+            ("skills_release_package_get", {"skill_id": "research", "version": "1.0.0"}),
+            ("skills_release_verify", {"skill_id": "research", "version": "1.0.0"}),
+            ("skills_release_entrypoint_get", {"skill_id": "research", "version": "1.0.0"}),
+        ):
+            result = empty.handle(dict(self.base, operation=operation, **extra))
+            self.assertEqual(result["error"], "catalog_unavailable", msg=operation)
+            self.assertNotEqual(result.get("qualification"), "qualified")
+            self.assertNotIn("bytes", result)
+            self.assertNotIn("content_digest", result)
+
+    def test_write_requires_report_scope_not_skills_read(self) -> None:
+        reader = V2Provider(
+            lambda _: _identity(capabilities=frozenset({"skills.read"})),
+            releases=[RELEASE],
+            store=self.store,
+        )
+        report = {
+            "schema_version": "0.2",
+            "report_kind": "completed_use",
+            "report_id": "opaque:report:read-only",
+            "occurred_at": "2026-08-13T00:00:00Z",
+            "skill_id": "research",
+            "skill_release_ref": "opaque:release:research:1.0.0",
+            "consumer_class": "codex",
+            "actor_ref": "opaque:actor:a",
+            "runtime_profile_ref": "opaque:runtime:codex",
+            "outcome": "use_succeeded",
+            "opaque_refs": ["opaque:program:run-1"],
+            "idempotency_source": "server",
+            "score": 10,
+        }
+        denied = reader.handle(
+            dict(self.base, operation="skills_use_report_submit", report=report)
+        )
+        self.assertEqual(denied["error"], "forbidden")
+        feedback_denied = reader.handle(
+            dict(
+                self.base,
+                operation="skills_feedback_submit",
+                feedback={"skill_id": "research", "feedback_id": "opaque:fb:read", "kind": "friction"},
+            )
+        )
+        self.assertEqual(feedback_denied["error"], "forbidden")
+
+    def test_receipts_are_isolated_by_org_and_actor(self) -> None:
+        store = InMemoryProviderStore()
+
+        def verify(token: str):
+            mapping = {
+                "a": _identity(org_id="org-a", actor_id="actor-a"),
+                "b": _identity(org_id="org-b", actor_id="actor-b"),
+                "c": _identity(org_id="org-a", actor_id="actor-c"),
+            }
+            return mapping[token]
+
+        provider = V2Provider(verify, releases=[RELEASE], store=store)
+        report = {
+            "schema_version": "0.2",
+            "report_kind": "completed_use",
+            "report_id": "opaque:report:collision",
+            "occurred_at": "2026-08-13T00:00:00Z",
+            "skill_id": "research",
+            "skill_release_ref": "opaque:release:research:1.0.0",
+            "consumer_class": "codex",
+            "actor_ref": "opaque:actor:a",
+            "runtime_profile_ref": "opaque:runtime:codex",
+            "outcome": "use_succeeded",
+            "opaque_refs": ["opaque:program:run-1"],
+            "idempotency_source": "server",
+            "score": 10,
+        }
+        first = provider.handle(
+            {
+                "protocol_version": "2026-07-28",
+                "authorization": "a",
+                "operation": "skills_use_report_submit",
+                "report": report,
+                "client_idempotency_key": "k-a",
+            }
+        )
+        self.assertTrue(first["ok"])
+        leak = provider.handle(
+            {
+                "protocol_version": "2026-07-28",
+                "authorization": "b",
+                "operation": "skills_use_report_status_get",
+                "report_id": "opaque:report:collision",
+            }
+        )
+        self.assertEqual(leak["error"], "not_found")
+        other_actor = provider.handle(
+            {
+                "protocol_version": "2026-07-28",
+                "authorization": "c",
+                "operation": "skills_use_report_status_get",
+                "report_id": "opaque:report:collision",
+            }
+        )
+        self.assertEqual(other_actor["error"], "not_found")
+        other_org = provider.handle(
+            {
+                "protocol_version": "2026-07-28",
+                "authorization": "b",
+                "operation": "skills_use_report_submit",
+                "report": report,
+                "client_idempotency_key": "k-b",
+            }
+        )
+        self.assertTrue(other_org["ok"])
+        self.assertFalse(other_org["replay"])
+        own = provider.handle(
+            {
+                "protocol_version": "2026-07-28",
+                "authorization": "a",
+                "operation": "skills_use_report_status_get",
+                "report_id": "opaque:report:collision",
+            }
+        )
+        self.assertEqual(own["status"], "accepted")
+        replay = provider.handle(
+            {
+                "protocol_version": "2026-07-28",
+                "authorization": "a",
+                "operation": "skills_use_report_submit",
+                "report": report,
+                "client_idempotency_key": "k-a",
+            }
+        )
+        self.assertTrue(replay["replay"])
+        conflict = provider.handle(
+            {
+                "protocol_version": "2026-07-28",
+                "authorization": "a",
+                "operation": "skills_use_report_submit",
+                "report": dict(report, outcome="use_failed"),
+                "client_idempotency_key": "k-a",
+            }
+        )
+        self.assertEqual(conflict["error"], "idempotency_conflict")
+
     def test_degraded_store_is_sanitised(self) -> None:
         self.store.available = False
         result = self.call(
