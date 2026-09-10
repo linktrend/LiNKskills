@@ -30,7 +30,7 @@ jobs:
           python3 scripts/build-catalog-index.py --check
 
       - name: Install test dependencies
-        run: pip install -r requirements-dev.txt
+        run: python -m pip install --require-hashes -r requirements-dev.lock
 
       - name: Unit tests (skill runtime)
         run: python3 -m unittest discover -s tests/skill_runtime -v
@@ -44,6 +44,7 @@ jobs:
           tests/eval_runner tests/tool_runtime
           tests/gateway tests/mcp_server tests/client
           tests/librarian_domain tests/migrations
+          tests/environment
           -q
 
       - name: Service ownership gate

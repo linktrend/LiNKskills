@@ -1,14 +1,21 @@
 # Dev / CI dependencies for LiNKskills package tests (not production runtime pins).
 # Runtime packages declare their own dependencies in packages/*/pyproject.toml.
-# Install order for editable proofs:
-#   pip install -e packages/core
-#   pip install -e packages/gateway
-#   pip install -e "packages/gateway[postgres]"
-#   pip install -e packages/client
-#   pip install -e packages/mcp_server
-#   pip install -e packages/librarian_domain
-#   pip install -e packages/publisher
-#   pip install -e packages/eval_runner
+# Hash-locked install (CI and cloud workers):
+#   python -m pip install --require-hashes -r requirements-dev.lock
+# This file is the unbounded compile input only. See docs/development/CLOUD-EXECUTION.md
+# for regeneration, local-package-before-umbrella order, and PYTHONPATH-only
+# packages/contracts and packages/persistence.
+# Install order for editable proofs (after the hash-locked PyPI install, --no-deps):
+#   pip install --no-deps -e packages/core
+#   pip install --no-deps -e packages/tool_runtime
+#   pip install --no-deps -e packages/gateway
+#   pip install --no-deps -e "packages/gateway[postgres]"
+#   pip install --no-deps -e packages/client
+#   pip install --no-deps -e packages/mcp_server
+#   pip install --no-deps -e packages/librarian_domain
+#   pip install --no-deps -e packages/publisher
+#   pip install --no-deps -e packages/eval_runner
+#   pip install --no-deps -e .
 
 pyyaml>=6.0
 pytest>=8.0
