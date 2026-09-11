@@ -69,7 +69,6 @@ except ModuleNotFoundError:  # pragma: no cover - script-style execution
     )
 
 try:
-    from scripts.gitops.github_auth import GitHubAuthError, resolve_phase_api_token
     from scripts.gitops.issue_checkpoint import bind_issue_completion, parse_immutable_evidence_payload
     from core.execution.rollout import (
         build_provider_consumer_handoff,
@@ -77,13 +76,30 @@ try:
         evaluate_provider_consumer_handoff,
     )
 except ModuleNotFoundError:  # pragma: no cover - script-style execution
-    from github_auth import GitHubAuthError, resolve_phase_api_token  # type: ignore
-    from issue_checkpoint import bind_issue_completion, parse_immutable_evidence_payload  # type: ignore
-    from core.execution.rollout import (  # type: ignore
-        build_provider_consumer_handoff,
-        consume_provider_consumer_handoff,
-        evaluate_provider_consumer_handoff,
-    )
+    try:
+        from issue_checkpoint import bind_issue_completion, parse_immutable_evidence_payload  # type: ignore
+        from core.execution.rollout import (  # type: ignore
+            build_provider_consumer_handoff,
+            consume_provider_consumer_handoff,
+            evaluate_provider_consumer_handoff,
+        )
+    except ModuleNotFoundError:  # jsonschema/core optional until assemble
+        bind_issue_completion = None  # type: ignore[assignment]
+        parse_immutable_evidence_payload = None  # type: ignore[assignment]
+        build_provider_consumer_handoff = None  # type: ignore[assignment]
+        consume_provider_consumer_handoff = None  # type: ignore[assignment]
+        evaluate_provider_consumer_handoff = None  # type: ignore[assignment]
+
+
+def _resolve_phase_api_token_lazy() -> tuple[str, str]:
+    try:
+        from scripts.gitops.github_auth import GitHubAuthError, resolve_phase_api_token
+    except ModuleNotFoundError:
+        from github_auth import GitHubAuthError, resolve_phase_api_token  # type: ignore
+    try:
+        return resolve_phase_api_token()
+    except GitHubAuthError as exc:
+        raise CoordinatorError(exc.code, exc.detail) from exc
 
 COMPONENT_KIND = "phase_packager_coordinator"
 IS_PHASE_PACKAGER = True
@@ -228,6 +244,8 @@ class MemoryGitHub:
             if subject in {normalize_sha(item) for item in self.ready_shas}
             else "missing"
         )
+        if bind_issue_completion is None:
+            raise CoordinatorError("checkpoint_module_unavailable", "bind_issue_completion is not importable")
         ok, detail, _meta = bind_issue_completion(
             sha=subject,
             evidence=dict(payload) if isinstance(payload, Mapping) else None,
@@ -418,6 +436,8 @@ class LiveGitHub:
         evidence_payload: Mapping[str, Any] | None = None,
     ) -> tuple[bool, str]:
         subject = normalize_sha(sha)
+        if bind_issue_completion is None:
+            raise CoordinatorError("checkpoint_module_unavailable", "bind_issue_completion is not importable")
         ok, detail, _meta = bind_issue_completion(
             sha=subject,
             evidence=dict(evidence_payload) if isinstance(evidence_payload, Mapping) else None,
@@ -441,10 +461,7 @@ def resolve_production_adapters(repository: str) -> tuple[LiveGitHub, GitPushAda
 
     if not repository or "/" not in repository or repository.count("/") != 1:
         raise CoordinatorError("missing_repository", "assemble requires --repository owner/name")
-    try:
-        token, _source = resolve_phase_api_token()
-    except GitHubAuthError as exc:
-        raise CoordinatorError(exc.code, exc.detail) from exc
+    token, _source = _resolve_phase_api_token_lazy()
     return (
         LiveGitHub(repository=repository, automation_token=token, user_token=token),
         GitPushAdapter(),
@@ -565,6 +582,8 @@ def consume_handoff(
     if not isinstance(handoff, Mapping):
         return False, "handoff_missing"
     if handoff.get("kind") == "provider-consumer-handoff":
+        if consume_provider_consumer_handoff is None:
+            return False, "rollout_module_unavailable"
         return consume_provider_consumer_handoff(
             handoff,
             protected_provider_identity=protected_provider_identity,
@@ -1189,7 +1208,10 @@ def invalidate_handoff_if_head_changed(handoff: Mapping[str, Any], *, live_head:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=["assemble", "consume-handoff", "full-may-start", "fast-contract"])
+    parser.add_argument(
+        "command",
+        choices=["assemble", "consume-handoff", "full-may-start", "fast-contract", "seal"],
+    )
     parser.add_argument("--repository", default="")
     parser.add_argument("--repo-path", default=".")
     parser.add_argument("--phase-branch", default="phase/next")
@@ -1208,6 +1230,19 @@ def main(argv: list[str] | None = None) -> int:
         help="Explicit immutable evidence payload (JSON object or sha->payload map) for out-of-tree hosted validation",
     )
     args = parser.parse_args(argv)
+
+    if args.command == "seal":
+        json.dump(
+            {
+                "ok": False,
+                "code": "packager_never_seals",
+                "detail": "Integrator seal is python3 scripts/gitops/phase_integrator.py seal",
+            },
+            sys.stdout,
+            sort_keys=True,
+        )
+        sys.stdout.write("\n")
+        return 2
 
     if args.command == "fast-contract":
         path = Path(args.workflow) if args.workflow else FAST_WORKFLOW_REL
@@ -1241,6 +1276,9 @@ def main(argv: list[str] | None = None) -> int:
     sources = [parse_accept(raw, order) for order, raw in enumerate(args.accept, start=1)]
     evidence_payloads: dict[str, Any] | None = None
     if args.evidence_json:
+        if parse_immutable_evidence_payload is None:
+            print("assemble --evidence-json invalid: checkpoint module unavailable", file=sys.stderr)
+            return 2
         try:
             loaded = parse_immutable_evidence_payload(args.evidence_json)
         except Exception as exc:  # noqa: BLE001
