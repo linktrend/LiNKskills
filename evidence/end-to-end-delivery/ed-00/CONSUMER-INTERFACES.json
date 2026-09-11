@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "kind": "linkskills-consumer-interfaces",
+  "status": "CONTRACT_FROZEN_LIVE_CONSUMER_HOLD",
+  "observedAt": "2026-09-10T15:41:06+08:00",
+  "providerContract": {
+    "repository": "linktrend/LiNKskills",
+    "ref": "refs/heads/development",
+    "commit": "7a813f529f7b25a40fd3e88f74fb0e86c7c728d5",
+    "tree": "d0bb392351994810173f730c47b63112c31e391b",
+    "contract": "skills.api.v0.2",
+    "transport": "sessionless MCP and HTTP adapters",
+    "selection": "resource-first bounded discovery, progressive retrieval, exact release/package digest verification",
+    "execution": "consumer-local only; skills_run_* and skills_tool_* are excluded from v2"
+  },
+  "initialProviderReleases": [
+    "git-safeguard@1.1.0",
+    "persistent-qa@1.0.0",
+    "repository-manager@1.0.0",
+    "skill-template@1.2.0",
+    "tool-architect@1.0.0"
+  ],
+  "localBootstrapAdapters": [
+    "agentsetup@1.3.0",
+    "agentcomply@1.3.0"
+  ],
+  "interfaceSources": [
+    {
+      "consumer": "Cursor",
+      "owner": "LiNKskills for project-scoped contract fragment; IDE Development/shared owner for any global surface",
+      "repository": "linktrend/LiNKskills",
+      "ref": "refs/heads/development",
+      "commit": "7a813f529f7b25a40fd3e88f74fb0e86c7c728d5",
+      "tree": "d0bb392351994810173f730c47b63112c31e391b",
+      "path": "docs/integrations/cursor/PACI-CLIENT-APPLICATION-HANDOFF.md",
+      "gitBlob": "052f096193c6cd3dec2ac38e1c66f53648c0412a",
+      "sha256": "262fd65aea560375adb63a3965fec0c4c9be4290d7ca35aefa56bb5e7743148b",
+      "status": "PROJECT_CONTRACT_READY_LIVE_NOT_PROVEN",
+      "externalConfigIdentity": "not refreshed in ED-00; owned by the consumer/runtime owner"
+    },
+    {
+      "consumer": "Codex",
+      "owner": "LiNKskills supplies the fragment; LiNKbrain/shared Codex configuration owner applies live config",
+      "repository": "linktrend/LiNKskills",
+      "ref": "refs/heads/development",
+      "commit": "7a813f529f7b25a40fd3e88f74fb0e86c7c728d5",
+      "tree": "d0bb392351994810173f730c47b63112c31e391b",
+      "path": "docs/integrations/codex/HANDOFF.md",
+      "gitBlob": "50c3618cd9fedfd9b4079da92fb1550b925240c3",
+      "sha256": "1c0a23ff82bcebb40bb28bf58757442a9033ecc49d09f3af78934aab58dc9cd8",
+      "status": "CONTRACT_READY_LIVE_NOT_PROVEN",
+      "externalConfigIdentity": "not refreshed in ED-00; owned by the Codex/shared configuration owner"
+    },
+    {
+      "consumer": "Lisa/OpenClaw",
+      "owner": "LiNKskills supplies the fragment; OpenClaw Prime/Lisa owns managed MCP, plugins, profile, credentials, and rollout",
+      "repository": "linktrend/LiNKskills",
+      "ref": "refs/heads/development",
+      "commit": "7a813f529f7b25a40fd3e88f74fb0e86c7c728d5",
+      "tree": "d0bb392351994810173f730c47b63112c31e391b",
+      "path": "docs/integrations/openclaw/HANDOFF.md",
+      "gitBlob": "62450530906dd0a3882c919a6ca0ac19524ccba0",
+      "sha256": "77a80ed8f9a3c33e616aca7a90f7725fa120ecd455c0e73278d121a63e288d41",
+      "status": "CONTRACT_READY_LIVE_NOT_PROVEN",
+      "externalConfigIdentity": "not refreshed in ED-00; owned by OpenClaw Prime/Lisa"
+    }
+  ],
+  "sharedConformanceSources": [
+    {
+      "path": "docs/provider-v2-consumer-conformance.md",
+      "gitBlob": "9555a26b042ff797b3bc047058e42bdae1b0e342",
+      "sha256": "f3bb3b2548e1b219af727a55425cf07e50dbf16645a7941c568350cd01237685"
+    },
+    {
+      "path": "docs/provider-v2-operations.md",
+      "gitBlob": "0321219935d3bd12375128022dbc24582f3444b1",
+      "sha256": "b885d23b13fc9868da1867dc87838b2573e487612e7b734280aaa63536620eb0"
+    },
+    {
+      "path": "docs/contracts/platform-actor-auth-requirements.md",
+      "gitBlob": "815dde111d08b6a1711ead909628c338f94636f8",
+      "sha256": "8dec215a2d9da092fa4a7429f0227170e37dfb40a4131f605c5deed07801ebd6"
+    }
+  ],
+  "platformAuthPins": {
+    "repository": "linktrend/LiNKplatform",
+    "ref": "refs/heads/development",
+    "commit": "f6373fccc89732cbb88bb18562daa69cc031a2e3",
+    "tree": "83feddf7d935561cfede60df456ea616a021d726",
+    "claimsSchema": {
+      "path": "packages/contracts/schemas/platform-auth-claims.v1.1.0.json",
+      "gitBlob": "4f62d303a88e4ba8b13c62f0c3b1d1a865f91f8f",
+      "sha256": "c2e8bc68b3feb9a3dacc497f5a5d497b466c400804fb4f9e41734c10772ddfa1"
+    },
+    "tokenEnvelopeSchema": {
+      "path": "packages/contracts/schemas/platform-auth-token-envelope.v0.1.0.json",
+      "gitBlob": "73ea06164acb6dc89ed7270c1c7b5e8167d83d5f",
+      "sha256": "7173b9f9bca59ce8a0e3e3dc2b78b680dd07fdd2451215e3ecd97ff3dd463eed"
+    },
+    "requiredAudience": "lskills-api",
+    "requiredScope": "lskills",
+    "liveTokenProof": "HOLD"
+  },
+  "acceptanceFlow": [
+    "discover bounded metadata",
+    "retrieve exact release progressively",
+    "verify release/package digest",
+    "execute locally under consumer authority",
+    "submit bounded use or diagnostic evidence"
+  ],
+  "externalConsumerProof": "No current consumer repository/configuration identity or live consumer execution receipt is claimed by ED-00."
+}

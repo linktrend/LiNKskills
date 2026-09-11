@@ -1126,6 +1126,7 @@ class SkillsGatewayService:
         catalog_loaded = len(self._skills) > 0
         store_reachable: Optional[bool] = None
         store_error: Optional[str] = None
+        store_diagnosis: Optional[Dict[str, Any]] = None
         if probe_store:
             try:
                 store_reachable = self.probe_store_reachable()
@@ -1133,6 +1134,21 @@ class SkillsGatewayService:
                 store_reachable = False
                 # Class name only — never include connection strings / messages with secrets.
                 store_error = type(exc).__name__
+                try:
+                    from linkskills_persistence.readiness import diagnose_store_exception
+
+                    diagnosis = diagnose_store_exception(exc)
+                    store_diagnosis = {
+                        "code": diagnosis.get("code"),
+                        "redacted_error": diagnosis.get("redacted_error"),
+                        "fail_closed": True,
+                    }
+                except Exception:
+                    store_diagnosis = {
+                        "code": "store_not_ready",
+                        "redacted_error": type(exc).__name__,
+                        "fail_closed": True,
+                    }
 
         ready = (
             bool(self._ready)
@@ -1158,6 +1174,8 @@ class SkillsGatewayService:
             payload["store_reachable"] = bool(store_reachable)
             if store_error:
                 payload["store_error"] = store_error
+            if store_diagnosis:
+                payload["store_diagnosis"] = store_diagnosis
         else:
             payload["store_probe"] = "skipped"
         return payload

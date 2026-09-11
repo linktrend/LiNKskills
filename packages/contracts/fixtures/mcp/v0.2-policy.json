@@ -3,7 +3,7 @@
   "contract_version": "skills.api.v0.2",
   "transport_policy": {
     "mode": "transport_agnostic",
-    "implementation_status": "policy_only_no_transport_change",
+    "implementation_status": "http_mcp_v2_implemented",
     "stateless": true,
     "sessionless": true,
     "initialize_required": false,
@@ -32,7 +32,7 @@
       {"name": "skills_release_package_get", "uri_templates": ["skills://release/{skill_id}/{version}/package"]}
     ]
   },
-  "typed_errors": ["contract_incompatible", "auth_required", "auth_invalid", "forbidden", "not_found", "validation_failed", "idempotency_conflict", "legacy_execution_disabled", "unsupported_operation", "expired_release", "revoked_release", "not_qualified"],
+  "typed_errors": ["contract_incompatible", "auth_required", "auth_invalid", "forbidden", "not_found", "catalog_unavailable", "validation_failed", "idempotency_conflict", "legacy_execution_disabled", "unsupported_operation", "expired_release", "revoked_release", "not_qualified"],
   "compatibility_policy": {
     "v1_preserved": true,
     "v2_additive": true,
