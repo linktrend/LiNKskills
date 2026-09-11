@@ -17,6 +17,7 @@ from .ops import (
 )
 from .service import SkillsGatewayService, OPERATIONS
 from .server import create_server, make_handler, serve_until_shutdown
+from .v2_http import LEGACY_REMOVAL_GATE, capability_record, encode_v2_result
 
 __all__ = [
     "ActorClaims",
@@ -35,6 +36,9 @@ __all__ = [
     "OPERATIONS",
     "create_server",
     "make_handler",
+    "LEGACY_REMOVAL_GATE",
+    "capability_record",
+    "encode_v2_result",
 ]
 
 __version__ = "0.1.0"

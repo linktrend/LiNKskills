@@ -15,7 +15,7 @@
       "required": ["mode", "implementation_status", "stateless", "sessionless", "initialize_required", "session_reliance_allowed"],
       "properties": {
         "mode": { "type": "string", "const": "transport_agnostic" },
-        "implementation_status": { "type": "string", "const": "policy_only_no_transport_change" },
+        "implementation_status": { "type": "string", "const": "http_mcp_v2_implemented" },
         "stateless": { "type": "boolean", "const": true },
         "sessionless": { "type": "boolean", "const": true },
         "initialize_required": { "type": "boolean", "const": false },
@@ -75,10 +75,10 @@
     },
     "typed_errors": {
       "type": "array",
-      "minItems": 12,
-      "maxItems": 12,
+      "minItems": 13,
+      "maxItems": 13,
       "uniqueItems": true,
-      "items": { "type": "string", "enum": ["contract_incompatible", "auth_required", "auth_invalid", "forbidden", "not_found", "validation_failed", "idempotency_conflict", "legacy_execution_disabled", "unsupported_operation", "expired_release", "revoked_release", "not_qualified"] }
+      "items": { "type": "string", "enum": ["contract_incompatible", "auth_required", "auth_invalid", "forbidden", "not_found", "catalog_unavailable", "validation_failed", "idempotency_conflict", "legacy_execution_disabled", "unsupported_operation", "expired_release", "revoked_release", "not_qualified"] }
     },
     "compatibility_policy": {
       "type": "object",
