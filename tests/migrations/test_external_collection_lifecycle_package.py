@@ -24,7 +24,11 @@ class ExternalCollectionMigrationPackageTests(unittest.TestCase):
 
     def test_manifest_is_source_only_and_hashes_both_directions(self):
         self.assertEqual(self.manifest["status"], "source_only_no_apply")
-        entry = self.manifest["entries"][0]
+        entry = next(
+            item
+            for item in self.manifest["entries"]
+            if item["id"] == "20260824_000012_lskills_external_collection_lifecycle"
+        )
         self.assertEqual(entry["apply_authority"], "LiNKplatform")
         self.assertEqual(entry["up_sha256"], hashlib.sha256(UP.read_bytes()).hexdigest())
         self.assertEqual(entry["down_sha256"], hashlib.sha256(DOWN.read_bytes()).hexdigest())

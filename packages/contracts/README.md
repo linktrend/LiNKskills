@@ -3,7 +3,10 @@
 Versioned JSON Schema draft-2020-12 contracts for Skill Pack publication, eval
 certification, telemetry, and MCP/API envelopes. v0.2 adds provider-only
 metadata, stateless/sessionless MCP policy, compatibility evidence, and bounded
-use telemetry without changing v0.1 files or transport behavior.
+use telemetry. Production HTTP and MCP adapters for `skills.api.v0.2` live in
+`packages/gateway` (`POST /v2/{operation}`) and `packages/mcp_server`
+(`linkskills-mcp-v2`). The observed v0.1 adapter remains `POST /v1/{operation}`
+and `linkskills-mcp-server`.
 
 ## Schema versions
 
@@ -36,8 +39,8 @@ All launch schemas are **v0.1** (`schema_version: "0.1"`). Filenames use the
 
 The implementation and evidence boundary is documented in
 [`docs/provider-v0.2-contract.md`](docs/provider-v0.2-contract.md). No Python
-MCP SDK is pinned in P0; modern-MCP support has been officially verified, while
-transport implementation remains a later, separately tested slice.
+MCP SDK is pinned; modern-MCP support has been officially verified. Production
+transport is `POST /v2/{operation}` and `linkskills-mcp-v2`.
 
 ## Fixtures
 
