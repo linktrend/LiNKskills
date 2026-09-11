@@ -1062,43 +1062,23 @@ def verify_generated_outputs(
 
 def _generate_secret_scan_fixtures(repo_root: Path) -> int:
     try:
-        from secret_scan import identify_synthetic_candidates
+        from secret_scan import identify_synthetic_candidates, rebind_declared_synthetic_fixtures
     except ModuleNotFoundError:  # pragma: no cover - package import path
-        from scripts.gitops.secret_scan import identify_synthetic_candidates
+        from scripts.gitops.secret_scan import (
+            identify_synthetic_candidates,
+            rebind_declared_synthetic_fixtures,
+        )
 
     declaration = repo_root / ".github" / "linktrend-secret-scan-fixtures.json"
     payload = json.loads(declaration.read_text(encoding="utf-8"))
     if not isinstance(payload, Mapping) or payload.get("kind") != "secret-scan-fixtures":
         raise ClosureError("fixture_input_invalid", "secret-scan fixture declaration identity is invalid")
-    candidates = identify_synthetic_candidates(repo_root)
-    by_identity: dict[tuple[Any, ...], list[dict[str, Any]]] = {}
-    for row in candidates:
-        identity = (row.get("path"), row.get("field"), row.get("rule"), row.get("digest"))
-        by_identity.setdefault(identity, []).append(row)
-    fixtures_by_identity: dict[tuple[Any, ...], list[dict[str, Any]]] = {}
-    for fixture in payload.get("fixtures", []):
-        identity = (
-            fixture.get("path"),
-            fixture.get("field"),
-            fixture.get("rule"),
-            fixture.get("digest"),
-        )
-        fixtures_by_identity.setdefault(identity, []).append(fixture)
-    for identity, declared in fixtures_by_identity.items():
-        matches = by_identity.get(identity, [])
-        if len(matches) != len(declared) or not matches:
-            continue
-        # Relocate an existing approval only when the immutable detection
-        # identity and its cardinality are unchanged. Repeated identical
-        # fixtures are paired in source order, which handles line-only shifts
-        # without approving new bytes, paths, fields, rules, or digests.
-        for fixture, match in zip(
-            sorted(declared, key=lambda row: int(row["line"])),
-            sorted(matches, key=lambda row: int(row["line"])),
-        ):
-            fixture["line"] = match["line"]
-    payload["candidateTree"] = candidate_source_tree(repo_root)
-    declaration.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    rebound = rebind_declared_synthetic_fixtures(
+        dict(payload),
+        identify_synthetic_candidates(repo_root),
+        candidate_source_tree(repo_root),
+    )
+    declaration.write_text(json.dumps(rebound, indent=2) + "\n", encoding="utf-8")
     return 0
 
 
