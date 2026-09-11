@@ -1631,6 +1631,12 @@ def _scan_repository(
         except SecretScanError as exc:
             findings.extend(_error_result(exc, content_tree)["findings"])
             declaration = None
+    if declaration is not None and generated_fixture_binding_authorized(root):
+        declaration = rebind_declared_synthetic_fixtures(
+            declaration,
+            _synthetic_candidates_from_detections(detections),
+            content_tree,
+        )
     findings = inherited + findings
     inherited_fixture_ids = set()
     if scope is not None:
@@ -1692,15 +1698,9 @@ def scan_repository(
         return _error_result(exc)
 
 
-def identify_synthetic_candidates(root: Path) -> list[dict[str, Any]]:
-    """Identify likely synthetic fixtures. Never writes an approval."""
-    root = root.resolve()
+def _synthetic_candidates_from_detections(detections: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Return exact synthetic detections that may already be declared. Never approves."""
     candidates: list[dict[str, Any]] = []
-    try:
-        entries = tracked_entries(root)
-        detections, _findings = _scan_regular_blobs(root, entries)
-    except SecretScanError:
-        return []
     for detection in detections:
         if detection["path"] == DECLARATION_REL or detection["realistic"]:
             continue
@@ -1715,6 +1715,66 @@ def identify_synthetic_candidates(root: Path) -> list[dict[str, Any]]:
                 }
             )
     return candidates
+
+
+def identify_synthetic_candidates(root: Path) -> list[dict[str, Any]]:
+    """Identify likely synthetic fixtures. Never writes an approval."""
+    root = root.resolve()
+    try:
+        entries = tracked_entries(root)
+        detections, _findings = _scan_regular_blobs(root, entries)
+    except SecretScanError:
+        return []
+    return _synthetic_candidates_from_detections(detections)
+
+
+def _fixture_identity(row: dict[str, Any]) -> tuple[Any, ...]:
+    return (row.get("path"), row.get("field"), row.get("rule"), row.get("digest"))
+
+
+def rebind_declared_synthetic_fixtures(
+    payload: dict[str, Any],
+    candidates: list[dict[str, Any]],
+    content_tree: str,
+) -> dict[str, Any]:
+    """Bind existing synthetic approvals to the current candidate identity.
+
+    Relocates line numbers only when path, field, rule, digest, and cardinality
+    are unchanged. Never adds fixtures, paths, fields, rules, digests, or bytes.
+    """
+    rebound = dict(payload)
+    fixtures = [dict(row) for row in list(payload.get("fixtures") or [])]
+    by_identity: dict[tuple[Any, ...], list[dict[str, Any]]] = {}
+    for row in candidates:
+        by_identity.setdefault(_fixture_identity(row), []).append(row)
+    fixtures_by_identity: dict[tuple[Any, ...], list[dict[str, Any]]] = {}
+    for fixture in fixtures:
+        fixtures_by_identity.setdefault(_fixture_identity(fixture), []).append(fixture)
+    for identity, declared in fixtures_by_identity.items():
+        matches = by_identity.get(identity, [])
+        if len(matches) != len(declared) or not matches:
+            continue
+        for fixture, match in zip(
+            sorted(declared, key=lambda row: int(row["line"])),
+            sorted(matches, key=lambda row: int(row["line"])),
+        ):
+            fixture["line"] = match["line"]
+    rebound["fixtures"] = fixtures
+    if isinstance(content_tree, str) and OID_RE.fullmatch(content_tree):
+        rebound["candidateTree"] = content_tree
+    return rebound
+
+
+def generated_fixture_binding_authorized(root: Path) -> bool:
+    """True when the generated-output graph owns fixture rebinding for this tree."""
+    try:
+        graph = load_generated_output_graph(root)
+    except ClosureError:
+        return False
+    return any(
+        spec.output == DECLARATION_REL and "--generate-fixtures" in spec.generator
+        for spec in graph.outputs
+    )
 
 
 def main(argv: list[str] | None = None) -> int:
