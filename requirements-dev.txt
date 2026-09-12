@@ -22,6 +22,9 @@ pytest>=8.0
 setuptools>=68
 wheel
 
+# Review Gate / delivery-controller tests and scripts/gitops importers.
+jsonschema>=4.26
+
 # Shared pins used by gateway/librarian/publisher adapters and PACI crypto.
 # Prefer installing via package extras/deps; these keep CI/dev environments aligned.
 psycopg[binary]>=3.1
