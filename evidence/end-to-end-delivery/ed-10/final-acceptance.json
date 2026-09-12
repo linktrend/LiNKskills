@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "kind": "linkskills-ed-10-final-acceptance-framework",
+  "packet": "ED-10",
+  "issue": "#354",
+  "status": "FRAMEWORK_ONLY",
+  "decision": "HOLD",
+  "finalAcceptanceDeclared": false,
+  "functionalAccepted": false,
+  "internalLaunchComplete": false,
+  "productionAccepted": false,
+  "completionClaimed": false,
+  "preparatoryStatement": "This file is the ED-10 fail-closed framework. It does not consume live runtime evidence, does not declare final acceptance, and does not substitute placeholders for ED-08, ED-09, IMP-00, or OSS proof.",
+  "observedAt": "2026-09-12T23:30:00+00:00",
+  "admittedIdentity": {
+    "repository": "linktrend/LiNKskills",
+    "startingRef": "issue/354-prepare-ed-10-final-acceptance-evidence-framewor",
+    "commit": "f97951feec6546ff924c65611802afd7ab19d2a3",
+    "tree": "9bd1ba9eb32885146317f25a1cd3b223d1540d9e"
+  },
+  "writerBranch": "cursor/linkskills-ed10-framework-354-002-19e1",
+  "ownedPaths": [
+    "docs/end-to-end-delivery/ACCEPTANCE.md",
+    "evidence/end-to-end-delivery/ed-10/"
+  ],
+  "prohibitedMutations": {
+    "productCode": false,
+    "consumerConfiguration": false,
+    "production": false,
+    "deploy": false,
+    "fabricatedRuntimeEvidence": false,
+    "pullRequest": false,
+    "nestedWorkers": false
+  },
+  "requiredReceipts": {
+    "ed08": {
+      "slot": "ED-08",
+      "path": "evidence/end-to-end-delivery/ed-08/deployment-receipt.json",
+      "mustBeReal": true,
+      "mustBeCompatible": true,
+      "supplied": false,
+      "status": "PENDING",
+      "admission": "NOT_SUPPLIED_ON_ADMITTED_IDENTITY"
+    },
+    "ed09": {
+      "slot": "ED-09",
+      "path": "evidence/end-to-end-delivery/ed-09/final-acceptance.json",
+      "mustBeReal": true,
+      "mustBeCompatible": true,
+      "supplied": false,
+      "status": "PENDING",
+      "admission": "NOT_SUPPLIED_ON_ADMITTED_IDENTITY"
+    },
+    "imp00": {
+      "slot": "IMP-00",
+      "path": "evidence/end-to-end-delivery/imp-00/improvement-loop-receipt.json",
+      "mustBeAccepted": true,
+      "mustBeCompatible": true,
+      "historicalCorrectionCommit": "6a2101d132b42010162595a2bab2c72fee6282da",
+      "supplied": false,
+      "status": "PENDING",
+      "admission": "NOT_SUPPLIED_ON_ADMITTED_IDENTITY"
+    },
+    "oss": {
+      "slot": "OSS",
+      "path": "evidence/end-to-end-delivery/ed-10/oss-proof-slots.json",
+      "requiredProofs": [
+        "continuity",
+        "provenance",
+        "reproducibility",
+        "rollback"
+      ],
+      "planningInventoryIsNotProof": true,
+      "supplied": false,
+      "status": "PENDING",
+      "admission": "SLOTS_DEFINED_PROOF_NOT_SUPPLIED"
+    }
+  },
+  "compatibility": {
+    "path": "evidence/end-to-end-delivery/ed-10/receipt-compatibility.json",
+    "result": "INCOMPATIBLE_BECAUSE_REQUIRED_RECEIPTS_ABSENT",
+    "passRequiresAllReceiptsCompatible": true
+  },
+  "criteriaLedger": {
+    "path": "evidence/end-to-end-delivery/ed-10/criteria-ledger.json",
+    "pendingCount": 13,
+    "passedCount": 0,
+    "holdCount": 0,
+    "rule": "PENDING is not PASS; no aggregate percentage substitutes for proof"
+  },
+  "conditionalFixPackets": {
+    "areEd10Prerequisites": false,
+    "unselectedRemainPlan": true,
+    "doNotCountNoWorkAsComplete": true
+  },
+  "humanLedger": "docs/end-to-end-delivery/ACCEPTANCE.md"
+}
