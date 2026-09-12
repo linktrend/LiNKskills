@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "kind": "ed-07-source-only-platform-handoff",
+  "workerVersion": "0.2",
+  "conformancePackage": "linkskills-librarian-conformance/0.2",
+  "domainKey": "linkskills",
+  "artifact": "packages/librarian_domain",
+  "liveHostIntegration": false,
+  "platformOwns": [
+    "generic librarian host",
+    "queue schedule credentials alerts",
+    "live worker load"
+  ],
+  "skillsOwns": [
+    "versioned domain worker contract",
+    "use and feedback binding",
+    "privacy redaction and retention",
+    "disable retry DLQ recovery semantics",
+    "founder proof-class status"
+  ],
+  "firstSupervisedRun": "source-simulated Skills-only; prompt-only cannot certify",
+  "independentlyDisableable": true,
+  "externalHolds": [
+    "XP-01 live host integration",
+    "Platform runner wiring",
+    "production schedule credentials"
+  ]
+}
