@@ -79,10 +79,12 @@ def subprocess_env_for_token(token: str, *, role: str) -> dict[str, str]:
 
     Roles:
       - ``automation``: GH_TOKEN=normal automation token; Carlos secret names scrubbed
-      - ``pr_create``: GH_TOKEN=Carlos token value only; Carlos secret *names*
-        still scrubbed so the child does not inherit residual secret env keys
+      - ``pr_create`` / ``bugbot_comment``: GH_TOKEN=Carlos token value only;
+        Carlos secret *names* still scrubbed so the child does not inherit
+        residual secret env keys. ``bugbot_comment`` is the review-provider
+        mention path; never an App or ``GITHUB_TOKEN`` substitution.
     """
-    if role not in {"automation", "pr_create"}:
+    if role not in {"automation", "pr_create", "bugbot_comment"}:
         raise ValueError(f"unsupported subprocess token role: {role}")
     if not token:
         raise BugbotUserCredentialsError("empty_token_for_subprocess")

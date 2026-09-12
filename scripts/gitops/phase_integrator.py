@@ -245,9 +245,10 @@ def phase_full_suite_dispatch_allowed(
 
     The caller still performs the explicit GitHub dispatch.  Keeping the
     decision pure makes it testable and prevents a draft or superseded head
-    from waking the expensive workflow.  Bugbot is requested by the Full Suite
-    workflow after the receipt succeeds, so both actions remain final-candidate
-    only without introducing a second trigger path.
+    from waking the expensive workflow.  Bugbot is requested by the default-branch
+    review-provider route after the named Full Suite job succeeds on that exact
+    head (final-candidate only). The Full Suite workflow must not post the
+    mention with ``GITHUB_TOKEN``.
     """
 
     allowed, detail = phase_bugbot_request_allowed(record, live_head_sha=live_head_sha)
