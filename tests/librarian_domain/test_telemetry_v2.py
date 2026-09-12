@@ -23,6 +23,8 @@ class TelemetryV2(unittest.TestCase):
             "source_fingerprint": "source:a",
             "privacy": {"raw_content": False, "prohibited_content": False},
             "retention_class": "minimal",
+            "opaque_correlation": "corr:" + "ab" * 16,
+            "domain": "linkskills",
         }
 
     def test_idempotency_and_privacy(self):
@@ -56,6 +58,7 @@ class TelemetryV2(unittest.TestCase):
             "source_fingerprint",
             "retention_class",
             "privacy",
+            "opaque_correlation",
         ):
             report = self.report()
             del report[field]
