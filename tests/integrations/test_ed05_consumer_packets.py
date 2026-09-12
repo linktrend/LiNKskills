@@ -143,7 +143,7 @@ def test_fake_platform_mints_skills_and_rejects_brain() -> None:
         token_endpoint=FIXTURE_TOKEN,
     )
     assert ok["ok"] is True
-    assert ok["token"].startswith("opaque:")
+    assert ok["handle"].startswith("opaque:")
     assert platform.mint(
         audience="lbrain-api",
         scope="lskills",
@@ -166,18 +166,18 @@ def test_fake_platform_mints_skills_and_rejects_brain() -> None:
 
 def test_fake_provider_retrieval_verify_execute_and_use_report() -> None:
     provider = FakeProvider(pins=pin_index())
-    token = FakePlatform().mint(
+    handle = FakePlatform().mint(
         audience="lskills-api",
         scope="lskills",
         client_kind="skills",
         token_endpoint=FIXTURE_TOKEN,
-    )["token"]
+    )["handle"]
     pin = pin_index()["git-safeguard@1.1.0"]
     retrieved = provider.retrieve(
         skill_id="git-safeguard",
         version="1.1.0",
         digest=pin["bundleDigest"],
-        token=token,
+        handle=handle,
     )
     assert retrieved["ok"] is True
     assert retrieved["endpoint"] == FIXTURE_PROVIDER
@@ -208,7 +208,7 @@ def test_fake_provider_retrieval_verify_execute_and_use_report() -> None:
     jsonschema.Draft202012Validator(use_schema).validate(report)
     assert provider.submit_use_report(report)["ok"] is True
     dirty = dict(report)
-    dirty["token"] = "should-not-appear"
+    dirty["opaque_refs"] = list(report["opaque_refs"]) + ["opaque:note:transcript"]
     assert provider.submit_use_report(dirty)["error"] == "forbidden_payload"
 
 
@@ -226,16 +226,16 @@ def test_fake_provider_retrieval_verify_execute_and_use_report() -> None:
 )
 def test_deny_stale_similar_native_and_unknown(kwargs: dict, error: str) -> None:
     provider = FakeProvider(pins=pin_index())
-    token = FakePlatform().mint(
+    handle = FakePlatform().mint(
         audience="lskills-api",
         scope="lskills",
         client_kind="skills",
         token_endpoint=FIXTURE_TOKEN,
-    )["token"]
+    )["handle"]
     pin = pin_index()["git-safeguard@1.1.0"]
     result = provider.retrieve(
         digest=kwargs.pop("digest", pin["bundleDigest"]),
-        token=token,
+        handle=handle,
         **kwargs,
     )
     assert result["ok"] is False

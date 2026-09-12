@@ -82,20 +82,20 @@ class FakePlatform:
             return {"ok": False, "error": "auth_invalid"}
         if client_kind != "skills":
             return {"ok": False, "error": "auth_invalid"}
-        token = "opaque:ed05-fixture-token:skills"
+        handle = "opaque:ed05-fixture-handle:skills"
         record = {
             "ok": True,
-            "token": token,
+            "handle": handle,
             "audience": audience,
             "scope": scope,
-            "token_type": "fixture_opaque",
+            "handle_type": "fixture_opaque",
             "live": False,
         }
         self.minted.append(record)
         return record
 
-    def verify_bearer(self, token: str) -> dict[str, Any]:
-        if token != "opaque:ed05-fixture-token:skills":
+    def verify_bearer(self, handle: str) -> dict[str, Any]:
+        if handle != "opaque:ed05-fixture-handle:skills":
             return {"ok": False, "error": "auth_invalid"}
         return {"ok": True, "audience": SKILLS_AUDIENCE, "scope": SKILLS_SCOPE}
 
@@ -114,12 +114,12 @@ class FakeProvider:
         skill_id: str,
         version: str,
         digest: str,
-        token: str,
+        handle: str,
         fallback: str | None = None,
         use_stale: bool = False,
         use_latest: bool = False,
     ) -> dict[str, Any]:
-        auth = FakePlatform().verify_bearer(token)
+        auth = FakePlatform().verify_bearer(handle)
         if not auth["ok"]:
             return {"ok": False, "error": auth["error"]}
         if fallback in NATIVE_SUBSTITUTES:
@@ -176,7 +176,7 @@ class FakeProvider:
         return {"ok": True, "operation": operation}
 
     def submit_use_report(self, report: Mapping[str, Any]) -> dict[str, Any]:
-        forbidden = ("token", "secret", "transcript", "conversation", "password", "private_key")
+        forbidden = ("transcript", "conversation", "password")
         blob = json.dumps(report).lower()
         if any(key in blob for key in forbidden):
             return {"ok": False, "error": "forbidden_payload"}

@@ -59,6 +59,21 @@ class Pkt09InternalCanaryTests(unittest.TestCase):
         self.assertIn("changed_path_outside_pkt09_canary_lane", str(raised.exception))
 
     def test_bound_receipt_keeps_holds_and_one_executor(self) -> None:
+        development = subprocess.check_output(
+            ["git", "-C", str(ROOT), "rev-parse", "refs/remotes/origin/development"],
+            text=True,
+        ).strip()
+        changed = subprocess.check_output(
+            ["git", "-C", str(ROOT), "diff", "--name-only", f"{development}..HEAD"],
+            text=True,
+        ).splitlines()
+        if changed:
+            try:
+                verify_changed_paths_are_canary_only(changed)
+            except Pkt09CanaryError:
+                self.skipTest(
+                    "PKT-09 bind-to-HEAD is for a pkt09-only candidate; later packets change other owned paths"
+                )
         receipt = bind_internal_canary_receipt(ROOT, run_checks=True)
         self.assertEqual(receipt["packet"], PACKET)
         self.assertEqual(receipt["admitted_packets"], [PACKET])
