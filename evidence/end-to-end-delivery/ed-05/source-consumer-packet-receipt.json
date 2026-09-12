@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "0.1",
+  "kind": "ed-05-source-only-consumer-packets",
+  "liveApply": false,
+  "liveActivation": false,
+  "providerPublish": false,
+  "externalConsumerRepoFiles": false,
+  "clientPackageEdits": false,
+  "nestedWorkers": false,
+  "disabledByDefault": true,
+  "ordinarySelectableCount": 5,
+  "ed04Protected": {
+    "commit": "0d4ad748ff9d4d89911f20e0c01aca0e1107fc54",
+    "tree": "6944fe1676beba87a44825f29a13e440f8f3512c",
+    "receiptDigest": "sha256:c2ac495dd9feee1257f022a16ae9aea55ee9256a3d1debc43fcb4b4164e79b42"
+  },
+  "validatedAt": {
+    "repository": "linktrend/LiNKskills",
+    "branch": "issue/344-ed-05-produce-consumer-pins-adapters-and-conform",
+    "commit": "67f12c8dd06dcb663f8ebdfd6f2d16ff0716b466",
+    "tree": "2a5796d36b07417e780f0210b11a8d63c9382c68"
+  },
+  "packets": [
+    {
+      "packetId": "ed-05-cursor",
+      "path": "configs/consumer-activation/ed-05-cursor-owner-packet.json",
+      "digest": "sha256:220d50ac362f1c30d6aadd564c3bdf47a1bea53141d8ebbda87be281a151bfbe",
+      "enabled": false,
+      "liveApply": false
+    },
+    {
+      "packetId": "ed-05-codex",
+      "path": "configs/consumer-activation/ed-05-codex-owner-packet.json",
+      "digest": "sha256:364a6779e41b8f22677c39367626b50864aa7765f069c364029226cf446bf3ec",
+      "enabled": false,
+      "liveApply": false
+    },
+    {
+      "packetId": "ed-05-lisa-openclaw",
+      "path": "configs/consumer-activation/ed-05-lisa-openclaw-owner-packet.json",
+      "digest": "sha256:0f1e18bd61d79f3a972168716c22c7327ff087c2139953d61b5794693a875ac6",
+      "enabled": false,
+      "liveApply": false
+    }
+  ],
+  "pinsRef": "configs/consumer-activation/ed-05-initial-five-pins.json",
+  "pinsDigest": "sha256:5b3f162343ee5f21f06cb927c87a7121fe08a342bca7dea8a7a53ccf639c7dd5",
+  "allowlist": [
+    "git-safeguard@1.1.0",
+    "persistent-qa@1.0.0",
+    "repository-manager@1.0.0",
+    "skill-template@1.2.0",
+    "tool-architect@1.0.0"
+  ],
+  "expansionManifestsRemainDisabled": true,
+  "brainSkillsSeparated": true,
+  "leanPolicy": {
+    "independentReview": "not_requested",
+    "reason": "no named material risk; source-only disabled packets and fake contracts"
+  },
+  "receiptDigest": "sha256:a2fd87656535c8645efa20cd7d71572d465098c367d5b101cb20d93ccd513830"
+}

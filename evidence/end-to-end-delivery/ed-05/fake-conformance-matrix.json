@@ -1,0 +1,68 @@
+{
+  "schemaVersion": "0.1",
+  "kind": "ed-05-fake-platform-provider-conformance",
+  "live": false,
+  "rows": [
+    {
+      "flow": "privateEndpoint",
+      "fixture": "https://skills.test.linktrend.invalid/provider-v2",
+      "result": "PASS"
+    },
+    {
+      "flow": "tokenMint",
+      "fixture": "skills audience lskills-api",
+      "result": "PASS"
+    },
+    {
+      "flow": "tokenMintBrainDenied",
+      "fixture": "lbrain-api and brain client",
+      "result": "PASS"
+    },
+    {
+      "flow": "resourceRetrieval",
+      "fixture": "exact five pins",
+      "result": "PASS"
+    },
+    {
+      "flow": "verification",
+      "fixture": "bundle and package digest",
+      "result": "PASS"
+    },
+    {
+      "flow": "localExecution",
+      "fixture": "consumer-local providerDoesNotExecute",
+      "result": "PASS"
+    },
+    {
+      "flow": "useReport",
+      "fixture": "use-report-v0.2 score 10",
+      "result": "PASS"
+    },
+    {
+      "flow": "failure",
+      "fixture": "digest mismatch",
+      "result": "PASS"
+    },
+    {
+      "flow": "rollback",
+      "fixture": "disable pin provider unchanged",
+      "result": "PASS"
+    },
+    {
+      "flow": "denyStale",
+      "result": "PASS"
+    },
+    {
+      "flow": "denySimilarName",
+      "result": "PASS"
+    },
+    {
+      "flow": "denyNative",
+      "result": "PASS"
+    },
+    {
+      "flow": "denyLegacyExecution",
+      "result": "PASS"
+    }
+  ]
+}
