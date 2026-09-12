@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "kind": "linkskills-ed-09-negative-path-matrix",
+  "packet": "ED-09",
+  "requiredBeforeAcceptance": true,
+  "status": "UNPROVEN",
+  "executed": false,
+  "unsafeFallbackForbidden": true,
+  "nativeSubstituteForbidden": true,
+  "latestPointerForbidden": true,
+  "similarNameForbidden": true,
+  "cases": [
+    {
+      "id": "wrongIdentityOrScope",
+      "required": true,
+      "actors": ["cursor", "codex", "lisa"],
+      "stimulus": "missing, expired, wrong-audience, or wrong-scope credential",
+      "expected": "stable denial; no retrieval of an exact release body as selectable; no fallback",
+      "result": "NOT_EXECUTED",
+      "evidence": null
+    },
+    {
+      "id": "revokedRelease",
+      "required": true,
+      "actors": ["cursor", "codex", "lisa"],
+      "stimulus": "pin points at a revoked or quarantined release",
+      "expected": "stable denial; history not rewritten; no latest/similar-name substitute",
+      "result": "NOT_EXECUTED",
+      "evidence": null
+    },
+    {
+      "id": "tamperedOrStaleCache",
+      "required": true,
+      "actors": ["cursor", "codex", "lisa"],
+      "stimulus": "bundle/package digest mismatch or stale cached bytes",
+      "expected": "stop; no execute; no native substitute",
+      "result": "NOT_EXECUTED",
+      "evidence": null
+    },
+    {
+      "id": "providerOutage",
+      "required": true,
+      "actors": ["cursor", "codex", "lisa"],
+      "stimulus": "provider unreachable or non-v2 error envelope",
+      "expected": "fail closed; disable/rollback the failing consumer first if needed",
+      "result": "NOT_EXECUTED",
+      "evidence": null
+    },
+    {
+      "id": "storeOutage",
+      "required": true,
+      "actors": ["cursor", "codex", "lisa"],
+      "stimulus": "durable store unreachable while auth/catalog may still appear live",
+      "expected": "not treated as ready/selectable; no unsafe fallback",
+      "result": "NOT_EXECUTED",
+      "evidence": null
+    },
+    {
+      "id": "consumerDisable",
+      "required": true,
+      "actors": ["cursor", "codex", "lisa"],
+      "stimulus": "consumer pin disabled or packet removed",
+      "expected": "no further retrieval/use; provider publication unchanged; local agentsetup/agentcomply retained",
+      "result": "NOT_EXECUTED",
+      "evidence": null
+    }
+  ],
+  "allRequiredCasesExecuted": false,
+  "allRequiredCasesPass": false,
+  "notes": "Every required case must have a real fail-closed result before any ED-09 acceptance status. Blank results are not PASS."
+}
