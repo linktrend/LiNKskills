@@ -245,18 +245,15 @@ jobs:
       GH_TOKEN: ${{ github.token }}
       PR_NUMBER: ${{ github.event_name == 'workflow_dispatch' && inputs.pr_number || github.event.pull_request.number }}
     steps:
-      - name: Request Bugbot once for the sealed candidate
+      - name: Defer Bugbot mention to the trusted review-provider route
         run: |
           set -euo pipefail
-          HEAD_SHA="$(gh api "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}" --jq .head.sha)"
-          marker="<!-- linktrend-bugbot-requested: ${HEAD_SHA} -->"
-          comments="$(gh api --paginate "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/comments" --jq '.[].body' || true)"
-          if printf '%s\n' "${comments}" | grep -Fq "${marker}"; then
-            echo "final_candidate_bugbot_request_already_recorded"
-            exit 0
-          fi
-          gh api --method POST "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/comments" \
-            -f body="@cursor review\n${marker}"
+          # Candidate Full Suite must not post @cursor review: GITHUB_TOKEN is a
+          # bot identity, and bash -f body="...\n..." stored a literal
+          # backslash-n so Cursor Bugbot never executed on sealed Phase PRs
+          # (including #333). Default-branch linktrend-review-provider.yml owns
+          # the user-token mention after this job succeeds.
+          echo "review_provider_route_owns_mention"
 
   reconciled-canary:
     name: Linktrend Reconciled Tree Canary

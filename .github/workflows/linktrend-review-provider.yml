@@ -1,0 +1,141 @@
+name: Linktrend Review Provider
+
+# Portal-style exact-head Bugbot mention (WP consumer route).
+# Scripts execute from the protected default branch only. The Phase candidate
+# SHA is event/API data — never checked out for execution. Mentions use
+# LINKTREND_BUGBOT_USER_TOKEN; GITHUB_TOKEN must not post @cursor review.
+#
+# Wakes after the named Linktrend Full Suite *job* succeeds on an exact head
+# so a sibling posting failure cannot hide Full success. workflow_dispatch
+# repairs a already-sealed Phase PR (for example #333) without rewriting it.
+
+on:
+  check_run:
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: "Exact same-repository Phase PR number"
+        required: true
+        type: string
+      expected_commit:
+        description: "Exact 40-character Phase PR head SHA"
+        required: true
+        type: string
+
+permissions: {}
+
+concurrency:
+  group: linktrend-review-provider-${{ github.event.check_run.head_sha || inputs.expected_commit }}
+  cancel-in-progress: false
+
+jobs:
+  request:
+    name: Request Cursor Bugbot for exact Phase head
+    if: >
+      (
+        github.event_name == 'check_run' &&
+        github.event.check_run.name == 'Linktrend Full Suite' &&
+        github.event.check_run.conclusion == 'success'
+      ) || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+      checks: read
+    env:
+      EXPECTED_HEAD: ${{ github.event_name == 'workflow_dispatch' && inputs.expected_commit || github.event.check_run.head_sha }}
+      DISPATCH_PR: ${{ github.event_name == 'workflow_dispatch' && inputs.pr_number || '' }}
+    steps:
+      - name: Checkout trusted default branch only (scripts)
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          persist-credentials: false
+
+      - name: Bind exact head and prepare executable mention
+        id: prepare
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          [[ "${EXPECTED_HEAD}" =~ ^[0-9a-f]{40}$ ]] || { echo "invalid_expected_head"; exit 1; }
+          PULLS_FILE="$(mktemp)"
+          COMMENTS_FILE="$(mktemp)"
+          CHECKS_FILE="$(mktemp)"
+          PREPARE_FILE="$(mktemp)"
+          trap 'rm -f "${PULLS_FILE}" "${COMMENTS_FILE}" "${CHECKS_FILE}" "${PREPARE_FILE}"' EXIT
+          gh api "repos/${GITHUB_REPOSITORY}/commits/${EXPECTED_HEAD}/pulls" >"${PULLS_FILE}" \
+            || { echo "HOLD: pulls_unreadable"; exit 1; }
+          if [ -n "${DISPATCH_PR}" ]; then
+            [[ "${DISPATCH_PR}" =~ ^[1-9][0-9]*$ ]] || { echo "invalid_dispatch_pr"; exit 1; }
+            gh api --paginate --slurp "repos/${GITHUB_REPOSITORY}/issues/${DISPATCH_PR}/comments" \
+              >"${COMMENTS_FILE}" || { echo "HOLD: comments_unreadable"; exit 1; }
+          else
+            python3 - "${PULLS_FILE}" "${EXPECTED_HEAD}" <<'PY' >"${GITHUB_WORKSPACE}/provider-pr-number.txt"
+          import json, sys
+          from pathlib import Path
+          sys.path.insert(0, str(Path("scripts/gitops").resolve()))
+          from review_provider_route import ReviewProviderError, select_exact_phase_pr
+          pulls = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+          try:
+              pr = select_exact_phase_pr(pulls, expected_head=sys.argv[2])
+          except ReviewProviderError as exc:
+              raise SystemExit(f"{exc.code}: {exc.detail}")
+          print(pr["number"])
+          PY
+            PR_NUMBER="$(cat "${GITHUB_WORKSPACE}/provider-pr-number.txt")"
+            gh api --paginate --slurp "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/comments" \
+              >"${COMMENTS_FILE}" || { echo "HOLD: comments_unreadable"; exit 1; }
+          fi
+          gh api "repos/${GITHUB_REPOSITORY}/commits/${EXPECTED_HEAD}/check-runs?per_page=100" \
+            >"${CHECKS_FILE}" || { echo "HOLD: check_runs_unreadable"; exit 1; }
+          PREPARE_ARGS=(
+            python3 scripts/gitops/review_provider_route.py prepare
+            --repository "${GITHUB_REPOSITORY}"
+            --expected-head "${EXPECTED_HEAD}"
+            --pulls-json "${PULLS_FILE}"
+            --comments-json "${COMMENTS_FILE}"
+            --check-runs-json "${CHECKS_FILE}"
+          )
+          if [ -n "${DISPATCH_PR}" ]; then
+            PREPARE_ARGS+=(--expected-pr-number "${DISPATCH_PR}")
+          fi
+          set +e
+          "${PREPARE_ARGS[@]}" >"${PREPARE_FILE}"
+          status=$?
+          set -e
+          cat "${PREPARE_FILE}"
+          ACTION="$(jq -r .action <"${PREPARE_FILE}")"
+          REASON="$(jq -r .reason <"${PREPARE_FILE}")"
+          echo "action=${ACTION}" >> "$GITHUB_OUTPUT"
+          echo "reason=${REASON}" >> "$GITHUB_OUTPUT"
+          if [ "${ACTION}" = "reject" ] || [ "${status}" -ne 0 ]; then
+            echo "review_provider_rejected:${REASON}"
+            exit 1
+          fi
+          if [ "${ACTION}" = "skip" ]; then
+            echo "review_provider_skipped:${REASON}"
+            exit 0
+          fi
+          PR_NUMBER="$(jq -r .prNumber <"${PREPARE_FILE}")"
+          jq -r .body <"${PREPARE_FILE}" > "${GITHUB_WORKSPACE}/bugbot-comment-body.txt"
+          echo "pr_number=${PR_NUMBER}" >> "$GITHUB_OUTPUT"
+          test -s "${GITHUB_WORKSPACE}/bugbot-comment-body.txt" || { echo "empty_bugbot_body"; exit 1; }
+
+      - name: Post mention with user token only
+        if: steps.prepare.outputs.action == 'request'
+        env:
+          LINKTREND_BUGBOT_USER_TOKEN: ${{ secrets.LINKTREND_BUGBOT_USER_TOKEN }}
+          PR_NUMBER: ${{ steps.prepare.outputs.pr_number }}
+          REQUIRE_BUGBOT_USER_TOKEN: "1"
+        run: |
+          set -euo pipefail
+          # shellcheck disable=SC1091
+          source scripts/gitops/resolve_bugbot_user_token.sh
+          python3 scripts/gitops/review_provider_route.py post \
+            --repository "${GITHUB_REPOSITORY}" \
+            --pr-number "${PR_NUMBER}" \
+            --body-file "${GITHUB_WORKSPACE}/bugbot-comment-body.txt"
