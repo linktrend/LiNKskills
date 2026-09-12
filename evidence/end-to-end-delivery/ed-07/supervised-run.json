@@ -1,0 +1,120 @@
+{
+  "use": {
+    "worker_version": "0.2",
+    "operation": "ingest_use_or_feedback",
+    "accepted": true,
+    "receipt": {
+      "accepted": true,
+      "receipt_id": "receipt:59fe993ef8ab5367",
+      "digest": "sha256:59fe993ef8ab5367893396535e909bee9178fa7616d99bd870d34bc8f4358e0f",
+      "skill_release_ref": "git-safeguard@1.1.0",
+      "runtime_profile_ref": "cursor-macos",
+      "skill_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "opaque_correlation": "corr:0f781917f9708d30e3fe8ec6d754e691",
+      "retention_class": "minimal",
+      "retained_until": "2026-09-19T00:00:00Z"
+    },
+    "bound": {
+      "skill_release_ref": "git-safeguard@1.1.0",
+      "runtime_profile_ref": "cursor-macos",
+      "skill_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "opaque_correlation": "corr:0f781917f9708d30e3fe8ec6d754e691"
+    },
+    "reason": null,
+    "at": "2026-09-12T11:42:28Z"
+  },
+  "supervised": {
+    "worker_version": "0.2",
+    "operation": "supervised_run",
+    "accepted": true,
+    "processed": [
+      {
+        "outcome": "done",
+        "job": {
+          "job_id": "f194c053-a1e7-443d-b54b-d861603118fd",
+          "kind": "interpret_eval",
+          "status": "done",
+          "attempt": 0,
+          "payload": {
+            "prompt_only": true,
+            "evidence": {
+              "passed": true,
+              "case_results": [
+                {
+                  "id": "c1",
+                  "passed": true
+                }
+              ]
+            }
+          },
+          "last_error": null,
+          "at": "2026-09-12T11:42:28Z"
+        },
+        "result": {
+          "worker_version": "0.2",
+          "operation": "interpret_eval_evidence",
+          "certifying": false,
+          "recommendation": "hold_eval_pending",
+          "reason": "prompt-only scoring cannot certify",
+          "at": "2026-09-12T11:42:28Z"
+        }
+      }
+    ],
+    "job_depth": 0,
+    "dlq_depth": 0,
+    "prompt_only_cannot_certify": true,
+    "skills_only": true,
+    "metrics": {
+      "git-safeguard@1.1.0,cursor,agent_actor,cursor-macos,compatible,incorrect": 1
+    },
+    "at": "2026-09-12T11:42:28Z"
+  },
+  "status": {
+    "worker_version": "0.2",
+    "conformance_package": "linkskills-librarian-conformance/0.2",
+    "domain_key": "linkskills",
+    "operation": "status_report",
+    "enabled": true,
+    "backlog": {
+      "review_queued": 0,
+      "jobs_open": 0,
+      "dead_letter": 0
+    },
+    "metrics_cardinality": 1,
+    "metrics": {
+      "git-safeguard@1.1.0,cursor,agent_actor,cursor-macos,compatible,incorrect": 1
+    },
+    "proof_classes": {
+      "source": {
+        "status": "pass",
+        "claim": "versioned Skills worker and conformance package exist in source"
+      },
+      "qualification": {
+        "status": "hold",
+        "claim": "live qualification remains ED-03/ED-04 evidence; this packet does not re-certify"
+      },
+      "selectability": {
+        "status": "hold",
+        "claim": "channel pointers and consumer activation are out of ED-07 source scope"
+      },
+      "consumer": {
+        "status": "hold",
+        "claim": "consumer config and live host integration are prohibited in this packet"
+      },
+      "server": {
+        "status": "hold",
+        "claim": "no deploy or live host mutation"
+      },
+      "production": {
+        "status": "hold",
+        "claim": "supervised production-equivalent run is source-simulated; live host waits XP-01"
+      },
+      "worker_contract": {
+        "status": "pass",
+        "claim": "use/feedback bind, privacy, retention, disable/retry/DLQ, prompt-only refusal"
+      }
+    },
+    "redacted": true,
+    "at": "2026-09-12T11:42:28Z"
+  }
+}
