@@ -1,0 +1,78 @@
+# Sanitized Server 01 overlay for the Platform owner.
+# Not the live file /srv/linktrend/deploy/compose/core-services.compose.yml.
+# image and external network MUST be replaced from hosted-build + Platform readback.
+# No secret values.
+
+services:
+  linktrend-linkskills:
+    image: REPLACE_WITH_HOSTED_LINUX_AMD64_DIGEST
+    platform: linux/amd64
+    user: "10002:10002"
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cpus: "1.0"
+    mem_limit: "1g"
+    pids_limit: 256
+    restart: unless-stopped
+    command:
+      - linkskills-gateway
+      - --host
+      - "0.0.0.0"
+      - --port
+      - "8787"
+    ports:
+      - "127.0.0.1:18798:8787"
+    tmpfs:
+      - /tmp
+    volumes:
+      - type: bind
+        source: /etc/linkskills/secrets
+        target: /etc/linkskills/secrets
+        read_only: true
+      - type: volume
+        source: linkskills-runtime-state
+        target: /var/lib/linkskills
+    environment:
+      LINKSKILLS_ENV: production
+      LINKSKILLS_AUTH_MODE: production
+      LINKSKILLS_GATEWAY_HOST: 0.0.0.0
+      LINKSKILLS_GATEWAY_PORT: "8787"
+      LINKSKILLS_GATEWAY_STORE: postgres
+      LINKSKILLS_STORE_PROBE: "1"
+      LINKSKILLS_DRAIN: "0"
+      LINKSKILLS_SHUTDOWN_TIMEOUT_S: "30"
+      LINKSKILLS_PACI_AUDIENCE: lskills-api
+      LINKSKILLS_PACI_REQUIRED_SERVICE_SCOPES: lskills
+      LINKSKILLS_PACI_CLIENT_PRIVATE_KEY_FILE: /etc/linkskills/secrets/paci-client.pem
+      LINKSKILLS_PLATFORM_AUTHENTICATOR: REPLACE_WITH_PLATFORM_AUTHENTICATOR_MODULE
+    healthcheck:
+      test:
+        - CMD
+        - python3
+        - -c
+        - import urllib.request; urllib.request.urlopen("http://127.0.0.1:8787/health")
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 20s
+    labels:
+      org.linktrend.service: lskills
+      org.linktrend.contract: skills.api.v0.2
+      org.linktrend.source.repository: linktrend/LiNKskills
+      org.linktrend.packet: ED-06
+      org.linktrend.deploy: candidate-not-live
+    networks:
+      - existing-core-services
+
+networks:
+  existing-core-services:
+    external: true
+    name: REPLACE_WITH_PLATFORM_READBACK_NETWORK
+
+volumes:
+  linkskills-runtime-state:
+    external: true
+    name: REPLACE_WITH_PLATFORM_READBACK_STATE_VOLUME
