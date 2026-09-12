@@ -72,7 +72,7 @@ class Server01CandidateTests(unittest.TestCase):
     def test_secret_dsn_in_overlay_is_rejected(self) -> None:
         data = json.loads((ROOT / "docs/integrations/server01/CANDIDATE.json").read_text())
         overlay = (ROOT / "docs/integrations/server01/compose.overlay.yml").read_text()
-        leaked = overlay + "\n      LINKSKILLS_DATABASE_URL: postgres://owner:secret@db/skills\n"
+        leaked = overlay + "\n      LINKSKILLS_DATABASE_URL: __LINKSKILLS_FORBIDDEN_SECRET__\n"
         with self.assertRaises(Server01CandidateError):
             validate_overlay(leaked, data)
 

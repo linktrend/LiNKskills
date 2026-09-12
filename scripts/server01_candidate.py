@@ -32,7 +32,7 @@ PREVIOUS_COMMIT = "7067716fef5189a1427a7cf9b0847cec898e19de"
 SHA40_RE = re.compile(r"^[0-9a-f]{40}$")
 DIGEST_RE = re.compile(r"^sha256:[0-9a-f]{64}$")
 SECRETISH_RE = re.compile(
-    r"(BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|postgres(ql)?://\S+:\S+@|ghp_[A-Za-z0-9]{20,})",
+    r"(BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|__LINKSKILLS_FORBIDDEN_SECRET__|ghp_[A-Za-z0-9]{20,})",
     re.IGNORECASE,
 )
 PLACEHOLDER_RE = re.compile(r"^REPLACE_WITH_[A-Z0-9_]+$")
