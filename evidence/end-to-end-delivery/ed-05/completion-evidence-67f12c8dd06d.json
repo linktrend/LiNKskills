@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "headSha": "67f12c8dd06dcb663f8ebdfd6f2d16ff0716b466",
+  "classification": "tests",
+  "acceptance": "ED-05 source-only three disabled owner packets for the qualified five-Skill set; schema/digest/allowlist/deny and fake Platform/provider contracts pass; Fast/secret-scan/diff-check pass; no live activation",
+  "commands": [
+    {
+      "cmd": "python3 -m pytest -q tests/integrations",
+      "exitCode": 0
+    },
+    {
+      "cmd": "python3 scripts/gitops/run_delivery_profile.py fast",
+      "exitCode": 0
+    },
+    {
+      "cmd": "python3 scripts/gitops/secret_scan.py",
+      "exitCode": 0
+    },
+    {
+      "cmd": "git diff --check origin/development...HEAD",
+      "exitCode": 0
+    }
+  ],
+  "at": "2026-09-12T12:04:56Z",
+  "kind": "v25-issue-checkpoint",
+  "amendment": "V25_BOOTSTRAP_LEAN",
+  "gitTree": "2a5796d36b07417e780f0210b11a8d63c9382c68",
+  "pushed": true,
+  "scopedDiff": true,
+  "focusedTests": {
+    "passed": true
+  },
+  "manifestEvidence": true,
+  "proofClass": "local"
+}
