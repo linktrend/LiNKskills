@@ -1,0 +1,49 @@
+# Server 01 Skills v2 image definition (source candidate only).
+# Build linux/amd64 in hosted CI; pin the resulting digest before Platform apply.
+# Do not copy secret files. Do not run as root.
+
+FROM python:3.11-slim-bookworm
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+RUN groupadd --gid 10002 linkskills \
+    && useradd --uid 10002 --gid 10002 --create-home --home-dir /home/linkskills --shell /usr/sbin/nologin linkskills \
+    && mkdir -p /opt/linkskills /var/lib/linkskills /etc/linkskills/secrets /tmp \
+    && chown -R 10002:10002 /opt/linkskills /var/lib/linkskills /home/linkskills \
+    && chmod 0750 /etc/linkskills/secrets
+
+WORKDIR /opt/linkskills
+
+COPY requirements-dev.lock requirements-dev.lock
+COPY packages packages
+COPY catalog catalog
+COPY validator.py validator.py
+
+RUN python3 -m pip install --no-cache-dir --require-hashes -r requirements-dev.lock \
+    && python3 -m pip install --no-cache-dir --no-deps \
+        packages/core \
+        packages/tool_runtime \
+        packages/gateway \
+        packages/client \
+        packages/mcp_server \
+        packages/librarian_domain \
+        packages/publisher \
+        packages/eval_runner \
+    && python3 -m pip install --no-cache-dir --no-deps "packages/gateway[postgres]"
+
+USER 10002:10002
+
+EXPOSE 8787
+
+LABEL org.linktrend.service="lskills" \
+      org.linktrend.contract="skills.api.v0.2" \
+      org.linktrend.packet="ED-06" \
+      org.linktrend.deploy="candidate-not-live"
+
+HEALTHCHECK --interval=10s --timeout=3s --start-period=20s --retries=3 \
+  CMD python3 -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8787/health')"
+
+ENTRYPOINT ["linkskills-gateway"]
+CMD ["--host", "0.0.0.0", "--port", "8787"]
