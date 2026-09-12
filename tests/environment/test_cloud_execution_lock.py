@@ -61,7 +61,15 @@ def test_lockfile_exists_and_is_fully_hashed() -> None:
     stanzas = _lock_stanzas()
     assert stanzas, "requirements-dev.lock has no requirement stanzas"
     names = [name.split("[", 1)[0].lower() for name, _ver, _hashes in stanzas]
-    for expected in ("pytest", "pyyaml", "setuptools", "wheel", "cryptography", "psycopg"):
+    for expected in (
+        "pytest",
+        "pyyaml",
+        "setuptools",
+        "wheel",
+        "cryptography",
+        "psycopg",
+        "jsonschema",
+    ):
         assert expected in names, f"missing top-level pin {expected}"
     for name, version, hashes in stanzas:
         assert version, f"{name} missing version"
@@ -91,6 +99,27 @@ def test_requirements_dev_txt_remains_range_input() -> None:
     assert "pytest>=" in text
     assert "psycopg[binary]>=" in text
     assert "cryptography>=" in text
+    assert "jsonschema>=" in text
+
+
+def test_hash_lock_covers_jsonschema_importers() -> None:
+    """Review Gate/controller tests fail closed if jsonschema is imported but unlocked."""
+    names = {name.split("[", 1)[0].lower() for name, _ver, _hashes in _lock_stanzas()}
+    assert "jsonschema" in names, "jsonschema imported by gitops/review-gate tests but absent from lock"
+    jsonschema_import = re.compile(r"^(?:from jsonschema(?:\.[A-Za-z0-9_]+)? import |import jsonschema)\b")
+    importers: list[str] = []
+    for path in (REPO_ROOT / "scripts").rglob("*.py"):
+        text = path.read_text(encoding="utf-8")
+        if any(jsonschema_import.match(line) for line in text.splitlines()):
+            importers.append(str(path.relative_to(REPO_ROOT)))
+    assert importers, "expected scripts/ to import jsonschema (review-gate/controller closure)"
+    for name, version, hashes in _lock_stanzas():
+        if name.split("[", 1)[0].lower() == "jsonschema":
+            assert version, "jsonschema lock stanza missing version"
+            assert hashes, f"jsonschema=={version} has no sha256 hashes"
+            break
+    else:
+        raise AssertionError("jsonschema stanza missing after name index check")
 
 
 def test_ci_installs_lock_with_require_hashes_on_protected_matrix() -> None:
