@@ -14,6 +14,16 @@ from .external_lifecycle import (
     UpdateCandidate,
     VendorRelease,
 )
+from .initial_set import (
+    ALLOWLIST_RELEASE_IDS,
+    INITIAL_ALLOWLIST,
+    InitialReleaseSpec,
+    ORDINARY_SELECTABLE_COUNT,
+    PublicationError,
+    SourceOnlyInitialPublisher,
+    catalog_skill_count,
+    publish_exact_initial_releases,
+)
 
 __all__ = [
     "PublishedRelease",
@@ -32,6 +42,14 @@ __all__ = [
     "ReviewOutcome",
     "UpdateCandidate",
     "VendorRelease",
+    "ALLOWLIST_RELEASE_IDS",
+    "INITIAL_ALLOWLIST",
+    "InitialReleaseSpec",
+    "ORDINARY_SELECTABLE_COUNT",
+    "PublicationError",
+    "SourceOnlyInitialPublisher",
+    "catalog_skill_count",
+    "publish_exact_initial_releases",
 ]
 
 __version__ = "0.1.0"

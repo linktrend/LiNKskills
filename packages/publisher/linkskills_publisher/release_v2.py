@@ -46,5 +46,12 @@ class ReleaseRegistry:
         if self._current.get(skill_id) != expected: raise ReleaseError("current_pointer_conflict")
         self.exact(skill_id, version); self._current[skill_id] = version; self._pointer_history.append((skill_id, expected, version))
 
+    def clear_current(self, skill_id: str, expected: str | None) -> None:
+        """Drop the intended current pointer without rewriting immutable rows."""
+        if self._current.get(skill_id) != expected:
+            raise ReleaseError("current_pointer_conflict")
+        self._current.pop(skill_id, None)
+        self._pointer_history.append((skill_id, expected, None))
+
     def verify(self, skill_id: str, version: str, files: dict[str, bytes], *, availability: str = "available") -> str:
         return self.exact(skill_id, version).verify(files, availability=availability)

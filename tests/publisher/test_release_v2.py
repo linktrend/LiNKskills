@@ -10,6 +10,8 @@ class PublisherV2(unittest.TestCase):
         self.assertEqual(registry.verify("a", "1.0.0", {"README.md": b"x"}), "verified")
         with self.assertRaises(ReleaseError): registry.exact("a", "latest")
         with self.assertRaises(ReleaseError): registry.set_current("a", "1.0.0", "wrong")
+        registry.clear_current("a", "1.0.0")
+        with self.assertRaises(ReleaseError): registry.clear_current("a", "1.0.0")
 
     def test_attestation_signature_and_claim_binding(self):
         registry = ReleaseRegistry(); manifest = registry.publish("a", "1.0.0", {"README.md": b"x"}, published_at="2026-08-13T00:00:00Z")
