@@ -1,0 +1,142 @@
+{
+  "artifact_hashes": [
+    "7cbf8c83522baeaebf00ddf9739a713418cd9d23b81ae11d7626e2ecf7e9300c",
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  ],
+  "case_id": "wrong-branch-target-blocks-push",
+  "environment": {
+    "adapter_digest": "sha256:bbd35ff600523790678fb819884abf0d810b02d6f0eac50f57943620ffc0a71f",
+    "consumer_profile": "cursor-macos",
+    "executor_version": "linkskills-eval-executor/0.4.0",
+    "machine": "x86_64",
+    "network_isolation": "denied",
+    "platform": "Linux-6.12.94+-x86_64-with-glibc2.39",
+    "python_version": "3.12.3",
+    "repo_root": "/workspace",
+    "runtime_digest": "sha256:c2c501f226cee560d9711692bd0c450e4fa15f481604ee47362cab68d4074023",
+    "system": "Linux",
+    "workspace_root": "/tmp/linkskills-eval-hs7_4vk_"
+  },
+  "evidence_source": "executor",
+  "execution_profile_hash": "3055576a289e6cbf3e33092c13c5037ce81f62981bce3a134f2bd9c400f33f17",
+  "executor_version": "linkskills-eval-executor/0.4.0",
+  "exit_code": 0,
+  "finished_at": "2026-09-13T07:51:56Z",
+  "issuer_id": "linkskills-eval-runner",
+  "issuer_signature": "5c3285e7a1144dcd01dd1927c1b28d048981e4022d8938dbee1b12365ddf2061",
+  "network_isolation": "denied",
+  "provenance_kind": "eval_runner_hmac_v1",
+  "receipt_hash": "eea8d8984176ef3fec88c7833d6a2cf2c012d54a40bb8329f3d397115773ad1c",
+  "receipt_id": "b70f32b8-0ab2-480d-b4f6-7b266d75fdca",
+  "skill_id": "git-safeguard",
+  "skill_release_hash": "skill-release:572202fb8a8b49ccf1a079fde183f664d9ed156f053457a9de3d11a2fbdb98b7",
+  "started_at": "2026-09-13T07:51:56Z",
+  "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout_hash": "7cbf8c83522baeaebf00ddf9739a713418cd9d23b81ae11d7626e2ecf7e9300c",
+  "suite_hash": "2c1ee1e4dd0343a70d559b4356907c77c789f6f9c21b97684a471feeaaf8b4e6",
+  "suite_id": "git-safeguard-eval",
+  "tool_calls": [
+    {
+      "adapter_kind": "confined_skill_script",
+      "argv": [
+        "python",
+        "skill/scripts/helper_tool.py",
+        "--case",
+        "wrong-branch-target-blocks-push"
+      ],
+      "error": null,
+      "exit_code": 0,
+      "stderr_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_hash": "7cbf8c83522baeaebf00ddf9739a713418cd9d23b81ae11d7626e2ecf7e9300c",
+      "timed_out": false,
+      "tool_hash": "915ff445005789d1293f5069a09b1bd9a052b620207b7e4fd37493cf2a70fdb2",
+      "tool_id": "cursor-macos:skill_script",
+      "version": "ed03-1.0.0"
+    }
+  ],
+  "toolchain": {
+    "adapter_digest": "sha256:bbd35ff600523790678fb819884abf0d810b02d6f0eac50f57943620ffc0a71f",
+    "consumer_profile_driver": {
+      "adapterDigest": "sha256:bbd35ff600523790678fb819884abf0d810b02d6f0eac50f57943620ffc0a71f",
+      "driverVersion": "ed03-1.0.0",
+      "guiLaunch": false,
+      "isolatorReceipt": {
+        "live": true,
+        "owner": "Sealed Linux confined executor (ADR 0009)",
+        "path": "/usr/bin/bwrap",
+        "present": true,
+        "reason": null,
+        "requiredKind": "linux-bwrap-path-allowlist-isolator"
+      },
+      "issuerReceipt": {
+        "authority": null,
+        "authorityEnvName": "LINKSKILLS_EVAL_RUNNER_ISSUER_AUTHORITY",
+        "envName": "LINKSKILLS_EVAL_RUNNER_ISSUER_KEY",
+        "live": false,
+        "owner": "Eval Runner issuer (SecretRef / process env, never Git)",
+        "present": true,
+        "reason": "missing_owner_receipt:LINKSKILLS_EVAL_RUNNER_ISSUER_KEY+LINKSKILLS_EVAL_RUNNER_ISSUER_AUTHORITY=secretref",
+        "requiredKind": "eval-runner-issuer-secretref"
+      },
+      "kind": "confined_linux_consumer_profile",
+      "liveConsumerActor": false,
+      "missingOwnerReceipts": [
+        {
+          "live": false,
+          "observedDigest": "sha256:b280726780a15ad3680e2c9804b7ada94b99a7e4b8116826317ac34f7f034dec",
+          "observedPath": "evidence/end-to-end-delivery/ed-05/source-consumer-packet-receipt.json",
+          "observedStatus": "source-only disabled packets; liveApply=false",
+          "owner": "XP-02 Cursor consumer owner",
+          "present": true,
+          "profileId": "cursor-macos",
+          "reason": "missing_live_owner_receipt",
+          "requiredKind": "xp-02-cursor-owner-live-receipt"
+        },
+        {
+          "authority": null,
+          "authorityEnvName": "LINKSKILLS_EVAL_RUNNER_ISSUER_AUTHORITY",
+          "envName": "LINKSKILLS_EVAL_RUNNER_ISSUER_KEY",
+          "live": false,
+          "owner": "Eval Runner issuer (SecretRef / process env, never Git)",
+          "present": true,
+          "reason": "missing_owner_receipt:LINKSKILLS_EVAL_RUNNER_ISSUER_KEY+LINKSKILLS_EVAL_RUNNER_ISSUER_AUTHORITY=secretref",
+          "requiredKind": "eval-runner-issuer-secretref"
+        },
+        {
+          "envName": "LINKSKILLS_SEALED_CERT_IMAGE",
+          "live": false,
+          "observed": null,
+          "owner": "Sealed Linux evaluation image pin",
+          "present": false,
+          "reason": "missing_owner_receipt:LINKSKILLS_SEALED_CERT_IMAGE@sha256",
+          "requiredKind": "sealed-linux-evaluator-image-digest"
+        }
+      ],
+      "ownerReceipt": {
+        "live": false,
+        "observedDigest": "sha256:b280726780a15ad3680e2c9804b7ada94b99a7e4b8116826317ac34f7f034dec",
+        "observedPath": "evidence/end-to-end-delivery/ed-05/source-consumer-packet-receipt.json",
+        "observedStatus": "source-only disabled packets; liveApply=false",
+        "owner": "XP-02 Cursor consumer owner",
+        "present": true,
+        "profileId": "cursor-macos",
+        "reason": "missing_live_owner_receipt",
+        "requiredKind": "xp-02-cursor-owner-live-receipt"
+      },
+      "profileId": "cursor-macos",
+      "runtimeDigest": "sha256:c2c501f226cee560d9711692bd0c450e4fa15f481604ee47362cab68d4074023",
+      "schemaVersion": 1,
+      "sealedImageReceipt": {
+        "envName": "LINKSKILLS_SEALED_CERT_IMAGE",
+        "live": false,
+        "observed": null,
+        "owner": "Sealed Linux evaluation image pin",
+        "present": false,
+        "reason": "missing_owner_receipt:LINKSKILLS_SEALED_CERT_IMAGE@sha256",
+        "requiredKind": "sealed-linux-evaluator-image-digest"
+      }
+    },
+    "runtime_digest": "sha256:c2c501f226cee560d9711692bd0c450e4fa15f481604ee47362cab68d4074023",
+    "runtime_profile": "cursor-macos"
+  }
+}

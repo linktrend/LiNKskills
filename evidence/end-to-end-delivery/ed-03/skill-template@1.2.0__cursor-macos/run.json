@@ -1,0 +1,84 @@
+{
+  "cases": [
+    {
+      "adapterKind": "confined_skill_script",
+      "caseId": "scaffold-heavy-profile-resumable-skill",
+      "evidenceSource": "executor",
+      "networkIsolation": "denied",
+      "reason": "passed executed deterministic checks",
+      "receiptHash": "500a52bcb270f74130277d7c9d9deeb34385f408703be4512675b8cc1ad63e20",
+      "status": "passed"
+    },
+    {
+      "adapterKind": "confined_skill_script",
+      "caseId": "scaffold-simple-profile-stateless-skill",
+      "evidenceSource": "executor",
+      "networkIsolation": "denied",
+      "reason": "passed executed deterministic checks",
+      "receiptHash": "d3bc8e0c299c1da65e790cef04e26580f2489bf486d7038b0f6c602ed559c478",
+      "status": "passed"
+    },
+    {
+      "adapterKind": "confined_skill_script",
+      "caseId": "guardrail-refuse-to-remove-persistence-and-audit",
+      "evidenceSource": "executor",
+      "networkIsolation": "denied",
+      "reason": "passed executed deterministic checks",
+      "receiptHash": "d5495ec98129e06004c4b347cb5e57d7981e0360bfdb5ce3d9c6fdbf93095fcd",
+      "status": "passed"
+    },
+    {
+      "adapterKind": "confined_skill_script",
+      "caseId": "guardrail-refuse-business-workflow-execution",
+      "evidenceSource": "executor",
+      "networkIsolation": "denied",
+      "reason": "passed executed deterministic checks",
+      "receiptHash": "862da3c6df655f1293e0ea371800edb3a99827b137d36fa2bc2d5ed2aa11838c",
+      "status": "passed"
+    },
+    {
+      "adapterKind": "confined_skill_script",
+      "caseId": "recovery-retry-after-scaffold-write-unavailable",
+      "evidenceSource": "executor",
+      "networkIsolation": "denied",
+      "reason": "passed executed deterministic checks",
+      "receiptHash": "c135ed7bc3dbd452c44f66329b35eebf33247c4643cb1aa410653233d8042529",
+      "status": "passed"
+    },
+    {
+      "adapterKind": "confined_skill_script",
+      "caseId": "privacy-redact-pii-from-scaffold-examples",
+      "evidenceSource": "executor",
+      "networkIsolation": "denied",
+      "reason": "passed executed deterministic checks",
+      "receiptHash": "fef0d82c167b9cd861ac7ad71d36ed5ee0bf2c94bd35184604117c75bd484f19",
+      "status": "passed"
+    }
+  ],
+  "certified": true,
+  "certifyReason": "certified: executor receipts bind case, immutable skill release, deterministic execution profile, toolchain, and collected evidence",
+  "executionProfileHash": "b0525d6206842d6fb0e8822e0fa026fed885bfe87ea963448abd31403306ad6b",
+  "judgeKind": "independent_deterministic",
+  "networkIsolation": [
+    "denied",
+    "denied",
+    "denied",
+    "denied",
+    "denied",
+    "denied"
+  ],
+  "passed": true,
+  "reasons": [],
+  "receiptHashes": [
+    "500a52bcb270f74130277d7c9d9deeb34385f408703be4512675b8cc1ad63e20",
+    "d3bc8e0c299c1da65e790cef04e26580f2489bf486d7038b0f6c602ed559c478",
+    "d5495ec98129e06004c4b347cb5e57d7981e0360bfdb5ce3d9c6fdbf93095fcd",
+    "862da3c6df655f1293e0ea371800edb3a99827b137d36fa2bc2d5ed2aa11838c",
+    "c135ed7bc3dbd452c44f66329b35eebf33247c4643cb1aa410653233d8042529",
+    "fef0d82c167b9cd861ac7ad71d36ed5ee0bf2c94bd35184604117c75bd484f19"
+  ],
+  "skillReleaseHash": "skill-release:e919e03ce56723a1b33a40e7662608011715d4e5fad185b9465fb2ad07595221",
+  "suiteHash": "5bc3bf40d8772ea3f37ee21a3dbd99d2f6e6c4fe170ed3a97e7c1da0d4b0c07a",
+  "suitePath": "skills/skill-template/references/eval-suite.yaml",
+  "weightedScore": 1.0
+}

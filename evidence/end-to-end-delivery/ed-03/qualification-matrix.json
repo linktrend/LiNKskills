@@ -1,0 +1,900 @@
+{
+  "combinations": [
+    {
+      "digests": {
+        "evalSuiteFileHash": "sha256:28f874b52792098866c8df1c23f0013fc73ed98c6f08ebb0cca3949960e8abf5",
+        "evalSuiteJsonDigest": "sha256:28f874b52792098866c8df1c23f0013fc73ed98c6f08ebb0cca3949960e8abf5",
+        "evalSuiteYamlDigest": "sha256:2c1ee1e4dd0343a70d559b4356907c77c789f6f9c21b97684a471feeaaf8b4e6",
+        "executionProfileDigest": "sha256:40f07522f621e7a328d35be5498c0b4ea550daead7204d6ec0d9e0ce1ef0c11f",
+        "profileHashErrors": [],
+        "skillPackDigest": "sha256:085d22217cce9b81d587b211cdf1a60e123e164066ec79a1bac570b43a0e77b6",
+        "skillReleaseHash": "skill-release:572202fb8a8b49ccf1a079fde183f664d9ed156f053457a9de3d11a2fbdb98b7",
+        "toolScriptDigest": "sha256:915ff445005789d1293f5069a09b1bd9a052b620207b7e4fd37493cf2a70fdb2"
+      },
+      "driver": {
+        "adapterDigest": "sha256:bbd35ff600523790678fb819884abf0d810b02d6f0eac50f57943620ffc0a71f",
+        "kind": "confined_linux_consumer_profile",
+        "profileId": "cursor-macos",
+        "runtimeDigest": "sha256:c2c501f226cee560d9711692bd0c450e4fa15f481604ee47362cab68d4074023"
+      },
+      "executableCases": [
+        "clean-tree-full-checklist-allows-push",
+        "guardrail-refuse-push-without-checklist",
+        "recovery-retry-after-transient-status-error",
+        "staged-diff-contains-secret-blocks-push",
+        "wrong-branch-target-blocks-push"
+      ],
+      "families": {
+        "failure": [
+          "recovery-retry-after-transient-status-error",
+          "staged-diff-contains-secret-blocks-push",
+          "wrong-branch-target-blocks-push"
+        ],
+        "guardrail": [
+          "guardrail-refuse-push-without-checklist"
+        ],
+        "privacy": [
+          "clean-tree-full-checklist-allows-push",
+          "staged-diff-contains-secret-blocks-push"
+        ],
+        "recovery": [
+          "recovery-retry-after-transient-status-error"
+        ],
+        "success": [
+          "clean-tree-full-checklist-allows-push",
+          "staged-diff-contains-secret-blocks-push",
+          "wrong-branch-target-blocks-push"
+        ]
+      },
+      "id": "git-safeguard@1.1.0/cursor-macos",
+      "lifecycle": "eval_pending",
+      "missingArtifacts": [],
+      "missingFamilies": [],
+      "missingOwnerReceipts": [
+        {
+          "live": false,
+          "observedDigest": "sha256:b280726780a15ad3680e2c9804b7ada94b99a7e4b8116826317ac34f7f034dec",
+          "observedPath": "evidence/end-to-end-delivery/ed-05/source-consumer-packet-receipt.json",
+          "observedStatus": "source-only disabled packets; liveApply=false",
+          "owner": "XP-02 Cursor consumer owner",
+          "present": true,
+          "profileId": "cursor-macos",
+          "reason": "missing_live_owner_receipt",
+          "requiredKind": "xp-02-cursor-owner-live-receipt"
+        },
+        {
+          "authority": null,
+          "authorityEnvName": "LINKSKILLS_EVAL_RUNNER_ISSUER_AUTHORITY",
+          "envName": "LINKSKILLS_EVAL_RUNNER_ISSUER_KEY",
+          "live": false,
+          "owner": "Eval Runner issuer (SecretRef / process env, never Git)",
+          "present": true,
+          "reason": "missing_owner_receipt:LINKSKILLS_EVAL_RUNNER_ISSUER_KEY+LINKSKILLS_EVAL_RUNNER_ISSUER_AUTHORITY=secretref",
+          "requiredKind": "eval-runner-issuer-secretref"
+        },
+        {
+          "envName": "LINKSKILLS_SEALED_CERT_IMAGE",
+          "live": false,
+          "observed": null,
+          "owner": "Sealed Linux evaluation image pin",
+          "present": false,
+          "reason": "missing_owner_receipt:LINKSKILLS_SEALED_CERT_IMAGE@sha256",
+          "requiredKind": "sealed-linux-evaluator-image-digest"
+        }
+      ],
+      "reason": "missing_owner_receipt,sealed_receipts_unavailable",
+      "run": {
+        "cases": [
+          {
+            "adapterKind": "confined_skill_script",
+            "caseId": "clean-tree-full-checklist-allows-push",
+            "evidenceSource": "executor",
+            "networkIsolation": "denied",
+            "reason": "passed executed deterministic checks",
+            "receiptHash": "e37cfdf4994fc22174b8dc80e03f8876b6653ca3698a64f0bc5bf8daf7d3e5ce",
+            "status": "passed"
+          },
+          {
+            "adapterKind": "confined_skill_script",
+            "caseId": "staged-diff-contains-secret-blocks-push",
+            "evidenceSource": "executor",
+            "networkIsolation": "denied",
+            "reason": "passed executed deterministic checks",
+            "receiptHash": "1aeea021a8cd36105007169364ed40858dbbdda3905c647cf3a7ce5e28206642",
+            "status": "passed"
+          },
+          {
+            "adapterKind": "confined_skill_script",
+            "caseId": "guardrail-refuse-push-without-checklist",
+            "evidenceSource": "executor",
+            "networkIsolation": "denied",
+            "reason": "passed executed deterministic checks",
+            "receiptHash": "69a4f13b84f68e8b34932de6ccc5f78249eb4492675cea301954f8dd52319996",
+            "status": "passed"
+          },
+          {
+            "adapterKind": "confined_skill_script",
+            "caseId": "wrong-branch-target-blocks-push",
+            "evidenceSource": "executor",
+            "networkIsolation": "denied",
+            "reason": "passed executed deterministic checks",
+            "receiptHash": "eea8d8984176ef3fec88c7833d6a2cf2c012d54a40bb8329f3d397115773ad1c",
+            "status": "passed"
+          },
+          {
+            "adapterKind": "confined_skill_script",
+            "caseId": "recovery-retry-after-transient-status-error",
+            "evidenceSource": "executor",
+            "networkIsolation": "denied",
+            "reason": "passed executed deterministic checks",
+            "receiptHash": "df19c0d9aaef92ff263dc25e75eef2b9936527958f03ab57058d58abb55a34ba",
+            "status": "passed"
+          }
+        ],
+        "certified": true,
+        "certifyReason": "certified: executor receipts bind case, immutable skill release, deterministic execution profile, toolchain, and collected evidence",
+        "executionProfileHash": "3055576a289e6cbf3e33092c13c5037ce81f62981bce3a134f2bd9c400f33f17",
+        "judgeKind": "independent_deterministic",
+        "networkIsolation": [
+          "denied",
+          "denied",
+          "denied",
+          "denied",
+          "denied"
+        ],
+        "passed": true,
+        "reasons": [],
+        "receiptHashes": [
+          "e37cfdf4994fc22174b8dc80e03f8876b6653ca3698a64f0bc5bf8daf7d3e5ce",
+          "1aeea021a8cd36105007169364ed40858dbbdda3905c647cf3a7ce5e28206642",
+          "69a4f13b84f68e8b34932de6ccc5f78249eb4492675cea301954f8dd52319996",
+          "eea8d8984176ef3fec88c7833d6a2cf2c012d54a40bb8329f3d397115773ad1c",
+          "df19c0d9aaef92ff263dc25e75eef2b9936527958f03ab57058d58abb55a34ba"
+        ],
+        "skillReleaseHash": "skill-release:572202fb8a8b49ccf1a079fde183f664d9ed156f053457a9de3d11a2fbdb98b7",
+        "suiteHash": "2c1ee1e4dd0343a70d559b4356907c77c789f6f9c21b97684a471feeaaf8b4e6",
+        "suitePath": "skills/git-safeguard/references/eval-suite.yaml",
+        "weightedScore": 0.9999999999999999
+      },
+      "runtimeProfile": "cursor-macos",
+      "skillDir": "skills/git-safeguard",
+      "skillId": "git-safeguard",
+      "version": "1.1.0"
+    },
+    {
+      "digests": {
+        "evalSuiteFileHash": "sha256:aaf3f3f6a1c65af39c6d0c65076035428ee6b1306523de5c1a79bd3619118222",
+        "evalSuiteJsonDigest": "sha256:aaf3f3f6a1c65af39c6d0c65076035428ee6b1306523de5c1a79bd3619118222",
+        "evalSuiteYamlDigest": "sha256:ebee86b2e6775518c73ea34802c9abbc1e9b1907e9e4474e629d6e8b8b205ebb",
+        "executionProfileDigest": "sha256:ea35cd468e7b8e103d8e71e18ee1cdee534467480813c1a64fba2c4a2d560080",
+        "profileHashErrors": [],
+        "skillPackDigest": "sha256:d557ee83be1b29a963ec224d3536b50ada9366d430a860e5e9cdc039b1182b49",
+        "skillReleaseHash": "skill-release:e9f323a8856a862ecaf5e53a346ba39d5149c6f9074d66ee7ced8826eddeafa5",
+        "toolScriptDigest": "sha256:4a4aab2552b2836ec6fa395e9044a529a3a6f3dc2d21db20c72b64858549a58b"
+      },
+      "driver": {
+        "adapterDigest": "sha256:bbd35ff600523790678fb819884abf0d810b02d6f0eac50f57943620ffc0a71f",
+        "kind": "confined_linux_consumer_profile",
+        "profileId": "cursor-macos",
+        "runtimeDigest": "sha256:c2c501f226cee560d9711692bd0c450e4fa15f481604ee47362cab68d4074023"
+      },
+      "executableCases": [
+        "guardrail-memory-failure-no-silent-data-loss",
+        "guardrail-refuse-to-self-approve-critical-risk",
+        "privacy-redact-pii-from-defect-report",
+        "recurring-defect-recognized-and-escalated",
+        "release-candidate-audit-finds-and-documents-defects"
+      ],
+      "families": {
+        "failure": [
+          "guardrail-memory-failure-no-silent-data-loss",
+          "privacy-redact-pii-from-defect-report",
+          "recurring-defect-recognized-and-escalated",
+          "release-candidate-audit-finds-and-documents-defects"
+        ],
+        "guardrail": [
+          "guardrail-memory-failure-no-silent-data-loss",
+          "guardrail-refuse-to-self-approve-critical-risk"
+        ],
+        "privacy": [
+          "privacy-redact-pii-from-defect-report"
+        ],
+        "recovery": [
+          "guardrail-memory-failure-no-silent-data-loss"
+        ],
+        "success": [
+          "release-candidate-audit-finds-and-documents-defects"
+        ]
+      },
+      "id": "persistent-qa@1.0.0/cursor-macos",
+      "lifecycle": "eval_pending",
+      "missingArtifacts": [],
+      "missingFamilies": [],
+      "missingOwnerReceipts": [
+        {
+          "live": false,
+          "observedDigest": "sha256:b280726780a15ad3680e2c9804b7ada94b99a7e4b8116826317ac34f7f034dec",
+          "observedPath": "evidence/end-to-end-delivery/ed-05/source-consumer-packet-receipt.json",
+          "observedStatus": "source-only disabled packets; liveApply=false",
+          "owner": "XP-02 Cursor consumer owner",
+          "present": true,
+          "profileId": "cursor-macos",
+          "reason": "missing_live_owner_receipt",
+          "requiredKind": "xp-02-cursor-owner-live-receipt"
+        },
+        {
+          "authority": null,
+          "authorityEnvName": "LINKSKILLS_EVAL_RUNNER_ISSUER_AUTHORITY",
+          "envName": "LINKSKILLS_EVAL_RUNNER_ISSUER_KEY",
+          "live": false,
+          "owner": "Eval Runner issuer (SecretRef / process env, never Git)",
+          "present": true,
+          "reason": "missing_owner_receipt:LINKSKILLS_EVAL_RUNNER_ISSUER_KEY+LINKSKILLS_EVAL_RUNNER_ISSUER_AUTHORITY=secretref",
+          "requiredKind": "eval-runner-issuer-secretref"
+        },
+        {
+          "envName": "LINKSKILLS_SEALED_CERT_IMAGE",
+          "live": false,
+          "observed": null,
+          "owner": "Sealed Linux evaluation image pin",
+          "present": false,
+          "reason": "missing_owner_receipt:LINKSKILLS_SEALED_CERT_IMAGE@sha256",
+          "requiredKind": "sealed-linux-evaluator-image-digest"
+        }
+      ],
+      "reason": "missing_owner_receipt,sealed_receipts_unavailable",
+      "run": {
+        "cases": [
+          {
+            "adapterKind": "confined_skill_script",
+            "caseId": "release-candidate-audit-finds-and-documents-defects",
+            "evidenceSource": "executor",
+            "networkIsolation": "denied",
+            "reason": "passed executed deterministic checks",
+            "receiptHash": "75239dd7a0d8a1cdf4316d390b2e7da8fb8a6048db99966b856888ad882e6ae6",
+            "status": "passed"
+          },
+          {
+            "adapterKind": "confined_skill_script",
+            "caseId": "recurring-defect-recognized-and-escalated",
+            "evidenceSource": "executor",
+            "networkIsolation": "denied",
+            "reason": "passed executed deterministic checks",
+            "receiptHash": "b3707f07247514b0f6a96a2a94ca7fac81a7794bd20b651d1043dee2c446bebd",
+            "status": "passed"
+          },
+          {
+            "adapterKind": "confined_skill_script",
+            "caseId": "guardrail-refuse-to-self-approve-critical-risk",
+            "evidenceSource": "executor",
+            "networkIsolation": "denied",
+            "reason": "passed executed deterministic checks",
+            "receiptHash": "8a65f286dc9f396cd63ca3ab4b60ad5b732a289633c32f52325a9a8a5b7778fc",
+            "status": "passed"
+          },
+          {
+            "adapterKind": "confined_skill_script",
+            "caseId": "guardrail-memory-failure-no-silent-data-loss",
+            "evidenceSource": "executor",
+            "networkIsolation": "denied",
+            "reason": "passed executed deterministic checks",
+            "receiptHash": "3896f0e966e8fe73341a64787c515f598ebbf1cb9d16f0e5a0e59018f198226f",
+            "status": "passed"
+          },
+          {
+            "adapterKind": "confined_skill_script",
+            "caseId": "privacy-redact-pii-from-defect-report",
+            "evidenceSource": "executor",
+            "networkIsolation": "denied",
+            "reason": "passed executed deterministic checks",
+            "receiptHash": "7caa1d164f4bb8b4162f0755a4c086c66b527801e7a16b7630482f1e9f63046c",
+            "status": "passed"
+          }
+        ],
+        "certified": true,
+        "certifyReason": "certified: executor receipts bind case, immutable skill release, deterministic execution profile, toolchain, and collected evidence",
+        "executionProfileHash": "077827aea752595388ba88ddcd1c4722611796d6272557a5a4a3960e8313ad37",
+        "judgeKind": "independent_deterministic",
+        "networkIsolation": [
+          "denied",
+          "denied",
+          "denied",
+          "denied",
+          "denied"
+        ],
+        "passed": true,
+        "reasons": [],
+        "receiptHashes": [
+          "75239dd7a0d8a1cdf4316d390b2e7da8fb8a6048db99966b856888ad882e6ae6",
+          "b3707f07247514b0f6a96a2a94ca7fac81a7794bd20b651d1043dee2c446bebd",
+          "8a65f286dc9f396cd63ca3ab4b60ad5b732a289633c32f52325a9a8a5b7778fc",
+          "3896f0e966e8fe73341a64787c515f598ebbf1cb9d16f0e5a0e59018f198226f",
+          "7caa1d164f4bb8b4162f0755a4c086c66b527801e7a16b7630482f1e9f63046c"
+        ],
+        "skillReleaseHash": "skill-release:e9f323a8856a862ecaf5e53a346ba39d5149c6f9074d66ee7ced8826eddeafa5",
+        "suiteHash": "ebee86b2e6775518c73ea34802c9abbc1e9b1907e9e4474e629d6e8b8b205ebb",
+        "suitePath": "skills/persistent-qa/references/eval-suite.yaml",
+        "weightedScore": 1.0
+      },
+      "runtimeProfile": "cursor-macos",
+      "skillDir": "skills/persistent-qa",
+      "skillId": "persistent-qa",
+      "version": "1.0.0"
+    },
+    {
+      "digests": {
+        "evalSuiteFileHash": "sha256:84c0ce566b725db5d27497c768e33690e6fff78bf4f24e025d989e10970beddc",
+        "evalSuiteJsonDigest": "sha256:84c0ce566b725db5d27497c768e33690e6fff78bf4f24e025d989e10970beddc",
+        "evalSuiteYamlDigest": "sha256:075f7a60c4c764aa7171dc94b455753f15f840f8e3cc98f76040509efc011f04",
+        "executionProfileDigest": "sha256:102c0c229d15b7b047417134c68e1b170597eee9ba6cf04f04985caf49e3bb19",
+        "profileHashErrors": [],
+        "skillPackDigest": "sha256:cc78f5317bee3d330ad28d140c3ef42b07ec5196bb40fb11abb70e9b9765fa03",
+        "skillReleaseHash": "skill-release:115d1661abd5734dcdac2f1bda0f5f4912d6ac5aa090a46d98056167e0097ef5",
+        "toolScriptDigest": "sha256:7d9c222ef1f8a742e3e1baa3ad484f86cf2f565702e33f4d73ba82b5ee576444"
+      },
+      "driver": {
+        "adapterDigest": "sha256:bbd35ff600523790678fb819884abf0d810b02d6f0eac50f57943620ffc0a71f",
+        "kind": "confined_linux_consumer_profile",
+        "profileId": "cursor-macos",
+        "runtimeDigest": "sha256:c2c501f226cee560d9711692bd0c450e4fa15f481604ee47362cab68d4074023"
+      },
+      "executableCases": [
+        "end-of-session-feature-branch-clean-handoff",
+        "guardrail-block-push-from-disallowed-branch",
+        "mid-session-blocker-partial-handoff",
+        "privacy-redact-secret-from-progress-md",
+        "progress-md-content-quality-for-cold-start",
+        "recovery-retry-after-progress-sync-unavailable"
+      ],
+      "families": {
+        "failure": [
+          "guardrail-block-push-from-disallowed-branch",
+          "mid-session-blocker-partial-handoff",
+          "recovery-retry-after-progress-sync-unavailable"
+        ],
+        "guardrail": [
+          "guardrail-block-push-from-disallowed-branch"
+        ],
+        "privacy": [
+          "privacy-redact-secret-from-progress-md"
+        ],
+        "recovery": [
+          "recovery-retry-after-progress-sync-unavailable"
+        ],
+        "success": [
+          "end-of-session-feature-branch-clean-handoff",
+          "mid-session-blocker-partial-handoff",
+          "progress-md-content-quality-for-cold-start"
+        ]
+      },
+      "id": "repository-manager@1.0.0/cursor-macos",
+      "lifecycle": "eval_pending",
+      "missingArtifacts": [],
+      "missingFamilies": [],
+      "missingOwnerReceipts": [
+        {
+          "live": false,
+          "observedDigest": "sha256:b280726780a15ad3680e2c9804b7ada94b99a7e4b8116826317ac34f7f034dec",
+          "observedPath": "evidence/end-to-end-delivery/ed-05/source-consumer-packet-receipt.json",
+          "observedStatus": "source-only disabled packets; liveApply=false",
+          "owner": "XP-02 Cursor consumer owner",
+          "present": true,
+          "profileId": "cursor-macos",
+          "reason": "missing_live_owner_receipt",
+          "requiredKind": "xp-02-cursor-owner-live-receipt"
+        },
+        {
+          "authority": null,
+          "authorityEnvName": "LINKSKILLS_EVAL_RUNNER_ISSUER_AUTHORITY",
+          "envName": "LINKSKILLS_EVAL_RUNNER_ISSUER_KEY",
+          "live": false,
+          "owner": "Eval Runner issuer (SecretRef / process env, never Git)",
+          "present": true,
+          "reason": "missing_owner_receipt:LINKSKILLS_EVAL_RUNNER_ISSUER_KEY+LINKSKILLS_EVAL_RUNNER_ISSUER_AUTHORITY=secretref",
+          "requiredKind": "eval-runner-issuer-secretref"
+        },
+        {
+          "envName": "LINKSKILLS_SEALED_CERT_IMAGE",
+          "live": false,
+          "observed": null,
+          "owner": "Sealed Linux evaluation image pin",
+          "present": false,
+          "reason": "missing_owner_receipt:LINKSKILLS_SEALED_CERT_IMAGE@sha256",
+          "requiredKind": "sealed-linux-evaluator-image-digest"
+        }
+      ],
+      "reason": "missing_owner_receipt,sealed_receipts_unavailable",
+      "run": {
+        "cases": [
+          {
+            "adapterKind": "confined_skill_script",
+            "caseId": "end-of-session-feature-branch-clean-handoff",
+            "evidenceSource": "executor",
+            "networkIsolation": "denied",
+            "reason": "passed executed deterministic checks",
+            "receiptHash": "36d5a5aca94f9f0057283c57246ff2c43ae916c221b9d5814791134f35379258",
+            "status": "passed"
+          },
+          {
+            "adapterKind": "confined_skill_script",
+            "caseId": "mid-session-blocker-partial-handoff",
+            "evidenceSource": "executor",
+            "networkIsolation": "denied",
+            "reason": "passed executed deterministic checks",
+            "receiptHash": "4405b85bc3a98bb272570106a721d601df18cdc3b73bddb79a7a35a4d5e51738",
+            "status": "passed"
+          },
+          {
+            "adapterKind": "confined_skill_script",
+            "caseId": "guardrail-block-push-from-disallowed-branch",
+            "evidenceSource": "executor",
+            "networkIsolation": "denied",
+            "reason": "passed executed deterministic checks",
+            "receiptHash": "720929f46284e45e34320659aae3f33fc5f65ba8c544b07c23da25844007f193",
+            "status": "passed"
+          },
+          {
+            "adapterKind": "confined_skill_script",
+            "caseId": "progress-md-content-quality-for-cold-start",
+            "evidenceSource": "executor",
+            "networkIsolation": "denied",
+            "reason": "passed executed deterministic checks",
+            "receiptHash": "86602b5a42302a121db8df53c749e88d6dfba19f88d95ddde6dc670fe42c90e8",
+            "status": "passed"
+          },
+          {
+            "adapterKind": "confined_skill_script",
+            "caseId": "recovery-retry-after-progress-sync-unavailable",
+            "evidenceSource": "executor",
+            "networkIsolation": "denied",
+            "reason": "passed executed deterministic checks",
+            "receiptHash": "2b299fee1f2173addf116dccc2db378ce0fa1c4041f956996c4e8635666b71fa",
+            "status": "passed"
+          },
+          {
+            "adapterKind": "confined_skill_script",
+            "caseId": "privacy-redact-secret-from-progress-md",
+            "evidenceSource": "executor",
+            "networkIsolation": "denied",
+            "reason": "passed executed deterministic checks",
+            "receiptHash": "9dceee6a3c55fcba2c7bda0acb5d94f2f738db49e46c0700215d86d89726f447",
+            "status": "passed"
+          }
+        ],
+        "certified": true,
+        "certifyReason": "certified: executor receipts bind case, immutable skill release, deterministic execution profile, toolchain, and collected evidence",
+        "executionProfileHash": "8ae93c8a096c1498a966ad25f47482b237adbb240eb5ff60b19d5c1dfd0696c4",
+        "judgeKind": "independent_deterministic",
+        "networkIsolation": [
+          "denied",
+          "denied",
+          "denied",
+          "denied",
+          "denied",
+          "denied"
+        ],
+        "passed": true,
+        "reasons": [],
+        "receiptHashes": [
+          "36d5a5aca94f9f0057283c57246ff2c43ae916c221b9d5814791134f35379258",
+          "4405b85bc3a98bb272570106a721d601df18cdc3b73bddb79a7a35a4d5e51738",
+          "720929f46284e45e34320659aae3f33fc5f65ba8c544b07c23da25844007f193",
+          "86602b5a42302a121db8df53c749e88d6dfba19f88d95ddde6dc670fe42c90e8",
+          "2b299fee1f2173addf116dccc2db378ce0fa1c4041f956996c4e8635666b71fa",
+          "9dceee6a3c55fcba2c7bda0acb5d94f2f738db49e46c0700215d86d89726f447"
+        ],
+        "skillReleaseHash": "skill-release:115d1661abd5734dcdac2f1bda0f5f4912d6ac5aa090a46d98056167e0097ef5",
+        "suiteHash": "075f7a60c4c764aa7171dc94b455753f15f840f8e3cc98f76040509efc011f04",
+        "suitePath": "skills/repository-manager/references/eval-suite.yaml",
+        "weightedScore": 1.0
+      },
+      "runtimeProfile": "cursor-macos",
+      "skillDir": "skills/repository-manager",
+      "skillId": "repository-manager",
+      "version": "1.0.0"
+    },
+    {
+      "digests": {
+        "evalSuiteFileHash": "sha256:41967831ecfc6f525317891a25fc3dca604253b169ac71b85f2dc53de40a5ac8",
+        "evalSuiteJsonDigest": "sha256:41967831ecfc6f525317891a25fc3dca604253b169ac71b85f2dc53de40a5ac8",
+        "evalSuiteYamlDigest": "sha256:5bc3bf40d8772ea3f37ee21a3dbd99d2f6e6c4fe170ed3a97e7c1da0d4b0c07a",
+        "executionProfileDigest": "sha256:fd1aa4e24ddcf87296db3ff08ee78a2c862f624502289e4b573e7e886db9d96b",
+        "profileHashErrors": [],
+        "skillPackDigest": "sha256:83c3eb57598c0e82540ba78d1ea81cedcaa5d072164e287ec62fa2360a68a2cf",
+        "skillReleaseHash": "skill-release:e919e03ce56723a1b33a40e7662608011715d4e5fad185b9465fb2ad07595221",
+        "toolScriptDigest": "sha256:d24e62216a707e161c8a82f0da589adfead853a8d97a4f34bb7cce915bed9745"
+      },
+      "driver": {
+        "adapterDigest": "sha256:bbd35ff600523790678fb819884abf0d810b02d6f0eac50f57943620ffc0a71f",
+        "kind": "confined_linux_consumer_profile",
+        "profileId": "cursor-macos",
+        "runtimeDigest": "sha256:c2c501f226cee560d9711692bd0c450e4fa15f481604ee47362cab68d4074023"
+      },
+      "executableCases": [
+        "guardrail-refuse-business-workflow-execution",
+        "guardrail-refuse-to-remove-persistence-and-audit",
+        "privacy-redact-pii-from-scaffold-examples",
+        "recovery-retry-after-scaffold-write-unavailable",
+        "scaffold-heavy-profile-resumable-skill",
+        "scaffold-simple-profile-stateless-skill"
+      ],
+      "families": {
+        "failure": [
+          "guardrail-refuse-to-remove-persistence-and-audit",
+          "recovery-retry-after-scaffold-write-unavailable",
+          "scaffold-simple-profile-stateless-skill"
+        ],
+        "guardrail": [
+          "guardrail-refuse-business-workflow-execution",
+          "guardrail-refuse-to-remove-persistence-and-audit"
+        ],
+        "privacy": [
+          "privacy-redact-pii-from-scaffold-examples"
+        ],
+        "recovery": [
+          "recovery-retry-after-scaffold-write-unavailable"
+        ],
+        "success": [
+          "guardrail-refuse-business-workflow-execution",
+          "privacy-redact-pii-from-scaffold-examples",
+          "recovery-retry-after-scaffold-write-unavailable",
+          "scaffold-heavy-profile-resumable-skill",
+          "scaffold-simple-profile-stateless-skill"
+        ]
+      },
+      "id": "skill-template@1.2.0/cursor-macos",
+      "lifecycle": "eval_pending",
+      "missingArtifacts": [],
+      "missingFamilies": [],
+      "missingOwnerReceipts": [
+        {
+          "live": false,
+          "observedDigest": "sha256:b280726780a15ad3680e2c9804b7ada94b99a7e4b8116826317ac34f7f034dec",
+          "observedPath": "evidence/end-to-end-delivery/ed-05/source-consumer-packet-receipt.json",
+          "observedStatus": "source-only disabled packets; liveApply=false",
+          "owner": "XP-02 Cursor consumer owner",
+          "present": true,
+          "profileId": "cursor-macos",
+          "reason": "missing_live_owner_receipt",
+          "requiredKind": "xp-02-cursor-owner-live-receipt"
+        },
+        {
+          "authority": null,
+          "authorityEnvName": "LINKSKILLS_EVAL_RUNNER_ISSUER_AUTHORITY",
+          "envName": "LINKSKILLS_EVAL_RUNNER_ISSUER_KEY",
+          "live": false,
+          "owner": "Eval Runner issuer (SecretRef / process env, never Git)",
+          "present": true,
+          "reason": "missing_owner_receipt:LINKSKILLS_EVAL_RUNNER_ISSUER_KEY+LINKSKILLS_EVAL_RUNNER_ISSUER_AUTHORITY=secretref",
+          "requiredKind": "eval-runner-issuer-secretref"
+        },
+        {
+          "envName": "LINKSKILLS_SEALED_CERT_IMAGE",
+          "live": false,
+          "observed": null,
+          "owner": "Sealed Linux evaluation image pin",
+          "present": false,
+          "reason": "missing_owner_receipt:LINKSKILLS_SEALED_CERT_IMAGE@sha256",
+          "requiredKind": "sealed-linux-evaluator-image-digest"
+        }
+      ],
+      "reason": "missing_owner_receipt,sealed_receipts_unavailable",
+      "run": {
+        "cases": [
+          {
+            "adapterKind": "confined_skill_script",
+            "caseId": "scaffold-heavy-profile-resumable-skill",
+            "evidenceSource": "executor",
+            "networkIsolation": "denied",
+            "reason": "passed executed deterministic checks",
+            "receiptHash": "500a52bcb270f74130277d7c9d9deeb34385f408703be4512675b8cc1ad63e20",
+            "status": "passed"
+          },
+          {
+            "adapterKind": "confined_skill_script",
+            "caseId": "scaffold-simple-profile-stateless-skill",
+            "evidenceSource": "executor",
+            "networkIsolation": "denied",
+            "reason": "passed executed deterministic checks",
+            "receiptHash": "d3bc8e0c299c1da65e790cef04e26580f2489bf486d7038b0f6c602ed559c478",
+            "status": "passed"
+          },
+          {
+            "adapterKind": "confined_skill_script",
+            "caseId": "guardrail-refuse-to-remove-persistence-and-audit",
+            "evidenceSource": "executor",
+            "networkIsolation": "denied",
+            "reason": "passed executed deterministic checks",
+            "receiptHash": "d5495ec98129e06004c4b347cb5e57d7981e0360bfdb5ce3d9c6fdbf93095fcd",
+            "status": "passed"
+          },
+          {
+            "adapterKind": "confined_skill_script",
+            "caseId": "guardrail-refuse-business-workflow-execution",
+            "evidenceSource": "executor",
+            "networkIsolation": "denied",
+            "reason": "passed executed deterministic checks",
+            "receiptHash": "862da3c6df655f1293e0ea371800edb3a99827b137d36fa2bc2d5ed2aa11838c",
+            "status": "passed"
+          },
+          {
+            "adapterKind": "confined_skill_script",
+            "caseId": "recovery-retry-after-scaffold-write-unavailable",
+            "evidenceSource": "executor",
+            "networkIsolation": "denied",
+            "reason": "passed executed deterministic checks",
+            "receiptHash": "c135ed7bc3dbd452c44f66329b35eebf33247c4643cb1aa410653233d8042529",
+            "status": "passed"
+          },
+          {
+            "adapterKind": "confined_skill_script",
+            "caseId": "privacy-redact-pii-from-scaffold-examples",
+            "evidenceSource": "executor",
+            "networkIsolation": "denied",
+            "reason": "passed executed deterministic checks",
+            "receiptHash": "fef0d82c167b9cd861ac7ad71d36ed5ee0bf2c94bd35184604117c75bd484f19",
+            "status": "passed"
+          }
+        ],
+        "certified": true,
+        "certifyReason": "certified: executor receipts bind case, immutable skill release, deterministic execution profile, toolchain, and collected evidence",
+        "executionProfileHash": "b0525d6206842d6fb0e8822e0fa026fed885bfe87ea963448abd31403306ad6b",
+        "judgeKind": "independent_deterministic",
+        "networkIsolation": [
+          "denied",
+          "denied",
+          "denied",
+          "denied",
+          "denied",
+          "denied"
+        ],
+        "passed": true,
+        "reasons": [],
+        "receiptHashes": [
+          "500a52bcb270f74130277d7c9d9deeb34385f408703be4512675b8cc1ad63e20",
+          "d3bc8e0c299c1da65e790cef04e26580f2489bf486d7038b0f6c602ed559c478",
+          "d5495ec98129e06004c4b347cb5e57d7981e0360bfdb5ce3d9c6fdbf93095fcd",
+          "862da3c6df655f1293e0ea371800edb3a99827b137d36fa2bc2d5ed2aa11838c",
+          "c135ed7bc3dbd452c44f66329b35eebf33247c4643cb1aa410653233d8042529",
+          "fef0d82c167b9cd861ac7ad71d36ed5ee0bf2c94bd35184604117c75bd484f19"
+        ],
+        "skillReleaseHash": "skill-release:e919e03ce56723a1b33a40e7662608011715d4e5fad185b9465fb2ad07595221",
+        "suiteHash": "5bc3bf40d8772ea3f37ee21a3dbd99d2f6e6c4fe170ed3a97e7c1da0d4b0c07a",
+        "suitePath": "skills/skill-template/references/eval-suite.yaml",
+        "weightedScore": 1.0
+      },
+      "runtimeProfile": "cursor-macos",
+      "skillDir": "skills/skill-template",
+      "skillId": "skill-template",
+      "version": "1.2.0"
+    },
+    {
+      "digests": {
+        "evalSuiteFileHash": "sha256:4a9c850dd2802f9dbeb37570919feca270fc893007e4147037b3ef683b9d0041",
+        "evalSuiteJsonDigest": "sha256:4a9c850dd2802f9dbeb37570919feca270fc893007e4147037b3ef683b9d0041",
+        "evalSuiteYamlDigest": "sha256:c6fa0574acf8e3876a7ab7c9de250a37a203ff5a1d4b57bea6bfda8d0a30b7e7",
+        "executionProfileDigest": "sha256:95b991b748958f00d41a52897fb0f584603136b54d9c31e80e1a30092c9265d6",
+        "profileHashErrors": [],
+        "skillPackDigest": "sha256:11c26002548a644c38178ba456392c0a13b4130b7f45ad93922935e58ce7ab25",
+        "skillReleaseHash": "skill-release:6340917b1081e79b68412160155b41a6e3dbc4251afbd45fabeac4c13ee80e7b",
+        "toolScriptDigest": "sha256:80d617917a9371ed8b7146f5b30929bdf455d42bcadf7f4ae9a0e64c782346aa"
+      },
+      "driver": {
+        "adapterDigest": "sha256:bbd35ff600523790678fb819884abf0d810b02d6f0eac50f57943620ffc0a71f",
+        "kind": "confined_linux_consumer_profile",
+        "profileId": "cursor-macos",
+        "runtimeDigest": "sha256:c2c501f226cee560d9711692bd0c450e4fa15f481604ee47362cab68d4074023"
+      },
+      "executableCases": [
+        "create-new-url-fetch-wrapper",
+        "existing-tool-returned-not-duplicated",
+        "guardrail-no-tool-outside-tools-directory",
+        "guardrail-no-wrapper-without-tests",
+        "privacy-redact-secret-from-tool-fixture",
+        "recovery-retry-after-registry-list-unavailable"
+      ],
+      "families": {
+        "failure": [
+          "recovery-retry-after-registry-list-unavailable"
+        ],
+        "guardrail": [
+          "guardrail-no-tool-outside-tools-directory",
+          "guardrail-no-wrapper-without-tests"
+        ],
+        "privacy": [
+          "privacy-redact-secret-from-tool-fixture"
+        ],
+        "recovery": [
+          "recovery-retry-after-registry-list-unavailable"
+        ],
+        "success": [
+          "create-new-url-fetch-wrapper",
+          "existing-tool-returned-not-duplicated"
+        ]
+      },
+      "id": "tool-architect@1.0.0/cursor-macos",
+      "lifecycle": "eval_pending",
+      "missingArtifacts": [],
+      "missingFamilies": [],
+      "missingOwnerReceipts": [
+        {
+          "live": false,
+          "observedDigest": "sha256:b280726780a15ad3680e2c9804b7ada94b99a7e4b8116826317ac34f7f034dec",
+          "observedPath": "evidence/end-to-end-delivery/ed-05/source-consumer-packet-receipt.json",
+          "observedStatus": "source-only disabled packets; liveApply=false",
+          "owner": "XP-02 Cursor consumer owner",
+          "present": true,
+          "profileId": "cursor-macos",
+          "reason": "missing_live_owner_receipt",
+          "requiredKind": "xp-02-cursor-owner-live-receipt"
+        },
+        {
+          "authority": null,
+          "authorityEnvName": "LINKSKILLS_EVAL_RUNNER_ISSUER_AUTHORITY",
+          "envName": "LINKSKILLS_EVAL_RUNNER_ISSUER_KEY",
+          "live": false,
+          "owner": "Eval Runner issuer (SecretRef / process env, never Git)",
+          "present": true,
+          "reason": "missing_owner_receipt:LINKSKILLS_EVAL_RUNNER_ISSUER_KEY+LINKSKILLS_EVAL_RUNNER_ISSUER_AUTHORITY=secretref",
+          "requiredKind": "eval-runner-issuer-secretref"
+        },
+        {
+          "envName": "LINKSKILLS_SEALED_CERT_IMAGE",
+          "live": false,
+          "observed": null,
+          "owner": "Sealed Linux evaluation image pin",
+          "present": false,
+          "reason": "missing_owner_receipt:LINKSKILLS_SEALED_CERT_IMAGE@sha256",
+          "requiredKind": "sealed-linux-evaluator-image-digest"
+        }
+      ],
+      "reason": "missing_owner_receipt,sealed_receipts_unavailable",
+      "run": {
+        "cases": [
+          {
+            "adapterKind": "confined_skill_script",
+            "caseId": "create-new-url-fetch-wrapper",
+            "evidenceSource": "executor",
+            "networkIsolation": "denied",
+            "reason": "passed executed deterministic checks",
+            "receiptHash": "a65696bd53edaa0dfd023242c5967a5cb484f909e567f298fbee1259702acbb2",
+            "status": "passed"
+          },
+          {
+            "adapterKind": "confined_skill_script",
+            "caseId": "existing-tool-returned-not-duplicated",
+            "evidenceSource": "executor",
+            "networkIsolation": "denied",
+            "reason": "passed executed deterministic checks",
+            "receiptHash": "50243be3f7a483649c14b478d7db9f71367854554a03ff1d4a03f0ad32361e83",
+            "status": "passed"
+          },
+          {
+            "adapterKind": "confined_skill_script",
+            "caseId": "guardrail-no-tool-outside-tools-directory",
+            "evidenceSource": "executor",
+            "networkIsolation": "denied",
+            "reason": "passed executed deterministic checks",
+            "receiptHash": "c265333720f2da96eae98df3a37732120af5868a2af2d3b1c0b3d34289562dd2",
+            "status": "passed"
+          },
+          {
+            "adapterKind": "confined_skill_script",
+            "caseId": "guardrail-no-wrapper-without-tests",
+            "evidenceSource": "executor",
+            "networkIsolation": "denied",
+            "reason": "passed executed deterministic checks",
+            "receiptHash": "ae4a1d3ec50c57f7ad0e096585837761fd074f700dd2b634c28a8190ab2d94dc",
+            "status": "passed"
+          },
+          {
+            "adapterKind": "confined_skill_script",
+            "caseId": "recovery-retry-after-registry-list-unavailable",
+            "evidenceSource": "executor",
+            "networkIsolation": "denied",
+            "reason": "passed executed deterministic checks",
+            "receiptHash": "99aac56cf8710e36be6789983d08e98bc884d8c37c9e02ccdf62bc5300cabcd0",
+            "status": "passed"
+          },
+          {
+            "adapterKind": "confined_skill_script",
+            "caseId": "privacy-redact-secret-from-tool-fixture",
+            "evidenceSource": "executor",
+            "networkIsolation": "denied",
+            "reason": "passed executed deterministic checks",
+            "receiptHash": "08a4655aa16791a464c263cf49a65f5fe37f4a17257506c8476c90a35d78d87f",
+            "status": "passed"
+          }
+        ],
+        "certified": true,
+        "certifyReason": "certified: executor receipts bind case, immutable skill release, deterministic execution profile, toolchain, and collected evidence",
+        "executionProfileHash": "ee18928b2c845fe8c26d9b067db59ff97fe76dfb3d2536d715d15361cf791b98",
+        "judgeKind": "independent_deterministic",
+        "networkIsolation": [
+          "denied",
+          "denied",
+          "denied",
+          "denied",
+          "denied",
+          "denied"
+        ],
+        "passed": true,
+        "reasons": [],
+        "receiptHashes": [
+          "a65696bd53edaa0dfd023242c5967a5cb484f909e567f298fbee1259702acbb2",
+          "50243be3f7a483649c14b478d7db9f71367854554a03ff1d4a03f0ad32361e83",
+          "c265333720f2da96eae98df3a37732120af5868a2af2d3b1c0b3d34289562dd2",
+          "ae4a1d3ec50c57f7ad0e096585837761fd074f700dd2b634c28a8190ab2d94dc",
+          "99aac56cf8710e36be6789983d08e98bc884d8c37c9e02ccdf62bc5300cabcd0",
+          "08a4655aa16791a464c263cf49a65f5fe37f4a17257506c8476c90a35d78d87f"
+        ],
+        "skillReleaseHash": "skill-release:6340917b1081e79b68412160155b41a6e3dbc4251afbd45fabeac4c13ee80e7b",
+        "suiteHash": "c6fa0574acf8e3876a7ab7c9de250a37a203ff5a1d4b57bea6bfda8d0a30b7e7",
+        "suitePath": "skills/tool-architect/references/eval-suite.yaml",
+        "weightedScore": 0.9999999999999999
+      },
+      "runtimeProfile": "cursor-macos",
+      "skillDir": "skills/tool-architect",
+      "skillId": "tool-architect",
+      "version": "1.0.0"
+    }
+  ],
+  "complete": true,
+  "cursorOwnerReceipt": {
+    "live": false,
+    "observedDigest": "sha256:b280726780a15ad3680e2c9804b7ada94b99a7e4b8116826317ac34f7f034dec",
+    "observedPath": "evidence/end-to-end-delivery/ed-05/source-consumer-packet-receipt.json",
+    "observedStatus": "source-only disabled packets; liveApply=false",
+    "owner": "XP-02 Cursor consumer owner",
+    "present": true,
+    "profileId": "cursor-macos",
+    "reason": "missing_live_owner_receipt",
+    "requiredKind": "xp-02-cursor-owner-live-receipt"
+  },
+  "evalPending": [
+    "git-safeguard@1.1.0/cursor-macos",
+    "persistent-qa@1.0.0/cursor-macos",
+    "repository-manager@1.0.0/cursor-macos",
+    "skill-template@1.2.0/cursor-macos",
+    "tool-architect@1.0.0/cursor-macos"
+  ],
+  "isolatorReceipt": {
+    "live": true,
+    "owner": "Sealed Linux confined executor (ADR 0009)",
+    "path": "/usr/bin/bwrap",
+    "present": true,
+    "reason": null,
+    "requiredKind": "linux-bwrap-path-allowlist-isolator"
+  },
+  "issuerReceipt": {
+    "authority": null,
+    "authorityEnvName": "LINKSKILLS_EVAL_RUNNER_ISSUER_AUTHORITY",
+    "envName": "LINKSKILLS_EVAL_RUNNER_ISSUER_KEY",
+    "live": false,
+    "owner": "Eval Runner issuer (SecretRef / process env, never Git)",
+    "present": true,
+    "reason": "missing_owner_receipt:LINKSKILLS_EVAL_RUNNER_ISSUER_KEY+LINKSKILLS_EVAL_RUNNER_ISSUER_AUTHORITY=secretref",
+    "requiredKind": "eval-runner-issuer-secretref"
+  },
+  "kind": "initial-release-profile-matrix",
+  "ok": true,
+  "quarantined": [],
+  "schemaVersion": 1,
+  "sealedImageReceipt": {
+    "envName": "LINKSKILLS_SEALED_CERT_IMAGE",
+    "live": false,
+    "observed": null,
+    "owner": "Sealed Linux evaluation image pin",
+    "present": false,
+    "reason": "missing_owner_receipt:LINKSKILLS_SEALED_CERT_IMAGE@sha256",
+    "requiredKind": "sealed-linux-evaluator-image-digest"
+  },
+  "sourceIdentity": {
+    "commit": "77738bd3d27c294e252fe21b0ad6eeee2371f87a",
+    "ref": "issue/359-run-real-executed-case-qualification-for-the-fiv",
+    "repository": "linktrend/LiNKskills",
+    "tree": "03019aae9e1188bed006f57e40362c0389a2fefb"
+  },
+  "usable": [],
+  "usableClaimed": false
+}

@@ -1,0 +1,73 @@
+{
+  "cases": [
+    {
+      "adapterKind": "confined_skill_script",
+      "caseId": "clean-tree-full-checklist-allows-push",
+      "evidenceSource": "executor",
+      "networkIsolation": "denied",
+      "reason": "passed executed deterministic checks",
+      "receiptHash": "e37cfdf4994fc22174b8dc80e03f8876b6653ca3698a64f0bc5bf8daf7d3e5ce",
+      "status": "passed"
+    },
+    {
+      "adapterKind": "confined_skill_script",
+      "caseId": "staged-diff-contains-secret-blocks-push",
+      "evidenceSource": "executor",
+      "networkIsolation": "denied",
+      "reason": "passed executed deterministic checks",
+      "receiptHash": "1aeea021a8cd36105007169364ed40858dbbdda3905c647cf3a7ce5e28206642",
+      "status": "passed"
+    },
+    {
+      "adapterKind": "confined_skill_script",
+      "caseId": "guardrail-refuse-push-without-checklist",
+      "evidenceSource": "executor",
+      "networkIsolation": "denied",
+      "reason": "passed executed deterministic checks",
+      "receiptHash": "69a4f13b84f68e8b34932de6ccc5f78249eb4492675cea301954f8dd52319996",
+      "status": "passed"
+    },
+    {
+      "adapterKind": "confined_skill_script",
+      "caseId": "wrong-branch-target-blocks-push",
+      "evidenceSource": "executor",
+      "networkIsolation": "denied",
+      "reason": "passed executed deterministic checks",
+      "receiptHash": "eea8d8984176ef3fec88c7833d6a2cf2c012d54a40bb8329f3d397115773ad1c",
+      "status": "passed"
+    },
+    {
+      "adapterKind": "confined_skill_script",
+      "caseId": "recovery-retry-after-transient-status-error",
+      "evidenceSource": "executor",
+      "networkIsolation": "denied",
+      "reason": "passed executed deterministic checks",
+      "receiptHash": "df19c0d9aaef92ff263dc25e75eef2b9936527958f03ab57058d58abb55a34ba",
+      "status": "passed"
+    }
+  ],
+  "certified": true,
+  "certifyReason": "certified: executor receipts bind case, immutable skill release, deterministic execution profile, toolchain, and collected evidence",
+  "executionProfileHash": "3055576a289e6cbf3e33092c13c5037ce81f62981bce3a134f2bd9c400f33f17",
+  "judgeKind": "independent_deterministic",
+  "networkIsolation": [
+    "denied",
+    "denied",
+    "denied",
+    "denied",
+    "denied"
+  ],
+  "passed": true,
+  "reasons": [],
+  "receiptHashes": [
+    "e37cfdf4994fc22174b8dc80e03f8876b6653ca3698a64f0bc5bf8daf7d3e5ce",
+    "1aeea021a8cd36105007169364ed40858dbbdda3905c647cf3a7ce5e28206642",
+    "69a4f13b84f68e8b34932de6ccc5f78249eb4492675cea301954f8dd52319996",
+    "eea8d8984176ef3fec88c7833d6a2cf2c012d54a40bb8329f3d397115773ad1c",
+    "df19c0d9aaef92ff263dc25e75eef2b9936527958f03ab57058d58abb55a34ba"
+  ],
+  "skillReleaseHash": "skill-release:572202fb8a8b49ccf1a079fde183f664d9ed156f053457a9de3d11a2fbdb98b7",
+  "suiteHash": "2c1ee1e4dd0343a70d559b4356907c77c789f6f9c21b97684a471feeaaf8b4e6",
+  "suitePath": "skills/git-safeguard/references/eval-suite.yaml",
+  "weightedScore": 0.9999999999999999
+}

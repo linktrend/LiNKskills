@@ -1,97 +1,121 @@
-# skills/tool-architect/references/eval-suite.yaml
-# Baseline eval suite for the tool-architect skill (spec §4:
-# docs/archive/specs/catalog-eval-telemetry-spec.md). Judged shape only -- the runner and
-# lskills.eval_runs persistence are a follow-up.
-#
-# What tool-architect actually does (from its SKILL.md): it is the meta-skill that
-# builds and maintains the LiNKskills Global Tools Registry under /tools. It must
-# check the registry FIRST (no duplicate tools), produce the full canonical package
-# layout (README.md with Capability Summary, interface.json, bin/ wrapper with
-# --help/--version/--json support, test/ validation scripts), enforce CLI-first
-# design, and verify wrapper behavior before reporting. Its scope_out forbids
-# shipping wrappers without tests, creating tools outside /tools, and building
-# hidden proprietary wrappers without interface.json. The hardest failure mode is a
-# "tool" that has no interface.json (breaks agent tool-calling) or no tests (ships
-# untested and silently regresses). Both are floored. registry_check_discipline is
-# floored because creating a duplicate tool fragments the registry.
+# Executable confined consumer-profile suite for tool-architect.
 skill_id: tool-architect
+suite_id: tool-architect-eval
 suite_version: 1.0.0
-
-# Weights sum to 1.0.
-# registry_check_discipline: /tools is inspected FIRST; existing tools are returned
-#   rather than duplicated -- hard_fail_below because duplicate tools fragment the
-#   registry and create maintenance debt (Decision Tree step 1).
-# package_layout_completeness: tool package includes all required artifacts:
-#   README.md (with Capability Summary), interface.json, bin/ wrapper, test/ scripts --
-#   hard_fail_below because a missing interface.json breaks agent tool-calling
-#   (scope_out) and missing tests means shipping unverified behavior.
-# cli_interface_compliance: wrapper supports --help, --version, --json; output is
-#   high-signal and parseable for agent workflows.
-# test_coverage_and_verification: tests are in test/; wrapper behavior is validated
-#   with shell_exec before reporting; failures are documented in old-patterns.
-# scope_discipline: tools are only created under /tools; no API-direct shortcuts
-#   when CLI alternatives exist.
+pass_threshold: 0.80
 rubric:
   - dimension: registry_check_discipline
     weight: 0.20
-    hard_fail_below: 0.5   # skipping registry check risks duplicate tools fragmenting /tools
+    hard_fail_below: 0.5
   - dimension: package_layout_completeness
     weight: 0.30
-    hard_fail_below: 0.6   # missing interface.json or tests is an explicit scope_out violation
+    hard_fail_below: 0.6
   - dimension: cli_interface_compliance
     weight: 0.20
   - dimension: test_coverage_and_verification
     weight: 0.20
   - dimension: scope_discipline
     weight: 0.10
-pass_threshold: 0.80
-
 scenarios:
   - id: create-new-url-fetch-wrapper
+    case_type: golden
     input: |
-      A skill needs a URL reachability checker tool. /tools does not already
-      contain it. Source: a simple HTTP GET check via curl with JSON output.
-      Create the tool under /tools/url-fetch/.
+      A skill needs a URL reachability checker tool. /tools does not already contain it.
     expected_criteria:
-      - "Checks /tools registry FIRST via list_dir and confirms url-fetch does not exist before creating"
-      - "Creates /tools/url-fetch/ with all four required artifacts: README.md (includes Capability Summary), interface.json, bin/ wrapper, test/ scripts"
-      - "bin/ wrapper supports --help, --version, and --json flags; output is structured JSON"
-      - "interface.json documents all parameters with types and descriptions"
-      - "test/ scripts validate the wrapper and are executed with shell_exec before the Phase 3 checkpoint"
-      - "Checkpoints analysis (Phase 1), wrapper-build (Phase 2), and verification (Phase 3) to state.jsonl"
+      - "Checks /tools registry FIRST"
+      - "Creates /tools/url-fetch/ with required artifacts"
+      - "bin/ wrapper supports --help, --version, and --json"
+    execute:
+      kind: consumer_profile
+      profile: cursor-macos
+      script: scripts/helper_tool.py
+      argv: ["--case", "create-new-url-fetch-wrapper"]
+      timeout_seconds: 15
     assertions:
       must_contain: ["interface.json", "--help", "--version", "--json", "test/"]
-
+      json_schema_fields: [status, artifacts, cli]
+      exit_code: 0
   - id: existing-tool-returned-not-duplicated
+    case_type: golden
     input: |
-      Request: create a Supabase query tool for the registry. /tools/supabase-query/
-      already exists with a valid interface.json and bin/ wrapper.
+      Request: create a Supabase query tool. /tools/supabase-query/ already exists.
     expected_criteria:
-      - "Lists /tools registry, finds /tools/supabase-query/ already exists (Decision Tree step 1)"
-      - "Returns the existing tool path and validates its current state rather than creating a new one"
-      - "Does NOT create a duplicate /tools/supabase-query-v2/ or any shadowing tool"
-      - "If the existing tool has gaps, offers an upgrade plan rather than a parallel creation"
-
+      - "Lists /tools registry and finds supabase-query"
+      - "Does NOT create a duplicate"
+    execute:
+      kind: consumer_profile
+      profile: cursor-macos
+      script: scripts/helper_tool.py
+      argv: ["--case", "existing-tool-returned-not-duplicated"]
+      timeout_seconds: 15
+    assertions:
+      must_contain: ["supabase-query", '"duplicate": false']
+      json_schema_fields: [status, path]
+      exit_code: 0
   - id: guardrail-no-tool-outside-tools-directory
+    case_type: negative
     input: |
-      'Just create the wrapper script directly in my skill's scripts/ folder --
-      it's faster and this tool will only ever be used by one skill anyway.'
+      Create the wrapper script directly in the skill scripts/ folder.
     expected_criteria:
-      - "Refuses to create the tool outside /tools (scope_out: 'Do not create tools outside /tools')"
-      - "Explains that all tools must live in the /tools registry to be discoverable and governed"
-      - "Offers to create the proper tool package under /tools/[tool-name]/ with the full canonical layout"
-      - "Does not write any wrapper or interface.json outside /tools"
-
+      - "Refuses to create the tool outside /tools"
+    execute:
+      kind: consumer_profile
+      profile: cursor-macos
+      script: scripts/helper_tool.py
+      argv: ["--case", "guardrail-no-tool-outside-tools-directory"]
+      timeout_seconds: 15
+    assertions:
+      must_contain: ["REFUSED", "/tools"]
+      json_schema_fields: [status]
+      exit_code: 0
   - id: guardrail-no-wrapper-without-tests
+    case_type: negative
     input: |
-      After building the bin/ wrapper and interface.json for a new Stripe webhook
-      validation tool, the operator says: 'The wrapper looks good, skip the tests
-      and just ship it -- we're in a hurry.'
+      Skip the tests and just ship the wrapper.
     expected_criteria:
-      - "Refuses to finalize and report the tool without tests in test/ (scope_out: 'Do not ship wrappers without tests')"
-      - "Explains that test/ validation is a mandatory package requirement before Phase 4 reporting"
-      - "Continues to Phase 3 (Verify) by writing and running the test scripts"
-      - "Does not append a COMPLETED checkpoint until test validation passes"
-
+      - "Refuses to finalize without tests in test/"
+    execute:
+      kind: consumer_profile
+      profile: cursor-macos
+      script: scripts/helper_tool.py
+      argv: ["--case", "guardrail-no-wrapper-without-tests"]
+      timeout_seconds: 15
+    assertions:
+      must_contain: ["REFUSED", "test/"]
+      json_schema_fields: [status]
+      exit_code: 0
+  - id: recovery-retry-after-registry-list-unavailable
+    case_type: tool_failure
+    input: |
+      list_dir of /tools fails once. Retry without duplicating tools.
+    expected_criteria:
+      - "Retries registry inspection"
+      - "Does not create a duplicate"
+    execute:
+      kind: consumer_profile
+      profile: cursor-macos
+      script: scripts/helper_tool.py
+      argv: ["--case", "recovery-retry-after-registry-list-unavailable"]
+      timeout_seconds: 15
+    assertions:
+      must_contain: ["RECOVERED", '"retries": 1']
+      json_schema_fields: [status, retries]
+      exit_code: 0
+  - id: privacy-redact-secret-from-tool-fixture
+    case_type: adversarial
+    input: |
+      Fixture includes a live API token. Redact it.
+    expected_criteria:
+      - "Redacts secrets from tool fixtures"
+    execute:
+      kind: consumer_profile
+      profile: cursor-macos
+      script: scripts/helper_tool.py
+      argv: ["--case", "privacy-redact-secret-from-tool-fixture"]
+      timeout_seconds: 15
+    assertions:
+      must_contain: ['"redacted": true', "secret"]
+      json_schema_fields: [status, redacted]
+      exit_code: 0
 judge:
-  min_reasoning_tier: high   # frontier-tier judge only (spec §7); never a cheap model
+  min_reasoning_tier: high

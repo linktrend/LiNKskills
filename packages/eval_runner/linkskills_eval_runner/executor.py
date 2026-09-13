@@ -489,6 +489,29 @@ def execute_case(
                 workspace=workspace,
                 skill_dir=Path(skill_dir),
             )
+        elif kind == "consumer_profile":
+            from .consumer_profiles import bind_consumer_profile_execute
+
+            script_spec, merged_toolchain = bind_consumer_profile_execute(
+                execute,
+                repo_root=root,
+                toolchain=toolchain_map,
+            )
+            toolchain_map = merged_toolchain
+            if skill_dir is None:
+                raise ValueError(
+                    "execute.consumer_profile requires the immutable skill directory"
+                )
+            exit_code, stdout, stderr, call, artifacts, network_isolation = _execute_skill_script(
+                script_spec,
+                case=case,
+                workspace=workspace,
+                skill_dir=Path(skill_dir),
+            )
+            driver_meta = merged_toolchain.get("consumer_profile_driver") or {}
+            environment["consumer_profile"] = execute.get("profile")
+            environment["adapter_digest"] = driver_meta.get("adapterDigest")
+            environment["runtime_digest"] = driver_meta.get("runtimeDigest")
         else:
             finished = _utc_now()
             return ExecutionCapture(
