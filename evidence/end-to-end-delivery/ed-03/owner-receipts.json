@@ -6,21 +6,31 @@
       "observedDigest": "sha256:b280726780a15ad3680e2c9804b7ada94b99a7e4b8116826317ac34f7f034dec",
       "observedPath": "evidence/end-to-end-delivery/ed-05/source-consumer-packet-receipt.json",
       "observedStatus": "source-only disabled packets; liveApply=false",
-      "owner": "XP-02 Cursor consumer owner",
+      "owner": "LiNKskills project-scoped Cursor owner",
       "present": true,
       "profileId": "cursor-macos",
       "reason": "missing_live_owner_receipt",
-      "requiredKind": "xp-02-cursor-owner-live-receipt"
+      "requiredKind": "ed-09-cursor-project-scoped-owner-live-receipt",
+      "scope": "project-scoped",
+      "xp02Required": false
     },
     {
       "authority": null,
       "authorityEnvName": "LINKSKILLS_EVAL_RUNNER_ISSUER_AUTHORITY",
       "envName": "LINKSKILLS_EVAL_RUNNER_ISSUER_KEY",
+      "issuerIdEnvName": "LINKSKILLS_EVAL_RUNNER_ISSUER_ID",
+      "issuerIdentityBound": false,
+      "keyMaterialMeetsMinBits": null,
       "live": false,
-      "owner": "Eval Runner issuer (SecretRef / process env, never Git)",
-      "present": true,
-      "reason": "missing_owner_receipt:LINKSKILLS_EVAL_RUNNER_ISSUER_KEY+LINKSKILLS_EVAL_RUNNER_ISSUER_AUTHORITY=secretref",
-      "requiredKind": "eval-runner-issuer-secretref"
+      "owner": "Eval Runner issuer (immutable SecretRef / version, never Git)",
+      "present": false,
+      "processKeyPresent": false,
+      "reason": "missing_owner_receipt:LINKSKILLS_EVAL_RUNNER_ISSUER_AUTHORITY=secretref,missing_owner_receipt:LINKSKILLS_EVAL_RUNNER_ISSUER_SECRETREF,missing_owner_receipt:LINKSKILLS_EVAL_RUNNER_ISSUER_SECRETREF_VERSION=immutable,missing_owner_receipt:LINKSKILLS_EVAL_RUNNER_ISSUER_ID",
+      "requiredKind": "eval-runner-issuer-secretref",
+      "secretRefEnvName": "LINKSKILLS_EVAL_RUNNER_ISSUER_SECRETREF",
+      "secretRefPresent": false,
+      "secretRefVersionEnvName": "LINKSKILLS_EVAL_RUNNER_ISSUER_SECRETREF_VERSION",
+      "secretRefVersionImmutable": false
     },
     {
       "envName": "LINKSKILLS_SEALED_CERT_IMAGE",

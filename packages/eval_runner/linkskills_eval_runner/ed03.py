@@ -527,6 +527,20 @@ def qualify_initial_release_profiles(
     }
 
 
+def missing_owner_receipt_evidence(root: Path) -> dict[str, Any]:
+    """Named missing live receipts. Never claims usable or fabricates live proof."""
+    return {
+        "kind": "ed-03-missing-owner-receipts",
+        "receipts": [
+            inspect_owner_receipt(root, CURSOR_MACOS),
+            inspect_issuer_receipt(),
+            inspect_sealed_image_receipt(),
+        ],
+        "schemaVersion": SCHEMA_VERSION,
+        "usableClaimed": False,
+    }
+
+
 def stamp_initial_execution_profiles(root: Path) -> dict[str, str]:
     """Refresh draft execution-profile hashes after suite/script edits."""
     written: dict[str, str] = {}
