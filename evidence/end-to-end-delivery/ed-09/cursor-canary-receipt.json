@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "kind": "linkskills-ed-09-actor-canary-receipt",
+  "packet": "ED-09",
+  "actor": "cursor",
+  "orderIndex": 1,
+  "owner": "LiNKskills project-scoped canary; XP-02 only if shared/global Cursor mutation is required",
+  "status": "NOT_EXECUTED",
+  "executed": false,
+  "canaryRun": false,
+  "providerContact": false,
+  "functionalPass": false,
+  "requiredBeforeAcceptance": true,
+  "admission": {
+    "requiresEd08ProductionPass": true,
+    "requiresExactIdentityPins": true,
+    "priorActorFunctionalPass": null
+  },
+  "safeRepresentativeTask": {
+    "description": "discover → retrieve → verify → local execute → bounded use-report on one exact initial release",
+    "releaseId": null,
+    "result": null
+  },
+  "flow": {
+    "discover": {"required": true, "result": "NOT_EXECUTED", "evidence": null},
+    "retrieve": {"required": true, "result": "NOT_EXECUTED", "evidence": null},
+    "verify": {"required": true, "result": "NOT_EXECUTED", "evidence": null},
+    "localExecute": {"required": true, "result": "NOT_EXECUTED", "evidence": null, "providerMustNotExecute": true},
+    "report": {"required": true, "result": "NOT_EXECUTED", "evidence": null, "schema": "use-report-v0.2"}
+  },
+  "negativeCase": {
+    "required": true,
+    "selectedCaseId": null,
+    "result": "NOT_EXECUTED"
+  },
+  "identities": {
+    "sourceCommit": null,
+    "sourceTree": null,
+    "providerImageDigest": null,
+    "pinReleaseId": null,
+    "pinBundleDigest": null,
+    "pinPackageDigest": null
+  },
+  "telemetry": {
+    "boundedFieldsOnly": true,
+    "secretsForbidden": true,
+    "observed": null
+  },
+  "unrelatedConsumersRemainDisabled": null,
+  "rollbackReady": null,
+  "notes": "Blank template. Do not mark PASS without live owner evidence at compatible pins."
+}

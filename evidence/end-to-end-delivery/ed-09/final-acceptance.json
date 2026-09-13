@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "kind": "linkskills-ed-09-final-acceptance",
+  "packet": "ED-09",
+  "issue": "#353",
+  "checkpointKind": "FRAMEWORK_ONLY",
+  "status": "FRAMEWORK_ONLY_NOT_ACCEPTED",
+  "executed": false,
+  "canaryRun": false,
+  "providerContact": false,
+  "consumerConfigurationAltered": false,
+  "fabricatedResults": false,
+  "functionalAccepted": false,
+  "FUNCTIONAL_ACCEPTED": false,
+  "INTERNAL_LAUNCH_COMPLETE": "HOLD",
+  "acceptanceClaimed": false,
+  "blockingReason": "Framework and blank templates only. Real ED-08 production PASS, exact identity pins, negative-path results, 48-hour Cursor observation over two Asia/Taipei dates, OSS continuity evidence, and owner receipts are all UNPROVEN. No actor canary was run.",
+  "gates": {
+    "ed08ProductionPass": "UNPROVEN",
+    "exactIdentityPins": "UNPROVEN",
+    "negativePathResults": "UNPROVEN",
+    "cursor48hTwoTaipeiDates": "UNPROVEN",
+    "ossContinuity": "UNPROVEN",
+    "ownerReceipts": "UNPROVEN"
+  },
+  "orderedActors": {
+    "cursor": "NOT_EXECUTED",
+    "codex": "NOT_EXECUTED",
+    "lisa": "NOT_EXECUTED"
+  },
+  "acceptanceMayBeClaimedOnlyWhen": "every required gate is PASS at compatible identities and no observational field is fabricated",
+  "handoff": "Later ED-09 execution fills the templates in this directory. ED-10 must not treat this checkpoint as canary proof."
+}
