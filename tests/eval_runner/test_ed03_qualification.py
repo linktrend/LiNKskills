@@ -137,7 +137,7 @@ def test_process_issuer_key_without_secretref_authority_is_not_live(monkeypatch)
 
 
 def test_raw_process_key_plus_authority_label_is_not_live(monkeypatch) -> None:
-    monkeypatch.setenv("LINKSKILLS_EVAL_RUNNER_ISSUER_KEY", "a" * 32)
+    monkeypatch.setenv("LINKSKILLS_EVAL_RUNNER_ISSUER_KEY", "Z" * 32)
     monkeypatch.setenv("LINKSKILLS_EVAL_RUNNER_ISSUER_AUTHORITY", "secretref")
     monkeypatch.delenv("LINKSKILLS_EVAL_RUNNER_ISSUER_SECRETREF", raising=False)
     monkeypatch.delenv("LINKSKILLS_EVAL_RUNNER_ISSUER_SECRETREF_VERSION", raising=False)
@@ -149,7 +149,7 @@ def test_raw_process_key_plus_authority_label_is_not_live(monkeypatch) -> None:
     assert row["keyMaterialMeetsMinBits"] is True
     assert row["live"] is False
     assert "LINKSKILLS_EVAL_RUNNER_ISSUER_SECRETREF" in row["reason"]
-    assert "a" * 32 not in json.dumps(row)
+    assert "Z" * 32 not in json.dumps(row)
 
 
 def test_weak_process_key_blocks_live_even_with_secretref_binding(monkeypatch) -> None:
