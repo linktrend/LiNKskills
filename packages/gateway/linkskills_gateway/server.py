@@ -35,6 +35,7 @@ import sys
 import threading
 import uuid
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
 from typing import Any, Callable, Dict, Mapping, Optional, Tuple, Type
 from urllib.parse import urlparse
 
@@ -55,7 +56,7 @@ from .ops import (
     shutdown_timeout_s,
     store_probe_configured,
 )
-from .service import OPERATIONS, ServiceError, SkillsGatewayService
+from .service import OPERATIONS, REPO_ROOT_ENV, ServiceError, SkillsGatewayService
 from .v2_http import (
     capability_record,
     encode_v2_result,
@@ -595,6 +596,14 @@ def main() -> None:
         type=int,
         default=int(os.environ.get("LINKSKILLS_GATEWAY_PORT", "8787")),
     )
+    parser.add_argument(
+        "--repo-root",
+        default=os.environ.get(REPO_ROOT_ENV) or None,
+        help=(
+            "Directory that contains catalog/ (and optionally skills/). "
+            f"Defaults to ${REPO_ROOT_ENV} when set."
+        ),
+    )
     args = parser.parse_args()
     try:
         verifier = resolve_claims_verifier()
@@ -603,7 +612,9 @@ def main() -> None:
         raise SystemExit(2) from exc
     metrics = GatewayMetrics()
     drain = drain_from_environ()
-    service = SkillsGatewayService()
+    service = SkillsGatewayService(
+        repo_root=Path(args.repo_root) if args.repo_root else None,
+    )
     httpd = create_server(
         args.host,
         args.port,
