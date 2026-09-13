@@ -1,0 +1,129 @@
+{
+  "schemaVersion": 1,
+  "kind": "linkskills-ed-09-evidence-framework",
+  "packet": "ED-09",
+  "issue": "#353",
+  "checkpointKind": "FRAMEWORK_ONLY",
+  "status": "FRAMEWORK_ONLY_NOT_ACCEPTED",
+  "executed": false,
+  "canaryRun": false,
+  "providerContact": false,
+  "consumerConfigurationAltered": false,
+  "fabricatedResults": false,
+  "functionalAccepted": false,
+  "internalLaunchComplete": "HOLD",
+  "acceptanceClaimed": false,
+  "nestedWorkers": false,
+  "implementerPullRequest": false,
+  "timezoneForObservation": "Asia/Taipei",
+  "order": ["cursor", "codex", "lisa"],
+  "orderRules": {
+    "cursorFirst": true,
+    "codexRequiresCursorFunctionalPass": true,
+    "lisaRequiresCodexFunctionalPass": true,
+    "functionalAcceptedRequiresAllThreeFunctionalPasses": true,
+    "internalLaunchCompleteRequiresFunctionalAcceptedAndCursor48h": true
+  },
+  "gatesRequiredBeforeAnyAcceptanceStatus": [
+    "ed08ProductionPass",
+    "exactIdentityPins",
+    "negativePathResults",
+    "cursor48hTwoTaipeiDates",
+    "ossContinuity",
+    "ownerReceipts"
+  ],
+  "gates": {
+    "ed08ProductionPass": {
+      "required": true,
+      "blocking": true,
+      "status": "UNPROVEN",
+      "template": "evidence/end-to-end-delivery/ed-09/ed-08-prerequisite.json",
+      "requiredLiveReceipt": "evidence/end-to-end-delivery/ed-08/deployment-receipt.json",
+      "planningPassInsufficient": true,
+      "requiredLiveFacts": [
+        "production /ready=200",
+        "exact deployed image and source commit/tree",
+        "rollback rehearsal"
+      ]
+    },
+    "exactIdentityPins": {
+      "required": true,
+      "blocking": true,
+      "status": "UNPROVEN",
+      "template": "evidence/end-to-end-delivery/ed-09/identity-pins.json",
+      "sourcePinsRef": "configs/consumer-activation/ed-05-initial-five-pins.json",
+      "mustMatch": [
+        "repository",
+        "ref",
+        "commit",
+        "tree",
+        "providerImageDigest",
+        "releaseDigests",
+        "consumerPinDigests",
+        "platformAudience",
+        "platformScope"
+      ]
+    },
+    "negativePathResults": {
+      "required": true,
+      "blocking": true,
+      "status": "UNPROVEN",
+      "template": "evidence/end-to-end-delivery/ed-09/negative-path-matrix.json",
+      "requiredCases": [
+        "wrongIdentityOrScope",
+        "revokedRelease",
+        "tamperedOrStaleCache",
+        "providerOutage",
+        "storeOutage",
+        "consumerDisable"
+      ],
+      "unsafeFallbackForbidden": true
+    },
+    "cursor48hTwoTaipeiDates": {
+      "required": true,
+      "blocking": true,
+      "status": "UNPROVEN",
+      "template": "evidence/end-to-end-delivery/ed-09/cursor-48h-observation.json",
+      "minimumHours": 48,
+      "consecutive": true,
+      "minimumDistinctAsiaTaipeiCalendarDates": 2,
+      "requiredSamples": ["start", "midpoint", "end"],
+      "continuousPaidActivityRequired": false,
+      "blocksInternalLaunchComplete": true
+    },
+    "ossContinuity": {
+      "required": true,
+      "blocking": true,
+      "status": "UNPROVEN",
+      "template": "evidence/end-to-end-delivery/ed-09/oss-continuity.json",
+      "inventory": "docs/end-to-end-delivery/OSS-INVENTORY.md",
+      "newStackForbiddenWithoutFounderApproval": true
+    },
+    "ownerReceipts": {
+      "required": true,
+      "blocking": true,
+      "status": "UNPROVEN",
+      "template": "evidence/end-to-end-delivery/ed-09/owner-receipts.json",
+      "requiredOwners": [
+        "cursor-project-scoped",
+        "xp-03-codex",
+        "xp-04-lisa-openclaw"
+      ],
+      "xp02OnlyIfSharedCursorMutation": true
+    }
+  },
+  "failClosed": {
+    "missingGate": "HOLD",
+    "incompatibleIdentity": "HOLD",
+    "fabricatedOrPlaceholderPass": "invalid",
+    "anyAcceptanceWithoutAllGates": false
+  },
+  "laterFillFiles": [
+    "evidence/end-to-end-delivery/ed-09/cursor-canary-receipt.json",
+    "evidence/end-to-end-delivery/ed-09/codex-canary-receipt.json",
+    "evidence/end-to-end-delivery/ed-09/lisa-canary-receipt.json",
+    "evidence/end-to-end-delivery/ed-09/reconciliation.json",
+    "evidence/end-to-end-delivery/ed-09/founder-walkthrough.json",
+    "evidence/end-to-end-delivery/ed-09/final-acceptance.json"
+  ]
+}
