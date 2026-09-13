@@ -28,6 +28,7 @@ from linkskills_eval_runner.consumer_profiles import (
     inspect_isolator_receipt,
     inspect_owner_receipt,
     inspect_sealed_image_receipt,
+    inspect_xp02_cursor_receipt,
     resolve_driver,
 )
 from linkskills_eval_runner.executor import compute_skill_release_hash
@@ -524,6 +525,7 @@ def qualify_initial_release_profiles(
         "sealedImageReceipt": inspect_sealed_image_receipt(),
         "isolatorReceipt": inspect_isolator_receipt(),
         "cursorOwnerReceipt": inspect_owner_receipt(root, CURSOR_MACOS),
+        "cursorXp02Receipt": inspect_xp02_cursor_receipt(root),
     }
 
 
