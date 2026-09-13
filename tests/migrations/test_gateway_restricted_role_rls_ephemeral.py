@@ -535,11 +535,11 @@ class GatewayRestrictedRoleRlsEphemeralTests(unittest.TestCase):
                 )
                 conn.commit()
         self.assertEqual(
-            self._admin_count("idempotency", key="ltfx.test-gateway-restricted-role-rls-ephemeral-py-key-538-cd57ecd863.v1"), 0
+            self._admin_count("idempotency", key="k-inherit-empty"), 0
         )
         self.assertEqual(
             self._admin_count(
-                "idempotency", actor_id="actor-a", org_id="org-a", key="ltfx.test-gateway-restricted-role-rls-ephemeral-py-key-542-1fda6ebf24.v1"
+                "idempotency", actor_id="actor-a", org_id="org-a", key="k-inherit-ok"
             ),
             1,
         )
