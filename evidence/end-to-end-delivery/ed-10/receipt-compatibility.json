@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "kind": "linkskills-ed-10-receipt-compatibility",
+  "packet": "ED-10",
+  "status": "PENDING",
+  "compatible": false,
+  "reason": "Required real ED-08, ED-09, and accepted IMP-00 receipts are absent on the admitted identity. Compatibility cannot be inferred.",
+  "algorithm": {
+    "conjunctive": true,
+    "rules": [
+      "All receipts must exist at the named paths and parse as JSON.",
+      "Each receipt must be real observed evidence for its packet, not a planning template, narrative copy, or fabricated runtime claim.",
+      "repository must be linktrend/LiNKskills on every Skills-owned receipt.",
+      "source commit and tree must match across ED-08, ED-09, and IMP-00, or the successor must name the prior identity as a verified ancestor.",
+      "ED-09 must bind the same provider image digest and release/channel pointer as ED-08.",
+      "IMP-00 must be accepted (not OBSERVATION_PENDING-only for the strict loop) and must bind the ED-08 image/release plus the accepted ED-09 canary identity.",
+      "IMP-00 must prove historical correction commit 6a2101d132b42010162595a2bab2c72fee6282da is an ancestor of the accepted candidate and that ResolveClaimsVerifierPaciIssuerPolicyTests were replayed.",
+      "OSS continuity, provenance, reproducibility, and rollback proofs must name the same image/release/source identity.",
+      "Any missing field, identity disagreement, or latest/main/development substitution fails closed as incompatible."
+    ]
+  },
+  "identityFields": [
+    "repository",
+    "ref",
+    "commit",
+    "tree",
+    "imageDigest",
+    "releasePointer",
+    "consumerPinDigest"
+  ],
+  "checkedPaths": {
+    "ed08DeploymentReceipt": {
+      "path": "evidence/end-to-end-delivery/ed-08/deployment-receipt.json",
+      "exists": false,
+      "real": false,
+      "compatible": false,
+      "status": "PENDING"
+    },
+    "ed09FinalAcceptance": {
+      "path": "evidence/end-to-end-delivery/ed-09/final-acceptance.json",
+      "exists": false,
+      "real": false,
+      "compatible": false,
+      "status": "PENDING"
+    },
+    "imp00ImprovementLoopReceipt": {
+      "path": "evidence/end-to-end-delivery/imp-00/improvement-loop-receipt.json",
+      "exists": false,
+      "real": false,
+      "accepted": false,
+      "compatible": false,
+      "status": "PENDING"
+    }
+  },
+  "observedIdentities": {
+    "ed08": null,
+    "ed09": null,
+    "imp00": null
+  },
+  "mismatches": [],
+  "note": "mismatches is empty because no receipts were supplied to compare; emptiness is not a compatibility pass."
+}

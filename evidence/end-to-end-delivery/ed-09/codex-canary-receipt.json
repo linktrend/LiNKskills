@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "kind": "linkskills-ed-09-actor-canary-receipt",
+  "packet": "ED-09",
+  "actor": "codex",
+  "orderIndex": 2,
+  "owner": "XP-03 / Codex configuration owner executes; LiNKskills records this receipt only",
+  "status": "NOT_EXECUTED",
+  "executed": false,
+  "canaryRun": false,
+  "providerContact": false,
+  "functionalPass": false,
+  "requiredBeforeAcceptance": true,
+  "admission": {
+    "requiresEd08ProductionPass": true,
+    "requiresExactIdentityPins": true,
+    "priorActor": "cursor",
+    "priorActorFunctionalPassRequired": true,
+    "priorActorFunctionalPassObserved": null
+  },
+  "safeRepresentativeTask": {
+    "description": "discover → retrieve → verify → local execute → bounded use-report on one exact initial release",
+    "releaseId": null,
+    "result": null
+  },
+  "flow": {
+    "discover": {"required": true, "result": "NOT_EXECUTED", "evidence": null},
+    "retrieve": {"required": true, "result": "NOT_EXECUTED", "evidence": null},
+    "verify": {"required": true, "result": "NOT_EXECUTED", "evidence": null},
+    "localExecute": {"required": true, "result": "NOT_EXECUTED", "evidence": null, "providerMustNotExecute": true},
+    "report": {"required": true, "result": "NOT_EXECUTED", "evidence": null, "schema": "use-report-v0.2"}
+  },
+  "negativeCase": {
+    "required": true,
+    "selectedCaseId": null,
+    "result": "NOT_EXECUTED"
+  },
+  "identities": {
+    "sourceCommit": null,
+    "sourceTree": null,
+    "providerImageDigest": null,
+    "pinReleaseId": null,
+    "pinBundleDigest": null,
+    "pinPackageDigest": null,
+    "mustMatchCursorIdentities": true
+  },
+  "telemetry": {
+    "boundedFieldsOnly": true,
+    "secretsForbidden": true,
+    "observed": null
+  },
+  "unrelatedConsumersRemainDisabled": null,
+  "rollbackReady": null,
+  "notes": "Codex may start only after Cursor functional flow PASS. Blank template; not an acceptance claim."
+}
