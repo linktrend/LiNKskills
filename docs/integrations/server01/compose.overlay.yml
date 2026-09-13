@@ -17,8 +17,8 @@ services:
     mem_limit: "1g"
     pids_limit: 256
     restart: unless-stopped
+    # Image ENTRYPOINT is linkskills-gateway; command supplies argv only.
     command:
-      - linkskills-gateway
       - --host
       - "0.0.0.0"
       - --port
