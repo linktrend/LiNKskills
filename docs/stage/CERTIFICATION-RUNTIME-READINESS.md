@@ -30,6 +30,22 @@
 Local ephemeral Postgres success **≠** stage migration success.
 Local `unproven` executor runs **≠** sealed certification.
 Local privileged Docker sealed canary **≠** stage/prod shared readiness.
+Local privileged Docker script **≠** hosted sealed evaluator (ED-03).
+
+## Hosted sealed evaluator (contract only)
+
+A future hosted executor for ED-03 qualification is admitted only by
+`validate_hosted_sealed_evaluator_contract` (`linkskills.hosted-sealed-evaluator/0.1.0`).
+It must use a digest-pinned Linux image, process-injected issuer material
+(name-only env), proven `network_isolation=denied`, exact source commit + git
+tree + `source_tree_sha256`, and bounded artifact retention. Fail closed otherwise.
+
+`scripts/run-sealed-linux-certify.sh` stays **local-workstation privileged Docker**.
+It must **never** be transferred to Server01/VPS and must **never** be used with
+production keys. See `docs/stage/HOSTED-SEALED-EVALUATOR-CONTRACT.md`.
+
+This packet does **not** deploy a hosted executor, grant Docker privilege on
+Server01, introduce credentials, or fabricate `usable` certification.
 
 ## Reproducible sealed canary command
 
@@ -54,5 +70,6 @@ python3 scripts/build-catalog-index.py --check
 - ADR 0009 / `evidence/phase10/CLASSIFICATION-HONESTY.md`
 - `packages/tool_runtime/linkskills_tool_runtime/confined_exec.py`
 - `scripts/certify-catalog.py` / `scripts/run-sealed-linux-certify.sh`
+- `docs/stage/HOSTED-SEALED-EVALUATOR-CONTRACT.md`
 - `docs/migrations/PREFLIGHT-STAGE-READINESS.md`
 - `docs/stage/MIGRATION-RUNTIME-STAGE-GATE.md`

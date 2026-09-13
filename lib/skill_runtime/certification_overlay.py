@@ -241,7 +241,12 @@ def verify_sealed_live_evidence(
         return False
 
     # Lazy import to keep overlay importable without sealed_cert_mode cycles.
-    from lib.skill_runtime.sealed_cert_mode import promoting_issuer_keys
+    from lib.skill_runtime.sealed_cert_mode import (
+        EXECUTOR_KIND_HOSTED,
+        LOCAL_PRIVILEGED_SCRIPT_REL,
+        payload_is_hosted_contract_document,
+        promoting_issuer_keys,
+    )
 
     if not promoting_issuer_keys():
         return False
@@ -275,6 +280,20 @@ def verify_sealed_live_evidence(
                 return False
             if not isinstance(payload, dict):
                 return False
+            # A hosted evaluator *contract* is admission-only. It is never
+            # sealed live receipt evidence and must not promote ``usable``.
+            if payload_is_hosted_contract_document(payload):
+                return False
+            host = payload.get("host")
+            if isinstance(host, Mapping):
+                host_kind = str(host.get("executor_kind") or "").strip().lower()
+                if host_kind == EXECUTOR_KIND_HOSTED:
+                    if host.get("privileged_docker") is True:
+                        return False
+                    if str(host.get("local_script") or "").strip() == (
+                        LOCAL_PRIVILEGED_SCRIPT_REL
+                    ):
+                        return False
 
             decision = evaluate_certification_evidence(payload)
             if not decision.allowed:

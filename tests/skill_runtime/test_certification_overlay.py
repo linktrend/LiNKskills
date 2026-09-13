@@ -513,6 +513,103 @@ class CertificationOverlayTests(unittest.TestCase):
             self.assertEqual(index["skills"][0]["certification_state"], "draft")
 
 
+class HostedContractCannotPromoteOverlayTests(unittest.TestCase):
+    def test_hosted_contract_document_cannot_promote_usable(self) -> None:
+        from lib.skill_runtime.sealed_cert_mode import HOSTED_CONTRACT_SCHEMA_ID
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            sealed = root / "evidence" / "phase10" / "sealed"
+            sealed.mkdir(parents=True)
+            contract = {
+                "schema_id": HOSTED_CONTRACT_SCHEMA_ID,
+                "executor_kind": "hosted",
+                "image": (
+                    "python@sha256:0123456789abcdef0123456789abcdef"
+                    "0123456789abcdef0123456789abcdef"
+                ),
+                "authorizes_usable": False,
+            }
+            path = sealed / "hosted-contract-only.json"
+            path.write_text(json.dumps(contract), encoding="utf-8")
+            prior = os.environ.get("LINKSKILLS_EVAL_RUNNER_ISSUER_KEY")
+            try:
+                os.environ["LINKSKILLS_EVAL_RUNNER_ISSUER_KEY"] = PROMOTING_TEST_ISSUER_KEY
+                overlay = overlay_from_ledger(
+                    {
+                        "skills": {
+                            "demo-skill": {
+                                "classification": "usable",
+                                "sealed_live_receipt_evidence": [
+                                    "evidence/phase10/sealed/hosted-contract-only.json"
+                                ],
+                            }
+                        }
+                    },
+                    repo_root=root,
+                )
+            finally:
+                if prior is None:
+                    os.environ.pop("LINKSKILLS_EVAL_RUNNER_ISSUER_KEY", None)
+                else:
+                    os.environ["LINKSKILLS_EVAL_RUNNER_ISSUER_KEY"] = prior
+            self.assertEqual(overlay["demo-skill"], "draft")
+
+    def test_hosted_privileged_docker_host_metadata_cannot_promote(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            sealed = root / "evidence" / "phase10" / "sealed"
+            sealed.mkdir(parents=True)
+            receipt = _seal_receipt()
+            evidence = {
+                "skill_id": "demo-skill",
+                "certified": True,
+                "skill_release_hash": "skill-release:abc123",
+                "profile_hash": "profilehash-bbb",
+                "suite_hash": "suitehash-aaa",
+                "host": {
+                    "executor_kind": "hosted",
+                    "privileged_docker": True,
+                    "local_script": "scripts/run-sealed-linux-certify.sh",
+                },
+                "cases": [
+                    {
+                        "case_id": "c1",
+                        "status": "passed",
+                        "execution_receipt": receipt,
+                    }
+                ],
+            }
+            path = sealed / "demo.json"
+            path.write_text(json.dumps(evidence), encoding="utf-8")
+            prior = os.environ.get("LINKSKILLS_EVAL_RUNNER_ISSUER_KEY")
+            try:
+                os.environ["LINKSKILLS_EVAL_RUNNER_ISSUER_KEY"] = PROMOTING_TEST_ISSUER_KEY
+                overlay = overlay_from_ledger(
+                    {
+                        "skills": {
+                            "demo-skill": {
+                                "classification": "usable",
+                                "sealed_live_receipt_evidence": [
+                                    "evidence/phase10/sealed/demo.json"
+                                ],
+                                "skill_release_hash": "skill-release:abc123",
+                                "profile_hash": "profilehash-bbb",
+                                "suite_hash": "suitehash-aaa",
+                                "tool_hash": "toolhash-ccc",
+                            }
+                        }
+                    },
+                    repo_root=root,
+                )
+            finally:
+                if prior is None:
+                    os.environ.pop("LINKSKILLS_EVAL_RUNNER_ISSUER_KEY", None)
+                else:
+                    os.environ["LINKSKILLS_EVAL_RUNNER_ISSUER_KEY"] = prior
+            self.assertEqual(overlay["demo-skill"], "draft")
+
+
 class CatalogCanarySkillTests(unittest.TestCase):
     def test_canary_echo_exists_with_executable_suite(self) -> None:
         skill = REPO_ROOT / "skills" / "canary-echo"
