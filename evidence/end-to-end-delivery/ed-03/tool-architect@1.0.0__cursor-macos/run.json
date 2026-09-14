@@ -1,0 +1,84 @@
+{
+  "cases": [
+    {
+      "adapterKind": "confined_skill_script",
+      "caseId": "create-new-url-fetch-wrapper",
+      "evidenceSource": "executor",
+      "networkIsolation": "denied",
+      "reason": "passed executed deterministic checks",
+      "receiptHash": "a65696bd53edaa0dfd023242c5967a5cb484f909e567f298fbee1259702acbb2",
+      "status": "passed"
+    },
+    {
+      "adapterKind": "confined_skill_script",
+      "caseId": "existing-tool-returned-not-duplicated",
+      "evidenceSource": "executor",
+      "networkIsolation": "denied",
+      "reason": "passed executed deterministic checks",
+      "receiptHash": "50243be3f7a483649c14b478d7db9f71367854554a03ff1d4a03f0ad32361e83",
+      "status": "passed"
+    },
+    {
+      "adapterKind": "confined_skill_script",
+      "caseId": "guardrail-no-tool-outside-tools-directory",
+      "evidenceSource": "executor",
+      "networkIsolation": "denied",
+      "reason": "passed executed deterministic checks",
+      "receiptHash": "c265333720f2da96eae98df3a37732120af5868a2af2d3b1c0b3d34289562dd2",
+      "status": "passed"
+    },
+    {
+      "adapterKind": "confined_skill_script",
+      "caseId": "guardrail-no-wrapper-without-tests",
+      "evidenceSource": "executor",
+      "networkIsolation": "denied",
+      "reason": "passed executed deterministic checks",
+      "receiptHash": "ae4a1d3ec50c57f7ad0e096585837761fd074f700dd2b634c28a8190ab2d94dc",
+      "status": "passed"
+    },
+    {
+      "adapterKind": "confined_skill_script",
+      "caseId": "recovery-retry-after-registry-list-unavailable",
+      "evidenceSource": "executor",
+      "networkIsolation": "denied",
+      "reason": "passed executed deterministic checks",
+      "receiptHash": "99aac56cf8710e36be6789983d08e98bc884d8c37c9e02ccdf62bc5300cabcd0",
+      "status": "passed"
+    },
+    {
+      "adapterKind": "confined_skill_script",
+      "caseId": "privacy-redact-secret-from-tool-fixture",
+      "evidenceSource": "executor",
+      "networkIsolation": "denied",
+      "reason": "passed executed deterministic checks",
+      "receiptHash": "08a4655aa16791a464c263cf49a65f5fe37f4a17257506c8476c90a35d78d87f",
+      "status": "passed"
+    }
+  ],
+  "certified": true,
+  "certifyReason": "certified: executor receipts bind case, immutable skill release, deterministic execution profile, toolchain, and collected evidence",
+  "executionProfileHash": "ee18928b2c845fe8c26d9b067db59ff97fe76dfb3d2536d715d15361cf791b98",
+  "judgeKind": "independent_deterministic",
+  "networkIsolation": [
+    "denied",
+    "denied",
+    "denied",
+    "denied",
+    "denied",
+    "denied"
+  ],
+  "passed": true,
+  "reasons": [],
+  "receiptHashes": [
+    "a65696bd53edaa0dfd023242c5967a5cb484f909e567f298fbee1259702acbb2",
+    "50243be3f7a483649c14b478d7db9f71367854554a03ff1d4a03f0ad32361e83",
+    "c265333720f2da96eae98df3a37732120af5868a2af2d3b1c0b3d34289562dd2",
+    "ae4a1d3ec50c57f7ad0e096585837761fd074f700dd2b634c28a8190ab2d94dc",
+    "99aac56cf8710e36be6789983d08e98bc884d8c37c9e02ccdf62bc5300cabcd0",
+    "08a4655aa16791a464c263cf49a65f5fe37f4a17257506c8476c90a35d78d87f"
+  ],
+  "skillReleaseHash": "skill-release:6340917b1081e79b68412160155b41a6e3dbc4251afbd45fabeac4c13ee80e7b",
+  "suiteHash": "c6fa0574acf8e3876a7ab7c9de250a37a203ff5a1d4b57bea6bfda8d0a30b7e7",
+  "suitePath": "skills/tool-architect/references/eval-suite.yaml",
+  "weightedScore": 0.9999999999999999
+}

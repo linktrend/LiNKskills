@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import os
 import sys
 import tempfile
 import unittest
@@ -182,6 +183,30 @@ class CertifyCatalogSealedFailureExitTests(unittest.TestCase):
             self.assertEqual(report["usable_count"], 0)
             self.assertEqual(report["results"][0]["reason_code"], "isolation_unavailable")
             self.assertEqual(report["results"][0]["classification"], "draft")
+
+
+class HostedKindRefusesLocalCertifyTests(unittest.TestCase):
+    def test_hosted_executor_kind_exits_before_report(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            _write_executable_skill(root)
+            with mock.patch.dict(
+                os.environ,
+                {"LINKSKILLS_SEALED_EXECUTOR_KIND": "hosted"},
+                clear=False,
+            ):
+                code = CERTIFY.main(
+                    [
+                        "--repo-root",
+                        str(root),
+                        "--skill",
+                        "canary-echo",
+                        "--no-write-ledger",
+                        "--no-rebuild-catalog",
+                    ]
+                )
+            self.assertEqual(code, 2)
+            self.assertFalse((root / CERTIFY.REPORT_REL).is_file())
 
 
 if __name__ == "__main__":
