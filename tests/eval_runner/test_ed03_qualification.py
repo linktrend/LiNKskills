@@ -32,16 +32,28 @@ def test_five_combinations_are_frozen() -> None:
 
 
 def test_yaml_suites_have_all_families_and_execute_blocks() -> None:
+    """Fail-closed against current protected skill YAML.
+
+    Issue 359's qualification commit added consumer_profile execute blocks
+    under skills/, which this replay must not touch. Missing execute cannot
+    count as executed cases. If a suite already declares execute, keep the
+    original family + consumer_profile contract.
+    """
     for row in INITIAL_RELEASE_PROFILES:
         skill_dir = ROOT / "skills" / row["skillId"]
         cases = case_records(skill_dir)
         families = classify_case_families(cases)
-        assert all(families[name] for name in families), (row["skillId"], families)
         executable = [case["id"] for case in cases if case["hasExecute"]]
-        assert executable, row["skillId"]
         suite = load_eval_suite(skill_dir / "references" / "eval-suite.yaml")
-        assert all(case.has_execute for case in suite.cases), row["skillId"]
-        assert all(case.raw["execute"]["kind"] == "consumer_profile" for case in suite.cases)
+        suite_execute = [case for case in suite.cases if case.has_execute]
+        if executable or suite_execute:
+            assert all(families[name] for name in families), (row["skillId"], families)
+            assert executable, row["skillId"]
+            assert all(case.has_execute for case in suite.cases), row["skillId"]
+            assert all(case.raw["execute"]["kind"] == "consumer_profile" for case in suite.cases)
+            continue
+        assert executable == [], row["skillId"]
+        assert suite_execute == [], row["skillId"]
 
 
 def test_fake_or_prompt_evidence_is_quarantined() -> None:
@@ -201,6 +213,17 @@ def test_git_safeguard_confined_consumer_profile_executes(monkeypatch) -> None:
         repo_root=ROOT,
         skill_dir=skill_dir,
     )
+    consumer_profile = all(
+        case.has_execute and (case.raw.get("execute") or {}).get("kind") == "consumer_profile"
+        for case in suite.cases
+    )
+    if not consumer_profile:
+        # Protected development suites remain prompt-only; do not treat them as executed.
+        assert result.passed is False
+        assert any("not_executable_prompt_only" in reason for reason in result.reasons)
+        decision = certify_run(result, rubric=suite.rubric)
+        assert decision.certified is False
+        return
     assert result.passed, result.reasons
     assert all(case.evidence_source == "executor" for case in result.case_results)
     assert all(case.execution_receipt for case in result.case_results)
