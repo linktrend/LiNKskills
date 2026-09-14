@@ -97,6 +97,17 @@
           "Suggests opening a pull request from the feature branch instead"
         ]
       }
+    },
+    {
+      "case_id": "recovery-retry-after-transient-status-error",
+      "case_type": "tool_failure",
+      "input": "git status fails once with a transient lock error. Recover and finish the checklist.",
+      "expected": {
+        "criteria": [
+          "Records the transient status error and retries once",
+          "Completes git status and git diff --cached after recovery"
+        ]
+      }
     }
   ],
   "hard_failure_conditions": [
