@@ -10,9 +10,10 @@ from __future__ import annotations
 import json
 import os
 import re
+import subprocess
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any, Callable, Mapping
 
 MODE_ISSUE_PR = "issue-pr"
 MODE_PHASE_INTEGRATION = "phase-integration"
@@ -37,6 +38,26 @@ ISSUE_PR_RISK_CLASSES = frozenset(
 )
 
 NAMED_GATES = frozenset({"fast-gate", "staging-gate", "release-gate"})
+PHASE_IDENTITY_PATHS = frozenset({PHASE_DELIVERY_REL.as_posix()})
+REUSED_PHASE_IDENTITY_KEYS = (
+    "headSha",
+    "gitTree",
+    "baseSha",
+    "immutableBaseSha",
+    "acceptedIssues",
+    "acceptedCommits",
+    "dependencyOrder",
+    "candidateRevision",
+    "sealed",
+    "mergeSha",
+    "sealRevision",
+    "sealedSha",
+    "candidateIdentity",
+    "candidateId",
+    "namedGateEvidence",
+    "fast",
+    "full",
+)
 
 _SHA40_RE = re.compile(r"^[0-9a-f]{40}$")
 _ZERO_SHA_RE = re.compile(r"^0{40}$")
@@ -105,6 +126,132 @@ def is_phase_branch(name: str, prefix: str = DEFAULT_PHASE_PREFIX) -> bool:
 
 def is_issue_branch(name: str) -> bool:
     return bool(name) and name.startswith("issue/")
+
+
+def git_first_parent_sha(repo: str | Path, sha: str) -> str:
+    """Return the only parent of a commit, or empty when the object is not a single-parent tip."""
+
+    subject = normalize_sha(sha)
+    if not is_valid_sha(subject):
+        return ""
+    result = subprocess.run(
+        ["git", "rev-list", "--parents", "-n", "1", subject],
+        cwd=Path(repo),
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    if result.returncode:
+        return ""
+    parts = (result.stdout or "").strip().split()
+    if len(parts) != 2:
+        return ""
+    parent = normalize_sha(parts[1])
+    return parent if is_valid_sha(parent) else ""
+
+
+def git_commit_paths(repo: str | Path, sha: str) -> set[str]:
+    """Return the path set changed by one commit."""
+
+    subject = normalize_sha(sha)
+    if not is_valid_sha(subject):
+        return set()
+    result = subprocess.run(
+        ["git", "diff-tree", "--no-commit-id", "-r", "--name-only", subject],
+        cwd=Path(repo),
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    if result.returncode:
+        return set()
+    return {line.strip() for line in (result.stdout or "").splitlines() if line.strip()}
+
+
+def is_phase_identity_commit(repo: str | Path, sha: str) -> bool:
+    """True when ``sha`` is a single-parent commit that only binds the Phase record path."""
+
+    if not git_first_parent_sha(repo, sha):
+        return False
+    paths = git_commit_paths(repo, sha)
+    return bool(paths) and paths <= PHASE_IDENTITY_PATHS
+
+
+def git_is_ancestor(repo: str | Path, ancestor_sha: str, descendant_sha: str) -> bool:
+    """Prove exact Git ancestry without relying on branch names or PR metadata."""
+
+    if not is_valid_sha(ancestor_sha) or not is_valid_sha(descendant_sha):
+        return False
+    result = subprocess.run(
+        ["git", "merge-base", "--is-ancestor", normalize_sha(ancestor_sha), normalize_sha(descendant_sha)],
+        cwd=Path(repo),
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    return result.returncode == 0
+
+
+def bind_phase_identity_fields(
+    record: Mapping[str, Any],
+    *,
+    assembled_sha: str,
+    tip_sha: str,
+) -> tuple[bool, str]:
+    """Bind sealed/merge/gate fields to the assembled package vs identity-binding tip."""
+
+    recorded = normalize_sha(str(record.get("headSha") or ""))
+    assembled = normalize_sha(assembled_sha)
+    tip = normalize_sha(tip_sha)
+    if not is_valid_sha(recorded) or not is_valid_sha(assembled) or not is_valid_sha(tip):
+        return False, "phase_delivery_head_sha_invalid"
+    if recorded != assembled:
+        return False, "phase_delivery_head_sha_mismatch"
+    if recorded == tip:
+        return False, "phase_delivery_self_referential_head"
+    tree = normalize_sha(str(record.get("gitTree") or ""))
+    if tree and tree == tip:
+        return False, "phase_delivery_self_referential_tree"
+    gate = record.get("namedGateEvidence") if isinstance(record.get("namedGateEvidence"), Mapping) else None
+    if gate is not None:
+        gate_sha = normalize_sha(str(gate.get("sha") or ""))
+        if is_valid_sha(gate_sha) and gate_sha != assembled:
+            return False, "phase_delivery_gate_sha_not_assembled"
+        if gate_sha == tip:
+            return False, "phase_delivery_gate_sha_self_referential"
+    merge = record.get("mergeSha")
+    if merge not in (None, "", False):
+        merged = normalize_sha(str(merge))
+        if not is_valid_sha(merged):
+            return False, "phase_delivery_merge_sha_invalid"
+        if merged in {assembled, tip}:
+            return False, "phase_delivery_merge_sha_identity_collision"
+    if bool(record.get("sealed")):
+        sealed_sha = normalize_sha(str(record.get("sealedSha") or ""))
+        if sealed_sha != tip:
+            return False, "phase_delivery_sealed_sha_not_tip"
+        identity = record.get("candidateIdentity") if isinstance(record.get("candidateIdentity"), Mapping) else None
+        if identity is not None:
+            source = normalize_sha(str(identity.get("sourceSha") or ""))
+            if source != tip:
+                return False, "phase_delivery_candidate_source_not_tip"
+    else:
+        sealed_sha = record.get("sealedSha")
+        if sealed_sha not in (None, "", False) and is_valid_sha(str(sealed_sha)):
+            return False, "phase_delivery_unsealed_sealed_sha"
+        identity = record.get("candidateIdentity")
+        if identity not in (None, "", False, {}):
+            return False, "phase_delivery_unsealed_candidate_identity"
+    return True, "identity_bound"
+
+
+def committed_record_matches_expected(committed: Mapping[str, Any], expected: Mapping[str, Any]) -> tuple[bool, str]:
+    """Reject forged extra-field overlays that would reuse sealed/merge/gate identity."""
+
+    for key in REUSED_PHASE_IDENTITY_KEYS:
+        if expected.get(key) != committed.get(key):
+            return False, f"phase_record_identity_mismatch:{key}"
+    return True, "ok"
 
 
 def validate_risk_class(value: str | None) -> str | None:
@@ -434,7 +581,14 @@ def phase_ready_for_pr(accepted_issues: list[dict[str, Any]]) -> tuple[bool, str
     return True, "all_required_issues_accepted_and_included"
 
 
-def phase_draft_record_ready(record: dict[str, Any] | None, *, branch: str, head_sha: str, phase_branch_prefix: str = DEFAULT_PHASE_PREFIX) -> tuple[bool, str]:
+def phase_draft_record_ready(
+    record: dict[str, Any] | None,
+    *,
+    branch: str,
+    head_sha: str,
+    phase_branch_prefix: str = DEFAULT_PHASE_PREFIX,
+    repo: str | Path | None = None,
+) -> tuple[bool, str]:
     """Validate an early visibility draft without admitting candidate gates."""
 
     if not isinstance(record, dict):
@@ -443,9 +597,20 @@ def phase_draft_record_ready(record: dict[str, Any] | None, *, branch: str, head
         return False, "phase_delivery_schema_or_mode_invalid"
     if not is_phase_branch(branch, phase_branch_prefix):
         return False, "phase_delivery_branch_prefix_mismatch"
-    if normalize_sha(str(record.get("phaseBranch") or "")) != branch:
+    if str(record.get("phaseBranch") or "") != branch:
         return False, "phase_delivery_branch_mismatch"
-    if normalize_sha(str(record.get("headSha") or "")) != normalize_sha(head_sha):
+    recorded = normalize_sha(str(record.get("headSha") or ""))
+    tip = normalize_sha(head_sha)
+    if not is_valid_sha(recorded) or not is_valid_sha(tip):
+        return False, "phase_delivery_head_sha_invalid"
+    if repo is not None and is_phase_identity_commit(repo, tip):
+        parent = git_first_parent_sha(repo, tip)
+        if recorded != parent:
+            return False, "phase_delivery_assembled_parent_mismatch"
+        bound, detail = bind_phase_identity_fields(record, assembled_sha=recorded, tip_sha=tip)
+        if not bound:
+            return False, detail
+    elif recorded != tip:
         return False, "phase_delivery_head_sha_mismatch"
     accepted = record.get("acceptedIssues")
     if not isinstance(accepted, list) or not accepted:
@@ -462,11 +627,13 @@ def validate_phase_delivery_record(
     branch: str,
     head_sha: str,
     phase_branch_prefix: str = DEFAULT_PHASE_PREFIX,
+    repo: str | Path | None = None,
 ) -> tuple[bool, str]:
     """Fail-closed validation of a Phase delivery record before opening a Phase PR.
 
-    Requires the tip SHA, configured Phase branch prefix, and every accepted Issue
-    SHA inclusion row to be present and consistent.
+    ``head_sha`` is the identity-binding Phase tip. The committed record names
+    the assembled package as ``headSha`` (the tip's only parent). Without a repo,
+    only legacy records that still name the tip itself are admitted.
     """
     if not isinstance(record, dict):
         return False, "phase_delivery_record_missing"
@@ -485,14 +652,37 @@ def validate_phase_delivery_record(
     tip = normalize_sha(head_sha)
     if not is_valid_sha(record_head) or not is_valid_sha(tip):
         return False, "phase_delivery_head_sha_invalid"
-    if record_head != tip:
-        return False, f"phase_delivery_head_sha_mismatch:{record_head[:8]}!={tip[:8]}"
     base = normalize_sha(str(record.get("baseSha") or ""))
     if not is_valid_sha(base):
         return False, "phase_delivery_base_sha_invalid"
     accepted = record.get("acceptedIssues")
     if not isinstance(accepted, list):
         return False, "phase_delivery_accepted_issues_invalid"
+    if repo is not None:
+        parent = git_first_parent_sha(repo, tip)
+        if is_phase_identity_commit(repo, tip):
+            if not parent:
+                return False, "phase_delivery_tip_parent_missing"
+            if record_head != parent:
+                return False, f"phase_delivery_assembled_parent_mismatch:{record_head[:8]}!={parent[:8]}"
+            bound, bind_detail = bind_phase_identity_fields(
+                record, assembled_sha=record_head, tip_sha=tip
+            )
+            if not bound:
+                return False, bind_detail
+            if not git_is_ancestor(repo, record_head, tip):
+                return False, "phase_delivery_assembled_not_ancestor"
+            if not git_is_ancestor(repo, base, record_head):
+                return False, "phase_delivery_base_not_ancestor"
+            for row in accepted:
+                if isinstance(row, Mapping) and is_valid_sha(row.get("sha")):
+                    if not git_is_ancestor(repo, str(row.get("sha")), record_head):
+                        return False, f"issue_not_included:{row.get('branch')}"
+        else:
+            if record_head != tip:
+                return False, f"phase_delivery_head_sha_mismatch:{record_head[:8]}!={tip[:8]}"
+    elif record_head != tip:
+        return False, "phase_delivery_assembled_parent_unproven"
     return phase_ready_for_pr(accepted)
 
 

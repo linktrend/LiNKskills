@@ -77,7 +77,7 @@ Schema: `core/managed-core/schemas/delivery-modes.schema.json` (`phaseDeliveryRe
 
 Temporary merge assembly stays in an isolated worktree. Coordinator handoff/provenance for the **pushed tip** is written under the git common directory and must match the remote `phase/*` SHA/tree. A later head invalidates that handoff.
 
-Packager discovery **must** load the committed tip record and prove: the blob exists at the tip, `headSha` is a non-self-referential ancestor of the tip, identity-binding diff is only the record path, and `phase_ready_for_pr` inclusion evidence holds. Do not rewrite `headSha` to the embedding commit to silence that check.
+Packager discovery **must** load the committed tip record and prove: the blob exists at the tip, the tip's only parent equals recorded `headSha` (the assembled package), identity-binding diff is only the record path, and `phase_ready_for_pr` inclusion evidence holds. Do not rewrite `headSha` to the embedding commit to silence that check. Unsealed records must not reuse forged extra sealed/merge/gate identity fields; `sealedSha` and candidate `sourceSha` bind to the identity-binding tip, while `namedGateEvidence.sha` stays on the assembled package. Isolated assembly has no deployment or promotion authority.
 
 ## Configuration
 

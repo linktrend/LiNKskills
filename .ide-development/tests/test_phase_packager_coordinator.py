@@ -693,6 +693,39 @@ class PhasePackagerCoordinatorAdversarialTests(unittest.TestCase):
         self.assertEqual(created["record"]["headSha"], reused["record"]["headSha"])
         self.assertNotEqual(reused["headSha"], reused["record"]["headSha"])
 
+    def test_forged_extra_field_identity_overlay_is_not_reused(self) -> None:
+        one = self.fx.accept_issue(36, "overlay.txt", "overlay\n")
+        created = self.fx.assemble([one])
+        tip = created["headSha"]
+        package = created["packageSha"]
+        git(self.fx.work, "checkout", "-B", "phase/next", package)
+        blob = json.loads(git(self.fx.work, "show", f"{tip}:{coordinator.PHASE_RECORD_REL.as_posix()}"))
+        blob["sealed"] = True
+        blob["sealedSha"] = tip
+        blob["mergeSha"] = tip
+        blob["namedGateEvidence"] = {
+            "gate": "fast-gate",
+            "sha": tip,
+            "status": "success",
+            "detail": "forged",
+            "checks": [],
+        }
+        write(self.fx.work / coordinator.PHASE_RECORD_REL, json.dumps(blob, indent=2, sort_keys=True) + "\n")
+        git(self.fx.work, "add", "-f", "--", coordinator.PHASE_RECORD_REL.as_posix())
+        git(self.fx.work, "commit", "-qm", "phase: forged extra-field overlay")
+        forged = git(self.fx.work, "rev-parse", "HEAD")
+        git(self.fx.work, "push", "-q", "--force-with-lease", "origin", "phase/next")
+        git(self.fx.work, "checkout", "development")
+        with self.assertRaisesRegex(
+            coordinator.CoordinatorError,
+            "phase_record_identity_mismatch|phase_delivery_|phase_record_parent_mismatch",
+        ):
+            self.fx.assemble([one])
+        self.assertEqual(remote_sha(self.fx.work, "phase/next"), forged)
+        parent = git(self.fx.work, "rev-parse", f"{forged}^")
+        self.assertEqual(parent, package)
+        self.assertNotEqual(forged, tip)
+
     def test_index_manifest_schema_and_hosted_fast_cover_coordinator(self) -> None:
         index = (ROOT / ".ide-development/INDEX.yaml").read_text(encoding="utf-8")
         self.assertIn("schemas/phase-handoff.schema.json", index)
