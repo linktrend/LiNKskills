@@ -87,6 +87,36 @@ class Server01CandidateTests(unittest.TestCase):
         self.assertIn("CANDIDATE_NOT_DEPLOYED", text)
         self.assertIn("linkskills-mcp-v2", text)
 
+    def test_overlay_command_does_not_duplicate_entrypoint_executable(self) -> None:
+        overlay = (ROOT / "docs/integrations/server01/compose.overlay.yml").read_text()
+        command = _overlay_command_args(overlay)
+        self.assertEqual(command, ["--host", "0.0.0.0", "--port", "8787"])
+        self.assertNotIn("linkskills-gateway", command)
+        dockerfile = (ROOT / "docs/integrations/server01/Dockerfile.candidate").read_text()
+        self.assertIn('ENTRYPOINT ["linkskills-gateway"]', dockerfile)
+        self.assertIn("LINKSKILLS_REPO_ROOT=/opt/linkskills", dockerfile)
+        self.assertIn("COPY catalog catalog", dockerfile)
+
+
+def _overlay_command_args(overlay: str) -> list[str]:
+    """Return compose ``command`` list items (fails if the executable is repeated)."""
+    items: list[str] = []
+    in_command = False
+    for line in overlay.splitlines():
+        if line.startswith("    command:"):
+            in_command = True
+            continue
+        if not in_command:
+            continue
+        stripped = line.strip()
+        if stripped.startswith("- "):
+            items.append(stripped[2:].strip().strip('"'))
+            continue
+        if stripped == "" or stripped.startswith("#"):
+            continue
+        break
+    return items
+
 
 if __name__ == "__main__":
     unittest.main()
