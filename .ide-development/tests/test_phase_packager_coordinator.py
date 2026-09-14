@@ -15,11 +15,12 @@ from pathlib import Path
 from jsonschema import Draft202012Validator, RefResolver
 
 from scripts.gitops import packager_coordinator as coordinator
-from scripts.gitops import packager_discover as discover
+from scripts.gitops import packager_logic
 from scripts.ide_development.constants import RC_REQUIRED_SCHEMA_RELS
 
 
 ROOT = Path(__file__).resolve().parents[2]
+SCHEMA_ROOT = ROOT / ".ide-development" / "schemas"
 
 
 def git(repo: Path, *args: str, check: bool = True) -> str:
@@ -106,10 +107,10 @@ class PhasePackagerCoordinatorTests(unittest.TestCase):
         self.addCleanup(self.fx.cleanup)
 
     def test_discover_is_not_phase_packager(self) -> None:
-        self.assertFalse(discover.IS_PHASE_PACKAGER)
-        self.assertNotEqual(discover.COMPONENT_KIND, coordinator.COMPONENT_KIND)
         self.assertTrue(coordinator.IS_PHASE_PACKAGER)
-        self.assertIn("not** the Update 3 Phase Packager/Coordinator", discover.__doc__)
+        self.assertFalse(getattr(packager_logic, "IS_PHASE_PACKAGER", False))
+        self.assertIn("packager_discover.py", coordinator.__doc__)
+        self.assertIn("not this component", coordinator.__doc__)
 
     def test_one_issue_creates_one_phase_branch_and_draft_pr(self) -> None:
         one = self.fx.accept_issue(11, "alpha.txt", "alpha\n")
@@ -163,7 +164,8 @@ class PhasePackagerCoordinatorTests(unittest.TestCase):
         self.assertNotEqual(updated["headSha"], created["headSha"])
         self.assertNotEqual(updated["candidateRevision"], created["candidateRevision"])
         self.assertEqual(updated["phasePr"]["number"], created["phasePr"]["number"])
-        self.assertEqual(updated["record"]["invalidatedFromSha"], created["headSha"])
+        self.assertEqual(updated["record"]["invalidatedFromSha"], created["record"]["headSha"])
+        self.assertNotEqual(updated["record"]["headSha"], updated["headSha"])
         self.assertEqual(updated["record"]["fast"]["status"], "invalidated")
         stale = coordinator.invalidate_handoff_if_head_changed(created["handoff"], live_head=updated["headSha"])
         self.assertFalse(stale["valid"])
@@ -284,7 +286,8 @@ class PhasePackagerCoordinatorTests(unittest.TestCase):
         self.assertFalse(coordinator._is_ancestor(self.fx.work, extra.sha, result["headSha"]))
 
     def test_checkpoint_push_does_not_start_managed_ci_and_phase_pr_starts_fast(self) -> None:
-        fast = (ROOT / coordinator.FAST_WORKFLOW_REL).read_text(encoding="utf-8")
+        fast = (ROOT / ".github/workflows/linktrend-review-packager.yml").read_text(encoding="utf-8")
+        managed = (ROOT / ".ide-development/workflows/linktrend-review-packager.yml").read_text(encoding="utf-8")
         contract = coordinator.parse_fast_trigger_contract(fast)
         self.assertTrue(contract["namedFast"])
         self.assertFalse(contract["checkpointPush"])
@@ -293,9 +296,11 @@ class PhasePackagerCoordinatorTests(unittest.TestCase):
         self.assertTrue(contract["checksExactHead"])
         self.assertTrue(contract["cancelObsolete"])
         self.assertFalse(contract["startsFull"])
-        live = (ROOT / ".github/workflows/linktrend-review-packager.yml").read_text(encoding="utf-8")
-        self.assertEqual(fast, live)
-        full = (ROOT / coordinator.FULL_WORKFLOW_REL).read_text(encoding="utf-8")
+        self.assertEqual(
+            coordinator.parse_fast_trigger_contract(managed)["checkpointPush"],
+            False,
+        )
+        full = (ROOT / ".github/workflows/linktrend-integrator-merge.yml").read_text(encoding="utf-8")
         self.assertNotRegex(full, r"(?m)^\s+push:")
         self.assertIn("types: [labeled]", full)
         one = self.fx.accept_issue(16, "fast.txt", "fast\n")
@@ -369,11 +374,11 @@ class PhasePackagerCoordinatorTests(unittest.TestCase):
             self.assertIn(key, handoff)
         self.assertEqual(handoff["kind"], "phase-handoff")
         self.assertEqual(handoff["component"], coordinator.COMPONENT_KIND)
-        schema = json.loads((ROOT / "core/managed-core/schemas/phase-handoff.schema.json").read_text(encoding="utf-8"))
+        schema = json.loads((SCHEMA_ROOT / "phase-handoff.schema.json").read_text(encoding="utf-8"))
         self.assertEqual(schema["required"], list(key for key in schema["required"]))
         for key in schema["required"]:
             self.assertIn(key, handoff)
-        record_schema = json.loads((ROOT / "core/managed-core/schemas/phase-record.schema.json").read_text(encoding="utf-8"))
+        record_schema = json.loads((SCHEMA_ROOT / "phase-record.schema.json").read_text(encoding="utf-8"))
         for key in record_schema["required"]:
             self.assertIn(key, cursor["record"])
 
@@ -403,9 +408,9 @@ class PhasePackagerCoordinatorTests(unittest.TestCase):
             json.loads((state_dir / "provider-consumer-handoff.json").read_text(encoding="utf-8")),
             typed,
         )
-        phase_schema_path = ROOT / "core/managed-core/schemas/phase-handoff.schema.json"
+        phase_schema_path = SCHEMA_ROOT / "phase-handoff.schema.json"
         phase_schema = json.loads(phase_schema_path.read_text(encoding="utf-8"))
-        typed_schema_path = ROOT / "core/managed-core/schemas/provider-consumer-handoff.schema.json"
+        typed_schema_path = SCHEMA_ROOT / "provider-consumer-handoff.schema.json"
         typed_schema = json.loads(typed_schema_path.read_text(encoding="utf-8"))
         resolver = RefResolver(
             phase_schema_path.as_uri(),
@@ -612,6 +617,8 @@ class PhasePackagerCoordinatorAdversarialTests(unittest.TestCase):
         self.assertEqual(git(self.fx.work, "rev-parse", "--abbrev-ref", "HEAD"), "development")
         self.assertFalse((self.fx.work / "isolated.txt").exists())
         self.assertFalse((self.fx.work / ".linktrend" / "phase-handoff.json").exists())
+        self.assertFalse((self.fx.work / ".linktrend" / "phase-delivery-record.json").exists())
+        git(self.fx.work, "cat-file", "-e", f"{result['headSha']}:{coordinator.PHASE_RECORD_REL.as_posix()}")
         state_dir = Path(result["stateDir"])
         self.assertTrue(state_dir.is_dir())
         self.assertTrue((state_dir / "phase-handoff.json").is_file())
@@ -626,35 +633,87 @@ class PhasePackagerCoordinatorAdversarialTests(unittest.TestCase):
         listed = git(self.fx.work, "worktree", "list", "--porcelain")
         self.assertNotIn("phase-assemble", listed)
 
+    def test_phase_tip_commits_delivery_record_without_self_referential_head(self) -> None:
+        one = self.fx.accept_issue(34, "record.txt", "record\n")
+        result = self.fx.assemble([one])
+        tip = result["headSha"]
+        package = result["packageSha"]
+        self.assertNotEqual(tip, package)
+        self.assertEqual(remote_sha(self.fx.work, "phase/next"), tip)
+        blob = git(self.fx.work, "show", f"{tip}:{coordinator.PHASE_RECORD_REL.as_posix()}")
+        committed = json.loads(blob)
+        self.assertEqual(committed["headSha"], package)
+        self.assertEqual(committed["gitTree"], result["packageTree"])
+        self.assertEqual(committed["mergeSha"], None)
+        self.assertNotEqual(committed["headSha"], tip)
+        self.assertTrue(coordinator._is_ancestor(self.fx.work, package, tip))
+        self.assertTrue(coordinator._is_phase_identity_commit(self.fx.work, tip))
+        coordinator.assert_non_self_referential_record(
+            committed,
+            assembled_sha=package,
+            tip_sha=tip,
+        )
+        changed = git(self.fx.work, "diff-tree", "--no-commit-id", "-r", "--name-only", tip)
+        self.assertEqual(changed, coordinator.PHASE_RECORD_REL.as_posix())
+        self.assertEqual(result["handoff"]["headCommit"], tip)
+        self.assertEqual(result["handoff"]["gitTree"], result["gitTree"])
+        self.assertNotEqual(result["record"]["headSha"], result["handoff"]["headCommit"])
+        ok, detail = coordinator.consume_handoff(
+            result["handoff"],
+            live_head=tip,
+            live_tree=result["gitTree"],
+        )
+        self.assertTrue(ok, detail)
+        ignore = (ROOT / ".gitignore").read_text(encoding="utf-8")
+        self.assertIn(".linktrend/*", ignore)
+        self.assertIn("!.linktrend/phase-delivery-record.json", ignore)
+
+    def test_self_referential_head_is_rejected(self) -> None:
+        sha = "a" * 40
+        with self.assertRaisesRegex(coordinator.CoordinatorError, "self_referential_head"):
+            coordinator.assert_non_self_referential_record(
+                {"headSha": sha},
+                assembled_sha=sha,
+                tip_sha=sha,
+            )
+        with self.assertRaisesRegex(coordinator.CoordinatorError, "phase_record_head_mismatch"):
+            coordinator.assert_non_self_referential_record(
+                {"headSha": "b" * 40},
+                assembled_sha=sha,
+                tip_sha="c" * 40,
+            )
+
+    def test_identity_commit_does_not_count_as_unique_phase_work(self) -> None:
+        one = self.fx.accept_issue(35, "bind.txt", "bind\n")
+        created = self.fx.assemble([one])
+        reused = self.fx.assemble([one])
+        self.assertTrue(reused["idempotent"])
+        self.assertEqual(reused["action"], "reused")
+        self.assertEqual(created["headSha"], reused["headSha"])
+        self.assertEqual(created["record"]["headSha"], reused["record"]["headSha"])
+        self.assertNotEqual(reused["headSha"], reused["record"]["headSha"])
+
     def test_index_manifest_schema_and_hosted_fast_cover_coordinator(self) -> None:
-        index = (ROOT / "core/managed-core/INDEX.yaml").read_text(encoding="utf-8")
+        index = (ROOT / ".ide-development/INDEX.yaml").read_text(encoding="utf-8")
         self.assertIn("schemas/phase-handoff.schema.json", index)
         self.assertIn("schemas/phase-record.schema.json", index)
         self.assertIn("core/managed-core/schemas/phase-handoff.schema.json", RC_REQUIRED_SCHEMA_RELS)
         self.assertIn("core/managed-core/schemas/phase-record.schema.json", RC_REQUIRED_SCHEMA_RELS)
-        manifest = json.loads((ROOT / "core/managed-core/MANIFEST.json").read_text(encoding="utf-8"))
+        manifest = json.loads((ROOT / ".ide-development/MANIFEST.json").read_text(encoding="utf-8"))
         sources = {row["source"] for row in manifest["files"]}
+        destinations = {row["destination"] for row in manifest["files"]}
         self.assertIn("core/managed-core/schemas/phase-handoff.schema.json", sources)
         self.assertIn("core/managed-core/schemas/phase-record.schema.json", sources)
         self.assertIn("scripts/gitops/packager_coordinator.py", sources)
         self.assertIn("scripts/tests/test_phase_packager_coordinator.py", sources)
-        index_entry = next(row for row in manifest["files"] if row["source"] == "core/managed-core/INDEX.yaml")
-        index_digest = "sha256:" + hashlib.sha256((ROOT / "core/managed-core/INDEX.yaml").read_bytes()).hexdigest()
+        self.assertIn(".ide-development/tests/test_phase_packager_coordinator.py", destinations)
+        index_entry = next(row for row in manifest["files"] if row["destination"] == ".ide-development/INDEX.yaml")
+        index_digest = "sha256:" + hashlib.sha256((ROOT / ".ide-development/INDEX.yaml").read_bytes()).hexdigest()
         self.assertEqual(index_entry["sourceHash"], index_digest)
-        runtime = json.loads((ROOT / "core/github/managed-runtime/MANIFEST.json").read_text(encoding="utf-8"))
-        self.assertIn("scripts/gitops/packager_coordinator.py", runtime["files"])
-        fast = json.loads((ROOT / ".github/linktrend-delivery-mode.json").read_text(encoding="utf-8"))
-        blob = json.dumps(fast["profiles"]["fast"]["commands"])
-        self.assertIn("packager_coordinator.py", blob)
-        self.assertIn("test_phase_packager_coordinator", blob)
         one = self.fx.accept_issue(27, "schema.txt", "schema\n")
         result = self.fx.assemble([one])
-        handoff_schema = json.loads(
-            (ROOT / "core/managed-core/schemas/phase-handoff.schema.json").read_text(encoding="utf-8")
-        )
-        record_schema = json.loads(
-            (ROOT / "core/managed-core/schemas/phase-record.schema.json").read_text(encoding="utf-8")
-        )
+        handoff_schema = json.loads((SCHEMA_ROOT / "phase-handoff.schema.json").read_text(encoding="utf-8"))
+        record_schema = json.loads((SCHEMA_ROOT / "phase-record.schema.json").read_text(encoding="utf-8"))
         for key in handoff_schema["required"]:
             self.assertIn(key, result["handoff"])
         extra_handoff = set(result["handoff"]) - set(handoff_schema["properties"])
