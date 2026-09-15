@@ -12,6 +12,12 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
     LINKSKILLS_REPO_ROOT=/opt/linkskills
 
+# The upstream base currently predates Debian's PCRE2 security update.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends --only-upgrade libpcre2-8-0 \
+    && dpkg --compare-versions "$(dpkg-query -W -f='${Version}' libpcre2-8-0)" ge '10.42-1+deb12u1' \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN groupadd --gid 10002 linkskills \
     && useradd --uid 10002 --gid 10002 --create-home --home-dir /home/linkskills --shell /usr/sbin/nologin linkskills \
     && mkdir -p /opt/linkskills /var/lib/linkskills /etc/linkskills/secrets /tmp \
