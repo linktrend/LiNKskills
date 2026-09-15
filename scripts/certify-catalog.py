@@ -18,6 +18,12 @@ Reproducible sealed host command (local Docker Linux + bwrap, not stage/cloud):
   # Local non-promoting smoke (no usable promotion)
   ./scripts/run-sealed-linux-certify.sh --local-non-promoting
 
+``scripts/run-sealed-linux-certify.sh`` is local-workstation privileged Docker
+only. It must never be transferred to Server01/VPS or used with production
+keys. Hosted ED-03 qualification uses
+``validate_hosted_sealed_evaluator_contract`` (see
+``docs/stage/HOSTED-SEALED-EVALUATOR-CONTRACT.md``) and is not this script.
+
 This script never writes to Supabase / stage / VPS.
 """
 
@@ -52,9 +58,12 @@ from lib.skill_runtime.certification_overlay import (  # noqa: E402
     load_classification_ledger,
 )
 from lib.skill_runtime.sealed_cert_mode import (  # noqa: E402
+    EXECUTOR_KIND_HOSTED,
+    EXECUTOR_KIND_LOCAL_PRIVILEGED_DOCKER,
     LOCAL_DEV_EVAL_RUNNER_ISSUER_KEY,
     is_local_dev_issuer_key,
     non_promoting_classification,
+    refuse_local_privileged_docker_script,
 )
 
 REPORT_REL = Path("evidence/phase10/catalog-certification-report.json")
@@ -159,11 +168,16 @@ def _host_cert_metadata() -> Dict[str, Any]:
     digest = os.environ.get("LINKSKILLS_SEALED_CERT_IMAGE_DIGEST", "").strip()
     if not digest and "@sha256:" in image:
         digest = image.rsplit("@sha256:", 1)[-1].strip().lower()
+    kind = (
+        os.environ.get("LINKSKILLS_SEALED_EXECUTOR_KIND", "") or ""
+    ).strip() or EXECUTOR_KIND_LOCAL_PRIVILEGED_DOCKER
     return {
         "platform": sys.platform,
         "issuer_id": os.environ.get("LINKSKILLS_EVAL_RUNNER_ISSUER_ID", ""),
         "sealed_path": "linux-bwrap-or-approved-container",
         "sealed_cert_mode": os.environ.get("LINKSKILLS_SEALED_CERT_MODE", "") or "release",
+        "executor_kind": kind,
+        "privileged_docker": kind == EXECUTOR_KIND_LOCAL_PRIVILEGED_DOCKER,
         "sealed_cert_image": image or None,
         "sealed_cert_image_digest": digest or None,
     }
@@ -492,6 +506,17 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     )
     args = parser.parse_args(list(argv) if argv is not None else None)
     repo_root = args.repo_root.resolve()
+    script_ok, script_errors = refuse_local_privileged_docker_script()
+    if not script_ok or (
+        os.environ.get("LINKSKILLS_SEALED_EXECUTOR_KIND", "").strip().lower()
+        == EXECUTOR_KIND_HOSTED
+    ):
+        for err in script_errors or (
+            "hosted executor_kind cannot run via local certify-catalog.py / "
+            "privileged Docker; use validate_hosted_sealed_evaluator_contract",
+        ):
+            print(err, file=sys.stderr)
+        return 2
     require_sealed = bool(args.require_sealed) and not args.allow_unproven_host
     isolation_ok = _proven_isolation_available()
     non_promoting = bool(args.non_promoting) or os.environ.get(

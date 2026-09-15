@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 # Sealed Linux certification via local privileged Docker + bubblewrap.
+# LOCAL WORKSTATION ONLY.
 # Does NOT touch stage, Supabase, VPS, cloud credentials, or live Lisa.
+# NEVER copy or run this script on Server01/VPS. NEVER use production issuer
+# keys here. A future hosted sealed evaluator is a separate fail-closed
+# contract (lib/skill_runtime/sealed_cert_mode.py +
+# docs/stage/HOSTED-SEALED-EVALUATOR-CONTRACT.md), not this privileged path.
 #
 # Modes:
 #   (A) release/promoting — DEFAULT for certification artifacts.
@@ -9,7 +14,7 @@
 #       digest-pinned LINKSKILLS_SEALED_CERT_IMAGE (name@sha256:<64 hex>).
 #       Records issuer id + image digest; never logs the key. Fails closed
 #       before mutation when missing/unpinned. Production later injects the
-#       key process-only from GSM.
+#       key process-only from GSM — not via this local privileged script.
 #
 #   (B) local non-promoting — explicit opt-in for pipeline smoke tests.
 #       May use the documented local HMAC key and a floating image tag, but
@@ -44,6 +49,10 @@ while [[ "$#" -gt 0 ]]; do
     --release|--promoting)
       MODE_HINT="release"
       shift
+      ;;
+    --hosted|--hosted-evaluator)
+      echo "refusing: ${0} is local privileged Docker only; hosted admission uses validate_hosted_sealed_evaluator_contract" >&2
+      exit 2
       ;;
     *)
       CERT_ARGS+=("$1")
@@ -95,25 +104,31 @@ PREFLIGHT_JSON="$(
   python3 - <<'PY'
 import json
 import os
-from lib.skill_runtime.sealed_cert_mode import validate_sealed_cert_preflight
+from lib.skill_runtime.sealed_cert_mode import (
+    refuse_local_privileged_docker_script,
+    validate_sealed_cert_preflight,
+)
 
+script_ok, script_errors = refuse_local_privileged_docker_script()
 result = validate_sealed_cert_preflight(
     mode=os.environ.get("LINKSKILLS_SEALED_CERT_MODE"),
     issuer_key=os.environ.get("LINKSKILLS_EVAL_RUNNER_ISSUER_KEY"),
     image=os.environ.get("LINKSKILLS_SEALED_CERT_IMAGE"),
     issuer_id=os.environ.get("LINKSKILLS_EVAL_RUNNER_ISSUER_ID"),
 )
+ok = bool(result.ok) and bool(script_ok)
+errors = list(script_errors) + list(result.errors)
 payload = {
-    "ok": result.ok,
+    "ok": ok,
     "mode": result.mode,
-    "errors": list(result.errors),
+    "errors": errors,
     "image": result.image,
     "image_digest": result.image_digest,
     "issuer_id": result.issuer_id,
     "non_promoting": result.non_promoting,
 }
 print(json.dumps(payload))
-raise SystemExit(0 if result.ok else 2)
+raise SystemExit(0 if ok else 2)
 PY
 )"
 PREFLIGHT_RC=$?

@@ -100,6 +100,47 @@ def _cmd_run(args: argparse.Namespace) -> int:
     return 0 if decision.certified or (result.passed and args.allow_uncertified) else 1
 
 
+def _cmd_qualify_ed03(args: argparse.Namespace) -> int:
+    import subprocess
+
+    from .ed03 import qualify_initial_release_profiles
+
+    root = Path(args.root).resolve()
+    evidence_dir = (root / args.evidence_dir).resolve()
+    evidence_dir.mkdir(parents=True, exist_ok=True)
+    matrix = qualify_initial_release_profiles(
+        root,
+        evidence_dir=None if args.source_only else evidence_dir,
+        execute=not args.source_only,
+    )
+    identity = {
+        "repository": "linktrend/LiNKskills",
+        "ref": None,
+        "commit": None,
+        "tree": None,
+    }
+    try:
+        identity["ref"] = subprocess.check_output(
+            ["git", "rev-parse", "--abbrev-ref", "HEAD"], cwd=root, text=True
+        ).strip()
+        identity["commit"] = subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=root, text=True
+        ).strip()
+        identity["tree"] = subprocess.check_output(
+            ["git", "rev-parse", "HEAD^{tree}"], cwd=root, text=True
+        ).strip()
+    except (OSError, subprocess.CalledProcessError):
+        pass
+    matrix["sourceIdentity"] = identity
+    text = json.dumps(matrix, indent=2, sort_keys=True) + "\n"
+    (evidence_dir / "qualification-matrix.json").write_text(text, encoding="utf-8")
+    (evidence_dir / "identity.json").write_text(
+        json.dumps(identity, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    print(text, end="")
+    return 0 if matrix.get("complete") else 1
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="linkskills-eval",
@@ -132,6 +173,23 @@ def build_parser() -> argparse.ArgumentParser:
         help="Exit 0 when the suite passes even if certification is refused",
     )
     run_p.set_defaults(func=_cmd_run)
+
+    q_p = sub.add_parser(
+        "qualify-ed03",
+        help="Run confined consumer-profile qualification for the five initial releases",
+    )
+    q_p.add_argument("--root", default=".", help="Repository root")
+    q_p.add_argument(
+        "--evidence-dir",
+        default="evidence/end-to-end-delivery/ed-03",
+        help="Immutable evidence output directory",
+    )
+    q_p.add_argument(
+        "--source-only",
+        action="store_true",
+        help="Classify suites without executing cases (never usable)",
+    )
+    q_p.set_defaults(func=_cmd_qualify_ed03)
     return parser
 
 
