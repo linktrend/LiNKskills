@@ -96,7 +96,8 @@ def test_missing_owner_receipt_stays_eval_pending() -> None:
 def test_cursor_driver_names_exact_missing_live_owner_receipt() -> None:
     binding = resolve_driver(CURSOR_MACOS).binding(ROOT)
     kinds = {item["requiredKind"] for item in binding["missingOwnerReceipts"]}
-    assert "cursor-project-scoped-owner-live-receipt" in kinds
+    assert "cursor-project-scoped-owner-live-receipt" not in kinds
+    assert binding["pendingConsumerReceipts"][0]["requiredKind"] == "cursor-project-scoped-owner-live-receipt"
     assert "xp-02-cursor-owner-live-receipt" not in kinds
     assert "eval-runner-issuer-secretref" in kinds
     assert binding["ownerReceipt"]["requiredKind"] == "cursor-project-scoped-owner-live-receipt"
@@ -116,7 +117,7 @@ def test_xp02_owner_receipt_required_only_when_shared_global_declared(monkeypatc
 
     monkeypatch.setenv("LINKSKILLS_CURSOR_SHARED_GLOBAL_MUTATION", "declared")
     declared = resolve_driver(CURSOR_MACOS).binding(ROOT)
-    kinds = {item["requiredKind"] for item in declared["missingOwnerReceipts"]}
+    kinds = {item["requiredKind"] for item in declared["pendingConsumerReceipts"]}
     assert "cursor-project-scoped-owner-live-receipt" in kinds
     assert "xp-02-cursor-owner-live-receipt" in kinds
 

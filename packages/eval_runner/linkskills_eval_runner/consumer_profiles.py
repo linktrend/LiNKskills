@@ -337,11 +337,10 @@ class ConsumerProfileDriver:
         issuer = inspect_issuer_receipt()
         image = inspect_sealed_image_receipt()
         isolator = inspect_isolator_receipt()
-        missing = [
-            row
-            for row in (*owners, issuer, image, isolator)
-            if not row.get("live")
-        ]
+        # Qualification precedes publication and consumer activation. Requiring
+        # an activated consumer here creates a cycle and conflates separate gates.
+        # The driver still requires real execution, issuer custody and isolation.
+        missing = [row for row in (issuer, image, isolator) if not row.get("live")]
         return {
             "schemaVersion": SCHEMA_VERSION,
             "kind": self.adapter_kind,
@@ -355,6 +354,7 @@ class ConsumerProfileDriver:
             "sealedImageReceipt": image,
             "isolatorReceipt": isolator,
             "missingOwnerReceipts": missing,
+            "pendingConsumerReceipts": [row for row in owners if not row.get("live")],
             "liveConsumerActor": False,
             "guiLaunch": False,
         }

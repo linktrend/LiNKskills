@@ -516,7 +516,7 @@ def qualify_initial_release_profiles(
         "kind": MATRIX_KIND,
         "complete": len(rows) == 5,
         "ok": len(rows) == 5 and not quarantined,
-        "usableClaimed": False,
+        "usableClaimed": bool(usable),
         "combinations": rows,
         "usable": usable,
         "evalPending": pending,

@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import base64
 import json
+import os
 from pathlib import Path
 from typing import Any, Mapping, Optional
 
@@ -93,6 +94,11 @@ def provider_from_verifier(verifier: Any, **kwargs: Any) -> SkillsApiV2:
     Production defaults load no releases. Exact retrieval then fails closed
     with ``catalog_unavailable`` until a real registry is supplied.
     """
+
+    if not kwargs and os.environ.get("LINKSKILLS_ENV") == "production":
+        from .production_v2 import production_provider
+
+        return production_provider(verifier)
 
     def _verify(token: str) -> TrustedIdentity:
         header = token if token.lower().startswith("bearer ") else f"Bearer {token}"
