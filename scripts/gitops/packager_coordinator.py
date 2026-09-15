@@ -39,8 +39,12 @@ try:
     from scripts.gitops.delivery_modes import (
         DEFAULT_PHASE_PREFIX,
         MODE_PHASE_INTEGRATION,
+        bind_phase_identity_fields,
+        committed_record_matches_expected,
+        git_first_parent_sha,
         is_issue_branch,
         is_phase_branch,
+        is_phase_identity_commit,
         is_valid_sha,
         normalize_sha,
     )
@@ -55,8 +59,12 @@ except ModuleNotFoundError:  # pragma: no cover - script-style execution
     from delivery_modes import (  # type: ignore
         DEFAULT_PHASE_PREFIX,
         MODE_PHASE_INTEGRATION,
+        bind_phase_identity_fields,
+        committed_record_matches_expected,
+        git_first_parent_sha,
         is_issue_branch,
         is_phase_branch,
+        is_phase_identity_commit,
         is_valid_sha,
         normalize_sha,
     )
@@ -89,6 +97,8 @@ COMPONENT_KIND = "phase_packager_coordinator"
 IS_PHASE_PACKAGER = True
 HANDOFF_REL = Path(".linktrend/phase-handoff.json")
 COORDINATOR_STATE_REL = Path("ide-development/phase-packager")
+PHASE_IDENTITY_PATHS = frozenset({PHASE_RECORD_REL.as_posix()})
+PHASE_RECORD_COMMIT_MESSAGE = "phase: commit delivery record"
 PROTECTED_BRANCHES = frozenset({"development", "staging", "main"})
 ISSUE_BRANCH_RE = re.compile(r"^issue/([1-9][0-9]{0,8})-[a-z0-9]+(?:-[a-z0-9]+)*$")
 ACCEPT_RE = re.compile(r"^([^@=]+)[@=]([0-9a-fA-F]{40})$")
@@ -732,6 +742,124 @@ def _assert_live_phase_pr_optional(pr: Mapping[str, Any], *, require_live_pr: bo
         assert_live_phase_pr(pr)
 
 
+def _is_phase_identity_commit(repo: Path, commit: str) -> bool:
+    """True for the single-parent Packager commit that only binds the Phase record."""
+
+    return is_phase_identity_commit(repo, commit)
+
+
+def _committed_phase_record(repo: Path, sha: str) -> dict[str, Any] | None:
+    blob = _git(repo, "show", f"{sha}:{PHASE_RECORD_REL.as_posix()}", check=False)
+    if not blob.strip():
+        return None
+    try:
+        payload = json.loads(blob)
+    except json.JSONDecodeError as exc:
+        raise CoordinatorError("phase_record_invalid", str(exc)) from exc
+    if not isinstance(payload, dict):
+        raise CoordinatorError("phase_record_invalid", "committed record must be an object")
+    return payload
+
+
+def assert_identity_binding_tip(
+    repo: Path,
+    *,
+    tip_sha: str,
+    assembled_sha: str,
+    record: Mapping[str, Any],
+) -> None:
+    """Require the tip parent to be the assembled package named by the record."""
+
+    tip = normalize_sha(tip_sha)
+    assembled = normalize_sha(assembled_sha)
+    parent = git_first_parent_sha(repo, tip)
+    if parent != assembled:
+        raise CoordinatorError(
+            "phase_record_parent_mismatch",
+            f"tip_parent={parent or 'missing'}:assembled={assembled}",
+        )
+    if not _is_phase_identity_commit(repo, tip):
+        raise CoordinatorError(
+            "phase_record_identity_mismatch",
+            "committed Phase record is not on a packager identity-binding commit",
+        )
+    assert_non_self_referential_record(record, assembled_sha=assembled, tip_sha=tip)
+    ok, detail = bind_phase_identity_fields(record, assembled_sha=assembled, tip_sha=tip)
+    if not ok:
+        raise CoordinatorError(detail, f"assembled={assembled}:tip={tip}")
+
+
+def assert_non_self_referential_record(
+    record: Mapping[str, Any],
+    *,
+    assembled_sha: str,
+    tip_sha: str | None = None,
+) -> None:
+    """Fail closed: the committed package identity is never the embedding tip."""
+
+    recorded = normalize_sha(str(record.get("headSha") or ""))
+    assembled = normalize_sha(assembled_sha)
+    if not is_valid_sha(recorded) or not is_valid_sha(assembled):
+        raise CoordinatorError("phase_record_head_mismatch", "assembled and recorded headSha must be exact SHAs")
+    if recorded != assembled:
+        raise CoordinatorError("phase_record_head_mismatch", f"recorded={recorded}:assembled={assembled}")
+    if tip_sha is None:
+        return
+    tip = normalize_sha(tip_sha)
+    if not is_valid_sha(tip):
+        raise CoordinatorError("phase_record_head_mismatch", "identity-binding tip must be an exact SHA")
+    if recorded == tip:
+        raise CoordinatorError(
+            "self_referential_head",
+            "phase delivery record headSha must name the assembled package commit, not the embedding tip",
+        )
+
+
+def _commit_phase_delivery_record(
+    repo: Path,
+    *,
+    assembled_sha: str,
+    record: Mapping[str, Any],
+) -> str:
+    """Commit the delivery record in an isolated worktree. Never edits the caller checkout."""
+
+    assembled = normalize_sha(assembled_sha)
+    assert_non_self_referential_record(record, assembled_sha=assembled)
+    payload = json.dumps(record, indent=2, sort_keys=True) + "\n"
+    with tempfile.TemporaryDirectory(prefix="phase-record-") as tmp:
+        probe = Path(tmp) / "work"
+        _git(repo, "worktree", "add", "--detach", str(probe), assembled)
+        try:
+            dest = probe / PHASE_RECORD_REL
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            dest.write_text(payload, encoding="utf-8")
+            _git(probe, "add", "-f", "--", PHASE_RECORD_REL.as_posix())
+            porcelain = _git(probe, "status", "--porcelain", "--untracked-files=all", check=False)
+            if not porcelain:
+                raise CoordinatorError("phase_record_unchanged", assembled)
+            _git(probe, "commit", "-m", PHASE_RECORD_COMMIT_MESSAGE)
+            tip = normalize_sha(_git(probe, "rev-parse", "HEAD"))
+            committed = json.loads(dest.read_text(encoding="utf-8"))
+            assert_identity_binding_tip(
+                repo, tip_sha=tip, assembled_sha=assembled, record=committed
+            )
+            assert_identity_binding_tip(
+                repo, tip_sha=tip, assembled_sha=assembled, record=record
+            )
+            if committed.get("headSha") != record.get("headSha") or committed.get("gitTree") != record.get("gitTree"):
+                raise CoordinatorError("phase_record_identity_mismatch", "in-memory record drifted from committed blob")
+            _git(repo, "update-ref", "refs/phase-packager/assemble", tip)
+        finally:
+            subprocess.run(
+                ["git", "worktree", "remove", "--force", str(probe)],
+                cwd=repo,
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+    return tip
+
+
 def _unique_phase_commits(
     repo: Path,
     *,
@@ -751,6 +879,10 @@ def _unique_phase_commits(
             continue
         if len(parents) == 2 and parents[1] in accepted_shas:
             continue
+        if _is_phase_identity_commit(repo, commit):
+            parent = parents[0] if parents else ""
+            if parent and not _is_phase_identity_commit(repo, parent):
+                continue
         unique.append(commit)
     return unique
 
@@ -900,6 +1032,7 @@ def _phase_record(
         "immutableBaseSha": normalize_sha(base),
         "headSha": normalize_sha(head),
         "gitTree": normalize_sha(tree),
+        "mergeSha": None,
         "candidateRevision": revision,
         "acceptedIssues": accepted,
         "acceptedCommits": [source.to_dict() for source in sources],
@@ -1062,40 +1195,93 @@ def assemble_phase(
 
     revision = _candidate_revision(repository, phase_branch, development_sha, ordered)
     identical = not remaining
-    if identical:
-        head = existing_phase or development_sha
+    bind_record = True
+    if identical and existing_phase:
+        committed_existing = _committed_phase_record(repo, existing_phase)
+        if committed_existing is not None:
+            package_sha = normalize_sha(str(committed_existing.get("headSha") or ""))
+            assert_identity_binding_tip(
+                repo,
+                tip_sha=existing_phase,
+                assembled_sha=package_sha,
+                record=committed_existing,
+            )
+            package_tree = _git(repo, "rev-parse", f"{package_sha}^{{tree}}")
+            expected = _phase_record(
+                repository=repository,
+                phase_branch=phase_branch,
+                base=development_sha,
+                head=package_sha,
+                tree=package_tree,
+                sources=ordered,
+                pr=None,
+                revision=revision,
+                previous=None,
+            )
+            matched, detail = committed_record_matches_expected(committed_existing, expected)
+            if not matched:
+                raise CoordinatorError(
+                    "phase_record_identity_mismatch",
+                    f"{detail}: committed record does not match assembled package identity",
+                )
+            record = dict(committed_existing)
+            tip = existing_phase
+            bind_record = False
+        else:
+            package_sha = normalize_sha(existing_phase)
+            package_tree = _git(repo, "rev-parse", f"{package_sha}^{{tree}}")
+            record = _phase_record(
+                repository=repository,
+                phase_branch=phase_branch,
+                base=development_sha,
+                head=package_sha,
+                tree=package_tree,
+                sources=ordered,
+                pr=None,
+                revision=revision,
+                previous=previous,
+            )
+            identical = False
+    elif identical:
+        raise CoordinatorError("missing_commit", "identical assemble requires an existing Phase head")
     else:
-        head = _assemble_in_worktree(repo, start_sha=start_sha, sources=ordered)
-    tree = _git(repo, "rev-parse", f"{head}^{{tree}}")
+        package_sha = _assemble_in_worktree(repo, start_sha=start_sha, sources=ordered)
+        package_tree = _git(repo, "rev-parse", f"{package_sha}^{{tree}}")
+        record = _phase_record(
+            repository=repository,
+            phase_branch=phase_branch,
+            base=development_sha,
+            head=package_sha,
+            tree=package_tree,
+            sources=ordered,
+            pr=None,
+            revision=revision,
+            previous=previous,
+        )
+
     for source in ordered:
-        if not _is_ancestor(repo, source.sha, head):
+        if not _is_ancestor(repo, source.sha, package_sha):
             raise CoordinatorError("unrelated_commits", source.branch)
 
-    if remote_phase == head:
+    if bind_record:
+        tip = _commit_phase_delivery_record(repo, assembled_sha=package_sha, record=record)
+        assert_identity_binding_tip(repo, tip_sha=tip, assembled_sha=package_sha, record=record)
+    tip_tree = _git(repo, "rev-parse", f"{tip}^{{tree}}")
+
+    if remote_phase == tip:
         verified = remote_phase
     else:
-        verified = pusher.push_phase_ref(repo, remote, phase_branch, head)
-    if verified != normalize_sha(head):
-        raise CoordinatorError("unverified_phase_ref", f"{phase_branch}:remote={verified}:expected={head}")
+        verified = pusher.push_phase_ref(repo, remote, phase_branch, tip)
+    if verified != normalize_sha(tip):
+        raise CoordinatorError("unverified_phase_ref", f"{phase_branch}:remote={verified}:expected={tip}")
 
     current = _git(repo, "rev-parse", "--abbrev-ref", "HEAD", check=False)
     if current != phase_branch:
         if local_phase:
-            _git(repo, "update-ref", f"refs/heads/{phase_branch}", head, local_phase)
+            _git(repo, "update-ref", f"refs/heads/{phase_branch}", tip, local_phase)
         elif not _local_sha(repo, phase_branch):
-            _git(repo, "update-ref", f"refs/heads/{phase_branch}", head)
+            _git(repo, "update-ref", f"refs/heads/{phase_branch}", tip)
 
-    record = _phase_record(
-        repository=repository,
-        phase_branch=phase_branch,
-        base=development_sha,
-        head=head,
-        tree=tree,
-        sources=ordered,
-        pr=None,
-        revision=revision,
-        previous=None if identical else previous,
-    )
     title = _stable_title(phase_branch)
     body = (
         "<!-- linktrend-phase-packager:begin -->\n"
@@ -1106,7 +1292,7 @@ def assemble_phase(
         repository=repository,
         head=phase_branch,
         base=development,
-        head_sha=head,
+        head_sha=tip,
         title=title,
         body=body,
         record=record,
@@ -1132,16 +1318,23 @@ def assemble_phase(
         sealed=False,
         fast_status=str((record.get("fast") or {}).get("status") or ""),
         required_ci={},
-        live_head_sha=head,
+        live_head_sha=tip,
         record=record,
         pr_number=int(pr["number"]),
     )
     record["fullMayStart"] = {"allowed": allowed, "detail": detail}
+    if normalize_sha(str(record.get("headSha") or "")) == normalize_sha(tip):
+        raise CoordinatorError(
+            "self_referential_head",
+            "refusing to claim the embedding Phase tip as record.headSha",
+        )
     handoff = _handoff_from(
         record,
         valid=True,
         provider_consumer_handoff=provider_consumer_handoff,
     )
+    handoff["headCommit"] = normalize_sha(tip)
+    handoff["gitTree"] = normalize_sha(tip_tree)
     written = _write_isolated_state(
         repo,
         phase_branch,
@@ -1155,8 +1348,10 @@ def assemble_phase(
         "repository": repository,
         "phaseBranch": phase_branch,
         "phasePr": record["phasePr"],
-        "headSha": head,
-        "gitTree": tree,
+        "headSha": tip,
+        "gitTree": tip_tree,
+        "packageSha": normalize_sha(package_sha),
+        "packageTree": normalize_sha(package_tree),
         "baseSha": normalize_sha(development_sha),
         "remoteSha": verified,
         "candidateRevision": revision,

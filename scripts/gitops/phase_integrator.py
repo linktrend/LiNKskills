@@ -27,6 +27,10 @@ try:  # Prefer the package path so unittest and CLI share one class identity.
     from scripts.gitops.delivery_modes import (
         DEFAULT_PHASE_PREFIX,
         MODE_PHASE_INTEGRATION,
+        bind_phase_identity_fields,
+        git_first_parent_sha,
+        git_is_ancestor as delivery_git_is_ancestor,
+        is_phase_identity_commit,
         is_valid_sha,
         normalize_sha,
     )
@@ -35,6 +39,10 @@ except ModuleNotFoundError:  # pragma: no cover - exercised by package-style tes
     from delivery_modes import (
         DEFAULT_PHASE_PREFIX,
         MODE_PHASE_INTEGRATION,
+        bind_phase_identity_fields,
+        git_first_parent_sha,
+        git_is_ancestor as delivery_git_is_ancestor,
+        is_phase_identity_commit,
         is_valid_sha,
         normalize_sha,
     )
@@ -128,13 +136,16 @@ def _checkout_has_unrelated_changes(repo: Path) -> bool:
 def git_is_ancestor(repo: str | Path, ancestor_sha: str, descendant_sha: str) -> bool:
     """Prove exact Git ancestry without relying on branch names or PR metadata."""
 
-    if not is_valid_sha(ancestor_sha) or not is_valid_sha(descendant_sha):
-        return False
-    result = subprocess.run(
-        ["git", "merge-base", "--is-ancestor", normalize_sha(ancestor_sha), normalize_sha(descendant_sha)],
-        cwd=Path(repo), text=True, capture_output=True, check=False,
-    )
-    return result.returncode == 0
+    return delivery_git_is_ancestor(repo, ancestor_sha, descendant_sha)
+
+
+def _record_matches_live_tip(repo: Path, record: Mapping[str, Any], live_head_sha: str) -> bool:
+    recorded = normalize_sha(str(record.get("headSha") or ""))
+    live = normalize_sha(live_head_sha)
+    if recorded == live:
+        return True
+    parent = git_first_parent_sha(repo, live)
+    return bool(parent) and parent == recorded
 
 
 def _issue_key(branch: str) -> str:
@@ -289,7 +300,7 @@ def phase_full_suite_dispatch_allowed(
 
 
 def phase_merge_eligibility(
-    record: Mapping[str, Any], *, live_head_sha: str, conflict: bool = False
+    record: Mapping[str, Any], *, live_head_sha: str, conflict: bool = False, repo: str | Path | None = None
 ) -> MergeEligibility:
     """Check all exact candidate conditions immediately before a Phase merge."""
 
@@ -297,6 +308,16 @@ def phase_merge_eligibility(
     sealed = bool(record.get("sealed")) and normalize_sha(str(record.get("sealedSha") or "")) == head
     identity = record.get("candidateIdentity")
     identity_head = normalize_sha(str(identity.get("sourceSha") or "")) if isinstance(identity, Mapping) else ""
+    recorded = normalize_sha(str(record.get("headSha") or ""))
+    if repo is not None and is_phase_identity_commit(repo, head):
+        parent = git_first_parent_sha(repo, head)
+        live_ok = recorded == parent and recorded != head
+        bound, _detail = bind_phase_identity_fields(record, assembled_sha=recorded, tip_sha=head)
+        live_ok = live_ok and bound
+    else:
+        live_ok = recorded == head or (
+            normalize_sha(str(record.get("sealedSha") or "")) == head and recorded != head
+        )
     fast = record.get("fast") if isinstance(record.get("fast"), Mapping) else {}
     bugbot = record.get("bugbot") if isinstance(record.get("bugbot"), Mapping) else {}
     full = record.get("full") if isinstance(record.get("full"), Mapping) else {}
@@ -309,7 +330,7 @@ def phase_merge_eligibility(
             or (full.get("status") == "passed" and normalize_sha(str(full.get("sha") or "")) == head)
         ),
         "noConflict": not conflict,
-        "liveHeadUnchanged": normalize_sha(str(record.get("headSha") or "")) == head,
+        "liveHeadUnchanged": live_ok,
     }
     failed = [name for name, ok in checks.items() if not ok]
     return MergeEligibility(not failed, "all_current_candidate_gates_passed" if not failed else "blocked:" + ",".join(failed), checks)
@@ -457,8 +478,8 @@ class PhaseIntegrator:
         if not git_is_ancestor(self.repo, self.immutable_base_sha, head):
             raise PhaseLifecycleError("wrong_base", "Phase head is not descended from immutable base")
         current = self.load() or self._base_record(head, [])
-        if normalize_sha(str(current.get("headSha") or "")) != head:
-            raise PhaseLifecycleError("stale_phase_head", "acceptance must attach to the live Phase head")
+        if not _record_matches_live_tip(self.repo, current, head):
+            raise PhaseLifecycleError("stale_phase_head", "acceptance must attach to the live Phase identity-binding tip")
         existing = list(current.get("acceptedIssues") or [])
         if any(str(row.get("branch") or "") == item.branch for row in existing):
             raise PhaseLifecycleError("duplicate_issue", item.branch)
@@ -491,7 +512,7 @@ class PhaseIntegrator:
         match = next((row for row in rows if row.get("branch") == item.branch), None)
         if not isinstance(match, dict) or match.get("sha") != item.sha or not match.get("accepted"):
             raise PhaseLifecycleError("acceptance_missing", item.branch)
-        if normalize_sha(str(current.get("headSha") or "")) != normalize_sha(_git(self.repo, "rev-parse", self.phase_branch)):
+        if not _record_matches_live_tip(self.repo, current, _git(self.repo, "rev-parse", self.phase_branch)):
             raise PhaseLifecycleError("stale_phase_head", "Phase moved after acceptance")
         if _checkout_has_unrelated_changes(self.repo):
             raise PhaseLifecycleError("dirty_checkout", "Issue integration requires a clean checkout")
@@ -535,8 +556,8 @@ class PhaseIntegrator:
         record = self.load()
         if record is None:
             raise PhaseLifecycleError("phase_record_missing", "aggregate accepted Issue tips before draft creation")
-        if normalize_sha(str(record.get("headSha") or "")) != normalize_sha(head_sha):
-            raise PhaseLifecycleError("stale_phase_head", "draft head is not the recorded Phase head")
+        if not _record_matches_live_tip(self.repo, record, head_sha):
+            raise PhaseLifecycleError("stale_phase_head", "draft head is not the recorded Phase identity-binding tip")
         existing = record.get("phasePr")
         if existing is not None and dict(existing) != dict(pr):
             raise PhaseLifecycleError("duplicate_phase_pr", "Phase may have one draft PR identity")
@@ -550,8 +571,8 @@ class PhaseIntegrator:
         if record is None:
             raise PhaseLifecycleError("phase_record_missing", "cannot seal without Phase record")
         head = normalize_sha(head_sha)
-        if normalize_sha(str(record.get("headSha") or "")) != head:
-            raise PhaseLifecycleError("stale_phase_head", "seal must bind to current Phase head")
+        if not _record_matches_live_tip(self.repo, record, head):
+            raise PhaseLifecycleError("stale_phase_head", "seal must bind to current Phase identity-binding tip")
         accepted = record.get("acceptedIssues")
         if not isinstance(accepted, list) or not accepted or any(not row.get("accepted") or not row.get("included") for row in accepted):
             raise PhaseLifecycleError("unincluded_issue", "every accepted Issue must be proven included before sealing")
@@ -575,7 +596,11 @@ class PhaseIntegrator:
         record["sealedSha"] = head
         record["candidateId"] = "sha256:" + _digest_set(candidate)
         record["candidateIdentity"] = candidate.to_dict()
-        record["namedGateEvidence"] = {"gate": "fast-gate", "sha": head, "status": "missing", "detail": "sealed_candidate", "checks": []}
+        record["namedGateEvidence"] = {"gate": "fast-gate", "sha": normalize_sha(str(record.get("headSha") or head)), "status": "missing", "detail": "sealed_candidate", "checks": []}
+        if is_phase_identity_commit(self.repo, head):
+            bound, detail = bind_phase_identity_fields(record, assembled_sha=str(record.get("headSha") or ""), tip_sha=head)
+            if not bound:
+                raise PhaseLifecycleError(detail, "sealed identity fields must bind assembled parent and live tip")
         return self._write(record)
 
     def update_gate(self, gate: str, *, status: str, sha: str, detail: str = "", **extra: Any) -> dict[str, Any]:
@@ -800,12 +825,19 @@ def seal_exact_phase_pr(
     integrator_path = isolated_record_path(root, phase_branch, kind="integrator")
     destination = Path(out_path).resolve() if out_path else integrator_path
     existing = _load_json_object(packager_path) or _load_json_object(integrator_path)
+    parent = git_first_parent_sha(root, head)
+    identity_tip = is_phase_identity_commit(root, head)
+    package_sha = parent if identity_tip else head
+    package_tree = normalize_sha(_git(root, "rev-parse", f"{package_sha}^{{tree}}")) if is_valid_sha(package_sha) else ""
     if existing is not None:
-        existing_head = normalize_sha(str(existing.get("headSha") or existing.get("sealedSha") or ""))
+        existing_head = normalize_sha(str(existing.get("headSha") or ""))
         existing_tree = normalize_sha(str(existing.get("gitTree") or ""))
-        if existing_head and existing_head != head:
+        identity_bound = identity_tip and existing_head == parent and existing_head != head
+        if existing_head and existing_head != head and not identity_bound:
             raise PhaseLifecycleError("stale_phase_head", f"record={existing_head}:live={head}")
-        if existing_tree and existing_tree != tree:
+        if existing_tree and identity_bound and existing_tree != package_tree:
+            raise PhaseLifecycleError("stale_phase_tree", f"record={existing_tree}:package={package_tree}")
+        if existing_tree and not identity_bound and existing_tree != tree:
             raise PhaseLifecycleError("stale_phase_tree", f"record={existing_tree}:live={tree}")
         if not parsed_issues:
             parsed_issues = [
@@ -834,8 +866,12 @@ def seal_exact_phase_pr(
     )
     if existing is not None:
         record = copy.deepcopy(existing)
-        record["headSha"] = head
-        record["gitTree"] = tree
+        if identity_tip and existing_head == parent:
+            record["headSha"] = existing_head
+            record["gitTree"] = existing_tree or package_tree
+        else:
+            record["headSha"] = head
+            record["gitTree"] = tree
         record["baseSha"] = base_sha
         record["immutableBaseSha"] = base_sha
         record["phaseBranch"] = phase_branch
@@ -856,7 +892,7 @@ def seal_exact_phase_pr(
         }
         integrator._write(record)
     else:
-        integrator.aggregate(parsed_issues, phase_head_sha=head)
+        integrator.aggregate(parsed_issues, phase_head_sha=package_sha if identity_tip else head)
         integrator.create_draft(
             head_sha=head,
             pr={
@@ -868,7 +904,8 @@ def seal_exact_phase_pr(
             },
         )
         loaded = integrator.load() or {}
-        loaded["gitTree"] = tree
+        loaded["gitTree"] = package_tree if identity_tip else tree
+        loaded["headSha"] = package_sha if identity_tip else head
         loaded["repository"] = repository
         integrator._write(loaded)
 
@@ -907,7 +944,10 @@ def seal_exact_phase_pr(
         test_profile="full",
     )
     record = integrator.seal(head_sha=head, candidate_identity=identity)
-    record["gitTree"] = tree
+    if identity_tip and normalize_sha(str(record.get("headSha") or "")) == package_sha:
+        record["gitTree"] = package_tree
+    else:
+        record["gitTree"] = tree
     record["merged"] = False
     record["fullDispatched"] = False
     record["deployed"] = False

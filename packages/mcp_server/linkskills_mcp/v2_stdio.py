@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import sys
 from typing import Any, Mapping, Optional, TextIO
 
@@ -47,6 +48,10 @@ def build_provider(verifier: Any | None = None, **kwargs: Any) -> Any:
     with ``catalog_unavailable`` until a real registry is supplied.
     """
     auth = verifier or resolve_claims_verifier()
+    if not kwargs and os.environ.get("LINKSKILLS_ENV") == "production":
+        from linkskills_gateway.production_v2 import production_provider
+
+        return production_provider(auth)
 
     def _verify(token: str) -> TrustedIdentity:
         header = token if token.lower().startswith("bearer ") else f"Bearer {token}"

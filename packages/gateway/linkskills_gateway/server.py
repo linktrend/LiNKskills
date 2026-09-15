@@ -128,13 +128,21 @@ def make_handler(
         def _ready_payload(self) -> Dict[str, Any]:
             configured, auth_mode, detail = auth_config_present(env)
             draining, _reason = drain_state.snapshot()
-            return service.ready(
+            ready = service.ready(
                 auth_configured=configured,
                 auth_mode=auth_mode,
                 auth_detail=detail,
                 draining=draining,
                 probe_store=store_probe_configured(env),
             )
+            if env.get("LINKSKILLS_ENV") == "production":
+                ready["provider_v2"] = skills_v2.store_status()
+                ready["provider_v2"]["catalog_ready"] = skills_v2.catalog_ready
+                ready["ready"] = bool(
+                    ready.get("ready") and ready["provider_v2"].get("ready")
+                    and skills_v2.catalog_ready
+                )
+            return ready
 
         def do_GET(self) -> None:  # noqa: N802
             stats.inc_request()
