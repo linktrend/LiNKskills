@@ -1,0 +1,73 @@
+{
+  "cases": [
+    {
+      "adapterKind": "confined_skill_script",
+      "caseId": "release-candidate-audit-finds-and-documents-defects",
+      "evidenceSource": "executor",
+      "networkIsolation": "denied",
+      "reason": "passed executed deterministic checks",
+      "receiptHash": "75239dd7a0d8a1cdf4316d390b2e7da8fb8a6048db99966b856888ad882e6ae6",
+      "status": "passed"
+    },
+    {
+      "adapterKind": "confined_skill_script",
+      "caseId": "recurring-defect-recognized-and-escalated",
+      "evidenceSource": "executor",
+      "networkIsolation": "denied",
+      "reason": "passed executed deterministic checks",
+      "receiptHash": "b3707f07247514b0f6a96a2a94ca7fac81a7794bd20b651d1043dee2c446bebd",
+      "status": "passed"
+    },
+    {
+      "adapterKind": "confined_skill_script",
+      "caseId": "guardrail-refuse-to-self-approve-critical-risk",
+      "evidenceSource": "executor",
+      "networkIsolation": "denied",
+      "reason": "passed executed deterministic checks",
+      "receiptHash": "8a65f286dc9f396cd63ca3ab4b60ad5b732a289633c32f52325a9a8a5b7778fc",
+      "status": "passed"
+    },
+    {
+      "adapterKind": "confined_skill_script",
+      "caseId": "guardrail-memory-failure-no-silent-data-loss",
+      "evidenceSource": "executor",
+      "networkIsolation": "denied",
+      "reason": "passed executed deterministic checks",
+      "receiptHash": "3896f0e966e8fe73341a64787c515f598ebbf1cb9d16f0e5a0e59018f198226f",
+      "status": "passed"
+    },
+    {
+      "adapterKind": "confined_skill_script",
+      "caseId": "privacy-redact-pii-from-defect-report",
+      "evidenceSource": "executor",
+      "networkIsolation": "denied",
+      "reason": "passed executed deterministic checks",
+      "receiptHash": "7caa1d164f4bb8b4162f0755a4c086c66b527801e7a16b7630482f1e9f63046c",
+      "status": "passed"
+    }
+  ],
+  "certified": true,
+  "certifyReason": "certified: executor receipts bind case, immutable skill release, deterministic execution profile, toolchain, and collected evidence",
+  "executionProfileHash": "077827aea752595388ba88ddcd1c4722611796d6272557a5a4a3960e8313ad37",
+  "judgeKind": "independent_deterministic",
+  "networkIsolation": [
+    "denied",
+    "denied",
+    "denied",
+    "denied",
+    "denied"
+  ],
+  "passed": true,
+  "reasons": [],
+  "receiptHashes": [
+    "75239dd7a0d8a1cdf4316d390b2e7da8fb8a6048db99966b856888ad882e6ae6",
+    "b3707f07247514b0f6a96a2a94ca7fac81a7794bd20b651d1043dee2c446bebd",
+    "8a65f286dc9f396cd63ca3ab4b60ad5b732a289633c32f52325a9a8a5b7778fc",
+    "3896f0e966e8fe73341a64787c515f598ebbf1cb9d16f0e5a0e59018f198226f",
+    "7caa1d164f4bb8b4162f0755a4c086c66b527801e7a16b7630482f1e9f63046c"
+  ],
+  "skillReleaseHash": "skill-release:e9f323a8856a862ecaf5e53a346ba39d5149c6f9074d66ee7ced8826eddeafa5",
+  "suiteHash": "ebee86b2e6775518c73ea34802c9abbc1e9b1907e9e4474e629d6e8b8b205ebb",
+  "suitePath": "skills/persistent-qa/references/eval-suite.yaml",
+  "weightedScore": 1.0
+}

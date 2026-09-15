@@ -2,12 +2,21 @@
 # Build linux/amd64 in hosted CI; pin the resulting digest before Platform apply.
 # Do not copy secret files. Do not run as root.
 
-FROM python:3.11-slim-bookworm
+FROM python:3.11-slim-bookworm AS runtime
+
+ARG SOURCE_COMMIT
+ARG SOURCE_TREE
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
     LINKSKILLS_REPO_ROOT=/opt/linkskills
+
+# The upstream base currently predates Debian's PCRE2 security update.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends --only-upgrade libpcre2-8-0 \
+    && dpkg --compare-versions "$(dpkg-query -W -f='${Version}' libpcre2-8-0)" ge '10.42-1+deb12u1' \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN groupadd --gid 10002 linkskills \
     && useradd --uid 10002 --gid 10002 --create-home --home-dir /home/linkskills --shell /usr/sbin/nologin linkskills \
@@ -20,7 +29,12 @@ WORKDIR /opt/linkskills
 COPY requirements-dev.lock requirements-dev.lock
 COPY packages packages
 COPY catalog catalog
+COPY skills skills
+COPY lib lib
+COPY scripts/provider_release.py scripts/provider_release.py
 COPY validator.py validator.py
+
+RUN printf '{"repository":"linktrend/LiNKskills","commit":"%s","tree":"%s"}\n' "$SOURCE_COMMIT" "$SOURCE_TREE" > source-identity.json
 
 RUN python3 -m pip install --no-cache-dir --require-hashes -r requirements-dev.lock \
     && python3 -m pip install --no-cache-dir --no-deps \
@@ -39,6 +53,8 @@ USER 10002:10002
 EXPOSE 8787
 
 LABEL org.linktrend.service="lskills" \
+      org.opencontainers.image.revision="$SOURCE_COMMIT" \
+      org.linktrend.source.tree="$SOURCE_TREE" \
       org.linktrend.contract="skills.api.v0.2" \
       org.linktrend.packet="ED-06" \
       org.linktrend.deploy="candidate-not-live"
