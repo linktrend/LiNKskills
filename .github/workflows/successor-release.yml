@@ -77,6 +77,28 @@ jobs:
           severity: CRITICAL,HIGH
           ignore-unfixed: true
           exit-code: '1'
+      - name: Summarize security findings without secret values
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          path = Path('release/runtime-vulnerabilities.json')
+          if path.exists():
+              for result in json.loads(path.read_text()).get('Results', []):
+                  for item in result.get('Vulnerabilities', []):
+                      print(json.dumps({key: item.get(key) for key in ('VulnerabilityID', 'PkgName', 'InstalledVersion', 'FixedVersion', 'Severity')}))
+                  for item in result.get('Secrets', []):
+                      print(json.dumps({'secretFinding': True, 'target': result.get('Target'), 'rule': item.get('RuleID')}))
+          PY
+      - name: Retain security diagnostics
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: linkskills-security-${{ github.sha }}
+          path: release/runtime-*.json
+          retention-days: 7
+          if-no-files-found: ignore
       - name: Bind retained artifact checksums
         run: |
           cd release
