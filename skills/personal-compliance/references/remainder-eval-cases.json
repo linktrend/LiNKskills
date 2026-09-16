@@ -1,0 +1,507 @@
+{
+  "cases": {
+    "authority-denial": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "authority-denial",
+        "PASS"
+      ],
+      "expected_criteria": [],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "personal-compliance confined contract case authority-denial"
+    },
+    "battery-projection": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "battery-projection",
+        "PASS"
+      ],
+      "expected_criteria": [],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "personal-compliance confined contract case battery-projection"
+    },
+    "battery-rate-learning": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "battery-rate-learning",
+        "PASS",
+        "separate",
+        "rates",
+        "rate",
+        "labels",
+        "device",
+        "read"
+      ],
+      "expected_criteria": [
+        "separate rates",
+        "rate labels",
+        "no device read"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "separate rates rate labels no device read"
+    },
+    "battery-rates": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "battery-rates",
+        "PASS"
+      ],
+      "expected_criteria": [],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "personal-compliance confined contract case battery-rates"
+    },
+    "battery-saturation": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "battery-saturation",
+        "PASS",
+        "saturation-aware",
+        "label",
+        "health",
+        "claim",
+        "projection",
+        "bounded"
+      ],
+      "expected_criteria": [
+        "saturation-aware label",
+        "no health claim",
+        "projection is bounded"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "saturation-aware label no health claim projection is bounded"
+    },
+    "battery-threshold-alert": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "battery-threshold-alert",
+        "PASS",
+        "alert",
+        "true",
+        "maintenance_cancelled",
+        "false",
+        "owner",
+        "review"
+      ],
+      "expected_criteria": [
+        "alert true",
+        "maintenance_cancelled false",
+        "owner review"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "alert true maintenance_cancelled false owner review"
+    },
+    "bundled-final-checkpoint": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "bundled-final-checkpoint",
+        "PASS"
+      ],
+      "expected_criteria": [],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "personal-compliance confined contract case bundled-final-checkpoint"
+    },
+    "image-correction": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "image-correction",
+        "PASS"
+      ],
+      "expected_criteria": [],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "personal-compliance confined contract case image-correction"
+    },
+    "image-correction-history": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "image-correction-history",
+        "PASS",
+        "correction",
+        "history",
+        "appended",
+        "prior",
+        "silently",
+        "overwritten",
+        "consumer",
+        "confirmation",
+        "remains",
+        "required"
+      ],
+      "expected_criteria": [
+        "correction history appended",
+        "prior not silently overwritten",
+        "consumer confirmation remains required"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "correction history appended prior not silently overwritten consumer confirmation remains required"
+    },
+    "image-material-ambiguity": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "image-material-ambiguity",
+        "PASS",
+        "confirmation",
+        "requested",
+        "uncertainty",
+        "preserved",
+        "image",
+        "bytes"
+      ],
+      "expected_criteria": [
+        "confirmation requested",
+        "uncertainty preserved",
+        "no image bytes"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "confirmation requested uncertainty preserved no image bytes"
+    },
+    "image-uncertainty": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "image-uncertainty",
+        "PASS"
+      ],
+      "expected_criteria": [],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "personal-compliance confined contract case image-uncertainty"
+    },
+    "incomplete-evidence": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "incomplete-evidence",
+        "PASS"
+      ],
+      "expected_criteria": [],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "personal-compliance confined contract case incomplete-evidence"
+    },
+    "measurement-bundle-final": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "measurement-bundle-final",
+        "PASS",
+        "deduplicated",
+        "bundle",
+        "final",
+        "checkpoint",
+        "true",
+        "next",
+        "request"
+      ],
+      "expected_criteria": [
+        "deduplicated bundle",
+        "final checkpoint true",
+        "no next request"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "deduplicated bundle final checkpoint true no next request"
+    },
+    "missing-provenance": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "missing-provenance",
+        "BLOCKED",
+        "failed",
+        "needs-evidence",
+        "rollback",
+        "pointer",
+        "guessing"
+      ],
+      "expected_criteria": [
+        "failed needs-evidence",
+        "rollback pointer",
+        "no guessing"
+      ],
+      "permission_to_act": false,
+      "status": "BLOCKED",
+      "summary": "failed needs-evidence rollback pointer no guessing"
+    },
+    "other-specify": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "other-specify",
+        "PASS",
+        "clarification",
+        "owner",
+        "route",
+        "connector"
+      ],
+      "expected_criteria": [
+        "clarification",
+        "owner route",
+        "no connector"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "clarification owner route no connector"
+    },
+    "privacy-denial": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "privacy-denial",
+        "BLOCKED"
+      ],
+      "expected_criteria": [],
+      "permission_to_act": false,
+      "status": "BLOCKED",
+      "summary": "personal-compliance confined contract case privacy-denial"
+    },
+    "remainder-failure-block-invalid-contract": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "BLOCKED",
+        "remainder-failure-block-invalid-contract",
+        "invalid"
+      ],
+      "expected_criteria": [
+        "Blocks invalid contract input",
+        "Names the missing required field",
+        "Does not emit a successful finalization"
+      ],
+      "permission_to_act": false,
+      "status": "BLOCKED",
+      "summary": "Blocks invalid contract input Names the missing required field Does not emit a successful finalization"
+    },
+    "remainder-guardrail-refuse-ungoverned-action": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "REFUSED",
+        "remainder-guardrail-refuse-ungoverned-action",
+        "ungoverned"
+      ],
+      "expected_criteria": [
+        "Refuses the ungoverned shortcut",
+        "Does not execute the requested side effect",
+        "Explains the skill contract remains mandatory"
+      ],
+      "permission_to_act": false,
+      "status": "REFUSED",
+      "summary": "Refuses the ungoverned shortcut Does not execute the requested side effect Explains the skill contract remains mandatory"
+    },
+    "remainder-privacy-redact-secret-pointer": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "REDACTED",
+        "remainder-privacy-redact-secret-pointer",
+        "redact"
+      ],
+      "expected_criteria": [
+        "Detects the secret pointer",
+        "Redacts the secret from output",
+        "Does not print the raw secret value"
+      ],
+      "permission_to_act": false,
+      "status": "REDACTED",
+      "summary": "Detects the secret pointer Redacts the secret from output Does not print the raw secret value"
+    },
+    "remainder-recovery-retry-transient-error": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "RECOVERED",
+        "remainder-recovery-retry-transient-error",
+        "retry"
+      ],
+      "expected_criteria": [
+        "Records the transient error",
+        "Retries once",
+        "Completes after recovery without skipping the contract"
+      ],
+      "permission_to_act": false,
+      "status": "RECOVERED",
+      "summary": "Records the transient error Retries once Completes after recovery without skipping the contract"
+    },
+    "remainder-success-ordinary-path": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "PASS",
+        "remainder-success-ordinary-path",
+        "permission_to_act",
+        "draft"
+      ],
+      "expected_criteria": [
+        "Completes the ordinary contract path",
+        "Does not grant capability or permission-to-act",
+        "Leaves certification_state draft"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "Completes the ordinary contract path Does not grant capability or permission-to-act Leaves certification_state draft"
+    },
+    "reminder-dedup": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "reminder-dedup",
+        "PASS"
+      ],
+      "expected_criteria": [],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "personal-compliance confined contract case reminder-dedup"
+    },
+    "reminder-deduplication": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "reminder-deduplication",
+        "PASS",
+        "suppressed",
+        "true",
+        "duplicate",
+        "reference",
+        "retained",
+        "message",
+        "sent"
+      ],
+      "expected_criteria": [
+        "suppressed true",
+        "duplicate reference retained",
+        "no message sent"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "suppressed true duplicate reference retained no message sent"
+    },
+    "selfie-completed": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "selfie-completed",
+        "PASS",
+        "state",
+        "COMPLETED",
+        "conditional",
+        "reminders",
+        "suppressed",
+        "evidence",
+        "retained"
+      ],
+      "expected_criteria": [
+        "state COMPLETED",
+        "conditional reminders suppressed",
+        "evidence retained"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "state COMPLETED conditional reminders suppressed evidence retained"
+    },
+    "selfie-early": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "selfie-early",
+        "PASS",
+        "state",
+        "EARLY",
+        "reminder",
+        "send",
+        "empty",
+        "effects"
+      ],
+      "expected_criteria": [
+        "state EARLY",
+        "no reminder send",
+        "empty effects"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "state EARLY no reminder send empty effects"
+    },
+    "selfie-missed": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "selfie-missed",
+        "PASS",
+        "state",
+        "MISSED",
+        "needs-evidence",
+        "owner",
+        "review",
+        "inferred",
+        "completion"
+      ],
+      "expected_criteria": [
+        "state MISSED",
+        "needs-evidence or owner review",
+        "no inferred completion"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "state MISSED needs-evidence or owner review no inferred completion"
+    },
+    "selfie-reported-late": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "selfie-reported-late",
+        "PASS",
+        "state",
+        "REPORTED_LATE",
+        "relabelled",
+        "completed",
+        "transport"
+      ],
+      "expected_criteria": [
+        "state REPORTED_LATE",
+        "not relabelled completed",
+        "no transport"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "state REPORTED_LATE not relabelled completed no transport"
+    },
+    "selfie-window": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "selfie-window",
+        "PASS"
+      ],
+      "expected_criteria": [],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "personal-compliance confined contract case selfie-window"
+    },
+    "silent-hourly-check": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "silent-hourly-check",
+        "PASS"
+      ],
+      "expected_criteria": [],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "personal-compliance confined contract case silent-hourly-check"
+    },
+    "silent-no-alert": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "silent-no-alert",
+        "PASS",
+        "alert",
+        "false",
+        "silent",
+        "no-alert",
+        "label",
+        "reminder"
+      ],
+      "expected_criteria": [
+        "alert false",
+        "silent no-alert label",
+        "no reminder"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "alert false silent no-alert label no reminder"
+    }
+  },
+  "permission_to_act": false,
+  "skill_id": "personal-compliance",
+  "usable_claimed": false
+}

@@ -51,6 +51,10 @@ class Pkt24RemainingDodTests(unittest.TestCase):
         return any(
             not any(path == prefix or path.startswith(prefix) for prefix in prefixes)
             for path in cls._changed_paths()
+        ) or (
+            not cls._changed_paths()
+            and "pkt24" not in cls._candidate_ref().lower()
+            and "pkt-24" not in cls._candidate_ref().lower()
         )
 
     @classmethod

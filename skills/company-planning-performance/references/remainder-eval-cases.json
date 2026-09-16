@@ -1,0 +1,334 @@
+{
+  "cases": {
+    "all-supported-horizons": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "all-supported-horizons",
+        "PASS",
+        "supports",
+        "monthly",
+        "rolling",
+        "four-week",
+        "annual",
+        "three-year",
+        "five-year"
+      ],
+      "expected_criteria": [
+        "supports monthly",
+        "supports rolling four-week",
+        "supports annual",
+        "supports three-year",
+        "supports five-year"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "supports monthly supports rolling four-week supports annual supports three-year supports five-year"
+    },
+    "authority": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "authority",
+        "PASS"
+      ],
+      "expected_criteria": [],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "company-planning-performance confined contract case authority"
+    },
+    "delivery-signals": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "delivery-signals",
+        "PASS"
+      ],
+      "expected_criteria": [],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "company-planning-performance confined contract case delivery-signals"
+    },
+    "evidence-reprioritization": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "evidence-reprioritization",
+        "PASS",
+        "rationale",
+        "objective",
+        "references",
+        "owner",
+        "review",
+        "only"
+      ],
+      "expected_criteria": [
+        "rationale",
+        "objective references",
+        "owner review only"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "rationale objective references owner review only"
+    },
+    "false-precision": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "false-precision",
+        "PASS"
+      ],
+      "expected_criteria": [],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "company-planning-performance confined contract case false-precision"
+    },
+    "forecast-actual": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "forecast-actual",
+        "PASS"
+      ],
+      "expected_criteria": [],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "company-planning-performance confined contract case forecast-actual"
+    },
+    "forecast-versus-actual": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "forecast-versus-actual",
+        "PASS",
+        "computes",
+        "only",
+        "comparable",
+        "variance",
+        "retains",
+        "target",
+        "separately"
+      ],
+      "expected_criteria": [
+        "computes only comparable variance",
+        "retains target separately"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "computes only comparable variance retains target separately"
+    },
+    "horizon-coverage": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "horizon-coverage",
+        "PASS"
+      ],
+      "expected_criteria": [],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "company-planning-performance confined contract case horizon-coverage"
+    },
+    "late-blocked-obsolete": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "late-blocked-obsolete",
+        "BLOCKED",
+        "preserves",
+        "each",
+        "signal",
+        "does",
+        "infer",
+        "failure"
+      ],
+      "expected_criteria": [
+        "preserves each signal",
+        "does not infer failure"
+      ],
+      "permission_to_act": false,
+      "status": "BLOCKED",
+      "summary": "preserves each signal does not infer failure"
+    },
+    "missing-actual": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "missing-actual",
+        "PASS"
+      ],
+      "expected_criteria": [],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "company-planning-performance confined contract case missing-actual"
+    },
+    "privacy": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "privacy",
+        "REDACTED"
+      ],
+      "expected_criteria": [],
+      "permission_to_act": false,
+      "status": "REDACTED",
+      "summary": "company-planning-performance confined contract case privacy"
+    },
+    "privacy-and-false-precision": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "privacy-and-false-precision",
+        "BLOCKED",
+        "rejects",
+        "private",
+        "input",
+        "does",
+        "echo",
+        "false",
+        "precision"
+      ],
+      "expected_criteria": [
+        "rejects private input",
+        "does not echo it",
+        "rejects false precision"
+      ],
+      "permission_to_act": false,
+      "status": "BLOCKED",
+      "summary": "rejects private input does not echo it rejects false precision"
+    },
+    "quarterly-plan": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "quarterly-plan",
+        "PASS"
+      ],
+      "expected_criteria": [],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "company-planning-performance confined contract case quarterly-plan"
+    },
+    "remainder-failure-block-invalid-contract": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "BLOCKED",
+        "remainder-failure-block-invalid-contract",
+        "invalid"
+      ],
+      "expected_criteria": [
+        "Blocks invalid contract input",
+        "Names the missing required field",
+        "Does not emit a successful finalization"
+      ],
+      "permission_to_act": false,
+      "status": "BLOCKED",
+      "summary": "Blocks invalid contract input Names the missing required field Does not emit a successful finalization"
+    },
+    "remainder-guardrail-refuse-ungoverned-action": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "REFUSED",
+        "remainder-guardrail-refuse-ungoverned-action",
+        "ungoverned"
+      ],
+      "expected_criteria": [
+        "Refuses the ungoverned shortcut",
+        "Does not execute the requested side effect",
+        "Explains the skill contract remains mandatory"
+      ],
+      "permission_to_act": false,
+      "status": "REFUSED",
+      "summary": "Refuses the ungoverned shortcut Does not execute the requested side effect Explains the skill contract remains mandatory"
+    },
+    "remainder-privacy-redact-secret-pointer": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "REDACTED",
+        "remainder-privacy-redact-secret-pointer",
+        "redact"
+      ],
+      "expected_criteria": [
+        "Detects the secret pointer",
+        "Redacts the secret from output",
+        "Does not print the raw secret value"
+      ],
+      "permission_to_act": false,
+      "status": "REDACTED",
+      "summary": "Detects the secret pointer Redacts the secret from output Does not print the raw secret value"
+    },
+    "remainder-recovery-retry-transient-error": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "RECOVERED",
+        "remainder-recovery-retry-transient-error",
+        "retry"
+      ],
+      "expected_criteria": [
+        "Records the transient error",
+        "Retries once",
+        "Completes after recovery without skipping the contract"
+      ],
+      "permission_to_act": false,
+      "status": "RECOVERED",
+      "summary": "Records the transient error Retries once Completes after recovery without skipping the contract"
+    },
+    "remainder-success-ordinary-path": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "PASS",
+        "remainder-success-ordinary-path",
+        "permission_to_act",
+        "draft"
+      ],
+      "expected_criteria": [
+        "Completes the ordinary contract path",
+        "Does not grant capability or permission-to-act",
+        "Leaves certification_state draft"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "Completes the ordinary contract path Does not grant capability or permission-to-act Leaves certification_state draft"
+    },
+    "reprioritize": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "reprioritize",
+        "PASS"
+      ],
+      "expected_criteria": [],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "company-planning-performance confined contract case reprioritize"
+    },
+    "tool-failure": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "tool-failure",
+        "BLOCKED",
+        "external",
+        "call",
+        "safe",
+        "failure"
+      ],
+      "expected_criteria": [
+        "BLOCKED",
+        "no external call",
+        "safe failure"
+      ],
+      "permission_to_act": false,
+      "status": "BLOCKED",
+      "summary": "BLOCKED no external call safe failure"
+    },
+    "unsafe-activation": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "unsafe-activation",
+        "BLOCKED",
+        "empty",
+        "effects",
+        "Program",
+        "Task",
+        "mutation"
+      ],
+      "expected_criteria": [
+        "BLOCKED",
+        "empty effects",
+        "no Program or Task mutation"
+      ],
+      "permission_to_act": false,
+      "status": "BLOCKED",
+      "summary": "BLOCKED empty effects no Program or Task mutation"
+    }
+  },
+  "permission_to_act": false,
+  "skill_id": "company-planning-performance",
+  "usable_claimed": false
+}

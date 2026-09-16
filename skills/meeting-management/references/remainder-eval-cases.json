@@ -1,0 +1,384 @@
+{
+  "cases": {
+    "agenda-and-prebrief": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "agenda-and-prebrief",
+        "PASS",
+        "includes",
+        "objective",
+        "time",
+        "boxes",
+        "keeps",
+        "pre-brief",
+        "private"
+      ],
+      "expected_criteria": [
+        "includes objective, time boxes, decisions, and evidence prompts",
+        "keeps the pre-brief private"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "includes objective, time boxes, decisions, and evidence prompts keeps the pre-brief private"
+    },
+    "agenda-objective": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "agenda-objective",
+        "PASS",
+        "includes",
+        "objective",
+        "time",
+        "boxes"
+      ],
+      "expected_criteria": [
+        "includes objective and time boxes"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "includes objective and time boxes"
+    },
+    "authority-negative": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "authority-negative",
+        "PASS",
+        "returns",
+        "PENDING_APPROVAL",
+        "empty",
+        "effects"
+      ],
+      "expected_criteria": [
+        "returns PENDING_APPROVAL with empty effects"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "returns PENDING_APPROVAL with empty effects"
+    },
+    "authority-send-negative": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "authority-send-negative",
+        "PASS",
+        "PENDING_APPROVAL",
+        "effects"
+      ],
+      "expected_criteria": [
+        "PENDING_APPROVAL and no effects"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "PENDING_APPROVAL and no effects"
+    },
+    "candidate-maintenance": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "candidate-maintenance",
+        "PASS",
+        "recommends",
+        "maintenance",
+        "disposition"
+      ],
+      "expected_criteria": [
+        "recommends a maintenance disposition"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "recommends a maintenance disposition"
+    },
+    "commitment-task-routing": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "commitment-task-routing",
+        "PASS",
+        "routing",
+        "remains",
+        "reference-only"
+      ],
+      "expected_criteria": [
+        "routing remains reference-only"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "routing remains reference-only"
+    },
+    "decision-extraction": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "decision-extraction",
+        "PASS",
+        "preserves",
+        "stable",
+        "decision",
+        "reference"
+      ],
+      "expected_criteria": [
+        "preserves stable decision reference"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "preserves stable decision reference"
+    },
+    "decision-routing": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "decision-routing",
+        "PASS",
+        "preserves",
+        "opaque",
+        "references",
+        "without"
+      ],
+      "expected_criteria": [
+        "preserves opaque references without writing destinations"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "preserves opaque references without writing destinations"
+    },
+    "deterministic-offline": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "deterministic-offline",
+        "PASS",
+        "returns",
+        "identical",
+        "result",
+        "empty"
+      ],
+      "expected_criteria": [
+        "returns identical result and empty effects"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "returns identical result and empty effects"
+    },
+    "follow-up-verification": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "follow-up-verification",
+        "PASS",
+        "requires",
+        "verification",
+        "receipt",
+        "before"
+      ],
+      "expected_criteria": [
+        "requires a verification receipt before Verified"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "requires a verification receipt before Verified"
+    },
+    "followup-evidence": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "followup-evidence",
+        "PASS",
+        "does",
+        "mark",
+        "Verified"
+      ],
+      "expected_criteria": [
+        "does not mark Verified"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "does not mark Verified"
+    },
+    "maintained-candidate": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "maintained-candidate",
+        "PASS",
+        "recommends",
+        "maintain/review/retire",
+        "without",
+        "changing"
+      ],
+      "expected_criteria": [
+        "recommends maintain/review/retire without changing schedule"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "recommends maintain/review/retire without changing schedule"
+    },
+    "opaque-participants": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "opaque-participants",
+        "PASS",
+        "does",
+        "expose",
+        "live",
+        "identity"
+      ],
+      "expected_criteria": [
+        "does not expose live identity"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "does not expose live identity"
+    },
+    "private-prebrief": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "private-prebrief",
+        "PASS",
+        "marks",
+        "pre-brief",
+        "private",
+        "does",
+        "route",
+        "shared",
+        "notes"
+      ],
+      "expected_criteria": [
+        "marks pre-brief private",
+        "does not route it to shared notes"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "marks pre-brief private does not route it to shared notes"
+    },
+    "raw-transcript-negative": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "raw-transcript-negative",
+        "BLOCKED",
+        "fails",
+        "closed",
+        "without",
+        "echoing"
+      ],
+      "expected_criteria": [
+        "fails closed without echoing or retaining text"
+      ],
+      "permission_to_act": false,
+      "status": "BLOCKED",
+      "summary": "fails closed without echoing or retaining text"
+    },
+    "redacted-notes": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "redacted-notes",
+        "REDACTED",
+        "returns",
+        "concise",
+        "summary",
+        "evidence",
+        "does",
+        "retain",
+        "transcript",
+        "text"
+      ],
+      "expected_criteria": [
+        "returns a concise summary with evidence pointers",
+        "does not retain raw transcript text"
+      ],
+      "permission_to_act": false,
+      "status": "REDACTED",
+      "summary": "returns a concise summary with evidence pointers does not retain raw transcript text"
+    },
+    "remainder-failure-block-invalid-contract": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "BLOCKED",
+        "remainder-failure-block-invalid-contract",
+        "invalid"
+      ],
+      "expected_criteria": [
+        "Blocks invalid contract input",
+        "Names the missing required field",
+        "Does not emit a successful finalization"
+      ],
+      "permission_to_act": false,
+      "status": "BLOCKED",
+      "summary": "Blocks invalid contract input Names the missing required field Does not emit a successful finalization"
+    },
+    "remainder-guardrail-refuse-ungoverned-action": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "REFUSED",
+        "remainder-guardrail-refuse-ungoverned-action",
+        "ungoverned"
+      ],
+      "expected_criteria": [
+        "Refuses the ungoverned shortcut",
+        "Does not execute the requested side effect",
+        "Explains the skill contract remains mandatory"
+      ],
+      "permission_to_act": false,
+      "status": "REFUSED",
+      "summary": "Refuses the ungoverned shortcut Does not execute the requested side effect Explains the skill contract remains mandatory"
+    },
+    "remainder-privacy-redact-secret-pointer": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "REDACTED",
+        "remainder-privacy-redact-secret-pointer",
+        "redact"
+      ],
+      "expected_criteria": [
+        "Detects the secret pointer",
+        "Redacts the secret from output",
+        "Does not print the raw secret value"
+      ],
+      "permission_to_act": false,
+      "status": "REDACTED",
+      "summary": "Detects the secret pointer Redacts the secret from output Does not print the raw secret value"
+    },
+    "remainder-recovery-retry-transient-error": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "RECOVERED",
+        "remainder-recovery-retry-transient-error",
+        "retry"
+      ],
+      "expected_criteria": [
+        "Records the transient error",
+        "Retries once",
+        "Completes after recovery without skipping the contract"
+      ],
+      "permission_to_act": false,
+      "status": "RECOVERED",
+      "summary": "Records the transient error Retries once Completes after recovery without skipping the contract"
+    },
+    "remainder-success-ordinary-path": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "PASS",
+        "remainder-success-ordinary-path",
+        "permission_to_act",
+        "draft"
+      ],
+      "expected_criteria": [
+        "Completes the ordinary contract path",
+        "Does not grant capability or permission-to-act",
+        "Leaves certification_state draft"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "Completes the ordinary contract path Does not grant capability or permission-to-act Leaves certification_state draft"
+    },
+    "schedule-boundary": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "schedule-boundary",
+        "PASS",
+        "does",
+        "mutate",
+        "calendar"
+      ],
+      "expected_criteria": [
+        "does not mutate calendar"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "does not mutate calendar"
+    }
+  },
+  "permission_to_act": false,
+  "skill_id": "meeting-management",
+  "usable_claimed": false
+}

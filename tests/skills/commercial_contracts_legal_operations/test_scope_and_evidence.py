@@ -8,7 +8,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[3]
 class ScopeAndEvidenceTests(unittest.TestCase):
     def test_skill_contains_no_live_or_privileged_material_markers(self):
         for path in (ROOT / "skills" / "commercial-contracts-legal-operations").rglob("*"):
-            if path.is_file():
+            if path.is_file() and "__pycache__" not in path.parts and path.suffix not in {".pyc", ".pyo"}:
                 text = path.read_text(encoding="utf-8", errors="replace")
                 for marker in ("sk_live_", "BEGIN PRIVATE KEY", "customer@example.com"):
                     self.assertNotIn(marker, text, str(path))

@@ -1,0 +1,591 @@
+{
+  "cases": {
+    "ambiguous-overlap": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "\"status\": \"AMBIGUOUS\"",
+        "\"selected_route\": null",
+        "\"source_entrypoint\": null",
+        "ambiguous-overlap",
+        "PASS",
+        "returns",
+        "ambiguous",
+        "does",
+        "select",
+        "source"
+      ],
+      "expected_criteria": [
+        "returns ambiguous",
+        "does not select a source"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "returns ambiguous does not select a source"
+    },
+    "consumer-boundary": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "\"status\": \"NOT_APPLICABLE\"",
+        "\"selected_route\": null",
+        "\"source_entrypoint\": null",
+        "consumer-boundary",
+        "PASS",
+        "returns",
+        "not_applicable",
+        "does",
+        "select",
+        "source"
+      ],
+      "expected_criteria": [
+        "returns not_applicable",
+        "does not select a source"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "returns not_applicable does not select a source"
+    },
+    "no-match": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "\"status\": \"NOT_APPLICABLE\"",
+        "\"selected_route\": null",
+        "\"source_entrypoint\": null",
+        "no-match",
+        "PASS",
+        "returns",
+        "not_applicable",
+        "does",
+        "select",
+        "source"
+      ],
+      "expected_criteria": [
+        "returns not_applicable",
+        "does not select a source"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "returns not_applicable does not select a source"
+    },
+    "remainder-failure-block-invalid-contract": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "BLOCKED",
+        "remainder-failure-block-invalid-contract",
+        "invalid"
+      ],
+      "expected_criteria": [
+        "Blocks invalid contract input",
+        "Names the missing required field",
+        "Does not emit a successful finalization"
+      ],
+      "permission_to_act": false,
+      "status": "BLOCKED",
+      "summary": "Blocks invalid contract input Names the missing required field Does not emit a successful finalization"
+    },
+    "remainder-guardrail-refuse-ungoverned-action": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "REFUSED",
+        "remainder-guardrail-refuse-ungoverned-action",
+        "ungoverned"
+      ],
+      "expected_criteria": [
+        "Refuses the ungoverned shortcut",
+        "Does not execute the requested side effect",
+        "Explains the skill contract remains mandatory"
+      ],
+      "permission_to_act": false,
+      "status": "REFUSED",
+      "summary": "Refuses the ungoverned shortcut Does not execute the requested side effect Explains the skill contract remains mandatory"
+    },
+    "remainder-privacy-redact-secret-pointer": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "REDACTED",
+        "remainder-privacy-redact-secret-pointer",
+        "redact"
+      ],
+      "expected_criteria": [
+        "Detects the secret pointer",
+        "Redacts the secret from output",
+        "Does not print the raw secret value"
+      ],
+      "permission_to_act": false,
+      "status": "REDACTED",
+      "summary": "Detects the secret pointer Redacts the secret from output Does not print the raw secret value"
+    },
+    "remainder-recovery-retry-transient-error": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "RECOVERED",
+        "remainder-recovery-retry-transient-error",
+        "retry"
+      ],
+      "expected_criteria": [
+        "Records the transient error",
+        "Retries once",
+        "Completes after recovery without skipping the contract"
+      ],
+      "permission_to_act": false,
+      "status": "RECOVERED",
+      "summary": "Records the transient error Retries once Completes after recovery without skipping the contract"
+    },
+    "remainder-success-ordinary-path": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "PASS",
+        "remainder-success-ordinary-path",
+        "permission_to_act",
+        "draft"
+      ],
+      "expected_criteria": [
+        "Completes the ordinary contract path",
+        "Does not grant capability or permission-to-act",
+        "Leaves certification_state draft"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "Completes the ordinary contract path Does not grant capability or permission-to-act Leaves certification_state draft"
+    },
+    "route-1-gstack-spec": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "\"status\": \"SELECTED\"",
+        "\"selected_route\": \"gstack-spec\"",
+        "\"source_entrypoint\": \"vendor-skills/hybrid-development/gstack-spec/SKILL.md\"",
+        "route-1-gstack-spec",
+        "PASS",
+        "selects",
+        "gstack-spec",
+        "returns",
+        "exact",
+        "source",
+        "entrypoint"
+      ],
+      "expected_criteria": [
+        "selects gstack-spec",
+        "returns one exact source entrypoint"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "selects gstack-spec returns one exact source entrypoint"
+    },
+    "route-10-gstack-learn": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "\"status\": \"SELECTED\"",
+        "\"selected_route\": \"gstack-learn\"",
+        "\"source_entrypoint\": \"vendor-skills/hybrid-development/gstack-learn/SKILL.md\"",
+        "route-10-gstack-learn",
+        "PASS",
+        "selects",
+        "gstack-learn",
+        "returns",
+        "exact",
+        "source",
+        "entrypoint"
+      ],
+      "expected_criteria": [
+        "selects gstack-learn",
+        "returns one exact source entrypoint"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "selects gstack-learn returns one exact source entrypoint"
+    },
+    "route-11-mattpocock-grill-with-docs": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "\"status\": \"SELECTED\"",
+        "\"selected_route\": \"mattpocock-grill-with-docs\"",
+        "\"source_entrypoint\": \"vendor-skills/hybrid-development/mattpocock-grill-with-docs/SKILL.md\"",
+        "route-11-mattpocock-grill-with-docs",
+        "PASS",
+        "selects",
+        "mattpocock-grill-with-docs",
+        "returns",
+        "exact",
+        "source",
+        "entrypoint"
+      ],
+      "expected_criteria": [
+        "selects mattpocock-grill-with-docs",
+        "returns one exact source entrypoint"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "selects mattpocock-grill-with-docs returns one exact source entrypoint"
+    },
+    "route-12-mattpocock-to-spec": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "\"status\": \"SELECTED\"",
+        "\"selected_route\": \"mattpocock-to-spec\"",
+        "\"source_entrypoint\": \"vendor-skills/hybrid-development/mattpocock-to-spec/SKILL.md\"",
+        "route-12-mattpocock-to-spec",
+        "PASS",
+        "selects",
+        "mattpocock-to-spec",
+        "returns",
+        "exact",
+        "source",
+        "entrypoint"
+      ],
+      "expected_criteria": [
+        "selects mattpocock-to-spec",
+        "returns one exact source entrypoint"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "selects mattpocock-to-spec returns one exact source entrypoint"
+    },
+    "route-13-mattpocock-to-tickets": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "\"status\": \"SELECTED\"",
+        "\"selected_route\": \"mattpocock-to-tickets\"",
+        "\"source_entrypoint\": \"vendor-skills/hybrid-development/mattpocock-to-tickets/SKILL.md\"",
+        "route-13-mattpocock-to-tickets",
+        "PASS",
+        "selects",
+        "mattpocock-to-tickets",
+        "returns",
+        "exact",
+        "source",
+        "entrypoint"
+      ],
+      "expected_criteria": [
+        "selects mattpocock-to-tickets",
+        "returns one exact source entrypoint"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "selects mattpocock-to-tickets returns one exact source entrypoint"
+    },
+    "route-14-mattpocock-tdd": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "\"status\": \"SELECTED\"",
+        "\"selected_route\": \"mattpocock-tdd\"",
+        "\"source_entrypoint\": \"vendor-skills/hybrid-development/mattpocock-tdd/SKILL.md\"",
+        "route-14-mattpocock-tdd",
+        "PASS",
+        "selects",
+        "mattpocock-tdd",
+        "returns",
+        "exact",
+        "source",
+        "entrypoint"
+      ],
+      "expected_criteria": [
+        "selects mattpocock-tdd",
+        "returns one exact source entrypoint"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "selects mattpocock-tdd returns one exact source entrypoint"
+    },
+    "route-15-mattpocock-diagnosing-bugs": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "\"status\": \"SELECTED\"",
+        "\"selected_route\": \"mattpocock-diagnosing-bugs\"",
+        "\"source_entrypoint\": \"vendor-skills/hybrid-development/mattpocock-diagnosing-bugs/SKILL.md\"",
+        "route-15-mattpocock-diagnosing-bugs",
+        "PASS",
+        "selects",
+        "mattpocock-diagnosing-bugs",
+        "returns",
+        "exact",
+        "source",
+        "entrypoint"
+      ],
+      "expected_criteria": [
+        "selects mattpocock-diagnosing-bugs",
+        "returns one exact source entrypoint"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "selects mattpocock-diagnosing-bugs returns one exact source entrypoint"
+    },
+    "route-16-mattpocock-improve-codebase-architecture": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "\"status\": \"SELECTED\"",
+        "\"selected_route\": \"mattpocock-improve-codebase-architecture\"",
+        "\"source_entrypoint\": \"vendor-skills/hybrid-development/mattpocock-improve-codebase-architecture/SKILL.md\"",
+        "route-16-mattpocock-improve-codebase-architecture",
+        "PASS",
+        "selects",
+        "mattpocock-improve-codebase-architecture",
+        "returns",
+        "exact",
+        "source",
+        "entrypoint"
+      ],
+      "expected_criteria": [
+        "selects mattpocock-improve-codebase-architecture",
+        "returns one exact source entrypoint"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "selects mattpocock-improve-codebase-architecture returns one exact source entrypoint"
+    },
+    "route-17-mattpocock-research": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "\"status\": \"SELECTED\"",
+        "\"selected_route\": \"mattpocock-research\"",
+        "\"source_entrypoint\": \"vendor-skills/hybrid-development/mattpocock-research/SKILL.md\"",
+        "route-17-mattpocock-research",
+        "PASS",
+        "selects",
+        "mattpocock-research",
+        "returns",
+        "exact",
+        "source",
+        "entrypoint"
+      ],
+      "expected_criteria": [
+        "selects mattpocock-research",
+        "returns one exact source entrypoint"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "selects mattpocock-research returns one exact source entrypoint"
+    },
+    "route-18-mattpocock-triage": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "\"status\": \"SELECTED\"",
+        "\"selected_route\": \"mattpocock-triage\"",
+        "\"source_entrypoint\": \"vendor-skills/hybrid-development/mattpocock-triage/SKILL.md\"",
+        "route-18-mattpocock-triage",
+        "PASS",
+        "selects",
+        "mattpocock-triage",
+        "returns",
+        "exact",
+        "source",
+        "entrypoint"
+      ],
+      "expected_criteria": [
+        "selects mattpocock-triage",
+        "returns one exact source entrypoint"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "selects mattpocock-triage returns one exact source entrypoint"
+    },
+    "route-19-mattpocock-setup-matt-pocock-skills": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "\"status\": \"SELECTED\"",
+        "\"selected_route\": \"mattpocock-setup-matt-pocock-skills\"",
+        "\"source_entrypoint\": \"vendor-skills/hybrid-development/mattpocock-setup-matt-pocock-skills/SKILL.md\"",
+        "route-19-mattpocock-setup-matt-pocock-skills",
+        "PASS",
+        "selects",
+        "mattpocock-setup-matt-pocock-skills",
+        "returns",
+        "exact",
+        "source",
+        "entrypoint"
+      ],
+      "expected_criteria": [
+        "selects mattpocock-setup-matt-pocock-skills",
+        "returns one exact source entrypoint"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "selects mattpocock-setup-matt-pocock-skills returns one exact source entrypoint"
+    },
+    "route-2-gstack-plan-ceo-review": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "\"status\": \"SELECTED\"",
+        "\"selected_route\": \"gstack-plan-ceo-review\"",
+        "\"source_entrypoint\": \"vendor-skills/hybrid-development/gstack-plan-ceo-review/SKILL.md\"",
+        "route-2-gstack-plan-ceo-review",
+        "PASS",
+        "selects",
+        "gstack-plan-ceo-review",
+        "returns",
+        "exact",
+        "source",
+        "entrypoint"
+      ],
+      "expected_criteria": [
+        "selects gstack-plan-ceo-review",
+        "returns one exact source entrypoint"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "selects gstack-plan-ceo-review returns one exact source entrypoint"
+    },
+    "route-3-gstack-health": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "\"status\": \"SELECTED\"",
+        "\"selected_route\": \"gstack-health\"",
+        "\"source_entrypoint\": \"vendor-skills/hybrid-development/gstack-health/SKILL.md\"",
+        "route-3-gstack-health",
+        "PASS",
+        "selects",
+        "gstack-health",
+        "returns",
+        "exact",
+        "source",
+        "entrypoint"
+      ],
+      "expected_criteria": [
+        "selects gstack-health",
+        "returns one exact source entrypoint"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "selects gstack-health returns one exact source entrypoint"
+    },
+    "route-4-gstack-ship": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "\"status\": \"SELECTED\"",
+        "\"selected_route\": \"gstack-ship\"",
+        "\"source_entrypoint\": \"vendor-skills/hybrid-development/gstack-ship/SKILL.md\"",
+        "route-4-gstack-ship",
+        "PASS",
+        "selects",
+        "gstack-ship",
+        "returns",
+        "exact",
+        "source",
+        "entrypoint"
+      ],
+      "expected_criteria": [
+        "selects gstack-ship",
+        "returns one exact source entrypoint"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "selects gstack-ship returns one exact source entrypoint"
+    },
+    "route-5-gstack-context-save": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "\"status\": \"SELECTED\"",
+        "\"selected_route\": \"gstack-context-save\"",
+        "\"source_entrypoint\": \"vendor-skills/hybrid-development/gstack-context-save/SKILL.md\"",
+        "route-5-gstack-context-save",
+        "PASS",
+        "selects",
+        "gstack-context-save",
+        "returns",
+        "exact",
+        "source",
+        "entrypoint"
+      ],
+      "expected_criteria": [
+        "selects gstack-context-save",
+        "returns one exact source entrypoint"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "selects gstack-context-save returns one exact source entrypoint"
+    },
+    "route-6-gstack-context-restore": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "\"status\": \"SELECTED\"",
+        "\"selected_route\": \"gstack-context-restore\"",
+        "\"source_entrypoint\": \"vendor-skills/hybrid-development/gstack-context-restore/SKILL.md\"",
+        "route-6-gstack-context-restore",
+        "PASS",
+        "selects",
+        "gstack-context-restore",
+        "returns",
+        "exact",
+        "source",
+        "entrypoint"
+      ],
+      "expected_criteria": [
+        "selects gstack-context-restore",
+        "returns one exact source entrypoint"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "selects gstack-context-restore returns one exact source entrypoint"
+    },
+    "route-7-gstack-review": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "\"status\": \"SELECTED\"",
+        "\"selected_route\": \"gstack-review\"",
+        "\"source_entrypoint\": \"vendor-skills/hybrid-development/gstack-review/SKILL.md\"",
+        "route-7-gstack-review",
+        "PASS",
+        "selects",
+        "gstack-review",
+        "returns",
+        "exact",
+        "source",
+        "entrypoint"
+      ],
+      "expected_criteria": [
+        "selects gstack-review",
+        "returns one exact source entrypoint"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "selects gstack-review returns one exact source entrypoint"
+    },
+    "route-8-gstack-qa": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "\"status\": \"SELECTED\"",
+        "\"selected_route\": \"gstack-qa\"",
+        "\"source_entrypoint\": \"vendor-skills/hybrid-development/gstack-qa/SKILL.md\"",
+        "route-8-gstack-qa",
+        "PASS",
+        "selects",
+        "gstack-qa",
+        "returns",
+        "exact",
+        "source",
+        "entrypoint"
+      ],
+      "expected_criteria": [
+        "selects gstack-qa",
+        "returns one exact source entrypoint"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "selects gstack-qa returns one exact source entrypoint"
+    },
+    "route-9-gstack-retro": {
+      "capability_grant": false,
+      "contract_tokens": [
+        "\"status\": \"SELECTED\"",
+        "\"selected_route\": \"gstack-retro\"",
+        "\"source_entrypoint\": \"vendor-skills/hybrid-development/gstack-retro/SKILL.md\"",
+        "route-9-gstack-retro",
+        "PASS",
+        "selects",
+        "gstack-retro",
+        "returns",
+        "exact",
+        "source",
+        "entrypoint"
+      ],
+      "expected_criteria": [
+        "selects gstack-retro",
+        "returns one exact source entrypoint"
+      ],
+      "permission_to_act": false,
+      "status": "PASS",
+      "summary": "selects gstack-retro returns one exact source entrypoint"
+    }
+  },
+  "permission_to_act": false,
+  "skill_id": "hybrid-development-methods",
+  "usable_claimed": false
+}

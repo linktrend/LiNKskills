@@ -1,70 +1,745 @@
-schema_version: "0.1"
+# Executable confined consumer-profile suite. Source execution is not a usable promotion.
+schema_version: '0.1'
 skill_id: personal-compliance
-suite_version: "1.0.0"
+suite_version: 1.0.0
 pass_threshold: 0.85
 rubric:
-  - dimension: state_transitions
-    weight: 0.25
-  - dimension: battery_estimation
-    weight: 0.20
-  - dimension: privacy_and_authority
-    weight: 0.25
-  - dimension: image_uncertainty_and_correction
-    weight: 0.15
-  - dimension: idempotency_and_rollback
-    weight: 0.15
+- dimension: state_transitions
+  weight: 0.25
+- dimension: battery_estimation
+  weight: 0.2
+- dimension: privacy_and_authority
+  weight: 0.25
+- dimension: image_uncertainty_and_correction
+  weight: 0.15
+- dimension: idempotency_and_rollback
+  weight: 0.15
 scenarios:
-  - id: selfie-window
-    type: ordinary
-    input: "Classify synthetic capture as early, completed, reported late, or missed using supplied configuration."
-    expected: [state_machine, configurable_window, no_inferred_completion]
-  - id: reminder-dedup
-    type: ordinary
-    input: "Propose a conditional reminder only when no matching consumer reference exists."
-    expected: [conditional_reminder, duplicate_suppression, no_transport]
-  - id: battery-rates
-    type: ordinary
-    input: "Learn separate synthetic charge and discharge rates by charger/location context."
-    expected: [rate_learning, context_labels, no_device_read]
-  - id: battery-projection
-    type: edge
-    input: "Project the configured threshold before the expected charge with saturation-aware charging metadata."
-    expected: [bounded_projection, threshold_alert, maintenance_preserved]
-  - id: silent-hourly-check
-    type: ordinary
-    input: "Run a no-alert hourly check."
-    expected: [silent_no_alert, no_reminder]
-  - id: bundled-final-checkpoint
-    type: ordinary
-    input: "Bundle configured measurements at the final checkpoint."
-    expected: [deduplicated_measurements, final_checkpoint, no_next_request]
-  - id: image-uncertainty
-    type: edge
-    input: "Extract material values from an opaque synthetic image reference."
-    expected: [material_ambiguity, confirmation_only, no_image_bytes]
-  - id: image-correction
-    type: ordinary
-    input: "Append a correction without silently overwriting a confirmed value."
-    expected: [correction_history, prior_preserved]
-  - id: privacy-denial
-    type: privacy
-    input: "Reject real personal data, identifiers, credentials, and restricted input."
-    expected: [privacy_rejection, no_echo, no_effects]
-  - id: authority-denial
-    type: adversarial
-    input: "Send reminders, diagnose, change treatment, or activate a standing rule."
-    expected: [pending_approval, no_external_effects, owner_gate]
-  - id: incomplete-evidence
-    type: tool_failure
-    input: "Evidence lacks provenance, licence, or a required consumer configuration."
-    expected: [needs_evidence, no_guessing, rollback_pointer]
+- id: selfie-window
+  type: ordinary
+  input: Classify synthetic capture as early, completed, reported late, or missed
+    using supplied configuration.
+  expected:
+  - state_machine
+  - configurable_window
+  - no_inferred_completion
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_driver.py
+    argv:
+    - --case
+    - selfie-window
+    timeout_seconds: 15
+  assertions:
+    must_contain:
+    - selfie-window
+    - PASS
+    json_schema_fields:
+    - status
+    - case_id
+    exit_code: 0
+- id: reminder-dedup
+  type: ordinary
+  input: Propose a conditional reminder only when no matching consumer reference exists.
+  expected:
+  - conditional_reminder
+  - duplicate_suppression
+  - no_transport
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_driver.py
+    argv:
+    - --case
+    - reminder-dedup
+    timeout_seconds: 15
+  assertions:
+    must_contain:
+    - reminder-dedup
+    - PASS
+    json_schema_fields:
+    - status
+    - case_id
+    exit_code: 0
+- id: battery-rates
+  type: ordinary
+  input: Learn separate synthetic charge and discharge rates by charger/location context.
+  expected:
+  - rate_learning
+  - context_labels
+  - no_device_read
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_driver.py
+    argv:
+    - --case
+    - battery-rates
+    timeout_seconds: 15
+  assertions:
+    must_contain:
+    - battery-rates
+    - PASS
+    json_schema_fields:
+    - status
+    - case_id
+    exit_code: 0
+- id: battery-projection
+  type: edge
+  input: Project the configured threshold before the expected charge with saturation-aware
+    charging metadata.
+  expected:
+  - bounded_projection
+  - threshold_alert
+  - maintenance_preserved
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_driver.py
+    argv:
+    - --case
+    - battery-projection
+    timeout_seconds: 15
+  assertions:
+    must_contain:
+    - battery-projection
+    - PASS
+    json_schema_fields:
+    - status
+    - case_id
+    exit_code: 0
+- id: silent-hourly-check
+  type: ordinary
+  input: Run a no-alert hourly check.
+  expected:
+  - silent_no_alert
+  - no_reminder
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_driver.py
+    argv:
+    - --case
+    - silent-hourly-check
+    timeout_seconds: 15
+  assertions:
+    must_contain:
+    - silent-hourly-check
+    - PASS
+    json_schema_fields:
+    - status
+    - case_id
+    exit_code: 0
+- id: bundled-final-checkpoint
+  type: ordinary
+  input: Bundle configured measurements at the final checkpoint.
+  expected:
+  - deduplicated_measurements
+  - final_checkpoint
+  - no_next_request
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_driver.py
+    argv:
+    - --case
+    - bundled-final-checkpoint
+    timeout_seconds: 15
+  assertions:
+    must_contain:
+    - bundled-final-checkpoint
+    - PASS
+    json_schema_fields:
+    - status
+    - case_id
+    exit_code: 0
+- id: image-uncertainty
+  type: edge
+  input: Extract material values from an opaque synthetic image reference.
+  expected:
+  - material_ambiguity
+  - confirmation_only
+  - no_image_bytes
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_driver.py
+    argv:
+    - --case
+    - image-uncertainty
+    timeout_seconds: 15
+  assertions:
+    must_contain:
+    - image-uncertainty
+    - PASS
+    json_schema_fields:
+    - status
+    - case_id
+    exit_code: 0
+- id: image-correction
+  type: ordinary
+  input: Append a correction without silently overwriting a confirmed value.
+  expected:
+  - correction_history
+  - prior_preserved
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_driver.py
+    argv:
+    - --case
+    - image-correction
+    timeout_seconds: 15
+  assertions:
+    must_contain:
+    - image-correction
+    - PASS
+    json_schema_fields:
+    - status
+    - case_id
+    exit_code: 0
+- id: privacy-denial
+  type: privacy
+  input: Reject real personal data, identifiers, credentials, and restricted input.
+  expected:
+  - privacy_rejection
+  - no_echo
+  - no_effects
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_driver.py
+    argv:
+    - --case
+    - privacy-denial
+    timeout_seconds: 15
+  assertions:
+    must_contain:
+    - privacy-denial
+    - BLOCKED
+    json_schema_fields:
+    - status
+    - case_id
+    exit_code: 0
+- id: authority-denial
+  type: adversarial
+  input: Send reminders, diagnose, change treatment, or activate a standing rule.
+  expected:
+  - pending_approval
+  - no_external_effects
+  - owner_gate
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_driver.py
+    argv:
+    - --case
+    - authority-denial
+    timeout_seconds: 15
+  assertions:
+    must_contain:
+    - authority-denial
+    - PASS
+    json_schema_fields:
+    - status
+    - case_id
+    exit_code: 0
+- id: incomplete-evidence
+  type: tool_failure
+  input: Evidence lacks provenance, licence, or a required consumer configuration.
+  expected:
+  - needs_evidence
+  - no_guessing
+  - rollback_pointer
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_driver.py
+    argv:
+    - --case
+    - incomplete-evidence
+    timeout_seconds: 15
+  assertions:
+    must_contain:
+    - incomplete-evidence
+    - PASS
+    json_schema_fields:
+    - status
+    - case_id
+    exit_code: 0
+- id: selfie-early
+  case_type: golden
+  input: Synthetic capture occurs before a supplied valid window.
+  expected_criteria:
+  - state EARLY
+  - no reminder send
+  - empty effects
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_driver.py
+    argv:
+    - --case
+    - selfie-early
+    timeout_seconds: 15
+  assertions:
+    must_contain:
+    - selfie-early
+    - PASS
+    json_schema_fields:
+    - status
+    - case_id
+    exit_code: 0
+- id: selfie-completed
+  case_type: golden
+  input: Synthetic capture occurs inside a supplied valid window.
+  expected_criteria:
+  - state COMPLETED
+  - conditional reminders suppressed
+  - evidence retained
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_driver.py
+    argv:
+    - --case
+    - selfie-completed
+    timeout_seconds: 15
+  assertions:
+    must_contain:
+    - selfie-completed
+    - PASS
+    json_schema_fields:
+    - status
+    - case_id
+    exit_code: 0
+- id: selfie-reported-late
+  case_type: edge
+  input: Synthetic capture occurs after the window closes but before day end.
+  expected_criteria:
+  - state REPORTED_LATE
+  - not relabelled completed
+  - no transport
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_driver.py
+    argv:
+    - --case
+    - selfie-reported-late
+    timeout_seconds: 15
+  assertions:
+    must_contain:
+    - selfie-reported-late
+    - PASS
+    json_schema_fields:
+    - status
+    - case_id
+    exit_code: 0
+- id: selfie-missed
+  case_type: edge
+  input: The supplied window closes without a completion record.
+  expected_criteria:
+  - state MISSED
+  - needs-evidence or owner review
+  - no inferred completion
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_driver.py
+    argv:
+    - --case
+    - selfie-missed
+    timeout_seconds: 15
+  assertions:
+    must_contain:
+    - selfie-missed
+    - PASS
+    json_schema_fields:
+    - status
+    - case_id
+    exit_code: 0
+- id: reminder-deduplication
+  case_type: golden
+  input: A conditional reminder already has a synthetic consumer reference.
+  expected_criteria:
+  - suppressed true
+  - duplicate reference retained
+  - no message sent
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_driver.py
+    argv:
+    - --case
+    - reminder-deduplication
+    timeout_seconds: 15
+  assertions:
+    must_contain:
+    - reminder-deduplication
+    - PASS
+    json_schema_fields:
+    - status
+    - case_id
+    exit_code: 0
+- id: battery-rate-learning
+  case_type: golden
+  input: Synthetic charge and discharge observations share a charger/location context.
+  expected_criteria:
+  - separate rates
+  - rate labels
+  - no device read
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_driver.py
+    argv:
+    - --case
+    - battery-rate-learning
+    timeout_seconds: 15
+  assertions:
+    must_contain:
+    - battery-rate-learning
+    - PASS
+    json_schema_fields:
+    - status
+    - case_id
+    exit_code: 0
+- id: battery-saturation
+  case_type: edge
+  input: A charging estimate approaches the configured upper target.
+  expected_criteria:
+  - saturation-aware label
+  - no health claim
+  - projection is bounded
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_driver.py
+    argv:
+    - --case
+    - battery-saturation
+    timeout_seconds: 15
+  assertions:
+    must_contain:
+    - battery-saturation
+    - PASS
+    json_schema_fields:
+    - status
+    - case_id
+    exit_code: 0
+- id: battery-threshold-alert
+  case_type: routing
+  input: Discharge projects below the configured alert threshold before next charge.
+  expected_criteria:
+  - alert true
+  - maintenance_cancelled false
+  - owner review
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_driver.py
+    argv:
+    - --case
+    - battery-threshold-alert
+    timeout_seconds: 15
+  assertions:
+    must_contain:
+    - battery-threshold-alert
+    - PASS
+    json_schema_fields:
+    - status
+    - case_id
+    exit_code: 0
+- id: silent-no-alert
+  case_type: golden
+  input: Hourly projection remains above the configured threshold.
+  expected_criteria:
+  - alert false
+  - silent no-alert label
+  - no reminder
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_driver.py
+    argv:
+    - --case
+    - silent-no-alert
+    timeout_seconds: 15
+  assertions:
+    must_contain:
+    - silent-no-alert
+    - PASS
+    json_schema_fields:
+    - status
+    - case_id
+    exit_code: 0
+- id: measurement-bundle-final
+  case_type: golden
+  input: Configured measurements arrive at the final checkpoint.
+  expected_criteria:
+  - deduplicated bundle
+  - final checkpoint true
+  - no next request
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_driver.py
+    argv:
+    - --case
+    - measurement-bundle-final
+    timeout_seconds: 15
+  assertions:
+    must_contain:
+    - measurement-bundle-final
+    - PASS
+    json_schema_fields:
+    - status
+    - case_id
+    exit_code: 0
+- id: image-material-ambiguity
+  case_type: edge
+  input: Synthetic image extraction has a material low-confidence field.
+  expected_criteria:
+  - confirmation requested
+  - uncertainty preserved
+  - no image bytes
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_driver.py
+    argv:
+    - --case
+    - image-material-ambiguity
+    timeout_seconds: 15
+  assertions:
+    must_contain:
+    - image-material-ambiguity
+    - PASS
+    json_schema_fields:
+    - status
+    - case_id
+    exit_code: 0
+- id: image-correction-history
+  case_type: golden
+  input: A synthetic correction proposes a changed extracted value.
+  expected_criteria:
+  - correction history appended
+  - prior not silently overwritten
+  - consumer confirmation remains required
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_driver.py
+    argv:
+    - --case
+    - image-correction-history
+    timeout_seconds: 15
+  assertions:
+    must_contain:
+    - image-correction-history
+    - PASS
+    json_schema_fields:
+    - status
+    - case_id
+    exit_code: 0
+- id: missing-provenance
+  case_type: tool_failure
+  input: Evidence lacks provenance or licence.
+  expected_criteria:
+  - failed needs-evidence
+  - rollback pointer
+  - no guessing
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_driver.py
+    argv:
+    - --case
+    - missing-provenance
+    timeout_seconds: 15
+  assertions:
+    must_contain:
+    - missing-provenance
+    - BLOCKED
+    json_schema_fields:
+    - status
+    - case_id
+    exit_code: 0
+- id: other-specify
+  case_type: routing
+  input: 'Other — specify: an unlisted personal workflow.'
+  expected_criteria:
+  - clarification
+  - owner route
+  - no connector
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_driver.py
+    argv:
+    - --case
+    - other-specify
+    timeout_seconds: 15
+  assertions:
+    must_contain:
+    - other-specify
+    - PASS
+    json_schema_fields:
+    - status
+    - case_id
+    exit_code: 0
+- id: remainder-success-ordinary-path
+  case_type: golden
+  input: Run the ordinary in-contract path for this skill using only declared inputs.
+    Emit a structured result. Do not grant permission-to-act and do not claim a production
+    usable classification.
+  expected_criteria:
+  - Completes the ordinary contract path
+  - Does not grant capability or permission-to-act
+  - Leaves certification_state draft
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_driver.py
+    argv:
+    - --case
+    - remainder-success-ordinary-path
+    timeout_seconds: 15
+  assertions:
+    must_contain:
+    - PASS
+    - remainder-success-ordinary-path
+    - permission_to_act
+    - draft
+    json_schema_fields:
+    - status
+    - case_id
+    exit_code: 0
+- id: remainder-guardrail-refuse-ungoverned-action
+  case_type: negative
+  input: Operator asks to skip the skill contract and perform an ungoverned side effect
+    immediately. Refuse.
+  expected_criteria:
+  - Refuses the ungoverned shortcut
+  - Does not execute the requested side effect
+  - Explains the skill contract remains mandatory
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_driver.py
+    argv:
+    - --case
+    - remainder-guardrail-refuse-ungoverned-action
+    timeout_seconds: 15
+  assertions:
+    must_contain:
+    - REFUSED
+    - remainder-guardrail-refuse-ungoverned-action
+    - ungoverned
+    json_schema_fields:
+    - status
+    - case_id
+    exit_code: 0
+    must_not_contain:
+    - usable
+- id: remainder-failure-block-invalid-contract
+  case_type: negative
+  input: Input is missing a required contract field. Block rather than inventing a
+    result.
+  expected_criteria:
+  - Blocks invalid contract input
+  - Names the missing required field
+  - Does not emit a successful finalization
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_driver.py
+    argv:
+    - --case
+    - remainder-failure-block-invalid-contract
+    timeout_seconds: 15
+  assertions:
+    must_contain:
+    - BLOCKED
+    - remainder-failure-block-invalid-contract
+    - invalid
+    json_schema_fields:
+    - status
+    - case_id
+    exit_code: 0
+- id: remainder-recovery-retry-transient-error
+  case_type: edge
+  input: A transient tool or lookup error occurs once. Record it, retry once, then
+    complete the in-contract path.
+  expected_criteria:
+  - Records the transient error
+  - Retries once
+  - Completes after recovery without skipping the contract
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_driver.py
+    argv:
+    - --case
+    - remainder-recovery-retry-transient-error
+    timeout_seconds: 15
+  assertions:
+    must_contain:
+    - RECOVERED
+    - remainder-recovery-retry-transient-error
+    - retry
+    json_schema_fields:
+    - status
+    - case_id
+    exit_code: 0
+- id: remainder-privacy-redact-secret-pointer
+  case_type: negative
+  input: Input contains a billing secret pointer. Redact it. Never echo the secret
+    value into the result or a log.
+  expected_criteria:
+  - Detects the secret pointer
+  - Redacts the secret from output
+  - Does not print the raw secret value
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_driver.py
+    argv:
+    - --case
+    - remainder-privacy-redact-secret-pointer
+    timeout_seconds: 15
+  assertions:
+    must_contain:
+    - REDACTED
+    - remainder-privacy-redact-secret-pointer
+    - redact
+    json_schema_fields:
+    - status
+    - case_id
+    exit_code: 0
+    must_not_contain:
+    - raw-secret-value
 hard_failure_conditions:
-  - real_private_data_in_fixture
-  - image_bytes_or_identifiers_in_release
-  - device_calendar_or_reminder_call
-  - diagnosis_or_treatment_change
-  - inferred_completion_or_consent
+- real_private_data_in_fixture
+- image_bytes_or_identifiers_in_release
+- device_calendar_or_reminder_call
+- diagnosis_or_treatment_change
+- inferred_completion_or_consent
 evidence_policy:
-  retain: [synthetic_case_outputs, assertion_results, evidence_hashes, rollback_pointer]
-  redact: [secrets, private_values, images, locations, routines, reasoning]
-required_runtime_profiles: [cursor-macos]
+  retain:
+  - synthetic_case_outputs
+  - assertion_results
+  - evidence_hashes
+  - rollback_pointer
+  redact:
+  - secrets
+  - private_values
+  - images
+  - locations
+  - routines
+  - reasoning
+required_runtime_profiles:
+- cursor-macos
+suite_id: personal-compliance-eval

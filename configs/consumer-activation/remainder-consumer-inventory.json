@@ -1,0 +1,115 @@
+{
+  "schemaVersion": "1.0",
+  "kind": "remainder-disabled-consumer-bindings",
+  "disabledByDefault": true,
+  "enabled": false,
+  "liveApply": false,
+  "skillRetrievalCreatesCapabilityGrants": false,
+  "permissionToAct": false,
+  "providerContract": "skills.api.v0.2",
+  "bindingTable": "lskills.provider_bindings",
+  "openclawIdentityRegistration": {
+    "owner": "LiNKplatform + Server01",
+    "status": "concurrently_owned_do_not_interfere",
+    "source": "LiNKplatform/docs/runbooks/production-identity-registration.md",
+    "pinnedPlatformCommit": "358b2eb3b89c2809a94e1ad35c6d29d40d550d23",
+    "catalogNamesOnly": [
+      "openclaw-lisa-lskills",
+      "openclaw-david-lskills",
+      "openclaw-eric-lskills",
+      "openclaw-sara-lskills",
+      "openclaw-jane-lskills"
+    ],
+    "inventedIdsForbidden": true
+  },
+  "consumers": [
+    {
+      "id": "openclaw-prime-lisa",
+      "actorDisplayName": "Lisa",
+      "runtimeAdapterType": "openclaw",
+      "runtimeProfile": "lisa-openclaw",
+      "paciProductionClientObserved": false,
+      "credentialNameHold": "openclaw-lisa-lskills",
+      "prerequisites": [
+        "Platform finishes current OpenClaw identity registration without Skills mutation",
+        "Server01 applies provider-v2 SQL then publishes remainder releases",
+        "OpenClaw Prime owner applies disabled MCP fragment; Lisa internals stay OpenClaw-owned"
+      ]
+    },
+    {
+      "id": "openclaw-prime-david",
+      "actorDisplayName": "David",
+      "runtimeAdapterType": "openclaw",
+      "runtimeProfile": "lisa-openclaw",
+      "paciProductionClientObserved": false,
+      "credentialNameHold": "openclaw-david-lskills",
+      "prerequisites": ["Same as Lisa; do not invent actor UUID or secret_ref"]
+    },
+    {
+      "id": "openclaw-prime-eric",
+      "actorDisplayName": "Eric",
+      "runtimeAdapterType": "openclaw",
+      "runtimeProfile": "lisa-openclaw",
+      "paciProductionClientObserved": false,
+      "credentialNameHold": "openclaw-eric-lskills",
+      "prerequisites": ["Same as Lisa; do not invent actor UUID or secret_ref"]
+    },
+    {
+      "id": "openclaw-prime-sara",
+      "actorDisplayName": "Sara",
+      "runtimeAdapterType": "openclaw",
+      "runtimeProfile": "lisa-openclaw",
+      "paciProductionClientObserved": false,
+      "credentialNameHold": "openclaw-sara-lskills",
+      "prerequisites": ["Same as Lisa; do not invent actor UUID or secret_ref"]
+    },
+    {
+      "id": "openclaw-prime-jane",
+      "actorDisplayName": "Jane",
+      "runtimeAdapterType": "openclaw",
+      "runtimeProfile": "lisa-openclaw",
+      "paciProductionClientObserved": false,
+      "credentialNameHold": "openclaw-jane-lskills",
+      "prerequisites": ["Same as Lisa; do not invent actor UUID or secret_ref"]
+    },
+    {
+      "id": "linkautowork-ai-automations",
+      "actorDisplayName": "LiNKautowork AI automations",
+      "runtimeAdapterType": "linkautowork",
+      "runtimeProfile": "cursor-macos",
+      "paciProductionClientObserved": false,
+      "observedSource": "LiNKautowork apps/product-api PACI env names only (PRODUCT_API_PACI_*); no Skills production binding",
+      "prerequisites": [
+        "Platform issues a dedicated lskills PACI client for Autowork automations",
+        "Do not reuse OpenClaw or Brain credentials",
+        "Autowork owner applies disabled binding after remainder publication"
+      ]
+    },
+    {
+      "id": "codex",
+      "actorDisplayName": "Codex",
+      "runtimeAdapterType": "codex",
+      "runtimeProfile": "codex-linux",
+      "paciProductionClientObserved": false,
+      "observedSource": "LiNKskills configs/consumer-activation/ed-05-codex-owner-packet.json disabled source packet only",
+      "prerequisites": [
+        "XP-03 Codex owner live receipt",
+        "Platform PACI client for audience lskills-api",
+        "No shared Codex host mutation from this repo"
+      ]
+    },
+    {
+      "id": "cursor",
+      "actorDisplayName": "Cursor",
+      "runtimeAdapterType": "cursor",
+      "runtimeProfile": "cursor-macos",
+      "paciProductionClientObserved": false,
+      "observedSource": "LiNKskills configs/consumer-activation/ed-05-cursor-owner-packet.json project-scoped canary packet; not production PACI proof",
+      "prerequisites": [
+        "XP-02 shared/global Cursor mutation remains undeclared unless owner receipt exists",
+        "Project-scoped Cursor canary owner receipt for remainder combinations",
+        "IDE Development does not mint PACI clients"
+      ]
+    }
+  ]
+}

@@ -1,9 +1,13 @@
 # LiNKskills — Intent
 
-> **Current state, 2026-08-11:** The Skills service and native Lisa bridge are
-> live and healthy on the VPS. Repository integration branches include the
-> current IDE Development rollout. Exact deployed-source equality still needs
-> a SHA receipt whenever the Skills checkout is next audited or deployed.
+> **Current state, 2026-09-16:** Source catalog has 59 skills. Five
+> production-successor releases are accepted in protected development; the
+> remaining 54 have confined executable eval cases in source only. `usable`
+> for those 54 requires hosted sealed evaluator receipts on Server01. Live
+> consumer PACI clients for OpenClaw Lisa/David/Eric/Sara/Jane, Autowork,
+> Codex, and Cursor were not observed as production Skills bindings in the
+> pinned sibling sources. Do not infer live VPS health from older 2026-08-11
+> prose.
 
 **Status:** Confirmed Intent for the LiNKskills Program itself (this repository), written in the same spirit as LiNKdeveloper's Intent artifact — a plain-English statement of what is being built, why, for whom, and what "done" means. Grounded in the **approved internal-launch architecture now being implemented** (plan hash below), not only the narrower 2026-07-19 git-checkout catalog surface.
 

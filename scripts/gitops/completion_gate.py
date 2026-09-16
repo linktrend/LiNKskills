@@ -642,6 +642,43 @@ def cmd_review_ready(args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def github_owner_repo_from_remote(url: str) -> str | None:
+    """Return owner/repo for exact GitHub HTTPS or git SSH remotes.
+
+    Rejects non-https schemes for HTTP URLs, nested paths, query strings,
+    parent-segment tricks, and SSH usernames other than ``git``.
+    """
+    raw = (url or "").strip()
+    if not raw:
+        return None
+    scp = re.fullmatch(r"git@github\.com:([^?#]+)", raw)
+    if scp:
+        owner_repo = scp.group(1)
+    else:
+        parsed = urlparse(raw)
+        if parsed.scheme == "ssh":
+            if parsed.username != "git" or parsed.hostname != "github.com" or parsed.query or parsed.fragment:
+                return None
+            owner_repo = parsed.path.lstrip("/")
+        elif parsed.scheme == "https":
+            if parsed.hostname != "github.com" or parsed.query or parsed.fragment:
+                return None
+            owner_repo = parsed.path.lstrip("/")
+        else:
+            return None
+    if owner_repo.endswith(".git"):
+        owner_repo = owner_repo[:-4]
+    owner_repo = owner_repo.strip("/")
+    segments = owner_repo.split("/")
+    if (
+        len(segments) != 2
+        or any(segment in {"", ".", ".."} for segment in segments)
+        or any(not re.fullmatch(r"[A-Za-z0-9_.-]+", segment) for segment in segments)
+    ):
+        return None
+    return owner_repo
+
+
 def resolve_repository(workdir: Path) -> tuple[str | None, str]:
     """Resolve owner/repo for durable repair records without printing secrets.
 
