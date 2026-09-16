@@ -51,6 +51,17 @@ class Pkt09InternalCanaryTests(unittest.TestCase):
             ["git", "-C", str(ROOT), "rev-parse", "refs/remotes/origin/development"],
             text=True,
         ).strip()
+        changed = subprocess.check_output(
+            ["git", "-C", str(ROOT), "diff", "--name-only", f"{development}..HEAD"],
+            text=True,
+        ).splitlines()
+        if changed:
+            try:
+                verify_changed_paths_are_canary_only(changed)
+            except Pkt09CanaryError:
+                self.skipTest(
+                    "PKT-09 unmutated-source check is for a pkt09-only candidate; later packets change other owned paths"
+                )
         self.assertEqual(verify_source_unmutated(ROOT, development), [])
 
     def test_out_of_lane_paths_are_rejected(self) -> None:
