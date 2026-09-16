@@ -2,7 +2,7 @@
 
 **Status:** `SOURCE_ONLY_NOT_DEPLOYED`. Do not deploy, publish live, apply migrations, or access secrets from this document.
 
-**Admitted Skills source (issue 374 branch start):** commit `b53d3588974dfa7589d5d45a30cb8824337099ba` / tree `e4397f801e72a570a2159c76dfc3e5fb06df83ee`. Replace with the accepted issue-374 checkpoint SHA after integration.
+**Admitted Skills source (issue 374 remainder packet):** governed inputs commit `e591f8880dde0e65a935618b235328b03629f7a1`. Catalog `git_sha` is that ancestor (not the catalog-embedding tip). Starting protected development was `b53d3588974dfa7589d5d45a30cb8824337099ba` / tree `e4397f801e72a570a2159c76dfc3e5fb06df83ee`.
 
 Successor five-release production path remains issue 372 / `docs/handoffs/2026-09-15-successor-release.md`. This packet adds the remaining 54 source qualification inputs. Target after Server01: **59** immutable production releases.
 
