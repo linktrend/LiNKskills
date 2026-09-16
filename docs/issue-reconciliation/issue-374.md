@@ -1,7 +1,7 @@
 # Issue 374 — GitHub reconciliation report (evidence-based, no closes)
 
-**Date:** 2026-09-16  
-**Issue:** https://github.com/linktrend/LiNKskills/issues/374  
+**Date:** 2026-09-16
+**Issue:** https://github.com/linktrend/LiNKskills/issues/374
 **Action:** source packet only. Unrelated issues are **not** closed.
 
 ## What this packet proves

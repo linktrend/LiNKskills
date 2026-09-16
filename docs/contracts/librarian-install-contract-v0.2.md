@@ -1,7 +1,7 @@
 # Librarian install contract v0.2 (LiNKskills-owned)
 
-**Status:** source contract; not live scheduled.  
-**Worker pin:** `linkskills-librarian` **0.2.0** / `DomainWorker.version=0.2` / `linkskills-librarian-conformance/0.2`.  
+**Status:** source contract; not live scheduled.
+**Worker pin:** `linkskills-librarian` **0.2.0** / `DomainWorker.version=0.2` / `linkskills-librarian-conformance/0.2`.
 **Host:** LiNKplatform `packages/librarian-runner` — **do not edit LiNKplatform from this packet**.
 
 Machine copy: `configs/librarian/install-contract.json`.

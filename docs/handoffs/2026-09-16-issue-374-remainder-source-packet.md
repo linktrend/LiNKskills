@@ -1,8 +1,8 @@
 # Handoff — issue 374 remainder source packet
 
-**Date:** 2026-09-16  
-**Branch:** `issue/374-complete-all-remaining-linkskills-catalog-qualif`  
-**Role:** implementation  
+**Date:** 2026-09-16
+**Branch:** `issue/374-complete-all-remaining-linkskills-catalog-qualif`
+**Role:** implementation
 **Live actions:** none
 
 ## Delivered
