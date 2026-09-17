@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "role-packs"))
 
 from role_pack_validator import load_role_pack_inputs, validate_role_pack  # noqa: E402
+from source_metadata import PROTECTED_BASE  # noqa: E402
 
 
 COLLECTION = ROOT / "collections" / "google-workspace"
@@ -108,11 +109,7 @@ class RolePackValidatorTests(unittest.TestCase):
         )
         self.assertEqual(
             evidence["current_head_qualification_repair"]["protected_base"],
-            {
-                "ref": "issue/374-complete-all-remaining-linkskills-catalog-qualif",
-                "commit": "2e03130b5d8e801a066da504e6ff444f1ff3d46c",
-                "tree": "3d3c3b1df7e1485b8f56607fbfe499d3403bf7ea",
-            },
+            PROTECTED_BASE,
         )
         self.assertEqual(evidence["current_head_qualification_repair"]["status"], "HOLD")
         self.assertEqual(
