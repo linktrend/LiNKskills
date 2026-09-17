@@ -164,7 +164,7 @@ def _is_packaged_tool(execute: Any) -> bool:
 
 def _family_scenario(spec: dict[str, Any]) -> dict[str, Any]:
     case_id = spec["id"]
-    status = classify_contract_status(case_id, spec.get("case_type") or "")
+    status = classify_contract_status(case_id, spec.get("case_type") or "", case=spec)
     return {
         "id": case_id,
         "case_type": spec["case_type"],
@@ -204,7 +204,9 @@ def _ensure_execute(scenario: MappingLike) -> dict[str, Any]:
         return updated
     if not (isinstance(execute, dict) and execute.get("kind")):
         updated["execute"] = _execute_block(case_id)
-    status = classify_contract_status(case_id, str(updated.get("case_type") or ""))
+    status = classify_contract_status(
+        case_id, str(updated.get("case_type") or ""), case=updated
+    )
     updated["assertions"] = canonical_assertions(case_id, status)
     return updated
 

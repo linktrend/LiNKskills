@@ -85,16 +85,51 @@ class RemainderQualificationTests(unittest.TestCase):
             "PASS",
         )
 
+    def test_secret_blocks_push_golden_classifies_blocked_from_contract(self) -> None:
+        from linkskills_eval_runner.remainder_driver import (
+            classify_contract_status,
+            status_from_case_contract,
+        )
+        from linkskills_eval_runner.runner import load_eval_suite
+
+        case_id = "staged-diff-contains-secret-blocks-push"
+        self.assertEqual(classify_contract_status(case_id, "golden"), "BLOCKED")
+        self.assertEqual(status_from_case_contract(case_id), "BLOCKED")
+
+        suite = load_eval_suite(REPO / "skills" / "git-safeguard" / "references" / "eval-suite.yaml")
+        case = next(item for item in suite.cases if item.id == case_id)
+        contract = {
+            "case_type": "golden",
+            "input": case.input,
+            "expected_criteria": list(case.expected_criteria),
+            "assertions": {
+                "must_contain": list(case.assertions.must_contain),
+                "must_not_contain": list(case.assertions.must_not_contain),
+            },
+        }
+        self.assertIn("secret", case_id)
+        self.assertTrue(any("secret" in str(part).lower() for part in case.expected_criteria))
+        self.assertEqual(
+            classify_contract_status(case_id, "golden", case=contract),
+            "BLOCKED",
+        )
+        self.assertIn("STRIPE_SECRET_KEY", contract["input"])
+
     def test_legitimate_blocked_golden_case_passes_assertions(self) -> None:
         from linkskills_eval_runner.assertions import (
             assertions_passed,
             parse_assertion_spec,
             run_assertions,
         )
-        from linkskills_eval_runner.remainder_driver import canonical_assertions
+        from linkskills_eval_runner.remainder_driver import (
+            canonical_assertions,
+            classify_contract_status,
+        )
 
         case_id = "staged-diff-contains-secret-blocks-push"
-        spec = parse_assertion_spec(canonical_assertions(case_id, "BLOCKED"))
+        status = classify_contract_status(case_id, "golden")
+        self.assertEqual(status, "BLOCKED")
+        spec = parse_assertion_spec(canonical_assertions(case_id, status))
         output = json.dumps(
             {
                 "case_id": case_id,
@@ -108,6 +143,54 @@ class RemainderQualificationTests(unittest.TestCase):
         )
         results = run_assertions(output, spec, observed_exit_code=0)
         self.assertTrue(assertions_passed(results), results)
+
+    def test_secret_blocks_push_full_suite_executes_blocked(self) -> None:
+        import os
+
+        from linkskills_eval_runner.assertions import assertions_passed, run_assertions
+        from linkskills_eval_runner.consumer_profiles import CURSOR_MACOS, resolve_driver
+        from linkskills_eval_runner.judge import IndependentDeterministicJudge
+        from linkskills_eval_runner.remainder_driver import classify_contract_status
+        from linkskills_eval_runner.runner import load_eval_suite, run_suite
+
+        case_id = "staged-diff-contains-secret-blocks-push"
+        self.assertEqual(classify_contract_status(case_id, "golden"), "BLOCKED")
+
+        skill_dir = REPO / "skills" / "git-safeguard"
+        suite = load_eval_suite(skill_dir / "references" / "eval-suite.yaml")
+        os.environ.setdefault("LINKSKILLS_EXECUTOR_NETWORK_ISOLATION", "allow_unproven")
+        os.environ.setdefault("LINKSKILLS_EVAL_RUNNER_ISSUER_KEY", "test-issuer-key")
+        toolchain = resolve_driver(CURSOR_MACOS).toolchain(REPO)
+        result = run_suite(
+            suite,
+            judge=IndependentDeterministicJudge(),
+            toolchain=toolchain,
+            repo_root=REPO,
+            skill_dir=skill_dir,
+        )
+        self.assertTrue(result.passed, result.reasons)
+        case_result = next(item for item in result.case_results if item.case_id == case_id)
+        output = case_result.observed_output or ""
+        self.assertIn("BLOCKED", output)
+        self.assertIn("config/secrets.py", output)
+        self.assertIn("STRIPE_SECRET_KEY", output)
+        self.assertNotIn("REDACTED", output)
+        spec = next(item.assertions for item in suite.cases if item.id == case_id)
+        receipt = case_result.execution_receipt or {}
+        assertion_rows = run_assertions(
+            output,
+            spec,
+            observed_exit_code=receipt.get("exit_code", 0),
+        )
+        self.assertTrue(assertions_passed(assertion_rows), assertion_rows)
+        self.assertTrue(
+            assertions_passed(case_result.assertion_results),
+            case_result.assertion_results,
+        )
+        payload = json.loads(output)
+        self.assertEqual(payload["status"], "BLOCKED")
+        self.assertEqual(payload["case_id"], case_id)
+        self.assertTrue(payload.get("secrets"))
 
     def test_fixture_echo_bypass_fails_must_not_contain(self) -> None:
         from linkskills_eval_runner.assertions import (

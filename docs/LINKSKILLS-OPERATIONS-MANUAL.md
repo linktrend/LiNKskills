@@ -145,7 +145,7 @@ So a failure is usually: “checks failed, usage was still recorded locally, cer
 | Real Eval Runner rejecting prompt-only certification | **Built in-repo.** |
 | Additive registry migrations (incl. `20260727_000005`) | **Packaged** here. **LiNKplatform alone applies** live. |
 | Compatibility load helper (`lib/skill_runtime`) | **Still present** for migration; not the final sole load path. |
-| Every skill marked certified/`usable` | **Not yet.** Overlay still shows one sealed local canary (`canary-echo`) as `usable`. Five production-successor releases (`git-safeguard`, `persistent-qa`, `repository-manager`, `skill-template`, `tool-architect`) are accepted in protected development. The other 54 have confined executable eval cases in source only and stay non-`usable` until Server01 hosted sealed receipts. |
+| Every skill marked certified/`usable` | **Not yet. No skill is `usable` from this source packet.** Catalog overlay and the phase10 classification ledger mark every skill, including `canary-echo`, as `draft`. Historical `canary-echo` sealed receipts no longer bind the current mutated suite and are not live/`usable` evidence. Five production-successor releases (`git-safeguard`, `persistent-qa`, `repository-manager`, `skill-template`, `tool-architect`) are accepted in protected development as source-qualified successors, not as `usable`. The other 54 have confined executable eval cases in source only and stay non-`usable` until Server01 hosted sealed receipts. |
 
 | Cursor product canary | **Project-scoped only** (example fragment + notes). No global live canary. |
 | Codex / OpenClaw wiring | **Fragments handed off** — not applied from this repo. |
