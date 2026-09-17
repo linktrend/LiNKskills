@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "kind": "ed-07-source-only-checkpoint",
+  "packet": "ED-07",
+  "headSha": "834771037242e74677038a2e93524bcac1b09eaf",
+  "gitTree": "3cb6389e23608f3b0f699b0ccf3d0d929dde0b7f",
+  "branch": "cursor/linkskills-ed07-345-implement-001-f37b",
+  "baseIssueBranch": "issue/345-ed-07-implement-librarian-telemetry-worker-and-c",
+  "admittedStart": {
+    "commit": "0d4ad748ff9d4d89911f20e0c01aca0e1107fc54",
+    "tree": "6944fe1676beba87a44825f29a13e440f8f3512c"
+  },
+  "workerVersion": "0.2",
+  "conformancePackage": "linkskills-librarian-conformance/0.2",
+  "liveHostIntegration": false,
+  "providerLiveSpend": false,
+  "commands": [
+    {"cmd": "python3 -m pytest -q tests/librarian_domain", "exitCode": 0, "detail": "26 passed, 13 subtests passed"},
+    {"cmd": "python3 scripts/gitops/run_delivery_profile.py fast", "exitCode": 0, "ok": true},
+    {"cmd": "python3 scripts/gitops/secret_scan.py", "exitCode": 0, "ok": true},
+    {"cmd": "git diff --check origin/development...HEAD", "exitCode": 0}
+  ],
+  "proofClasses": {
+    "source": "pass",
+    "worker_contract": "pass",
+    "qualification": "hold",
+    "selectability": "hold",
+    "consumer": "hold",
+    "server": "hold",
+    "production": "hold"
+  },
+  "toolchain": {
+    "python": "3.12.3",
+    "lock": "requirements-dev.lock",
+    "install": "pip install --require-hashes -r requirements-dev.lock",
+    "ciPython": "3.11 on ubuntu-24.04-arm"
+  },
+  "pushed": true
+}

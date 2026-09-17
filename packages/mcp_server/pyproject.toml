@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "linkskills-mcp"
 version = "0.1.0"
-description = "LiNKskills MCP adapter over SkillsGatewayService"
+description = "LiNKskills MCP adapters (legacy v0.1 compatibility and production skills.api.v0.2)"
 requires-python = ">=3.11"
 license = { text = "Proprietary" }
 dependencies = [
@@ -16,6 +16,7 @@ dependencies = [
 [project.scripts]
 linkskills-mcp = "linkskills_mcp.paci_stdio_proxy:main"
 linkskills-mcp-server = "linkskills_mcp.server:main"
+linkskills-mcp-v2 = "linkskills_mcp.v2_stdio:main"
 
 [tool.setuptools.packages.find]
 where = ["."]

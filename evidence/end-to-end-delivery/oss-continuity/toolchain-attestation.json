@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "kind": "linkskills-oss-continuity-toolchain-attestation",
+  "installationComplete": false,
+  "proofClass": "hosted_worker_session",
+  "boundIdentity": {
+    "repository": "linktrend/LiNKskills",
+    "ref": "issue/352-prepare-oss-continuity-evidence-and-validation-f",
+    "commit": "f97951feec6546ff924c65611802afd7ab19d2a3",
+    "tree": "9bd1ba9eb32885146317f25a1cd3b223d1540d9e"
+  },
+  "admittedManifestAndCi": {
+    "ciWorkflow": ".github/workflows/ci.yml",
+    "ciRunsOn": "ubuntu-24.04-arm",
+    "ciPython": "3.11",
+    "ciInstall": "python -m pip install --require-hashes -r requirements-dev.lock",
+    "env00Doc": "docs/development/CLOUD-EXECUTION.md",
+    "env00Worker": "CPython 3.12.3 Linux x86_64 Ubuntu 24.04.4 LTS",
+    "requiresPython": ">=3.11",
+    "nodeRequiredByEnv00": false
+  },
+  "observedThisWorker": {
+    "os": "Ubuntu 24.04.4 LTS",
+    "arch": "x86_64",
+    "python": "CPython 3.12.3 (/usr/bin/python3 -> python3.12)",
+    "python311": "absent",
+    "systemPip": "24.0",
+    "nodePresentNotRequired": "v22.14.0"
+  },
+  "lockPins": {
+    "requirementsDevLockSha256": "cb534f8847e80e8af1fa115745f62650ee67488dde1a876da4f443361bf448c1",
+    "requirementsDevTxtSha256": "b0b0424f212cd0b468642888677c1527361eb3f81f12d674b6c3c343e6c7f0b0",
+    "lockChangedThisPacket": false
+  },
+  "diagnoses": [
+    "Python 3.11 is the protected CI interpreter and is not installed on this VM. ENV-00 already records that gap. This worker used the attested 3.12.3 interpreter with the frozen hash lock. Locks were not rewritten.",
+    "A cached image install may belong to another branch; this session performed python -m pip install --require-hashes -r requirements-dev.lock into an isolated venv for acceptance only. That is not a product, Server 01, or consumer installation.",
+    "nvm PATH and venv activation do not persist across shells; commands must invoke the venv interpreter explicitly.",
+    "Node is present and unused. There is no root Node package manifest to pin."
+  ],
+  "sessionHashLockedInstall": {
+    "claimedProductInstallComplete": false,
+    "command": "/workspace/.venv-oss-continuity/bin/python -m pip install --require-hashes -r requirements-dev.lock",
+    "result": "exit 0; public PyPI wheels matching lock hashes"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "sourceReceiptSha256": "993b4d297bbaa67085b3e4a8bbf238550e8971fdcfe2dd87cb5058a884b3bf66",
+  "headSha": "b06a3179b6f0290db55f0d6c0854a232260eeee6",
+  "classification": "tests",
+  "acceptance": "ENV-00 exact pushed reproducible cloud environment candidate independently reviewed PASS; public-PyPI hash lock, stable regeneration, fresh require-hashes install, CI wiring, install order, and focused tests accepted with ARM/Python 3.11 CI still external",
+  "commands": [
+    {"cmd": "Cursor ENV-00 implementation run FINISHED with pushed exact candidate", "exitCode": 0, "evidencePath": "/Users/linktrend/Documents/Codex/2026-09-09/files-pasted-by-the-user-i/outputs/cursor-cloud/state/LINKSKILLS-ENV-00-324-001.latest.json"},
+    {"cmd": "Independent Grok exact-head review PASS", "exitCode": 0, "evidencePath": "/Users/linktrend/Documents/Codex/2026-09-09/files-pasted-by-the-user-i/outputs/cursor-cloud/state/LINKSKILLS-ENV-00-324-REVIEW-001.latest.json"},
+    {"cmd": "fresh isolated python -m pip install --require-hashes -r requirements-dev.lock", "exitCode": 0},
+    {"cmd": "python3 -m pytest -q tests/environment (7 passed)", "exitCode": 0},
+    {"cmd": "python3 validator.py --repo-root . --scan-all", "exitCode": 0},
+    {"cmd": "git diff --check dfa3f9fd48e70e5b23763444eb3a8b3ddc1f0174..b06a3179b6f0290db55f0d6c0854a232260eeee6", "exitCode": 0},
+    {"cmd": "python3 scripts/gitops/secret_scan.py (known unchanged baseline: 40 stale fixture declarations plus one skipped binary input; zero new candidate findings)", "exitCode": 1}
+  ],
+  "at": "2026-09-10T08:20:17Z",
+  "kind": "v25-issue-checkpoint",
+  "amendment": "V25_BOOTSTRAP_LEAN",
+  "gitTree": "758f6998b781250bfa5e922e17f472f482ab46f7",
+  "pushed": true,
+  "scopedDiff": true,
+  "focusedTests": {"passed": true},
+  "independentNarrowReview": {
+    "accepted": true,
+    "headSha": "b06a3179b6f0290db55f0d6c0854a232260eeee6",
+    "gitTree": "758f6998b781250bfa5e922e17f472f482ab46f7",
+    "paths": ["declared-checkpoint-scope"],
+    "reviewer": {"actor": "routed-independent-reviewer", "role": "reviewer"},
+    "implementerActor": "checkpoint-implementer"
+  },
+  "manifestEvidence": true,
+  "proofClass": "hosted"
+}

@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "kind": "linkskills-oss-continuity-preservation-policy",
+  "installationComplete": false,
+  "boundIdentity": {
+    "repository": "linktrend/LiNKskills",
+    "ref": "issue/352-prepare-oss-continuity-evidence-and-validation-f",
+    "commit": "f97951feec6546ff924c65611802afd7ab19d2a3",
+    "tree": "9bd1ba9eb32885146317f25a1cd3b223d1540d9e"
+  },
+  "defaultMode": "read_only_default",
+  "appliesTo": [
+    "upstream external repositories and tags",
+    "vendor-skills and collections LICENSE.upstream / NOTICE files",
+    "archival snapshots and historical pins",
+    "Platform-owned live compose, GSM, PACI, database, and generic Librarian host",
+    "completed packet evidence directories listed in completedEvidenceDoNotModify"
+  ],
+  "allowed": [
+    "Record paths, commits, trees, digests, and licence file hashes already present in this repository",
+    "Publish a new immutable identity after explicit update review",
+    "Leave unknowns as PENDING or HOLD"
+  ],
+  "forbidden": [
+    "Overwrite vendor or upstream bytes in place",
+    "Auto-promote a newer upstream",
+    "Claim installation, deployment, or production acceptance from this framework",
+    "Modify completed packet evidence, deployment files, or provider code to satisfy continuity paperwork",
+    "Pad truncated inventory digests"
+  ],
+  "autoPromote": false,
+  "completedEvidenceDoNotModify": [
+    "evidence/end-to-end-delivery/ed-00/",
+    "evidence/end-to-end-delivery/ed-01/",
+    "evidence/end-to-end-delivery/ed-04/",
+    "evidence/end-to-end-delivery/ed-05/",
+    "evidence/end-to-end-delivery/ed-07/",
+    "evidence/end-to-end-delivery/env-00/",
+    "evidence/end-to-end-delivery/xp-00/"
+  ],
+  "remainingPacketIds": [
+    "ED-02",
+    "ED-03",
+    "ED-06",
+    "ED-08",
+    "ED-09",
+    "ED-10",
+    "IMP-00",
+    "FIXGS-00",
+    "FIXPQ-00",
+    "FIXRM-00",
+    "FIXST-00",
+    "FIXTA-00"
+  ],
+  "notes": "FIX* packets stay PLAN with no mutation unless ED-09 records an actual named-skill failure. XP-01 through XP-04 remain external owners."
+}

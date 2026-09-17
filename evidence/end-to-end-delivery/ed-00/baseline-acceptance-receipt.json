@@ -1,0 +1,208 @@
+{
+  "schemaVersion": 1,
+  "kind": "linkskills-ed-00-baseline-acceptance-receipt",
+  "packet": "ED-00",
+  "issue": "#323",
+  "status": "ED-00_CANDIDATE_READY_WITH_EXTERNAL_HOLDS",
+  "observedAt": "2026-09-10T15:41:06+08:00",
+  "founderApproval": "Literal APPROVE is recorded in the owning task as supplied for this execution; the documented Gate-0 packet is authorized and no second packet-stage approval is required.",
+  "startingIdentity": {
+    "repository": "linktrend/LiNKskills",
+    "ref": "issue/323-plan-linkskills-end-to-end-deployment-on-linkser",
+    "commit": "8f27a179c891c0fdcbe0ccc5c010f5de1b08b275",
+    "tree": "911626f69484df0f8b82a5872844492983242979"
+  },
+  "scope": {
+    "allowed": [
+      "refresh exact protected identities and non-secret interface facts",
+      "create ED-00 evidence under evidence/end-to-end-delivery/ed-00/",
+      "update ED-00-owned planning documents when refreshed facts changed",
+      "validate manifest, links, JSON, whitespace, scope, and secret patterns",
+      "commit and push this issue branch"
+    ],
+    "prohibited": [
+      "product code, dependencies, Skills, migrations, providers, credentials",
+      "consumer configs, queue ownership/files, server state, protected refs, production",
+      "agent dispatch, PR creation, merge, promotion, or live mutation"
+    ]
+  },
+  "proofClasses": {
+    "source": {
+      "status": "FROZEN",
+      "proof": "LiNKskills protected development 7a813f529f7b25a40fd3e88f74fb0e86c7c728d5 / d0bb392351994810173f730c47b63112c31e391b; protected main 7067716fef5189a1427a7cf9b0847cec898e19de / d0bb392351994810173f730c47b63112c31e391b; five-release initial set preserved."
+    },
+    "providerSelectability": {
+      "status": "HOLD",
+      "proof": "Live catalog contains 59 entries, all certification_state=draft; no live publication or ordinary selectability is claimed."
+    },
+    "consumer": {
+      "status": "HOLD",
+      "proof": "Cursor, Codex, and Lisa/OpenClaw contract fragments are versioned and digest-bound; current consumer pins, valid identity-backed reads, local execution, and bounded reports remain unproven."
+    },
+    "serverLive": {
+      "status": "PARTIAL_LIVE_NOT_READY",
+      "proof": "linktrend-linkskills is running healthy on loopback 127.0.0.1:18798 with the immutable 7cf2780a82c2 image/source release, /health=200, /ready=503, and store_reachable=false due OperationalError."
+    },
+    "production": {
+      "status": "HOLD",
+      "proof": "Platform has an accepted isolated restore receipt, but live migration/auth identity/runtime activation, provider-v2 readiness, consumer acceptance, Librarian operation, and final production acceptance are not proven."
+    }
+  },
+  "installedExecutionControls": {
+    "packageVersion": "2.5.2",
+    "protocol": {
+      "id": "coding-execution-protocol",
+      "version": "1.0.1",
+      "amendment": "V25_BOOTSTRAP_LEAN",
+      "path": ".ide-development/execution/CODING-EXECUTION-PROTOCOL.md",
+      "sha256": "0d715d3063553682c295dcf7647361bf0bd7bbfdfa2f417bbcc0a26f89df17bc"
+    },
+    "controlContract": {
+      "path": ".ide-development/contracts/EXECUTION-CONTROL-CONTRACT.md",
+      "sha256": "6bbbfe6a0917f2a59e6d80cd3cabb6baf71b96bcd67ac76aabb629feaff85f1d"
+    },
+    "manifestSchema": {
+      "path": ".ide-development/contracts/EXECUTION-MANIFEST.schema.json",
+      "sha256": "c1be4434d813fe5af976814548db34c8625250bf7c90fff86ff649af9015e599"
+    },
+    "lifecycleImplementation": {
+      "path": ".ide-development/execution/lifecycle.py",
+      "sha256": "a415857492bdfded0c57d218b96db978ed722fc734669d1d7c34af2c599c303e"
+    },
+    "cursorDispatchSchema": {
+      "path": ".ide-development/schemas/cursor-cloud-dispatch.schema.json",
+      "sha256": "331eb28c68e0657f8eb6bff0c440527141a2f4f7ecf1251628dff2ff5f154ca7"
+    },
+    "transactionalDispatchSchema": {
+      "path": ".ide-development/schemas/transactional-dispatch.schema.json",
+      "sha256": "680b75490ba0540e3da282af6a06b00699f2180884e8b78e2ed9b2af612a8972"
+    },
+    "candidateLifecycleSchema": {
+      "path": ".ide-development/schemas/candidate-lifecycle.schema.json",
+      "sha256": "bc18576ee92c6513ee149b8ea3cbadfcbfd23d97059bb2d063cbd0f1e6727366"
+    }
+  },
+  "xp05": {
+    "status": "PASS_OFFLINE_INDEPENDENTLY_REVIEWED",
+    "dispatcher": {
+      "path": "local:/Users/linktrend/Documents/Codex/2026-09-09/files-pasted-by-the-user-i/outputs/cursor-cloud/cursor_cloud.py",
+      "sha256": "9c5b5486842e695e47f32896728ec15568237f304ea86115cde50997e419c260"
+    },
+    "guide": {
+      "path": "local:/Users/linktrend/Documents/Codex/2026-09-09/files-pasted-by-the-user-i/outputs/cursor-cloud/README.md",
+      "sha256": "16474821f05b766ffd397f37178790cc0ccfd77b0554dd89cd975b0b81a12ed6"
+    },
+    "laneVerification": {
+      "path": "local:/Users/linktrend/Documents/Codex/2026-09-09/files-pasted-by-the-user-i/outputs/cursor-cloud/LANE-VERIFICATION.json",
+      "sha256": "0a8dfbcd5f8d31157b454204e7a9fa57458c0c53f0f59558cf5f9f51718289ba"
+    },
+    "testsPassed": 23,
+    "providerJobsCreated": 0,
+    "ownerAdmissionGranted": false
+  },
+  "queueTruth": {
+    "suspended": true,
+    "suspendedFileSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "resumeScopeSha256": "297ad54610bf3478a4576c43007fed69b907892f0db8105d892fb0df99fe6f05",
+    "admittedLiNKskillsOwners": [
+      "01a0843c-0df9-74e2-907a-05c5f736d6ed",
+      "01a07f1c-67d5-7c70-989e-5b83c01ccc79"
+    ],
+    "currentTaskOwner": "01a089cb-ee73-7c52-9e62-4f9654114eba",
+    "currentTaskAdmitted": false,
+    "mutationPerformed": false,
+    "exactXp00Requirement": "Under the exclusive coordinator lock, reconcile current saved agents with provider GET readback; if no LiNKskills writer is active, atomically add only \"01a089cb-ee73-7c52-9e62-4f9654114eba\": [\"linktrend/LiNKskills\"] to RESUME-SCOPE.json, preserving SUSPENDED, every existing owner/repository, and the 20 outstanding-job, 16-writer, and one-live-writer-per-repository ceilings; fsync/rename/read back and record before/after hashes plus the approval reference. If policy refuses the exact mapping, return that failure without bypassing suspension or creating another route."
+  },
+  "cloudOverlap": {
+    "packet": "LINKSKILLS-CLOUD-ENV-001",
+    "agentId": "bc-b013fc81-2b43-4872-84bd-a8cc16638e36",
+    "runId": "run-33695ab5-4772-4938-a1a0-a93b52415ba4",
+    "providerAgentStatus": "IDLE",
+    "providerRunStatus": "FINISHED",
+    "repository": "https://github.com/linktrend/LiNKskills",
+    "startingRefReadback": null,
+    "overlap": "No active LiNKskills cloud writer; this is historical qualification evidence and is not reusable ownership."
+  },
+  "server01Readback": {
+    "host": "linkserver-01",
+    "service": "linktrend-linkskills",
+    "image": "linktrend/linkskills@sha256:7cf2780a82c2c37c113b2d55b787a4e72a7098063cf434ea0654826c3719257f",
+    "imageId": "sha256:7cf2780a82c2c37c113b2d55b787a4e72a7098063cf434ea0654826c3719257f",
+    "release": {
+      "repository": "linktrend/LiNKskills",
+      "sourceRef": "refs/heads/main",
+      "commit": "7067716fef5189a1427a7cf9b0847cec898e19de",
+      "tree": "d0bb392351994810173f730c47b63112c31e391b",
+      "archiveSha256": "4dcf203117c64f56264f1094e06fb7bee8fdbf88ee211fd41dafbf4dc02ea855"
+    },
+    "config": {
+      "composePath": "/srv/linktrend/deploy/compose/core-services.compose.yml",
+      "composeSha256": "a114290bf485c51a9ffd297ede317e79a2ac708d088a90487b1c9eeae037cd67",
+      "runtimeEnvPath": "/run/linktrend/linkskills/runtime.env",
+      "runtimeEnvFileAtObservation": "absent",
+      "effectiveNonSecretMode": "production",
+      "effectiveStore": "postgres",
+      "storeProbe": true,
+      "secretMount": "/etc/linkskills/secrets:ro",
+      "stateMount": "/var/lib/linkskills:rw",
+      "hostPort": "127.0.0.1:18798",
+      "containerPort": 8787,
+      "networkExposure": "loopback only"
+    },
+    "health": {
+      "containerState": "running",
+      "dockerHealth": "healthy",
+      "healthHttp": 200,
+      "readyHttp": 503,
+      "readyBody": {
+        "auth_configured": true,
+        "catalog_loaded": true,
+        "contract_version": "skills.api.v0.1",
+        "ready": false,
+        "skill_count": 59,
+        "store_error": "OperationalError",
+        "store_reachable": false
+      },
+      "catalogCertificationStates": ["draft"],
+      "metricsReadyGauge": 0,
+      "inFlight": 0
+    },
+    "capacity": {
+      "srvAvailableKiB": 153586632,
+      "srvUsePercent": 40,
+      "memoryTotalMiB": 257626,
+      "memoryAvailableMiB": 249574,
+      "dockerImages": 30,
+      "dockerActiveImages": 12,
+      "dockerBuildCacheReclaimable": "29.97GB"
+    }
+  },
+  "validation": {
+    "manifestJson": "PASS",
+    "manifestSchema": "PASS",
+    "manifestSemanticLifecycle": "PASS",
+    "jsonFiles": "PASS",
+    "relativeLinks": "PASS",
+    "gitDiffCheck": "PASS",
+    "productPathChanges": "NONE",
+    "scopedSecretPatternScan": "PASS",
+    "repositorySecretScan": "FAIL_BASELINE_STALE_FIXTURE_DECLARATIONS_AND_BINARY_INPUT",
+    "independentReview": "PENDING_EXACT_CANDIDATE",
+    "checkpointIdentity": "reported after commit and push; this receipt records the accepted starting identity and will be evaluated as part of the exact pushed candidate"
+  },
+  "mutations": {
+    "productCode": false,
+    "dependencies": false,
+    "skills": false,
+    "migrations": false,
+    "providers": false,
+    "credentials": false,
+    "consumerConfig": false,
+    "queueOwnership": false,
+    "serverState": false,
+    "protectedRefs": false,
+    "production": false,
+    "agentDispatch": false,
+    "pullRequest": false
+  }
+}

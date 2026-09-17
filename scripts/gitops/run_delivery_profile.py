@@ -22,7 +22,7 @@ from typing import Any, Callable, Mapping, Sequence
 
 SCHEMA_VERSION = 1
 INVENTORY_KIND = "ci-profile-inventory"
-PROFILE_BOUNDARIES = {"focused", "fast", "full"}
+PROFILE_BOUNDARIES = {"focused", "fast", "full", "release"}
 IDENTITY_FIELDS = (
     "repository",
     "gitTree",
@@ -136,9 +136,9 @@ def classify_risk(
     if mutation_command:
         level = "critical"
         reason = "profile_declares_mutating_command"
-    elif profile == "full" or (governance and application):
+    elif profile in {"full", "release"} or (governance and application):
         level = "high"
-        reason = "full_or_mixed_surface"
+        reason = "full_or_mixed_surface" if profile != "release" else "release_promotion_surface"
     elif governance:
         level = "high"
         reason = "governance_surface"

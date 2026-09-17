@@ -1,0 +1,80 @@
+{
+  "schemaVersion": "1.0",
+  "kind": "lskills.provider_bindings.template",
+  "disabledByDefault": true,
+  "enabled": false,
+  "liveApply": false,
+  "skillRetrievalCreatesCapabilityGrants": false,
+  "table": "lskills.provider_bindings",
+  "requiredFields": [
+    "org_id",
+    "actor_id",
+    "runtime_binding_id",
+    "runtime_profile",
+    "release_ids",
+    "enabled"
+  ],
+  "placeholders": {
+    "org_id": "<owner-supplied-platform-org-id>",
+    "actor_id": "<owner-supplied-platform-actor-id>",
+    "runtime_binding_id": "<owner-supplied-runtime-binding-id>"
+  },
+  "forbidden": [
+    "invented UUIDs",
+    "GSM secret values",
+    "enabled=true in source",
+    "capability grants",
+    "permission-to-act"
+  ],
+  "bindings": [
+    {
+      "consumerId": "openclaw-prime-lisa",
+      "runtime_profile": "lisa-openclaw",
+      "release_ids": [],
+      "enabled": false,
+      "releaseIdsFilledAfter": "Server01 remainder publication of the 54"
+    },
+    {
+      "consumerId": "openclaw-prime-david",
+      "runtime_profile": "lisa-openclaw",
+      "release_ids": [],
+      "enabled": false
+    },
+    {
+      "consumerId": "openclaw-prime-eric",
+      "runtime_profile": "lisa-openclaw",
+      "release_ids": [],
+      "enabled": false
+    },
+    {
+      "consumerId": "openclaw-prime-sara",
+      "runtime_profile": "lisa-openclaw",
+      "release_ids": [],
+      "enabled": false
+    },
+    {
+      "consumerId": "openclaw-prime-jane",
+      "runtime_profile": "lisa-openclaw",
+      "release_ids": [],
+      "enabled": false
+    },
+    {
+      "consumerId": "linkautowork-ai-automations",
+      "runtime_profile": "cursor-macos",
+      "release_ids": [],
+      "enabled": false
+    },
+    {
+      "consumerId": "codex",
+      "runtime_profile": "codex-linux",
+      "release_ids": [],
+      "enabled": false
+    },
+    {
+      "consumerId": "cursor",
+      "runtime_profile": "cursor-macos",
+      "release_ids": [],
+      "enabled": false
+    }
+  ]
+}

@@ -89,15 +89,14 @@ exact host sequence is in
 
 ## Status
 
-**Current source state (2026-08-11):** `main`, `staging`, and `development`
-contain the same source tree. The Skills Gateway is running on the VPS and the
-current Lisa/OpenClaw release reaches it through the native Skills bridge. The
-catalog, validator, Gateway/MCP packages, certification paths, and IDE
-Development rollout are on the integration branches.
+**Current source state (2026-09-16):** protected development contains the
+accepted five-release production successor. Issue 374 adds source-complete
+executable eval cases for the remaining 54 catalog skills, disabled consumer
+binding templates, Librarian 0.2 install contract, and provider-v2 SQL coverage.
+This is **not** live qualification, publication, or consumer activation.
 
-This is real service-integration evidence, but it is not permission to infer a
-specific deployed LiNKskills commit from health alone. Record the exact Skills
-checkout SHA whenever it is next deployed or audited.
+Do not infer a deployed LiNKskills commit from historical VPS health prose.
+Record the exact Skills checkout SHA whenever it is next deployed or audited.
 
 The generic Librarian host remains in
 **`LiNKplatform/packages/librarian-runner`**. LiNKskills owns its skill-domain

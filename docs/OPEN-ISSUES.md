@@ -1,5 +1,16 @@
 # LiNKskills — Open Issues
 
+**2026-09-16 remainder source packet (issue #374):** protected development
+commit `b53d3588974dfa7589d5d45a30cb8824337099ba` already contains the accepted
+**five-release production successor** (`git-safeguard`, `persistent-qa`,
+`repository-manager`, `skill-template`, `tool-architect`). This packet adds
+source-complete confined executable eval cases and qualification/release
+inputs for the other **54** catalog skills. It does **not** mint `usable`,
+publish live, apply migrations, or enable consumers. Hosted sealed
+qualification and Server01 publication remain live gates. OpenClaw PACI
+identity registration is concurrently owned by Platform/Server01 — do not
+interfere. Historical 2026-08-11 VPS health claims are not current evidence.
+
 **2026-08-11 reconciliation:** the service integration and IDE Development
 rollout are complete. Remaining honest gap: record an exact deployed
 LiNKskills checkout SHA on the next deployment/audit; do not infer it from
@@ -15,21 +26,22 @@ Append-only engineering build log for this repository. Prefer this file over sta
 
 ### 1. Live certification of skills to `usable` / certified profiles
 
-**Status:** Partially open (operational) — sealed local canary path landed 2026-08-03.
-Filesystem catalog + eval-suite YAML exist for all catalog skills; generated
-`catalog/index.json` overlays certification from
-`evidence/phase10/skill-classification-draft.json`. **One** skill
-(`canary-echo`) is `usable` after sealed Linux/`bwrap` (privileged local Docker)
-Eval Runner receipts. The remaining skills stay `draft` with machine-readable
-reasons (most suites are judged-shape / lack `execute` blocks). Studio-wide
-promotion of published certified profiles still depends on executable suites +
-sealed evidence + publication + (when applicable) applied schema.
-**Blocked on (remaining):** executable suite upgrades for launch skills; applied
-`lskills` schema on target Supabase; supervised/live librarian passes.
+**Status:** Partially open (operational) — 2026-09-16 source packet for issue #374.
+The **five** production-successor releases are accepted in protected development.
+The other **54** catalog skills now have confined executable eval cases and a
+machine-readable remainder qualification plan. They remain `draft` until
+Server01 hosted sealed receipts exist. Filesystem presence and source helper
+output are not production passes. Historical 2026-08-03 canary (`canary-echo`
+usable=1) is a sealed local canary, not the five-release successor and not
+remainder production evidence.
+**Blocked on (remaining):** hosted sealed evaluator on Server01; publisher
+credential; disabled-then-owner-enabled `provider_bindings`; Platform PACI
+identities (OpenClaw registration concurrently owned).
 **Do not** start multi-day Cursor canary until Platform gates pass independent verification.
 **Reproducible command (release/promoting; requires external issuer key + digest-pinned image):**
 `LINKSKILLS_EVAL_RUNNER_ISSUER_KEY=… LINKSKILLS_SEALED_CERT_IMAGE=name@sha256:… ./scripts/run-sealed-linux-certify.sh`
 **Local smoke (non-promoting):** `./scripts/run-sealed-linux-certify.sh --local-non-promoting`
+**Remainder source matrix:** `python3 scripts/qualify_remainder.py`
 
 ### 2. Confirm `lskills` migrations applied per environment (Platform-owned live apply)
 
@@ -40,8 +52,8 @@ Migrations `20260715_000002`, `000003` seed, `20260718_000004` PostgREST exposur
 ### 3. Unsupervised production Librarian schedule
 
 **Status:** Partially done.
-Runnable generic host: `LiNKplatform/packages/librarian-runner`. Skills domain worker package: `packages/librarian_domain`. First production passes should stay dry-run / supervised until trusted.
-**Remaining:** stage→prod confidence, monitoring, escalation briefing path for the Principal.
+Runnable generic host: `LiNKplatform/packages/librarian-runner`. Skills domain worker package: `packages/librarian_domain`. Skills-owned install contract pin is **0.2 / 0.2.0** (`configs/librarian/install-contract.json`) — supervised-first, disabled by default. Do not edit LiNKplatform from Skills.
+**Remaining:** Platform host integration of worker 0.2 after the concurrent OpenClaw identity task; stage→prod confidence; monitoring; Principal briefing route. Unsupervised remainder certification waits on hosted sealed receipts.
 
 ### 4. Live Platform authentication issuer (claims shape consumed)
 

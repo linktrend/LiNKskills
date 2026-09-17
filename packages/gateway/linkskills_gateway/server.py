@@ -7,7 +7,16 @@ Routes:
   GET  /drain
   POST /drain
   POST /drain/cancel
+  GET  /v2/openapi.json
+  GET  /v2/capabilities
+  GET  /v2/mcp-capabilities
+  POST /v2/{operation}
   POST /v1/{operation}
+
+Production ``skills.api.v0.2`` is ``POST /v2/{operation}`` plus MCP
+``linkskills-mcp-v2``. Legacy ``POST /v1/{operation}`` remains the observed
+compatibility adapter. Empty-registry production defaults fail closed on
+exact retrieval with ``catalog_unavailable``.
 
 Compatibility note: ``packages/client/linkskills_client/compat.py`` wraps
 ``lib.skill_runtime`` so existing Python consumers can migrate toward this
@@ -26,8 +35,11 @@ import sys
 import threading
 import uuid
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
 from typing import Any, Callable, Dict, Mapping, Optional, Tuple, Type
 from urllib.parse import urlparse
+
+from linkskills_core.provider_v2 import bind_trusted_request
 
 from .auth import (
     AuthConfigurationError,
@@ -44,7 +56,13 @@ from .ops import (
     shutdown_timeout_s,
     store_probe_configured,
 )
-from .service import OPERATIONS, ServiceError, SkillsGatewayService
+from .service import OPERATIONS, REPO_ROOT_ENV, ServiceError, SkillsGatewayService
+from .v2_http import (
+    capability_record,
+    encode_v2_result,
+    load_openapi,
+    provider_from_verifier,
+)
 
 
 def _json_bytes(payload: Dict[str, Any]) -> bytes:
@@ -58,12 +76,14 @@ def make_handler(
     metrics: Optional[GatewayMetrics] = None,
     drain: Optional[DrainState] = None,
     environ: Optional[Mapping[str, str]] = None,
+    v2_provider: Optional[Any] = None,
 ) -> Type[BaseHTTPRequestHandler]:
     # Never default to unsigned decoding. Missing production authenticator fails closed.
     auth = resolve_claims_verifier(verifier=verifier)
     stats = metrics if metrics is not None else GatewayMetrics()
     drain_state = drain if drain is not None else drain_from_environ(environ)
     env = environ if environ is not None else os.environ
+    skills_v2 = v2_provider if v2_provider is not None else provider_from_verifier(auth)
 
     class LiNKskillsGateway(BaseHTTPRequestHandler):
         server_version = "LiNKskillsGateway/0.1"
@@ -108,13 +128,21 @@ def make_handler(
         def _ready_payload(self) -> Dict[str, Any]:
             configured, auth_mode, detail = auth_config_present(env)
             draining, _reason = drain_state.snapshot()
-            return service.ready(
+            ready = service.ready(
                 auth_configured=configured,
                 auth_mode=auth_mode,
                 auth_detail=detail,
                 draining=draining,
                 probe_store=store_probe_configured(env),
             )
+            if env.get("LINKSKILLS_ENV") == "production":
+                ready["provider_v2"] = skills_v2.store_status()
+                ready["provider_v2"]["catalog_ready"] = skills_v2.catalog_ready
+                ready["ready"] = bool(
+                    ready.get("ready") and ready["provider_v2"].get("ready")
+                    and skills_v2.catalog_ready
+                )
+            return ready
 
         def do_GET(self) -> None:  # noqa: N802
             stats.inc_request()
@@ -151,6 +179,12 @@ def make_handler(
                         "in_flight": stats.snapshot()["in_flight"],
                     },
                 )
+                return
+            if path == "/v2/openapi.json":
+                self._send(200, load_openapi())
+                return
+            if path in {"/v2/capabilities", "/v2/mcp-capabilities"}:
+                self._send(200, capability_record(skills_v2))
                 return
             self._send(
                 404,
@@ -208,6 +242,64 @@ def make_handler(
                         "in_flight": stats.snapshot()["in_flight"],
                     },
                 )
+                return
+
+            if path.startswith("/v2/"):
+                draining, drain_reason = drain_state.snapshot()
+                if draining:
+                    stats.inc_drain_reject()
+                    self._send(
+                        503,
+                        {
+                            "error": {
+                                "code": "draining",
+                                "message": "Gateway is draining; rejecting new work",
+                                "retryable": True,
+                                "reason": drain_reason,
+                            }
+                        },
+                    )
+                    return
+                operation = path[len("/v2/") :]
+                body, err = self._read_json()
+                if err:
+                    self._send(
+                        400,
+                        {
+                            "ok": False,
+                            "error": err,
+                            "retryable": False,
+                        },
+                    )
+                    return
+                assert body is not None
+                authorization = self.headers.get("Authorization")
+                params = body.get("params") if isinstance(body.get("params"), dict) else body
+                request = bind_trusted_request(
+                    params if isinstance(params, dict) else {},
+                    operation=operation,
+                    authorization=authorization,
+                )
+                stats.begin_work()
+                try:
+                    result = skills_v2.handle(request)
+                    encoded = encode_v2_result(result)
+                    error = encoded.get("error")
+                    status = 200
+                    if not encoded.get("ok", True):
+                        status = {
+                            "auth_required": 401,
+                            "auth_invalid": 401,
+                            "forbidden": 403,
+                            "not_found": 404,
+                            "catalog_unavailable": 503,
+                            "idempotency_conflict": 409,
+                            "legacy_execution_disabled": 410,
+                            "store_unavailable": 503,
+                        }.get(str(error), 400)
+                    self._send(status, encoded)
+                finally:
+                    stats.end_work()
                 return
 
             prefix = "/v1/"
@@ -405,6 +497,7 @@ def create_server(
     metrics: Optional[GatewayMetrics] = None,
     drain: Optional[DrainState] = None,
     environ: Optional[Mapping[str, str]] = None,
+    v2_provider: Optional[Any] = None,
 ) -> ThreadingHTTPServer:
     svc = service or SkillsGatewayService()
     handler = make_handler(
@@ -413,6 +506,7 @@ def create_server(
         metrics=metrics,
         drain=drain,
         environ=environ,
+        v2_provider=v2_provider,
     )
     httpd = ThreadingHTTPServer((host, port), handler)
     # Attach runtime handles for signal/drain shutdown (tests may override).
@@ -510,6 +604,14 @@ def main() -> None:
         type=int,
         default=int(os.environ.get("LINKSKILLS_GATEWAY_PORT", "8787")),
     )
+    parser.add_argument(
+        "--repo-root",
+        default=os.environ.get(REPO_ROOT_ENV) or None,
+        help=(
+            "Directory that contains catalog/ (and optionally skills/). "
+            f"Defaults to ${REPO_ROOT_ENV} when set."
+        ),
+    )
     args = parser.parse_args()
     try:
         verifier = resolve_claims_verifier()
@@ -518,7 +620,9 @@ def main() -> None:
         raise SystemExit(2) from exc
     metrics = GatewayMetrics()
     drain = drain_from_environ()
-    service = SkillsGatewayService()
+    service = SkillsGatewayService(
+        repo_root=Path(args.repo_root) if args.repo_root else None,
+    )
     httpd = create_server(
         args.host,
         args.port,

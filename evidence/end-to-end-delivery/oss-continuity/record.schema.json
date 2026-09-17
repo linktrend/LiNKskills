@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/linktrend/LiNKskills/evidence/end-to-end-delivery/oss-continuity/record.schema.json",
+  "title": "LiNKskills OSS continuity record",
+  "description": "Reusable evidence object for preserved upstream source/artifact continuity. Installation complete is never implied by schema validity.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "kind",
+    "componentId",
+    "preservationMode",
+    "installationComplete",
+    "boundIdentity",
+    "sourceArtifact",
+    "immutableIdentity",
+    "provenanceLicense",
+    "reproducibleInstallation",
+    "compatibility",
+    "updateReview",
+    "rollback",
+    "remainingPacketIds",
+    "unknowns"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "kind": { "const": "linkskills-oss-continuity-record" },
+    "componentId": { "type": "string", "minLength": 1 },
+    "title": { "type": "string" },
+    "preservationMode": {
+      "type": "string",
+      "enum": ["read_only_default", "linkskills_owned_publish_new_identity"]
+    },
+    "installationComplete": { "const": false },
+    "boundIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "ref", "commit", "tree"],
+      "properties": {
+        "repository": { "type": "string" },
+        "ref": { "type": "string" },
+        "commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "tree": { "type": "string", "pattern": "^[0-9a-f]{40}$" }
+      }
+    },
+    "sourceArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "location", "owner"],
+      "properties": {
+        "status": { "$ref": "#/$defs/sectionStatus" },
+        "location": { "type": "string" },
+        "owner": { "type": "string" },
+        "notes": { "type": "string" }
+      }
+    },
+    "immutableIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": { "$ref": "#/$defs/sectionStatus" },
+        "version": { "type": ["string", "null"] },
+        "commit": { "type": ["string", "null"] },
+        "tree": { "type": ["string", "null"] },
+        "digest": { "type": ["string", "null"] },
+        "truncatedAsInventoried": { "type": "boolean" },
+        "notes": { "type": "string" }
+      }
+    },
+    "provenanceLicense": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": { "$ref": "#/$defs/sectionStatus" },
+        "declaredLicense": { "type": ["string", "null"] },
+        "licensePath": { "type": ["string", "null"] },
+        "noticePath": { "type": ["string", "null"] },
+        "licensePathSha256": { "type": ["string", "null"] },
+        "conflict": { "type": ["string", "null"] },
+        "notes": { "type": "string" }
+      }
+    },
+    "reproducibleInstallation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "claimedComplete"],
+      "properties": {
+        "status": { "$ref": "#/$defs/sectionStatus" },
+        "claimedComplete": { "const": false },
+        "command": { "type": ["string", "null"] },
+        "lockOrPin": { "type": ["string", "null"] },
+        "notes": { "type": "string" }
+      }
+    },
+    "compatibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": { "$ref": "#/$defs/sectionStatus" },
+        "requiresPython": { "type": ["string", "null"] },
+        "ciMatrix": { "type": ["string", "null"] },
+        "workerAttestation": { "type": ["string", "null"] },
+        "notes": { "type": "string" }
+      }
+    },
+    "updateReview": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "autoPromote"],
+      "properties": {
+        "status": { "$ref": "#/$defs/sectionStatus" },
+        "autoPromote": { "const": false },
+        "reviewer": { "type": "string" },
+        "notes": { "type": "string" }
+      }
+    },
+    "rollback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": { "$ref": "#/$defs/sectionStatus" },
+        "priorIdentity": { "type": ["string", "null"] },
+        "restoringOwner": { "type": ["string", "null"] },
+        "notes": { "type": "string" }
+      }
+    },
+    "remainingPacketIds": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "unknowns": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "sources": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "$defs": {
+    "sectionStatus": {
+      "type": "string",
+      "enum": ["RECORDED_SOURCE_FACT", "PENDING", "HOLD", "NOT_APPLICABLE"]
+    }
+  }
+}

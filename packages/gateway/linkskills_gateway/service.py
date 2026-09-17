@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
 import threading
 import time
@@ -172,9 +173,33 @@ def _utc_now() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
-def _repo_root_from_here() -> Path:
+REPO_ROOT_ENV = "LINKSKILLS_REPO_ROOT"
+
+
+def resolve_repo_root(repo_root: Optional[Path] = None) -> Path:
+    """Return the catalog-bearing repository root.
+
+    Resolution order (supported factory path, not an invented env name):
+
+    1. Explicit ``repo_root`` constructor/CLI argument.
+    2. ``LINKSKILLS_REPO_ROOT`` (documented in the Gateway/MCP service definition).
+    3. Source-tree layout: ``packages/gateway/linkskills_gateway/service.py`` → repo root.
+
+    Packaged installs live under site-packages, so parents[3] is
+    ``/usr/local/lib`` and must not be used when the image catalog is at
+    ``/opt/linkskills/catalog``.
+    """
+    if repo_root is not None:
+        return Path(repo_root).expanduser().resolve()
+    env = os.environ.get(REPO_ROOT_ENV, "").strip()
+    if env:
+        return Path(env).expanduser().resolve()
     # packages/gateway/linkskills_gateway/service.py -> repo root
     return Path(__file__).resolve().parents[3]
+
+
+def _repo_root_from_here() -> Path:
+    return resolve_repo_root()
 
 
 @dataclass
@@ -291,7 +316,7 @@ class SkillsGatewayService:
         state_dir: Optional[Path] = None,
         store: Optional[GatewayStore] = None,
     ) -> None:
-        self.repo_root = Path(repo_root) if repo_root else _repo_root_from_here()
+        self.repo_root = resolve_repo_root(repo_root)
         self._clock = clock or time.time
         self._state_dir = resolve_state_dir(repo_root=self.repo_root, state_dir=state_dir)
         self._store = open_gateway_store(
@@ -1126,6 +1151,7 @@ class SkillsGatewayService:
         catalog_loaded = len(self._skills) > 0
         store_reachable: Optional[bool] = None
         store_error: Optional[str] = None
+        store_diagnosis: Optional[Dict[str, Any]] = None
         if probe_store:
             try:
                 store_reachable = self.probe_store_reachable()
@@ -1133,6 +1159,21 @@ class SkillsGatewayService:
                 store_reachable = False
                 # Class name only — never include connection strings / messages with secrets.
                 store_error = type(exc).__name__
+                try:
+                    from linkskills_persistence.readiness import diagnose_store_exception
+
+                    diagnosis = diagnose_store_exception(exc)
+                    store_diagnosis = {
+                        "code": diagnosis.get("code"),
+                        "redacted_error": diagnosis.get("redacted_error"),
+                        "fail_closed": True,
+                    }
+                except Exception:
+                    store_diagnosis = {
+                        "code": "store_not_ready",
+                        "redacted_error": type(exc).__name__,
+                        "fail_closed": True,
+                    }
 
         ready = (
             bool(self._ready)
@@ -1158,6 +1199,8 @@ class SkillsGatewayService:
             payload["store_reachable"] = bool(store_reachable)
             if store_error:
                 payload["store_error"] = store_error
+            if store_diagnosis:
+                payload["store_diagnosis"] = store_diagnosis
         else:
             payload["store_probe"] = "skipped"
         return payload

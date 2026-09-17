@@ -1,1 +1,192 @@
-{"schema_version":"0.2","status":"source_only_no_apply","entries":[{"id":"20260824_000012_lskills_external_collection_lifecycle","up":"supabase/migrations/20260824_000012_lskills_external_collection_lifecycle.sql","up_sha256":"51236e86c938e7bad8717f94949ccef4bd6ff1d4d1903796abccfbde9f819515","down":"supabase/migrations/20260824_000012_lskills_external_collection_lifecycle_down.sql","down_sha256":"68090475b40675d2597e28a28733cb439828a6e69c1346bf5c69731eb88ff343","apply_authority":"LiNKplatform","rollback":"Platform receipt and prior current pointer; source package down migration is exact-object rollback only"}]}
+{
+  "schema_version": "1.0",
+  "package_id": "lskills-production-store-readiness",
+  "package_version": "1.0.0",
+  "status": "source_only_no_apply",
+  "apply_authority": "LiNKplatform",
+  "live_recovery_owner": "01a0843c-0df9-74e2-907a-05c5f736d6ed",
+  "compatible_postgres_major": [
+    17
+  ],
+  "entries": [
+    {
+      "order": 2,
+      "id": "20260715_000002_lskills_catalog_core",
+      "up": "supabase/migrations/20260715_000002_lskills_catalog_core.sql",
+      "up_sha256": "4991dd628cc501a1013a4d7c3d8f859274e62ff847e768f106b0e3c2b89d8414",
+      "apply_authority": "LiNKplatform",
+      "down": null,
+      "down_sha256": null,
+      "rollback": "No companion down file; forward-fix with a later additive migration. Never drop schema lskills cascade."
+    },
+    {
+      "order": 3,
+      "id": "20260715_000003_lskills_catalog_seed",
+      "up": "supabase/migrations/20260715_000003_lskills_catalog_seed.sql",
+      "up_sha256": "5e8f58a7159ad09f0c6389e12060c6a9cc76ff73dcfc2397ddea256d47a75e82",
+      "apply_authority": "LiNKplatform",
+      "down": null,
+      "down_sha256": null,
+      "rollback": "No companion down file; forward-fix with a later additive migration. Never drop schema lskills cascade."
+    },
+    {
+      "order": 4,
+      "id": "20260718_000004_lskills_postgrest_exposure",
+      "up": "supabase/migrations/20260718_000004_lskills_postgrest_exposure.sql",
+      "up_sha256": "4220d70b626313f572a38720958fb78550b3b89c0efab5366a449d33c0b22ca0",
+      "apply_authority": "LiNKplatform",
+      "down": null,
+      "down_sha256": null,
+      "rollback": "No companion down file; forward-fix with a later additive migration. Never drop schema lskills cascade."
+    },
+    {
+      "order": 5,
+      "id": "20260727_000005_lskills_registry_foundation",
+      "up": "supabase/migrations/20260727_000005_lskills_registry_foundation.sql",
+      "up_sha256": "36081765032f21dfd2dcca223035555e1e54b71298874235def8e0362c55c4ed",
+      "apply_authority": "LiNKplatform",
+      "down": null,
+      "down_sha256": null,
+      "rollback": "No companion down file; forward-fix with a later additive migration. Never drop schema lskills cascade."
+    },
+    {
+      "order": 6,
+      "id": "20260728_000006_lskills_rls_actor_org_scope",
+      "up": "supabase/migrations/20260728_000006_lskills_rls_actor_org_scope.sql",
+      "up_sha256": "12c2e45e94fd9216a5857ce53ce299a953dc2ee869f89bcdb392857133df763d",
+      "apply_authority": "LiNKplatform",
+      "down": null,
+      "down_sha256": null,
+      "rollback": "No companion down file; forward-fix with a later additive migration. Never drop schema lskills cascade."
+    },
+    {
+      "order": 7,
+      "id": "20260730_000007_lskills_gateway_persistence",
+      "up": "supabase/migrations/20260730_000007_lskills_gateway_persistence.sql",
+      "up_sha256": "c26d1c55d9f87e242fe1e225fd4240cd911a5e0315d88500417d491689596222",
+      "apply_authority": "LiNKplatform",
+      "down": null,
+      "down_sha256": null,
+      "rollback": "No companion down file; forward-fix with a later additive migration. Never drop schema lskills cascade."
+    },
+    {
+      "order": 8,
+      "id": "20260730_000008_lskills_review_queue",
+      "up": "supabase/migrations/20260730_000008_lskills_review_queue.sql",
+      "up_sha256": "0d5cf1f6abf62bddffc2e494bd8fb7faabe5aceb44266d446bb71f1209f43bab",
+      "apply_authority": "LiNKplatform",
+      "down": null,
+      "down_sha256": null,
+      "rollback": "No companion down file; forward-fix with a later additive migration. Never drop schema lskills cascade."
+    },
+    {
+      "order": 9,
+      "id": "20260730_000009_lskills_review_queue_actor_isolation",
+      "up": "supabase/migrations/20260730_000009_lskills_review_queue_actor_isolation.sql",
+      "up_sha256": "acd0a1dbf81697d4e278ed4cdfa11d4b410b383420e02e6105940f578b6b6467",
+      "apply_authority": "LiNKplatform",
+      "down": null,
+      "down_sha256": null,
+      "rollback": "No companion down file; forward-fix with a later additive migration. Never drop schema lskills cascade."
+    },
+    {
+      "order": 10,
+      "id": "20260803_000010_lskills_canary_echo_usable_seed",
+      "up": "supabase/migrations/20260803_000010_lskills_canary_echo_usable_seed.sql",
+      "up_sha256": "5e391f4845984dbf83724b3ac931a879f774f91014fb46ced89154145df9f059",
+      "apply_authority": "LiNKplatform",
+      "down": "supabase/migrations/20260803_000010_lskills_canary_echo_usable_seed_down.sql",
+      "down_sha256": "3b48c7f284ae902d6dd97d86dee5f7ba222d04d7900335bd3b3abb9681a2ef5e",
+      "rollback": "Platform receipt and prior current pointer; source package down migration is exact-object rollback only"
+    },
+    {
+      "order": 11,
+      "id": "20260804_000011_lskills_gateway_role_rls_contract",
+      "up": "supabase/migrations/20260804_000011_lskills_gateway_role_rls_contract.sql",
+      "up_sha256": "0a8c56ee8ac2b3368d2a0ea8f6cc98719ccbc852d884dc34bc0143d5c7984a73",
+      "apply_authority": "LiNKplatform",
+      "down": "supabase/migrations/20260804_000011_lskills_gateway_role_rls_contract_down.sql",
+      "down_sha256": "b538241ef3c95af5e1f51a4781c7600644365720343016d41f15a935e209af89",
+      "rollback": "Platform receipt and prior current pointer; source package down migration is exact-object rollback only"
+    },
+    {
+      "order": 12,
+      "id": "20260824_000012_lskills_external_collection_lifecycle",
+      "up": "supabase/migrations/20260824_000012_lskills_external_collection_lifecycle.sql",
+      "up_sha256": "51236e86c938e7bad8717f94949ccef4bd6ff1d4d1903796abccfbde9f819515",
+      "apply_authority": "LiNKplatform",
+      "down": "supabase/migrations/20260824_000012_lskills_external_collection_lifecycle_down.sql",
+      "down_sha256": "68090475b40675d2597e28a28733cb439828a6e69c1346bf5c69731eb88ff343",
+      "rollback": "Platform receipt and prior current pointer; source package down migration is exact-object rollback only"
+    },
+    {
+      "order": 13,
+      "id": "20260910_000013_lskills_production_store_readiness",
+      "up": "supabase/migrations/20260910_000013_lskills_production_store_readiness.sql",
+      "up_sha256": "47fa3facefa865fd1c511475322d138841c89ca651afa932fd9f3d5800b96172",
+      "down": "supabase/migrations/20260910_000013_lskills_production_store_readiness_down.sql",
+      "down_sha256": "f416ccbc47708717d0795f2bd99012c5311dd06a0e1f87ebffa20e4c8747260a",
+      "apply_authority": "LiNKplatform",
+      "rollback": "Platform receipt; companion down drops only store_package, its policies, and store_readiness_snapshot"
+    }
+  ],
+  "payload_digest_sha256": "626b8b5874ab17a3a2bc77b323573daaa077e510009bb9d6d97c20026efb9774",
+  "package_digest_sha256": "0a51c7928cac9bdab535b23ab5d0b467a36f71c1c312dd73f8ea4dde2a5e7cea",
+  "digest_algorithm": "sha256",
+  "prerequisites": {
+    "platform_foundation": [
+      "platform.organizations",
+      "platform.member_role",
+      "platform.has_org_access(uuid, platform.member_role)"
+    ],
+    "postgres_major": 17,
+    "notes": "Platform foundation must already be applied on the same database. service_role and authenticator are Platform-owned PostgREST principals referenced by 000004; Skills does not issue them or any secret."
+  },
+  "backup_scope": {
+    "schemas": [
+      "platform",
+      "lskills"
+    ],
+    "roles": [
+      "svc_lskills_runtime",
+      "svc_lskills_librarian",
+      "svc_observer",
+      "svc_lskills_gateway"
+    ],
+    "includes": [
+      "table data",
+      "RLS policies",
+      "grants",
+      "functions in lskills"
+    ],
+    "excludes": [
+      "GSM secret values",
+      "LOGIN passwords",
+      "production data copies in Skills repos"
+    ]
+  },
+  "least_privilege": {
+    "runtime_role": "svc_lskills_runtime",
+    "runtime_may": [
+      "SELECT store_package",
+      "EXECUTE store_readiness_snapshot",
+      "bounded gateway table DML granted by 000007 under RLS"
+    ],
+    "runtime_must_not": [
+      "BYPASSRLS",
+      "LOGIN issuance",
+      "CREATE/DROP schema",
+      "INSERT store_package",
+      "service_role impersonation"
+    ]
+  },
+  "forward_verification": [
+    "Recompute SHA-256 of every listed SQL file and match this manifest",
+    "SELECT lskills.store_readiness_snapshot() as svc_lskills_runtime",
+    "Confirm postgres_major = 17 and missing_relations is empty",
+    "Confirm runtime INSERT into lskills.store_package is denied"
+  ],
+  "idempotency": "CREATE IF NOT EXISTS / DROP POLICY IF EXISTS / INSERT ON CONFLICT that fail-closes on payload digest mismatch",
+  "forward_fix": "Never rewrite an applied file. Author a later additive dated migration.",
+  "compatibility": "PostgreSQL 17. Additive with prior lskills 000002-000012. Does not copy Platform implementation."
+}

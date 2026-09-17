@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "kind": "linkskills-ed-10-oss-proof-slots",
+  "packet": "ED-10",
+  "status": "PENDING",
+  "planningInventoryPath": "docs/end-to-end-delivery/OSS-INVENTORY.md",
+  "planningInventoryIsNotProof": true,
+  "allSlotsPassRequiredForAcceptance": true,
+  "slots": {
+    "continuity": {
+      "id": "OSS-CONTINUITY",
+      "requirement": "The accepted candidate is a recoverable successor of the deployed identity; rollback identity remains named; no silent substitution of latest main or development.",
+      "requiredRefs": [
+        "sourceCommit",
+        "sourceTree",
+        "deployedImageDigest",
+        "priorRollbackImageDigest"
+      ],
+      "supplied": false,
+      "status": "PENDING",
+      "proof": null
+    },
+    "provenance": {
+      "id": "OSS-PROVENANCE",
+      "requirement": "Source commit/tree, image digest, hash-locked requirements-dev.lock, and supply-chain/SBOM or equivalent named artifacts are inspectable.",
+      "requiredRefs": [
+        "sourceCommit",
+        "sourceTree",
+        "imageDigest",
+        "requirementsDevLockSha256",
+        "sbomOrSupplyChainReceipt"
+      ],
+      "supplied": false,
+      "status": "PENDING",
+      "proof": null
+    },
+    "reproducibility": {
+      "id": "OSS-REPRODUCIBILITY",
+      "requirement": "The attested interpreter and hash-locked public-PyPI install can be re-identified for this source identity; an unpinned compiler must not silently replace the lock.",
+      "requiredRefs": [
+        "pythonVersion",
+        "lockPath",
+        "requireHashesInstall",
+        "imageDigest"
+      ],
+      "admittedWorkerNote": "This framework run used CPython 3.12.3 and python -m pip install --require-hashes -r requirements-dev.lock. That records worker toolchain only; it is not ED-08/ED-09 runtime proof.",
+      "supplied": false,
+      "status": "PENDING",
+      "proof": null
+    },
+    "rollback": {
+      "id": "OSS-ROLLBACK",
+      "requirement": "Prior image, compose projection, channel pointers, and consumer-disable path remain recoverable; ED-08 rollback rehearsal or equivalent receipt exists at the compatible identity.",
+      "requiredRefs": [
+        "priorImageDigest",
+        "composeProjection",
+        "releasePointer",
+        "rollbackReceipt"
+      ],
+      "supplied": false,
+      "status": "PENDING",
+      "proof": null
+    }
+  }
+}

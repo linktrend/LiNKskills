@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "kind": "linkskills-oss-canary-final-framework-aggregation",
+  "packet": "ISSUE-355",
+  "status": "FRAMEWORK_ONLY",
+  "decision": "HOLD",
+  "claims": {
+    "ed08Acceptance": false,
+    "ed09Acceptance": false,
+    "ed10Acceptance": false,
+    "functionalAccepted": false,
+    "internalLaunchComplete": false,
+    "installationComplete": false,
+    "notLive": true
+  },
+  "aggregatorIdentity": {
+    "repository": "linktrend/LiNKskills",
+    "ref": "issue/355-integrate-prepared-oss-canary-and-final-acceptan",
+    "startingCommit": "f97951feec6546ff924c65611802afd7ab19d2a3",
+    "startingTree": "9bd1ba9eb32885146317f25a1cd3b223d1540d9e"
+  },
+  "sourceCheckpoints": [
+    {
+      "issue": 352,
+      "ref": "issue/352-prepare-oss-continuity-evidence-and-validation-f",
+      "commit": "b38ce473ec550d476b974c9b513a7f4fa02d04fa",
+      "tree": "141900db99a3c176b7f551ffcf83718fb6977484",
+      "paths": [
+        "docs/end-to-end-delivery/OSS-CONTINUITY.md",
+        "evidence/end-to-end-delivery/oss-continuity/"
+      ],
+      "classificationPreserved": ["HOLD", "FRAMEWORK_READY", "NO_INSTALLATION_CLAIMED"]
+    },
+    {
+      "issue": 353,
+      "ref": "issue/353-prepare-ed-09-consumer-canary-evidence-framework",
+      "commit": "004fce9e3bc396ce02b85a7b467eed2a8d409ff7",
+      "tree": "63574516f2a033d6f4f0ebb940cf179041c6c2ca",
+      "paths": ["evidence/end-to-end-delivery/ed-09/"],
+      "classificationPreserved": ["FRAMEWORK_ONLY_NOT_ACCEPTED", "HOLD", "UNPROVEN", "NOT_EXECUTED"]
+    },
+    {
+      "issue": 354,
+      "ref": "issue/354-prepare-ed-10-final-acceptance-evidence-framewor",
+      "commit": "146fae717e0bd9017afccf4f62eaca2113e58be0",
+      "tree": "388f865ca78bff3bb23b5396ee7dc205f8c5d488",
+      "paths": [
+        "docs/end-to-end-delivery/ACCEPTANCE.md",
+        "evidence/end-to-end-delivery/ed-10/"
+      ],
+      "classificationPreserved": ["FRAMEWORK_ONLY", "HOLD", "PENDING"]
+    }
+  ],
+  "disjoint": true,
+  "prohibitedActionsNotTaken": [
+    "ed-08-live-deploy",
+    "consumer-canary-execution",
+    "ed-09-acceptance-claim",
+    "ed-10-acceptance-claim",
+    "implementer-pr",
+    "self-merge",
+    "nested-workers",
+    "lockfile-rewrite"
+  ],
+  "notes": "Issue 355 copies only the verified disjoint framework paths from issues 352/353/354. Source HOLD, framework-only, and not-live classifications remain authoritative. This file does not fill ED-09 or ED-10 receipts."
+}

@@ -9,7 +9,7 @@ ALLOWED = ("skills/sales-customer-management/", "tests/skills/sales_customer_man
 class ScopeAndEvidenceTests(unittest.TestCase):
     def test_fixture_and_skill_scope_are_safe(self):
         for path in (ROOT / "skills" / "sales-customer-management").rglob("*"):
-            if path.is_file():
+            if path.is_file() and "__pycache__" not in path.parts:
                 text = path.read_text(encoding="utf-8", errors="replace")
                 self.assertNotIn("sk_live_", text)
                 self.assertNotIn("BEGIN PRIVATE KEY", text)

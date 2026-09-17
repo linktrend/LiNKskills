@@ -187,13 +187,16 @@ class ConformanceTests(unittest.TestCase):
     def test_fake_host_runs_default_fixtures(self) -> None:
         host = FakeLibrarianHost()
         report = host.run_fixture_suite(DEFAULT_FIXTURES)
-        self.assertEqual(report["worker_version"], "0.1")
+        self.assertEqual(report["worker_version"], "0.2")
         staging = report["results"]["propose_improvement_staging_push"]
         self.assertFalse(staging["accepted"])
         thin = report["results"]["interpret_eval_evidence"]
         self.assertFalse(thin["certifying"])
         self.assertIn("intake_normalize", report["results"])
         self.assertGreaterEqual(report["invocation_count"], 8)
+        ingest = report["results"]["ingest_use"]
+        self.assertTrue(ingest["accepted"])
+        self.assertEqual(report["results"]["status_report"]["worker_version"], "0.2")
 
 
 if __name__ == "__main__":

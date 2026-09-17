@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "sourceReceiptSha256": "1547111d97811094056c09f685633cb9783b13dbde095b438f5c195ba70d1fc4",
+  "headSha": "537e1778e926982a1d744166f2a638a9262e2446",
+  "classification": "docs_only",
+  "acceptance": "ED-00 exact pushed baseline/interface evidence independently reviewed PASS with source, provider, consumer, Server01, and production proof classes kept separate",
+  "commands": [
+    {"cmd": "python3 JSON parse for evidence/end-to-end-delivery/ed-00/*.json", "exitCode": 0},
+    {"cmd": "validate_plan_or_runtime docs/end-to-end-delivery/EXECUTION-MANIFEST.json", "exitCode": 0},
+    {"cmd": "relative Markdown links existence check", "exitCode": 0},
+    {"cmd": "git diff --check 8f27a179c891c0fdcbe0ccc5c010f5de1b08b275..HEAD", "exitCode": 0},
+    {"cmd": "scoped credential-pattern scan evidence/end-to-end-delivery/ed-00", "exitCode": 0},
+    {"cmd": "python3 scripts/gitops/secret_scan.py (known repository baseline: stale fixture declarations and binary input; no ED-00 finding)", "exitCode": 1}
+  ],
+  "at": "2026-09-10T07:55:57Z",
+  "docsOnlyJustification": "ED-00 is the approved Gate-0 evidence-only identity and interface refresh; no product or runtime behavior is changed.",
+  "kind": "v25-issue-checkpoint",
+  "amendment": "V25_BOOTSTRAP_LEAN",
+  "gitTree": "d45613d6f29d40daa5083470708f3388d6b4c4e9",
+  "pushed": true,
+  "scopedDiff": true,
+  "focusedTests": {"passed": true},
+  "independentNarrowReview": {
+    "accepted": true,
+    "headSha": "537e1778e926982a1d744166f2a638a9262e2446",
+    "gitTree": "d45613d6f29d40daa5083470708f3388d6b4c4e9",
+    "paths": ["declared-checkpoint-scope"],
+    "reviewer": {"actor": "routed-independent-reviewer", "role": "reviewer"},
+    "implementerActor": "checkpoint-implementer"
+  },
+  "manifestEvidence": true,
+  "proofClass": "local"
+}

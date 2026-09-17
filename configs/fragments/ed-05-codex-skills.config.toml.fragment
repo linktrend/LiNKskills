@@ -1,0 +1,21 @@
+# ED-05 Codex owner fragment. Independently named Skills MCP entry.
+# Owner of shared Codex config.toml: LiNKbrain / XP-03. LiNKskills authors
+# this fragment only — do not paste secrets; do not edit shared host files here.
+# Keep this server name distinct from Brain MCP entries.
+
+[mcp_servers.linkskills_ed05_codex]
+enabled = false
+command = "python3"
+args = ["-m", "linkskills_mcp.server"]
+cwd = "/ABS/PATH/TO/LiNKskills"
+startup_timeout_sec = 15
+
+[mcp_servers.linkskills_ed05_codex.env]
+PYTHONPATH = "packages/gateway:packages/mcp_server:packages/client:packages/librarian_domain:packages/eval_runner:packages/tool_runtime:packages/contracts:packages/core:."
+GATEWAY_URL = "https://skills.test.linktrend.invalid/provider-v2"
+LINKSKILLS_PACI_SCOPE = "lskills"
+LINKSKILLS_PACI_RESOURCE_AUDIENCE = "lskills-api"
+LINKSKILLS_CODEX_FRAGMENT = "ed-05"
+
+# Exact pins: configs/consumer-activation/ed-05-codex-owner-packet.json
+# live_apply=false. Do not invent latest pointers or Brain credential reuse.

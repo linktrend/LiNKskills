@@ -406,6 +406,11 @@ def main() -> None:
     parser.add_argument("--output", default=None, help="Optional output file path")
     parser.add_argument("--failure-threshold", type=float, default=0.20)
     parser.add_argument("--hitl-threshold", type=float, default=0.30)
+    parser.add_argument(
+        "--founder-status",
+        default=None,
+        help="Optional worker status_report JSON to render a redacted founder report",
+    )
     args = parser.parse_args()
 
     root = Path(args.root).resolve()
@@ -413,20 +418,68 @@ def main() -> None:
     ledger_value = args.ledger or config.get("logging", {}).get("ledger_path", "execution_ledger.jsonl")
     ledger_path = (root / ledger_value).resolve() if not Path(ledger_value).is_absolute() else Path(ledger_value)
 
-    report = generate_report(
-        root=root,
-        ledger_path=ledger_path,
-        failure_threshold=args.failure_threshold,
-        hitl_threshold=args.hitl_threshold,
-        engine_policy=config.get("engine", {}) if isinstance(config.get("engine"), dict) else {},
-    )
-    output = json.dumps(report, indent=2) if args.format == "json" else render_text(report)
+    if args.founder_status:
+        status_path = Path(args.founder_status).resolve()
+        worker_status = json.loads(status_path.read_text(encoding="utf-8"))
+        report = founder_visibility_report(worker_status)
+        output = json.dumps(report, indent=2) if args.format == "json" else json.dumps(report, indent=2)
+    else:
+        report = generate_report(
+            root=root,
+            ledger_path=ledger_path,
+            failure_threshold=args.failure_threshold,
+            hitl_threshold=args.hitl_threshold,
+            engine_policy=config.get("engine", {}) if isinstance(config.get("engine"), dict) else {},
+        )
+        output = json.dumps(report, indent=2) if args.format == "json" else render_text(report)
 
     if args.output:
         out_path = Path(args.output).resolve()
         out_path.write_text(output + "\n", encoding="utf-8")
     else:
         print(output)
+
+
+FOUNDER_FORBIDDEN_KEYS = {
+    "prompt",
+    "transcript",
+    "conversation",
+    "secret",
+    "credential",
+    "raw_output",
+    "consumer_correlation",
+    "brain_memory",
+}
+
+
+def redact_founder_payload(value: Any) -> Any:
+    """Drop forbidden keys from founder-facing status payloads."""
+    if isinstance(value, dict):
+        return {
+            key: redact_founder_payload(item)
+            for key, item in value.items()
+            if not any(token in str(key).lower() for token in FOUNDER_FORBIDDEN_KEYS)
+        }
+    if isinstance(value, list):
+        return [redact_founder_payload(item) for item in value]
+    return value
+
+
+def founder_visibility_report(worker_status: Dict[str, Any]) -> Dict[str, Any]:
+    """Separate proof classes for founder visibility without payload leakage."""
+    classes = dict(worker_status.get("proof_classes") or {})
+    return redact_founder_payload(
+        {
+            "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+            "kind": "linkskills-founder-status",
+            "worker_version": worker_status.get("worker_version"),
+            "enabled": worker_status.get("enabled"),
+            "backlog": worker_status.get("backlog"),
+            "metrics_cardinality": worker_status.get("metrics_cardinality"),
+            "proof_classes": classes,
+            "live_host_integration": False,
+        }
+    )
 
 
 if __name__ == "__main__":

@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "kind": "linkskills-server01-candidate",
+  "packet": "ED-06",
+  "issue": 328,
+  "title": "Build the Server 01 candidate",
+  "status": "CANDIDATE_NOT_DEPLOYED",
+  "liveMutation": false,
+  "proofClass": "source-candidate",
+  "hostedImageBuild": {
+    "status": "HOLD",
+    "reason": "This packet defines the linux/amd64 image and compose overlay only. A hosted digest is recorded after an independent build; this worker does not publish, pull credentials, or mutate Server 01.",
+    "architecture": "linux/amd64",
+    "runtimeUser": "10002:10002",
+    "baseImage": "python:3.11-slim-bookworm",
+    "baseImageDigest": "HOLD_PIN_AT_HOSTED_BUILD",
+    "candidateImage": "HOLD_REPLACE_WITH_HOSTED_LINUX_AMD64_DIGEST"
+  },
+  "sourceIdentity": {
+    "repository": "linktrend/LiNKskills",
+    "ownedBranch": "issue/328-build-the-server-01-candidate",
+    "bindAtValidation": true
+  },
+  "previousState": {
+    "service": "linktrend-linkskills",
+    "image": "linktrend/linkskills@sha256:7cf2780a82c2c37c113b2d55b787a4e72a7098063cf434ea0654826c3719257f",
+    "imageDigest": "sha256:7cf2780a82c2c37c113b2d55b787a4e72a7098063cf434ea0654826c3719257f",
+    "releaseCommit": "7067716fef5189a1427a7cf9b0847cec898e19de",
+    "releaseTree": "d0bb392351994810173f730c47b63112c31e391b",
+    "contract": "skills.api.v0.1",
+    "composePath": "/srv/linktrend/deploy/compose/core-services.compose.yml",
+    "composeSha256": "a114290bf485c51a9ffd297ede317e79a2ac708d088a90487b1c9eeae037cd67",
+    "hostPort": "127.0.0.1:18798",
+    "containerPort": 8787,
+    "secretMount": "/etc/linkskills/secrets:ro",
+    "stateMount": "/var/lib/linkskills:rw",
+    "networkExposure": "loopback only"
+  },
+  "candidate": {
+    "service": "linktrend-linkskills",
+    "project": "linktrend-core-services",
+    "contract": "skills.api.v0.2",
+    "httpEntrypoint": "linkskills-gateway",
+    "mcpEntrypoint": "linkskills-mcp-v2",
+    "legacyMcpEntrypoint": "linkskills-mcp-server",
+    "bind": "127.0.0.1:18798",
+    "containerPort": 8787,
+    "healthPaths": ["/health", "/ready", "/metrics", "/drain"],
+    "store": "postgres",
+    "storeProbe": true,
+    "authMode": "production",
+    "audience": "lskills-api",
+    "requiredScope": "lskills",
+    "drainTimeoutSeconds": 30
+  },
+  "hardening": {
+    "user": "10002:10002",
+    "readOnlyRoot": true,
+    "capDrop": ["ALL"],
+    "noNewPrivileges": true,
+    "cpus": "1.0",
+    "memLimit": "1g",
+    "pidsLimit": 256,
+    "restart": "unless-stopped",
+    "tmpfs": ["/tmp"]
+  },
+  "labels": {
+    "org.linktrend.service": "lskills",
+    "org.linktrend.contract": "skills.api.v0.2",
+    "org.linktrend.source.repository": "linktrend/LiNKskills",
+    "org.linktrend.packet": "ED-06",
+    "org.linktrend.deploy": "candidate-not-live"
+  },
+  "environmentNamesOnly": [
+    "LINKSKILLS_ENV",
+    "LINKSKILLS_AUTH_MODE",
+    "LINKSKILLS_PLATFORM_AUTHENTICATOR",
+    "LINKSKILLS_GATEWAY_HOST",
+    "LINKSKILLS_GATEWAY_PORT",
+    "LINKSKILLS_GATEWAY_STORE",
+    "LINKSKILLS_STORE_PROBE",
+    "LINKSKILLS_DRAIN",
+    "LINKSKILLS_SHUTDOWN_TIMEOUT_S",
+    "LINKSKILLS_PACI_ISSUER",
+    "LINKSKILLS_PACI_JWKS_URI",
+    "LINKSKILLS_PACI_AUDIENCE",
+    "LINKSKILLS_PACI_REQUIRED_SERVICE_SCOPES",
+    "LINKSKILLS_PACI_INTROSPECTION_URL",
+    "LINKSKILLS_PACI_INTROSPECTION_CLIENT_ID",
+    "LINKSKILLS_PACI_TRUSTED_MINT_CLIENT_IDS",
+    "LINKSKILLS_PACI_CLIENT_PRIVATE_KEY_FILE",
+    "LINKSKILLS_DATABASE_URL_SECRET_NAME"
+  ],
+  "forbidden": [
+    "edit /srv/linktrend/deploy/compose/core-services.compose.yml from this repository",
+    "public or non-loopback published ports",
+    "secret values, PEMs, DSNs, or tokens in Git",
+    "deploy, registry push, or live container mutation from this packet",
+    "replace the retained v0.1 image without an independent hosted digest",
+    "treat /health=200 as /ready proof"
+  ],
+  "rollback": {
+    "action": "drain candidate then restore previousState image, compose projection, secret mount, and state mount",
+    "retainFailedCandidateEvidence": true,
+    "owner": "Platform/Server 01"
+  },
+  "holds": [
+    "hosted linux/amd64 image digest and SBOM",
+    "Platform backup/restore and store-probe receipts",
+    "live compose apply (ED-08)"
+  ]
+}

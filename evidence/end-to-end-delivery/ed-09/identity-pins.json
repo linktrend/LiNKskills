@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "kind": "linkskills-ed-09-identity-pins",
+  "packet": "ED-09",
+  "requiredBeforeAcceptance": true,
+  "status": "UNPROVEN",
+  "executed": false,
+  "compatibleIdentitiesProven": false,
+  "sourceCandidate": {
+    "repository": "linktrend/LiNKskills",
+    "ref": null,
+    "commit": null,
+    "tree": null
+  },
+  "providerDeployed": {
+    "imageDigest": null,
+    "sourceCommit": null,
+    "sourceTree": null,
+    "mustEqualEd08": true
+  },
+  "platformAuth": {
+    "audience": "lskills-api",
+    "scope": "lskills",
+    "brainAudienceForbidden": "lbrain-api",
+    "observedIssuer": null,
+    "observedJwks": null
+  },
+  "consumerPins": {
+    "pinsRef": "configs/consumer-activation/ed-05-initial-five-pins.json",
+    "cursorPacket": "configs/consumer-activation/ed-05-cursor-owner-packet.json",
+    "codexPacket": "configs/consumer-activation/ed-05-codex-owner-packet.json",
+    "lisaPacket": "configs/consumer-activation/ed-05-lisa-openclaw-owner-packet.json",
+    "pinsDigest": null,
+    "cursorPacketDigest": null,
+    "codexPacketDigest": null,
+    "lisaPacketDigest": null,
+    "enabledObserved": null,
+    "thisPacketMustNotAlterConsumerConfig": true
+  },
+  "initialReleasesOnly": [
+    "git-safeguard@1.1.0",
+    "persistent-qa@1.0.0",
+    "repository-manager@1.0.0",
+    "skill-template@1.2.0",
+    "tool-architect@1.0.0"
+  ],
+  "localBootstrapRetained": ["agentsetup@1.3.0", "agentcomply@1.3.0"],
+  "expansionManifestsRemainDisabled": true,
+  "representativeReleaseUsed": {
+    "skillId": null,
+    "version": null,
+    "releaseId": null,
+    "runtimeProfile": null,
+    "bundleDigest": null,
+    "packageDigest": null,
+    "evalDigest": null,
+    "profileDigest": null,
+    "toolDigest": null
+  },
+  "mismatchPolicy": "fail-closed; never fall back to latest, similar name, stale cache, or native substitute"
+}

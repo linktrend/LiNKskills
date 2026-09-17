@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "kind": "linkskills-ed-09-ed-08-prerequisite",
+  "packet": "ED-09",
+  "requiredBeforeAcceptance": true,
+  "status": "UNPROVEN",
+  "executed": false,
+  "planningPassAcceptedAsProduction": false,
+  "requiredLiveReceiptPath": "evidence/end-to-end-delivery/ed-08/deployment-receipt.json",
+  "requiredOutcome": "PASS",
+  "observedReceipt": {
+    "present": false,
+    "path": null,
+    "digest": null,
+    "status": null,
+    "observedAt": null
+  },
+  "requiredLiveFacts": {
+    "healthHttp": {"required": 200, "observed": null},
+    "readyHttp": {"required": 200, "observed": null},
+    "storeReachable": {"required": true, "observed": null},
+    "authConfigured": {"required": true, "observed": null},
+    "providerContract": {"required": "skills.api.v0.2", "observed": null},
+    "rollbackRehearsal": {"required": "PASS", "observed": null}
+  },
+  "deployedIdentity": {
+    "repository": null,
+    "ref": null,
+    "commit": null,
+    "tree": null,
+    "imageDigest": null
+  },
+  "notes": "ED-09 may not claim any acceptance status until a real ED-08 production PASS exists at compatible identities. A source-only or planning receipt is insufficient."
+}
