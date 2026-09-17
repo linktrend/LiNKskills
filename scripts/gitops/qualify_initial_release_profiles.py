@@ -364,6 +364,59 @@ def qualify_initial_release_profiles(
     }
 
 
+_UNSAFE_ARTIFACT_PREFIXES = (
+    "artifact_unreadable:",
+    "artifact_not_object:",
+)
+
+
+def _safe_missing_artifact(note: str) -> str:
+    """Keep diagnostic codes; drop exception/file payloads from unread artifacts."""
+    for prefix in _UNSAFE_ARTIFACT_PREFIXES:
+        if note.startswith(prefix):
+            return prefix[:-1]
+    return note
+
+
+def public_qualification_summary(matrix: Mapping[str, Any]) -> dict[str, Any]:
+    """Return a stdout-safe diagnostic view with no eval inputs, paths, or payloads."""
+    combinations: list[dict[str, Any]] = []
+    for row in matrix.get("combinations") or []:
+        if not isinstance(row, Mapping):
+            continue
+        combinations.append(
+            {
+                "id": row.get("id"),
+                "skillId": row.get("skillId"),
+                "version": row.get("version"),
+                "runtimeProfile": row.get("runtimeProfile"),
+                "lifecycle": row.get("lifecycle"),
+                "reason": row.get("reason"),
+                "missingFamilies": list(row.get("missingFamilies") or []),
+                "missingArtifacts": [
+                    _safe_missing_artifact(str(item))
+                    for item in (row.get("missingArtifacts") or [])
+                ],
+                "executableCaseCount": len(row.get("executableCases") or []),
+            }
+        )
+    summary: dict[str, Any] = {
+        "schemaVersion": matrix.get("schemaVersion"),
+        "kind": matrix.get("kind"),
+        "complete": matrix.get("complete"),
+        "ok": matrix.get("ok"),
+        "usable": list(matrix.get("usable") or []),
+        "evalPending": list(matrix.get("evalPending") or []),
+        "quarantined": list(matrix.get("quarantined") or []),
+        "combinations": combinations,
+    }
+    if "secretScanPreserved" in matrix:
+        summary["secretScanPreserved"] = matrix["secretScanPreserved"]
+    if "secretScanReason" in matrix:
+        summary["secretScanReason"] = matrix["secretScanReason"]
+    return summary
+
+
 def delivery_secret_scan_preserved(root: Path) -> bool:
     """True when Fast, Full, and Release still invoke the fixture-aware secret scanner."""
     config = root / ".ide-development" / "config" / "delivery.json"
@@ -387,7 +440,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     if not matrix["secretScanPreserved"]:
         matrix["ok"] = False
         matrix["secretScanReason"] = "fast_or_full_missing_secret_scan"
-    text = json.dumps(matrix, indent=2, sort_keys=True) + "\n"
+    summary = public_qualification_summary(matrix)
+    text = json.dumps(summary, indent=2, sort_keys=True) + "\n"
     if args.matrix_json:
         args.matrix_json.parent.mkdir(parents=True, exist_ok=True)
         args.matrix_json.write_text(text, encoding="utf-8")
