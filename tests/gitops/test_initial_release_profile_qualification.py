@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+import io
 import json
+import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from scripts.gitops.qualify_initial_release_profiles import (
     EVAL_PENDING,
@@ -16,6 +19,8 @@ from scripts.gitops.qualify_initial_release_profiles import (
     classify_case_families,
     combination_id,
     delivery_secret_scan_preserved,
+    main,
+    public_qualification_summary,
     qualify_initial_release_profiles,
     qualify_skill,
 )
@@ -182,6 +187,49 @@ class InitialReleaseProfileQualificationTests(unittest.TestCase):
             payload["profiles"]["release"]["commands"][1],
             ["python3", "scripts/gitops/secret_scan.py"],
         )
+
+    def test_cli_output_never_includes_sensitive_payloads(self) -> None:
+        canary = "CLEARTEXT_SENSITIVE_VALUE_ISSUE_380"
+        poisoned = qualify_initial_release_profiles(ROOT)
+        poisoned["combinations"][0]["families"] = {"privacy": [canary]}
+        poisoned["combinations"][0]["executableCases"] = [canary]
+        poisoned["combinations"][0]["skillDir"] = f"skills/{canary}"
+        poisoned["combinations"][0]["skillPackDigest"] = canary
+        poisoned["combinations"][0]["missingArtifacts"] = [
+            f"artifact_unreadable:skills/git-safeguard/references/skill-pack.json:{canary}"
+        ]
+        summary = public_qualification_summary(poisoned)
+        dumped = json.dumps(summary)
+        self.assertNotIn(canary, dumped)
+        self.assertIn("artifact_unreadable", dumped)
+        self.assertTrue(summary["complete"])
+        self.assertEqual(len(summary["combinations"]), 5)
+        stdout = io.StringIO()
+        with tempfile.TemporaryDirectory() as tmp:
+            matrix_path = Path(tmp) / "matrix.json"
+            with (
+                patch(
+                    "scripts.gitops.qualify_initial_release_profiles.qualify_initial_release_profiles",
+                    return_value=poisoned,
+                ),
+                patch(
+                    "scripts.gitops.qualify_initial_release_profiles.delivery_secret_scan_preserved",
+                    return_value=True,
+                ),
+                patch("sys.stdout", stdout),
+            ):
+                code = main(["--root", str(ROOT), "--matrix-json", str(matrix_path)])
+            written = matrix_path.read_text(encoding="utf-8")
+        self.assertEqual(code, 0)
+        self.assertNotIn(canary, stdout.getvalue())
+        self.assertNotIn(canary, written)
+        parsed = json.loads(stdout.getvalue())
+        self.assertEqual(parsed["kind"], "initial-release-profile-matrix")
+        self.assertIn("lifecycle", parsed["combinations"][0])
+        self.assertIn("reason", parsed["combinations"][0])
+        self.assertNotIn("families", parsed["combinations"][0])
+        self.assertNotIn("skillDir", parsed["combinations"][0])
+        self.assertNotIn("skillPackDigest", parsed["combinations"][0])
 
 
 if __name__ == "__main__":
