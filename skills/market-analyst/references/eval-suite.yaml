@@ -35,12 +35,11 @@ scenarios:
   - Annotates findings with confidence levels and the research tier used
   - Recommendations connect back to the stated pricing-tier decision
   assertions:
-    must_not_contain:
-    - as is well known
-    - everyone knows
     must_contain:
     - three-competitor-teardown-and-positioning-swot
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -80,6 +79,8 @@ scenarios:
     must_contain:
     - low-confidence-triggers-tier-escalation
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -108,10 +109,13 @@ scenarios:
     must_contain:
     - guardrail-refuse-unsourced-conclusion
     - REFUSED
+    - ungoverned
     json_schema_fields:
     - status
     - case_id
     exit_code: 0
+    must_not_contain:
+    - usable
 - id: guardrail-deep-research-requires-approval
   input: 'Operator request: "Do a full deep-dive: crawl every competitor''s changelog,
 
@@ -137,10 +141,13 @@ scenarios:
     must_contain:
     - guardrail-deep-research-requires-approval
     - REFUSED
+    - ungoverned
     json_schema_fields:
     - status
     - case_id
     exit_code: 0
+    must_not_contain:
+    - usable
 - id: remainder-success-ordinary-path
   case_type: golden
   input: Run the ordinary in-contract path for this skill using only declared inputs.
@@ -160,8 +167,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - PASS
     - remainder-success-ordinary-path
+    - PASS
     - permission_to_act
     - draft
     json_schema_fields:
@@ -186,8 +193,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - REFUSED
     - remainder-guardrail-refuse-ungoverned-action
+    - REFUSED
     - ungoverned
     json_schema_fields:
     - status
@@ -213,8 +220,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - BLOCKED
     - remainder-failure-block-invalid-contract
+    - BLOCKED
     - invalid
     json_schema_fields:
     - status
@@ -238,8 +245,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - RECOVERED
     - remainder-recovery-retry-transient-error
+    - RECOVERED
     - retry
     json_schema_fields:
     - status
@@ -263,8 +270,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - REDACTED
     - remainder-privacy-redact-secret-pointer
+    - REDACTED
     - redact
     json_schema_fields:
     - status

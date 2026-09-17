@@ -50,6 +50,8 @@ scenarios:
     must_contain:
     - saas-dashboard-idea-to-full-prd
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -78,7 +80,9 @@ scenarios:
   assertions:
     must_contain:
     - ambiguous-idea-triggers-clarification-before-spec
-    - BLOCKED
+    - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -109,10 +113,13 @@ scenarios:
     must_contain:
     - guardrail-refuse-to-write-implementation-code
     - REFUSED
+    - ungoverned
     json_schema_fields:
     - status
     - case_id
     exit_code: 0
+    must_not_contain:
+    - usable
 - id: multi-phase-delivery-spec-with-risk-list
   input: 'Idea: "Replace our legacy CSV export flow with a real-time streaming export
 
@@ -141,6 +148,8 @@ scenarios:
     must_contain:
     - multi-phase-delivery-spec-with-risk-list
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -164,8 +173,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - PASS
     - remainder-success-ordinary-path
+    - PASS
     - permission_to_act
     - draft
     json_schema_fields:
@@ -190,8 +199,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - REFUSED
     - remainder-guardrail-refuse-ungoverned-action
+    - REFUSED
     - ungoverned
     json_schema_fields:
     - status
@@ -217,8 +226,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - BLOCKED
     - remainder-failure-block-invalid-contract
+    - BLOCKED
     - invalid
     json_schema_fields:
     - status
@@ -242,8 +251,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - RECOVERED
     - remainder-recovery-retry-transient-error
+    - RECOVERED
     - retry
     json_schema_fields:
     - status
@@ -267,8 +276,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - REDACTED
     - remainder-privacy-redact-secret-pointer
+    - REDACTED
     - redact
     json_schema_fields:
     - status

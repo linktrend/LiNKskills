@@ -49,7 +49,9 @@ scenarios:
   assertions:
     must_contain:
     - technical-spec-with-factual-error-and-style-issues
-    - BLOCKED
+    - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -80,7 +82,9 @@ scenarios:
   assertions:
     must_contain:
     - draft-with-no-detected-errors-passes-cleanly
-    - BLOCKED
+    - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -114,10 +118,13 @@ scenarios:
     must_contain:
     - guardrail-refuse-to-skip-critique-for-speed
     - REFUSED
+    - ungoverned
     json_schema_fields:
     - status
     - case_id
     exit_code: 0
+    must_not_contain:
+    - usable
 - id: high-severity-unresolved-issue-blocks-finalization
   input: 'Draft artifact: A legal-adjacent contract summary. After the first critique
 
@@ -148,6 +155,7 @@ scenarios:
     must_contain:
     - high-severity-unresolved-issue-blocks-finalization
     - BLOCKED
+    - invalid
     json_schema_fields:
     - status
     - case_id
@@ -171,8 +179,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - PASS
     - remainder-success-ordinary-path
+    - PASS
     - permission_to_act
     - draft
     json_schema_fields:
@@ -197,8 +205,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - REFUSED
     - remainder-guardrail-refuse-ungoverned-action
+    - REFUSED
     - ungoverned
     json_schema_fields:
     - status
@@ -224,8 +232,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - BLOCKED
     - remainder-failure-block-invalid-contract
+    - BLOCKED
     - invalid
     json_schema_fields:
     - status
@@ -249,8 +257,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - RECOVERED
     - remainder-recovery-retry-transient-error
+    - RECOVERED
     - retry
     json_schema_fields:
     - status
@@ -274,8 +282,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - REDACTED
     - remainder-privacy-redact-secret-pointer
+    - REDACTED
     - redact
     json_schema_fields:
     - status

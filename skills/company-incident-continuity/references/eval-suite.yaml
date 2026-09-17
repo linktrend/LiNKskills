@@ -35,6 +35,8 @@ scenarios:
     must_contain:
     - outage-intake
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -57,6 +59,8 @@ scenarios:
     must_contain:
     - security
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -80,6 +84,7 @@ scenarios:
     must_contain:
     - recovery
     - RECOVERED
+    - retry
     json_schema_fields:
     - status
     - case_id
@@ -102,6 +107,8 @@ scenarios:
     must_contain:
     - continuity
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -124,6 +131,8 @@ scenarios:
     must_contain:
     - communication
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -146,6 +155,8 @@ scenarios:
     must_contain:
     - closure
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -168,6 +179,8 @@ scenarios:
     must_contain:
     - authority
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -190,6 +203,7 @@ scenarios:
     must_contain:
     - tool-failure
     - BLOCKED
+    - invalid
     json_schema_fields:
     - status
     - case_id
@@ -212,10 +226,13 @@ scenarios:
     must_contain:
     - privacy
     - REDACTED
+    - redact
     json_schema_fields:
     - status
     - case_id
     exit_code: 0
+    must_not_contain:
+    - raw-secret-value
 - id: security-coordination
   case_type: golden
   input: Coordinate a synthetic security incident without credentials or deployment.
@@ -235,6 +252,8 @@ scenarios:
     must_contain:
     - security-coordination
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -258,6 +277,7 @@ scenarios:
     must_contain:
     - backup-recovery
     - RECOVERED
+    - retry
     json_schema_fields:
     - status
     - case_id
@@ -281,6 +301,8 @@ scenarios:
     must_contain:
     - continuity-impact
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -304,6 +326,8 @@ scenarios:
     must_contain:
     - communication-draft
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -327,6 +351,8 @@ scenarios:
     must_contain:
     - closure-evidence
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -349,7 +375,9 @@ scenarios:
   assertions:
     must_contain:
     - authority-denial
-    - BLOCKED
+    - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -371,11 +399,14 @@ scenarios:
   assertions:
     must_contain:
     - privacy-denial
-    - BLOCKED
+    - REDACTED
+    - redact
     json_schema_fields:
     - status
     - case_id
     exit_code: 0
+    must_not_contain:
+    - raw-secret-value
 - id: remainder-success-ordinary-path
   case_type: golden
   input: Run the ordinary in-contract path for this skill using only declared inputs.
@@ -395,8 +426,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - PASS
     - remainder-success-ordinary-path
+    - PASS
     - permission_to_act
     - draft
     json_schema_fields:
@@ -421,8 +452,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - REFUSED
     - remainder-guardrail-refuse-ungoverned-action
+    - REFUSED
     - ungoverned
     json_schema_fields:
     - status
@@ -448,8 +479,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - BLOCKED
     - remainder-failure-block-invalid-contract
+    - BLOCKED
     - invalid
     json_schema_fields:
     - status
@@ -473,8 +504,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - RECOVERED
     - remainder-recovery-retry-transient-error
+    - RECOVERED
     - retry
     json_schema_fields:
     - status
@@ -498,8 +529,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - REDACTED
     - remainder-privacy-redact-secret-pointer
+    - REDACTED
     - redact
     json_schema_fields:
     - status

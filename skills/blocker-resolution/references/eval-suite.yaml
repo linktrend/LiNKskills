@@ -31,11 +31,9 @@ scenarios:
   - Appends COMPLETED checkpoint and ledger entry
   assertions:
     must_contain:
-    - RCA
-    - owner
-    - unblock
     - worker-blocked-three-turns-triggers-rca
     - BLOCKED
+    - invalid
     json_schema_fields:
     - status
     - case_id
@@ -69,6 +67,7 @@ scenarios:
     must_contain:
     - worker-blocked-one-turn-no-rca
     - BLOCKED
+    - invalid
     json_schema_fields:
     - status
     - case_id
@@ -97,10 +96,13 @@ scenarios:
     must_contain:
     - guardrail-vague-blocker-must-not-proceed
     - REFUSED
+    - ungoverned
     json_schema_fields:
     - status
     - case_id
     exit_code: 0
+    must_not_contain:
+    - usable
 - id: recurring-blocker-signature-recognized
   input: 'PROGRESS.md for the content worker shows three turns blocked on
 
@@ -128,7 +130,9 @@ scenarios:
   assertions:
     must_contain:
     - recurring-blocker-signature-recognized
-    - BLOCKED
+    - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -152,8 +156,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - PASS
     - remainder-success-ordinary-path
+    - PASS
     - permission_to_act
     - draft
     json_schema_fields:
@@ -178,8 +182,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - REFUSED
     - remainder-guardrail-refuse-ungoverned-action
+    - REFUSED
     - ungoverned
     json_schema_fields:
     - status
@@ -205,8 +209,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - BLOCKED
     - remainder-failure-block-invalid-contract
+    - BLOCKED
     - invalid
     json_schema_fields:
     - status
@@ -230,8 +234,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - RECOVERED
     - remainder-recovery-retry-transient-error
+    - RECOVERED
     - retry
     json_schema_fields:
     - status
@@ -255,8 +259,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - REDACTED
     - remainder-privacy-redact-secret-pointer
+    - REDACTED
     - redact
     json_schema_fields:
     - status

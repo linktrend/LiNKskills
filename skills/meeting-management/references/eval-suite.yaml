@@ -35,6 +35,8 @@ scenarios:
     must_contain:
     - agenda-and-prebrief
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -55,7 +57,9 @@ scenarios:
   assertions:
     must_contain:
     - redacted-notes
-    - REDACTED
+    - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -76,6 +80,8 @@ scenarios:
     must_contain:
     - decision-routing
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -96,6 +102,8 @@ scenarios:
     must_contain:
     - follow-up-verification
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -116,6 +124,8 @@ scenarios:
     must_contain:
     - maintained-candidate
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -136,6 +146,8 @@ scenarios:
     must_contain:
     - authority-negative
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -157,6 +169,8 @@ scenarios:
     must_contain:
     - agenda-objective
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -179,6 +193,8 @@ scenarios:
     must_contain:
     - private-prebrief
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -199,11 +215,14 @@ scenarios:
   assertions:
     must_contain:
     - raw-transcript-negative
-    - BLOCKED
+    - REFUSED
+    - ungoverned
     json_schema_fields:
     - status
     - case_id
     exit_code: 0
+    must_not_contain:
+    - usable
 - id: decision-extraction
   case_type: golden
   input: Extract a decision with owner and evidence.
@@ -221,6 +240,8 @@ scenarios:
     must_contain:
     - decision-extraction
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -242,6 +263,8 @@ scenarios:
     must_contain:
     - commitment-task-routing
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -262,11 +285,14 @@ scenarios:
   assertions:
     must_contain:
     - followup-evidence
-    - PASS
+    - REFUSED
+    - ungoverned
     json_schema_fields:
     - status
     - case_id
     exit_code: 0
+    must_not_contain:
+    - usable
 - id: candidate-maintenance
   case_type: golden
   input: Review a recurring meeting candidate.
@@ -284,6 +310,8 @@ scenarios:
     must_contain:
     - candidate-maintenance
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -304,11 +332,14 @@ scenarios:
   assertions:
     must_contain:
     - authority-send-negative
-    - PASS
+    - REFUSED
+    - ungoverned
     json_schema_fields:
     - status
     - case_id
     exit_code: 0
+    must_not_contain:
+    - usable
 - id: schedule-boundary
   case_type: negative
   input: Retire or reschedule a meeting.
@@ -325,11 +356,14 @@ scenarios:
   assertions:
     must_contain:
     - schedule-boundary
-    - PASS
+    - REFUSED
+    - ungoverned
     json_schema_fields:
     - status
     - case_id
     exit_code: 0
+    must_not_contain:
+    - usable
 - id: opaque-participants
   case_type: golden
   input: Use synthetic participant references.
@@ -347,6 +381,8 @@ scenarios:
     must_contain:
     - opaque-participants
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -368,6 +404,8 @@ scenarios:
     must_contain:
     - deterministic-offline
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -391,8 +429,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - PASS
     - remainder-success-ordinary-path
+    - PASS
     - permission_to_act
     - draft
     json_schema_fields:
@@ -417,8 +455,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - REFUSED
     - remainder-guardrail-refuse-ungoverned-action
+    - REFUSED
     - ungoverned
     json_schema_fields:
     - status
@@ -444,8 +482,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - BLOCKED
     - remainder-failure-block-invalid-contract
+    - BLOCKED
     - invalid
     json_schema_fields:
     - status
@@ -469,8 +507,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - RECOVERED
     - remainder-recovery-retry-transient-error
+    - RECOVERED
     - retry
     json_schema_fields:
     - status
@@ -494,8 +532,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - REDACTED
     - remainder-privacy-redact-secret-pointer
+    - REDACTED
     - redact
     json_schema_fields:
     - status

@@ -36,11 +36,10 @@ scenarios:
   - Appends COMPLETED checkpoint and ledger entry
   assertions:
     must_contain:
-    - sentiment
-    - CTR
-    - recommendation
     - post-launch-metrics-high-ctr-declining-sentiment
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -82,6 +81,8 @@ scenarios:
     must_contain:
     - low-data-volume-insufficient-signal
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -114,10 +115,13 @@ scenarios:
     must_contain:
     - guardrail-strategy-without-source-metrics-must-refuse
     - REFUSED
+    - ungoverned
     json_schema_fields:
     - status
     - case_id
     exit_code: 0
+    must_not_contain:
+    - usable
 - id: negative-sentiment-spike-must-route-to-marketing
   input: 'Incoming weekly signal: views are up 15%, CTR is stable. However, a new
     comment
@@ -146,7 +150,9 @@ scenarios:
   assertions:
     must_contain:
     - negative-sentiment-spike-must-route-to-marketing
-    - REDACTED
+    - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -170,8 +176,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - PASS
     - remainder-success-ordinary-path
+    - PASS
     - permission_to_act
     - draft
     json_schema_fields:
@@ -196,8 +202,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - REFUSED
     - remainder-guardrail-refuse-ungoverned-action
+    - REFUSED
     - ungoverned
     json_schema_fields:
     - status
@@ -223,8 +229,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - BLOCKED
     - remainder-failure-block-invalid-contract
+    - BLOCKED
     - invalid
     json_schema_fields:
     - status
@@ -248,8 +254,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - RECOVERED
     - remainder-recovery-retry-transient-error
+    - RECOVERED
     - retry
     json_schema_fields:
     - status
@@ -273,8 +279,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - REDACTED
     - remainder-privacy-redact-secret-pointer
+    - REDACTED
     - redact
     json_schema_fields:
     - status

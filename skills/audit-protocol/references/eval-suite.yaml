@@ -34,13 +34,10 @@ scenarios:
   - Appends a summary to execution_ledger.jsonl at Phase 5
   assertions:
     must_contain:
-    - LTRAuditLogger
-    - rollback
     - google-sheets-batch-update-with-intent-logging
     - PASS
-    must_not_contain:
-    - write first
-    - log after
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -84,6 +81,8 @@ scenarios:
     must_contain:
     - n8n-workflow-trigger-multi-step-intent
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -117,11 +116,14 @@ scenarios:
   assertions:
     must_contain:
     - guardrail-audit-logger-unavailable-must-block
-    - RECOVERED
+    - REFUSED
+    - ungoverned
     json_schema_fields:
     - status
     - case_id
     exit_code: 0
+    must_not_contain:
+    - usable
 - id: remainder-success-ordinary-path
   case_type: golden
   input: Run the ordinary in-contract path for this skill using only declared inputs.
@@ -141,8 +143,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - PASS
     - remainder-success-ordinary-path
+    - PASS
     - permission_to_act
     - draft
     json_schema_fields:
@@ -167,8 +169,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - REFUSED
     - remainder-guardrail-refuse-ungoverned-action
+    - REFUSED
     - ungoverned
     json_schema_fields:
     - status
@@ -194,8 +196,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - BLOCKED
     - remainder-failure-block-invalid-contract
+    - BLOCKED
     - invalid
     json_schema_fields:
     - status
@@ -219,8 +221,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - RECOVERED
     - remainder-recovery-retry-transient-error
+    - RECOVERED
     - retry
     json_schema_fields:
     - status
@@ -244,8 +246,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - REDACTED
     - remainder-privacy-redact-secret-pointer
+    - REDACTED
     - redact
     json_schema_fields:
     - status

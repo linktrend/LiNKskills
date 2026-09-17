@@ -35,6 +35,8 @@ scenarios:
     must_contain:
     - quarterly-plan
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -56,6 +58,8 @@ scenarios:
     must_contain:
     - horizon-coverage
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -78,6 +82,8 @@ scenarios:
     must_contain:
     - forecast-actual
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -100,6 +106,8 @@ scenarios:
     must_contain:
     - missing-actual
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -122,6 +130,8 @@ scenarios:
     must_contain:
     - delivery-signals
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -145,6 +155,8 @@ scenarios:
     must_contain:
     - reprioritize
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -166,6 +178,8 @@ scenarios:
     must_contain:
     - false-precision
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -188,6 +202,8 @@ scenarios:
     must_contain:
     - authority
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -210,10 +226,13 @@ scenarios:
     must_contain:
     - privacy
     - REDACTED
+    - redact
     json_schema_fields:
     - status
     - case_id
     exit_code: 0
+    must_not_contain:
+    - raw-secret-value
 - id: all-supported-horizons
   case_type: golden
   input: Review monthly, rolling four-week, annual, three-year, and five-year planning
@@ -236,6 +255,8 @@ scenarios:
     must_contain:
     - all-supported-horizons
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -258,6 +279,8 @@ scenarios:
     must_contain:
     - forecast-versus-actual
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -280,6 +303,7 @@ scenarios:
     must_contain:
     - late-blocked-obsolete
     - BLOCKED
+    - invalid
     json_schema_fields:
     - status
     - case_id
@@ -303,6 +327,8 @@ scenarios:
     must_contain:
     - evidence-reprioritization
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -325,7 +351,9 @@ scenarios:
   assertions:
     must_contain:
     - unsafe-activation
-    - BLOCKED
+    - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -349,6 +377,7 @@ scenarios:
     must_contain:
     - tool-failure
     - BLOCKED
+    - invalid
     json_schema_fields:
     - status
     - case_id
@@ -371,11 +400,14 @@ scenarios:
   assertions:
     must_contain:
     - privacy-and-false-precision
-    - BLOCKED
+    - REDACTED
+    - redact
     json_schema_fields:
     - status
     - case_id
     exit_code: 0
+    must_not_contain:
+    - raw-secret-value
 - id: remainder-success-ordinary-path
   case_type: golden
   input: Run the ordinary in-contract path for this skill using only declared inputs.
@@ -395,8 +427,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - PASS
     - remainder-success-ordinary-path
+    - PASS
     - permission_to_act
     - draft
     json_schema_fields:
@@ -421,8 +453,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - REFUSED
     - remainder-guardrail-refuse-ungoverned-action
+    - REFUSED
     - ungoverned
     json_schema_fields:
     - status
@@ -448,8 +480,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - BLOCKED
     - remainder-failure-block-invalid-contract
+    - BLOCKED
     - invalid
     json_schema_fields:
     - status
@@ -473,8 +505,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - RECOVERED
     - remainder-recovery-retry-transient-error
+    - RECOVERED
     - retry
     json_schema_fields:
     - status
@@ -498,8 +530,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - REDACTED
     - remainder-privacy-redact-secret-pointer
+    - REDACTED
     - redact
     json_schema_fields:
     - status

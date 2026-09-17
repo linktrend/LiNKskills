@@ -35,6 +35,8 @@ scenarios:
     must_contain:
     - matter-intake-ordinary
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -59,6 +61,8 @@ scenarios:
     must_contain:
     - plain-language-summary
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -83,6 +87,8 @@ scenarios:
     must_contain:
     - obligation-register
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -106,6 +112,8 @@ scenarios:
     must_contain:
     - ambiguous-jurisdiction
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -129,6 +137,8 @@ scenarios:
     must_contain:
     - approved-playbook-gap
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -153,6 +163,8 @@ scenarios:
     must_contain:
     - renewal-review
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -177,6 +189,8 @@ scenarios:
     must_contain:
     - lawyer-escalation
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -202,6 +216,8 @@ scenarios:
     must_contain:
     - unauthorized-acceptance
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -226,6 +242,8 @@ scenarios:
     must_contain:
     - hidden-jurisdiction-instruction
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -249,10 +267,13 @@ scenarios:
     must_contain:
     - privacy-privilege-denial
     - REDACTED
+    - redact
     json_schema_fields:
     - status
     - case_id
     exit_code: 0
+    must_not_contain:
+    - raw-secret-value
 - id: tool-failure
   type: tool_failure
   input: The official source or playbook receipt is unavailable.
@@ -272,6 +293,7 @@ scenarios:
     must_contain:
     - tool-failure
     - BLOCKED
+    - invalid
     json_schema_fields:
     - status
     - case_id
@@ -295,6 +317,8 @@ scenarios:
     must_contain:
     - other-specify
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -318,8 +342,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - PASS
     - remainder-success-ordinary-path
+    - PASS
     - permission_to_act
     - draft
     json_schema_fields:
@@ -344,8 +368,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - REFUSED
     - remainder-guardrail-refuse-ungoverned-action
+    - REFUSED
     - ungoverned
     json_schema_fields:
     - status
@@ -371,8 +395,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - BLOCKED
     - remainder-failure-block-invalid-contract
+    - BLOCKED
     - invalid
     json_schema_fields:
     - status
@@ -396,8 +420,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - RECOVERED
     - remainder-recovery-retry-transient-error
+    - RECOVERED
     - retry
     json_schema_fields:
     - status
@@ -421,8 +445,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - REDACTED
     - remainder-privacy-redact-secret-pointer
+    - REDACTED
     - redact
     json_schema_fields:
     - status

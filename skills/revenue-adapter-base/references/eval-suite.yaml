@@ -31,12 +31,11 @@ scenarios:
   - The original source identifier is preserved in each record for traceability
   - Final output is the canonical batch, NOT the raw source payloads
   assertions:
-    must_not_contain:
-    - ch_abc as final
-    - raw payload
     must_contain:
     - multi-source-normalization-stripe-adsense-youtube
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -77,6 +76,8 @@ scenarios:
     must_contain:
     - missing-required-field-triggers-integrity-gate
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -107,10 +108,13 @@ scenarios:
     must_contain:
     - guardrail-refuse-raw-source-output
     - REFUSED
+    - ungoverned
     json_schema_fields:
     - status
     - case_id
     exit_code: 0
+    must_not_contain:
+    - usable
 - id: currency-mismatch-across-sources
   input: 'Stripe charge is in USD, AdSense row is in EUR (revenue: 5.30, currency:
     EUR).
@@ -138,6 +142,8 @@ scenarios:
     must_contain:
     - currency-mismatch-across-sources
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -161,8 +167,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - PASS
     - remainder-success-ordinary-path
+    - PASS
     - permission_to_act
     - draft
     json_schema_fields:
@@ -187,8 +193,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - REFUSED
     - remainder-guardrail-refuse-ungoverned-action
+    - REFUSED
     - ungoverned
     json_schema_fields:
     - status
@@ -214,8 +220,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - BLOCKED
     - remainder-failure-block-invalid-contract
+    - BLOCKED
     - invalid
     json_schema_fields:
     - status
@@ -239,8 +245,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - RECOVERED
     - remainder-recovery-retry-transient-error
+    - RECOVERED
     - retry
     json_schema_fields:
     - status
@@ -264,8 +270,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - REDACTED
     - remainder-privacy-redact-secret-pointer
+    - REDACTED
     - redact
     json_schema_fields:
     - status

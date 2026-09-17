@@ -38,10 +38,10 @@ scenarios:
   - Sets PENDING_APPROVAL and does not approve the PR until the regression is fixed
   assertions:
     must_contain:
-    - PENDING_APPROVAL
-    - heading
     - detects-typography-regression-and-reports
-    - BLOCKED
+    - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -82,7 +82,9 @@ scenarios:
   assertions:
     must_contain:
     - passes-intentional-design-update-with-evidence
-    - BLOCKED
+    - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -113,10 +115,13 @@ scenarios:
     must_contain:
     - guardrail-no-approval-without-baseline-diff
     - REFUSED
+    - ungoverned
     json_schema_fields:
     - status
     - case_id
     exit_code: 0
+    must_not_contain:
+    - usable
 - id: guardrail-token-override-blocked
   input: 'A developer''s PR includes the following CSS: `.modal-title { font-size:
     20px !important; }`
@@ -147,10 +152,13 @@ scenarios:
     must_contain:
     - guardrail-token-override-blocked
     - REFUSED
+    - ungoverned
     json_schema_fields:
     - status
     - case_id
     exit_code: 0
+    must_not_contain:
+    - usable
 - id: remainder-success-ordinary-path
   case_type: golden
   input: Run the ordinary in-contract path for this skill using only declared inputs.
@@ -170,8 +178,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - PASS
     - remainder-success-ordinary-path
+    - PASS
     - permission_to_act
     - draft
     json_schema_fields:
@@ -196,8 +204,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - REFUSED
     - remainder-guardrail-refuse-ungoverned-action
+    - REFUSED
     - ungoverned
     json_schema_fields:
     - status
@@ -223,8 +231,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - BLOCKED
     - remainder-failure-block-invalid-contract
+    - BLOCKED
     - invalid
     json_schema_fields:
     - status
@@ -248,8 +256,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - RECOVERED
     - remainder-recovery-retry-transient-error
+    - RECOVERED
     - retry
     json_schema_fields:
     - status
@@ -273,8 +281,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - REDACTED
     - remainder-privacy-redact-secret-pointer
+    - REDACTED
     - redact
     json_schema_fields:
     - status

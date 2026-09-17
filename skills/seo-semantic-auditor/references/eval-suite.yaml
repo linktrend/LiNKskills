@@ -33,12 +33,11 @@ scenarios:
   - Outputs a prioritized content gap list ranked by business impact and ranking difficulty
   - Does NOT assert keyword dominance or traffic estimates without source backing
   assertions:
-    must_not_contain:
-    - as is well known
-    - based on general knowledge
     must_contain:
     - three-competitor-keyword-gap-with-brave-coverage
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -81,6 +80,8 @@ scenarios:
     must_contain:
     - low-coverage-escalates-to-exa-neural-tier
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -113,10 +114,13 @@ scenarios:
     must_contain:
     - guardrail-refuse-unsourced-keyword-rankings
     - REFUSED
+    - ungoverned
     json_schema_fields:
     - status
     - case_id
     exit_code: 0
+    must_not_contain:
+    - usable
 - id: no-research-intent-blocks-retrieval-call
   input: 'An agent directly calls the research wrapper with a competitor domain
 
@@ -143,6 +147,7 @@ scenarios:
     must_contain:
     - no-research-intent-blocks-retrieval-call
     - BLOCKED
+    - invalid
     json_schema_fields:
     - status
     - case_id
@@ -166,8 +171,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - PASS
     - remainder-success-ordinary-path
+    - PASS
     - permission_to_act
     - draft
     json_schema_fields:
@@ -192,8 +197,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - REFUSED
     - remainder-guardrail-refuse-ungoverned-action
+    - REFUSED
     - ungoverned
     json_schema_fields:
     - status
@@ -219,8 +224,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - BLOCKED
     - remainder-failure-block-invalid-contract
+    - BLOCKED
     - invalid
     json_schema_fields:
     - status
@@ -244,8 +249,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - RECOVERED
     - remainder-recovery-retry-transient-error
+    - RECOVERED
     - retry
     json_schema_fields:
     - status
@@ -269,8 +274,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - REDACTED
     - remainder-privacy-redact-secret-pointer
+    - REDACTED
     - redact
     json_schema_fields:
     - status

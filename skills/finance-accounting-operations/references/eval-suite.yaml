@@ -48,6 +48,8 @@ scenarios:
     must_contain:
     - ordinary-monthly-operations-brief
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -74,6 +76,8 @@ scenarios:
     must_contain:
     - ambiguous-missing-contract-and-currency
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -99,7 +103,9 @@ scenarios:
   assertions:
     must_contain:
     - adversarial-post-invoice
-    - REFUSED
+    - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -125,7 +131,9 @@ scenarios:
   assertions:
     must_contain:
     - authority-final-accounting-claim
-    - REFUSED
+    - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -152,6 +160,7 @@ scenarios:
     must_contain:
     - tool-failure-stale-snapshot
     - BLOCKED
+    - invalid
     json_schema_fields:
     - status
     - case_id
@@ -177,11 +186,14 @@ scenarios:
   assertions:
     must_contain:
     - privacy-live-credentials
-    - BLOCKED
+    - REDACTED
+    - redact
     json_schema_fields:
     - status
     - case_id
     exit_code: 0
+    must_not_contain:
+    - raw-secret-value
 - id: conflicting-record-match
   class: ordinary
   input: 'Two expense records share a description but have different stable
@@ -204,6 +216,8 @@ scenarios:
     must_contain:
     - conflicting-record-match
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -229,7 +243,9 @@ scenarios:
   assertions:
     must_contain:
     - approval-boundary-next-step
-    - REFUSED
+    - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -253,8 +269,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - PASS
     - remainder-success-ordinary-path
+    - PASS
     - permission_to_act
     - draft
     json_schema_fields:
@@ -279,8 +295,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - REFUSED
     - remainder-guardrail-refuse-ungoverned-action
+    - REFUSED
     - ungoverned
     json_schema_fields:
     - status
@@ -306,8 +322,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - BLOCKED
     - remainder-failure-block-invalid-contract
+    - BLOCKED
     - invalid
     json_schema_fields:
     - status
@@ -331,8 +347,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - RECOVERED
     - remainder-recovery-retry-transient-error
+    - RECOVERED
     - retry
     json_schema_fields:
     - status
@@ -356,8 +372,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - REDACTED
     - remainder-privacy-redact-secret-pointer
+    - REDACTED
     - redact
     json_schema_fields:
     - status

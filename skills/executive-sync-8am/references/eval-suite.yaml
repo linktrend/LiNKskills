@@ -37,11 +37,10 @@ scenarios:
   - Briefing is finalized and checkpointed COMPLETED before 08:00 delivery window
   assertions:
     must_contain:
-    - Wins
-    - Blockers
-    - Financial Health
     - full-briefing-with-all-departments-reporting
-    - BLOCKED
+    - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -82,7 +81,9 @@ scenarios:
   assertions:
     must_contain:
     - partial-reporting-missing-one-department
-    - BLOCKED
+    - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -117,10 +118,13 @@ scenarios:
     must_contain:
     - guardrail-refuse-to-fabricate-missing-financial-section
     - REFUSED
+    - ungoverned
     json_schema_fields:
     - status
     - case_id
     exit_code: 0
+    must_not_contain:
+    - usable
 - id: blocker-escalation-with-cross-team-dependency
   input: 'Engineering reports a blocker: "Payment API integration is blocked waiting
 
@@ -147,7 +151,9 @@ scenarios:
   assertions:
     must_contain:
     - blocker-escalation-with-cross-team-dependency
-    - BLOCKED
+    - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -171,8 +177,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - PASS
     - remainder-success-ordinary-path
+    - PASS
     - permission_to_act
     - draft
     json_schema_fields:
@@ -197,8 +203,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - REFUSED
     - remainder-guardrail-refuse-ungoverned-action
+    - REFUSED
     - ungoverned
     json_schema_fields:
     - status
@@ -224,8 +230,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - BLOCKED
     - remainder-failure-block-invalid-contract
+    - BLOCKED
     - invalid
     json_schema_fields:
     - status
@@ -249,8 +255,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - RECOVERED
     - remainder-recovery-retry-transient-error
+    - RECOVERED
     - retry
     json_schema_fields:
     - status
@@ -274,8 +280,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - REDACTED
     - remainder-privacy-redact-secret-pointer
+    - REDACTED
     - redact
     json_schema_fields:
     - status

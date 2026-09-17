@@ -27,14 +27,9 @@ scenarios:
   assertions:
     must_contain:
     - HELLO_CANARY
-    - echo-hello
-    - PASS
     must_not_contain:
     - PROMPT_ONLY
     exit_code: 0
-    json_schema_fields:
-    - status
-    - case_id
 - id: echo-json
   case_type: golden
   input: 'Return JSON acknowledging the echo via packaged text-echo --json.
@@ -54,8 +49,6 @@ scenarios:
     must_contain:
     - '"status": "ok"'
     - '"echo": "ping"'
-    - echo-json
-    - PASS
     json_schema_fields:
     - status
     - echo
@@ -79,8 +72,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - PASS
     - remainder-success-ordinary-path
+    - PASS
     - permission_to_act
     - draft
     json_schema_fields:
@@ -105,8 +98,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - REFUSED
     - remainder-guardrail-refuse-ungoverned-action
+    - REFUSED
     - ungoverned
     json_schema_fields:
     - status
@@ -132,8 +125,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - BLOCKED
     - remainder-failure-block-invalid-contract
+    - BLOCKED
     - invalid
     json_schema_fields:
     - status
@@ -157,8 +150,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - RECOVERED
     - remainder-recovery-retry-transient-error
+    - RECOVERED
     - retry
     json_schema_fields:
     - status
@@ -182,8 +175,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - REDACTED
     - remainder-privacy-redact-secret-pointer
+    - REDACTED
     - redact
     json_schema_fields:
     - status

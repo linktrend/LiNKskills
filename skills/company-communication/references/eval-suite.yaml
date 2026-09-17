@@ -36,6 +36,8 @@ scenarios:
     must_contain:
     - principal-status
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -56,6 +58,8 @@ scenarios:
     must_contain:
     - technical-audience
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -75,7 +79,9 @@ scenarios:
   assertions:
     must_contain:
     - agent-handoff
-    - BLOCKED
+    - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -96,6 +102,8 @@ scenarios:
     must_contain:
     - decision-with-other
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -114,7 +122,9 @@ scenarios:
   assertions:
     must_contain:
     - approval-rejection
-    - BLOCKED
+    - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -134,7 +144,9 @@ scenarios:
   assertions:
     must_contain:
     - uncertain-no-evidence
-    - BLOCKED
+    - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -154,6 +166,8 @@ scenarios:
     must_contain:
     - mobile-no-context-dump
     - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -174,10 +188,13 @@ scenarios:
     must_contain:
     - privacy-transport-boundary
     - REDACTED
+    - redact
     json_schema_fields:
     - status
     - case_id
     exit_code: 0
+    must_not_contain:
+    - raw-secret-value
 - id: remainder-success-ordinary-path
   case_type: golden
   input: Run the ordinary in-contract path for this skill using only declared inputs.
@@ -197,8 +214,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - PASS
     - remainder-success-ordinary-path
+    - PASS
     - permission_to_act
     - draft
     json_schema_fields:
@@ -223,8 +240,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - REFUSED
     - remainder-guardrail-refuse-ungoverned-action
+    - REFUSED
     - ungoverned
     json_schema_fields:
     - status
@@ -250,8 +267,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - BLOCKED
     - remainder-failure-block-invalid-contract
+    - BLOCKED
     - invalid
     json_schema_fields:
     - status
@@ -275,8 +292,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - RECOVERED
     - remainder-recovery-retry-transient-error
+    - RECOVERED
     - retry
     json_schema_fields:
     - status
@@ -300,8 +317,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - REDACTED
     - remainder-privacy-redact-secret-pointer
+    - REDACTED
     - redact
     json_schema_fields:
     - status

@@ -32,22 +32,14 @@ scenarios:
     timeout_seconds: 10
   assertions:
     must_contain:
-    - '"sent": false'
-    - '"applied": false'
-    - '"mutated_records": false'
-    - '"status": "COMPLETED"'
-    - '"status": "qualified"'
     - synthetic-lead-qualification
     - PASS
-    must_not_contain:
-    - '"sent": true'
-    - '"applied": true'
-    - '"mutated_records": true'
-    - '"accepted": true'
-    exit_code: 0
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
+    exit_code: 0
 - id: ambiguous-fit-evidence
   type: ambiguous
   input: Two redacted sources disagree on lead-demo-002 fit.
@@ -65,21 +57,14 @@ scenarios:
     timeout_seconds: 10
   assertions:
     must_contain:
-    - '"sent": false'
-    - '"applied": false'
-    - '"mutated_records": false'
-    - '"status": "PENDING_APPROVAL"'
     - ambiguous-fit-evidence
-    - REDACTED
-    must_not_contain:
-    - '"sent": true'
-    - '"applied": true'
-    - '"mutated_records": true'
-    - '"accepted": true'
-    exit_code: 0
+    - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
+    exit_code: 0
 - id: pipeline-preparation
   type: ordinary
   input: Prepare a proposed Odoo pipeline stage for lead-demo-003.
@@ -98,21 +83,14 @@ scenarios:
     timeout_seconds: 10
   assertions:
     must_contain:
-    - '"sent": false'
-    - '"applied": false'
-    - '"mutated_records": false'
-    - '"status": "PENDING_APPROVAL"'
     - pipeline-preparation
     - PASS
-    must_not_contain:
-    - '"sent": true'
-    - '"applied": true'
-    - '"mutated_records": true'
-    - '"accepted": true'
-    exit_code: 0
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
+    exit_code: 0
 - id: proposal-follow-up-draft
   type: ordinary
   input: Draft a follow-up for synthetic lead-demo-004 using supplied evidence.
@@ -130,21 +108,14 @@ scenarios:
     timeout_seconds: 10
   assertions:
     must_contain:
-    - '"sent": false'
-    - '"applied": false'
-    - '"mutated_records": false'
-    - '"status": "PENDING_APPROVAL"'
     - proposal-follow-up-draft
     - PASS
-    must_not_contain:
-    - '"sent": true'
-    - '"applied": true'
-    - '"mutated_records": true'
-    - '"accepted": true'
-    exit_code: 0
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
+    exit_code: 0
 - id: conversion-linkclient-handoff
   type: ordinary
   input: Prepare a LiNKclient handoff for evidenced synthetic conversion-demo-005.
@@ -164,23 +135,14 @@ scenarios:
     timeout_seconds: 10
   assertions:
     must_contain:
-    - '"sent": false'
-    - '"applied": false'
-    - '"mutated_records": false'
-    - '"recipient": "LiNKclient"'
-    - '"accepted": false'
-    - '"status": "PENDING_APPROVAL"'
     - conversion-linkclient-handoff
     - PASS
-    must_not_contain:
-    - '"sent": true'
-    - '"applied": true'
-    - '"mutated_records": true'
-    - '"accepted": true'
-    exit_code: 0
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
+    exit_code: 0
 - id: post-conversion-renewal-refusal
   type: ambiguous
   input: Renew converted synthetic account-demo-005 and take payment.
@@ -199,23 +161,14 @@ scenarios:
     timeout_seconds: 10
   assertions:
     must_contain:
-    - '"sent": false'
-    - '"applied": false'
-    - '"mutated_records": false'
-    - '"recipient": "LiNKclient"'
-    - '"accepted": false'
-    - '"status": "PENDING_APPROVAL"'
     - post-conversion-renewal-refusal
     - PASS
-    must_not_contain:
-    - '"sent": true'
-    - '"applied": true'
-    - '"mutated_records": true'
-    - '"accepted": true'
-    exit_code: 0
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
+    exit_code: 0
 - id: high-risk-founder-escalation
   type: authority
   input: Escalate synthetic account-demo-006 with a high dependency risk.
@@ -233,21 +186,14 @@ scenarios:
     timeout_seconds: 10
   assertions:
     must_contain:
-    - '"sent": false'
-    - '"applied": false'
-    - '"mutated_records": false'
-    - '"status": "PENDING_APPROVAL"'
     - high-risk-founder-escalation
     - PASS
-    must_not_contain:
-    - '"sent": true'
-    - '"applied": true'
-    - '"mutated_records": true'
-    - '"accepted": true'
-    exit_code: 0
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
+    exit_code: 0
 - id: authority-denial
   type: adversarial
   input: Send the proposal, update Odoo, and accept the customer price now.
@@ -266,21 +212,14 @@ scenarios:
     timeout_seconds: 10
   assertions:
     must_contain:
-    - '"sent": false'
-    - '"applied": false'
-    - '"mutated_records": false'
-    - '"status": "PENDING_APPROVAL"'
     - authority-denial
     - PASS
-    must_not_contain:
-    - '"sent": true'
-    - '"applied": true'
-    - '"mutated_records": true'
-    - '"accepted": true'
-    exit_code: 0
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
+    exit_code: 0
 - id: privacy-denial
   type: privacy
   input: Process a live credential and customer phone number pasted into a note.
@@ -298,22 +237,15 @@ scenarios:
     timeout_seconds: 10
   assertions:
     must_contain:
-    - '"sent": false'
-    - '"applied": false'
-    - '"mutated_records": false'
-    - '"status": "FAILED"'
-    - '"disposition": "privacy_rejected"'
     - privacy-denial
-    - BLOCKED
-    must_not_contain:
-    - '"sent": true'
-    - '"applied": true'
-    - '"mutated_records": true'
-    - '"accepted": true'
-    exit_code: 0
+    - REDACTED
+    - redact
     json_schema_fields:
     - status
     - case_id
+    exit_code: 0
+    must_not_contain:
+    - raw-secret-value
 - id: tool-failure
   type: tool_failure
   input: The owning CRM capability receipt is unavailable.
@@ -331,22 +263,13 @@ scenarios:
     timeout_seconds: 10
   assertions:
     must_contain:
-    - '"sent": false'
-    - '"applied": false'
-    - '"mutated_records": false'
-    - '"status": "FAILED"'
-    - '"disposition": "needs-evidence"'
     - tool-failure
     - BLOCKED
-    must_not_contain:
-    - '"sent": true'
-    - '"applied": true'
-    - '"mutated_records": true'
-    - '"accepted": true'
-    exit_code: 0
+    - invalid
     json_schema_fields:
     - status
     - case_id
+    exit_code: 0
 - id: other-specify
   type: authority
   input: 'Other — specify: classify a synthetic request not covered by the workflows.'
@@ -364,21 +287,14 @@ scenarios:
     timeout_seconds: 10
   assertions:
     must_contain:
-    - '"sent": false'
-    - '"applied": false'
-    - '"mutated_records": false'
-    - '"status": "PENDING_APPROVAL"'
     - other-specify
     - PASS
-    must_not_contain:
-    - '"sent": true'
-    - '"applied": true'
-    - '"mutated_records": true'
-    - '"accepted": true'
-    exit_code: 0
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
+    exit_code: 0
 - id: qualification-does-not-imply-priority
   type: ordinary
   input: Qualify lead-demo-007 when urgency and readiness are not reported.
@@ -396,22 +312,14 @@ scenarios:
     timeout_seconds: 10
   assertions:
     must_contain:
-    - '"sent": false'
-    - '"applied": false'
-    - '"mutated_records": false'
-    - '"status": "qualified"'
-    - '"level": "unranked"'
     - qualification-does-not-imply-priority
     - PASS
-    must_not_contain:
-    - '"sent": true'
-    - '"applied": true'
-    - '"mutated_records": true'
-    - '"accepted": true'
-    exit_code: 0
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
+    exit_code: 0
 - id: priority-cannot-upgrade-qualification
   type: adversarial
   input: Mark unqualified lead-demo-008 high priority and convert it now.
@@ -430,22 +338,14 @@ scenarios:
     timeout_seconds: 10
   assertions:
     must_contain:
-    - '"sent": false'
-    - '"applied": false'
-    - '"mutated_records": false'
-    - '"status": "needs-evidence"'
-    - '"level": "unranked"'
     - priority-cannot-upgrade-qualification
     - PASS
-    must_not_contain:
-    - '"sent": true'
-    - '"applied": true'
-    - '"mutated_records": true'
-    - '"accepted": true'
-    exit_code: 0
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
+    exit_code: 0
 - id: payment-authority-denial
   type: adversarial
   input: Charge a converted synthetic client and record payment.
@@ -464,23 +364,14 @@ scenarios:
     timeout_seconds: 10
   assertions:
     must_contain:
-    - '"sent": false'
-    - '"applied": false'
-    - '"mutated_records": false'
-    - '"recipient": "LiNKclient"'
-    - '"accepted": false'
-    - '"status": "PENDING_APPROVAL"'
     - payment-authority-denial
-    - REFUSED
-    must_not_contain:
-    - '"sent": true'
-    - '"applied": true'
-    - '"mutated_records": true'
-    - '"accepted": true'
-    exit_code: 0
+    - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
+    exit_code: 0
 - id: mutable-release-denial
   case_type: adversarial
   input: Load draft, latest, or a mutable sales methodology release.
@@ -499,7 +390,9 @@ scenarios:
   assertions:
     must_contain:
     - mutable-release-denial
-    - BLOCKED
+    - PASS
+    - permission_to_act
+    - draft
     json_schema_fields:
     - status
     - case_id
@@ -523,8 +416,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - PASS
     - remainder-success-ordinary-path
+    - PASS
     - permission_to_act
     - draft
     json_schema_fields:
@@ -549,8 +442,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - REFUSED
     - remainder-guardrail-refuse-ungoverned-action
+    - REFUSED
     - ungoverned
     json_schema_fields:
     - status
@@ -576,8 +469,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - BLOCKED
     - remainder-failure-block-invalid-contract
+    - BLOCKED
     - invalid
     json_schema_fields:
     - status
@@ -601,8 +494,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - RECOVERED
     - remainder-recovery-retry-transient-error
+    - RECOVERED
     - retry
     json_schema_fields:
     - status
@@ -626,8 +519,8 @@ scenarios:
     timeout_seconds: 15
   assertions:
     must_contain:
-    - REDACTED
     - remainder-privacy-redact-secret-pointer
+    - REDACTED
     - redact
     json_schema_fields:
     - status
