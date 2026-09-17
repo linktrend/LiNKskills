@@ -116,7 +116,7 @@ def build_release_record(release_id: str) -> dict[str, Any]:
         raise ValueError(f"skill version does not equal release_id version: {release_id}")
     pack_path = skill_dir / "references" / "skill-pack.json"
     pack = _read_json(pack_path) if pack_path.is_file() else {}
-    lifecycle = pack.get("lifecycle_state") if isinstance(pack.get("lifecycle_state"), str) else "draft"
+    lifecycle = "draft"
     declared_profiles = pack.get("compatible_runtime_profiles")
     execution_profiles = list(declared_profiles) if isinstance(declared_profiles, list) else []
     eligibility_ref = f"opaque:eligibility:{eligibility_id_for(release_id)}"

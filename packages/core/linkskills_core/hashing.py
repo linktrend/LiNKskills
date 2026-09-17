@@ -15,6 +15,8 @@ from typing import Any, Mapping, Optional, Sequence, Union
 UNSET_SKILL_RELEASE_HASH = "skill-release:unset"
 _FRONTMATTER_RE = re.compile(r"\A---\s*\n(.*?)\n---\s*\n?", re.DOTALL)
 _SKIP_NAMES = {".DS_Store", "Thumbs.db"}
+_SKIP_DIR_NAMES = {"__pycache__", ".pytest_cache", ".mypy_cache"}
+_SKIP_SUFFIXES = {".pyc", ".pyo"}
 # Stamped profile embeds skill_bundle_hash; exclude it from that bundle's content hash.
 # Remainder evaluation inputs (remainder-eval-cases.json, scripts/eval_driver.py)
 # are release-affecting: Server01 packaging identity must include them.
@@ -68,9 +70,13 @@ def iter_skill_files(
     for path in sorted(root.rglob("*")):
         if not path.is_file():
             continue
+        rel = path.resolve().relative_to(root).as_posix()
+        if any(part in _SKIP_DIR_NAMES for part in rel.split("/")[:-1]):
+            continue
         if path.name in _SKIP_NAMES or path.name.startswith("."):
             continue
-        rel = path.resolve().relative_to(root).as_posix()
+        if path.suffix.lower() in _SKIP_SUFFIXES:
+            continue
         if rel in excluded:
             continue
         files.append(path)
