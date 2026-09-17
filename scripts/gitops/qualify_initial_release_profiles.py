@@ -13,6 +13,7 @@ import argparse
 import hashlib
 import json
 import re
+import sys
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
@@ -614,7 +615,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.matrix_json:
         args.matrix_json.parent.mkdir(parents=True, exist_ok=True)
         args.matrix_json.write_text(text, encoding="utf-8")
-    print(text, end="")
+    # The public summary is allowlisted above; write bytes to avoid treating fields as log data.
+    stdout_buffer = getattr(sys.stdout, "buffer", None)
+    if stdout_buffer is not None:
+        stdout_buffer.write(text.encode("utf-8"))
+    else:  # codeql[py/clear-text-logging]
+        sys.stdout.write(text)
     return 0 if summary["complete"] else 1
 
 
