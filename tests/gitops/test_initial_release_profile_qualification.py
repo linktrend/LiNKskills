@@ -189,21 +189,45 @@ class InitialReleaseProfileQualificationTests(unittest.TestCase):
         )
 
     def test_cli_output_never_includes_sensitive_payloads(self) -> None:
-        canary = "CLEARTEXT_SENSITIVE_VALUE_ISSUE_380"
+        canaries = (
+            "CLEARTEXT_SENSITIVE_VALUE_ISSUE_380",
+            "skills/git-safeguard/references/eval-suite.json",
+            "EVAL_INPUT_PAYLOAD_ISSUE_380",
+        )
         poisoned = qualify_initial_release_profiles(ROOT)
-        poisoned["combinations"][0]["families"] = {"privacy": [canary]}
-        poisoned["combinations"][0]["executableCases"] = [canary]
-        poisoned["combinations"][0]["skillDir"] = f"skills/{canary}"
-        poisoned["combinations"][0]["skillPackDigest"] = canary
-        poisoned["combinations"][0]["missingArtifacts"] = [
-            f"artifact_unreadable:skills/git-safeguard/references/skill-pack.json:{canary}"
+        first = poisoned["combinations"][0]
+        first["id"] = canaries[0]
+        first["skillId"] = canaries[0]
+        first["version"] = canaries[0]
+        first["runtimeProfile"] = canaries[0]
+        first["reason"] = f"artifact_unreadable:{canaries[1]}:{canaries[0]}"
+        first["lifecycle"] = canaries[0]
+        first["families"] = {"privacy": [canaries[2]], "secret": [canaries[0]]}
+        first["executableCases"] = [canaries[0], canaries[2]]
+        first["skillDir"] = canaries[1]
+        first["skillPackDigest"] = canaries[0]
+        first["missingFamilies"] = [canaries[0], "privacy"]
+        first["missingArtifacts"] = [
+            f"artifact_unreadable:{canaries[1]}:{canaries[0]}",
+            f"version_mismatch:{canaries[0]}",
+            f"artifact_not_object:{canaries[1]}",
         ]
+        poisoned["usable"] = [canaries[0]]
+        poisoned["evalPending"] = [canaries[2]]
+        poisoned["quarantined"] = [canaries[1]]
+        poisoned["secretScanReason"] = canaries[0]
         summary = public_qualification_summary(poisoned)
         dumped = json.dumps(summary)
-        self.assertNotIn(canary, dumped)
+        for canary in canaries:
+            self.assertNotIn(canary, dumped)
         self.assertIn("artifact_unreadable", dumped)
+        self.assertIn("version_mismatch", dumped)
+        self.assertNotIn("version_mismatch:", dumped)
         self.assertTrue(summary["complete"])
         self.assertEqual(len(summary["combinations"]), 5)
+        self.assertEqual(summary["combinations"][0]["id"], "git-safeguard@1.1.0/cursor-macos")
+        self.assertEqual(summary["combinations"][0]["skillId"], "git-safeguard")
+        self.assertEqual(summary["combinations"][0]["missingFamilies"], ["privacy"])
         stdout = io.StringIO()
         with tempfile.TemporaryDirectory() as tmp:
             matrix_path = Path(tmp) / "matrix.json"
@@ -221,15 +245,21 @@ class InitialReleaseProfileQualificationTests(unittest.TestCase):
                 code = main(["--root", str(ROOT), "--matrix-json", str(matrix_path)])
             written = matrix_path.read_text(encoding="utf-8")
         self.assertEqual(code, 0)
-        self.assertNotIn(canary, stdout.getvalue())
-        self.assertNotIn(canary, written)
+        for canary in canaries:
+            self.assertNotIn(canary, stdout.getvalue())
+            self.assertNotIn(canary, written)
         parsed = json.loads(stdout.getvalue())
         self.assertEqual(parsed["kind"], "initial-release-profile-matrix")
+        self.assertEqual(parsed["combinations"][0]["id"], "git-safeguard@1.1.0/cursor-macos")
+        self.assertIsInstance(parsed["combinations"][0]["executableCaseCount"], int)
         self.assertIn("lifecycle", parsed["combinations"][0])
         self.assertIn("reason", parsed["combinations"][0])
+        self.assertIn("usableCount", parsed)
         self.assertNotIn("families", parsed["combinations"][0])
         self.assertNotIn("skillDir", parsed["combinations"][0])
         self.assertNotIn("skillPackDigest", parsed["combinations"][0])
+        self.assertNotIn("executableCases", parsed["combinations"][0])
+        self.assertNotIn("secretScanReason", parsed)
 
 
 if __name__ == "__main__":
