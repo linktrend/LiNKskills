@@ -3,20 +3,20 @@
   "artifact_kind": "skill_pack",
   "attestation": {
     "algorithm": "ES256",
-    "claims_digest": "sha256:4833f50eee8105aab324f56c0da1ae6f04d54b3ee78f675d0adb3f9518338292",
+    "claims_digest": "sha256:d4477d27a8a7628a8c9115a7c9d240688297f068c767e428199a9c4e7bd72095",
     "issuer": "linkskills-publisher",
     "key_id": "linkskills-draft-unqualified",
     "signature": "draft-unqualified-no-signature",
     "trust_boundary": "linkskills-release-attestation"
   },
-  "bundle_hash": "sha256:4833f50eee8105aab324f56c0da1ae6f04d54b3ee78f675d0adb3f9518338292",
+  "bundle_hash": "sha256:d4477d27a8a7628a8c9115a7c9d240688297f068c767e428199a9c4e7bd72095",
   "channel": "development",
-  "content_digest": "sha256:edabbab5e3b72ff24cf72af302abbd17e9b804338414fc31f46e461a314aa608",
+  "content_digest": "sha256:c3ffa818bd4e31fb27b8c32f38ac20aa77e1f05f3ddb3256f44b5110354ccbe3",
   "eligibility_ref": "opaque:eligibility:company-incident-continuity-1",
   "execution_profiles": [
     "cursor-macos"
   ],
-  "inventory_digest": "sha256:edabbab5e3b72ff24cf72af302abbd17e9b804338414fc31f46e461a314aa608",
+  "inventory_digest": "sha256:c3ffa818bd4e31fb27b8c32f38ac20aa77e1f05f3ddb3256f44b5110354ccbe3",
   "lifecycle_state": "draft",
   "lineage": {
     "kind": "native",
@@ -62,13 +62,18 @@
       },
       {
         "path": "references/eval-suite.yaml",
-        "sha256": "697be47697a42163007d1a51236fc5a422aa289ac830b31ec46879101569b8e1",
-        "size": 1664
+        "sha256": "3c009bae48afb69c88ee52708ab68e4e8504bd996fdd6e8543e0d2d340411fa8",
+        "size": 11976
       },
       {
         "path": "references/old-patterns.md",
         "sha256": "cc1cab5363ab39f7d55e3bea06158c3b3829c674e7a5631cf4c8c62e8f845ea3",
         "size": 507
+      },
+      {
+        "path": "references/remainder-eval-cases.json",
+        "sha256": "c78a38b15d5dbbd4e4233fa5583b16f425aeb54ff9c85fdc1304c0e691e0d81a",
+        "size": 3273
       },
       {
         "path": "references/schemas.json",
@@ -86,13 +91,18 @@
         "size": 409
       },
       {
+        "path": "scripts/eval_driver.py",
+        "sha256": "5074f3ec735ea52398e32e3fa932c935e85a97517078d524b8dc3980977551f1",
+        "size": 8610
+      },
+      {
         "path": "scripts/helper_tool.py",
         "sha256": "30996f5869109e5a2b65e67580936574e86c33ddd8f2fcdb21803c3b783f67db",
         "size": 12191
       }
     ],
-    "file_count": 13,
-    "total_bytes": 35290
+    "file_count": 15,
+    "total_bytes": 57485
   },
   "notes": "PKT-22 exact source identity only; draft/unqualified and not selectable.",
   "provenance": {
@@ -100,9 +110,10 @@
     "publisher": "LiNKskills",
     "repository": "https://github.com/linktrend/LiNKskills",
     "retrieved_at": "2026-08-31T00:00:00Z",
-    "source_commit": "1289f9a374c38115d3f4dcfac31439a9904d74c6",
+    "source_commit": "f775a633e0d50c86eff0a6c00951b79ad148f497",
     "source_path": "skills/company-incident-continuity",
-    "source_ref": "origin/development",
+    "source_ref": "issue/374-complete-all-remaining-linkskills-catalog-qualif",
+    "source_tree": "77c492a2061ee199d557230260e11fa0012ca84b",
     "trust_boundary": "linkskills-release-provenance"
   },
   "published_at": "2026-08-31T00:00:00Z",
@@ -114,8 +125,9 @@
   ],
   "retrieved_at": "2026-08-31T00:00:00Z",
   "schema_version": "0.1",
-  "source_commit": "1289f9a374c38115d3f4dcfac31439a9904d74c6",
+  "source_commit": "f775a633e0d50c86eff0a6c00951b79ad148f497",
   "source_path": "skills/company-incident-continuity",
-  "source_ref": "origin/development",
+  "source_ref": "issue/374-complete-all-remaining-linkskills-catalog-qualif",
+  "source_tree": "77c492a2061ee199d557230260e11fa0012ca84b",
   "version": "1.0.0"
 }

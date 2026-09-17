@@ -33,7 +33,7 @@ class SalesCustomerManagementContractTests(unittest.TestCase):
         for relative in required:
             self.assertTrue((SKILL / relative).is_file(), relative)
         body = (SKILL / "SKILL.md").read_text(encoding="utf-8")
-        for phrase in ["Odoo", "LiNKreach", "PENDING_APPROVAL", "execution_ledger.jsonl", "state.jsonl", "native CLI", "CLI wrapper", "direct API", "MCP", "specialist", "generalist", "get_tool_details", "Other — specify"]:
+        for phrase in ["Odoo", "LiNKclient", "PENDING_APPROVAL", "execution_ledger.jsonl", "state.jsonl", "native CLI", "CLI wrapper", "direct API", "MCP", "specialist", "generalist", "get_tool_details", "Other — specify"]:
             self.assertIn(phrase, body)
         for forbidden in ["send: true", "applied: true", "mutated_records: true", "sk_live_", "BEGIN PRIVATE KEY"]:
             self.assertNotIn(forbidden, body)

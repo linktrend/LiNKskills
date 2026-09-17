@@ -4,13 +4,14 @@
 > VPS Skills service was healthy and integrated with Lisa. That report is
 > retained as historical context, not current deployment evidence.
 >
-> **Current state (2026-08-26):** Current evidence establishes source/pre-VPS
-> engineering only. No current evidence establishes provider-live, VPS, stage,
-> consumer-runtime, canary, or production deployment of the Skills service or
-> Lisa integration. Live Platform apply/auth, consumer/VPS deployment, canary,
-> and production acceptance remain **HOLD** until exact source/runtime receipts
-> and independent acceptance exist. Preserve the root-level `evidence/` path
-> because certification code and migration receipts bind to it directly.
+> **Current state (2026-09-16):** Five production-successor releases exist in
+> protected development. Issue 374 lands source qualification for the remaining
+> 54 (executable eval cases, disabled consumer templates, Librarian 0.2
+> install contract, provider-v2 SQL coverage). Live hosted qualification,
+> Server01 publish/activate, and Platform PACI identity registration remain
+> **HOLD**. Historical 2026-08-11 VPS/Lisa health claims are not current
+> evidence. Preserve `evidence/` because certification and migration receipts
+> bind to it.
 
 **Who this is for:** you — LiNKtrend’s Principal. You make strategic decisions and review escalations. You do not write skills, run validators, or manage servers day to day.
 
@@ -144,7 +145,7 @@ So a failure is usually: “checks failed, usage was still recorded locally, cer
 | Real Eval Runner rejecting prompt-only certification | **Built in-repo.** |
 | Additive registry migrations (incl. `20260727_000005`) | **Packaged** here. **LiNKplatform alone applies** live. |
 | Compatibility load helper (`lib/skill_runtime`) | **Still present** for migration; not the final sole load path. |
-| Every skill marked certified/`usable` | **Not yet.** One sealed local canary (`canary-echo`) is `usable`; other catalog skills remain draft until sealed executable evidence. |
+| Every skill marked certified/`usable` | **Not yet. No skill is `usable` from this source packet.** Catalog overlay and the phase10 classification ledger mark every skill, including `canary-echo`, as `draft`. Historical `canary-echo` sealed receipts no longer bind the current mutated suite and are not live/`usable` evidence. Five production-successor releases (`git-safeguard`, `persistent-qa`, `repository-manager`, `skill-template`, `tool-architect`) are accepted in protected development as source-qualified successors, not as `usable`. The other 54 have confined executable eval cases in source only and stay non-`usable` until Server01 hosted sealed receipts. |
 
 | Cursor product canary | **Project-scoped only** (example fragment + notes). No global live canary. |
 | Codex / OpenClaw wiring | **Fragments handed off** — not applied from this repo. |

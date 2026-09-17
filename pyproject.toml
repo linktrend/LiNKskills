@@ -62,6 +62,7 @@ Documentation = "https://github.com/linktrend/LiNKskills/tree/main/docs"
 packages = []
 
 [tool.pytest.ini_options]
+addopts = "--import-mode=importlib"
 testpaths = ["tests"]
 norecursedirs = [
   "archive",
