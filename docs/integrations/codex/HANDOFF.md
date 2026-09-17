@@ -43,5 +43,5 @@ The Skills Codex fragment in this repository is an **immutable handoff artifact*
 
 ## Related packets
 
-- Stage readiness: `docs/handoffs/2026-07-30-linkskills-stage-readiness-packet.md`
-- Librarian stage packet: `docs/handoffs/2026-07-30-linkskills-librarian-stage-packet.md`
+- Stage readiness: `docs/archive/handoffs/2026-07-30-linkskills-stage-readiness-packet.md`
+- Librarian stage packet: `docs/archive/handoffs/2026-07-30-linkskills-librarian-stage-packet.md`

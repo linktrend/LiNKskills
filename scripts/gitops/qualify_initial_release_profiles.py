@@ -620,7 +620,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     if stdout_buffer is not None:
         stdout_buffer.write(text.encode("utf-8"))
     else:
-        raise RuntimeError("stdout buffer unavailable")
+        # Test-only text streams (for example io.StringIO) have no binary buffer.
+        type(sys.stdout).write(sys.stdout, text)
     return 0 if summary["complete"] else 1
 
 
