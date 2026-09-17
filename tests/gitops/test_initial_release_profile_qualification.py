@@ -189,7 +189,7 @@ class InitialReleaseProfileQualificationTests(unittest.TestCase):
         )
 
     def test_cli_output_never_includes_sensitive_payloads(self) -> None:
-        canary = "ghp_cleartext380secretTOKEN"
+        canary = "CLEARTEXT_SENSITIVE_VALUE_ISSUE_380"
         poisoned = qualify_initial_release_profiles(ROOT)
         poisoned["combinations"][0]["families"] = {"privacy": [canary]}
         poisoned["combinations"][0]["executableCases"] = [canary]
