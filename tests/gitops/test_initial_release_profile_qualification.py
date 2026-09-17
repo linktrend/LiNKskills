@@ -178,6 +178,10 @@ class InitialReleaseProfileQualificationTests(unittest.TestCase):
             payload["profiles"]["full"]["commands"][1],
             ["python3", "scripts/gitops/secret_scan.py"],
         )
+        self.assertEqual(
+            payload["profiles"]["release"]["commands"][1],
+            ["python3", "scripts/gitops/secret_scan.py"],
+        )
 
 
 if __name__ == "__main__":

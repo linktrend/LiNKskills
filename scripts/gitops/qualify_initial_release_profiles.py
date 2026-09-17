@@ -365,11 +365,11 @@ def qualify_initial_release_profiles(
 
 
 def delivery_secret_scan_preserved(root: Path) -> bool:
-    """True when Fast and Full still invoke the fixture-aware secret scanner."""
+    """True when Fast, Full, and Release still invoke the fixture-aware secret scanner."""
     config = root / ".ide-development" / "config" / "delivery.json"
     payload = json.loads(config.read_text(encoding="utf-8"))
     profiles = payload.get("profiles") or {}
-    for name in ("fast", "full"):
+    for name in ("fast", "full", "release"):
         commands = (profiles.get(name) or {}).get("commands") or []
         if _SECRET_SCAN_ARGV not in commands:
             return False

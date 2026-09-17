@@ -1,0 +1,102 @@
+name: Linktrend Release Gate
+run-name: Release Gate PR #${{ github.event.pull_request.number || 'dispatch' }} @ ${{ github.event.pull_request.head.sha || inputs.expected_commit }}
+
+# Short release profile only. Promotion still reuses the sealed full-suite
+# receipt and must not re-enter Full from this workflow.
+on:
+  pull_request:
+    branches: [staging, main]
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+    inputs:
+      expected_commit:
+        description: Exact Phase or promotion commit to certify
+        required: true
+        type: string
+      expected_tree:
+        description: Exact Git tree for the same commit
+        required: true
+        type: string
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.repository }}|${{ github.workflow }}|head-${{ github.event.pull_request.head.sha || inputs.expected_commit }}
+  cancel-in-progress: true
+
+jobs:
+  release:
+    name: Linktrend Release Gate
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (startsWith(github.event.pull_request.head.ref, 'promote/') &&
+       github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    env:
+      EXPECTED_HEAD: ${{ github.event_name == 'workflow_dispatch' && inputs.expected_commit || github.event.pull_request.head.sha }}
+      EXPECTED_TREE: ${{ github.event_name == 'workflow_dispatch' && inputs.expected_tree || '' }}
+    steps:
+      - name: Checkout exact Phase or promotion commit
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.expected_commit || github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Bind live HEAD to the requested identity
+        run: |
+          set -euo pipefail
+          [[ "${EXPECTED_HEAD}" =~ ^[0-9a-f]{40}$ ]] || { echo "release_gate_head_invalid"; exit 1; }
+          actual="$(git rev-parse HEAD)"
+          tree="$(git rev-parse 'HEAD^{tree}')"
+          test "${actual}" = "${EXPECTED_HEAD}" || {
+            echo "release_gate_stale_head: expected=${EXPECTED_HEAD} actual=${actual}"; exit 1;
+          }
+          if [[ -n "${EXPECTED_TREE}" ]]; then
+            [[ "${EXPECTED_TREE}" =~ ^[0-9a-f]{40}$ ]] || { echo "release_gate_tree_invalid"; exit 1; }
+            test "${tree}" = "${EXPECTED_TREE}" || {
+              echo "release_gate_stale_tree: expected=${EXPECTED_TREE} actual=${tree}"; exit 1;
+            }
+          fi
+          printf 'BOUND_HEAD=%s\nBOUND_TREE=%s\n' "${actual}" "${tree}" >> "$GITHUB_ENV"
+
+      - name: Run short non-mutating release profile
+        run: |
+          set -euo pipefail
+          python3 scripts/gitops/run_delivery_profile.py release \
+            --repository "${GITHUB_REPOSITORY}" \
+            --head "${BOUND_HEAD}" \
+            --tree "${BOUND_TREE}" \
+            --inventory-json release-profile-inventory.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          inventory = json.loads(Path("release-profile-inventory.json").read_text(encoding="utf-8"))
+          if inventory.get("profile") != "release":
+              raise SystemExit("release_gate_profile_required")
+          if inventory.get("fullSuiteInvoked") is True:
+              raise SystemExit("full_suite_reentered")
+          PY
+
+      - name: Write identity-bound release evidence
+        run: |
+          set -euo pipefail
+          python3 scripts/gitops/release_gate.py write \
+            --inventory release-profile-inventory.json \
+            --out release-gate-evidence.json
+          python3 scripts/gitops/release_gate.py verify \
+            --evidence release-gate-evidence.json \
+            --require
+
+      - name: Upload release-gate evidence
+        if: success()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: linktrend-release-gate-evidence-${{ github.run_id }}
+          path: |
+            release-gate-evidence.json
+            release-profile-inventory.json
+          retention-days: 30
