@@ -4,7 +4,7 @@
 
 **Admitted Skills source (issue 374 remainder packet):** governed inputs commit `e591f8880dde0e65a935618b235328b03629f7a1`. Catalog `git_sha` is that ancestor (not the catalog-embedding tip). Starting protected development was `b53d3588974dfa7589d5d45a30cb8824337099ba` / tree `e4397f801e72a570a2159c76dfc3e5fb06df83ee`.
 
-Successor five-release production path remains issue 372 / `docs/handoffs/2026-09-15-successor-release.md`. This packet adds the remaining 54 source qualification inputs. Target after Server01: **59** immutable production releases.
+Successor five-release production path remains issue 372 / `docs/archive/handoffs/2026-09-15-successor-release.md`. This packet adds the remaining 54 source qualification inputs. Target after Server01: **59** immutable production releases.
 
 ## 1. Artifact identity
 

@@ -2,7 +2,7 @@
 
 - **Status:** Accepted (Phase 0)
 - **Date:** 2026-07-27
-- **Authority:** `docs/CURSOR-GROK-EXECUTION-PROMPT.md` + approved plan hash `31a6cc70bb778ce1dff236819e4bf600b0495dbb06c95bac55bcb2b0b2f5fe88`
+- **Authority:** `docs/archive/prompts/CURSOR-GROK-EXECUTION-PROMPT.md` + approved plan hash `31a6cc70bb778ce1dff236819e4bf600b0495dbb06c95bac55bcb2b0b2f5fe88`
 - **Plan refs:** §2, §29.5, Phase 0 items 13–14, Phase 11 classifications
 
 ## 1. Approved-plan control
@@ -76,4 +76,4 @@ A Grok completion report is **provisional** until repository Codex verification 
 
 ## 6. Relation to interface gates
 
-Bypassing an accepted gate in `docs/inventories/cross-plan-interface-gates.md` is a deviation. Fake-backed progress behind a gate is allowed; declaring the gated outcome complete is not.
+Bypassing an accepted gate in `docs/archive/inventories/cross-plan-interface-gates.md` is a deviation. Fake-backed progress behind a gate is allowed; declaring the gated outcome complete is not.

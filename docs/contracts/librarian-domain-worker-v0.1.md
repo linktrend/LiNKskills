@@ -2,7 +2,7 @@
 
 - **Status:** Accepted contract sketch for Phase 0 handoff
 - **Date:** 2026-07-27
-- **Authority:** `docs/CURSOR-GROK-EXECUTION-PROMPT.md` + approved plan hash `31a6cc70bb778ce1dff236819e4bf600b0495dbb06c95bac55bcb2b0b2f5fe88`
+- **Authority:** `docs/archive/prompts/CURSOR-GROK-EXECUTION-PROMPT.md` + approved plan hash `31a6cc70bb778ce1dff236819e4bf600b0495dbb06c95bac55bcb2b0b2f5fe88`
 - **Plan refs:** §18, §29.4 Librarian gate
 - **Related ADR:** 0008 (ownership), 0006 (executed evidence)
 
