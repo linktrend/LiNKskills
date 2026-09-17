@@ -1,30 +1,17 @@
 # LiNKskills documentation
 
-This directory is the home for repository documentation. Start with:
+## Current source of truth
 
-- `LINKSKILLS-INTENT.md` for scope and purpose.
-- `LINKSKILLS-TECHNICAL-PRD.md` for the implemented architecture.
-- `LINKSKILLS-OPERATIONS-MANUAL.md` for operations.
-- `OPEN-ISSUES.md` for genuinely open work.
-- `end-to-end-delivery/README.md` for the Server 01 operational-delivery plan,
-  initial five-release scope, current live evidence, execution manifest, and
-  acceptance gates.
-- `planning/governed-skill-expansion/` for the final IDE v2.5.1 PRD,
-  dependency graph, manifest, and approval-gated execution packets for provider
-  v2 completion, governed external collections, approved reusable skills, and
-  role manifests.
-- `runbooks/` for current procedures.
+- [`LINKSKILLS-AGENT-GUIDE.md`](LINKSKILLS-AGENT-GUIDE.md) — complete operating guide for AI agents and operators.
+- [`LINKSKILLS-INTENT.md`](LINKSKILLS-INTENT.md) — product purpose and boundaries.
+- [`LINKSKILLS-TECHNICAL-PRD.md`](LINKSKILLS-TECHNICAL-PRD.md) — architecture and package contracts.
+- [`LINKSKILLS-OPERATIONS-MANUAL.md`](LINKSKILLS-OPERATIONS-MANUAL.md) — concise operations reference.
+- [`runbooks/PRODUCTION_OPERATIONS.md`](runbooks/PRODUCTION_OPERATIONS.md) — Server 01 runtime procedure.
+- [`integrations/server01/`](integrations/server01/) — non-secret deployment and rollback handoff.
+- [`contracts/`](contracts/) and [`adr/`](adr/) — active contracts and accepted architectural decisions.
 
-Historical material belongs in `archive/` and is not implementation authority.
-The root-level `archive/` directory is a self-contained retired code snapshot,
-not an active documentation tree; it remains outside `docs/` so its historical
-layout and recoverability are preserved. The root-level `evidence/` directory
-is also intentional because certification code and migrations consume those
-paths directly.
+Development plans, agent prompts, issue packets, inventories, handoffs, end-to-end delivery plans, and superseded readiness reports are retained under [`archive/`](archive/) for historical reference. They are not current implementation authority.
 
-The historical 2026-08-11 service-health and OpenClaw/Lisa evidence does not
-prove current readiness or end-to-end use. The 2026-09-10 Server 01 inspection
-recorded in `end-to-end-delivery/STARTING-POSITION.md` confirms an exact running
-release and process health, but `/ready` fails because the production store is
-unreachable and current provider/selectability/consumer acceptance remains
-unproven.
+## Release identity
+
+LiNKskills 1.0.0 is pinned to `main` commit `e40bf0dac697eca74a49d956189d2a87f728fbd6`, tree `d5b3410ccf4a383fba71ace86e8904a6dceb1270`. The same tree is expected on `development` and `staging` during the 1.0 release freeze.

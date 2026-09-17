@@ -61,4 +61,4 @@ Not proven / not performed here:
 3. Wire host-side MCP only under OpenClaw ownership.
 4. Do not ask LiNKskills agents to edit OpenClaw/Lisa internals.
 
-Correction evidence: `docs/handoffs/2026-07-28-grok-certification-correction-wave2.md`, `docs/handoffs/2026-07-28-grok-certification-correction-wave4.md`, `docs/handoffs/2026-07-28-grok-certification-correction-wave5.md`.
+Correction evidence: `docs/archive/handoffs/2026-07-28-grok-certification-correction-wave2.md`, `docs/archive/handoffs/2026-07-28-grok-certification-correction-wave4.md`, `docs/archive/handoffs/2026-07-28-grok-certification-correction-wave5.md`.

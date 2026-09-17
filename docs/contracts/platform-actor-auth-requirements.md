@@ -2,7 +2,7 @@
 
 - **Status:** Requirements contract v0.1 (fake-backed until Identity gate passes)
 - **Date:** 2026-07-27
-- **Authority:** `docs/CURSOR-GROK-EXECUTION-PROMPT.md` + approved plan hash `31a6cc70bb778ce1dff236819e4bf600b0495dbb06c95bac55bcb2b0b2f5fe88`
+- **Authority:** `docs/archive/prompts/CURSOR-GROK-EXECUTION-PROMPT.md` + approved plan hash `31a6cc70bb778ce1dff236819e4bf600b0495dbb06c95bac55bcb2b0b2f5fe88`
 - **Plan refs:** §20.1, §8.2, §29.4 Identity gate
 - **Related ADRs:** 0003, 0005, 0007
 

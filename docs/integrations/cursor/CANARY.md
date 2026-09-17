@@ -43,7 +43,7 @@ See Platform frozen `platform.auth-token-envelope/0.1.0` §§6–7 for assertion
 | Stage | Intent | Status in this repo |
 |---|---|---|
 | 1 | Prove fake/contract tests with isolated or project-scoped configuration | **Ready (fake/contract)** via gateway/MCP/client/PACI-proxy unit tests + example fragment + Lane C contract tests |
-| 2 | Inspect `.cursor` symlinks and shared/global settings read-only; record ownership | **Ready (docs)** in `docs/inventories/cursor-codex-mutation-surfaces.md` — no mutation |
+| 2 | Inspect `.cursor` symlinks and shared/global settings read-only; record ownership | **Ready (docs)** in `docs/archive/inventories/cursor-codex-mutation-surfaces.md` — no mutation |
 | 3 | Stage read-only discovery | **Blocked** — requires Platform stage PACI issuer + Skills credential |
 | 4 | Stage run/telemetry with non-side-effecting skills | **Blocked** — same; contract documented in `TELEMETRY-CONTRACT.md` (events, privacy, idempotency) — not live |
 | 5 | Exact packaged tool + artifact validation | **Blocked** on live stage; local dry-run only |
