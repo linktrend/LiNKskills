@@ -25,9 +25,9 @@ from linkskills_core.hashing import build_skill_bundle_manifest  # noqa: E402
 from role_pack_validator import load_role_pack_inputs  # noqa: E402
 
 PROTECTED_BASE = {
-    "ref": "origin/development",
-    "commit": "1289f9a374c38115d3f4dcfac31439a9904d74c6",
-    "tree": "8d3312b21ccfa92102233211f8224d50fb07ac88",
+    "ref": "issue/374-complete-all-remaining-linkskills-catalog-qualif",
+    "commit": "2e03130b5d8e801a066da504e6ff444f1ff3d46c",
+    "tree": "3d3c3b1df7e1485b8f56607fbfe499d3403bf7ea",
 }
 EVALUATED_AT = "2026-08-31T00:00:00Z"
 ROLE_PACK_DIR = _ROOT / "role-packs"

@@ -109,9 +109,9 @@ class RolePackValidatorTests(unittest.TestCase):
         self.assertEqual(
             evidence["current_head_qualification_repair"]["protected_base"],
             {
-                "ref": "origin/development",
-                "commit": "1289f9a374c38115d3f4dcfac31439a9904d74c6",
-                "tree": "8d3312b21ccfa92102233211f8224d50fb07ac88",
+                "ref": "issue/374-complete-all-remaining-linkskills-catalog-qualif",
+                "commit": "2e03130b5d8e801a066da504e6ff444f1ff3d46c",
+                "tree": "3d3c3b1df7e1485b8f56607fbfe499d3403bf7ea",
             },
         )
         self.assertEqual(evidence["current_head_qualification_repair"]["status"], "HOLD")

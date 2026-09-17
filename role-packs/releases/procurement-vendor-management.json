@@ -3,20 +3,20 @@
   "artifact_kind": "skill_pack",
   "attestation": {
     "algorithm": "ES256",
-    "claims_digest": "sha256:fe58334b069bad56caf32a9f15e6fa3da02a325dbb3764d0dd910ee6021e3be6",
+    "claims_digest": "sha256:f8dfcb6b1897461d3f823f35df7ec0620b94a925bb54ba126e6fff9be7b3f2fe",
     "issuer": "linkskills-publisher",
     "key_id": "linkskills-draft-unqualified",
     "signature": "draft-unqualified-no-signature",
     "trust_boundary": "linkskills-release-attestation"
   },
-  "bundle_hash": "sha256:a1436a9acf89b2877429b37460144ccd376941a52b8569ac9c3da0934efd5011",
+  "bundle_hash": "sha256:f8dfcb6b1897461d3f823f35df7ec0620b94a925bb54ba126e6fff9be7b3f2fe",
   "channel": "development",
-  "content_digest": "sha256:570d2ad5165c2ac8893e1d11e27eee64e41503f203334b7991119e9f5b8e360a",
+  "content_digest": "sha256:7fb00d6adb397c6864de61c5a06ccc127764325aa4af374596f313ca00ebd316",
   "eligibility_ref": "opaque:eligibility:procurement-vendor-management-1",
   "execution_profiles": [
     "cursor-macos"
   ],
-  "inventory_digest": "sha256:570d2ad5165c2ac8893e1d11e27eee64e41503f203334b7991119e9f5b8e360a",
+  "inventory_digest": "sha256:7fb00d6adb397c6864de61c5a06ccc127764325aa4af374596f313ca00ebd316",
   "lifecycle_state": "draft",
   "lineage": {
     "kind": "native",
@@ -62,13 +62,18 @@
       },
       {
         "path": "references/eval-suite.yaml",
-        "sha256": "480ca587d489e4a47a502949a8e3d67a530738cd49406b822fedf6dac7797d13",
-        "size": 2676
+        "sha256": "e1a408d960bf7a04264df269f3741a01762b63d9b99b49322a458912e948a649",
+        "size": 10429
       },
       {
         "path": "references/old-patterns.md",
         "sha256": "e2f0369f07cdaaba5166f2ccb6e5532844bce9d03aeec4061b31f972f790f79f",
         "size": 539
+      },
+      {
+        "path": "references/remainder-eval-cases.json",
+        "sha256": "a457c7e52ba3d8e86d774437e28ae0c6a26fe7d5c103f1b968c009ad09414677",
+        "size": 2684
       },
       {
         "path": "references/schemas.json",
@@ -91,13 +96,18 @@
         "size": 238
       },
       {
+        "path": "scripts/eval_driver.py",
+        "sha256": "5074f3ec735ea52398e32e3fa932c935e85a97517078d524b8dc3980977551f1",
+        "size": 8610
+      },
+      {
         "path": "scripts/helper_tool.py",
         "sha256": "0883bb70e4c2a46b653e59432bce7e5c4c768b5e00d4235e22cc7a00249e94de",
         "size": 7604
       }
     ],
-    "file_count": 14,
-    "total_bytes": 36966
+    "file_count": 16,
+    "total_bytes": 56013
   },
   "notes": "PKT-22 exact source identity only; draft/unqualified and not selectable.",
   "provenance": {
@@ -105,9 +115,9 @@
     "publisher": "LiNKskills",
     "repository": "https://github.com/linktrend/LiNKskills",
     "retrieved_at": "2026-08-31T00:00:00Z",
-    "source_commit": "1289f9a374c38115d3f4dcfac31439a9904d74c6",
+    "source_commit": "2e03130b5d8e801a066da504e6ff444f1ff3d46c",
     "source_path": "skills/procurement-vendor-management",
-    "source_ref": "origin/development",
+    "source_ref": "issue/374-complete-all-remaining-linkskills-catalog-qualif",
     "trust_boundary": "linkskills-release-provenance"
   },
   "published_at": "2026-08-31T00:00:00Z",
@@ -119,8 +129,8 @@
   ],
   "retrieved_at": "2026-08-31T00:00:00Z",
   "schema_version": "0.1",
-  "source_commit": "1289f9a374c38115d3f4dcfac31439a9904d74c6",
+  "source_commit": "2e03130b5d8e801a066da504e6ff444f1ff3d46c",
   "source_path": "skills/procurement-vendor-management",
-  "source_ref": "origin/development",
+  "source_ref": "issue/374-complete-all-remaining-linkskills-catalog-qualif",
   "version": "1.0.0"
 }

@@ -3,18 +3,18 @@
   "artifact_kind": "skill_pack",
   "attestation": {
     "algorithm": "ES256",
-    "claims_digest": "sha256:a6779605d78a21a6c01437f593a99dbf243158e3a8c08f27daf5df7145a8c694",
+    "claims_digest": "sha256:ce6a882f48e5e07f9a87a971261fd3a8d01c28b48ac2d4079d77a8bbf723591d",
     "issuer": "linkskills-publisher",
     "key_id": "linkskills-draft-unqualified",
     "signature": "draft-unqualified-no-signature",
     "trust_boundary": "linkskills-release-attestation"
   },
-  "bundle_hash": "sha256:5b7a7e655c14611b53b9b0514adbba9c388c27af1a3f787ce208ac3e34f10a72",
+  "bundle_hash": "sha256:ce6a882f48e5e07f9a87a971261fd3a8d01c28b48ac2d4079d77a8bbf723591d",
   "channel": "development",
-  "content_digest": "sha256:cacd7da6f9f1be4b513fbbb43a16343c27b0ab568194f8a792d9802d76a6fe26",
+  "content_digest": "sha256:6d18679d252ecc08dfecd6cc3522d1a8f2b564a10e4fe5ccaf15b2512d4928c5",
   "eligibility_ref": "opaque:eligibility:marketing-strategist-1",
   "execution_profiles": [],
-  "inventory_digest": "sha256:cacd7da6f9f1be4b513fbbb43a16343c27b0ab568194f8a792d9802d76a6fe26",
+  "inventory_digest": "sha256:6d18679d252ecc08dfecd6cc3522d1a8f2b564a10e4fe5ccaf15b2512d4928c5",
   "lifecycle_state": "draft",
   "lineage": {
     "kind": "native",
@@ -55,13 +55,18 @@
       },
       {
         "path": "references/eval-suite.yaml",
-        "sha256": "f98fc38a68e87eefcc7c029792137fe6d4d64701c9e52980c1a12a0c3861c51c",
-        "size": 4324
+        "sha256": "a1853b36e1ad9e75793f18a9954777b85ca7dd7eebb3faab0197d15efce4c8b2",
+        "size": 8261
       },
       {
         "path": "references/old-patterns.md",
         "sha256": "c90b69af8a7d6685211adbaab7025c5cbbf006bf17e9e3beceee4b7e3df52221",
         "size": 325
+      },
+      {
+        "path": "references/remainder-eval-cases.json",
+        "sha256": "b7a1a950080bf2d0b43111710720962e9bbf44f9c8205efb2ec1f43857655bb0",
+        "size": 2405
       },
       {
         "path": "references/schemas.json",
@@ -74,13 +79,18 @@
         "size": 426
       },
       {
+        "path": "scripts/eval_driver.py",
+        "sha256": "5074f3ec735ea52398e32e3fa932c935e85a97517078d524b8dc3980977551f1",
+        "size": 8610
+      },
+      {
         "path": "scripts/helper_tool.py",
         "sha256": "5c690f108c83e409a54acddeed2a2eb805a507264d3be2dc295302535ad36159",
         "size": 1315
       }
     ],
-    "file_count": 11,
-    "total_bytes": 14527
+    "file_count": 13,
+    "total_bytes": 29479
   },
   "notes": "PKT-22 exact source identity only; draft/unqualified and not selectable.",
   "provenance": {
@@ -88,9 +98,9 @@
     "publisher": "LiNKskills",
     "repository": "https://github.com/linktrend/LiNKskills",
     "retrieved_at": "2026-08-31T00:00:00Z",
-    "source_commit": "1289f9a374c38115d3f4dcfac31439a9904d74c6",
+    "source_commit": "2e03130b5d8e801a066da504e6ff444f1ff3d46c",
     "source_path": "skills/marketing-strategist",
-    "source_ref": "origin/development",
+    "source_ref": "issue/374-complete-all-remaining-linkskills-catalog-qualif",
     "trust_boundary": "linkskills-release-provenance"
   },
   "published_at": "2026-08-31T00:00:00Z",
@@ -102,8 +112,8 @@
   ],
   "retrieved_at": "2026-08-31T00:00:00Z",
   "schema_version": "0.1",
-  "source_commit": "1289f9a374c38115d3f4dcfac31439a9904d74c6",
+  "source_commit": "2e03130b5d8e801a066da504e6ff444f1ff3d46c",
   "source_path": "skills/marketing-strategist",
-  "source_ref": "origin/development",
+  "source_ref": "issue/374-complete-all-remaining-linkskills-catalog-qualif",
   "version": "1.0.0"
 }

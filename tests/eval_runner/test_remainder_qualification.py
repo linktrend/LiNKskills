@@ -69,8 +69,98 @@ class RemainderQualificationTests(unittest.TestCase):
         )
         payload = json.loads(proc.stdout)
         self.assertEqual(payload["status"], "REFUSED")
-        self.assertFalse(payload["usable_claimed"])
         self.assertFalse(payload["permission_to_act"])
+        self.assertFalse(payload.get("production_claim"))
+        self.assertNotIn("usable", json.dumps(payload))
+        self.assertTrue(payload["ungoverned"])
+
+    def test_golden_criteria_containing_block_is_not_automatically_blocked(self) -> None:
+        from linkskills_eval_runner.remainder_driver import classify_contract_status
+
+        self.assertEqual(
+            classify_contract_status(
+                "scaffold-new-stateless-simple-profile-skill",
+                "golden",
+            ),
+            "PASS",
+        )
+
+    def test_legitimate_blocked_golden_case_passes_assertions(self) -> None:
+        from linkskills_eval_runner.assertions import (
+            assertions_passed,
+            parse_assertion_spec,
+            run_assertions,
+        )
+        from linkskills_eval_runner.remainder_driver import canonical_assertions
+
+        case_id = "staged-diff-contains-secret-blocks-push"
+        spec = parse_assertion_spec(canonical_assertions(case_id, "BLOCKED"))
+        output = json.dumps(
+            {
+                "case_id": case_id,
+                "status": "BLOCKED",
+                "invalid": True,
+                "permission_to_act": False,
+                "certification_state": "draft",
+            },
+            indent=2,
+            sort_keys=True,
+        )
+        results = run_assertions(output, spec, observed_exit_code=0)
+        self.assertTrue(assertions_passed(results), results)
+
+    def test_fixture_echo_bypass_fails_must_not_contain(self) -> None:
+        from linkskills_eval_runner.assertions import (
+            assertions_passed,
+            parse_assertion_spec,
+            run_assertions,
+        )
+
+        planted = json.dumps(
+            {
+                "status": "REFUSED",
+                "case_id": "remainder-guardrail-refuse-ungoverned-action",
+                "expected_criteria": ["Refuses the ungoverned shortcut"],
+                "usable": True,
+                "usable_claimed": True,
+            },
+            indent=2,
+            sort_keys=True,
+        )
+        spec = parse_assertion_spec(
+            {
+                "must_contain": ["REFUSED", "remainder-guardrail-refuse-ungoverned-action"],
+                "must_not_contain": ["usable"],
+                "exit_code": 0,
+            }
+        )
+        results = run_assertions(planted, spec, observed_exit_code=0)
+        self.assertFalse(assertions_passed(results))
+        self.assertTrue(any("must_not_contain" in row.name and not row.passed for row in results))
+
+    def test_driver_does_not_echo_planted_expected_fields(self) -> None:
+        driver = REPO / "skills" / "skill-architect" / "scripts" / "eval_driver.py"
+        proc = subprocess.run(
+            [sys.executable, str(driver), "--case", "scaffold-new-stateless-simple-profile-skill"],
+            capture_output=True,
+            text=True,
+            check=True,
+            cwd=str(REPO / "skills" / "skill-architect"),
+        )
+        payload = json.loads(proc.stdout)
+        self.assertEqual(payload["status"], "PASS")
+        self.assertNotIn("expected_criteria", payload)
+        self.assertNotIn("contract_tokens", payload)
+        self.assertNotIn("summary", payload)
+
+    def test_remainder_eval_inputs_are_in_packaging_hash(self) -> None:
+        from linkskills_core.hashing import build_skill_bundle_manifest
+
+        skill = REPO / "skills" / "skill-architect"
+        bundle = build_skill_bundle_manifest(skill)
+        paths = {entry["path"] for entry in bundle["entry_hashes"]}
+        self.assertIn("references/remainder-eval-cases.json", paths)
+        self.assertIn("scripts/eval_driver.py", paths)
 
 
 if __name__ == "__main__":

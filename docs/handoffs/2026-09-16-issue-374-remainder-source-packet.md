@@ -7,8 +7,9 @@
 
 ## Delivered
 
-- 54 remainder skills: confined executable eval cases + fail-closed `eval_driver.py`
+- 54 remainder skills: confined executable eval cases that exercise declared contract status (not fixture-echo)
 - Remainder qualification matrix never claims usable
+- canary-echo historical sealed usable evidence demoted after suite mutation
 - Disabled consumer inventory/bindings for Lisa/David/Eric/Sara/Jane, Autowork, Codex, Cursor
 - Librarian 0.2 install contract + Platform handoff
 - Provider-v2 SQL hash-bound companion manifest

@@ -15,12 +15,12 @@
   },
   "counts": {
     "deprecated": 0,
-    "draft": 34,
+    "draft": 59,
     "eval_pending": 0,
     "retired": 0,
-    "total_catalog_skills": 35,
-    "usable": 1,
-    "with_sealed_live_receipts": 1
+    "total_catalog_skills": 59,
+    "usable": 0,
+    "with_sealed_live_receipts": 0
   },
   "deprecated_or_retired": [],
   "evidence_tier": "sealed local Linux bwrap (or privileged Docker Linux); not stage/prod apply",
@@ -59,7 +59,7 @@
   ],
   "legacy_yaml_note": "Legacy references/eval-suite.yaml alone cannot establish launch readiness; validator requires schema-valid canonical JSON for launch targets and recalculated hash agreement.",
   "linux_bwrap_required": true,
-  "live_certification": "local sealed Linux/container certification performed 2026-08-03T10:09:03Z (1 usable)",
+  "live_certification": "not performed for current remainder suites; historical canary-echo sealed receipts are unbound after suite mutation",
   "macos_certifiable": false,
   "non_certifying_local_evidence": [
     {
@@ -136,27 +136,15 @@
       "usable_claimed": false
     },
     "canary-echo": {
-      "classification": "usable",
-      "profile_hash": "9db2d1db2663d9e3fb2a60b0ab4aaaf291aed010d155caba65798b5ecb0ec188",
-      "reason": "certified: executor receipts bind case, immutable skill release, deterministic execution profile, toolchain, and collected evidence",
-      "reason_code": "certified_usable",
-      "sealed_live_receipt_evidence": [
+      "classification": "draft",
+      "historical_sealed_evidence": [
         "evidence/phase10/sealed/canary-echo-sealed.json"
       ],
-      "skill_release_hash": "skill-release:006a23b0af3abbcb9a0600c3f44bf337b89dc6cdd5be6d328097a2498a5f05bb",
-      "source_hash": "29b179692378ba32ee244afa7f8b8017e918a158f37127e117cfe24a820f3d83",
+      "reason": "historical sealed usable receipts no longer bind this mutated eval suite/release; demoted to draft. Hosted sealed evaluator must recertify. No live or usable claim.",
+      "reason_code": "suite_mutated_after_sealed_usable",
+      "sealed_live_receipt_evidence": [],
       "suite_executable": true,
-      "tool_hash": "29b179692378ba32ee244afa7f8b8017e918a158f37127e117cfe24a820f3d83",
-      "toolchain": {
-        "tools": [
-          {
-            "source_hash": "29b179692378ba32ee244afa7f8b8017e918a158f37127e117cfe24a820f3d83",
-            "tool_hash": "29b179692378ba32ee244afa7f8b8017e918a158f37127e117cfe24a820f3d83",
-            "tool_id": "text-echo",
-            "version": "1.0.0"
-          }
-        ]
-      }
+      "usable_claimed": false
     },
     "channel-ops": {
       "canonical_v01_artifacts": false,

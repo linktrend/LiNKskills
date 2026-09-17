@@ -3,21 +3,21 @@
   "artifact_kind": "skill_pack",
   "attestation": {
     "algorithm": "ES256",
-    "claims_digest": "sha256:42d041217ef0ea877aa8852a423fc016387c6286126a496f63872fb398eebca6",
+    "claims_digest": "sha256:868e1566eebb29131aed4b266ad393840bed92e2ee35334f303417573ee7a064",
     "issuer": "linkskills-publisher",
     "key_id": "linkskills-draft-unqualified",
     "signature": "draft-unqualified-no-signature",
     "trust_boundary": "linkskills-release-attestation"
   },
-  "bundle_hash": "sha256:08dc99aaa9b9b4be215374381e5a6d2c079f8b211049c6dd0dd9fcdaafcbb8e7",
+  "bundle_hash": "sha256:868e1566eebb29131aed4b266ad393840bed92e2ee35334f303417573ee7a064",
   "channel": "development",
-  "content_digest": "sha256:90a27b54a21a898a7f52da75b0f1c383ceae74921fdff992f7a9e866c5c33bf9",
+  "content_digest": "sha256:b422f2ec99a95dbfa6feb8241a6e95b65d48f6e8aef30085dd2e7d794f5fa87f",
   "eligibility_ref": "opaque:eligibility:sales-customer-management-1",
   "execution_profiles": [
     "cursor-macos"
   ],
-  "inventory_digest": "sha256:90a27b54a21a898a7f52da75b0f1c383ceae74921fdff992f7a9e866c5c33bf9",
-  "lifecycle_state": "draft",
+  "inventory_digest": "sha256:b422f2ec99a95dbfa6feb8241a6e95b65d48f6e8aef30085dd2e7d794f5fa87f",
+  "lifecycle_state": "eval_pending",
   "lineage": {
     "kind": "native",
     "relationship": "none",
@@ -27,13 +27,13 @@
     "entry_hashes": [
       {
         "path": "SKILL.md",
-        "sha256": "145faf13eef3dd4528088b800f8803152b05fca0c1165ef7bc4892a4c3eff783",
-        "size": 8257
+        "sha256": "f8103c5980928b0ae75c5af92dfa94d2538e6c3ee54d3f31d253dca0ebf351ba",
+        "size": 9378
       },
       {
         "path": "advanced/advanced.md",
-        "sha256": "d662f435e69c7d5d933210866d9de9fddc9d69130b9db3e35b810a100062dffa",
-        "size": 4425
+        "sha256": "5fb7b0f7dce50038a90b5e7d7eb93981fc76d3c4f86986221422e943dc00657c",
+        "size": 5304
       },
       {
         "path": "examples/error-recovery.md",
@@ -47,33 +47,38 @@
       },
       {
         "path": "references/api-specs.md",
-        "sha256": "18368e41f29be23155f0d48f6908b3a1f93f987f9b3e8902501ea7a704652d00",
-        "size": 4491
+        "sha256": "baa49f1d8ca9a7321b0ccb01c114da67fe13b4185b61724f791142a4d74bc54a",
+        "size": 4596
       },
       {
         "path": "references/changelog.md",
-        "sha256": "d62135a5a2ddd0eec057f23a6f8ff652fa44983ab2e064856db13fb0a17267f1",
-        "size": 479
+        "sha256": "1cc0049d9dc898949be89919dd429d286e81221193a14862e737684b7f82b7f1",
+        "size": 907
       },
       {
         "path": "references/eval-suite.json",
-        "sha256": "b81f9012cb68c09a07dfe9cd585af9e855bfced07871a327455bda9bb1d4ef73",
-        "size": 3967
+        "sha256": "3f3024f0101b895b230bbf203c88a273b3f8315ca69d3f774227a7d6c1835bbd",
+        "size": 6874
       },
       {
         "path": "references/eval-suite.yaml",
-        "sha256": "6dd3e0311cbf1a0c531858634de7a4f1e4573b2b451d3afce631eadd872ca06f",
-        "size": 2969
+        "sha256": "626d4b9056843b0b221178bfae0f0b031a19bfc872901697ac1a76da5c6d246c",
+        "size": 14619
       },
       {
         "path": "references/old-patterns.md",
-        "sha256": "419f93e211227c5ec2136b8ff529a1ce6eb3fcf75606303b7de6d84542d592fc",
-        "size": 1398
+        "sha256": "1e41ce513438620d46945e46958f0dc7e6d130a0c3bc2f6f190add9bbd45f4ad",
+        "size": 1400
+      },
+      {
+        "path": "references/remainder-eval-cases.json",
+        "sha256": "d76979a7d36d49592b540a94116fba83df3ea54a0ad3c2cea1c108f9fd926065",
+        "size": 3482
       },
       {
         "path": "references/schemas.json",
-        "sha256": "c5aa979c10ecb4f2f0832dcdd874b7fce2e3fae1dab1f37a5f86487563fd94c3",
-        "size": 3762
+        "sha256": "2b957fd1b5f34807a6b4394fe973543832f25a1ff893b1f1567cf7950f6755b2",
+        "size": 9507
       },
       {
         "path": "references/simple-profile.md",
@@ -82,8 +87,8 @@
       },
       {
         "path": "references/skill-pack.json",
-        "sha256": "18d16ee689ecce2b868fbc42e3153815437f6879307fa59971832cbfdfef023e",
-        "size": 3325
+        "sha256": "64888598d210e4b911d2521e501dd350e5fbeb94304fa0dad6e8ade65467d63d",
+        "size": 3975
       },
       {
         "path": "scripts/README.md",
@@ -91,13 +96,18 @@
         "size": 706
       },
       {
+        "path": "scripts/eval_driver.py",
+        "sha256": "5074f3ec735ea52398e32e3fa932c935e85a97517078d524b8dc3980977551f1",
+        "size": 8610
+      },
+      {
         "path": "scripts/helper_tool.py",
-        "sha256": "cdc0125520ffacb1797b5bdd9178936f875461bde9279b92534b28ad6a2db744",
-        "size": 7005
+        "sha256": "051bd8b9d5ebca4c1013299473ef140a5a5959a98336840a6e298d7c418f42f2",
+        "size": 9028
       }
     ],
-    "file_count": 14,
-    "total_bytes": 46523
+    "file_count": 16,
+    "total_bytes": 84125
   },
   "notes": "PKT-22 exact source identity only; draft/unqualified and not selectable.",
   "provenance": {
@@ -105,22 +115,22 @@
     "publisher": "LiNKskills",
     "repository": "https://github.com/linktrend/LiNKskills",
     "retrieved_at": "2026-08-31T00:00:00Z",
-    "source_commit": "1289f9a374c38115d3f4dcfac31439a9904d74c6",
+    "source_commit": "2e03130b5d8e801a066da504e6ff444f1ff3d46c",
     "source_path": "skills/sales-customer-management",
-    "source_ref": "origin/development",
+    "source_ref": "issue/374-complete-all-remaining-linkskills-catalog-qualif",
     "trust_boundary": "linkskills-release-provenance"
   },
   "published_at": "2026-08-31T00:00:00Z",
   "publisher": "LiNKskills",
-  "release_id": "sales-customer-management@1.0.0",
+  "release_id": "sales-customer-management@1.1.0",
   "release_kind": "native",
   "resource_descriptors": [
     "opaque:resource:sales-customer-management-skill-md"
   ],
   "retrieved_at": "2026-08-31T00:00:00Z",
   "schema_version": "0.1",
-  "source_commit": "1289f9a374c38115d3f4dcfac31439a9904d74c6",
+  "source_commit": "2e03130b5d8e801a066da504e6ff444f1ff3d46c",
   "source_path": "skills/sales-customer-management",
-  "source_ref": "origin/development",
-  "version": "1.0.0"
+  "source_ref": "issue/374-complete-all-remaining-linkskills-catalog-qualif",
+  "version": "1.1.0"
 }

@@ -3,20 +3,20 @@
   "artifact_kind": "skill_pack",
   "attestation": {
     "algorithm": "ES256",
-    "claims_digest": "sha256:5b1d7ff7668435076fcdc83a979e05e523479eba83fe5149bdae435a4746ed2d",
+    "claims_digest": "sha256:4fab03e0b85d68b530aa647ef4d1dd560240ad6345b58a724a0e0a31bae217bd",
     "issuer": "linkskills-publisher",
     "key_id": "linkskills-draft-unqualified",
     "signature": "draft-unqualified-no-signature",
     "trust_boundary": "linkskills-release-attestation"
   },
-  "bundle_hash": "sha256:4b5551a23b9765ff40d9689a3f8ec60c308560350d9106bc8a261e7ee379b251",
+  "bundle_hash": "sha256:4fab03e0b85d68b530aa647ef4d1dd560240ad6345b58a724a0e0a31bae217bd",
   "channel": "development",
-  "content_digest": "sha256:ff68a76e289cf7777466fae6b7b6394ad7f0ec8f33adcdfe558525448bee60c4",
+  "content_digest": "sha256:8c831c083ca962a25b2ae288b4e3b2e9ba385a141bdb802c63e5af2b7d8b525f",
   "eligibility_ref": "opaque:eligibility:commercial-contracts-legal-operations-1",
   "execution_profiles": [
     "cursor-macos"
   ],
-  "inventory_digest": "sha256:ff68a76e289cf7777466fae6b7b6394ad7f0ec8f33adcdfe558525448bee60c4",
+  "inventory_digest": "sha256:8c831c083ca962a25b2ae288b4e3b2e9ba385a141bdb802c63e5af2b7d8b525f",
   "lifecycle_state": "draft",
   "lineage": {
     "kind": "native",
@@ -62,13 +62,18 @@
       },
       {
         "path": "references/eval-suite.yaml",
-        "sha256": "d74595eedbb61cf89632baa44c9f7606228f879d85fe2629f1d67f92c9af98c1",
-        "size": 3449
+        "sha256": "793a270d476bb208b16db8a5279f9c420ca7b950f64bcf57a22c038aa10e04c3",
+        "size": 11371
       },
       {
         "path": "references/old-patterns.md",
         "sha256": "705cc326bb8e9fc99c8aba797c2e4cf0577de7d009d9e568fcec30abfabbf10f",
         "size": 1474
+      },
+      {
+        "path": "references/remainder-eval-cases.json",
+        "sha256": "df08899cd5bb3f28ba7a23a040b03743f66aa35440f33dd5918f6d594ea2b0d1",
+        "size": 3077
       },
       {
         "path": "references/schemas.json",
@@ -91,13 +96,18 @@
         "size": 795
       },
       {
+        "path": "scripts/eval_driver.py",
+        "sha256": "5074f3ec735ea52398e32e3fa932c935e85a97517078d524b8dc3980977551f1",
+        "size": 8610
+      },
+      {
         "path": "scripts/helper_tool.py",
         "sha256": "a6880e4309490f04acb2cabd830599e2755e19b78712b0685126b6ff0ede6038",
         "size": 8170
       }
     ],
-    "file_count": 14,
-    "total_bytes": 51332
+    "file_count": 16,
+    "total_bytes": 70941
   },
   "notes": "PKT-22 exact source identity only; draft/unqualified and not selectable.",
   "provenance": {
@@ -105,9 +115,9 @@
     "publisher": "LiNKskills",
     "repository": "https://github.com/linktrend/LiNKskills",
     "retrieved_at": "2026-08-31T00:00:00Z",
-    "source_commit": "1289f9a374c38115d3f4dcfac31439a9904d74c6",
+    "source_commit": "2e03130b5d8e801a066da504e6ff444f1ff3d46c",
     "source_path": "skills/commercial-contracts-legal-operations",
-    "source_ref": "origin/development",
+    "source_ref": "issue/374-complete-all-remaining-linkskills-catalog-qualif",
     "trust_boundary": "linkskills-release-provenance"
   },
   "published_at": "2026-08-31T00:00:00Z",
@@ -119,8 +129,8 @@
   ],
   "retrieved_at": "2026-08-31T00:00:00Z",
   "schema_version": "0.1",
-  "source_commit": "1289f9a374c38115d3f4dcfac31439a9904d74c6",
+  "source_commit": "2e03130b5d8e801a066da504e6ff444f1ff3d46c",
   "source_path": "skills/commercial-contracts-legal-operations",
-  "source_ref": "origin/development",
+  "source_ref": "issue/374-complete-all-remaining-linkskills-catalog-qualif",
   "version": "1.0.0"
 }

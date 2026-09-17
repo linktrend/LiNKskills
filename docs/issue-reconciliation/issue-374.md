@@ -7,7 +7,7 @@
 ## What this packet proves
 
 - Catalog has 59 skills. Five production-successor releases remain `git-safeguard`, `persistent-qa`, `repository-manager`, `skill-template`, `tool-architect`.
-- The other 54 now have confined executable eval cases (representative families included). Classification stays `draft` except the historical sealed canary `canary-echo` ledger row, which is not one of the five production-successor releases and is not reused as remainder production evidence.
+- The other 54 have confined executable eval cases. Classification stays `draft`. Historical canary-echo sealed receipts are unbound after suite mutation and are demoted — they are not live/usable evidence.
 - No usable promotion, live publish, migration apply, or consumer enablement is claimed.
 
 ## Related open themes (leave open without exact live proof)
