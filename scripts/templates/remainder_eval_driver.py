@@ -26,16 +26,6 @@ FAMILY_STATUS = {
     "remainder-privacy-redact-secret-pointer": "REDACTED",
 }
 
-# Cited executable golden-case contracts (git-safeguard eval-suite assertions /
-# helper_tool status). These bind classification to the case's declared outcome
-# rather than to generic id-token heuristics. A golden case whose contract is
-# BLOCKED stays BLOCKED even when the id or input mentions a privacy term.
-CITED_GOLDEN_CASE_STATUS = {
-    "clean-tree-full-checklist-allows-push": "PASS",
-    "staged-diff-contains-secret-blocks-push": "BLOCKED",
-    "wrong-branch-target-blocks-push": "BLOCKED",
-}
-
 _EXPLICIT_STATUS_TOKENS = {
     "BLOCKED": "BLOCKED",
     "REDACTED": "REDACTED",
@@ -86,12 +76,11 @@ def status_from_case_contract(
     """Return status declared by the cited case contract, if one exists.
 
     Does not inspect planted remainder expected-output fields such as ``status``
-    on remainder-eval-cases.json. Uses suite assertions, expected criteria, and
-    the frozen cited-golden map.
+    on remainder-eval-cases.json. Uses only an explicitly supplied cited
+    eval-suite case contract (assertions and expected criteria).
     """
-    cid = str(case_id or "").strip()
-    if cid in CITED_GOLDEN_CASE_STATUS:
-        return CITED_GOLDEN_CASE_STATUS[cid]
+    if not isinstance(case, Mapping):
+        return None
     for raw in _contract_text_parts(case):
         token = str(raw).strip().strip('"').upper()
         if token in _EXPLICIT_STATUS_TOKENS:
@@ -118,12 +107,12 @@ def classify_contract_status(
     """Classify expected contract status from the cited case contract.
 
     Family remainder ids keep their declared status. Cited golden cases bind to
-    the suite/helper contract (so a BLOCKED secret-in-diff golden case is not
-    reclassified as REDACTED merely because the id contains ``secret``).
-    Token heuristics apply only when no cited contract is present. Golden cases
-    whose expected output mentions the word "block" (for example
-    "Preconditions block") remain PASS unless the case id itself is a failure
-    or refuse family.
+    an explicitly supplied eval-suite contract (so a BLOCKED secret-in-diff
+    golden case is not reclassified as REDACTED merely because the id contains
+    ``secret``). A case-less id map cannot force BLOCKED. Token heuristics apply
+    only when no cited contract is present. Golden cases whose expected output
+    mentions the word "block" (for example "Preconditions block") remain PASS
+    unless the case id itself is a failure or refuse family.
     """
     cid = str(case_id or "").strip()
     if cid in FAMILY_STATUS:

@@ -85,6 +85,20 @@ class RemainderQualificationTests(unittest.TestCase):
             "PASS",
         )
 
+    def test_caseless_golden_id_map_cannot_force_blocked(self) -> None:
+        from linkskills_eval_runner import remainder_driver
+        from linkskills_eval_runner.remainder_driver import (
+            classify_contract_status,
+            status_from_case_contract,
+        )
+
+        self.assertFalse(hasattr(remainder_driver, "CITED_GOLDEN_CASE_STATUS"))
+        case_id = "staged-diff-contains-secret-blocks-push"
+        self.assertIsNone(status_from_case_contract(case_id))
+        self.assertIsNone(status_from_case_contract(case_id, None))
+        self.assertNotEqual(classify_contract_status(case_id, "golden"), "BLOCKED")
+        self.assertEqual(classify_contract_status(case_id, "golden"), "REDACTED")
+
     def test_secret_blocks_push_golden_classifies_blocked_from_contract(self) -> None:
         from linkskills_eval_runner.remainder_driver import (
             classify_contract_status,
@@ -93,9 +107,6 @@ class RemainderQualificationTests(unittest.TestCase):
         from linkskills_eval_runner.runner import load_eval_suite
 
         case_id = "staged-diff-contains-secret-blocks-push"
-        self.assertEqual(classify_contract_status(case_id, "golden"), "BLOCKED")
-        self.assertEqual(status_from_case_contract(case_id), "BLOCKED")
-
         suite = load_eval_suite(REPO / "skills" / "git-safeguard" / "references" / "eval-suite.yaml")
         case = next(item for item in suite.cases if item.id == case_id)
         contract = {
@@ -109,11 +120,12 @@ class RemainderQualificationTests(unittest.TestCase):
         }
         self.assertIn("secret", case_id)
         self.assertTrue(any("secret" in str(part).lower() for part in case.expected_criteria))
+        self.assertIn("STRIPE_SECRET_KEY", contract["input"])
+        self.assertEqual(status_from_case_contract(case_id, contract), "BLOCKED")
         self.assertEqual(
             classify_contract_status(case_id, "golden", case=contract),
             "BLOCKED",
         )
-        self.assertIn("STRIPE_SECRET_KEY", contract["input"])
 
     def test_legitimate_blocked_golden_case_passes_assertions(self) -> None:
         from linkskills_eval_runner.assertions import (
@@ -125,9 +137,16 @@ class RemainderQualificationTests(unittest.TestCase):
             canonical_assertions,
             classify_contract_status,
         )
+        from linkskills_eval_runner.runner import load_eval_suite
 
         case_id = "staged-diff-contains-secret-blocks-push"
-        status = classify_contract_status(case_id, "golden")
+        suite = load_eval_suite(REPO / "skills" / "git-safeguard" / "references" / "eval-suite.yaml")
+        case = next(item for item in suite.cases if item.id == case_id)
+        contract = {
+            "expected_criteria": list(case.expected_criteria),
+            "assertions": {"must_contain": list(case.assertions.must_contain)},
+        }
+        status = classify_contract_status(case_id, "golden", case=contract)
         self.assertEqual(status, "BLOCKED")
         spec = parse_assertion_spec(canonical_assertions(case_id, status))
         output = json.dumps(
@@ -154,10 +173,15 @@ class RemainderQualificationTests(unittest.TestCase):
         from linkskills_eval_runner.runner import load_eval_suite, run_suite
 
         case_id = "staged-diff-contains-secret-blocks-push"
-        self.assertEqual(classify_contract_status(case_id, "golden"), "BLOCKED")
-
         skill_dir = REPO / "skills" / "git-safeguard"
         suite = load_eval_suite(skill_dir / "references" / "eval-suite.yaml")
+        case = next(item for item in suite.cases if item.id == case_id)
+        contract = {
+            "expected_criteria": list(case.expected_criteria),
+            "assertions": {"must_contain": list(case.assertions.must_contain)},
+        }
+        self.assertEqual(classify_contract_status(case_id, "golden", case=contract), "BLOCKED")
+
         os.environ.setdefault("LINKSKILLS_EXECUTOR_NETWORK_ISOLATION", "allow_unproven")
         os.environ.setdefault("LINKSKILLS_EVAL_RUNNER_ISSUER_KEY", "test-issuer-key")
         toolchain = resolve_driver(CURSOR_MACOS).toolchain(REPO)
