@@ -122,11 +122,14 @@ def test_hybrid_routing_suite_is_executable_and_complete() -> None:
         root / "skills" / "hybrid-development-methods" / "references" / "eval-suite.yaml"
     )
 
-    assert len(suite.cases) == 22
     assert all(case.has_execute for case in suite.cases)
-    assert all(case.raw["execute"]["kind"] == "skill_script" for case in suite.cases)
-    assert len([case for case in suite.cases if case.id.startswith("route-")]) == 19
-    assert {case.id for case in suite.cases if not case.id.startswith("route-")} == {
+    script_cases = [case for case in suite.cases if case.raw["execute"]["kind"] == "skill_script"]
+    remainder_cases = [case for case in suite.cases if str(case.id).startswith("remainder-")]
+    assert len(script_cases) == 22
+    assert len(remainder_cases) == 5
+    assert all(case.raw["execute"]["kind"] == "consumer_profile" for case in remainder_cases)
+    assert len([case for case in script_cases if case.id.startswith("route-")]) == 19
+    assert {case.id for case in script_cases if not case.id.startswith("route-")} == {
         "ambiguous-overlap",
         "consumer-boundary",
         "no-match",

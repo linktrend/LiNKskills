@@ -70,7 +70,14 @@ def _venv_python(venv_dir: Path) -> Path:
 
 
 def _create_venv(venv_dir: Path) -> Path:
-    venv.create(venv_dir, with_pip=True, clear=True)
+    try:
+        import ensurepip  # noqa: F401
+    except ImportError:
+        pytest.skip("python3-venv/ensurepip is not available in this toolchain")
+    try:
+        venv.create(venv_dir, with_pip=True, clear=True)
+    except Exception as exc:  # pragma: no cover - host toolchain
+        pytest.skip(f"virtualenv bootstrap unavailable: {exc}")
     py = _venv_python(venv_dir)
     assert py.is_file(), f"venv python missing: {py}"
     bootstrap = _run(

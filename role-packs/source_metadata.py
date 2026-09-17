@@ -9,8 +9,11 @@ from __future__ import annotations
 
 import hashlib
 import json
+import subprocess
 import sys
-from collections.abc import Mapping
+import tempfile
+from collections.abc import Iterator, Mapping
+from contextlib import contextmanager
 from pathlib import Path
 from typing import Any
 
@@ -24,10 +27,13 @@ from linkskills_core.hashing import build_skill_bundle_manifest  # noqa: E402
 
 from role_pack_validator import load_role_pack_inputs  # noqa: E402
 
+# Exact git identity whose skill trees produce every recorded PKT-22 bundle_hash.
+# Do not retarget this to HEAD unless every release record is recomputed from
+# that same commit/tree (git objects, not a possibly dirty live checkout).
 PROTECTED_BASE = {
-    "ref": "origin/development",
-    "commit": "1289f9a374c38115d3f4dcfac31439a9904d74c6",
-    "tree": "8d3312b21ccfa92102233211f8224d50fb07ac88",
+    "ref": "issue/374-complete-all-remaining-linkskills-catalog-qualif",
+    "commit": "f775a633e0d50c86eff0a6c00951b79ad148f497",
+    "tree": "77c492a2061ee199d557230260e11fa0012ca84b",
 }
 EVALUATED_AT = "2026-08-31T00:00:00Z"
 ROLE_PACK_DIR = _ROOT / "role-packs"
@@ -64,6 +70,64 @@ def _read_json(path: Path) -> Mapping[str, Any]:
 def _canonical_digest(payload: Mapping[str, Any]) -> str:
     encoded = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode()
     return "sha256:" + hashlib.sha256(encoded).hexdigest()
+
+
+def _git(*args: str) -> str:
+    """Run a git command in the repository root and return stripped stdout."""
+
+    proc = subprocess.run(
+        ["git", "-C", str(_ROOT), *args],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return proc.stdout.strip()
+
+
+def verify_source_identity(identity: Mapping[str, Any] | None = None) -> dict[str, str]:
+    """Fail closed unless *identity* commit exists and its tree matches."""
+
+    source = dict(identity or PROTECTED_BASE)
+    commit = str(source.get("commit") or "").strip()
+    tree = str(source.get("tree") or "").strip()
+    ref = str(source.get("ref") or "").strip()
+    if len(commit) != 40 or len(tree) != 40:
+        raise ValueError(f"source identity must be full commit/tree SHAs: {source}")
+    object_type = _git("cat-file", "-t", commit)
+    if object_type != "commit":
+        raise ValueError(f"source_commit is not a commit: {commit} ({object_type})")
+    resolved_tree = _git("rev-parse", f"{commit}^{{tree}}")
+    if resolved_tree != tree:
+        raise ValueError(
+            f"source_commit {commit} tree is {resolved_tree}, not recorded {tree}"
+        )
+    return {"ref": ref, "commit": commit, "tree": resolved_tree}
+
+
+@contextmanager
+def skill_tree_at_source(skill_id: str, commit: str) -> Iterator[Path]:
+    """Yield the skill directory extracted from *commit*, not the live checkout."""
+
+    rel = f"skills/{skill_id}"
+    archive = subprocess.run(
+        ["git", "-C", str(_ROOT), "archive", commit, rel],
+        check=True,
+        capture_output=True,
+    )
+    with tempfile.TemporaryDirectory(prefix="pkt22-source-") as tmp:
+        dest = Path(tmp)
+        subprocess.run(["tar", "-x"], input=archive.stdout, cwd=dest, check=True)
+        skill_dir = dest / "skills" / skill_id
+        if not skill_dir.is_dir():
+            raise FileNotFoundError(f"missing {rel} at {commit}")
+        yield skill_dir
+
+
+def bundle_hash_at_source(skill_id: str, commit: str) -> dict[str, Any]:
+    """Compute the skill-pack bundle from the exact historical skill tree."""
+
+    with skill_tree_at_source(skill_id, commit) as skill_dir:
+        return build_skill_bundle_manifest(skill_dir)
 
 
 def iter_manifest_paths() -> tuple[Path, ...]:
@@ -105,20 +169,25 @@ def eligibility_id_for(release_id: str) -> str:
 
 
 def build_release_record(release_id: str) -> dict[str, Any]:
-    """Build a draft native release record from the exact skill tree."""
+    """Build a draft native release record from the bound source skill tree."""
 
+    source = verify_source_identity(PROTECTED_BASE)
     skill_id = skill_id_from_release_id(release_id)
-    skill_dir = _ROOT / "skills" / skill_id
-    if not skill_dir.is_dir():
-        raise FileNotFoundError(f"missing exact skill tree for {release_id}: {skill_dir}")
-    bundle = build_skill_bundle_manifest(skill_dir)
-    if bundle["version"] != release_id.split("@", 1)[1]:
-        raise ValueError(f"skill version does not equal release_id version: {release_id}")
-    pack_path = skill_dir / "references" / "skill-pack.json"
-    pack = _read_json(pack_path) if pack_path.is_file() else {}
-    lifecycle = pack.get("lifecycle_state") if isinstance(pack.get("lifecycle_state"), str) else "draft"
-    declared_profiles = pack.get("compatible_runtime_profiles")
-    execution_profiles = list(declared_profiles) if isinstance(declared_profiles, list) else []
+    with skill_tree_at_source(skill_id, source["commit"]) as skill_dir:
+        bundle = build_skill_bundle_manifest(skill_dir)
+        if bundle["version"] != release_id.split("@", 1)[1]:
+            raise ValueError(f"skill version does not equal release_id version: {release_id}")
+        pack_path = skill_dir / "references" / "skill-pack.json"
+        pack = _read_json(pack_path) if pack_path.is_file() else {}
+        declared_profiles = pack.get("compatible_runtime_profiles")
+        execution_profiles = list(declared_profiles) if isinstance(declared_profiles, list) else []
+        entry_hashes = list(bundle["entry_hashes"])
+        file_count = bundle["file_count"]
+        total_bytes = sum(int(entry["size"]) for entry in entry_hashes)
+        content_hash = bundle["content_hash"]
+        bundle_hash = bundle["bundle_hash"]
+        version = bundle["version"]
+    lifecycle = "draft"
     eligibility_ref = f"opaque:eligibility:{eligibility_id_for(release_id)}"
     source_path = f"skills/{skill_id}"
     return {
@@ -126,27 +195,29 @@ def build_release_record(release_id: str) -> dict[str, Any]:
         "release_id": release_id,
         "artifact_kind": "skill_pack",
         "artifact_id": skill_id,
-        "version": bundle["version"],
-        "bundle_hash": bundle["bundle_hash"],
+        "version": version,
+        "bundle_hash": bundle_hash,
         "channel": "development",
         "lifecycle_state": lifecycle,
         "published_at": EVALUATED_AT,
         "publisher": "LiNKskills",
-        "source_commit": PROTECTED_BASE["commit"],
-        "source_ref": PROTECTED_BASE["ref"],
+        "source_commit": source["commit"],
+        "source_tree": source["tree"],
+        "source_ref": source["ref"],
         "source_path": source_path,
         "execution_profiles": execution_profiles,
         "eligibility_ref": eligibility_ref,
         "release_kind": "native",
-        "inventory_digest": bundle["content_hash"],
-        "content_digest": bundle["content_hash"],
+        "inventory_digest": content_hash,
+        "content_digest": content_hash,
         "retrieved_at": EVALUATED_AT,
         "notes": "PKT-22 exact source identity only; draft/unqualified and not selectable.",
         "provenance": {
             "publisher": "LiNKskills",
             "repository": "https://github.com/linktrend/LiNKskills",
-            "source_ref": PROTECTED_BASE["ref"],
-            "source_commit": PROTECTED_BASE["commit"],
+            "source_ref": source["ref"],
+            "source_commit": source["commit"],
+            "source_tree": source["tree"],
             "source_path": source_path,
             "retrieved_at": EVALUATED_AT,
             "licence": "LiNKtrend internal",
@@ -162,16 +233,43 @@ def build_release_record(release_id: str) -> dict[str, Any]:
             "algorithm": "ES256",
             "key_id": "linkskills-draft-unqualified",
             "issuer": "linkskills-publisher",
-            "claims_digest": bundle["bundle_hash"],
+            "claims_digest": bundle_hash,
             "signature": "draft-unqualified-no-signature",
             "trust_boundary": "linkskills-release-attestation",
         },
         "manifest": {
-            "file_count": bundle["file_count"],
-            "total_bytes": sum(int(entry["size"]) for entry in bundle["entry_hashes"]),
-            "entry_hashes": bundle["entry_hashes"],
+            "file_count": file_count,
+            "total_bytes": total_bytes,
+            "entry_hashes": entry_hashes,
         },
     }
+
+
+def verify_release_records_match_source(identity: Mapping[str, Any] | None = None) -> dict[str, str]:
+    """Prove each committed release bundle_hash comes from the recorded git identity."""
+
+    source = verify_source_identity(identity or PROTECTED_BASE)
+    for release_id in referenced_release_ids():
+        skill_id = skill_id_from_release_id(release_id)
+        path = RELEASE_DIR / f"{skill_id}.json"
+        record = _read_json(path)
+        computed = bundle_hash_at_source(skill_id, source["commit"])
+        if record.get("release_id") != release_id:
+            raise ValueError(f"{path} release_id {record.get('release_id')} != {release_id}")
+        if record.get("source_commit") != source["commit"]:
+            raise ValueError(f"{path} source_commit {record.get('source_commit')} != {source['commit']}")
+        if record.get("source_tree") != source["tree"]:
+            raise ValueError(f"{path} source_tree {record.get('source_tree')} != {source['tree']}")
+        if record.get("bundle_hash") != computed["bundle_hash"]:
+            raise ValueError(
+                f"{path} bundle_hash {record.get('bundle_hash')} != source {computed['bundle_hash']}"
+            )
+        provenance = record.get("provenance") if isinstance(record.get("provenance"), Mapping) else {}
+        if provenance.get("source_commit") != source["commit"]:
+            raise ValueError(f"{path} provenance.source_commit does not match bound source")
+        if provenance.get("source_tree") != source["tree"]:
+            raise ValueError(f"{path} provenance.source_tree does not match bound source")
+    return source
 
 
 def build_eligibility_record(release_id: str) -> dict[str, Any]:
@@ -299,7 +397,7 @@ def make_source_receipt() -> dict[str, Any]:
         "status": "HOLD",
         "admitted": False,
         "proof_scope": "source",
-        "protected_base": dict(PROTECTED_BASE),
+        "protected_base": verify_source_identity(PROTECTED_BASE),
         "role_pack_count": len(results),
         "release_reference_count": sum(result["release_reference_count"] for result in results),
         "unique_release_count": len(referenced_release_ids()),
@@ -340,7 +438,7 @@ def make_qualification_closure(receipt: Mapping[str, Any], release_ids: tuple[st
         ),
         "runtime_profiles": ["cursor-macos", "codex-macos"],
         "release_ids": list(release_ids),
-        "protected_base": dict(PROTECTED_BASE),
+        "protected_base": verify_source_identity(PROTECTED_BASE),
         "receipt_digest": receipt["receipt_digest"],
         "claims": dict(FALSE_CLAIMS),
     }
@@ -357,6 +455,11 @@ def main(argv: list[str] | None = None) -> int:
     if write:
         receipt = materialize_source_metadata()
     else:
+        try:
+            verify_release_records_match_source()
+        except (OSError, ValueError, subprocess.CalledProcessError) as exc:
+            print(f"release records do not match bound source identity: {exc}", file=sys.stderr)
+            return 1
         receipt = make_source_receipt()
         committed = _read_json(ROLE_PACK_DIR / "pkt-22-source-receipt.json")
         if committed != receipt:

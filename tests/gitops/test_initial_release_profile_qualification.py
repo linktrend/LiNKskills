@@ -152,7 +152,8 @@ class InitialReleaseProfileQualificationTests(unittest.TestCase):
         self.assertEqual(row["skillId"], "git-safeguard")
         self.assertIn("privacy", row["families"])
         self.assertTrue(row["families"]["privacy"])
-        self.assertIn("recovery", row["missingFamilies"])
+        self.assertTrue(row["families"]["recovery"])
+        self.assertFalse(row["missingFamilies"])
 
     def test_persistent_qa_yaml_suite_is_classified_without_json(self) -> None:
         row = qualify_skill(ROOT, INITIAL_RELEASE_PROFILES[1])

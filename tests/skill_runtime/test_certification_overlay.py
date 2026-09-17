@@ -647,14 +647,20 @@ class CatalogCanarySkillTests(unittest.TestCase):
                 )
             os.environ["LINKSKILLS_EVAL_RUNNER_ISSUER_KEY"] = promoting
             overlay = load_certification_overlay(REPO_ROOT)
-            self.assertEqual(overlay.get("canary-echo"), "usable")
+            self.assertNotEqual(
+                overlay.get("canary-echo"),
+                "usable",
+                msg="mutated canary-echo suite cannot keep historical usable after demotion",
+            )
             ledger = json.loads(
                 (REPO_ROOT / "evidence/phase10/skill-classification-draft.json").read_text(
                     encoding="utf-8"
                 )
             )
             entry = ledger["skills"]["canary-echo"]
-            self.assertTrue(verify_sealed_live_evidence(REPO_ROOT, "canary-echo", entry))
+            self.assertEqual(entry["classification"], "draft")
+            self.assertFalse(entry.get("usable_claimed"))
+            self.assertFalse(verify_sealed_live_evidence(REPO_ROOT, "canary-echo", entry))
         finally:
             if prior is None:
                 os.environ.pop("LINKSKILLS_EVAL_RUNNER_ISSUER_KEY", None)

@@ -3,20 +3,20 @@
   "artifact_kind": "skill_pack",
   "attestation": {
     "algorithm": "ES256",
-    "claims_digest": "sha256:3548dda64017d9364f28d262cf7012050c34a52ded842b4b4f2d9d5e43b9738a",
+    "claims_digest": "sha256:2a2c6d9c4934ac6f7f02b159d6d8da8eb4da3a3f1dd336a7f3fe35cd8d351a6e",
     "issuer": "linkskills-publisher",
     "key_id": "linkskills-draft-unqualified",
     "signature": "draft-unqualified-no-signature",
     "trust_boundary": "linkskills-release-attestation"
   },
-  "bundle_hash": "sha256:3548dda64017d9364f28d262cf7012050c34a52ded842b4b4f2d9d5e43b9738a",
+  "bundle_hash": "sha256:2a2c6d9c4934ac6f7f02b159d6d8da8eb4da3a3f1dd336a7f3fe35cd8d351a6e",
   "channel": "development",
-  "content_digest": "sha256:0cb2c13a07561471f4b8bcb2dfb134fa4c887589f890a407c770d12fb11fe3cc",
+  "content_digest": "sha256:3532303d35049d8167b534f3c71dae65ee15d8b12cb28c6400c93335273c6b48",
   "eligibility_ref": "opaque:eligibility:agent-workforce-management-1",
   "execution_profiles": [
     "cursor-macos"
   ],
-  "inventory_digest": "sha256:0cb2c13a07561471f4b8bcb2dfb134fa4c887589f890a407c770d12fb11fe3cc",
+  "inventory_digest": "sha256:3532303d35049d8167b534f3c71dae65ee15d8b12cb28c6400c93335273c6b48",
   "lifecycle_state": "draft",
   "lineage": {
     "kind": "native",
@@ -62,13 +62,18 @@
       },
       {
         "path": "references/eval-suite.yaml",
-        "sha256": "50a29662b3e88517845131236f515aa7272fcae27c050c286e4e0a96d0d37dfd",
-        "size": 2812
+        "sha256": "5e0adf22b842fc45e4277830ad5cb3d6b49561f152520f9df4d12c3cb1a6400a",
+        "size": 9855
       },
       {
         "path": "references/old-patterns.md",
         "sha256": "696e4c33b1996f104a633ea7fc75196e809ceeaba31cd0396edfb633d78679c2",
         "size": 733
+      },
+      {
+        "path": "references/remainder-eval-cases.json",
+        "sha256": "04292cb62b1750cac287c064ccfd97e17fe27a8be2e87cf2d5bacbc3c26848f5",
+        "size": 2625
       },
       {
         "path": "references/schemas.json",
@@ -86,13 +91,18 @@
         "size": 298
       },
       {
+        "path": "scripts/eval_driver.py",
+        "sha256": "5074f3ec735ea52398e32e3fa932c935e85a97517078d524b8dc3980977551f1",
+        "size": 8610
+      },
+      {
         "path": "scripts/helper_tool.py",
         "sha256": "0ffc313630eef921b2ece6f89f97c0e2e347f488c6ac8928451bfac01b56757f",
         "size": 15382
       }
     ],
-    "file_count": 13,
-    "total_bytes": 45097
+    "file_count": 15,
+    "total_bytes": 63375
   },
   "notes": "PKT-22 exact source identity only; draft/unqualified and not selectable.",
   "provenance": {
@@ -100,9 +110,10 @@
     "publisher": "LiNKskills",
     "repository": "https://github.com/linktrend/LiNKskills",
     "retrieved_at": "2026-08-31T00:00:00Z",
-    "source_commit": "1289f9a374c38115d3f4dcfac31439a9904d74c6",
+    "source_commit": "f775a633e0d50c86eff0a6c00951b79ad148f497",
     "source_path": "skills/agent-workforce-management",
-    "source_ref": "origin/development",
+    "source_ref": "issue/374-complete-all-remaining-linkskills-catalog-qualif",
+    "source_tree": "77c492a2061ee199d557230260e11fa0012ca84b",
     "trust_boundary": "linkskills-release-provenance"
   },
   "published_at": "2026-08-31T00:00:00Z",
@@ -114,8 +125,9 @@
   ],
   "retrieved_at": "2026-08-31T00:00:00Z",
   "schema_version": "0.1",
-  "source_commit": "1289f9a374c38115d3f4dcfac31439a9904d74c6",
+  "source_commit": "f775a633e0d50c86eff0a6c00951b79ad148f497",
   "source_path": "skills/agent-workforce-management",
-  "source_ref": "origin/development",
+  "source_ref": "issue/374-complete-all-remaining-linkskills-catalog-qualif",
+  "source_tree": "77c492a2061ee199d557230260e11fa0012ca84b",
   "version": "1.0.0"
 }

@@ -19,7 +19,9 @@
     {
       "certified": true,
       "certify_reason": "certified: executor receipts bind case, immutable skill release, deterministic execution profile, toolchain, and collected evidence",
-      "classification": "usable",
+      "classification": "draft",
+      "historical_classification": "usable",
+      "unbound_after_suite_mutation": true,
       "evidence_path": "evidence/phase10/sealed/canary-echo-sealed.json",
       "host": {
         "issuer_id": "linkskills-eval-runner-sealed-linux",
@@ -68,5 +70,10 @@
       }
     ]
   },
-  "usable_count": 1
+  "usable_count": 0,
+  "historical_unbound": true,
+  "supersession": {
+    "reason": "canary-echo eval suite was mutated after this sealed report; receipts no longer bind the current release. Ledger classification is draft. No live or usable claim.",
+    "issue": 374
+  }
 }

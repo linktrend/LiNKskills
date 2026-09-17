@@ -1,0 +1,59 @@
+{
+  "schemaVersion": "0.2",
+  "kind": "linkskills-librarian-install-contract",
+  "package": "linkskills-librarian",
+  "workerVersion": "0.2",
+  "conformancePackage": "linkskills-librarian-conformance/0.2",
+  "domainKey": "linkskills",
+  "supervisedFirst": true,
+  "unsupervisedProduction": false,
+  "enabledDefault": false,
+  "maxJobRetries": 3,
+  "host": {
+    "owner": "LiNKplatform",
+    "package": "packages/librarian-runner",
+    "doNotEditFromLiNKskills": true
+  },
+  "schedule": {
+    "kind": "supervised-cron-input",
+    "timezone": "Asia/Taipei",
+    "suggestedWindows": ["07:30", "19:30"],
+    "dryRunUntilTrusted": true,
+    "unsupervisedRequires": [
+      "hosted sealed remainder qualification",
+      "Platform host integration of worker 0.2",
+      "monitoring/alert route to Principal briefing"
+    ]
+  },
+  "monitoring": {
+    "metrics": [
+      "job_depth",
+      "dead_letter_count",
+      "prompt_only_rejected",
+      "regression_holds"
+    ],
+    "alertOn": [
+      "dead_letter",
+      "prompt_only_certification_attempt",
+      "protected_branch_push_blocked",
+      "cross_domain_payload"
+    ],
+    "principalBriefing": "escalation via Platform host, not Skills direct messaging"
+  },
+  "regressionHandling": {
+    "promptOnly": "reject_non_certifying",
+    "evalRegression": "hold_eval_pending",
+    "hideGaps": false,
+    "autoUsable": false
+  },
+  "platformHandoffAfterIdentityTask": [
+    "Load DomainWorker 0.2 from published linkskills-librarian wheel/path pin",
+    "Wire supervised schedule; keep dry-run until remainder sealed receipts exist",
+    "Do not grant capability or mutate OpenClaw identity registration from Librarian",
+    "Apply provider-v2 SQL only via Server01/Platform, never from this contract"
+  ],
+  "secretRefsNamesOnly": [
+    "LINKTREND_SKILLS_PROD_EVAL_RUNNER_ISSUER_KEY",
+    "LINKSKILLS_PUBLISHER_DATABASE_URL"
+  ]
+}
