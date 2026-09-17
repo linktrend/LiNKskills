@@ -30,6 +30,13 @@ from .payload_guard import (
     prepare_run_mutation_params,
     prepare_trace_params,
 )
+from .provider_v2 import (
+    CONTRACT_VERSION as SKILLS_API_V2,
+    PROTOCOL_VERSION as MCP_PROTOCOL_V2,
+    SkillsApiV2,
+    TrustedIdentity,
+    V2Provider,
+)
 from .retention import redact_payload, should_redact_key
 from .selection import filter_compatible_usable_releases
 
@@ -61,6 +68,11 @@ __all__ = [
     "skill_release_hash",
     "stamp_execution_profile",
     "verify_execution_profile_hashes",
+    "SkillsApiV2",
+    "TrustedIdentity",
+    "V2Provider",
+    "SKILLS_API_V2",
+    "MCP_PROTOCOL_V2",
 ]
 
 __version__ = "0.1.0"

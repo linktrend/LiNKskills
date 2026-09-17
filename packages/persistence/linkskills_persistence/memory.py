@@ -101,3 +101,9 @@ class MemoryStore:
     def get_current(self, org, collection_id):
         """Read a collection pointer without fallback selection."""
         return self.current.get((org,collection_id))
+
+    def readiness(self):
+        """Memory is never a production durable store. Fail closed."""
+        from .readiness import memory_store_readiness
+
+        return memory_store_readiness()

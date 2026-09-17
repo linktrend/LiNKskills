@@ -1,0 +1,62 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "LiNKskills skills.api.v0.2",
+    "version": "skills.api.v0.2",
+    "description": "Production provider-v2 HTTP surface. MCP 2026-07-28 is the matching sessionless protocol. Consumers execute locally; skills_run_* and skills_tool_* are denied."
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Process liveness only",
+        "responses": { "200": { "description": "Process up" } }
+      }
+    },
+    "/ready": {
+      "get": {
+        "summary": "Readiness; never proves consumer execution or production acceptance",
+        "responses": {
+          "200": { "description": "Ready for traffic" },
+          "503": { "description": "Not ready; store diagnosis is sanitised" }
+        }
+      }
+    },
+    "/v2/openapi.json": {
+      "get": { "summary": "This document" }
+    },
+    "/v2/capabilities": {
+      "get": { "summary": "HTTP/MCP capability record" }
+    },
+    "/v2/mcp-capabilities": {
+      "get": { "summary": "Same capability record as GET /v2/capabilities" }
+    },
+    "/v2/{operation}": {
+      "post": {
+        "summary": "Stateless skills.api.v0.2 operation",
+        "parameters": [
+          {
+            "name": "operation",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "security": [{ "bearerAuth": [] }]
+      }
+    },
+    "/v1/{operation}": {
+      "post": {
+        "summary": "Observed v0.1 compatibility adapter (not a second long-term authority)"
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Platform-verifiable token. Caller-minted identity is rejected."
+      }
+    }
+  }
+}

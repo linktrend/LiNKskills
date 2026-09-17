@@ -1,8 +1,11 @@
 # Provider-only v0.2 contract foundation
 
-This P0 slice is additive. It preserves the v0.1 schemas and records the
-legacy surface; it does not change gateway, MCP, client, runtime, persistence,
-publisher, evaluator, or consumer code.
+This contract is additive to v0.1. It preserves the v0.1 schemas and the
+observed legacy HTTP/MCP adapter. Production ``skills.api.v0.2`` is served
+by Gateway ``POST /v2/{operation}`` and MCP ``linkskills-mcp-v2`` over the
+shared ``linkskills_core.provider_v2`` domain. Empty-registry production
+defaults fail closed on exact retrieval; they do not synthesize qualified
+releases or empty-byte digests.
 
 ## Legacy compatibility evidence
 
@@ -34,11 +37,15 @@ ready or currently deployed.
 
 ## v0.2 policy
 
-The v0.2 policy is transport-independent and deliberately does not implement a
-new transport. It is stateless and sessionless, authenticates every request,
-does not require or rely on `initialize` or a session, and has a closed tool
-and resource map. Unsupported versions fail with `contract_incompatible`;
-there is no silent downgrade to the v1 execution-era surface.
+The v0.2 policy is transport-independent and is implemented by HTTP
+``POST /v2/{operation}`` and MCP ``linkskills-mcp-v2``. It is stateless and
+sessionless, authenticates every request, does not rely on a session, and has
+a closed tool and resource map. MCP ``initialize`` requires an explicit
+``protocolVersion`` of ``2026-07-28``; omission and HTTP-side
+``protocol_version`` injection are not negotiation. Domain operations remain
+usable without an MCP session. Unsupported versions fail with
+``contract_incompatible``; there is no silent downgrade to the v1
+execution-era surface.
 
 The provider exposes read-only guides, catalogue/release metadata, qualification,
 entrypoint instructions, sections, and bounded resources as MCP **resources**.
@@ -91,9 +98,56 @@ data, trading orders, portfolios, and raw input/output. Skills metadata is
 informational: it cannot execute, select, grant identity/data access, approve,
 escalate, or confer domain authority.
 
-No MCP SDK is pinned in this slice. Official support for modern MCP `2026-07-28`
-was verified in the [official Python SDK](https://github.com/modelcontextprotocol/python-sdk),
-its [v2 behavior notes](https://github.com/modelcontextprotocol/python-sdk/blob/main/docs/whats-new.md),
-and the [Streamable HTTP specification](https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/docs/specification/2026-07-28/basic/transports/streamable-http.mdx).
-Pinning and transport implementation remain separate HOLDs until their package,
-conformance, and deployment decisions are implemented and tested.
+No MCP SDK is pinned. Official support for modern MCP `2026-07-28` was
+verified in the [official Python SDK](https://github.com/modelcontextprotocol/python-sdk).
+ED-02 implements the production HTTP and MCP adapters over the shared
+`linkskills_core.provider_v2` domain (`POST /v2/{operation}`,
+`linkskills-mcp-v2`). The Python MCP SDK remains unpinned.
+
+## Production entrypoint (ED-02)
+
+One installable domain (`SkillsApiV2` / `V2Provider`) is shared by:
+
+- HTTP: `linkskills-gateway` serving `GET /health`, `GET /ready`,
+  `GET /v2/openapi.json`, `GET /v2/capabilities`, `GET /v2/mcp-capabilities`,
+  `POST /v2/{operation}`
+- MCP: `linkskills-mcp-v2` requiring explicit protocol `2026-07-28` on
+  `initialize`, with sessionless per-request authorization thereafter.
+  Transport ``_meta.authorization`` (HTTP ``Authorization``) is the only
+  identity source. Caller ``operation``, ``authorization``, ``org_id``,
+  ``actor_id``, and equivalent identity fields are stripped. MCP
+  ``resources/read`` derives its operation exclusively from the server-owned
+  URI map.
+
+Public domain errors are the closed ``skills.api.v0.2`` vocabulary in
+``fixtures/mcp/v0.2-policy.json`` ``typed_errors``. Internal role, store,
+integrity, cursor, and lifecycle reasons project onto that vocabulary and
+are never returned as public codes. ``GET /v2/capabilities`` and
+``GET /v2/mcp-capabilities`` return one live document; the committed MCP
+capability fixture is the deterministic static projection of that document
+(every field except runtime ``catalog_ready``).
+
+Business rules (gates, pagination snapshot, exact bytes/digests, privacy,
+idempotency, legacy execution denial) live only in the core domain.
+
+## Observed v0.1 compatibility adapter, removal gate, and rollback
+
+The observed live compatibility adapter remains `POST /v1/{operation}` and
+newline-delimited JSON-RPC MCP `2024-11-05` (`linkskills-mcp-server`) with the
+15 legacy tools and no resources. Machine evidence:
+`fixtures/mcp/legacy-v0.1-compatibility.json`.
+
+On the v2 surface every `skills_run_*` and `skills_tool_*` name fails closed
+with `legacy_execution_disabled` and HTTP 410. There is no provider execution
+or tool-invoke route on v2.
+
+Removal gate: drop the v0.1 adapter only after every admitted consumer uses
+`skills.api.v0.2`, a rollback drill has restored the retained v0.1 image, and
+no live v0.1 client remains. Until then v0.1 is preserved, observable, and
+not a second long-term authority.
+
+Rollback: drain the v2 candidate and restore the retained v0.1 image
+`sha256:7cf2780a82c2c37c113b2d55b787a4e72a7098063cf434ea0654826c3719257f`
+(release `7067716fef5189a1427a7cf9b0847cec898e19de`) and its compose
+projection. Immutable releases are never rewritten. Live compose remains
+Platform/Server 01 owned (ED-06/ED-08).

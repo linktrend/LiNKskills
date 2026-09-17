@@ -1,0 +1,835 @@
+{
+  "schemaVersion": 1,
+  "kind": "linkskills-oss-continuity-registry",
+  "installationComplete": false,
+  "boundIdentity": {
+    "repository": "linktrend/LiNKskills",
+    "ref": "issue/352-prepare-oss-continuity-evidence-and-validation-f",
+    "commit": "f97951feec6546ff924c65611802afd7ab19d2a3",
+    "tree": "9bd1ba9eb32885146317f25a1cd3b223d1540d9e"
+  },
+  "recordSchema": "evidence/end-to-end-delivery/oss-continuity/record.schema.json",
+  "records": [
+    {
+      "schemaVersion": 1,
+      "kind": "linkskills-oss-continuity-record",
+      "componentId": "docker-engine-compose",
+      "title": "Docker Engine + Compose on LiNKserver 01",
+      "preservationMode": "read_only_default",
+      "installationComplete": false,
+      "boundIdentity": {
+        "repository": "linktrend/LiNKskills",
+        "ref": "issue/352-prepare-oss-continuity-evidence-and-validation-f",
+        "commit": "f97951feec6546ff924c65611802afd7ab19d2a3",
+        "tree": "9bd1ba9eb32885146317f25a1cd3b223d1540d9e"
+      },
+      "sourceArtifact": {
+        "status": "RECORDED_SOURCE_FACT",
+        "location": "LiNKserver 01 existing linktrend-core-services project",
+        "owner": "Platform/Server 01 operations",
+        "notes": "Preserve current project, network, volumes, image and compose projection."
+      },
+      "immutableIdentity": {
+        "status": "PENDING",
+        "version": null,
+        "commit": null,
+        "tree": null,
+        "digest": null,
+        "truncatedAsInventoried": false,
+        "notes": "OSS inventory does not pin Engine/Compose versions. Refresh at execution."
+      },
+      "provenanceLicense": {
+        "status": "PENDING",
+        "declaredLicense": null,
+        "licensePath": null,
+        "noticePath": null,
+        "licensePathSha256": null,
+        "conflict": null,
+        "notes": "Upstream Docker licence not copied into this repository."
+      },
+      "reproducibleInstallation": {
+        "status": "RECORDED_SOURCE_FACT",
+        "claimedComplete": false,
+        "command": null,
+        "lockOrPin": "Reuse existing runtime; build/pull only approved digest",
+        "notes": "Do not install another container runtime."
+      },
+      "compatibility": {
+        "status": "PENDING",
+        "requiresPython": null,
+        "ciMatrix": null,
+        "workerAttestation": null,
+        "notes": "Server architecture match is ED-06 remaining work."
+      },
+      "updateReview": {
+        "status": "RECORDED_SOURCE_FACT",
+        "autoPromote": false,
+        "reviewer": "Platform/Server 01 operations",
+        "notes": "Image/compose changes require approved digest."
+      },
+      "rollback": {
+        "status": "PENDING",
+        "priorIdentity": "Retain current compose projection (exact digest pending refresh)",
+        "restoringOwner": "Platform/Server 01 operations",
+        "notes": "ED-08 rollback rehearsal remaining."
+      },
+      "remainingPacketIds": ["ED-06", "ED-08"],
+      "unknowns": ["Exact Docker Engine and Compose versions on Server 01"],
+      "sources": ["docs/end-to-end-delivery/OSS-INVENTORY.md"]
+    },
+    {
+      "schemaVersion": 1,
+      "kind": "linkskills-oss-continuity-record",
+      "componentId": "linkskills-python-image",
+      "title": "LiNKskills Python runtime image",
+      "preservationMode": "read_only_default",
+      "installationComplete": false,
+      "boundIdentity": {
+        "repository": "linktrend/LiNKskills",
+        "ref": "issue/352-prepare-oss-continuity-evidence-and-validation-f",
+        "commit": "f97951feec6546ff924c65611802afd7ab19d2a3",
+        "tree": "9bd1ba9eb32885146317f25a1cd3b223d1540d9e"
+      },
+      "sourceArtifact": {
+        "status": "RECORDED_SOURCE_FACT",
+        "location": "Running linux/amd64 image on LiNKserver 01",
+        "owner": "LiNKskills artifact; Platform deploys"
+      },
+      "immutableIdentity": {
+        "status": "PENDING",
+        "version": null,
+        "commit": "7067716…",
+        "tree": "d0bb392351994810173f730c47b63112c31e391b",
+        "digest": "sha256:7cf2780…",
+        "truncatedAsInventoried": true,
+        "notes": "Inventory and starting-position truncations preserved. Full image digest pending refresh. ED-00 records full main commit 7067716fef5189a1427a7cf9b0847cec898e19de for the deployed source identity."
+      },
+      "provenanceLicense": {
+        "status": "RECORDED_SOURCE_FACT",
+        "declaredLicense": "Proprietary",
+        "licensePath": "pyproject.toml",
+        "noticePath": null,
+        "licensePathSha256": null,
+        "conflict": "No root LICENSE file on this tree",
+        "notes": "Umbrella package licence text is Proprietary."
+      },
+      "reproducibleInstallation": {
+        "status": "PENDING",
+        "claimedComplete": false,
+        "command": null,
+        "lockOrPin": "Replace only with independently verified release candidate after approval",
+        "notes": "ED-06 remaining; current running image is not a completed v2 install."
+      },
+      "compatibility": {
+        "status": "RECORDED_SOURCE_FACT",
+        "requiresPython": ">=3.11",
+        "ciMatrix": "ubuntu-24.04-arm Python 3.11",
+        "workerAttestation": "ENV-00 CPython 3.12.3 x86_64 is a valid worker, not CI authority"
+      },
+      "updateReview": {
+        "status": "RECORDED_SOURCE_FACT",
+        "autoPromote": false,
+        "reviewer": "LiNKskills implementer plus Platform deploy owner"
+      },
+      "rollback": {
+        "status": "PENDING",
+        "priorIdentity": "sha256:7cf2780… / source 7067716… (truncated)",
+        "restoringOwner": "Platform/Server 01",
+        "notes": "WORK-PACKETS ED-02/ED-06/ED-08: drain and restore prior digest without rewriting immutable releases."
+      },
+      "remainingPacketIds": ["ED-02", "ED-06", "ED-08"],
+      "unknowns": ["Full image digest", "Whether running image exposes provider-v2 entrypoint"],
+      "sources": [
+        "docs/end-to-end-delivery/OSS-INVENTORY.md",
+        "docs/end-to-end-delivery/STARTING-POSITION.md",
+        "evidence/end-to-end-delivery/ed-00/PLATFORM-INTERFACE.json"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "kind": "linkskills-oss-continuity-record",
+      "componentId": "env00-public-pypi-lock",
+      "title": "ENV-00 hash-locked public PyPI development dependencies",
+      "preservationMode": "read_only_default",
+      "installationComplete": false,
+      "boundIdentity": {
+        "repository": "linktrend/LiNKskills",
+        "ref": "issue/352-prepare-oss-continuity-evidence-and-validation-f",
+        "commit": "f97951feec6546ff924c65611802afd7ab19d2a3",
+        "tree": "9bd1ba9eb32885146317f25a1cd3b223d1540d9e"
+      },
+      "sourceArtifact": {
+        "status": "RECORDED_SOURCE_FACT",
+        "location": "requirements-dev.lock",
+        "owner": "LiNKskills ENV-00",
+        "notes": "requirements-dev.txt is unbounded compile input only."
+      },
+      "immutableIdentity": {
+        "status": "RECORDED_SOURCE_FACT",
+        "version": null,
+        "commit": "f97951feec6546ff924c65611802afd7ab19d2a3",
+        "tree": "9bd1ba9eb32885146317f25a1cd3b223d1540d9e",
+        "digest": "sha256:cb534f8847e80e8af1fa115745f62650ee67488dde1a876da4f443361bf448c1",
+        "truncatedAsInventoried": false,
+        "notes": "Lock file SHA-256 on admitted tree. Product package versions are not in this lock."
+      },
+      "provenanceLicense": {
+        "status": "PENDING",
+        "declaredLicense": null,
+        "licensePath": "requirements-dev.lock",
+        "noticePath": null,
+        "licensePathSha256": "cb534f8847e80e8af1fa115745f62650ee67488dde1a876da4f443361bf448c1",
+        "conflict": null,
+        "notes": "Per-wheel licences are PyPI metadata; not restated here."
+      },
+      "reproducibleInstallation": {
+        "status": "RECORDED_SOURCE_FACT",
+        "claimedComplete": false,
+        "command": "python -m pip install --require-hashes -r requirements-dev.lock",
+        "lockOrPin": "requirements-dev.lock",
+        "notes": "A worker venv install is session proof only, not product installation complete. ENV-00 completion evidence exists under evidence/end-to-end-delivery/env-00/ and must not be modified."
+      },
+      "compatibility": {
+        "status": "RECORDED_SOURCE_FACT",
+        "requiresPython": ">=3.11",
+        "ciMatrix": "ubuntu-24.04-arm Python 3.11; lock hashes include cp311/aarch64 wheels where published",
+        "workerAttestation": "CPython 3.12.3 x86_64"
+      },
+      "updateReview": {
+        "status": "RECORDED_SOURCE_FACT",
+        "autoPromote": false,
+        "reviewer": "ENV-00 owner",
+        "notes": "Regenerate only with pip-tools 7.4.1 and pip 24.3.1 as documented. This packet did not change the lock."
+      },
+      "rollback": {
+        "status": "RECORDED_SOURCE_FACT",
+        "priorIdentity": "Revert the ENV-00 checkpoint; restore preceding CI install line",
+        "restoringOwner": "LiNKskills ENV-00",
+        "notes": "No server or production state exists for this lock."
+      },
+      "remainingPacketIds": ["ED-02", "ED-03", "ED-06"],
+      "unknowns": [],
+      "sources": [
+        "docs/development/CLOUD-EXECUTION.md",
+        ".github/workflows/ci.yml",
+        "evidence/end-to-end-delivery/env-00/completion-evidence-b06a3179b6f0.json"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "kind": "linkskills-oss-continuity-record",
+      "componentId": "postgresql-supabase",
+      "title": "PostgreSQL / Supabase store",
+      "preservationMode": "read_only_default",
+      "installationComplete": false,
+      "boundIdentity": {
+        "repository": "linktrend/LiNKskills",
+        "ref": "issue/352-prepare-oss-continuity-evidence-and-validation-f",
+        "commit": "f97951feec6546ff924c65611802afd7ab19d2a3",
+        "tree": "9bd1ba9eb32885146317f25a1cd3b223d1540d9e"
+      },
+      "sourceArtifact": {
+        "status": "RECORDED_SOURCE_FACT",
+        "location": "Existing Platform stage/prod projects",
+        "owner": "LiNKplatform",
+        "notes": "No new database project; no Skills live DDL."
+      },
+      "immutableIdentity": {
+        "status": "PENDING",
+        "version": null,
+        "commit": null,
+        "tree": null,
+        "digest": null,
+        "truncatedAsInventoried": false,
+        "notes": "Starting position reports store OperationalError. Migration fingerprints vs live are unknown."
+      },
+      "provenanceLicense": {
+        "status": "PENDING",
+        "declaredLicense": null,
+        "licensePath": null,
+        "noticePath": null,
+        "licensePathSha256": null,
+        "conflict": null
+      },
+      "reproducibleInstallation": {
+        "status": "HOLD",
+        "claimedComplete": false,
+        "command": null,
+        "lockOrPin": "Governed Platform migration package; SecretRef DSN",
+        "notes": "ED-01 source evidence exists and must not be modified. Live apply is XP-01."
+      },
+      "compatibility": {
+        "status": "PENDING",
+        "requiresPython": null,
+        "ciMatrix": null,
+        "workerAttestation": null,
+        "notes": "Ephemeral Postgres version compatible with production is an ED-01 validation input; production match pending Platform receipts."
+      },
+      "updateReview": {
+        "status": "RECORDED_SOURCE_FACT",
+        "autoPromote": false,
+        "reviewer": "LiNKplatform / XP-01"
+      },
+      "rollback": {
+        "status": "PENDING",
+        "priorIdentity": null,
+        "restoringOwner": "LiNKplatform",
+        "notes": "Packaged forward-fix/rollback under Platform authority; backup scope unproven."
+      },
+      "remainingPacketIds": ["ED-08"],
+      "unknowns": [
+        "Which exact database defect causes OperationalError",
+        "Whether lskills migrations fingerprints match live stage/prod"
+      ],
+      "sources": [
+        "docs/end-to-end-delivery/OSS-INVENTORY.md",
+        "docs/end-to-end-delivery/STARTING-POSITION.md",
+        "docs/end-to-end-delivery/WORK-PACKETS.md"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "kind": "linkskills-oss-continuity-record",
+      "componentId": "paci-platform-identity",
+      "title": "PACI / Platform identity",
+      "preservationMode": "read_only_default",
+      "installationComplete": false,
+      "boundIdentity": {
+        "repository": "linktrend/LiNKskills",
+        "ref": "issue/352-prepare-oss-continuity-evidence-and-validation-f",
+        "commit": "f97951feec6546ff924c65611802afd7ab19d2a3",
+        "tree": "9bd1ba9eb32885146317f25a1cd3b223d1540d9e"
+      },
+      "sourceArtifact": {
+        "status": "RECORDED_SOURCE_FACT",
+        "location": "Existing HTTPS issuer/JWKS/token/introspection service configured in container",
+        "owner": "LiNKplatform",
+        "notes": "Do not create a Skills identity authority."
+      },
+      "immutableIdentity": {
+        "status": "RECORDED_SOURCE_FACT",
+        "version": null,
+        "commit": "f6373fccc89732cbb88bb18562daa69cc031a2e3",
+        "tree": "83feddf7d935561cfede60df456ea616a021d726",
+        "digest": null,
+        "truncatedAsInventoried": false,
+        "notes": "ED-00 recorded LiNKplatform development identity for consumed AuthClaims schema. Live issuer key/version pending Platform recovery."
+      },
+      "provenanceLicense": {
+        "status": "PENDING",
+        "declaredLicense": null,
+        "licensePath": "evidence/end-to-end-delivery/ed-00/PLATFORM-INTERFACE.json",
+        "noticePath": null,
+        "licensePathSha256": null,
+        "conflict": null
+      },
+      "reproducibleInstallation": {
+        "status": "HOLD",
+        "claimedComplete": false,
+        "command": null,
+        "lockOrPin": "audience lskills-api scope lskills; ES256 key file via SecretRef",
+        "notes": "Unauthenticated 401 is proven; valid intended identity is not."
+      },
+      "compatibility": {
+        "status": "RECORDED_SOURCE_FACT",
+        "requiresPython": null,
+        "ciMatrix": null,
+        "workerAttestation": null,
+        "notes": "skills.api.v0.2 consumers use Platform-issued identity."
+      },
+      "updateReview": {
+        "status": "RECORDED_SOURCE_FACT",
+        "autoPromote": false,
+        "reviewer": "LiNKplatform"
+      },
+      "rollback": {
+        "status": "PENDING",
+        "priorIdentity": null,
+        "restoringOwner": "LiNKplatform",
+        "notes": "Credential revocation is a PRD operations requirement; live rehearsal remaining."
+      },
+      "remainingPacketIds": ["ED-02", "ED-08", "ED-09"],
+      "unknowns": ["Valid intended identity canary", "mint allowlist current binding"],
+      "sources": [
+        "docs/end-to-end-delivery/OSS-INVENTORY.md",
+        "evidence/end-to-end-delivery/ed-00/PLATFORM-INTERFACE.json"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "kind": "linkskills-oss-continuity-record",
+      "componentId": "sealed-linux-evaluation",
+      "title": "Sealed Linux evaluator and Bubblewrap",
+      "preservationMode": "read_only_default",
+      "installationComplete": false,
+      "boundIdentity": {
+        "repository": "linktrend/LiNKskills",
+        "ref": "issue/352-prepare-oss-continuity-evidence-and-validation-f",
+        "commit": "f97951feec6546ff924c65611802afd7ab19d2a3",
+        "tree": "9bd1ba9eb32885146317f25a1cd3b223d1540d9e"
+      },
+      "sourceArtifact": {
+        "status": "RECORDED_SOURCE_FACT",
+        "location": "Repository confined-executor / digest-pinned image contract; Bubblewrap inside evaluator image",
+        "owner": "LiNKskills qualification"
+      },
+      "immutableIdentity": {
+        "status": "PENDING",
+        "version": null,
+        "commit": null,
+        "tree": null,
+        "digest": null,
+        "truncatedAsInventoried": false,
+        "notes": "Inventory says digest-pinned image contract exists; exact current evaluator digest not copied into OSS inventory."
+      },
+      "provenanceLicense": {
+        "status": "PENDING",
+        "declaredLicense": null,
+        "licensePath": null,
+        "noticePath": null,
+        "licensePathSha256": null,
+        "conflict": null,
+        "notes": "Bubblewrap upstream licence not restated in delivery docs."
+      },
+      "reproducibleInstallation": {
+        "status": "PENDING",
+        "claimedComplete": false,
+        "command": null,
+        "lockOrPin": "Immutable evaluator image digest; denied network",
+        "notes": "Do not privileged-host-install Bubblewrap outside the evaluator. ED-03 remaining for five initial releases."
+      },
+      "compatibility": {
+        "status": "PENDING",
+        "requiresPython": ">=3.11",
+        "ciMatrix": null,
+        "workerAttestation": null,
+        "notes": "Cursor, Codex, and Lisa capability profiles are ED-03 inputs."
+      },
+      "updateReview": {
+        "status": "RECORDED_SOURCE_FACT",
+        "autoPromote": false,
+        "reviewer": "LiNKskills qualification owner"
+      },
+      "rollback": {
+        "status": "PENDING",
+        "priorIdentity": null,
+        "restoringOwner": "LiNKskills qualification owner",
+        "notes": "Revoke/withhold channel pointer; never rewrite a release or evidence record."
+      },
+      "remainingPacketIds": ["ED-03"],
+      "unknowns": ["Exact evaluator image digest on this tree"],
+      "sources": [
+        "docs/end-to-end-delivery/OSS-INVENTORY.md",
+        "docs/end-to-end-delivery/WORK-PACKETS.md"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "kind": "linkskills-oss-continuity-record",
+      "componentId": "linkskills-mcp-source",
+      "title": "LiNKskills MCP source package",
+      "preservationMode": "read_only_default",
+      "installationComplete": false,
+      "boundIdentity": {
+        "repository": "linktrend/LiNKskills",
+        "ref": "issue/352-prepare-oss-continuity-evidence-and-validation-f",
+        "commit": "f97951feec6546ff924c65611802afd7ab19d2a3",
+        "tree": "9bd1ba9eb32885146317f25a1cd3b223d1540d9e"
+      },
+      "sourceArtifact": {
+        "status": "RECORDED_SOURCE_FACT",
+        "location": "packages/mcp_server/",
+        "owner": "LiNKskills contract; consumer owns process/adapter"
+      },
+      "immutableIdentity": {
+        "status": "PENDING",
+        "version": "skills.api.v0.2 target; live v0.1",
+        "commit": "f97951feec6546ff924c65611802afd7ab19d2a3",
+        "tree": "9bd1ba9eb32885146317f25a1cd3b223d1540d9e",
+        "digest": null,
+        "truncatedAsInventoried": false,
+        "notes": "Source exists on admitted tree. Running container exposes legacy skills.api.v0.1. ED-02 remaining."
+      },
+      "provenanceLicense": {
+        "status": "RECORDED_SOURCE_FACT",
+        "declaredLicense": "Proprietary",
+        "licensePath": "pyproject.toml",
+        "noticePath": null,
+        "licensePathSha256": null,
+        "conflict": "No root LICENSE file"
+      },
+      "reproducibleInstallation": {
+        "status": "PENDING",
+        "claimedComplete": false,
+        "command": "pip install --no-deps -e packages/mcp_server (after hash-locked PyPI install)",
+        "lockOrPin": "requirements-dev.lock plus local-package-before-umbrella order",
+        "notes": "No separate public MCP daemon unless an approved adapter needs it."
+      },
+      "compatibility": {
+        "status": "RECORDED_SOURCE_FACT",
+        "requiresPython": ">=3.11",
+        "ciMatrix": "pytest tests/mcp_server on CI PYTHONPATH",
+        "workerAttestation": "standard MCP 2026-07-28 named in WORK-PACKETS ED-02"
+      },
+      "updateReview": {
+        "status": "RECORDED_SOURCE_FACT",
+        "autoPromote": false,
+        "reviewer": "ED-02 owner"
+      },
+      "rollback": {
+        "status": "PENDING",
+        "priorIdentity": "current v0.1 image/compose projection",
+        "restoringOwner": "Platform/Server 01",
+        "notes": "Retain v0.1 until ED-02/ED-08 rollback notes are executed."
+      },
+      "remainingPacketIds": ["ED-02", "ED-08", "ED-09"],
+      "unknowns": ["Whether existing image actually exposes provider-v2 through configured entrypoint"],
+      "sources": [
+        "docs/end-to-end-delivery/OSS-INVENTORY.md",
+        "docs/end-to-end-delivery/STARTING-POSITION.md",
+        "docs/end-to-end-delivery/WORK-PACKETS.md"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "kind": "linkskills-oss-continuity-record",
+      "componentId": "later-expansion-collections",
+      "title": "External collection adapters and vendor bytes (later expansion)",
+      "preservationMode": "read_only_default",
+      "installationComplete": false,
+      "boundIdentity": {
+        "repository": "linktrend/LiNKskills",
+        "ref": "issue/352-prepare-oss-continuity-evidence-and-validation-f",
+        "commit": "f97951feec6546ff924c65611802afd7ab19d2a3",
+        "tree": "9bd1ba9eb32885146317f25a1cd3b223d1540d9e"
+      },
+      "sourceArtifact": {
+        "status": "RECORDED_SOURCE_FACT",
+        "location": "collections/ and vendor-skills/",
+        "owner": "LiNKskills preserves; later expansion plan owns qualification",
+        "notes": "Six adapters and 207 members remain nonselectable. Vendor bytes stay unchanged."
+      },
+      "immutableIdentity": {
+        "status": "RECORDED_SOURCE_FACT",
+        "version": "google-workspace historical v0.18.1 plus reviewed main pin",
+        "commit": "a3768d0e82ad83cca2da97724e46bea4ff0e6dbd",
+        "tree": "28127e4c0edff4bdf9226369e7a2ef744b353c25",
+        "digest": null,
+        "truncatedAsInventoried": false,
+        "notes": "Google Workspace reviewed source from collections/google-workspace/README.md. Other collections pinned by LICENSE.upstream hashes in OSS-CONTINUITY.md. update-candidate.json is non-promoting."
+      },
+      "provenanceLicense": {
+        "status": "PENDING",
+        "declaredLicense": "mixed MIT and Apache-2.0 as stored in LICENSE.upstream files",
+        "licensePath": "collections/*/LICENSE.upstream",
+        "noticePath": "collections/impeccable/NOTICE.upstream.md",
+        "licensePathSha256": null,
+        "conflict": "impeccable LICENSE.upstream is Apache-2.0 text; NOTICE.upstream.md attributes distilled platform refs to MIT original ehmo/platform-design-skills",
+        "notes": "Do not collapse into one SPDX expression."
+      },
+      "reproducibleInstallation": {
+        "status": "NOT_APPLICABLE",
+        "claimedComplete": false,
+        "command": null,
+        "lockOrPin": null,
+        "notes": "Preservation is archival. This delivery does not install or activate collection members."
+      },
+      "compatibility": {
+        "status": "HOLD",
+        "requiresPython": null,
+        "ciMatrix": null,
+        "workerAttestation": null,
+        "notes": "Unqualified/inactive by default. Compatibility for later expansion is out of initial delivery."
+      },
+      "updateReview": {
+        "status": "RECORDED_SOURCE_FACT",
+        "autoPromote": false,
+        "reviewer": "LiNKskills; LiNKautowork may submit candidates only",
+        "notes": "Frozen interfaces section 5: no poll result changes a current pointer."
+      },
+      "rollback": {
+        "status": "RECORDED_SOURCE_FACT",
+        "priorIdentity": "Keep current collection manifests and vendor bytes",
+        "restoringOwner": "LiNKskills collection owner",
+        "notes": "Restore prior current pointer; preserve immutable records. Deprecated skills removed only after audit, replacement mapping, compatibility proof, and rollback planning."
+      },
+      "remainingPacketIds": ["ED-10"],
+      "unknowns": [
+        "Whether any collection member licence file besides those hashed here exists",
+        "Live consumer pins outside this repository"
+      ],
+      "sources": [
+        "docs/end-to-end-delivery/README.md",
+        "docs/INITIAL-SKILL-SEED-ROUTING.md",
+        "collections/google-workspace/README.md",
+        "docs/planning/governed-skill-expansion/FROZEN-INTERFACES.md"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "kind": "linkskills-oss-continuity-record",
+      "componentId": "observability-stack",
+      "title": "Prometheus + Grafana + node exporter",
+      "preservationMode": "read_only_default",
+      "installationComplete": false,
+      "boundIdentity": {
+        "repository": "linktrend/LiNKskills",
+        "ref": "issue/352-prepare-oss-continuity-evidence-and-validation-f",
+        "commit": "f97951feec6546ff924c65611802afd7ab19d2a3",
+        "tree": "9bd1ba9eb32885146317f25a1cd3b223d1540d9e"
+      },
+      "sourceArtifact": {
+        "status": "RECORDED_SOURCE_FACT",
+        "location": "Existing and healthy on Server 01 according to recovery evidence cited in OSS inventory",
+        "owner": "Platform observability"
+      },
+      "immutableIdentity": {
+        "status": "PENDING",
+        "version": null,
+        "commit": null,
+        "tree": null,
+        "digest": null,
+        "truncatedAsInventoried": false
+      },
+      "provenanceLicense": {
+        "status": "PENDING",
+        "declaredLicense": null,
+        "licensePath": null,
+        "noticePath": null,
+        "licensePathSha256": null,
+        "conflict": null
+      },
+      "reproducibleInstallation": {
+        "status": "RECORDED_SOURCE_FACT",
+        "claimedComplete": false,
+        "command": null,
+        "lockOrPin": "Reuse; do not add another monitoring stack",
+        "notes": "Skills scrape, dashboards, alerts, and redaction remain unproven."
+      },
+      "compatibility": {
+        "status": "PENDING",
+        "requiresPython": null,
+        "ciMatrix": null,
+        "workerAttestation": null
+      },
+      "updateReview": {
+        "status": "RECORDED_SOURCE_FACT",
+        "autoPromote": false,
+        "reviewer": "Platform observability"
+      },
+      "rollback": {
+        "status": "PENDING",
+        "priorIdentity": null,
+        "restoringOwner": "Platform observability",
+        "notes": "Do not add a second stack as rollback."
+      },
+      "remainingPacketIds": ["ED-07", "ED-08"],
+      "unknowns": ["Skills-specific target, dashboard, and alert identities"],
+      "sources": [
+        "docs/end-to-end-delivery/OSS-INVENTORY.md",
+        "docs/end-to-end-delivery/STARTING-POSITION.md"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "kind": "linkskills-oss-continuity-record",
+      "componentId": "generic-librarian-host",
+      "title": "Platform generic Librarian host",
+      "preservationMode": "read_only_default",
+      "installationComplete": false,
+      "boundIdentity": {
+        "repository": "linktrend/LiNKskills",
+        "ref": "issue/352-prepare-oss-continuity-evidence-and-validation-f",
+        "commit": "f97951feec6546ff924c65611802afd7ab19d2a3",
+        "tree": "9bd1ba9eb32885146317f25a1cd3b223d1540d9e"
+      },
+      "sourceArtifact": {
+        "status": "RECORDED_SOURCE_FACT",
+        "location": "Platform source / LiNKplatform packages/librarian-runner (XP-01 owned live surface)",
+        "owner": "LiNKplatform host; LiNKskills domain worker"
+      },
+      "immutableIdentity": {
+        "status": "PENDING",
+        "version": null,
+        "commit": null,
+        "tree": null,
+        "digest": null,
+        "truncatedAsInventoried": false,
+        "notes": "ED-07 source evidence exists under evidence/end-to-end-delivery/ed-07/ and must not be modified. Production worker operation is unproven."
+      },
+      "provenanceLicense": {
+        "status": "PENDING",
+        "declaredLicense": null,
+        "licensePath": null,
+        "noticePath": null,
+        "licensePathSha256": null,
+        "conflict": null
+      },
+      "reproducibleInstallation": {
+        "status": "HOLD",
+        "claimedComplete": false,
+        "command": null,
+        "lockOrPin": "Exact domain-worker artifact pin; separate identity",
+        "notes": "Platform integrates; LiNKskills supplies conformance."
+      },
+      "compatibility": {
+        "status": "PENDING",
+        "requiresPython": ">=3.11",
+        "ciMatrix": "tests/librarian_domain",
+        "workerAttestation": null
+      },
+      "updateReview": {
+        "status": "RECORDED_SOURCE_FACT",
+        "autoPromote": false,
+        "reviewer": "Platform host owner plus ED-07 Skills owner"
+      },
+      "rollback": {
+        "status": "RECORDED_SOURCE_FACT",
+        "priorIdentity": "Disable Skills worker/schedule; preserve queue and evidence",
+        "restoringOwner": "LiNKplatform host / ED-07",
+        "notes": "Provider reads stay independent. Live disable unproven."
+      },
+      "remainingPacketIds": ["ED-08", "ED-09", "IMP-00", "ED-10"],
+      "unknowns": ["Production worker load, identity, queue/retry/DLQ live receipts"],
+      "sources": [
+        "docs/end-to-end-delivery/OSS-INVENTORY.md",
+        "docs/end-to-end-delivery/WORK-PACKETS.md"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "kind": "linkskills-oss-continuity-record",
+      "componentId": "gsm-tailscale-reuse",
+      "title": "Google Secret Manager and Tailscale (reuse, no new install)",
+      "preservationMode": "read_only_default",
+      "installationComplete": false,
+      "boundIdentity": {
+        "repository": "linktrend/LiNKskills",
+        "ref": "issue/352-prepare-oss-continuity-evidence-and-validation-f",
+        "commit": "f97951feec6546ff924c65611802afd7ab19d2a3",
+        "tree": "9bd1ba9eb32885146317f25a1cd3b223d1540d9e"
+      },
+      "sourceArtifact": {
+        "status": "RECORDED_SOURCE_FACT",
+        "location": "Existing server secret custody and Tailscale private routes",
+        "owner": "Platform security/operations and networking",
+        "notes": "Environment contains names/paths only. No direct Skills 18798 public ingress by default."
+      },
+      "immutableIdentity": {
+        "status": "PENDING",
+        "version": null,
+        "commit": null,
+        "tree": null,
+        "digest": null,
+        "truncatedAsInventoried": false
+      },
+      "provenanceLicense": {
+        "status": "PENDING",
+        "declaredLicense": null,
+        "licensePath": null,
+        "noticePath": null,
+        "licensePathSha256": null,
+        "conflict": null
+      },
+      "reproducibleInstallation": {
+        "status": "RECORDED_SOURCE_FACT",
+        "claimedComplete": false,
+        "command": null,
+        "lockOrPin": "Reuse; provision/rotate GSM after approval as execution work",
+        "notes": "No secret values in Git or this evidence."
+      },
+      "compatibility": {
+        "status": "PENDING",
+        "requiresPython": null,
+        "ciMatrix": null,
+        "workerAttestation": null,
+        "notes": "Final private endpoint/route is Platform-selected and unknown here."
+      },
+      "updateReview": {
+        "status": "RECORDED_SOURCE_FACT",
+        "autoPromote": false,
+        "reviewer": "Platform security/operations"
+      },
+      "rollback": {
+        "status": "PENDING",
+        "priorIdentity": null,
+        "restoringOwner": "Platform security/operations",
+        "notes": "Credential rotation/revocation remaining."
+      },
+      "remainingPacketIds": ["ED-08", "ED-09"],
+      "unknowns": ["Final private Skills route", "Current GSM resource versions"],
+      "sources": ["docs/end-to-end-delivery/OSS-INVENTORY.md"]
+    },
+    {
+      "schemaVersion": 1,
+      "kind": "linkskills-oss-continuity-record",
+      "componentId": "initial-five-native-releases",
+      "title": "Initial five LiNKskills-owned provider releases",
+      "preservationMode": "linkskills_owned_publish_new_identity",
+      "installationComplete": false,
+      "boundIdentity": {
+        "repository": "linktrend/LiNKskills",
+        "ref": "issue/352-prepare-oss-continuity-evidence-and-validation-f",
+        "commit": "f97951feec6546ff924c65611802afd7ab19d2a3",
+        "tree": "9bd1ba9eb32885146317f25a1cd3b223d1540d9e"
+      },
+      "sourceArtifact": {
+        "status": "RECORDED_SOURCE_FACT",
+        "location": "skills/git-safeguard, skills/persistent-qa, skills/repository-manager, skills/skill-template, skills/tool-architect",
+        "owner": "LiNKskills",
+        "notes": "agentsetup@1.3.0 and agentcomply@1.3.0 remain local bootstrap adapters, not provider catalogue skills."
+      },
+      "immutableIdentity": {
+        "status": "RECORDED_SOURCE_FACT",
+        "version": "git-safeguard@1.1.0 persistent-qa@1.0.0 repository-manager@1.0.0 skill-template@1.2.0 tool-architect@1.0.0",
+        "commit": "0d4ad748ff9d4d89911f20e0c01aca0e1107fc54",
+        "tree": "6944fe1676beba87a44825f29a13e440f8f3512c",
+        "digest": "sha256:c2ac495dd9feee1257f022a16ae9aea55ee9256a3d1debc43fcb4b4164e79b42",
+        "truncatedAsInventoried": false,
+        "notes": "ED-04 source-publication-receipt.json receiptDigest and ed04Protected identity from ED-05. qualificationLifecycle eval_pending; liveProviderMutation false. Do not modify those files."
+      },
+      "provenanceLicense": {
+        "status": "RECORDED_SOURCE_FACT",
+        "declaredLicense": "Proprietary (umbrella); skill packages follow repository skill metadata",
+        "licensePath": "pyproject.toml",
+        "noticePath": null,
+        "licensePathSha256": null,
+        "conflict": "No root LICENSE file"
+      },
+      "reproducibleInstallation": {
+        "status": "PENDING",
+        "claimedComplete": false,
+        "command": null,
+        "lockOrPin": "Exact release/package/eval/tool digests in ED-04 receipt",
+        "notes": "Source publication is not live channel apply. ED-03 executed-case usable receipts remaining."
+      },
+      "compatibility": {
+        "status": "HOLD",
+        "requiresPython": ">=3.11",
+        "ciMatrix": "validator.py --scan-all plus eval_runner tests",
+        "workerAttestation": null,
+        "notes": "ED-04 external-holds: ED-03 executed-case usable receipts pending; classifier eval_pending for all five."
+      },
+      "updateReview": {
+        "status": "RECORDED_SOURCE_FACT",
+        "autoPromote": false,
+        "reviewer": "ED-03 then ED-04 then consumer owners",
+        "notes": "New defect corrections publish a new immutable version without rewriting the old one (FIX* packets)."
+      },
+      "rollback": {
+        "status": "PENDING",
+        "priorIdentity": "Prior channel pointer / previous immutable release (live pointer not applied)",
+        "restoringOwner": "LiNKskills publisher plus Platform for live apply",
+        "notes": "Atomically restore prior pointer or revoke; preserve immutable rows."
+      },
+      "remainingPacketIds": ["ED-03", "ED-08", "ED-09", "FIXGS-00", "FIXPQ-00", "FIXRM-00", "FIXST-00", "FIXTA-00"],
+      "unknowns": ["Live internal channel pointer", "Executed-case usable profile receipts"],
+      "sources": [
+        "docs/end-to-end-delivery/README.md",
+        "evidence/end-to-end-delivery/ed-04/source-publication-receipt.json",
+        "evidence/end-to-end-delivery/ed-04/external-holds.json",
+        "evidence/end-to-end-delivery/ed-05/source-consumer-packet-receipt.json"
+      ]
+    }
+  ]
+}

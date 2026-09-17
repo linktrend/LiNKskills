@@ -1,0 +1,228 @@
+{
+  "worker_version": "0.2",
+  "results": {
+    "intake_normalize": {
+      "worker_version": "0.2",
+      "operation": "intake_normalize",
+      "skill_ref": "git-safeguard",
+      "normalized": {
+        "schema_version": "0.1",
+        "skill_id": "git-safeguard",
+        "pack_mapping": {
+          "identity": true,
+          "routing": "pending",
+          "execution_contract": "pending",
+          "typed_dependencies": "pending"
+        },
+        "provenance": {
+          "source": "catalog",
+          "commit": "deadbeef"
+        }
+      },
+      "gaps": [],
+      "overlap_notes": [],
+      "at": "2026-09-12T11:42:28Z"
+    },
+    "prioritize": {
+      "worker_version": "0.2",
+      "operation": "prioritize",
+      "prioritized": [
+        {
+          "skill_id": "b",
+          "impact": 0.9,
+          "cost": 2.0
+        },
+        {
+          "skill_id": "a",
+          "impact": 0.2,
+          "cost": 1.0
+        }
+      ],
+      "count": 2,
+      "at": "2026-09-12T11:42:28Z"
+    },
+    "propose_improvement_ok": {
+      "worker_version": "0.2",
+      "operation": "propose_improvement",
+      "accepted": true,
+      "proposal": {
+        "proposal_id": "57073ef5-36f5-40a9-bd1d-ab7448622db4",
+        "branch": "feature/librarian-git-safeguard",
+        "skill_id": "git-safeguard",
+        "summary": "clarify branch checks",
+        "pr_required": true,
+        "direct_push_forbidden": true
+      },
+      "policy": {
+        "allowed": true,
+        "code": "ok"
+      },
+      "at": "2026-09-12T11:42:28Z"
+    },
+    "propose_improvement_staging_push": {
+      "worker_version": "0.2",
+      "operation": "propose_improvement",
+      "accepted": false,
+      "proposal": null,
+      "policy": {
+        "allowed": false,
+        "code": "policy_refuse_protected_push",
+        "message": "Refused forbidden action 'push_staging': no direct staging/main push",
+        "escalate": true
+      },
+      "at": "2026-09-12T11:42:28Z"
+    },
+    "request_eval": {
+      "worker_version": "0.2",
+      "operation": "request_eval",
+      "request_id": "78780453-7acf-4481-894d-bb96e03ff5bf",
+      "skill_id": "git-safeguard",
+      "execution_profile": "cursor-macos",
+      "eval_suite_ref": "skills/git-safeguard/references/eval-suite.yaml",
+      "status": "queued",
+      "requires_executed_evidence": true,
+      "at": "2026-09-12T11:42:28Z"
+    },
+    "interpret_eval_evidence": {
+      "worker_version": "0.2",
+      "operation": "interpret_eval_evidence",
+      "certifying": false,
+      "recommendation": "hold_eval_pending",
+      "reason": "no trusted Eval Runner issuer key configured (LINKSKILLS_EVAL_RUNNER_ISSUER_KEY)",
+      "at": "2026-09-12T11:42:28Z"
+    },
+    "propose_consolidation_low_confidence": {
+      "worker_version": "0.2",
+      "operation": "propose_consolidation",
+      "accepted": false,
+      "escalate": true,
+      "policy": {
+        "allowed": false,
+        "code": "policy_escalate_low_confidence",
+        "message": "Low-confidence merge (confidence=0.2, threshold=0.75) requires Principal review",
+        "escalate": true
+      },
+      "review": {
+        "worker_version": "0.2",
+        "operation": "enqueue_review",
+        "item": {
+          "review_id": "9812d52f-e1ae-4216-8c99-76adbd68e1f0",
+          "kind": "consolidation_escalation",
+          "payload": {
+            "kind": "consolidation_escalation",
+            "proposal": {
+              "kind": "merge",
+              "action": "propose_consolidation",
+              "confidence": 0.2,
+              "skills": [
+                "a",
+                "b"
+              ],
+              "summary": "possible duplicate"
+            },
+            "policy": {
+              "allowed": false,
+              "code": "policy_escalate_low_confidence",
+              "message": "Low-confidence merge (confidence=0.2, threshold=0.75) requires Principal review",
+              "escalate": true
+            }
+          },
+          "status": "queued",
+          "at": "2026-09-12T11:42:28Z"
+        },
+        "queue_depth": 1,
+        "at": "2026-09-12T11:42:28Z"
+      },
+      "at": "2026-09-12T11:42:28Z"
+    },
+    "enqueue_review": {
+      "worker_version": "0.2",
+      "operation": "enqueue_review",
+      "item": {
+        "review_id": "22f64a79-eb5a-41b4-8c2c-e0de9a782b7c",
+        "kind": "manual",
+        "payload": {
+          "kind": "manual",
+          "note": "fixture"
+        },
+        "status": "queued",
+        "at": "2026-09-12T11:42:28Z"
+      },
+      "queue_depth": 2,
+      "at": "2026-09-12T11:42:28Z"
+    },
+    "ingest_use": {
+      "worker_version": "0.2",
+      "operation": "ingest_use_or_feedback",
+      "accepted": true,
+      "receipt": {
+        "accepted": true,
+        "receipt_id": "receipt:59fe993ef8ab5367",
+        "digest": "sha256:59fe993ef8ab5367893396535e909bee9178fa7616d99bd870d34bc8f4358e0f",
+        "skill_release_ref": "git-safeguard@1.1.0",
+        "runtime_profile_ref": "cursor-macos",
+        "skill_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "opaque_correlation": "corr:0f781917f9708d30e3fe8ec6d754e691",
+        "retention_class": "minimal",
+        "retained_until": "2026-09-19T00:00:00Z"
+      },
+      "bound": {
+        "skill_release_ref": "git-safeguard@1.1.0",
+        "runtime_profile_ref": "cursor-macos",
+        "skill_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "opaque_correlation": "corr:0f781917f9708d30e3fe8ec6d754e691"
+      },
+      "reason": null,
+      "at": "2026-09-12T11:42:28Z"
+    },
+    "status_report": {
+      "worker_version": "0.2",
+      "conformance_package": "linkskills-librarian-conformance/0.2",
+      "domain_key": "linkskills",
+      "operation": "status_report",
+      "enabled": true,
+      "backlog": {
+        "review_queued": 2,
+        "jobs_open": 0,
+        "dead_letter": 0
+      },
+      "metrics_cardinality": 1,
+      "metrics": {
+        "git-safeguard@1.1.0,cursor,agent_actor,cursor-macos,compatible,incorrect": 1
+      },
+      "proof_classes": {
+        "source": {
+          "status": "pass",
+          "claim": "versioned Skills worker and conformance package exist in source"
+        },
+        "qualification": {
+          "status": "hold",
+          "claim": "live qualification remains ED-03/ED-04 evidence; this packet does not re-certify"
+        },
+        "selectability": {
+          "status": "hold",
+          "claim": "channel pointers and consumer activation are out of ED-07 source scope"
+        },
+        "consumer": {
+          "status": "hold",
+          "claim": "consumer config and live host integration are prohibited in this packet"
+        },
+        "server": {
+          "status": "hold",
+          "claim": "no deploy or live host mutation"
+        },
+        "production": {
+          "status": "hold",
+          "claim": "supervised production-equivalent run is source-simulated; live host waits XP-01"
+        },
+        "worker_contract": {
+          "status": "pass",
+          "claim": "use/feedback bind, privacy, retention, disable/retry/DLQ, prompt-only refusal"
+        }
+      },
+      "redacted": true,
+      "at": "2026-09-12T11:42:28Z"
+    }
+  },
+  "invocation_count": 10
+}

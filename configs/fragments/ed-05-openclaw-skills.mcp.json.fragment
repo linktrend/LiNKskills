@@ -1,0 +1,49 @@
+{
+  "contract_version": "0.2",
+  "fragment_id": "ed-05-openclaw-skills-mcp",
+  "owner": "OpenClaw Prime / Lisa (XP-04); LiNKskills authors the packet only",
+  "purpose": "Disabled-by-default Skills MCP v2 fragment for the ED-05 Lisa/OpenClaw owner packet. Conformance only — no OpenClaw mutation.",
+  "disabled": true,
+  "live_apply": false,
+  "mcp": {
+    "server_name": "linkskills-ed05-lisa",
+    "transport": "stdio",
+    "command": "python3",
+    "args": ["-m", "linkskills_mcp.server"],
+    "env": {
+      "PYTHONPATH": "packages/gateway:packages/mcp_server:packages/client:packages/librarian_domain:packages/eval_runner:packages/tool_runtime:packages/contracts:packages/core:.",
+      "GATEWAY_URL": "https://skills.test.linktrend.invalid/provider-v2",
+      "LINKSKILLS_PACI_SCOPE": "lskills",
+      "LINKSKILLS_PACI_RESOURCE_AUDIENCE": "lskills-api"
+    }
+  },
+  "provider_contract": "skills.api.v0.2",
+  "operations": {
+    "tools": [
+      "skills_release_verify",
+      "skills_use_report_submit",
+      "skills_use_report_status_get",
+      "skills_feedback_submit",
+      "skills_feedback_status_get",
+      "skills_librarian_status_get"
+    ],
+    "denied": ["skills_run_*", "skills_tool_*"]
+  },
+  "auth": {
+    "issuer": "LiNKplatform",
+    "claim_contract": "platform.auth-claims/1.1.0",
+    "envelope_contract": "platform.auth-token-envelope/0.1.0",
+    "required_service_scope": "lskills",
+    "required_audience": "lskills-api",
+    "brain_credential_reuse": false,
+    "secrets": "none_in_fragment"
+  },
+  "allowlist": [
+    "git-safeguard@1.1.0",
+    "persistent-qa@1.0.0",
+    "repository-manager@1.0.0",
+    "skill-template@1.2.0",
+    "tool-architect@1.0.0"
+  ],
+  "packet": "configs/consumer-activation/ed-05-lisa-openclaw-owner-packet.json"
+}

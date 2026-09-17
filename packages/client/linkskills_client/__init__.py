@@ -1,6 +1,7 @@
 """LiNKskills generic HTTP client and skill_runtime compatibility wrappers."""
 
 from .client import BufferedEvent, LocalEventBuffer, SkillsGatewayClient
+from .http_v2 import HttpV2Client
 from .mcp_v2 import McpV2Client, McpV2Error, StandardMcpV2Client
 from .compat import load_skill, record_invocation
 from .paci_token_client import (
@@ -19,6 +20,7 @@ from .paci_token_client import (
 __all__ = [
     "BufferedEvent",
     "LocalEventBuffer",
+    "HttpV2Client",
     "McpV2Client",
     "McpV2Error",
     "MAX_ACCESS_TTL_S",

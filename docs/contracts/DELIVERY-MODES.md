@@ -22,9 +22,9 @@ Checkpoint pushes **never** open a PR and **never** request Bugbot, in either mo
 
 1. **Issue checkpoint:** Implementer commits and pushes on `issue/<id>-<slug>`. No PR. No Bugbot.
 2. **Independent Issue acceptance:** Exact tip SHA receives successful `Linktrend Review Ready` (or equivalent acceptance record). Later commits invalidate acceptance for the new tip.
-3. **Phase inclusion:** Accepted Issue SHAs are merged/cherry-picked onto `phase/<slug>` (or another configured Phase branch prefix). Machine-readable Phase records list each accepted Issue SHA and prove inclusion (committed at `.linktrend/phase-delivery-record.json` on the Phase tip).
+3. **Phase inclusion:** Accepted Issue SHAs are merged/cherry-picked onto `phase/<slug>` (or another configured Phase branch prefix). Machine-readable Phase records list each accepted Issue SHA and prove inclusion. The Packager commits `.linktrend/phase-delivery-record.json` onto the Phase tip as a single-parent identity-binding commit after isolated assembly. `headSha` / `gitTree` name the assembled package commit (an ancestor of the tip), never the self-referential embedding commit that contains this JSON. The Phase PR head and isolated handoff `headCommit` / `gitTree` name the identity-binding tip that protected integration checks out.
 4. **Phase PR:** After all required accepted Issue SHAs are included, the Phase tip is marked review-ready through the same trusted completion / App-publisher path used for Issue tips (exact SHA; configured `phase/<slug>` is App-eligible without weakening `issue/<number>-<slug>` safeguards). Review Packager opens **one** draft PR only after validating that Phase delivery record and inclusion evidence: `phase/*` → `development`.
-5. **Named gates:** `fast-gate` (then Bugbot when required), Integrator merge, `staging-gate`, and `release-gate` evaluate the **exact PR head SHA**. Missing, empty/zero SHA, wrong SHA, stale event head, skipped/neutral (unless explicitly allowed), or failed checks are **non-success**.
+5. **Named gates:** `fast-gate` (then Bugbot when required), Integrator merge, `staging-gate`, and `release-gate` evaluate the **exact PR head SHA**. Missing, empty/zero SHA, wrong SHA, stale event head, skipped/neutral (unless explicitly allowed), or failed checks are **non-success**. The short release profile and identity-bound evidence are defined in `docs/contracts/RELEASE-GATE.md`; promotions reuse the sealed full-suite receipt and never rerun Full.
 
 ## Risk-based Issue PR exceptions
 
@@ -63,18 +63,21 @@ Authorized integration tooling writes / updates a Phase delivery record (fixture
 | `deliveryMode` | `phase-integration` |
 | `phaseBranch` | Phase branch name |
 | `baseSha` | Integration base (usually `development` tip at Phase open) |
-| `headSha` | Exact Phase tip SHA under review |
+| `headSha` | Exact assembled package commit (parent of the identity-binding tip). Must not equal the commit that embeds this file. |
+| `gitTree` | Tree of that assembled package commit, not the identity-binding tree |
 | `mergeSha` | Merge commit SHA after Integrator merge, else `null` |
-| `phasePr` | `{ number, url, base }` when a Phase PR exists |
+| `phasePr` | `{ number, url, base }` when a Phase PR exists (isolated/PR overlay; may be `null` in the committed blob before GitHub identity exists) |
 | `acceptedIssues[]` | `{ branch, sha, accepted, included }` for each required Issue |
-| `namedGateEvidence` | Gate id, exact SHA, status, per-check outcomes |
+| `namedGateEvidence` | Gate id, assembled package SHA, status, per-check outcomes |
 | `riskExceptionIssuePrs[]` | Optional Issue PRs opened under explicit risk classes |
 
-Path on the Phase tip: `.linktrend/phase-delivery-record.json`
+Path on the Phase tip: `.linktrend/phase-delivery-record.json` (gitignore exception; other `.linktrend/*` state stays local).
 
-Schema: `core/managed-core/schemas/delivery-modes.schema.json` (`phaseDeliveryRecord`).
+Schema: `core/managed-core/schemas/delivery-modes.schema.json` (`phaseDeliveryRecord`) and `phase-record.schema.json`.
 
-Packager discovery **must** load and validate this record (branch, `headSha`, and `phase_ready_for_pr` inclusion evidence) before opening a Phase PR.
+Temporary merge assembly stays in an isolated worktree. Coordinator handoff/provenance for the **pushed tip** is written under the git common directory and must match the remote `phase/*` SHA/tree. A later head invalidates that handoff.
+
+Packager discovery **must** load the committed tip record and prove: the blob exists at the tip, the tip's only parent equals recorded `headSha` (the assembled package), identity-binding diff is only the record path, and `phase_ready_for_pr` inclusion evidence holds. Do not rewrite `headSha` to the embedding commit to silence that check. Unsealed records must not reuse forged extra sealed/merge/gate identity fields; `sealedSha` and candidate `sourceSha` bind to the identity-binding tip, while `namedGateEvidence.sha` stays on the assembled package. Isolated assembly has no deployment or promotion authority.
 
 ## Configuration
 

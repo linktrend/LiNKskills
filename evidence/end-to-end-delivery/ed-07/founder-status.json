@@ -1,0 +1,43 @@
+{
+  "generated_at": "2026-09-12T11:42:28.146972Z",
+  "kind": "linkskills-founder-status",
+  "worker_version": "0.2",
+  "enabled": true,
+  "backlog": {
+    "review_queued": 0,
+    "jobs_open": 0,
+    "dead_letter": 0
+  },
+  "metrics_cardinality": 1,
+  "proof_classes": {
+    "source": {
+      "status": "pass",
+      "claim": "versioned Skills worker and conformance package exist in source"
+    },
+    "qualification": {
+      "status": "hold",
+      "claim": "live qualification remains ED-03/ED-04 evidence; this packet does not re-certify"
+    },
+    "selectability": {
+      "status": "hold",
+      "claim": "channel pointers and consumer activation are out of ED-07 source scope"
+    },
+    "consumer": {
+      "status": "hold",
+      "claim": "consumer config and live host integration are prohibited in this packet"
+    },
+    "server": {
+      "status": "hold",
+      "claim": "no deploy or live host mutation"
+    },
+    "production": {
+      "status": "hold",
+      "claim": "supervised production-equivalent run is source-simulated; live host waits XP-01"
+    },
+    "worker_contract": {
+      "status": "pass",
+      "claim": "use/feedback bind, privacy, retention, disable/retry/DLQ, prompt-only refusal"
+    }
+  },
+  "live_host_integration": false
+}

@@ -79,9 +79,28 @@ class V2ContractTests(unittest.TestCase):
             read_operations,
         )
         self.assertNotIn("skills_tool_invoke", policy["operation_map"]["tools"])
+        self.assertEqual(policy["transport_policy"]["implementation_status"], "http_mcp_v2_implemented")
+        self.assertNotEqual(policy["transport_policy"]["implementation_status"], "policy_only_no_transport_change")
         self.assertFalse(policy["compatibility_policy"]["no_dual_era_downgrade"] is False)
         self.assert_valid(policy, "mcp-policy-v0.2.json")
         self.assert_valid(legacy, "compatibility-evidence-v0.2.json")
+
+    def test_production_capability_and_openapi_records_exist(self) -> None:
+        capabilities = load_fixture("mcp", "v0.2-capabilities.json")
+        self.assertEqual(capabilities["mcp_protocol"], "2026-07-28")
+        self.assertFalse(capabilities["legacy_execution"])
+        self.assertEqual(capabilities["resources"], [
+            "skills_capabilities_get", "skills_catalog_list", "skills_catalog_search",
+            "skills_release_list", "skills_release_describe", "skills_qualification_get",
+            "skills_release_entrypoint_get", "skills_release_sections_list",
+            "skills_release_section_get", "skills_release_resources_list",
+            "skills_release_resource_get", "skills_release_content_get", "skills_release_package_get",
+        ])
+        self.assertEqual(len(capabilities["tools"]), 6)
+        openapi = load_fixture("openapi", "skills-api-v0.2.json")
+        self.assertEqual(openapi["openapi"], "3.1.0")
+        self.assertIn("/v2/{operation}", openapi["paths"])
+        self.assertIn("/v2/mcp-capabilities", openapi["paths"])
 
     def test_metadata_vocabularies_and_informational_authority(self) -> None:
         payload = load_fixture("metadata", "valid-informational.json")

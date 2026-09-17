@@ -1,65 +1,50 @@
 {
-  "note": "Honest classification ledger (lanes 5+6, 2026-07-30). No skill is promoted to usable/certified without sealed live executor receipts with network_isolation=denied on a certifiable host. macOS cannot certify (ADR 0009). This file is not a live promotion.",
+  "all_34_default_catalog_state": "draft",
   "as_of": "2026-08-03",
-  "updated_at": "2026-08-03T10:09:03Z",
-  "wave": "lanes_5_6_honesty",
-  "live_certification": "local sealed Linux/container certification performed 2026-08-03T10:09:03Z (1 usable)",
-  "macos_certifiable": false,
-  "linux_bwrap_required": true,
+  "certification_rules": {
+    "allow_unproven_never_certifies": true,
+    "authority": [
+      "docs/adr/0009-confined-executor-network-isolation.md",
+      "packages/core/linkskills_core/certification.py",
+      "evidence/phase10/CLASSIFICATION-HONESTY.md"
+    ],
+    "prompt_only_never_certifies": true,
+    "requires_network_isolation": "denied",
+    "requires_sealed_executor_receipt": true,
+    "suite_authored_observed_output_never_certifies": true
+  },
+  "counts": {
+    "deprecated": 0,
+    "draft": 59,
+    "eval_pending": 0,
+    "retired": 0,
+    "total_catalog_skills": 59,
+    "usable": 0,
+    "with_sealed_live_receipts": 0
+  },
+  "deprecated_or_retired": [],
   "evidence_tier": "sealed local Linux bwrap (or privileged Docker Linux); not stage/prod apply",
-  "launch_target_source": "evidence/phase1/canary-set.json",
-  "required_canonical_artifacts": [
-    "references/skill-pack.json",
-    "references/eval-suite.json",
-    "references/execution-profile.json"
-  ],
   "hashing": {
     "shared_module": "packages/core/linkskills_core/hashing.py",
     "status": "verified_wave_8",
     "validator_recalculates_cross_artifact_hashes": true
   },
   "idempotency": {
-    "fence_token": true,
+    "crash_injection_after_mutation": true,
     "db_owned_atomic_reserve_mutate_complete": true,
+    "downstream_idempotency_propagated_not_implicit_honored": true,
+    "downstream_key_stable_not_fence_derived": true,
+    "external_side_effect_complete_checks_reservation_fence": true,
+    "external_side_effects": "at_least_once_with_intent_result_reconciliation",
+    "fence_token": true,
     "mutation_context_explicit_request_owned": true,
     "mutation_gate_serialize_commit_through_publish": true,
     "mutation_reads_store_not_stale_cache": true,
-    "write_operations_require_validated_idempotency_key": true,
-    "ungated_write_handler_fallback_removed": true,
-    "crash_injection_after_mutation": true,
-    "external_side_effect_complete_checks_reservation_fence": true,
-    "downstream_key_stable_not_fence_derived": true,
-    "downstream_idempotency_propagated_not_implicit_honored": true,
     "reclaim_preserves_durable_side_effect_result": true,
-    "external_side_effects": "at_least_once_with_intent_result_reconciliation"
+    "ungated_write_handler_fallback_removed": true,
+    "write_operations_require_validated_idempotency_key": true
   },
-  "certification_rules": {
-    "requires_sealed_executor_receipt": true,
-    "requires_network_isolation": "denied",
-    "allow_unproven_never_certifies": true,
-    "prompt_only_never_certifies": true,
-    "suite_authored_observed_output_never_certifies": true,
-    "authority": [
-      "docs/adr/0009-confined-executor-network-isolation.md",
-      "packages/core/linkskills_core/certification.py",
-      "evidence/phase10/CLASSIFICATION-HONESTY.md"
-    ]
-  },
-  "non_certifying_local_evidence": [
-    {
-      "path": "evidence/phase3/canary-echo-cli.json",
-      "skill_id": "canary-echo",
-      "in_catalog": false,
-      "platform": "macOS",
-      "network_isolation": null,
-      "legacy_certified_flag": true,
-      "honest_status": "non_certifying \u2014 macOS receipt missing network_isolation=denied; superseded by ADR 0009",
-      "does_not_promote": true
-    }
-  ],
-  "sealed_live_receipt_evidence_paths": [
-    "evidence/phase10/sealed/canary-echo-sealed.json"
-  ],
+  "launch_target_source": "evidence/phase1/canary-set.json",
   "launch_targets_with_canonical_v01_artifacts": [
     "git-safeguard",
     "citation-enforcer",
@@ -72,6 +57,575 @@
     "search-strategy",
     "compliance-guardian"
   ],
+  "legacy_yaml_note": "Legacy references/eval-suite.yaml alone cannot establish launch readiness; validator requires schema-valid canonical JSON for launch targets and recalculated hash agreement.",
+  "linux_bwrap_required": true,
+  "live_certification": "not performed for current remainder suites; historical canary-echo sealed receipts are unbound after suite mutation",
+  "macos_certifiable": false,
+  "non_certifying_local_evidence": [
+    {
+      "does_not_promote": true,
+      "honest_status": "non_certifying \u2014 macOS receipt missing network_isolation=denied; superseded by ADR 0009",
+      "in_catalog": false,
+      "legacy_certified_flag": true,
+      "network_isolation": null,
+      "path": "evidence/phase3/canary-echo-cli.json",
+      "platform": "macOS",
+      "skill_id": "canary-echo"
+    }
+  ],
+  "note": "Honest classification ledger (lanes 5+6, 2026-07-30). No skill is promoted to usable/certified without sealed live executor receipts with network_isolation=denied on a certifiable host. macOS cannot certify (ADR 0009). This file is not a live promotion.",
+  "remain_draft_until_suite_upgrade": [
+    "skill-architect",
+    "self-improvement",
+    "search-strategy"
+  ],
+  "remainder_source_packet": {
+    "initial_production_successor": [
+      "git-safeguard",
+      "persistent-qa",
+      "repository-manager",
+      "skill-template",
+      "tool-architect"
+    ],
+    "issue": 374,
+    "remainder_count": 54,
+    "usable_from_this_packet": false
+  },
+  "required_canonical_artifacts": [
+    "references/skill-pack.json",
+    "references/eval-suite.json",
+    "references/execution-profile.json"
+  ],
+  "sealed_live_receipt_evidence_paths": [
+    "evidence/phase10/sealed/canary-echo-sealed.json"
+  ],
+  "skills": {
+    "agent-workforce-management": {
+      "classification": "draft",
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "suite_executable": true,
+      "usable_claimed": false
+    },
+    "audit-protocol": {
+      "canonical_v01_artifacts": true,
+      "classification": "draft",
+      "launch_target": true,
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "sealed_live_receipt_evidence": [],
+      "suite_executable": true,
+      "suite_readiness": "ready_for_runner",
+      "usable_claimed": false
+    },
+    "awesome-design-presets": {
+      "classification": "draft",
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "suite_executable": true,
+      "usable_claimed": false
+    },
+    "blocker-resolution": {
+      "canonical_v01_artifacts": false,
+      "classification": "draft",
+      "launch_target": false,
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "sealed_live_receipt_evidence": [],
+      "suite_executable": true,
+      "usable_claimed": false
+    },
+    "canary-echo": {
+      "classification": "draft",
+      "historical_sealed_evidence": [
+        "evidence/phase10/sealed/canary-echo-sealed.json"
+      ],
+      "reason": "historical sealed usable receipts no longer bind this mutated eval suite/release; demoted to draft. Hosted sealed evaluator must recertify. No live or usable claim.",
+      "reason_code": "suite_mutated_after_sealed_usable",
+      "sealed_live_receipt_evidence": [],
+      "suite_executable": true,
+      "usable_claimed": false
+    },
+    "channel-ops": {
+      "canonical_v01_artifacts": false,
+      "classification": "draft",
+      "launch_target": false,
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "sealed_live_receipt_evidence": [],
+      "suite_executable": true,
+      "usable_claimed": false
+    },
+    "citation-enforcer": {
+      "canonical_v01_artifacts": true,
+      "classification": "draft",
+      "launch_target": true,
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "sealed_live_receipt_evidence": [],
+      "suite_executable": true,
+      "suite_readiness": "ready_for_runner",
+      "usable_claimed": false
+    },
+    "commercial-contracts-legal-operations": {
+      "classification": "draft",
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "suite_executable": true,
+      "usable_claimed": false
+    },
+    "company-communication": {
+      "classification": "draft",
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "suite_executable": true,
+      "usable_claimed": false
+    },
+    "company-incident-continuity": {
+      "classification": "draft",
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "suite_executable": true,
+      "usable_claimed": false
+    },
+    "company-planning-performance": {
+      "classification": "draft",
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "suite_executable": true,
+      "usable_claimed": false
+    },
+    "compliance-guardian": {
+      "canonical_v01_artifacts": true,
+      "classification": "draft",
+      "launch_target": true,
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "sealed_live_receipt_evidence": [],
+      "suite_executable": true,
+      "suite_readiness": "ready_for_runner",
+      "usable_claimed": false
+    },
+    "creative-director": {
+      "canonical_v01_artifacts": false,
+      "classification": "draft",
+      "launch_target": false,
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "sealed_live_receipt_evidence": [],
+      "suite_executable": true,
+      "usable_claimed": false
+    },
+    "creative-qa": {
+      "canonical_v01_artifacts": false,
+      "classification": "draft",
+      "launch_target": false,
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "sealed_live_receipt_evidence": [],
+      "suite_executable": true,
+      "usable_claimed": false
+    },
+    "department-head": {
+      "canonical_v01_artifacts": false,
+      "classification": "draft",
+      "launch_target": false,
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "sealed_live_receipt_evidence": [],
+      "suite_executable": true,
+      "usable_claimed": false
+    },
+    "devops-sre": {
+      "canonical_v01_artifacts": false,
+      "classification": "draft",
+      "launch_target": false,
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "sealed_live_receipt_evidence": [],
+      "suite_executable": true,
+      "usable_claimed": false
+    },
+    "emil-design-engineering": {
+      "classification": "draft",
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "suite_executable": true,
+      "usable_claimed": false
+    },
+    "engagement-to-strategy-loop": {
+      "canonical_v01_artifacts": false,
+      "classification": "draft",
+      "launch_target": false,
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "sealed_live_receipt_evidence": [],
+      "suite_executable": true,
+      "usable_claimed": false
+    },
+    "executive-decisions-governance": {
+      "classification": "draft",
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "suite_executable": true,
+      "usable_claimed": false
+    },
+    "executive-sync-8am": {
+      "canonical_v01_artifacts": false,
+      "classification": "draft",
+      "launch_target": false,
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "sealed_live_receipt_evidence": [],
+      "suite_executable": true,
+      "usable_claimed": false
+    },
+    "finance-accounting-operations": {
+      "classification": "draft",
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "suite_executable": true,
+      "usable_claimed": false
+    },
+    "git-safeguard": {
+      "canonical_v01_artifacts": true,
+      "classification": "draft",
+      "launch_target": true,
+      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
+      "reason_code": "suite_not_executable",
+      "sealed_live_receipt_evidence": [],
+      "suite_executable": false,
+      "suite_readiness": "ready_for_runner"
+    },
+    "google-workspace-operations": {
+      "classification": "draft",
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "suite_executable": true,
+      "usable_claimed": false
+    },
+    "governed-browser-use": {
+      "classification": "draft",
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "suite_executable": true,
+      "usable_claimed": false
+    },
+    "hybrid-development-methods": {
+      "classification": "draft",
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "suite_executable": true,
+      "usable_claimed": false
+    },
+    "impeccable-design-system": {
+      "classification": "draft",
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "suite_executable": true,
+      "usable_claimed": false
+    },
+    "lead-engineer": {
+      "canonical_v01_artifacts": false,
+      "classification": "draft",
+      "launch_target": false,
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "sealed_live_receipt_evidence": [],
+      "suite_executable": true,
+      "usable_claimed": false
+    },
+    "market-analyst": {
+      "canonical_v01_artifacts": false,
+      "classification": "draft",
+      "launch_target": false,
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "sealed_live_receipt_evidence": [],
+      "suite_executable": true,
+      "usable_claimed": false
+    },
+    "marketing-strategist": {
+      "canonical_v01_artifacts": false,
+      "classification": "draft",
+      "launch_target": false,
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "sealed_live_receipt_evidence": [],
+      "suite_executable": true,
+      "usable_claimed": false
+    },
+    "meeting-management": {
+      "classification": "draft",
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "suite_executable": true,
+      "usable_claimed": false
+    },
+    "operational-reporting": {
+      "classification": "draft",
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "suite_executable": true,
+      "usable_claimed": false
+    },
+    "persistent-qa": {
+      "canonical_v01_artifacts": false,
+      "classification": "draft",
+      "launch_target": false,
+      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
+      "reason_code": "suite_not_executable",
+      "sealed_live_receipt_evidence": [],
+      "suite_executable": false
+    },
+    "personal-compliance": {
+      "classification": "draft",
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "suite_executable": true,
+      "usable_claimed": false
+    },
+    "prd-architect": {
+      "canonical_v01_artifacts": false,
+      "classification": "draft",
+      "launch_target": false,
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "sealed_live_receipt_evidence": [],
+      "suite_executable": true,
+      "usable_claimed": false
+    },
+    "private-health-wellbeing": {
+      "classification": "draft",
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "suite_executable": true,
+      "usable_claimed": false
+    },
+    "procurement-vendor-management": {
+      "classification": "draft",
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "suite_executable": true,
+      "usable_claimed": false
+    },
+    "repository-manager": {
+      "canonical_v01_artifacts": true,
+      "classification": "draft",
+      "launch_target": true,
+      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
+      "reason_code": "suite_not_executable",
+      "sealed_live_receipt_evidence": [],
+      "suite_executable": false,
+      "suite_readiness": "ready_for_runner"
+    },
+    "research": {
+      "classification": "draft",
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "suite_executable": true,
+      "usable_claimed": false
+    },
+    "revenue-adapter-base": {
+      "canonical_v01_artifacts": false,
+      "classification": "draft",
+      "launch_target": false,
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "sealed_live_receipt_evidence": [],
+      "suite_executable": true,
+      "usable_claimed": false
+    },
+    "sales-customer-management": {
+      "classification": "draft",
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "suite_executable": true,
+      "usable_claimed": false
+    },
+    "search-strategy": {
+      "canonical_v01_artifacts": true,
+      "classification": "draft",
+      "launch_target": true,
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "sealed_live_receipt_evidence": [],
+      "suite_executable": true,
+      "suite_readiness": "baseline_incomplete",
+      "usable_claimed": false
+    },
+    "self-critique-loop": {
+      "canonical_v01_artifacts": false,
+      "classification": "draft",
+      "launch_target": false,
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "sealed_live_receipt_evidence": [],
+      "suite_executable": true,
+      "usable_claimed": false
+    },
+    "self-improvement": {
+      "canonical_v01_artifacts": true,
+      "classification": "draft",
+      "launch_target": true,
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "sealed_live_receipt_evidence": [],
+      "suite_executable": true,
+      "suite_readiness": "baseline_incomplete",
+      "usable_claimed": false
+    },
+    "seo-semantic-auditor": {
+      "canonical_v01_artifacts": false,
+      "classification": "draft",
+      "launch_target": false,
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "sealed_live_receipt_evidence": [],
+      "suite_executable": true,
+      "usable_claimed": false
+    },
+    "skill-architect": {
+      "canonical_v01_artifacts": true,
+      "classification": "draft",
+      "launch_target": true,
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "sealed_live_receipt_evidence": [],
+      "suite_executable": true,
+      "suite_readiness": "baseline_incomplete",
+      "usable_claimed": false
+    },
+    "skill-template": {
+      "canonical_v01_artifacts": true,
+      "classification": "draft",
+      "launch_target": true,
+      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
+      "reason_code": "suite_not_executable",
+      "sealed_live_receipt_evidence": [],
+      "suite_executable": false,
+      "suite_readiness": "ready_for_runner"
+    },
+    "smart-file-clerk": {
+      "canonical_v01_artifacts": false,
+      "classification": "draft",
+      "launch_target": false,
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "sealed_live_receipt_evidence": [],
+      "suite_executable": true,
+      "usable_claimed": false
+    },
+    "software-pm": {
+      "canonical_v01_artifacts": false,
+      "classification": "draft",
+      "launch_target": false,
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "sealed_live_receipt_evidence": [],
+      "suite_executable": true,
+      "usable_claimed": false
+    },
+    "studio-architect": {
+      "canonical_v01_artifacts": false,
+      "classification": "draft",
+      "launch_target": false,
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "sealed_live_receipt_evidence": [],
+      "suite_executable": true,
+      "usable_claimed": false
+    },
+    "studio-controller": {
+      "canonical_v01_artifacts": false,
+      "classification": "draft",
+      "launch_target": false,
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "sealed_live_receipt_evidence": [],
+      "suite_executable": true,
+      "usable_claimed": false
+    },
+    "studio-health-reporting": {
+      "canonical_v01_artifacts": false,
+      "classification": "draft",
+      "launch_target": false,
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "sealed_live_receipt_evidence": [],
+      "suite_executable": true,
+      "usable_claimed": false
+    },
+    "target-assessment-prioritization": {
+      "classification": "draft",
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "suite_executable": true,
+      "usable_claimed": false
+    },
+    "target-definition-segmentation": {
+      "classification": "draft",
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "suite_executable": true,
+      "usable_claimed": false
+    },
+    "task-decomposition": {
+      "canonical_v01_artifacts": false,
+      "classification": "draft",
+      "launch_target": false,
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "sealed_live_receipt_evidence": [],
+      "suite_executable": true,
+      "usable_claimed": false
+    },
+    "taste-design-exploration": {
+      "classification": "draft",
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "suite_executable": true,
+      "usable_claimed": false
+    },
+    "time-management": {
+      "classification": "draft",
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "suite_executable": true,
+      "usable_claimed": false
+    },
+    "tool-architect": {
+      "canonical_v01_artifacts": true,
+      "classification": "draft",
+      "launch_target": true,
+      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
+      "reason_code": "suite_not_executable",
+      "sealed_live_receipt_evidence": [],
+      "suite_executable": false,
+      "suite_readiness": "ready_for_runner"
+    },
+    "ui-ux-guardian": {
+      "canonical_v01_artifacts": false,
+      "classification": "draft",
+      "launch_target": false,
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "sealed_live_receipt_evidence": [],
+      "suite_executable": true,
+      "usable_claimed": false
+    },
+    "workflow-architect": {
+      "canonical_v01_artifacts": false,
+      "classification": "draft",
+      "launch_target": false,
+      "reason": "confined executable eval cases exist; hosted sealed evaluator receipts are required before usable; filesystem presence is not a production pass",
+      "reason_code": "awaiting_hosted_sealed_qualification",
+      "sealed_live_receipt_evidence": [],
+      "suite_executable": true,
+      "usable_claimed": false
+    }
+  },
+  "updated_at": "2026-08-03T10:09:03Z",
   "usable_candidates_after_real_eval": [
     "git-safeguard",
     "citation-enforcer",
@@ -82,362 +636,5 @@
     "compliance-guardian"
   ],
   "usable_candidates_note": "Aspirational only after Linux bwrap sealed receipts + suite pass. Not promoted in this ledger.",
-  "remain_draft_until_suite_upgrade": [
-    "skill-architect",
-    "self-improvement",
-    "search-strategy"
-  ],
-  "deprecated_or_retired": [],
-  "all_34_default_catalog_state": "draft",
-  "skills": {
-    "audit-protocol": {
-      "classification": "draft",
-      "launch_target": true,
-      "canonical_v01_artifacts": true,
-      "suite_readiness": "ready_for_runner",
-      "sealed_live_receipt_evidence": [],
-      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
-      "reason_code": "suite_not_executable",
-      "suite_executable": false
-    },
-    "blocker-resolution": {
-      "classification": "draft",
-      "launch_target": false,
-      "canonical_v01_artifacts": false,
-      "sealed_live_receipt_evidence": [],
-      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
-      "reason_code": "suite_not_executable",
-      "suite_executable": false
-    },
-    "canary-echo": {
-      "classification": "usable",
-      "sealed_live_receipt_evidence": [
-        "evidence/phase10/sealed/canary-echo-sealed.json"
-      ],
-      "reason": "certified: executor receipts bind case, immutable skill release, deterministic execution profile, toolchain, and collected evidence",
-      "reason_code": "certified_usable",
-      "suite_executable": true,
-      "skill_release_hash": "skill-release:006a23b0af3abbcb9a0600c3f44bf337b89dc6cdd5be6d328097a2498a5f05bb",
-      "profile_hash": "9db2d1db2663d9e3fb2a60b0ab4aaaf291aed010d155caba65798b5ecb0ec188",
-      "source_hash": "29b179692378ba32ee244afa7f8b8017e918a158f37127e117cfe24a820f3d83",
-      "tool_hash": "29b179692378ba32ee244afa7f8b8017e918a158f37127e117cfe24a820f3d83",
-      "toolchain": {
-        "tools": [
-          {
-            "tool_id": "text-echo",
-            "version": "1.0.0",
-            "source_hash": "29b179692378ba32ee244afa7f8b8017e918a158f37127e117cfe24a820f3d83",
-            "tool_hash": "29b179692378ba32ee244afa7f8b8017e918a158f37127e117cfe24a820f3d83"
-          }
-        ]
-      }
-    },
-    "channel-ops": {
-      "classification": "draft",
-      "launch_target": false,
-      "canonical_v01_artifacts": false,
-      "sealed_live_receipt_evidence": [],
-      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
-      "reason_code": "suite_not_executable",
-      "suite_executable": false
-    },
-    "citation-enforcer": {
-      "classification": "draft",
-      "launch_target": true,
-      "canonical_v01_artifacts": true,
-      "suite_readiness": "ready_for_runner",
-      "sealed_live_receipt_evidence": [],
-      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
-      "reason_code": "suite_not_executable",
-      "suite_executable": false
-    },
-    "compliance-guardian": {
-      "classification": "draft",
-      "launch_target": true,
-      "canonical_v01_artifacts": true,
-      "suite_readiness": "ready_for_runner",
-      "sealed_live_receipt_evidence": [],
-      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
-      "reason_code": "suite_not_executable",
-      "suite_executable": false
-    },
-    "creative-director": {
-      "classification": "draft",
-      "launch_target": false,
-      "canonical_v01_artifacts": false,
-      "sealed_live_receipt_evidence": [],
-      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
-      "reason_code": "suite_not_executable",
-      "suite_executable": false
-    },
-    "creative-qa": {
-      "classification": "draft",
-      "launch_target": false,
-      "canonical_v01_artifacts": false,
-      "sealed_live_receipt_evidence": [],
-      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
-      "reason_code": "suite_not_executable",
-      "suite_executable": false
-    },
-    "department-head": {
-      "classification": "draft",
-      "launch_target": false,
-      "canonical_v01_artifacts": false,
-      "sealed_live_receipt_evidence": [],
-      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
-      "reason_code": "suite_not_executable",
-      "suite_executable": false
-    },
-    "devops-sre": {
-      "classification": "draft",
-      "launch_target": false,
-      "canonical_v01_artifacts": false,
-      "sealed_live_receipt_evidence": [],
-      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
-      "reason_code": "suite_not_executable",
-      "suite_executable": false
-    },
-    "engagement-to-strategy-loop": {
-      "classification": "draft",
-      "launch_target": false,
-      "canonical_v01_artifacts": false,
-      "sealed_live_receipt_evidence": [],
-      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
-      "reason_code": "suite_not_executable",
-      "suite_executable": false
-    },
-    "executive-sync-8am": {
-      "classification": "draft",
-      "launch_target": false,
-      "canonical_v01_artifacts": false,
-      "sealed_live_receipt_evidence": [],
-      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
-      "reason_code": "suite_not_executable",
-      "suite_executable": false
-    },
-    "git-safeguard": {
-      "classification": "draft",
-      "launch_target": true,
-      "canonical_v01_artifacts": true,
-      "suite_readiness": "ready_for_runner",
-      "sealed_live_receipt_evidence": [],
-      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
-      "reason_code": "suite_not_executable",
-      "suite_executable": false
-    },
-    "lead-engineer": {
-      "classification": "draft",
-      "launch_target": false,
-      "canonical_v01_artifacts": false,
-      "sealed_live_receipt_evidence": [],
-      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
-      "reason_code": "suite_not_executable",
-      "suite_executable": false
-    },
-    "market-analyst": {
-      "classification": "draft",
-      "launch_target": false,
-      "canonical_v01_artifacts": false,
-      "sealed_live_receipt_evidence": [],
-      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
-      "reason_code": "suite_not_executable",
-      "suite_executable": false
-    },
-    "marketing-strategist": {
-      "classification": "draft",
-      "launch_target": false,
-      "canonical_v01_artifacts": false,
-      "sealed_live_receipt_evidence": [],
-      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
-      "reason_code": "suite_not_executable",
-      "suite_executable": false
-    },
-    "persistent-qa": {
-      "classification": "draft",
-      "launch_target": false,
-      "canonical_v01_artifacts": false,
-      "sealed_live_receipt_evidence": [],
-      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
-      "reason_code": "suite_not_executable",
-      "suite_executable": false
-    },
-    "prd-architect": {
-      "classification": "draft",
-      "launch_target": false,
-      "canonical_v01_artifacts": false,
-      "sealed_live_receipt_evidence": [],
-      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
-      "reason_code": "suite_not_executable",
-      "suite_executable": false
-    },
-    "repository-manager": {
-      "classification": "draft",
-      "launch_target": true,
-      "canonical_v01_artifacts": true,
-      "suite_readiness": "ready_for_runner",
-      "sealed_live_receipt_evidence": [],
-      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
-      "reason_code": "suite_not_executable",
-      "suite_executable": false
-    },
-    "revenue-adapter-base": {
-      "classification": "draft",
-      "launch_target": false,
-      "canonical_v01_artifacts": false,
-      "sealed_live_receipt_evidence": [],
-      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
-      "reason_code": "suite_not_executable",
-      "suite_executable": false
-    },
-    "search-strategy": {
-      "classification": "draft",
-      "launch_target": true,
-      "canonical_v01_artifacts": true,
-      "suite_readiness": "baseline_incomplete",
-      "sealed_live_receipt_evidence": [],
-      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
-      "reason_code": "suite_not_executable",
-      "suite_executable": false
-    },
-    "self-critique-loop": {
-      "classification": "draft",
-      "launch_target": false,
-      "canonical_v01_artifacts": false,
-      "sealed_live_receipt_evidence": [],
-      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
-      "reason_code": "suite_not_executable",
-      "suite_executable": false
-    },
-    "self-improvement": {
-      "classification": "draft",
-      "launch_target": true,
-      "canonical_v01_artifacts": true,
-      "suite_readiness": "baseline_incomplete",
-      "sealed_live_receipt_evidence": [],
-      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
-      "reason_code": "suite_not_executable",
-      "suite_executable": false
-    },
-    "seo-semantic-auditor": {
-      "classification": "draft",
-      "launch_target": false,
-      "canonical_v01_artifacts": false,
-      "sealed_live_receipt_evidence": [],
-      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
-      "reason_code": "suite_not_executable",
-      "suite_executable": false
-    },
-    "skill-architect": {
-      "classification": "draft",
-      "launch_target": true,
-      "canonical_v01_artifacts": true,
-      "suite_readiness": "baseline_incomplete",
-      "sealed_live_receipt_evidence": [],
-      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
-      "reason_code": "suite_not_executable",
-      "suite_executable": false
-    },
-    "skill-template": {
-      "classification": "draft",
-      "launch_target": true,
-      "canonical_v01_artifacts": true,
-      "suite_readiness": "ready_for_runner",
-      "sealed_live_receipt_evidence": [],
-      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
-      "reason_code": "suite_not_executable",
-      "suite_executable": false
-    },
-    "smart-file-clerk": {
-      "classification": "draft",
-      "launch_target": false,
-      "canonical_v01_artifacts": false,
-      "sealed_live_receipt_evidence": [],
-      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
-      "reason_code": "suite_not_executable",
-      "suite_executable": false
-    },
-    "software-pm": {
-      "classification": "draft",
-      "launch_target": false,
-      "canonical_v01_artifacts": false,
-      "sealed_live_receipt_evidence": [],
-      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
-      "reason_code": "suite_not_executable",
-      "suite_executable": false
-    },
-    "studio-architect": {
-      "classification": "draft",
-      "launch_target": false,
-      "canonical_v01_artifacts": false,
-      "sealed_live_receipt_evidence": [],
-      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
-      "reason_code": "suite_not_executable",
-      "suite_executable": false
-    },
-    "studio-controller": {
-      "classification": "draft",
-      "launch_target": false,
-      "canonical_v01_artifacts": false,
-      "sealed_live_receipt_evidence": [],
-      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
-      "reason_code": "suite_not_executable",
-      "suite_executable": false
-    },
-    "studio-health-reporting": {
-      "classification": "draft",
-      "launch_target": false,
-      "canonical_v01_artifacts": false,
-      "sealed_live_receipt_evidence": [],
-      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
-      "reason_code": "suite_not_executable",
-      "suite_executable": false
-    },
-    "task-decomposition": {
-      "classification": "draft",
-      "launch_target": false,
-      "canonical_v01_artifacts": false,
-      "sealed_live_receipt_evidence": [],
-      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
-      "reason_code": "suite_not_executable",
-      "suite_executable": false
-    },
-    "tool-architect": {
-      "classification": "draft",
-      "launch_target": true,
-      "canonical_v01_artifacts": true,
-      "suite_readiness": "ready_for_runner",
-      "sealed_live_receipt_evidence": [],
-      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
-      "reason_code": "suite_not_executable",
-      "suite_executable": false
-    },
-    "ui-ux-guardian": {
-      "classification": "draft",
-      "launch_target": false,
-      "canonical_v01_artifacts": false,
-      "sealed_live_receipt_evidence": [],
-      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
-      "reason_code": "suite_not_executable",
-      "suite_executable": false
-    },
-    "workflow-architect": {
-      "classification": "draft",
-      "launch_target": false,
-      "canonical_v01_artifacts": false,
-      "sealed_live_receipt_evidence": [],
-      "reason": "eval suite has no execute blocks; prompt-only / judged-shape suites cannot certify (ADR 0006)",
-      "reason_code": "suite_not_executable",
-      "suite_executable": false
-    }
-  },
-  "counts": {
-    "total_catalog_skills": 35,
-    "draft": 34,
-    "usable": 1,
-    "eval_pending": 0,
-    "deprecated": 0,
-    "retired": 0,
-    "with_sealed_live_receipts": 1
-  },
-  "legacy_yaml_note": "Legacy references/eval-suite.yaml alone cannot establish launch readiness; validator requires schema-valid canonical JSON for launch targets and recalculated hash agreement."
+  "wave": "lanes_5_6_honesty"
 }

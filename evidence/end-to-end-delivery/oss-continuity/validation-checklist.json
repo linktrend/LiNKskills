@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "kind": "linkskills-oss-continuity-validation-checklist",
+  "installationComplete": false,
+  "boundIdentity": {
+    "repository": "linktrend/LiNKskills",
+    "ref": "issue/352-prepare-oss-continuity-evidence-and-validation-f",
+    "commit": "f97951feec6546ff924c65611802afd7ab19d2a3",
+    "tree": "9bd1ba9eb32885146317f25a1cd3b223d1540d9e"
+  },
+  "authorityDoc": "docs/end-to-end-delivery/OSS-CONTINUITY.md",
+  "recordSchema": "evidence/end-to-end-delivery/oss-continuity/record.schema.json",
+  "statusVocabulary": [
+    "RECORDED_SOURCE_FACT",
+    "PENDING",
+    "HOLD",
+    "NOT_APPLICABLE"
+  ],
+  "items": [
+    {
+      "id": "C-01",
+      "dimension": "preserved_upstream_source_artifact",
+      "requirement": "Location and owner recorded; preservationMode read_only_default unless publishing a new LiNKskills-owned identity.",
+      "status": "RECORDED_SOURCE_FACT",
+      "evidence": [
+        "docs/end-to-end-delivery/OSS-INVENTORY.md",
+        "evidence/end-to-end-delivery/oss-continuity/registry.json",
+        "evidence/end-to-end-delivery/oss-continuity/preservation-policy.json"
+      ]
+    },
+    {
+      "id": "C-02",
+      "dimension": "immutable_version_commit_digest",
+      "requirement": "Version and/or commit and/or tree and/or digest recorded; truncated inventory strings not padded.",
+      "status": "PENDING",
+      "reason": "Full live image digest sha256:7cf2780… and several Platform/runtime versions require execution-time refresh. ED-04 source digests exist but liveProviderMutation is false.",
+      "recordedWithoutCompletion": [
+        "ENV-00 requirements-dev.lock sha256 cb534f8847e80e8af1fa115745f62650ee67488dde1a876da4f443361bf448c1",
+        "ED-00 development 7a813f529f7b25a40fd3e88f74fb0e86c7c728d5 tree d0bb392351994810173f730c47b63112c31e391b",
+        "admitted issue/352 commit f97951feec6546ff924c65611802afd7ab19d2a3 tree 9bd1ba9eb32885146317f25a1cd3b223d1540d9e"
+      ]
+    },
+    {
+      "id": "C-03",
+      "dimension": "provenance_license",
+      "requirement": "Declared licence or explicit pending/conflict; attribution paths retained.",
+      "status": "PENDING",
+      "reason": "Umbrella pyproject licence is Proprietary with no root LICENSE file. Impeccable LICENSE.upstream is Apache-2.0 text while NOTICE.upstream.md attributes a subset of files to MIT original ehmo/platform-design-skills. Do not collapse SPDX.",
+      "recordedWithoutCompletion": [
+        "collections/*/LICENSE.upstream hashes in OSS-CONTINUITY.md",
+        "collections/google-workspace README Apache-2.0 plus commit a3768d0e82ad83cca2da97724e46bea4ff0e6dbd",
+        "tools/gws/vendor/link-gws-cli/LICENSE Apache-2.0 sha256 cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+      ]
+    },
+    {
+      "id": "C-04",
+      "dimension": "reproducible_installation",
+      "requirement": "Accepted install is hash-locked or digest-pinned. Unbounded requirements-dev.txt is compile input only.",
+      "status": "PENDING",
+      "reason": "ENV-00 lock and CI --require-hashes line exist as source facts. No Server 01, consumer, Platform, or production install is claimed complete by this framework.",
+      "recordedCommand": "python -m pip install --require-hashes -r requirements-dev.lock"
+    },
+    {
+      "id": "C-05",
+      "dimension": "compatibility",
+      "requirement": "Compatible with requires-python >=3.11; CI ubuntu-24.04-arm Python 3.11 remains authority; ENV-00 worker CPython 3.12.3 x86_64 is a documented valid worker.",
+      "status": "PENDING",
+      "reason": "This cloud VM has CPython 3.12.3 only. Python 3.11 is absent. Diagnosed, not used as permission to change locks or CI."
+    },
+    {
+      "id": "C-06",
+      "dimension": "explicit_update_review",
+      "requirement": "No automatic pointer, activation, or vendor overwrite. Candidates remain non-promoting until review.",
+      "status": "RECORDED_SOURCE_FACT",
+      "evidence": [
+        "docs/planning/governed-skill-expansion/FROZEN-INTERFACES.md section 5",
+        "collections/google-workspace/README.md update-candidate.json non-promoting",
+        "autoPromote false in preservation-policy.json"
+      ]
+    },
+    {
+      "id": "C-07",
+      "dimension": "rollback",
+      "requirement": "Named prior immutable identity and restoring owner, or PENDING if prior identity is truncated or live-unproven.",
+      "status": "PENDING",
+      "reason": "Packet recovery procedures exist in WORK-PACKETS.md. Current production image/source strings are truncated in OSS-INVENTORY.md. Live rollback rehearsal is ED-08 remaining work."
+    }
+  ],
+  "acceptanceCommandsForThisFramework": [
+    ["git", "diff", "--check", "origin/development...HEAD"],
+    ["python3", "-m", "json.tool", "docs/end-to-end-delivery/EXECUTION-MANIFEST.json"]
+  ]
+}

@@ -1,0 +1,7 @@
+ARG RUNTIME_IMAGE
+FROM ${RUNTIME_IMAGE}
+USER root
+RUN apt-get update && apt-get install --no-install-recommends -y bubblewrap \
+    && rm -rf /var/lib/apt/lists/*
+USER 10002:10002
+ENTRYPOINT ["python3", "/opt/linkskills/scripts/provider_release.py"]

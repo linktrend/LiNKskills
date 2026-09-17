@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "kind": "linkskills-ed-09-owner-receipts",
+  "packet": "ED-09",
+  "requiredBeforeAcceptance": true,
+  "status": "UNPROVEN",
+  "executed": false,
+  "thisPacketMustNotImpersonateOwners": true,
+  "receipts": [
+    {
+      "id": "cursor-project-scoped",
+      "required": true,
+      "owner": "LiNKskills project-scoped Cursor canary owner",
+      "xp": null,
+      "present": false,
+      "path": null,
+      "digest": null,
+      "status": null,
+      "boundIdentities": null
+    },
+    {
+      "id": "xp-02-shared-cursor",
+      "requiredWhen": "sharedOrGlobalCursorMutation",
+      "required": false,
+      "owner": "shared Cursor configuration owner",
+      "xp": "XP-02",
+      "present": false,
+      "path": null,
+      "digest": null,
+      "status": null,
+      "boundIdentities": null,
+      "notes": "Required only if a shared/global Cursor mutation is unavoidable. Absence is allowed when the canary stays project-scoped."
+    },
+    {
+      "id": "xp-03-codex",
+      "required": true,
+      "owner": "Codex / LiNKbrain host owner",
+      "xp": "XP-03",
+      "present": false,
+      "path": null,
+      "digest": null,
+      "status": null,
+      "boundIdentities": null
+    },
+    {
+      "id": "xp-04-lisa-openclaw",
+      "required": true,
+      "owner": "OpenClaw Prime / Lisa owner",
+      "xp": "XP-04",
+      "present": false,
+      "path": null,
+      "digest": null,
+      "status": null,
+      "boundIdentities": null
+    }
+  ],
+  "allRequiredOwnerReceiptsPresent": false,
+  "notes": "Owner receipts must be supplied by the named owners at compatible pins. This checkpoint does not mint, request, or fabricate them."
+}

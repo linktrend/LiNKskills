@@ -1,0 +1,28 @@
+{
+  "schema_version": "1.0",
+  "package_id": "lskills-provider-v2-runtime",
+  "package_version": "1.0.0",
+  "status": "source_only_no_apply",
+  "apply_authority": "LiNKplatform",
+  "live_apply_surface": "Server01",
+  "prerequisite_package": "lskills-production-store-readiness",
+  "compatible_postgres_major": [17],
+  "entries": [
+    {
+      "order": 14,
+      "id": "20260915031801_lskills_provider_v2_runtime",
+      "up": "supabase/migrations/20260915031801_lskills_provider_v2_runtime.sql",
+      "up_sha256": "1262ad8200130d7127407d659fc0d9ddfdc5aacba164aab9fd8ad64ccdd914e1",
+      "apply_authority": "LiNKplatform",
+      "down": null,
+      "down_sha256": null,
+      "rollback": "Revert application/configuration to retained release; preserve tables and qualification evidence. Do not drop schema lskills cascade. Disable provider_bindings independently. Revoke via lifecycle column."
+    }
+  ],
+  "digest_algorithm": "sha256",
+  "prerequisites": {
+    "lskills_schema": true,
+    "roles": ["svc_lskills_runtime", "svc_lskills_librarian"],
+    "notes": "Requires existing lskills catalog/registry/store package. Live apply is Server01/Platform only."
+  }
+}

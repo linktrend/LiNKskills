@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "kind": "linkskills-ed-10-criteria-ledger",
+  "packet": "ED-10",
+  "authority": "docs/end-to-end-delivery/PRD.md#8-definition-of-done",
+  "statusVocabulary": {
+    "PENDING": "Required proof is not supplied on this candidate. Not a pass.",
+    "PASS": "Every required sub-proof is present at compatible real identities. Forbidden in this framework checkpoint.",
+    "HOLD": "A named blocker remains after inspection of supplied receipts."
+  },
+  "pendingIsNotPassed": true,
+  "aggregatePercentForbidden": true,
+  "summary": {
+    "pending": 13,
+    "pass": 0,
+    "hold": 0
+  },
+  "criteria": [
+    {
+      "id": "DOD-01",
+      "requirement": "Protected source and deployed image/release identities are exact and independently verified.",
+      "requiredReceipts": ["ED-08"],
+      "status": "PENDING"
+    },
+    {
+      "id": "DOD-02",
+      "requirement": "Production Gateway is live and ready (/health=200, /ready=200) with auth and durable store reachable.",
+      "requiredReceipts": ["ED-08"],
+      "status": "PENDING"
+    },
+    {
+      "id": "DOD-03",
+      "requirement": "Provider-v2 discovery/retrieval and digest verification pass; legacy execution operations are unavailable on the v2 route.",
+      "requiredReceipts": ["ED-08"],
+      "status": "PENDING"
+    },
+    {
+      "id": "DOD-04",
+      "requirement": "Five initial releases have immutable live publication plus valid executed-case qualification and are selectable only through intended consumer pins.",
+      "requiredReceipts": ["ED-03", "ED-04", "ED-05", "ED-08", "ED-09"],
+      "status": "PENDING"
+    },
+    {
+      "id": "DOD-05",
+      "requirement": "Cursor, Codex, and Lisa complete ordered representative end-to-end use; 48-hour Cursor observation is required for internal-launch completeness.",
+      "requiredReceipts": ["ED-09"],
+      "status": "PENDING"
+    },
+    {
+      "id": "DOD-06",
+      "requirement": "Wrong identity/scope, revoked/tampered content, store outage, provider outage, and disabled-consumer scenarios fail closed.",
+      "requiredReceipts": ["ED-09"],
+      "status": "PENDING"
+    },
+    {
+      "id": "DOD-07",
+      "requirement": "Metrics, logs, alerts, founder report, Librarian status, backup, restore, restart, drain, and rollback evidence pass.",
+      "requiredReceipts": ["ED-07", "ED-08", "OSS-rollback"],
+      "status": "PENDING"
+    },
+    {
+      "id": "DOD-08",
+      "requirement": "Brain/Skills separation, privacy/redaction, least privilege, and consumer tool authority remain intact.",
+      "requiredReceipts": ["ED-08", "ED-09"],
+      "status": "PENDING"
+    },
+    {
+      "id": "DOD-09",
+      "requirement": "Accepted improvement-loop receipt for the real PACI canary correction plus tool blast-radius/rollback proof.",
+      "requiredReceipts": ["IMP-00"],
+      "status": "PENDING"
+    },
+    {
+      "id": "DOD-10",
+      "requirement": "Database, request, model, storage, and evaluation cost measured and founder-accepted; security/privacy/supply-chain has no launch blocker.",
+      "requiredReceipts": ["ED-10-cost", "OSS-provenance"],
+      "status": "PENDING"
+    },
+    {
+      "id": "DOD-11",
+      "requirement": "All 59 source-catalogue entries are classified; only the five initial releases may become selectable.",
+      "requiredReceipts": ["ED-03", "ED-04", "ED-09"],
+      "status": "PENDING"
+    },
+    {
+      "id": "DOD-12",
+      "requirement": "Independent narrow reviews and final cross-surface acceptance reconcile source, provider/selectability, consumer, server/live, and production proof.",
+      "requiredReceipts": ["ED-08", "ED-09", "IMP-00", "independent-review"],
+      "status": "PENDING"
+    },
+    {
+      "id": "DOD-13",
+      "requirement": "Later expansion remains disabled/unqualified except for a separately approved material scope change.",
+      "requiredReceipts": ["ED-05", "ED-09"],
+      "status": "PENDING"
+    }
+  ]
+}
