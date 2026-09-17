@@ -619,7 +619,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     stdout_buffer = getattr(sys.stdout, "buffer", None)
     if stdout_buffer is not None:
         stdout_buffer.write(text.encode("utf-8"))
-    else:  # lgtm [py/clear-text-logging]
+    else:
+        # codeql[py/clear-text-logging]
         sys.stdout.write(text)
     return 0 if summary["complete"] else 1
 
