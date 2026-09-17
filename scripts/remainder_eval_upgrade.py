@@ -7,7 +7,6 @@ Does not mark skills usable. Source helpers fail closed on unknown case ids.
 from __future__ import annotations
 
 import json
-import re
 import shutil
 import sys
 from pathlib import Path
@@ -22,12 +21,16 @@ sys.path.insert(0, str(REPO))
 
 from linkskills_eval_runner.ed03 import INITIAL_RELEASE_PROFILES  # noqa: E402
 from linkskills_eval_runner.remainder import remainder_skill_ids  # noqa: E402
+from linkskills_eval_runner.remainder_driver import (  # noqa: E402
+    canonical_assertions,
+    classify_contract_status,
+)
 from linkskills_core.hashing import (  # noqa: E402
     build_skill_bundle_manifest,
     execution_profile_identity_hash,
 )
 
-DRIVER_TEMPLATE = REPO / "scripts" / "templates" / "remainder_eval_driver.py"
+DRIVER_TEMPLATE = REPO / "packages" / "eval_runner" / "linkskills_eval_runner" / "remainder_driver.py"
 INITIAL_IDS = {item["skillId"] for item in INITIAL_RELEASE_PROFILES}
 
 FAMILY_CASES: dict[str, dict[str, Any]] = {
@@ -132,53 +135,9 @@ FAMILY_CASES: dict[str, dict[str, Any]] = {
     },
 }
 
-STATUS_RE = re.compile(
-    r"(refuse|guardrail|skip|bypass|block|reject|denied|fail|recover|retry|secret|privacy|redact)",
-    re.I,
-)
-
-
-def _status_for_existing(scenario: MappingLike) -> str:
-    blob = " ".join(
-        [
-            str(scenario.get("id") or ""),
-            str(scenario.get("case_type") or ""),
-            str(scenario.get("input") or ""),
-            " ".join(str(x) for x in (scenario.get("expected_criteria") or [])),
-        ]
-    ).lower()
-    if "recover" in blob or "retry" in blob:
-        return "RECOVERED"
-    if any(tok in blob for tok in ("refuse", "guardrail", "skip", "bypass")):
-        return "REFUSED"
-    if any(tok in blob for tok in ("block", "reject", "denied", "fail", "invalid", "cycle")):
-        return "BLOCKED"
-    if any(tok in blob for tok in ("secret", "privacy", "redact", "pii")):
-        return "REDACTED"
-    return "PASS"
-
+INJECTED_STATUSES = frozenset({"PASS", "REFUSED", "BLOCKED", "RECOVERED", "REDACTED"})
 
 MappingLike = dict[str, Any]
-
-
-def _must_contain(scenario: MappingLike, status: str) -> list[str]:
-    existing = ((scenario.get("assertions") or {}) if isinstance(scenario.get("assertions"), dict) else {}).get(
-        "must_contain"
-    ) or []
-    tokens = [str(item) for item in existing if str(item).strip()]
-    tokens.append(str(scenario.get("id") or ""))
-    tokens.append(status)
-    for criterion in scenario.get("expected_criteria") or []:
-        words = [w for w in re.findall(r"[A-Za-z0-9_./:-]{4,}", str(criterion)) if w.lower() not in {"that", "this", "with", "from", "must"}]
-        tokens.extend(words[:4])
-    # de-dupe preserving order
-    out: list[str] = []
-    seen: set[str] = set()
-    for token in tokens:
-        if token and token not in seen:
-            seen.add(token)
-            out.append(token)
-    return out[:12]
 
 
 def _execute_block(case_id: str) -> dict[str, Any]:
@@ -191,54 +150,62 @@ def _execute_block(case_id: str) -> dict[str, Any]:
     }
 
 
-def _driver_payload(skill_id: str, scenario: MappingLike, status: str) -> dict[str, Any]:
-    criteria = [str(item) for item in (scenario.get("expected_criteria") or [])]
-    summary = " ".join(criteria) if criteria else f"{skill_id} confined contract case {scenario.get('id')}"
-    return {
-        "status": status,
-        "summary": summary,
-        "expected_criteria": criteria,
-        "contract_tokens": _must_contain(scenario, status),
-        "permission_to_act": False,
-        "capability_grant": False,
+def _driver_input(scenario: MappingLike) -> dict[str, Any]:
+    payload = {
+        "input": str(scenario.get("input") or ""),
+        "case_type": str(scenario.get("case_type") or "golden"),
     }
+    return payload
+
+
+def _is_packaged_tool(execute: Any) -> bool:
+    return isinstance(execute, dict) and execute.get("kind") == "packaged_tool"
 
 
 def _family_scenario(spec: dict[str, Any]) -> dict[str, Any]:
     case_id = spec["id"]
-    assertions: dict[str, Any] = {
-        "must_contain": list(spec["must_contain"]),
-        "json_schema_fields": ["status", "case_id"],
-        "exit_code": 0,
-    }
-    if spec.get("must_not_contain"):
-        assertions["must_not_contain"] = list(spec["must_not_contain"])
+    status = classify_contract_status(case_id, spec.get("case_type") or "")
     return {
         "id": case_id,
         "case_type": spec["case_type"],
         "input": spec["input"],
         "expected_criteria": list(spec["expected_criteria"]),
         "execute": _execute_block(case_id),
-        "assertions": assertions,
+        "assertions": canonical_assertions(case_id, status),
     }
+
+
+def _restore_packaged_assertions(scenario: MappingLike) -> dict[str, Any]:
+    assertions = dict(scenario.get("assertions") or {}) if isinstance(scenario.get("assertions"), dict) else {}
+    case_id = str(scenario.get("id") or "")
+    must = [
+        str(token)
+        for token in (assertions.get("must_contain") or [])
+        if str(token) not in INJECTED_STATUSES and str(token) != case_id
+    ]
+    assertions["must_contain"] = must
+    assertions.setdefault("exit_code", 0)
+    execute = scenario.get("execute") if isinstance(scenario.get("execute"), dict) else {}
+    argv = [str(item) for item in (execute.get("argv") or [])]
+    if "--json" in argv or case_id.endswith("-json") or case_id == "echo-json":
+        fields = [str(item) for item in (assertions.get("json_schema_fields") or []) if item != "case_id"]
+        assertions["json_schema_fields"] = fields
+    else:
+        assertions.pop("json_schema_fields", None)
+    return assertions
 
 
 def _ensure_execute(scenario: MappingLike) -> dict[str, Any]:
     updated = dict(scenario)
     case_id = str(updated.get("id") or "")
     execute = updated.get("execute")
+    if _is_packaged_tool(execute):
+        updated["assertions"] = _restore_packaged_assertions(updated)
+        return updated
     if not (isinstance(execute, dict) and execute.get("kind")):
         updated["execute"] = _execute_block(case_id)
-    assertions = updated.get("assertions") if isinstance(updated.get("assertions"), dict) else {}
-    status = _status_for_existing(updated)
-    must = list(assertions.get("must_contain") or [])
-    for token in (case_id, status):
-        if token and token not in must:
-            must.append(token)
-    assertions["must_contain"] = must
-    assertions.setdefault("json_schema_fields", ["status", "case_id"])
-    assertions.setdefault("exit_code", 0)
-    updated["assertions"] = assertions
+    status = classify_contract_status(case_id, str(updated.get("case_type") or ""))
+    updated["assertions"] = canonical_assertions(case_id, status)
     return updated
 
 
@@ -265,8 +232,8 @@ def upgrade_skill(skill_dir: Path) -> None:
             originally_executable = False
         scenario = _ensure_execute(raw)
         upgraded.append(scenario)
-        status = _status_for_existing(scenario)
-        cases_payload[str(scenario["id"])] = _driver_payload(skill_id, scenario, status)
+        if not _is_packaged_tool(scenario.get("execute")):
+            cases_payload[str(scenario["id"])] = _driver_input(scenario)
     json_path = skill_dir / "references" / "eval-suite.json"
     if json_path.is_file():
         suite_preview = json.loads(json_path.read_text(encoding="utf-8"))
@@ -287,21 +254,15 @@ def upgrade_skill(skill_dir: Path) -> None:
                 extra = _ensure_execute(extra)
                 upgraded.append(extra)
                 leftover_json_added = True
-                cases_payload[case_id] = _driver_payload(skill_id, extra, _status_for_existing(extra))
+                if not _is_packaged_tool(extra.get("execute")):
+                    cases_payload[case_id] = _driver_input(extra)
     present_ids = {str(scenario["id"]) for scenario in upgraded}
     for _family, spec in FAMILY_CASES.items():
         if spec["id"] in present_ids:
             continue
         extra = _family_scenario(spec)
         upgraded.append(extra)
-        cases_payload[spec["id"]] = {
-            "status": spec["status"],
-            "summary": " ".join(spec["expected_criteria"]),
-            "expected_criteria": list(spec["expected_criteria"]),
-            "contract_tokens": list(spec["must_contain"]),
-            "permission_to_act": False,
-            "capability_grant": False,
-        }
+        cases_payload[spec["id"]] = _driver_input(extra)
     data["scenarios"] = upgraded
     if not data.get("suite_id"):
         data["suite_id"] = f"{skill_id}-eval"
@@ -345,18 +306,43 @@ def update_ledger(root: Path) -> None:
     ledger = json.loads(path.read_text(encoding="utf-8"))
     skills = ledger.setdefault("skills", {})
     for skill_id in remainder_skill_ids(root):
-        if skill_id == "canary-echo":
-            continue
         entry = dict(skills.get(skill_id) or {})
-        entry["classification"] = "draft"
-        entry["suite_executable"] = True
-        entry["reason_code"] = "awaiting_hosted_sealed_qualification"
-        entry["reason"] = (
-            "confined executable eval cases exist; hosted sealed evaluator receipts "
-            "are required before usable; filesystem presence is not a production pass"
-        )
-        entry["usable_claimed"] = False
+        if skill_id == "canary-echo":
+            entry["classification"] = "draft"
+            entry["suite_executable"] = True
+            entry["reason_code"] = "suite_mutated_after_sealed_usable"
+            entry["reason"] = (
+                "historical sealed usable receipts no longer bind this mutated eval "
+                "suite/release; demoted to draft. Hosted sealed evaluator must recertify. "
+                "No live or usable claim."
+            )
+            entry["usable_claimed"] = False
+            entry["historical_sealed_evidence"] = [
+                "evidence/phase10/sealed/canary-echo-sealed.json"
+            ]
+            entry.pop("profile_hash", None)
+            entry.pop("skill_release_hash", None)
+            entry.pop("source_hash", None)
+            entry.pop("tool_hash", None)
+            entry.pop("toolchain", None)
+            entry["sealed_live_receipt_evidence"] = []
+        else:
+            entry["classification"] = "draft"
+            entry["suite_executable"] = True
+            entry["reason_code"] = "awaiting_hosted_sealed_qualification"
+            entry["reason"] = (
+                "confined executable eval cases exist; hosted sealed evaluator receipts "
+                "are required before usable; filesystem presence is not a production pass"
+            )
+            entry["usable_claimed"] = False
         skills[skill_id] = entry
+    ledger["counts"] = dict(ledger.get("counts") or {})
+    ledger["counts"]["usable"] = 0
+    ledger["counts"]["with_sealed_live_receipts"] = 0
+    ledger["live_certification"] = (
+        "not performed for current remainder suites; historical canary-echo "
+        "sealed receipts are unbound after suite mutation"
+    )
     ledger["remainder_source_packet"] = {
         "issue": 374,
         "initial_production_successor": sorted(INITIAL_IDS),

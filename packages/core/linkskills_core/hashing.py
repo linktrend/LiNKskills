@@ -16,12 +16,11 @@ UNSET_SKILL_RELEASE_HASH = "skill-release:unset"
 _FRONTMATTER_RE = re.compile(r"\A---\s*\n(.*?)\n---\s*\n?", re.DOTALL)
 _SKIP_NAMES = {".DS_Store", "Thumbs.db"}
 # Stamped profile embeds skill_bundle_hash; exclude it from that bundle's content hash.
-# Remainder confined helpers are source-eval inputs, not skill-procedure bytes.
+# Remainder evaluation inputs (remainder-eval-cases.json, scripts/eval_driver.py)
+# are release-affecting: Server01 packaging identity must include them.
 BUNDLE_CONTENT_EXCLUDES = frozenset(
     {
         "references/execution-profile.json",
-        "references/remainder-eval-cases.json",
-        "scripts/eval_driver.py",
     }
 )
 

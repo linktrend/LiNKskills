@@ -19,11 +19,30 @@ for rel in (
 ):
     sys.path.insert(0, str(REPO / rel))
 
+from linkskills_eval_runner.assertions import (
+    assertions_hard_failed,
+    assertions_passed,
+    parse_assertion_spec,
+    run_assertions,
+)
 from linkskills_eval_runner.remainder import qualify_remainder_release_profiles
+from linkskills_eval_runner.remainder_driver import canonical_assertions, classify_contract_status
+from linkskills_eval_runner.runner import load_eval_suite
 
 
 def _utc() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+
+
+def _suite_assertions(skill_dir: Path, case_id: str):
+    yaml_path = skill_dir / "references" / "eval-suite.yaml"
+    if yaml_path.is_file():
+        suite = load_eval_suite(yaml_path)
+        for case in suite.cases:
+            if case.id == case_id:
+                return case.assertions
+    status = classify_contract_status(case_id)
+    return parse_assertion_spec(canonical_assertions(case_id, status))
 
 
 def run_source_drivers(root: Path) -> dict:
@@ -43,7 +62,19 @@ def run_source_drivers(root: Path) -> dict:
                 text=True,
                 cwd=str(skill_dir),
             )
-            ok = proc.returncode == 0 and '"status": "error"' not in proc.stdout
+            spec = _suite_assertions(skill_dir, case_id)
+            assertion_results = run_assertions(
+                proc.stdout,
+                spec,
+                observed_exit_code=proc.returncode,
+                workspace_root=skill_dir,
+            )
+            ok = (
+                proc.returncode == 0
+                and '"status": "error"' not in proc.stdout
+                and assertions_passed(assertion_results)
+                and not assertions_hard_failed(assertion_results)
+            )
             if not ok:
                 failed += 1
             results.append(
@@ -52,6 +83,11 @@ def run_source_drivers(root: Path) -> dict:
                     "caseId": case_id,
                     "exitCode": proc.returncode,
                     "ok": ok,
+                    "assertionFailures": [
+                        {"name": row.name, "detail": row.detail}
+                        for row in assertion_results
+                        if not row.passed
+                    ],
                 }
             )
     return {
