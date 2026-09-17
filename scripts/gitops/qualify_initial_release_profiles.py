@@ -364,57 +364,226 @@ def qualify_initial_release_profiles(
     }
 
 
-_UNSAFE_ARTIFACT_PREFIXES = (
-    "artifact_unreadable:",
-    "artifact_not_object:",
+_LIFECYCLE_CODES = (USABLE, EVAL_PENDING, QUARANTINED)
+_REASON_CODES = (
+    "executed_case_evidence",
+    "missing_representative_families",
+    "missing_or_mismatched_artifacts",
+    "no_executed_cases",
+    "eval_pending",
+    "prompt_only_or_fake_evidence",
+    "certified_without_executed_cases",
+    "qualification_error",
 )
+_MISSING_ARTIFACT_CODES = (
+    "skill_frontmatter_version",
+    "runtime_profile_not_declared",
+    "artifact_unreadable",
+    "artifact_not_object",
+    "version_mismatch",
+)
+_SECRET_SCAN_REASON = "fast_or_full_missing_secret_scan"
 
 
-def _safe_missing_artifact(note: str) -> str:
-    """Keep diagnostic codes; drop exception/file payloads from unread artifacts."""
-    for prefix in _UNSAFE_ARTIFACT_PREFIXES:
-        if note.startswith(prefix):
-            return prefix[:-1]
-    return note
+def _count(value: object) -> int:
+    if isinstance(value, (list, tuple, set)):
+        return len(value)
+    return 0
+
+
+def _allowlisted_code(value: object, allowed: Sequence[str]) -> str | None:
+    """Return the allowlisted literal itself, never the incoming value."""
+    if not isinstance(value, str):
+        return None
+    for code in allowed:
+        if value == code:
+            return code
+    return None
+
+
+def _safe_lifecycle(value: object) -> str:
+    return _allowlisted_code(value, _LIFECYCLE_CODES) or EVAL_PENDING
+
+
+def _safe_reason(value: object, *, lifecycle: str) -> str:
+    if not isinstance(value, str):
+        value = ""
+    picked: list[str] = []
+    for part in value.split(","):
+        code = _allowlisted_code(part, _REASON_CODES)
+        if code is not None:
+            picked.append(code)
+    if picked:
+        return ",".join(picked)
+    if lifecycle == USABLE:
+        return "executed_case_evidence"
+    if lifecycle == QUARANTINED:
+        return "qualification_error"
+    return "eval_pending"
+
+
+def _safe_missing_families(value: object) -> list[str]:
+    present = value if isinstance(value, (list, tuple, set)) else ()
+    families: list[str] = []
+    for family in REQUIRED_FAMILIES:
+        for item in present:
+            if item == family:
+                families.append(family)
+                break
+    return families
+
+
+def _safe_missing_artifact(note: object) -> str | None:
+    """Keep closed diagnostic codes; drop paths, versions, and exception payloads."""
+    if not isinstance(note, str):
+        return None
+    for code in _MISSING_ARTIFACT_CODES:
+        if note == code or note.startswith(code + ":"):
+            return code
+    return None
+
+
+def _safe_missing_artifacts(value: object) -> list[str]:
+    codes: list[str] = []
+    items = value if isinstance(value, (list, tuple)) else ()
+    for item in items:
+        code = _safe_missing_artifact(item)
+        if code is not None:
+            codes.append(code)
+    return codes
+
+
+def _declared_public_row(declared: Mapping[str, str]) -> dict[str, str]:
+    skill_id = declared["skillId"]
+    version = declared["version"]
+    runtime_profile = declared["runtimeProfile"]
+    return {
+        "id": combination_id(skill_id, version, runtime_profile),
+        "skillId": skill_id,
+        "version": version,
+        "runtimeProfile": runtime_profile,
+    }
 
 
 def public_qualification_summary(matrix: Mapping[str, Any]) -> dict[str, Any]:
-    """Return a stdout-safe diagnostic view with no eval inputs, paths, or payloads."""
+    """Return a stdout-safe view built only from frozen scalars and counts."""
+    raw_rows = [row for row in (matrix.get("combinations") or []) if isinstance(row, Mapping)]
     combinations: list[dict[str, Any]] = []
-    for row in matrix.get("combinations") or []:
+    usable: list[str] = []
+    pending: list[str] = []
+    quarantined: list[str] = []
+    for index, declared in enumerate(INITIAL_RELEASE_PROFILES):
+        identity = _declared_public_row(declared)
+        row = raw_rows[index] if index < len(raw_rows) else {}
+        lifecycle = _safe_lifecycle(row.get("lifecycle"))
+        public_row = {
+            **identity,
+            "lifecycle": lifecycle,
+            "reason": _safe_reason(row.get("reason"), lifecycle=lifecycle),
+            "missingFamilies": _safe_missing_families(row.get("missingFamilies")),
+            "missingArtifacts": _safe_missing_artifacts(row.get("missingArtifacts")),
+            "executableCaseCount": _count(row.get("executableCases")),
+        }
+        combinations.append(public_row)
+        if lifecycle == USABLE:
+            usable.append(identity["id"])
+        elif lifecycle == QUARANTINED:
+            quarantined.append(identity["id"])
+        else:
+            pending.append(identity["id"])
+    include_secret_scan = "secretScanPreserved" in matrix
+    secret_scan_preserved = matrix.get("secretScanPreserved") is True
+    secret_scan_reason = _allowlisted_code(
+        matrix.get("secretScanReason"), (_SECRET_SCAN_REASON,)
+    )
+    complete = _count(raw_rows) == 5
+    ok = complete and not quarantined
+    if include_secret_scan:
+        ok = ok and secret_scan_preserved
+    summary: dict[str, Any] = {
+        "schemaVersion": SCHEMA_VERSION,
+        "kind": MATRIX_KIND,
+        "complete": complete,
+        "ok": ok,
+        "usable": usable,
+        "evalPending": pending,
+        "quarantined": quarantined,
+        "usableCount": _count(usable),
+        "evalPendingCount": _count(pending),
+        "quarantinedCount": _count(quarantined),
+        "combinations": combinations,
+    }
+    if include_secret_scan:
+        summary["secretScanPreserved"] = secret_scan_preserved
+    if secret_scan_reason is not None:
+        summary["secretScanReason"] = secret_scan_reason
+    return summary
+
+
+def encode_public_qualification_summary(summary: Mapping[str, Any]) -> str:
+    """Serialize only allowlisted scalars/counts for stdout and --matrix-json."""
+    declared_ids = tuple(
+        combination_id(row["skillId"], row["version"], row["runtimeProfile"])
+        for row in INITIAL_RELEASE_PROFILES
+    )
+    declared_skill_ids = tuple(row["skillId"] for row in INITIAL_RELEASE_PROFILES)
+    declared_versions = tuple(row["version"] for row in INITIAL_RELEASE_PROFILES)
+    declared_profiles = tuple(row["runtimeProfile"] for row in INITIAL_RELEASE_PROFILES)
+    combinations: list[dict[str, Any]] = []
+    for row in summary.get("combinations") or []:
         if not isinstance(row, Mapping):
             continue
         combinations.append(
             {
-                "id": row.get("id"),
-                "skillId": row.get("skillId"),
-                "version": row.get("version"),
-                "runtimeProfile": row.get("runtimeProfile"),
-                "lifecycle": row.get("lifecycle"),
-                "reason": row.get("reason"),
-                "missingFamilies": list(row.get("missingFamilies") or []),
-                "missingArtifacts": [
-                    _safe_missing_artifact(str(item))
-                    for item in (row.get("missingArtifacts") or [])
-                ],
-                "executableCaseCount": len(row.get("executableCases") or []),
+                "id": _allowlisted_code(row.get("id"), declared_ids),
+                "skillId": _allowlisted_code(row.get("skillId"), declared_skill_ids),
+                "version": _allowlisted_code(row.get("version"), declared_versions),
+                "runtimeProfile": _allowlisted_code(row.get("runtimeProfile"), declared_profiles),
+                "lifecycle": _safe_lifecycle(row.get("lifecycle")),
+                "reason": _safe_reason(row.get("reason"), lifecycle=_safe_lifecycle(row.get("lifecycle"))),
+                "missingFamilies": _safe_missing_families(row.get("missingFamilies")),
+                "missingArtifacts": _safe_missing_artifacts(row.get("missingArtifacts")),
+                "executableCaseCount": int(row["executableCaseCount"])
+                if isinstance(row.get("executableCaseCount"), int)
+                else 0,
             }
         )
-    summary: dict[str, Any] = {
-        "schemaVersion": matrix.get("schemaVersion"),
-        "kind": matrix.get("kind"),
-        "complete": matrix.get("complete"),
-        "ok": matrix.get("ok"),
-        "usable": list(matrix.get("usable") or []),
-        "evalPending": list(matrix.get("evalPending") or []),
-        "quarantined": list(matrix.get("quarantined") or []),
+    usable = [
+        code
+        for item in (summary.get("usable") or [])
+        if (code := _allowlisted_code(item, declared_ids)) is not None
+    ]
+    pending = [
+        code
+        for item in (summary.get("evalPending") or [])
+        if (code := _allowlisted_code(item, declared_ids)) is not None
+    ]
+    quarantined = [
+        code
+        for item in (summary.get("quarantined") or [])
+        if (code := _allowlisted_code(item, declared_ids)) is not None
+    ]
+    payload = {
+        "schemaVersion": SCHEMA_VERSION,
+        "kind": MATRIX_KIND,
+        "complete": summary.get("complete") is True,
+        "ok": summary.get("ok") is True,
+        "usable": usable,
+        "evalPending": pending,
+        "quarantined": quarantined,
+        "usableCount": _count(usable),
+        "evalPendingCount": _count(pending),
+        "quarantinedCount": _count(quarantined),
         "combinations": combinations,
     }
-    if "secretScanPreserved" in matrix:
-        summary["secretScanPreserved"] = matrix["secretScanPreserved"]
-    if "secretScanReason" in matrix:
-        summary["secretScanReason"] = matrix["secretScanReason"]
-    return summary
+    if "secretScanPreserved" in summary:
+        payload["secretScanPreserved"] = summary.get("secretScanPreserved") is True
+    secret_scan_reason = _allowlisted_code(
+        summary.get("secretScanReason"), (_SECRET_SCAN_REASON,)
+    )
+    if secret_scan_reason is not None:
+        payload["secretScanReason"] = secret_scan_reason
+    return json.dumps(payload, indent=2, sort_keys=True) + "\n"
 
 
 def delivery_secret_scan_preserved(root: Path) -> bool:
@@ -441,12 +610,12 @@ def main(argv: Sequence[str] | None = None) -> int:
         matrix["ok"] = False
         matrix["secretScanReason"] = "fast_or_full_missing_secret_scan"
     summary = public_qualification_summary(matrix)
-    text = json.dumps(summary, indent=2, sort_keys=True) + "\n"
+    text = encode_public_qualification_summary(summary)
     if args.matrix_json:
         args.matrix_json.parent.mkdir(parents=True, exist_ok=True)
         args.matrix_json.write_text(text, encoding="utf-8")
     print(text, end="")
-    return 0 if matrix["complete"] else 1
+    return 0 if summary["complete"] else 1
 
 
 if __name__ == "__main__":
