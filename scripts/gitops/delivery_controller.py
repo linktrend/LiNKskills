@@ -939,7 +939,10 @@ def promote_to_staging(
     )
     if full_suite_invoked or bool(release_gate.get("fullSuiteInvoked")):
         raise ControllerError("full_suite_reentered", "staging must reuse the matching receipt")
-    release = evaluate_release_path({**dict(release_gate), "fullSuiteInvoked": False})
+    release = evaluate_release_path(
+        {**dict(release_gate), "fullSuiteInvoked": False},
+        candidate_identity,
+    )
     if not release.accepted:
         raise ControllerError(release.code, release.detail)
     receipt_decision = verify_receipt_payload(
@@ -1042,7 +1045,10 @@ def prepare_main_promotion(
         candidate_sha=candidate_sha,
         source_sha=staging_sha,
     )
-    release = evaluate_release_path({**dict(release_gate), "fullSuiteInvoked": False})
+    release = evaluate_release_path(
+        {**dict(release_gate), "fullSuiteInvoked": False},
+        candidate_identity,
+    )
     if not release.accepted:
         raise ControllerError(release.code, release.detail)
     receipt_decision = verify_receipt_payload(
