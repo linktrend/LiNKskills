@@ -1,8 +1,8 @@
-# LiNKskills
+# LiNKskills 1.0
 
-> Production status: the pre-configuration engineering baseline is complete. See [the production-readiness index](docs/PRODUCTION-READINESS.md) for remaining configuration, staging, deployment, and operational acceptance work.
+> **Production source:** `main` at `e40bf0dac697eca74a49d956189d2a87f728fbd6` (tree `d5b3410ccf4a383fba71ace86e8904a6dceb1270`). The three protected refs are aligned to this release candidate; Server 01 is the production deployment target.
 
-LiNKskills is LiNKtrend's **centralized skill catalog and procedural-capability platform**. It provides progressive-disclosure skills, a mandatory per-skill eval suite executed by a real Eval Runner, published delivery through a `skills_*` MCP/HTTP Gateway, usage telemetry, and Librarian curation — and deliberately does **not** own governance or permission-to-act.
+LiNKskills is LiNKtrend's centralized catalog and procedural-capability platform. It provides reusable AI skills, executable evaluation, immutable publication, the `skills_*` Gateway/MCP surface, usage telemetry, and Librarian curation. It supplies procedures and evidence; governance and permission-to-act remain in LiNKplatform and each consuming Program.
 
 ## Start here (source of truth)
 
@@ -12,7 +12,7 @@ These documents are the current, authoritative description of this Program. If a
 - **[`docs/LINKSKILLS-TECHNICAL-PRD.md`](docs/LINKSKILLS-TECHNICAL-PRD.md)** — the exhaustive technical reference: architecture, packages, Gateway/MCP, eval, telemetry, compatibility load path, Librarian split, and what is / isn't live.
 - **[`docs/LINKSKILLS-OPERATIONS-MANUAL.md`](docs/LINKSKILLS-OPERATIONS-MANUAL.md)** — a plain-English handbook for the Principal: what your role is and what isn't fully live yet.
 - **[`docs/OPEN-ISSUES.md`](docs/OPEN-ISSUES.md)** — append-only engineering build log and open/deferred items.
-- **[`docs/LINKSKILLS-INTERNAL-LAUNCH-DETAILED-DEVELOPMENT-PLAN.md`](docs/LINKSKILLS-INTERNAL-LAUNCH-DETAILED-DEVELOPMENT-PLAN.md)** — approved internal-launch architecture and phased plan (SHA-256 `31a6cc70bb778ce1dff236819e4bf600b0495dbb06c95bac55bcb2b0b2f5fe88`).
+- **[`docs/LINKSKILLS-AGENT-GUIDE.md`](docs/LINKSKILLS-AGENT-GUIDE.md)** — complete guide for AI agents and operators.
 
 Still-live supporting docs (not archived):
 
@@ -89,14 +89,7 @@ exact host sequence is in
 
 ## Status
 
-**Current source state (2026-09-16):** protected development contains the
-accepted five-release production successor. Issue 374 adds source-complete
-executable eval cases for the remaining 54 catalog skills, disabled consumer
-binding templates, Librarian 0.2 install contract, and provider-v2 SQL coverage.
-This is **not** live qualification, publication, or consumer activation.
-
-Do not infer a deployed LiNKskills commit from historical VPS health prose.
-Record the exact Skills checkout SHA whenever it is next deployed or audited.
+**Current source state (LiNKskills 1.0):** protected `development`, `staging`, and `main` are aligned to the accepted release tree `d5b3410ccf4a383fba71ace86e8904a6dceb1270`. `main` is the production candidate for Server 01. Runtime identity must be confirmed from the Server 01 deployment receipt when operating the host; Git alone is not a health probe.
 
 The generic Librarian host remains in
 **`LiNKplatform/packages/librarian-runner`**. LiNKskills owns its skill-domain

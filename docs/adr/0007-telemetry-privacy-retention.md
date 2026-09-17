@@ -2,7 +2,7 @@
 
 - **Status:** Accepted
 - **Date:** 2026-07-27
-- **Decided by:** Principal, authorized via `docs/CURSOR-GROK-EXECUTION-PROMPT.md` and approved plan SHA-256 `31a6cc70bb778ce1dff236819e4bf600b0495dbb06c95bac55bcb2b0b2f5fe88` (`docs/LINKSKILLS-INTERNAL-LAUNCH-DETAILED-DEVELOPMENT-PLAN.md` §17, §20.3)
+- **Decided by:** Principal, authorized via `docs/archive/prompts/CURSOR-GROK-EXECUTION-PROMPT.md` and approved plan SHA-256 `31a6cc70bb778ce1dff236819e4bf600b0495dbb06c95bac55bcb2b0b2f5fe88` (`docs/archive/prompts/LINKSKILLS-INTERNAL-LAUNCH-DETAILED-DEVELOPMENT-PLAN.md` §17, §20.3)
 - **Context source:** Plan §17 (telemetry/feedback/trace-to-eval), §5.3 / §19.4 (Brain correlation limits), ADR 0001 (telemetry in LiNKskills scope)
 
 ## Context
