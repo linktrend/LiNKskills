@@ -35,10 +35,7 @@ from coordinator.receipts import (  # noqa: E402
     receipt_lookup_key,
     verify_receipt,
 )
-from release_gate import (  # noqa: E402
-    has_release_evidence_shape,
-    verify_release_evidence,
-)
+from release_gate import verify_release_evidence  # noqa: E402
 
 
 SHA40 = set("0123456789abcdef")
@@ -251,13 +248,8 @@ def evaluate_release_path(
     profile = str(payload.get("testProfile") or "release").strip().lower()
     if profile != "release":
         return Decision(False, "release_profile_required", "promotion release checks must use the release profile")
-    if has_release_evidence_shape(payload) or candidate_identity is not None:
-        verdict = verify_release_evidence(payload, candidate_identity, require=True)
-        return Decision(bool(verdict["accepted"]), str(verdict["code"]), str(verdict["detail"]))
-    status = str(_field(payload, "status", "state", "conclusion") or "").strip().lower()
-    if status not in {"passed", "success", "successful", "green"}:
-        return Decision(False, "release_gate_not_passed", "short release checks did not pass")
-    return Decision(True, "accepted", "short release checks passed without a full-suite rerun")
+    verdict = verify_release_evidence(payload, candidate_identity, require=True)
+    return Decision(bool(verdict["accepted"]), str(verdict["code"]), str(verdict["detail"]))
 
 
 def evaluate_automatic_main(
@@ -272,10 +264,7 @@ def evaluate_automatic_main(
     transition_receipt: Mapping[str, Any] | None = None,
 ) -> Decision:
     """Automatic main is still gate- and receipt-bound; mode changes no gates."""
-    release_decision = evaluate_release_path(
-        release,
-        candidate_identity if has_release_evidence_shape(release) else None,
-    )
+    release_decision = evaluate_release_path(release, candidate_identity)
     if not release_decision.accepted:
         return release_decision
     receipt_decision = verify_receipt_payload(

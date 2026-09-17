@@ -7,7 +7,14 @@ from pathlib import Path
 
 import pytest
 
-from scripts.gitops.promotion_receipt_gate import evaluate_release_path
+from scripts.gitops.coordinator.receipts import create_full_suite_receipt
+from scripts.gitops.delivery_controller import (
+    ControllerError,
+    MemoryGitHub,
+    prepare_main_promotion,
+    promote_to_staging,
+)
+from scripts.gitops.promotion_receipt_gate import evaluate_automatic_main, evaluate_release_path
 from scripts.gitops.release_gate import (
     EVIDENCE_KIND,
     ReleaseGateError,
@@ -131,10 +138,142 @@ def test_full_suite_marker_is_rejected() -> None:
     assert caught_cmd.value.code == "full_suite_reentered"
 
 
-def test_status_only_payload_remains_compatible_without_identity() -> None:
+def test_status_only_payload_is_rejected_without_identity_bound_evidence() -> None:
     decision = evaluate_release_path({"status": "passed", "testProfile": "release", "fullSuiteInvoked": False})
-    assert decision.accepted is True
-    assert decision.code == "accepted"
+    assert decision.accepted is False
+    assert decision.code == "evidence_missing"
+
+
+def _promotion_identity() -> dict[str, str]:
+    return {
+        "repository": "linktrend/LiNKskills",
+        "sourceBranch": "development",
+        "headCommit": "a" * 40,
+        "gitTree": "b" * 40,
+        "dependencyDigest": "sha256:" + ("1" * 64),
+        "profileDigest": "sha256:" + ("2" * 64),
+        "workflowDigest": "sha256:" + ("3" * 64),
+    }
+
+
+def _full_suite_receipt(identity: dict[str, str]) -> dict:
+    return create_full_suite_receipt(
+        {
+            "schemaVersion": 2,
+            "candidateIdentity": identity,
+            "workflowRunId": 501,
+            "workflowRunAttempt": 1,
+            "runnerLabel": "ubuntu-24.04-arm",
+            "startedAt": "2026-08-18T01:00:00Z",
+            "completedAt": "2026-08-18T01:01:00Z",
+            "conclusion": "success",
+            "commandDigest": "sha256:" + ("c" * 64),
+            "evidenceDigests": {"evidence/full.log": "sha256:" + ("b" * 64)},
+        }
+    ).to_dict()
+
+
+def _status_only_release() -> dict[str, object]:
+    return {"status": "passed", "testProfile": "release", "fullSuiteInvoked": False}
+
+
+def test_promote_to_staging_rejects_status_only_release_payload() -> None:
+    identity = _promotion_identity()
+    github = MemoryGitHub(repository="linktrend/LiNKskills")
+    with pytest.raises(ControllerError) as caught:
+        promote_to_staging(
+            github=github,
+            repository="linktrend/LiNKskills",
+            development_sha=identity["headCommit"],
+            staging_sha="7" * 40,
+            candidate_sha=identity["headCommit"],
+            candidate_tree=identity["gitTree"],
+            receipt=_full_suite_receipt(identity),
+            candidate_identity=identity,
+            release_gate=_status_only_release(),
+            role="operator",
+        )
+    assert caught.value.code == "evidence_missing"
+    assert github.merges == []
+
+
+def test_prepare_main_promotion_rejects_status_only_release_payload() -> None:
+    identity = _promotion_identity()
+    github = MemoryGitHub(repository="linktrend/LiNKskills")
+    with pytest.raises(ControllerError) as caught:
+        prepare_main_promotion(
+            github=github,
+            repository="linktrend/LiNKskills",
+            staging_sha=identity["headCommit"],
+            main_sha="6" * 40,
+            candidate_sha=identity["headCommit"],
+            receipt=_full_suite_receipt(identity),
+            candidate_identity=identity,
+            release_gate=_status_only_release(),
+            role="operator",
+        )
+    assert caught.value.code == "evidence_missing"
+    assert github.prs == {}
+
+
+def test_evaluate_automatic_main_rejects_status_only_release_payload() -> None:
+    identity = _promotion_identity()
+    decision = evaluate_automatic_main(
+        release=_status_only_release(),
+        required_receipt=_full_suite_receipt(identity),
+        candidate_identity=identity,
+        workflow_run_id=501,
+        workflow_run_attempt=1,
+        runner_label="ubuntu-24.04-arm",
+    )
+    assert decision.accepted is False
+    assert decision.code == "evidence_missing"
+
+
+def test_identity_bound_release_evidence_preserves_receipt_reuse_and_founder_wait() -> None:
+    identity = _promotion_identity()
+    evidence = evidence_from_inventory(_inventory(identity=_identity()))
+    receipt = _full_suite_receipt(identity)
+    github = MemoryGitHub(repository="linktrend/LiNKskills")
+    staging = promote_to_staging(
+        github=github,
+        repository="linktrend/LiNKskills",
+        development_sha=identity["headCommit"],
+        staging_sha="7" * 40,
+        candidate_sha=identity["headCommit"],
+        candidate_tree=identity["gitTree"],
+        receipt=receipt,
+        candidate_identity=identity,
+        release_gate=evidence,
+        role="operator",
+    )
+    assert staging["status"] == "merged"
+    assert staging["receiptReused"] is True
+    assert staging["fullSuiteRerun"] is False
+    prepared = prepare_main_promotion(
+        github=github,
+        repository="linktrend/LiNKskills",
+        staging_sha=identity["headCommit"],
+        main_sha="6" * 40,
+        candidate_sha=identity["headCommit"],
+        receipt=receipt,
+        candidate_identity=identity,
+        release_gate=evidence,
+        role="operator",
+    )
+    assert prepared["status"] == "waiting_founder_approval"
+    assert prepared["founderApprovalInferred"] is False
+    automatic = evaluate_automatic_main(
+        release=evidence,
+        required_receipt=receipt,
+        candidate_identity=identity,
+        workflow_run_id=501,
+        workflow_run_attempt=1,
+        runner_label="ubuntu-24.04-arm",
+    )
+    assert automatic.accepted is True
+    assert automatic.code == "accepted"
+    assert automatic.source_commit == identity["headCommit"]
 
 
 def test_repo_release_profile_is_non_empty_and_non_mutating(tmp_path: Path) -> None:

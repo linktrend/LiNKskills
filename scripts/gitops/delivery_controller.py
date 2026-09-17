@@ -38,7 +38,6 @@ try:
         evaluate_release_path,
         verify_receipt_payload,
     )
-    from scripts.gitops.release_gate import has_release_evidence_shape
     from scripts.gitops.coordinator.receipts import (
         compute_receipt_digest,
         compute_transition_digest,
@@ -55,7 +54,6 @@ except ModuleNotFoundError:  # pragma: no cover - script-style execution
         evaluate_release_path,
         verify_receipt_payload,
     )
-    from release_gate import has_release_evidence_shape  # type: ignore
     from coordinator.receipts import compute_receipt_digest, compute_transition_digest, create_transition_receipt  # type: ignore
     from github_auth import GitHubAuthError, resolve_phase_api_token  # type: ignore
     from administrator_recovery import MemoryProtection, recover_phase_merge  # type: ignore
@@ -941,10 +939,9 @@ def promote_to_staging(
     )
     if full_suite_invoked or bool(release_gate.get("fullSuiteInvoked")):
         raise ControllerError("full_suite_reentered", "staging must reuse the matching receipt")
-    expected_identity = candidate_identity if has_release_evidence_shape(release_gate) else None
     release = evaluate_release_path(
         {**dict(release_gate), "fullSuiteInvoked": False},
-        expected_identity,
+        candidate_identity,
     )
     if not release.accepted:
         raise ControllerError(release.code, release.detail)
@@ -1048,10 +1045,9 @@ def prepare_main_promotion(
         candidate_sha=candidate_sha,
         source_sha=staging_sha,
     )
-    expected_identity = candidate_identity if has_release_evidence_shape(release_gate) else None
     release = evaluate_release_path(
         {**dict(release_gate), "fullSuiteInvoked": False},
-        expected_identity,
+        candidate_identity,
     )
     if not release.accepted:
         raise ControllerError(release.code, release.detail)
