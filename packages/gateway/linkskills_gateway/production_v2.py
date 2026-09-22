@@ -13,10 +13,57 @@ from typing import Any, Mapping
 from linkskills_core.provider_v2 import PROTOCOL_VERSION, RESOURCE_OPERATIONS, V2Provider, WRITE_TOOLS
 
 
+# Names only. Empty floors sit beside families that already have releases.
+CATALOG_FLOORS: tuple[dict[str, str], ...] = (
+    {"family_id": "company-direction", "display_name": "Company direction"},
+    {"family_id": "software", "display_name": "Software"},
+    {"family_id": "customers-and-products", "display_name": "Customers and products"},
+    {"family_id": "company-operations", "display_name": "Company operations"},
+    {"family_id": "trading", "display_name": "Trading"},
+    {"family_id": "shared-systems", "display_name": "Shared systems"},
+)
+
+
 def manifest_digest(value: Mapping[str, Any]) -> str:
     """Hash the immutable JSON publication document, including resource digests."""
     raw = json.dumps(value, sort_keys=True, separators=(",", ":")).encode()
     return "sha256:" + hashlib.sha256(raw).hexdigest()
+
+
+def catalog_families(releases: list[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    """Keep release families as they are, then add missing floor names."""
+    families: list[dict[str, Any]] = []
+    seen_ids: set[str] = set()
+    seen_names: set[str] = set()
+    for release in releases:
+        family_id = str(release.get("family_id") or "")
+        if not family_id or family_id in seen_ids:
+            continue
+        display_name = family_id.replace("-", " ").title()
+        seen_ids.add(family_id)
+        seen_names.add(display_name)
+        families.append(
+            {
+                "family_id": family_id,
+                "display_name": display_name,
+                "description": "Qualified LiNKskills releases.",
+                "subcategories": (),
+            }
+        )
+    for floor in CATALOG_FLOORS:
+        if floor["family_id"] in seen_ids or floor["display_name"] in seen_names:
+            continue
+        seen_ids.add(floor["family_id"])
+        seen_names.add(floor["display_name"])
+        families.append(
+            {
+                "family_id": floor["family_id"],
+                "display_name": floor["display_name"],
+                "description": "",
+                "subcategories": (),
+            }
+        )
+    return families
 
 
 def decode_release(row: Mapping[str, Any]) -> dict[str, Any]:
@@ -187,7 +234,8 @@ class ProductionV2Provider:
                 activated_release_ids=frozenset(binding["release_ids"]),
             )
             provider = V2Provider(
-                lambda token: identity, releases=releases, store=self.store, production_store=True,
+                lambda token: identity, releases=releases, families=catalog_families(releases),
+                store=self.store, production_store=True,
                 catalog_version=manifest_digest({"releases": [
                     {"id": f"{r['skill_id']}@{r['version']}", "state": r["lifecycle_state"],
                      "resources": {k: v["content_digest"] for k, v in r["resources"].items()}}

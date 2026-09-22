@@ -103,6 +103,28 @@ def test_database_errors_do_not_leak():
     assert provider.handle(request("skills_catalog_list")) == {"ok": False, "error": "store_unavailable"}
 
 
+def test_catalog_keeps_development_and_adds_floor_names():
+    provider, _, _ = runtime()
+    catalog = provider.handle(request("skills_catalog_list"))
+    assert catalog["ok"]
+    assert [item["display_name"] for item in catalog["items"]] == [
+        "Development",
+        "Company direction",
+        "Software",
+        "Customers and products",
+        "Company operations",
+        "Trading",
+        "Shared systems",
+    ]
+    assert catalog["items"][0]["family_id"] == "development"
+    assert all(item["subcategory_count"] == 0 for item in catalog["items"])
+    development = provider.handle(request("skills_release_list", family_id="development"))
+    assert [item["skill_id"] for item in development["items"]] == ["git-safeguard"]
+    assert development["items"][0]["family_id"] == "development"
+    trading = provider.handle(request("skills_release_list", family_id="trading"))
+    assert trading["ok"] and trading["items"] == []
+
+
 def test_legacy_and_bad_protocol_do_not_touch_database():
     provider, _, store = runtime()
     store.snapshot = Mock(side_effect=AssertionError("must not connect"))
