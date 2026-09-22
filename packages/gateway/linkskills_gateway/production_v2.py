@@ -153,7 +153,7 @@ CATALOG_FLOORS: tuple[dict[str, Any], ...] = (
     ),
 )
 
-# skill_id -> (floor, aisle). Left off: hybrid-development-methods,
+# skill_id -> (floor, aisle). Left off shared floors:
 # private-health-wellbeing, personal-compliance.
 CATALOG_PLACEMENTS: dict[str, tuple[str, str]] = {
     "agent-workforce-management": ("operations", "workforce"),
@@ -242,7 +242,6 @@ CATALOG_PLACEMENTS: dict[str, tuple[str, str]] = {
 }
 
 UNFILED_SKILL_IDS = frozenset({
-    "hybrid-development-methods",
     "private-health-wellbeing",
     "personal-compliance",
 })

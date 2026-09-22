@@ -73,7 +73,6 @@ def test_new_drafts_file_on_approved_floors_and_private_cards_stay_off():
         path.parent.name for path in (repo / "skills").glob("*/SKILL.md")
     }
     assert UNFILED_SKILL_IDS == {
-        "hybrid-development-methods",
         "private-health-wellbeing",
         "personal-compliance",
     }
@@ -88,6 +87,7 @@ def test_new_drafts_file_on_approved_floors_and_private_cards_stay_off():
     assert by_id["git-safeguard"]["family_id"] == "software-development"
     assert by_id["triage"]["qualification"] == "draft"
     assert "hybrid-development-methods" not in by_id
+    assert "hybrid-development-methods" not in catalog_ids
     assert "personal-compliance" not in by_id
     assert "private-health-wellbeing" not in by_id
 

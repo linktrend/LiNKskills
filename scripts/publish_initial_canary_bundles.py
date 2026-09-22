@@ -22,7 +22,6 @@ ADAPTERS = (
     "awesome-design-presets",
     "emil-design-engineering",
     "google-workspace-operations",
-    "hybrid-development-methods",
     "impeccable-design-system",
     "taste-design-exploration",
 )
