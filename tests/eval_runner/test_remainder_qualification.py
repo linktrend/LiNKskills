@@ -1,4 +1,4 @@
-"""Remainder catalog qualification: 54 executable, never usable from source."""
+"""Remainder catalog qualification: executable drafts, never usable from source."""
 
 from __future__ import annotations
 

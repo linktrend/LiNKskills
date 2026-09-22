@@ -1,4 +1,4 @@
-"""Remainder (54-skill) qualification matrix.
+"""Remainder qualification matrix.
 
 The five production-successor releases stay owned by ``ed03``. This module
 inventories every other catalog skill, requires executable confined cases, and
