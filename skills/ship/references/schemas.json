@@ -1,0 +1,67 @@
+{
+  "definitions": {
+    "input": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "task"
+      ],
+      "properties": {
+        "task": {
+          "type": "string",
+          "minLength": 3
+        },
+        "consumer": {
+          "type": "string"
+        },
+        "artifact_path": {
+          "type": "string"
+        },
+        "plan_path": {
+          "type": "string"
+        },
+        "server": {
+          "type": "string"
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "status",
+        "summary"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "SUCCESS",
+            "FAILED",
+            "BLOCKED",
+            "DRAFT"
+          ]
+        },
+        "summary": {
+          "type": "string"
+        },
+        "artifact_path": {
+          "type": "string"
+        },
+        "errors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "external_calls": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "mutations": {
+          "type": "array"
+        }
+      }
+    }
+  }
+}

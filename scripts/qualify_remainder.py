@@ -151,8 +151,8 @@ def main() -> int:
                     "authorizesUsable": False,
                     "skillRetrievalCreatesCapabilityGrants": False,
                     "initialProductionSuccessor": matrix["initialProductionSuccessor"],
-                    "remainderCount": 54,
-                    "targetImmutableProductionReleasesAfterServer01": 59,
+                    "remainderCount": matrix["remainderCount"],
+                    "targetImmutableProductionReleasesAfterServer01": matrix["remainderCount"] + 5,
                     "runtimeProfile": "cursor-macos",
                     "combinations": [
                         {

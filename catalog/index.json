@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-09-17T02:49:33.745045+00:00",
+  "generated_at": "2026-09-22T13:15:42.431382+00:00",
   "repo_root_marker": "LiNKskills",
-  "git_sha": "30daa15521a3881eb93d4f564a9529370f85f2ee",
-  "source_tree_sha256": "7b2c341aa0e90470199018dd37c1d051c0c8a52bd89e3e1c04635990b308ffb2",
-  "skill_count": 59,
+  "git_sha": "1b4e55e416af16bc1ec75569a8cfa530a3c89c82",
+  "source_tree_sha256": "b656d88f0a746ed1fa032badf6fb954f395425ff144be08bc7f1c269e256cd24",
+  "skill_count": 85,
   "skills": [
     {
       "skill_id": "agent-workforce-management",
@@ -18,6 +18,17 @@
       "usage_trigger": "Use for a synthetic, redacted, or public workforce matter that needs a role definition, applicable-rule selection, capability request, domain delegation plan, workload/blocker review, quality evaluation, or owner-review suspend/retire proposal."
     },
     {
+      "skill_id": "ask-sonner",
+      "version": "1.0.0",
+      "path": "skills/ask-sonner",
+      "description": "Sonner toast setup, styling ladder, and troubleshooting when the brief has toasts.",
+      "format_profile": "simple",
+      "eval_suite_ref": "skills/ask-sonner/references/eval-suite.yaml",
+      "certification_state": "draft",
+      "min_reasoning_tier": "high",
+      "usage_trigger": "Use on Execution issues that include toasts."
+    },
+    {
       "skill_id": "audit-protocol",
       "version": "1.0.0",
       "path": "skills/audit-protocol",
@@ -29,15 +40,37 @@
       "usage_trigger": "Use when a task writes data to Google Workspace services or n8n workflows and requires pre-write intent logging."
     },
     {
+      "skill_id": "autoplan",
+      "version": "1.0.0",
+      "path": "skills/autoplan",
+      "description": "Run CEO, design, DX, and eng plan reviews in order with auto-decisions; eng last so a test plan exists for Verification.",
+      "format_profile": "simple",
+      "eval_suite_ref": "skills/autoplan/references/eval-suite.yaml",
+      "certification_state": "draft",
+      "min_reasoning_tier": "high",
+      "usage_trigger": "Use for independent review of the Technical PRD. Eng is always last. Do not re-run this whole chain on Assembly design."
+    },
+    {
       "skill_id": "awesome-design-presets",
       "version": "1.0.0",
       "path": "skills/awesome-design-presets",
-      "description": "Selects one exact visual-style preset from the complete Awesome Design Skills collection without treating presets as procedural design authorities.",
+      "description": "Apply one named look \u2014 soft, minimal, or brutal \u2014 when the plan allows a distinct visual language. Not a router over hidden preset files.",
       "format_profile": "simple",
       "eval_suite_ref": "skills/awesome-design-presets/references/eval-suite.yaml",
       "certification_state": "draft",
       "min_reasoning_tier": "high",
-      "usage_trigger": "Use when a website or application needs a named aesthetic preset or a brief-to-style recommendation from the Awesome Design Skills library; use Taste for broad divergence and Impeccable for design-quality control."
+      "usage_trigger": "Use after default direction when the product is allowed a distinct named look (soft, minimal, or brutal). Do not load all three."
+    },
+    {
+      "skill_id": "benchmark",
+      "version": "1.0.0",
+      "path": "skills/benchmark",
+      "description": "Page-performance regression check: before/after load, Core Web Vitals, resource size.",
+      "format_profile": "simple",
+      "eval_suite_ref": "skills/benchmark/references/eval-suite.yaml",
+      "certification_state": "draft",
+      "min_reasoning_tier": "high",
+      "usage_trigger": "Use in Verification when the PRD names page performance."
     },
     {
       "skill_id": "blocker-resolution",
@@ -49,6 +82,17 @@
       "certification_state": "draft",
       "min_reasoning_tier": "high",
       "usage_trigger": "Use when developer or worker streams are repeatedly blocked and require structured diagnosis and recovery actions."
+    },
+    {
+      "skill_id": "canary",
+      "version": "1.0.0",
+      "path": "skills/canary",
+      "description": "Watch the first minutes on the named production server after deploy: health, console, screenshots, regressions.",
+      "format_profile": "simple",
+      "eval_suite_ref": "skills/canary/references/eval-suite.yaml",
+      "certification_state": "draft",
+      "min_reasoning_tier": "high",
+      "usage_trigger": "Use immediately after land-and-deploy on the named live URL."
     },
     {
       "skill_id": "canary-echo",
@@ -161,6 +205,17 @@
       "usage_trigger": "Use when creative outputs must be quality-gated before publication or handoff."
     },
     {
+      "skill_id": "cso",
+      "version": "1.0.0",
+      "path": "skills/cso",
+      "description": "Product security audit with supported findings, attacker, boundary, impact, and explicit coverage. Not a lockfile scan.",
+      "format_profile": "simple",
+      "eval_suite_ref": "skills/cso/references/eval-suite.yaml",
+      "certification_state": "draft",
+      "min_reasoning_tier": "high",
+      "usage_trigger": "Use in Verification for supported security findings. Dependency advisory scanning is script, not this skill."
+    },
+    {
       "skill_id": "department-head",
       "version": "1.0.0",
       "path": "skills/department-head",
@@ -170,6 +225,39 @@
       "certification_state": "draft",
       "min_reasoning_tier": "high",
       "usage_trigger": "Use when Lisa needs to supervise delivery status, unblock teams, and align engineering and QA execution via structured progress reports."
+    },
+    {
+      "skill_id": "design-html",
+      "version": "1.0.0",
+      "path": "skills/design-html",
+      "description": "Produce shippable Pretext-native HTML/CSS when the issue brief's deliverable is HTML.",
+      "format_profile": "simple",
+      "eval_suite_ref": "skills/design-html/references/eval-suite.yaml",
+      "certification_state": "draft",
+      "min_reasoning_tier": "high",
+      "usage_trigger": "Use in Execution only when the brief's deliverable is Pretext HTML, not general application code."
+    },
+    {
+      "skill_id": "design-sample",
+      "version": "1.0.0",
+      "path": "skills/design-sample",
+      "description": "Lock pictures or a small picker the builders must match. Required in Assembly when the product has a screen.",
+      "format_profile": "simple",
+      "eval_suite_ref": "skills/design-sample/references/eval-suite.yaml",
+      "certification_state": "draft",
+      "min_reasoning_tier": "high",
+      "usage_trigger": "Use in Assembly after visual direction is locked and before execution briefs. Builders must match this sample and must not restyle later."
+    },
+    {
+      "skill_id": "devex-review",
+      "version": "1.0.0",
+      "path": "skills/devex-review",
+      "description": "Live developer-experience audit of onboarding, APIs, CLIs, SDKs, and docs against the plan scores.",
+      "format_profile": "simple",
+      "eval_suite_ref": "skills/devex-review/references/eval-suite.yaml",
+      "certification_state": "draft",
+      "min_reasoning_tier": "high",
+      "usage_trigger": "Use in Verification when the PRD names API, CLI, SDK, or developer docs."
     },
     {
       "skill_id": "devops-sre",
@@ -183,15 +271,37 @@
       "usage_trigger": "Use when packaging services for container deployment, preparing VPS rollout, and validating secure runtime injection policies."
     },
     {
+      "skill_id": "diagnose-investigate",
+      "version": "1.0.0",
+      "path": "skills/diagnose-investigate",
+      "description": "Find a cause before any fix: tight red command first, then a written root cause. Then return to implement.",
+      "format_profile": "simple",
+      "eval_suite_ref": "skills/diagnose-investigate/references/eval-suite.yaml",
+      "certification_state": "draft",
+      "min_reasoning_tier": "high",
+      "usage_trigger": "Use when Execution or Verification repair needs a cause. No fix without investigation."
+    },
+    {
+      "skill_id": "document-release",
+      "version": "1.0.0",
+      "path": "skills/document-release",
+      "description": "Update docs to match what shipped using a coverage map; generate missing Di\u00e1taxis pages only when the map shows a hole.",
+      "format_profile": "simple",
+      "eval_suite_ref": "skills/document-release/references/eval-suite.yaml",
+      "certification_state": "draft",
+      "min_reasoning_tier": "high",
+      "usage_trigger": "Use at the end of Shipment so documentation matches the shipped tree."
+    },
+    {
       "skill_id": "emil-design-engineering",
       "version": "1.0.0",
       "path": "skills/emil-design-engineering",
-      "description": "Routes specialist motion, animation, prototyping, Expo, Apple-interface, Sonner, UI-library, and Swift work through the complete exact Emil Kowalski skill collection.",
+      "description": "Motion set: decide whether to animate, build web or Expo motion, review, improve, and name vocabulary. Not look, not visual acceptance.",
       "format_profile": "simple",
       "eval_suite_ref": "skills/emil-design-engineering/references/eval-suite.yaml",
       "certification_state": "draft",
       "min_reasoning_tier": "high",
-      "usage_trigger": "Use for building or reviewing animation and interaction, finding motion opportunities, prototyping variants, Expo or React Native motion, Apple-style interactions, Sonner, curated UI-library selection, or modern Swift work."
+      "usage_trigger": "Use on Execution screen issues when the brief allows motion, or in Verification when motion was in the briefs. Use animate-expo only for native. Toasts are ask-sonner. UI kit pick is pick-ui-library."
     },
     {
       "skill_id": "engagement-to-strategy-loop",
@@ -238,6 +348,17 @@
       "usage_trigger": "Use when a Principal needs an evidence-labeled finance operations brief from supplied Odoo contract data, without changing accounting records or invoking a connector."
     },
     {
+      "skill_id": "gap-design",
+      "version": "1.0.0",
+      "path": "skills/gap-design",
+      "description": "Design remaining technical gaps as documents: deep-module vocabulary, DESIGN.md consultation, and plan-time UI scoring when there is a screen.",
+      "format_profile": "simple",
+      "eval_suite_ref": "skills/gap-design/references/eval-suite.yaml",
+      "certification_state": "draft",
+      "min_reasoning_tier": "high",
+      "usage_trigger": "Use in Assembly after library lookup to design remaining gaps. Documents only: no throwaway prototypes or shotgun mockups."
+    },
+    {
       "skill_id": "git-safeguard",
       "version": "1.1.0",
       "path": "skills/git-safeguard",
@@ -271,26 +392,48 @@
       "usage_trigger": "Use when a task may need browser interaction and the operator needs a safe action class, approval boundary, or refusal reason before a consumer-owned browser adapter acts."
     },
     {
-      "skill_id": "hybrid-development-methods",
+      "skill_id": "grill-office-hours",
       "version": "1.0.0",
-      "path": "skills/hybrid-development-methods",
-      "description": "Routes software-development work through the Principal-created LiNKtrend hybrid migrated from IDE Development, selecting its adapted gstack macro or Matt Pocock micro workflow while preserving consumer delivery gates.",
+      "path": "skills/grill-office-hours",
+      "description": "Force a conversation before code: design-tree interview, domain glossary and ADRs in-repo, and office-hours premise challenge with a design doc.",
       "format_profile": "simple",
-      "eval_suite_ref": "skills/hybrid-development-methods/references/eval-suite.yaml",
+      "eval_suite_ref": "skills/grill-office-hours/references/eval-suite.yaml",
       "certification_state": "draft",
       "min_reasoning_tier": "high",
-      "usage_trigger": "Use when IDE Development, LiNKdeveloper, or another software consumer needs specification, PRD clarification, issue decomposition, TDD, debugging, architecture improvement, project health, QA, review, retrospective, context continuity, or shipping assessment."
+      "usage_trigger": "Use at Intake elicitation before any code, when an idea, plan, or design must be sharpened and written down."
     },
     {
       "skill_id": "impeccable-design-system",
       "version": "1.0.0",
       "path": "skills/impeccable-design-system",
-      "description": "Routes interface design, redesign, critique, audit, and polish work through the exact Impeccable source while preserving the user's brief and consumer delivery gates.",
+      "description": "Screen craft while building: layout, type, color, and polish against a locked sample. The brief and brand notes win.",
       "format_profile": "simple",
       "eval_suite_ref": "skills/impeccable-design-system/references/eval-suite.yaml",
       "certification_state": "draft",
       "min_reasoning_tier": "high",
-      "usage_trigger": "Use for end-to-end website or application interface design quality, including shaping, critique, audit, typography, layout, responsive adaptation, hardening, and final polish; use Taste first when the task is primarily divergent visual exploration."
+      "usage_trigger": "Use on Execution screen issues for layout, typography, color, and polish. Use taste-design-exploration to lock direction first. Use ui-ux-guardian for live visual acceptance."
+    },
+    {
+      "skill_id": "implement",
+      "version": "1.0.0",
+      "path": "skills/implement",
+      "description": "Implement one issue from its brief test-first at agreed seams, using deep-module vocabulary, then checkpoint. Phase review is not per issue.",
+      "format_profile": "simple",
+      "eval_suite_ref": "skills/implement/references/eval-suite.yaml",
+      "certification_state": "draft",
+      "min_reasoning_tier": "high",
+      "usage_trigger": "Use on an Execution issue: branch or worktree, implement from the brief, commit, push, checkpoint. Do not open a PR. Do not run phase review per issue."
+    },
+    {
+      "skill_id": "land-and-deploy",
+      "version": "1.0.0",
+      "path": "skills/land-and-deploy",
+      "description": "Merge or land the reviewed release, deploy to the named production server, and confirm it is up.",
+      "format_profile": "simple",
+      "eval_suite_ref": "skills/land-and-deploy/references/eval-suite.yaml",
+      "certification_state": "draft",
+      "min_reasoning_tier": "high",
+      "usage_trigger": "Use after ship, when the plan names the server and deploy method. A cheaper model must not invent where it ships."
     },
     {
       "skill_id": "lead-engineer",
@@ -337,6 +480,17 @@
       "usage_trigger": "Use when a supplied meeting needs an agenda, private pre-brief, redacted notes, decision and commitment extraction, routing references, or follow-up verification."
     },
     {
+      "skill_id": "mobile-native-web",
+      "version": "1.0.0",
+      "path": "skills/mobile-native-web",
+      "description": "Phone-web tells: hover, tap highlight, dynamic viewport, 16px inputs, safe area. Not React Native.",
+      "format_profile": "simple",
+      "eval_suite_ref": "skills/mobile-native-web/references/eval-suite.yaml",
+      "certification_state": "draft",
+      "min_reasoning_tier": "high",
+      "usage_trigger": "Use on Execution issues whose brief is phone-web. Not for Expo/RN."
+    },
+    {
       "skill_id": "operational-reporting",
       "version": "1.0.0",
       "path": "skills/operational-reporting",
@@ -370,6 +524,50 @@
       "usage_trigger": "Use when a consumer-owned private workflow needs a reusable selfie window, battery estimate, bundled measurement, or image-extraction correction plan without storing personal data or sending reminders."
     },
     {
+      "skill_id": "phase-review",
+      "version": "1.0.0",
+      "path": "skills/phase-review",
+      "description": "One phase-end review: Standards and Spec axes plus pre-landing bug hunt, and a PR body. Does not open or merge the PR.",
+      "format_profile": "simple",
+      "eval_suite_ref": "skills/phase-review/references/eval-suite.yaml",
+      "certification_state": "draft",
+      "min_reasoning_tier": "high",
+      "usage_trigger": "Use once at phase end for the integrated diff. Do not review every issue. Do not open or merge pull requests."
+    },
+    {
+      "skill_id": "pick-ui-library",
+      "version": "1.0.0",
+      "path": "skills/pick-ui-library",
+      "description": "Opinionated UI-library pick when the reused library did not already choose one.",
+      "format_profile": "simple",
+      "eval_suite_ref": "skills/pick-ui-library/references/eval-suite.yaml",
+      "certification_state": "draft",
+      "min_reasoning_tier": "high",
+      "usage_trigger": "Use in Assembly when a screen product still needs a UI kit and LiNKlibraries did not already choose it."
+    },
+    {
+      "skill_id": "plan-ceo-review",
+      "version": "1.0.0",
+      "path": "skills/plan-ceo-review",
+      "description": "Founder-mode review that challenges scope, rank, and whether the plan is worth building.",
+      "format_profile": "simple",
+      "eval_suite_ref": "skills/plan-ceo-review/references/eval-suite.yaml",
+      "certification_state": "draft",
+      "min_reasoning_tier": "high",
+      "usage_trigger": "Use at Intake prioritization to challenge scope and rank before Intent is locked. The human or OpenClaw executive gate after this skill is not this skill."
+    },
+    {
+      "skill_id": "plan-eng-review",
+      "version": "1.0.0",
+      "path": "skills/plan-eng-review",
+      "description": "Engineering-manager review of the plan that writes the test plan Verification will read.",
+      "format_profile": "simple",
+      "eval_suite_ref": "skills/plan-eng-review/references/eval-suite.yaml",
+      "certification_state": "draft",
+      "min_reasoning_tier": "high",
+      "usage_trigger": "Use for independent review of Assembly design and to produce or refresh the Verification test plan. Re-run only if the PRD changed."
+    },
+    {
       "skill_id": "prd-architect",
       "version": "1.0.0",
       "path": "skills/prd-architect",
@@ -401,6 +599,28 @@
       "certification_state": "draft",
       "min_reasoning_tier": "high",
       "usage_trigger": "Use when supplied procurement or vendor evidence needs structured comparison, risk review, or an approval brief without spending, acceptance, or vendor-system action."
+    },
+    {
+      "skill_id": "qa-only",
+      "version": "1.0.0",
+      "path": "skills/qa-only",
+      "description": "Report-only end-to-end QA against the eng test plan. Does not fix.",
+      "format_profile": "simple",
+      "eval_suite_ref": "skills/qa-only/references/eval-suite.yaml",
+      "certification_state": "draft",
+      "min_reasoning_tier": "high",
+      "usage_trigger": "Use in Verification for end-to-end acceptance. Repair is a separate step. Do not use the fixing QA skill."
+    },
+    {
+      "skill_id": "redesign-existing-ui",
+      "version": "1.0.0",
+      "path": "skills/redesign-existing-ui",
+      "description": "Audit an existing UI then fix layout, spacing, hierarchy, and styling without breaking function.",
+      "format_profile": "simple",
+      "eval_suite_ref": "skills/redesign-existing-ui/references/eval-suite.yaml",
+      "certification_state": "draft",
+      "min_reasoning_tier": "high",
+      "usage_trigger": "Use when the job is an existing product UI, not a greenfield sample. Preserve behaviour."
     },
     {
       "skill_id": "repository-manager",
@@ -489,6 +709,17 @@
       "certification_state": "draft",
       "min_reasoning_tier": "high",
       "usage_trigger": "Use when SEO strategy requires competitor semantic mapping and a ranked content gap backlog."
+    },
+    {
+      "skill_id": "ship",
+      "version": "1.0.0",
+      "path": "skills/ship",
+      "description": "Package the Verification tree: version, changelog, and release commit without a second full test when Verification already passed.",
+      "format_profile": "simple",
+      "eval_suite_ref": "skills/ship/references/eval-suite.yaml",
+      "certification_state": "draft",
+      "min_reasoning_tier": "high",
+      "usage_trigger": "Use at Shipment after the tree is proven identical to the Verification result. Do not re-run the full Verification suite on an unchanged tree."
     },
     {
       "skill_id": "skill-architect",
@@ -604,12 +835,23 @@
       "skill_id": "taste-design-exploration",
       "version": "1.0.0",
       "path": "skills/taste-design-exploration",
-      "description": "Routes divergent website and application visual exploration through the exact Taste collection to produce meaningfully different directions without replacing downstream quality control.",
+      "description": "Lock default visual direction: company brand notes first, then Taste default, then Apple-like or shape/color/type decisions. Named looks are awesome-design-presets.",
       "format_profile": "simple",
       "eval_suite_ref": "skills/taste-design-exploration/references/eval-suite.yaml",
       "certification_state": "draft",
       "min_reasoning_tier": "high",
-      "usage_trigger": "Use when a website or application needs multiple distinct visual directions, an anti-generic redesign, image-to-code exploration, a brand kit, or an explicitly named Taste mode; use Impeccable after a direction is selected."
+      "usage_trigger": "Use in Assembly after library lookup to lock visual direction before design-sample. Use brandkit path only when the product is a visual identity."
+    },
+    {
+      "skill_id": "technical-prd",
+      "version": "1.0.0",
+      "path": "skills/technical-prd",
+      "description": "Turn approved Intent into an executable technical spec: five-phase precision plus in-repo spec, seams, and tracker publish.",
+      "format_profile": "simple",
+      "eval_suite_ref": "skills/technical-prd/references/eval-suite.yaml",
+      "certification_state": "draft",
+      "min_reasoning_tier": "high",
+      "usage_trigger": "Use at Intake to produce the Technical PRD after Intent. Do not spawn Execution from this skill."
     },
     {
       "skill_id": "time-management",
@@ -623,6 +865,28 @@
       "usage_trigger": "Use when the consumer needs store-independent intake, prioritisation, capacity planning, review, evidence reconciliation, or a standing-rule proposal."
     },
     {
+      "skill_id": "to-questionnaire",
+      "version": "1.0.0",
+      "path": "skills/to-questionnaire",
+      "description": "Turn a decision the session cannot finish into a questionnaire another person fills asynchronously.",
+      "format_profile": "simple",
+      "eval_suite_ref": "skills/to-questionnaire/references/eval-suite.yaml",
+      "certification_state": "draft",
+      "min_reasoning_tier": "high",
+      "usage_trigger": "Use when Intake analysis cannot finish because a named person off-session holds facts or decisions."
+    },
+    {
+      "skill_id": "to-tickets",
+      "version": "1.0.0",
+      "path": "skills/to-tickets",
+      "description": "Break the approved PRD into tracer-bullet tickets with blocking edges; this is the feature map.",
+      "format_profile": "simple",
+      "eval_suite_ref": "skills/to-tickets/references/eval-suite.yaml",
+      "certification_state": "draft",
+      "min_reasoning_tier": "high",
+      "usage_trigger": "Use in Assembly to produce the feature map from the approved PRD. One GitHub issue is the wrong shape."
+    },
+    {
       "skill_id": "tool-architect",
       "version": "1.0.0",
       "path": "skills/tool-architect",
@@ -634,15 +898,26 @@
       "usage_trigger": "Use when a required tool is missing in /tools, or when converting APIs/third-party tools into standardized CLI wrappers."
     },
     {
+      "skill_id": "triage",
+      "version": "1.0.0",
+      "path": "skills/triage",
+      "description": "Move inbound issues and external PRs you did not write through category and state roles, verify the claim, and write an agent-ready brief.",
+      "format_profile": "simple",
+      "eval_suite_ref": "skills/triage/references/eval-suite.yaml",
+      "certification_state": "draft",
+      "min_reasoning_tier": "high",
+      "usage_trigger": "Use when classifying inbound bugs, requests, or external PRs you did not author before implementation. Do not triage tickets that to-tickets just wrote."
+    },
+    {
       "skill_id": "ui-ux-guardian",
       "version": "1.0.0",
       "path": "skills/ui-ux-guardian",
-      "description": "Design system guardian skill for enforcing Studio CSS standards and Playwright-based visual regression controls.",
-      "format_profile": "heavy",
+      "description": "Visual acceptance of a running screen: Impeccable audit/critique/live, motion review when motion shipped, gstack live visual QA, and Playwright regression. Report; do not restyle.",
+      "format_profile": "simple",
       "eval_suite_ref": "skills/ui-ux-guardian/references/eval-suite.yaml",
       "certification_state": "draft",
       "min_reasoning_tier": "high",
-      "usage_trigger": "Use when auditing UI changes for consistency with the Studio design system and preventing visual drift."
+      "usage_trigger": "Use in Verification whenever the product has a screen. Always for screen products. Motion review when motion was in the briefs."
     },
     {
       "skill_id": "workflow-architect",
@@ -654,6 +929,17 @@
       "certification_state": "draft",
       "min_reasoning_tier": "balanced",
       "usage_trigger": "Use when a user needs to design or update an n8n workflow and activate/test it automatically."
+    },
+    {
+      "skill_id": "writing-for-agents",
+      "version": "1.0.0",
+      "path": "skills/writing-for-agents",
+      "description": "Write documents cheaper executors can follow: Intent, reuse decisions, issue briefs, proof manifests, ship criteria, and library entries.",
+      "format_profile": "simple",
+      "eval_suite_ref": "skills/writing-for-agents/references/eval-suite.yaml",
+      "certification_state": "draft",
+      "min_reasoning_tier": "high",
+      "usage_trigger": "Use when writing Intent, reuse decisions, execution briefs, proof manifests, ship criteria, or library entries for later agents."
     }
   ]
 }

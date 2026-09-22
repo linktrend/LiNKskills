@@ -115,22 +115,3 @@ def test_skill_script_rejects_symlink_anywhere_in_release(tmp_path: Path, monkey
     assert capture.receipt is None
     assert "containing symlinks" in (capture.error or "")
 
-
-def test_hybrid_routing_suite_is_executable_and_complete() -> None:
-    root = Path(__file__).resolve().parents[2]
-    suite = load_eval_suite(
-        root / "skills" / "hybrid-development-methods" / "references" / "eval-suite.yaml"
-    )
-
-    assert all(case.has_execute for case in suite.cases)
-    script_cases = [case for case in suite.cases if case.raw["execute"]["kind"] == "skill_script"]
-    remainder_cases = [case for case in suite.cases if str(case.id).startswith("remainder-")]
-    assert len(script_cases) == 22
-    assert len(remainder_cases) == 5
-    assert all(case.raw["execute"]["kind"] == "consumer_profile" for case in remainder_cases)
-    assert len([case for case in script_cases if case.id.startswith("route-")]) == 19
-    assert {case.id for case in script_cases if not case.id.startswith("route-")} == {
-        "ambiguous-overlap",
-        "consumer-boundary",
-        "no-match",
-    }

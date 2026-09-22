@@ -348,7 +348,7 @@ def update_ledger(root: Path) -> None:
     ledger["remainder_source_packet"] = {
         "issue": 374,
         "initial_production_successor": sorted(INITIAL_IDS),
-        "remainder_count": 54,
+        "remainder_count": len(remainder_skill_ids(root)),
         "usable_from_this_packet": False,
     }
     path.write_text(json.dumps(ledger, indent=2, sort_keys=True) + "\n", encoding="utf-8")

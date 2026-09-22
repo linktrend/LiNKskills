@@ -1,4 +1,4 @@
-"""Remainder (54-skill) qualification matrix.
+"""Remainder qualification matrix.
 
 The five production-successor releases stay owned by ``ed03``. This module
 inventories every other catalog skill, requires executable confined cases, and
@@ -39,7 +39,7 @@ from .ed03 import (
 
 REMAINDER_KIND = "remainder-release-profile-matrix"
 INITIAL_SKILL_IDS = frozenset(item["skillId"] for item in INITIAL_RELEASE_PROFILES)
-REQUIRED_REMAINDER_COUNT = 54
+REQUIRED_REMAINDER_COUNT = 80
 
 
 def catalog_skill_ids(root: Path) -> list[str]:

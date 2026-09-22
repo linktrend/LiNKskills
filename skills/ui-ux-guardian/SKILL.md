@@ -1,12 +1,12 @@
 ---
 name: ui-ux-guardian
-description: "Design system guardian skill for enforcing Studio CSS standards and Playwright-based visual regression controls."
-usage_trigger: "Use when auditing UI changes for consistency with the Studio design system and preventing visual drift."
+description: "Visual acceptance of a running screen: Impeccable audit/critique/live, motion review when motion shipped, gstack live visual QA, and Playwright regression. Report; do not restyle."
+usage_trigger: "Use in Verification whenever the product has a screen. Always for screen products. Motion review when motion was in the briefs."
 version: 1.0.0
 release_tag: v1.0.0
 created: 2026-02-25
 author: LiNKskills Library
-tags: [design-system, ux, regression]
+tags: [design-system, ux, regression, visual-acceptance]
 engine:
   min_reasoning_tier: high
   preferred_model: gpt-5
@@ -19,96 +19,39 @@ tooling:
 tools: [write_file, read_file, list_dir, get_tool_details]
 dependencies: [playwright-cli, fast-playwright]
 permissions: [fs_read, fs_write, shell_exec]
-scope_out: ["Do not approve visual changes without baseline diff", "Do not modify design tokens without explicit policy update"]
-persistence:
-  required: true
-  state_path: ".workdir/tasks/{{task_id}}/state.jsonl"
-last_updated: 2026-02-25
+scope_out: ["Do not approve visual changes without evidence", "Do not restyle during Verification", "Do not skip accessibility and responsive checks"]
+format_profile: simple
+last_updated: 2026-09-22
 ---
 
 # ui-ux-guardian
 
-## Decision Tree (Fail-Fast & Persistence)
-0. Attempt resume from `.workdir/tasks/*/state.jsonl` when task exists.
-1. Confirm target screens, baseline images, and Studio CSS source are available.
-2. Validate runtime intelligence floor.
-3. Validate tooling protocol order: native cli, cli wrapper, direct api, mcp.
-4. Classify specialist or generalist audit profile.
-5. If generalist or >10 tools, call `get_tool_details` and cache capabilities.
-6. Block approval if visual diff exceeds policy tolerance.
+This card is **visual check** in Verification. Always if there is a screen. Repair is `diagnose-investigate` then `implement` / `impeccable-design-system`. Do not restyle here.
 
-## Rules
+Companions in this package: `references/impeccable-audit.md`, `impeccable-critique.md`, `impeccable-live.md`, `gstack-design-review-procedure.md`, `emil-review-animations.md`. Follow them; do not open upstream repos.
 
-### Scope-In
-- Run visual regression comparisons using Playwright tools.
-- Detect deviations from design tokens, spacing, typography, and component states.
-- Produce actionable remediation guidance.
+## 1. Match the locked sample
 
-### Scope-Out
-- Do not pass UI changes without evidence artifacts.
-- Do not accept one-off CSS overrides that bypass tokens.
-- Do not skip accessibility and responsive checks.
+Screenshot the running routes. Compare to `design-sample` and `DESIGN.md`. Fail mismatches (spacing, type, color, hierarchy), not taste opinions.
 
-### Tooling Protocol (CLI-First)
-1. Level 1: native cli for file and artifact checks.
-2. Level 2: cli wrapper scripts (`playwright-cli`) for deterministic snapshots.
-3. Level 3: direct api only when wrapper output is insufficient.
-4. Level 4: mcp for persistent interactive sessions (`fast-playwright`) when needed.
+## 2. Impeccable critique / audit
 
-### Internal Persistence (Zero-Copy / Flat-File)
-- Save checkpoint lines to `.workdir/tasks/{{task_id}}/state.jsonl`.
-- Save screenshots and diff metadata as task-local files.
-- Use seek-based reads to fetch only failing selectors or pages.
+Heuristic UX critique (findable primary action, errors recoverable, empty states). Technical audit: contrast, a11y names, responsive, keyboard. Live variant picking is optional evidence, not a redesign session.
 
-### Smart JIT Tool Loading (Mitigated)
-- Enable only for generalist/multi-surface audits or >10 tools.
-- `get_tool_details` is required to load tool schemas and capability summaries.
+## 3. Motion (if briefs allowed motion)
 
-## Workflow
+Run Emil review standards: justified, frequency, easing, duration, origin, reduced motion. Default to flag.
 
-### Phase 1: Ingestion & Checkpointing
-1. Gather changed routes/pages and expected design tokens.
-2. Load baseline image references and threshold policy.
-3. Determine specialist/generalist mode and initialize JIT cache if required.
-4. Validate Input Contract.
-5. Append `INITIALIZED` checkpoint.
+## 4. gstack live visual QA
 
-### Phase 2: Visual Audit Logic
-6. Capture fresh screenshots with Playwright.
-7. Run visual and token-level diffs.
-8. Classify deltas as pass/warn/fail and prepare remediation list.
-9. Append `IN_PROGRESS` checkpoint.
+Before/after screenshots on named pages. Console errors. Broken layout at the agreed widths. Report only.
 
-### Phase 3: Drafting & Asynchronous Gate
-10. Draft audit report with failing selectors/pages.
-11. If critical visual regression appears, mark `PENDING_APPROVAL`.
+## 5. Playwright / Studio regression
 
-### Phase 4: Finalization
-12. Finalize audit report and gating recommendation.
-13. Validate Output Contract.
-14. Append `COMPLETED` checkpoint.
+If baselines exist, capture and diff. Block approval when visual diff exceeds policy. Save screenshots as task-local files.
 
-### Phase 5: Self-Correction & Auditing
-15. Log run summary to `execution_ledger.jsonl`.
-16. Save traces and screenshots index to task trace files.
-17. Update `references/old-patterns.md` with recurring UI drift patterns.
+## Tooling protocol (CLI-first)
 
-## Tools
-| Tool Name | Workflow Scope | Critical Execution Rule |
-| :--- | :--- | :--- |
-| `playwright-cli` | Phases 1-4 | Required for deterministic screenshot and PDF artifacts. |
-| `fast-playwright` | Phases 2-3 | Use for interactive debugging when static snapshots are insufficient. |
-| `get_tool_details` | Phase 1+ | Required for generalist/JIT audits. |
+**Native CLI** for artifacts; **CLI wrapper** (`playwright-cli`) for snapshots; **direct API** only if wrappers fail; **MCP** (`fast-playwright`) only for an approved session. Generalist or >10 tools: `get_tool_details`.
 
-## Contracts
-| Direction | Artifact Name | Schema Reference | Purpose |
-| :--- | :--- | :--- | :--- |
-| **Input** | `ui_audit_request` | `./references/schemas.json#/definitions/input` | Validate target pages, baselines, and thresholds. |
-| **Output** | `ui_audit_report` | `./references/schemas.json#/definitions/output` | Validate diff results and pass/fail decision. |
-| **State** | `execution_state` | `./references/schemas.json#/definitions/state` | Persist resumable audit checkpoints. |
-
-## Progressive Disclosure References
-- Audit edge cases: `./advanced/advanced.md`
-- Tool usage notes: `./references/api-specs.md`
-- Known anti-patterns: `./references/old-patterns.md`
-- Version notes: `./references/changelog.md`
+Contracts: `references/schemas.json#/definitions/input` and `#/definitions/output`.
