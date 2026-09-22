@@ -1,0 +1,86 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "implement",
+  "display_name": "implement",
+  "version": "1.0.0",
+  "description": "Implement one issue from its brief test-first at agreed seams, using deep-module vocabulary, then checkpoint. Phase review is not per issue.",
+  "capability_category": "internal_launch",
+  "lifecycle_state": "draft",
+  "format_profile": "simple",
+  "compatible_runtime_profiles": [
+    "cursor-macos"
+  ],
+  "min_capability_tier": "high",
+  "routing": {
+    "when_to_use": "Implement one issue from its brief test-first at agreed seams, using deep-module vocabulary, then checkpoint. Phase review is not per issue.",
+    "when_not_to_use": [
+      "Do not claim usable or live",
+      "Do not grant permission-to-act"
+    ],
+    "tags": [
+      "hybrid",
+      "draft"
+    ]
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "task",
+        "description": "Operator task"
+      }
+    ],
+    "expected_outputs": [
+      {
+        "name": "result",
+        "description": "Procedure result"
+      }
+    ],
+    "forbidden_actions": [
+      "Publish as live",
+      "Print secrets"
+    ],
+    "verification_steps": [
+      "Validate input contract",
+      "Follow SKILL.md"
+    ],
+    "completion_criteria": [
+      "Draft procedure followed",
+      "No live claim"
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read",
+      "filesystem_write"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "suite_hash": "sha256:565de21ff923e7350129e8eb7355cf5e16881b38ea539552b1b2e300494677cf"
+  },
+  "telemetry": {
+    "classification": "public_internal",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_private_data",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain_ids_and_hashes"
+  },
+  "fragments": [
+    {
+      "fragment_id": "summary",
+      "disclosure_level": 2,
+      "path": "SKILL.md"
+    }
+  ],
+  "release_channel": "eval"
+}

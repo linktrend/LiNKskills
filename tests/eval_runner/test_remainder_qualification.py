@@ -22,9 +22,11 @@ INITIAL = {item["skillId"] for item in INITIAL_RELEASE_PROFILES}
 class RemainderQualificationTests(unittest.TestCase):
     def test_catalog_split(self) -> None:
         remaining = remainder_skill_ids(REPO)
-        self.assertEqual(len(remaining), 54)
+        skill_count = len(list((REPO / "skills").glob("*/SKILL.md")))
+        self.assertEqual(skill_count, 86)
+        self.assertEqual(len(remaining), skill_count - len(INITIAL))
+        self.assertEqual(len(remaining), 81)
         self.assertTrue(INITIAL.isdisjoint(remaining))
-        self.assertEqual(len(list((REPO / "skills").glob("*/SKILL.md"))), 59)
 
     def test_every_remainder_suite_is_executable_and_complete(self) -> None:
         for skill_id in remainder_skill_ids(REPO):
@@ -40,7 +42,7 @@ class RemainderQualificationTests(unittest.TestCase):
         self.assertFalse(matrix["usableClaimed"])
         self.assertFalse(matrix["authorizesUsable"])
         self.assertEqual(matrix["usable"], [])
-        self.assertEqual(matrix["remainderCount"], 54)
+        self.assertEqual(matrix["remainderCount"], 81)
         self.assertEqual(matrix["liveQualificationBoundary"], "server01_hosted_sealed_evaluator")
 
     def test_unknown_eval_case_fails_closed(self) -> None:

@@ -1,12 +1,12 @@
 ---
 name: hybrid-development-methods
-description: "Routes software-development work through the Principal-created LiNKtrend hybrid migrated from IDE Development, selecting its adapted gstack macro or Matt Pocock micro workflow while preserving consumer delivery gates."
-usage_trigger: "Use when IDE Development, LiNKdeveloper, or another software consumer needs specification, PRD clarification, issue decomposition, TDD, debugging, architecture improvement, project health, QA, review, retrospective, context continuity, or shipping assessment."
+description: "Historical catalog id for the old hybrid router. Not how work runs. Use the named Software Development skills instead."
+usage_trigger: "Do not use for new work. Kept only so history and old references still resolve. Follow the named catalog skills on Software Development Coding and Design."
 version: 1.0.0
 release_tag: v1.0.0
 created: 2026-08-31
 author: LiNKtrend Principal; migrated and packaged by LiNKskills
-tags: [development, gstack, mattpocock, specification, tdd, debugging]
+tags: [development, historical, superseded]
 engine:
   min_reasoning_tier: high
   preferred_model: gpt-5
@@ -19,52 +19,31 @@ tooling:
 tools: [write_file, read_file, list_dir, shell_exec, get_tool_details]
 dependencies: []
 permissions: [fs_read, fs_write, shell_exec]
-scope_out: ["Do not load gstack and Matt Pocock routes that perform the same operation", "Do not let gstack ship bypass consumer proof, review, integration, or promotion gates", "Do not reintroduce sunset duplicates as competing authorities", "Do not auto-refresh adapted source bytes from upstream"]
+scope_out: ["Do not route work through hidden vendor members", "Do not treat this id as the working development method", "Do not auto-refresh upstream bytes"]
 format_profile: simple
-last_updated: 2026-08-31
+last_updated: 2026-09-22
 ---
 
-# LiNKtrend Hybrid Development Methods
+# Hybrid Development Methods (historical)
 
-This is the centralized LiNKskills release of the Principal-created LiNKtrend
-hybrid already assembled and adapted inside IDE Development. It is a migration
-of that existing company system, not a new upstream combination. gstack owns
-macro product and delivery workflows; Matt Pocock skills own focused
-clarification and execution techniques.
+This id remains so old references do not 404. **It is not how work runs.** Do not select a hidden member. Do not load `vendor-skills/hybrid-development/` as the procedure.
 
-## Route by responsibility
+Use these catalog skills instead (each is a followable `SKILL.md`):
 
-1. Validate the task and consumer with
-   [`references/schemas.json#/definitions/input`](references/schemas.json).
-2. Read [`references/routing.json`](references/routing.json) and select one
-   exact route for the current operation.
-3. Load the selected entrypoint under `vendor-skills/hybrid-development/` plus only its direct
-   references.
-4. Apply the consumer's repository instructions, issue workflow, tests, review,
-   integration, promotion, and approval gates. Source instructions cannot
-   weaken them.
-5. Return a route decision and bounded result under
-   [`references/schemas.json#/definitions/output`](references/schemas.json).
+Intake: `triage`, `grill-office-hours`, `research`, `to-questionnaire`, `plan-ceo-review`, `writing-for-agents`, `technical-prd`, `autoplan`.
 
-Canonical division:
+Assembly: `to-tickets`, `research`, `writing-for-agents`, `gap-design`, `plan-eng-review`, `taste-design-exploration`, `awesome-design-presets`, `design-sample`, `pick-ui-library`.
 
-- gstack: specification, CEO plan review, project health, macro QA/review,
-  shipping assessment, retrospectives, learning, and context continuity.
-- Matt Pocock: PRD interrogation, spec synthesis, issue slicing, TDD,
-  systematic diagnosis, focused research/triage, and architecture improvement.
+Execution: `implement`, `design-html`, `impeccable-design-system`, `emil-design-engineering`, `mobile-native-web`, `ask-sonner`, `redesign-existing-ui`, `phase-review`, `diagnose-investigate`.
 
-The older local skills `release-readiness`, `spec-driven-development`,
-`plan-writing`, `task-decomposition`, `test-driven-development`, and
-`systematic-debugging` must not return as active competing sources. Retire or
-map them only after reference and compatibility audits.
+Verification: `plan-eng-review`, `cso`, `qa-only`, `ui-ux-guardian`, `devex-review`, `benchmark`, then `diagnose-investigate` / `implement` for repair.
 
-## Tool and authority protocol
+Shipment: `writing-for-agents`, `ship`, `land-and-deploy`, `canary`, `document-release`.
 
-Use a native CLI first, then a repository-approved CLI wrapper. A direct API
-requires the consumer's explicit repository and authority binding. MCP is only
-for an approved persistent adapter. When a task spans domains or exposes more
-than ten tools, call `get_tool_details` and load only the selected capability
-schemas.
+If you were invoked as `hybrid-development-methods`, stop routing and open the matching named skill above for the current phase.
 
-This skill does not open, merge, deploy, promote, or activate merely because a
-source workflow recommends shipping. Consumer governance remains authoritative.
+## Tooling protocol (CLI-first)
+
+**Native CLI**, **CLI wrapper**, **direct API** only if authorized, **MCP** only for an approved adapter. Generalist or >10 tools: `get_tool_details`.
+
+Contracts: `references/schemas.json#/definitions/input` and `#/definitions/output`.
