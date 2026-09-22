@@ -103,26 +103,35 @@ def test_database_errors_do_not_leak():
     assert provider.handle(request("skills_catalog_list")) == {"ok": False, "error": "store_unavailable"}
 
 
-def test_catalog_keeps_development_and_adds_floor_names():
+def test_catalog_files_floors_and_leaves_private_skills_off():
     provider, _, _ = runtime()
-    catalog = provider.handle(request("skills_catalog_list"))
+    catalog = provider.handle(request("skills_catalog_list", limit=100))
     assert catalog["ok"]
-    assert [item["display_name"] for item in catalog["items"]] == [
-        "Development",
-        "Company direction",
-        "Software",
-        "Customers and products",
-        "Company operations",
-        "Trading",
-        "Shared systems",
-    ]
-    assert catalog["items"][0]["family_id"] == "development"
-    assert all(item["subcategory_count"] == 0 for item in catalog["items"])
-    development = provider.handle(request("skills_release_list", family_id="development"))
-    assert [item["skill_id"] for item in development["items"]] == ["git-safeguard"]
-    assert development["items"][0]["family_id"] == "development"
-    trading = provider.handle(request("skills_release_list", family_id="trading"))
+    names = [item["display_name"] for item in catalog["items"]]
+    assert names[0] == "Operations"
+    assert "Trading" in names
+    assert "Development" not in names
+    assert "Company direction" not in names
+    assert "Shared systems" not in names
+    by_id = {item["family_id"]: item for item in catalog["items"]}
+    assert by_id["trading"]["subcategory_count"] == 0
+    assert by_id["software-development"]["subcategory_count"] == 2
+    assert by_id["systems"]["subcategory_count"] == 10
+    assert "Jane" not in by_id["operations"]["description"]
+    assert "LiNKtrend" not in by_id["research"]["description"]
+    coding = provider.handle(request(
+        "skills_release_list", family_id="software-development", limit=100,
+    ))
+    by_skill = {item["skill_id"]: item for item in coding["items"]}
+    assert by_skill["git-safeguard"]["subcategory_id"] == "coding"
+    assert by_skill["git-safeguard"]["qualification"] == "qualified"
+    assert "hybrid-development-methods" not in by_skill
+    assert "private-health-wellbeing" not in by_skill
+    assert "personal-compliance" not in by_skill
+    trading = provider.handle(request("skills_release_list", family_id="trading", limit=100))
     assert trading["ok"] and trading["items"] == []
+    missing = provider.handle(request("skills_release_list", family_id="development"))
+    assert missing["error"] == "not_found"
 
 
 def test_legacy_and_bad_protocol_do_not_touch_database():
