@@ -49,6 +49,10 @@ RUN python3 -m pip install --no-cache-dir --require-hashes -r requirements-dev.l
         packages/eval_runner \
     && python3 -m pip install --no-cache-dir --no-deps "packages/gateway[postgres]"
 
+# Host checkouts can carry private directory modes. The runtime user must read
+# every catalog skill and packaged tool.
+RUN chmod -R a+rX /opt/linkskills
+
 USER 10002:10002
 
 EXPOSE 8787
