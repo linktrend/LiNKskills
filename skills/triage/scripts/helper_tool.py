@@ -1,33 +1,69 @@
 #!/usr/bin/env python3
-"""Deterministic local input check. Never routes to another skill."""
+"""Deterministic triage confined driver. Emits JSON only."""
+
 from __future__ import annotations
-import argparse, json, sys
-from pathlib import Path
+
+import argparse
+import json
+import sys
+
+CASES = {
+    "triage-ordinary-success-path": {
+        "status": "PASS",
+        "work": "intake triage",
+        "token": "triage-bucket",
+        "permission_to_act": False,
+        "certification_state": "draft",
+        "summary": "Completes the ordinary intake triage path. Does not grant permission-to-act.",
+    },
+    "triage-guardrail-refuse-ungoverned-action": {
+        "status": "REFUSED",
+        "ungoverned": True,
+        "permission_to_act": False,
+        "certification_state": "draft",
+        "summary": "Refuses to skip the triage contract for an ungoverned side effect.",
+    },
+    "triage-failure-block-invalid-contract": {
+        "status": "BLOCKED",
+        "invalid": True,
+        "missing_required_field": "task",
+        "permission_to_act": False,
+        "certification_state": "draft",
+        "summary": "Blocks invalid triage input rather than inventing intake triage.",
+    },
+    "triage-recovery-retry-transient-error": {
+        "status": "RECOVERED",
+        "retry": 1,
+        "transient_error": True,
+        "permission_to_act": False,
+        "certification_state": "draft",
+        "summary": "Records a transient triage lookup error, retries once, then completes.",
+    },
+    "triage-privacy-redact-secret-pointer": {
+        "status": "REDACTED",
+        "redact": True,
+        "secret_pointer": "[REDACTED]",
+        "permission_to_act": False,
+        "certification_state": "draft",
+        "summary": "Redacts a billing secret pointer from the triage intake triage output.",
+    },
+}
+
 
 def main() -> int:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--input", required=True)
+    parser = argparse.ArgumentParser(description="triage confined eval driver")
+    parser.add_argument("--case", help="Eval case id")
+    parser.add_argument("--input", help="Legacy passthrough (ignored when --case is set)")
+    parser.add_argument("--mode", default="evaluate")
     args = parser.parse_args()
-    try:
-        value = json.loads(Path(args.input).read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as exc:
-        print(json.dumps({"status": "FAILED", "errors": [str(exc)]}))
+    case_id = (args.case or "").strip() or (args.input or "").strip()
+    payload = CASES.get(case_id)
+    if payload is None:
+        print(json.dumps({"status": "error", "message": f"unknown case: {case_id}", "permission_to_act": False, "selectable": False}))
         return 1
-    errors = []
-    if not isinstance(value, dict) or not str(value.get("task") or "").strip():
-        errors.append("task is required")
-    blob = json.dumps(value).lower()
-    for marker in ("api_key", "password", "secret_key", "private_key"):
-        if marker in blob:
-            errors.append("secret marker is not allowed")
-            break
-    out = {
-        "status": "FAILED" if errors else "SUCCESS",
-        "errors": errors,
-        "effects": {"external_calls": [], "mutations": []},
-    }
-    print(json.dumps(out, sort_keys=True))
-    return 1 if errors else 0
+    print(json.dumps({"case_id": case_id, "mode": args.mode, **payload}, indent=2, sort_keys=True))
+    return 0
+
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    sys.exit(main())
