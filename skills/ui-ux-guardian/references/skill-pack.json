@@ -1,0 +1,79 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "ui-ux-guardian",
+  "display_name": "Ui Ux Guardian",
+  "version": "1.0.0",
+  "description": "Visual acceptance of a running screen: Impeccable audit/critique/live, motion review when motion shipped, gstack live visual QA, and Playwright regression. Report; do not restyle.",
+  "capability_category": "internal_launch",
+  "lifecycle_state": "draft",
+  "format_profile": "simple",
+  "compatible_runtime_profiles": [
+    "cursor-macos"
+  ],
+  "min_capability_tier": "high",
+  "routing": {
+    "when_to_use": "Use in Verification whenever the product has a screen. Always for screen products. Motion review when motion was in the briefs.",
+    "when_not_to_use": [
+      "Do not approve visual changes without evidence",
+      "Do not restyle during Verification",
+      "Do not skip accessibility and responsive checks"
+    ],
+    "tags": [
+      "design-system",
+      "ux",
+      "regression",
+      "visual-acceptance"
+    ]
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "task",
+        "description": "Operator task"
+      }
+    ],
+    "expected_outputs": [
+      {
+        "name": "result",
+        "description": "Scoped skill result"
+      }
+    ],
+    "forbidden_actions": [
+      "Publish without an issuer-sealed receipt",
+      "Grant permission-to-act"
+    ],
+    "verification_steps": [
+      "Run the confined eval suite",
+      "Confirm cursor-macos is declared"
+    ],
+    "completion_criteria": [
+      "Canonical skill pack and execution profile match this version"
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "suite_hash": "sha256:8beafb7e283dd240e7bd0c50836078f48630b2c19573aca6c3afed8d2ac446bb"
+  },
+  "telemetry": {
+    "classification": "public_internal",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain_ids_and_hashes"
+  },
+  "release_channel": "eval"
+}

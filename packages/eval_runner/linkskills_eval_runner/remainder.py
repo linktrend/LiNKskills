@@ -167,21 +167,37 @@ def qualify_hosted_remainder_release_profiles(
     root: Path,
     *,
     evidence_dir: Optional[Path] = None,
+    only_skill_ids: Optional[Sequence[str]] = None,
 ) -> dict[str, Any]:
-    """Run confined suites for the 78 shared-floor remainder ids.
+    """Run confined suites for shared-floor remainder ids.
 
     Source ``qualify_remainder_release_profiles`` stays uncertified. Usable
     rows come only from executed bubblewrap receipts with isolation denied.
+    ``only_skill_ids`` limits execution to that shared-floor subset. The two
+    private skills stay unpublished.
     """
     source = qualify_remainder_release_profiles(root)
     if source.get("usable") or source.get("usableClaimed") or source.get("authorizesUsable"):
         raise QualificationError("source_remainder_matrix_claimed_usable")
+    shared = shared_floor_remainder_skill_ids(root)
+    if only_skill_ids is None:
+        selected = list(shared)
+    else:
+        selected = [str(item) for item in only_skill_ids]
+        if not selected or len(selected) != len(set(selected)):
+            raise QualificationError("remainder_only_skill_ids_invalid")
+        blocked = [item for item in selected if item in UNPUBLISHED_SKILL_IDS]
+        if blocked:
+            raise QualificationError("unpublished_skill_forbidden:" + ",".join(blocked))
+        unknown = [item for item in selected if item not in set(shared)]
+        if unknown:
+            raise QualificationError("remainder_skill_not_shared_floor:" + ",".join(unknown))
     declared = [
         item
         for item in declared_remainder_profiles(root)
-        if item["skillId"] not in UNPUBLISHED_SKILL_IDS
+        if item["skillId"] in set(selected)
     ]
-    if len(declared) != SHARED_FLOOR_REMAINDER_COUNT:
+    if len(declared) != len(selected):
         raise QualificationError(f"shared_floor_remainder_count_invalid:{len(declared)}")
     rows: list[dict[str, Any]] = []
     for item in declared:
@@ -234,8 +250,9 @@ def qualify_hosted_remainder_release_profiles(
     return {
         "schemaVersion": SCHEMA_VERSION,
         "kind": HOSTED_REMAINDER_KIND,
-        "complete": len(rows) == SHARED_FLOOR_REMAINDER_COUNT,
-        "ok": len(rows) == SHARED_FLOOR_REMAINDER_COUNT and not quarantined,
+        "complete": len(rows) == len(selected),
+        "ok": len(rows) == len(selected) and not quarantined,
+        "onlySkillIds": selected if only_skill_ids is not None else [],
         "usableClaimed": bool(usable),
         "authorizesUsable": bool(usable),
         "sourceMatrixAuthorizesUsable": False,

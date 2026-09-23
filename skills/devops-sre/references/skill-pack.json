@@ -1,0 +1,77 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "devops-sre",
+  "display_name": "Devops Sre",
+  "version": "1.0.0",
+  "description": "DevOps/SRE persona skill for automated Dockerization, VPS deployment hardening, and secure LSL_MASTER_KEY propagation.",
+  "capability_category": "internal_launch",
+  "lifecycle_state": "draft",
+  "format_profile": "heavy",
+  "compatible_runtime_profiles": [
+    "cursor-macos"
+  ],
+  "min_capability_tier": "high",
+  "routing": {
+    "when_to_use": "Use when packaging services for container deployment, preparing VPS rollout, and validating secure runtime injection policies.",
+    "when_not_to_use": [
+      "Do not ship deployment plans without rollback path",
+      "Do not allow production deployment without LSL_MASTER_KEY verification"
+    ],
+    "tags": [
+      "devops",
+      "sre",
+      "deployment"
+    ]
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "task",
+        "description": "Operator task"
+      }
+    ],
+    "expected_outputs": [
+      {
+        "name": "result",
+        "description": "Scoped skill result"
+      }
+    ],
+    "forbidden_actions": [
+      "Publish without an issuer-sealed receipt",
+      "Grant permission-to-act"
+    ],
+    "verification_steps": [
+      "Run the confined eval suite",
+      "Confirm cursor-macos is declared"
+    ],
+    "completion_criteria": [
+      "Canonical skill pack and execution profile match this version"
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "suite_hash": "sha256:f8fb69e519a68487f00e73e08d4d4b303746bc387fdee26ae4e46eef4579887e"
+  },
+  "telemetry": {
+    "classification": "public_internal",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain_ids_and_hashes"
+  },
+  "release_channel": "eval"
+}

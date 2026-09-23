@@ -1,0 +1,77 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "creative-director",
+  "display_name": "Creative Director",
+  "version": "1.0.0",
+  "description": "Senior Creative Lead persona that converts marketing briefs into structured asset orders and triggers rendering workflows through n8n-bridge.",
+  "capability_category": "internal_launch",
+  "lifecycle_state": "draft",
+  "format_profile": "heavy",
+  "compatible_runtime_profiles": [
+    "cursor-macos"
+  ],
+  "min_capability_tier": "high",
+  "routing": {
+    "when_to_use": "Use when campaign strategy must be translated into executable creative asset orders (script, thumbnail, post) and routed to production workflows.",
+    "when_not_to_use": [
+      "Do not send production jobs without explicit asset order definitions",
+      "Do not skip rendering trigger metadata"
+    ],
+    "tags": [
+      "creative",
+      "production",
+      "orchestration"
+    ]
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "task",
+        "description": "Operator task"
+      }
+    ],
+    "expected_outputs": [
+      {
+        "name": "result",
+        "description": "Scoped skill result"
+      }
+    ],
+    "forbidden_actions": [
+      "Publish without an issuer-sealed receipt",
+      "Grant permission-to-act"
+    ],
+    "verification_steps": [
+      "Run the confined eval suite",
+      "Confirm cursor-macos is declared"
+    ],
+    "completion_criteria": [
+      "Canonical skill pack and execution profile match this version"
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "suite_hash": "sha256:b408a21f3a0ca916682c7b6ad7788e7d205b9715dff2e3723a8b135c838d6d9a"
+  },
+  "telemetry": {
+    "classification": "public_internal",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain_ids_and_hashes"
+  },
+  "release_channel": "eval"
+}

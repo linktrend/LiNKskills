@@ -1,0 +1,77 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "studio-health-reporting",
+  "display_name": "Studio Health Reporting",
+  "version": "1.0.0",
+  "description": "Aggregates lsl_memory.audit_logs and PROGRESS.md streams into a Venture Studio Health Report for COO oversight.",
+  "capability_category": "internal_launch",
+  "lifecycle_state": "draft",
+  "format_profile": "heavy",
+  "compatible_runtime_profiles": [
+    "cursor-macos"
+  ],
+  "min_capability_tier": "high",
+  "routing": {
+    "when_to_use": "Use when Lisa needs a consolidated, evidence-based health report across studio delivery streams.",
+    "when_not_to_use": [
+      "Do not issue unsupported health claims",
+      "Do not omit source attribution from audit logs or PROGRESS reports"
+    ],
+    "tags": [
+      "reporting",
+      "operations",
+      "health"
+    ]
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "task",
+        "description": "Operator task"
+      }
+    ],
+    "expected_outputs": [
+      {
+        "name": "result",
+        "description": "Scoped skill result"
+      }
+    ],
+    "forbidden_actions": [
+      "Publish without an issuer-sealed receipt",
+      "Grant permission-to-act"
+    ],
+    "verification_steps": [
+      "Run the confined eval suite",
+      "Confirm cursor-macos is declared"
+    ],
+    "completion_criteria": [
+      "Canonical skill pack and execution profile match this version"
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "suite_hash": "sha256:0bc52fa0b7e1b7a7951264e823ea49eea5e0d6b9715117da260996e75c563ec2"
+  },
+  "telemetry": {
+    "classification": "public_internal",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain_ids_and_hashes"
+  },
+  "release_channel": "eval"
+}

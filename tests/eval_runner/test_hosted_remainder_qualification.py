@@ -17,10 +17,15 @@ sys.path.insert(0, str(REPO / "packages" / "gateway"))
 sys.path.insert(0, str(REPO / "packages" / "publisher"))
 sys.path.insert(0, str(REPO / "packages" / "contracts"))
 
-from linkskills_eval_runner.ed03 import case_records, classify_case_families  # noqa: E402
+from linkskills_eval_runner.ed03 import (  # noqa: E402
+    QualificationError,
+    case_records,
+    classify_case_families,
+)
 from linkskills_eval_runner.remainder import (  # noqa: E402
     SHARED_FLOOR_REMAINDER_COUNT,
     UNPUBLISHED_SKILL_IDS,
+    qualify_hosted_remainder_release_profiles,
     qualify_remainder_release_profiles,
     shared_floor_remainder_skill_ids,
 )
@@ -180,6 +185,18 @@ class HostedRemainderContractTests(unittest.TestCase):
             ],
         }
         self.assertEqual(module._sealed_remainder_rows(with_ship), [])
+
+    def test_only_skill_ids_refuse_private_and_unknown(self) -> None:
+        with self.assertRaises(QualificationError) as private:
+            qualify_hosted_remainder_release_profiles(
+                REPO, only_skill_ids=["personal-compliance"]
+            )
+        self.assertIn("unpublished_skill_forbidden", str(private.exception))
+        with self.assertRaises(QualificationError) as unknown:
+            qualify_hosted_remainder_release_profiles(
+                REPO, only_skill_ids=["not-a-catalog-skill"]
+            )
+        self.assertIn("remainder_skill_not_shared_floor", str(unknown.exception))
 
 
 if __name__ == "__main__":

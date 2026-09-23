@@ -1,0 +1,77 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "executive-sync-8am",
+  "display_name": "Executive Sync 8Am",
+  "version": "1.0.0",
+  "description": "Executive sync orchestration skill that starts data collection at 06:00 Taipei, queries department leads, and consolidates Wins, Blockers, and Financial Health into the 08:00 AM briefing.",
+  "capability_category": "internal_launch",
+  "lifecycle_state": "draft",
+  "format_profile": "heavy",
+  "compatible_runtime_profiles": [
+    "cursor-macos"
+  ],
+  "min_capability_tier": "high",
+  "routing": {
+    "when_to_use": "Use for daily executive standup preparation and structured morning briefing consolidation for studio leadership.",
+    "when_not_to_use": [
+      "Do not publish briefing without lead updates",
+      "Do not omit financial health section from 08:00 briefing"
+    ],
+    "tags": [
+      "executive",
+      "standup",
+      "briefing"
+    ]
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "task",
+        "description": "Operator task"
+      }
+    ],
+    "expected_outputs": [
+      {
+        "name": "result",
+        "description": "Scoped skill result"
+      }
+    ],
+    "forbidden_actions": [
+      "Publish without an issuer-sealed receipt",
+      "Grant permission-to-act"
+    ],
+    "verification_steps": [
+      "Run the confined eval suite",
+      "Confirm cursor-macos is declared"
+    ],
+    "completion_criteria": [
+      "Canonical skill pack and execution profile match this version"
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "suite_hash": "sha256:87261e0cd942ee2d2bdbee09b361630102091f28d2fe71b35c735e9dbf3cd251"
+  },
+  "telemetry": {
+    "classification": "public_internal",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain_ids_and_hashes"
+  },
+  "release_channel": "eval"
+}

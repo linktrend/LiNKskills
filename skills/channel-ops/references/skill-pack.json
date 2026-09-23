@@ -1,0 +1,77 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "channel-ops",
+  "display_name": "Channel Ops",
+  "version": "1.0.0",
+  "description": "Platform-specific channel operations skill for YouTube, TikTok, and X, covering scheduling, comment workflows, and support-to-sales conversion motions.",
+  "capability_category": "internal_launch",
+  "lifecycle_state": "draft",
+  "format_profile": "heavy",
+  "compatible_runtime_profiles": [
+    "cursor-macos"
+  ],
+  "min_capability_tier": "high",
+  "routing": {
+    "when_to_use": "Use when campaign content needs platform execution SOPs, engagement handling, and conversion-oriented channel operations.",
+    "when_not_to_use": [
+      "Do not publish without platform-specific SOP alignment",
+      "Do not ignore support-to-sales handoff opportunities"
+    ],
+    "tags": [
+      "channel",
+      "distribution",
+      "operations"
+    ]
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "task",
+        "description": "Operator task"
+      }
+    ],
+    "expected_outputs": [
+      {
+        "name": "result",
+        "description": "Scoped skill result"
+      }
+    ],
+    "forbidden_actions": [
+      "Publish without an issuer-sealed receipt",
+      "Grant permission-to-act"
+    ],
+    "verification_steps": [
+      "Run the confined eval suite",
+      "Confirm cursor-macos is declared"
+    ],
+    "completion_criteria": [
+      "Canonical skill pack and execution profile match this version"
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "suite_hash": "sha256:2909e94c0e2b354a7ec6d85cd3564908d51da76a261cdeb3a3d23d7168aa6b43"
+  },
+  "telemetry": {
+    "classification": "public_internal",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain_ids_and_hashes"
+  },
+  "release_channel": "eval"
+}

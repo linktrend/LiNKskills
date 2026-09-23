@@ -1,0 +1,77 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "smart-file-clerk",
+  "display_name": "Smart File Clerk",
+  "version": "1.0.0",
+  "description": "Senior Document Manager skill for hybrid storage orchestration: Supabase Buckets for active RAG and Google Drive for deep archive, with OCR pipelines for financial/legal documents.",
+  "capability_category": "internal_launch",
+  "lifecycle_state": "draft",
+  "format_profile": "heavy",
+  "compatible_runtime_profiles": [
+    "cursor-macos"
+  ],
+  "min_capability_tier": "high",
+  "routing": {
+    "when_to_use": "Use when documents must be classified, OCR-processed, and routed between active and archive storage tiers.",
+    "when_not_to_use": [
+      "Do not store sensitive docs without classification",
+      "Do not skip OCR for eligible financial/legal documents in Supabase"
+    ],
+    "tags": [
+      "documents",
+      "storage",
+      "ocr"
+    ]
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "task",
+        "description": "Operator task"
+      }
+    ],
+    "expected_outputs": [
+      {
+        "name": "result",
+        "description": "Scoped skill result"
+      }
+    ],
+    "forbidden_actions": [
+      "Publish without an issuer-sealed receipt",
+      "Grant permission-to-act"
+    ],
+    "verification_steps": [
+      "Run the confined eval suite",
+      "Confirm cursor-macos is declared"
+    ],
+    "completion_criteria": [
+      "Canonical skill pack and execution profile match this version"
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "suite_hash": "sha256:4d44f1e58bc7f257a0333bf9336b5e992e3a4b8e438cb1b7e7e9236408033b4c"
+  },
+  "telemetry": {
+    "classification": "public_internal",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain_ids_and_hashes"
+  },
+  "release_channel": "eval"
+}

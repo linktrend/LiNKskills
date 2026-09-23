@@ -6,7 +6,7 @@ import hashlib
 import json
 import re
 import sys
-from typing import Any
+from typing import Any, Optional
 
 LIVE_MARKERS = re.compile(r"(?:sk_live|api[_-]?key|password|bearer|\+?\d[\d ()-]{7,})", re.I)
 EMAIL_MARKER = re.compile(r"\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b", re.I)
@@ -44,7 +44,7 @@ def _result(
     qualification: str = "needs-evidence",
     priority: str = "unranked",
     handoff_required: bool = False,
-    conversion_ref: str | None = None,
+    conversion_ref: Optional[str] = None,
 ) -> dict[str, Any]:
     """Return an output-contract-complete, redacted preparation result."""
     return {

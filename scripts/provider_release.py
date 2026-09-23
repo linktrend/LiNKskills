@@ -176,9 +176,13 @@ def _release_document(root: Path, spec: dict, source: dict, qualification_digest
     }
 
 
-def export_remainder_package(root: Path, output: Path):
+def export_remainder_package(root: Path, output: Path, only_skill_ids=None):
     """Qualify shared-floor remainder ids on the hosted evaluator; seal receipts only."""
-    matrix = qualify_hosted_remainder_release_profiles(root, evidence_dir=output.parent / "remainder-cases")
+    matrix = qualify_hosted_remainder_release_profiles(
+        root,
+        evidence_dir=output.parent / "remainder-cases",
+        only_skill_ids=only_skill_ids,
+    )
     sealed_rows = _sealed_remainder_rows(matrix)
     if not sealed_rows:
         output.with_suffix(".pending.json").write_text(json.dumps(matrix, indent=2) + "\n")
@@ -291,14 +295,21 @@ def main():
     parser.add_argument("--root", type=Path, default=Path("/opt/linkskills"))
     parser.add_argument("--package", type=Path, required=True)
     parser.add_argument("--expected-commit", default="")
+    parser.add_argument(
+        "--only-skill",
+        action="append",
+        default=[],
+        help="Shared-floor skill id to qualify. Repeat for a subset. Omit to run the full shared floor.",
+    )
     args = parser.parse_args()
+    only_skill_ids = list(args.only_skill) or None
     try:
         if args.command == "qualify":
             result = export_package(args.root, args.package)
         elif args.command == "publish":
             result = import_package(args.package, args.expected_commit)
         elif args.command == "qualify-remainder":
-            result = export_remainder_package(args.root, args.package)
+            result = export_remainder_package(args.root, args.package, only_skill_ids)
         else:
             result = import_remainder_package(args.package, args.expected_commit)
         print(json.dumps(result, sort_keys=True))

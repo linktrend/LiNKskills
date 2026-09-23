@@ -1,0 +1,77 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "lead-engineer",
+  "display_name": "Lead Engineer",
+  "version": "1.0.0",
+  "description": "Refactored senior execution model for PRD decomposition, factory.json routing, and sub-agent sessions_spawn coordination.",
+  "capability_category": "internal_launch",
+  "lifecycle_state": "draft",
+  "format_profile": "heavy",
+  "compatible_runtime_profiles": [
+    "cursor-macos"
+  ],
+  "min_capability_tier": "high",
+  "routing": {
+    "when_to_use": "Use when a product request must be decomposed into execution lanes and delegated through controlled sub-agent sessions.",
+    "when_not_to_use": [
+      "Do not implement feature code directly that belongs to delegated worker sessions",
+      "Do not spawn sessions before route ownership is validated in factory.json"
+    ],
+    "tags": [
+      "orchestration",
+      "prd",
+      "routing"
+    ]
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "task",
+        "description": "Operator task"
+      }
+    ],
+    "expected_outputs": [
+      {
+        "name": "result",
+        "description": "Scoped skill result"
+      }
+    ],
+    "forbidden_actions": [
+      "Publish without an issuer-sealed receipt",
+      "Grant permission-to-act"
+    ],
+    "verification_steps": [
+      "Run the confined eval suite",
+      "Confirm cursor-macos is declared"
+    ],
+    "completion_criteria": [
+      "Canonical skill pack and execution profile match this version"
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "suite_hash": "sha256:65a74d79cafd69a6ee2d89ebc3d04f6cd2ae6146124b877821f7237cbb448fa7"
+  },
+  "telemetry": {
+    "classification": "public_internal",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain_ids_and_hashes"
+  },
+  "release_channel": "eval"
+}

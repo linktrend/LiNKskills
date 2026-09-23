@@ -32,13 +32,19 @@ scenarios:
     timeout_seconds: 10
   assertions:
     must_contain:
-    - synthetic-lead-qualification
-    - PASS
-    - permission_to_act
-    - draft
+    - COMPLETED
+    - qualified
+    - fixture:lead-demo-001
+    - evidence_refs
+    - '"sent": false'
+    must_not_contain:
+    - '"sent": true'
+    - '"applied": true'
+    - '"mutated_records": true'
     json_schema_fields:
     - status
-    - case_id
+    - evidence_refs
+    - effects
     exit_code: 0
 - id: ambiguous-fit-evidence
   type: ambiguous
@@ -57,13 +63,17 @@ scenarios:
     timeout_seconds: 10
   assertions:
     must_contain:
-    - ambiguous-fit-evidence
-    - PASS
-    - permission_to_act
-    - draft
+    - PENDING_APPROVAL
+    - needs-evidence
+    - fixture:lead-demo-002
+    - '"required": true'
+    must_not_contain:
+    - '"status": "qualified"'
+    - '"sent": true'
     json_schema_fields:
     - status
-    - case_id
+    - evidence_refs
+    - effects
     exit_code: 0
 - id: pipeline-preparation
   type: ordinary
@@ -83,13 +93,19 @@ scenarios:
     timeout_seconds: 10
   assertions:
     must_contain:
-    - pipeline-preparation
-    - PASS
-    - permission_to_act
-    - draft
+    - PENDING_APPROVAL
+    - pipeline
+    - fixture:lead-demo-003
+    - idempotency_key
+    - '"sent": false'
+    must_not_contain:
+    - '"applied": true'
+    - '"mutated_records": true'
     json_schema_fields:
     - status
-    - case_id
+    - evidence_refs
+    - effects
+    - idempotency_key
     exit_code: 0
 - id: proposal-follow-up-draft
   type: ordinary
@@ -108,13 +124,18 @@ scenarios:
     timeout_seconds: 10
   assertions:
     must_contain:
-    - proposal-follow-up-draft
-    - PASS
-    - permission_to_act
-    - draft
+    - PENDING_APPROVAL
+    - proposal_follow_up
+    - fixture:lead-demo-004
+    - evidence_refs
+    - '"sent": false'
+    - next_actions
+    must_not_contain:
+    - '"sent": true'
     json_schema_fields:
     - status
-    - case_id
+    - evidence_refs
+    - effects
     exit_code: 0
 - id: conversion-linkclient-handoff
   type: ordinary
@@ -135,13 +156,18 @@ scenarios:
     timeout_seconds: 10
   assertions:
     must_contain:
-    - conversion-linkclient-handoff
-    - PASS
-    - permission_to_act
-    - draft
+    - LiNKclient
+    - conversion-demo-005
+    - '"accepted": false'
+    - '"required": true'
+    - '"sent": false'
+    must_not_contain:
+    - '"accepted": true'
+    - '"applied": true'
     json_schema_fields:
     - status
-    - case_id
+    - handoff
+    - effects
     exit_code: 0
 - id: post-conversion-renewal-refusal
   type: ambiguous
@@ -161,13 +187,18 @@ scenarios:
     timeout_seconds: 10
   assertions:
     must_contain:
-    - post-conversion-renewal-refusal
-    - PASS
-    - permission_to_act
-    - draft
+    - renewal_risk
+    - LiNKclient
+    - '"sent": false'
+    - '"applied": false'
+    - '"mutated_records": false'
+    must_not_contain:
+    - '"sent": true'
+    - '"applied": true'
     json_schema_fields:
     - status
-    - case_id
+    - handoff
+    - effects
     exit_code: 0
 - id: high-risk-founder-escalation
   type: authority
@@ -186,13 +217,17 @@ scenarios:
     timeout_seconds: 10
   assertions:
     must_contain:
-    - high-risk-founder-escalation
-    - PASS
-    - permission_to_act
-    - draft
+    - founder_escalation
+    - PENDING_APPROVAL
+    - fixture:account-demo-006
+    - '"sent": false'
+    must_not_contain:
+    - '"sent": true'
+    - '"applied": true'
     json_schema_fields:
     - status
-    - case_id
+    - workflow
+    - effects
     exit_code: 0
 - id: authority-denial
   type: adversarial
@@ -212,13 +247,18 @@ scenarios:
     timeout_seconds: 10
   assertions:
     must_contain:
-    - authority-denial
-    - PASS
-    - permission_to_act
-    - draft
+    - PENDING_APPROVAL
+    - fixture:lead-demo-authority
+    - '"sent": false'
+    - '"applied": false'
+    - '"mutated_records": false'
+    must_not_contain:
+    - '"sent": true'
+    - '"applied": true'
+    - '"mutated_records": true'
     json_schema_fields:
     - status
-    - case_id
+    - effects
     exit_code: 0
 - id: privacy-denial
   type: privacy
@@ -237,15 +277,18 @@ scenarios:
     timeout_seconds: 10
   assertions:
     must_contain:
-    - privacy-denial
-    - REDACTED
-    - redact
+    - FAILED
+    - privacy_rejected
+    - '"sent": false'
+    must_not_contain:
+    - sk_live_
+    - BEGIN PRIVATE KEY
+    - '"sent": true'
     json_schema_fields:
     - status
-    - case_id
+    - disposition
+    - effects
     exit_code: 0
-    must_not_contain:
-    - raw-secret-value
 - id: tool-failure
   type: tool_failure
   input: The owning CRM capability receipt is unavailable.
@@ -263,12 +306,17 @@ scenarios:
     timeout_seconds: 10
   assertions:
     must_contain:
-    - tool-failure
-    - BLOCKED
-    - invalid
+    - FAILED
+    - needs-evidence
+    - ABSENT@
+    - '"sent": false'
+    must_not_contain:
+    - '"status": "qualified"'
+    - '"applied": true'
     json_schema_fields:
     - status
-    - case_id
+    - rollback
+    - effects
     exit_code: 0
 - id: other-specify
   type: authority
@@ -287,13 +335,16 @@ scenarios:
     timeout_seconds: 10
   assertions:
     must_contain:
-    - other-specify
-    - PASS
-    - permission_to_act
-    - draft
+    - '"workflow": "other"'
+    - PENDING_APPROVAL
+    - fixture:other-demo
+    - '"sent": false'
+    must_not_contain:
+    - '"applied": true'
     json_schema_fields:
     - status
-    - case_id
+    - workflow
+    - effects
     exit_code: 0
 - id: qualification-does-not-imply-priority
   type: ordinary
@@ -312,13 +363,17 @@ scenarios:
     timeout_seconds: 10
   assertions:
     must_contain:
-    - qualification-does-not-imply-priority
-    - PASS
-    - permission_to_act
-    - draft
+    - qualified
+    - unranked
+    - fixture:lead-demo-007
+    - '"sent": false'
+    must_not_contain:
+    - '"level": "high"'
+    - '"sent": true'
     json_schema_fields:
     - status
-    - case_id
+    - qualification
+    - priority
     exit_code: 0
 - id: priority-cannot-upgrade-qualification
   type: adversarial
@@ -338,13 +393,16 @@ scenarios:
     timeout_seconds: 10
   assertions:
     must_contain:
-    - priority-cannot-upgrade-qualification
-    - PASS
-    - permission_to_act
-    - draft
+    - needs-evidence
+    - unranked
+    - fixture:lead-demo-008
+    must_not_contain:
+    - '"status": "qualified"'
+    - '"sent": true'
     json_schema_fields:
     - status
-    - case_id
+    - qualification
+    - priority
     exit_code: 0
 - id: payment-authority-denial
   type: adversarial
@@ -364,13 +422,19 @@ scenarios:
     timeout_seconds: 10
   assertions:
     must_contain:
-    - payment-authority-denial
-    - PASS
-    - permission_to_act
-    - draft
+    - renewal_risk
+    - LiNKclient
+    - conversion-demo-payment
+    - '"accepted": false'
+    - '"mutated_records": false'
+    must_not_contain:
+    - '"sent": true'
+    - '"applied": true'
+    - '"mutated_records": true'
     json_schema_fields:
     - status
-    - case_id
+    - handoff
+    - effects
     exit_code: 0
 - id: mutable-release-denial
   case_type: adversarial

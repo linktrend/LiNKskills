@@ -1,14 +1,24 @@
 import importlib.util
 import json
 import pathlib
+import subprocess
 import sys
 import unittest
 
+import yaml
 
 ROOT = pathlib.Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(ROOT / "packages" / "eval_runner"))
+sys.path.insert(0, str(ROOT / "packages" / "core"))
 sys.path.insert(0, str(ROOT / "packages" / "contracts"))
 
 from linkskills_contracts import validate_instance  # noqa: E402
+from linkskills_eval_runner.assertions import (  # noqa: E402
+    assertions_hard_failed,
+    assertions_passed,
+    parse_assertion_spec,
+    run_assertions,
+)
 
 
 SKILL = ROOT / "skills" / "sales-customer-management"
@@ -54,6 +64,29 @@ class SalesCustomerManagementContractTests(unittest.TestCase):
         text = json.dumps(suite)
         for unsafe in ["sk_live", "customer@example.com", "BEGIN PRIVATE KEY", "real account"]:
             self.assertNotIn(unsafe, text)
+
+    def test_synthetic_qualification_assertions_match_helper(self):
+        suite = yaml.safe_load((SKILL / "references/eval-suite.yaml").read_text(encoding="utf-8"))
+        scenario = next(item for item in suite["scenarios"] if item["id"] == "synthetic-lead-qualification")
+        proc = subprocess.run(
+            [sys.executable, str(SKILL / "scripts/helper_tool.py"), *scenario["execute"]["argv"]],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        payload = json.loads(proc.stdout)
+        self.assertEqual(payload["status"], "COMPLETED")
+        self.assertEqual(payload["qualification"]["status"], "qualified")
+        self.assertFalse(payload["effects"]["sent"])
+        self.assertNotIn("permission_to_act", payload)
+        results = run_assertions(
+            proc.stdout,
+            parse_assertion_spec(scenario["assertions"]),
+            observed_exit_code=proc.returncode,
+            workspace_root=SKILL,
+        )
+        self.assertTrue(assertions_passed(results), msg=[result.detail for result in results])
+        self.assertFalse(assertions_hard_failed(results))
 
     def test_helper_is_deterministic_and_side_effect_free(self):
         helper = load_helper()
