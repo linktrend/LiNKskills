@@ -28,7 +28,6 @@ COLLECTIONS = {
     "awesome-design": ("awesome-design-presets", ["cursor-macos", "codex-macos"]),
     "emil-design": ("emil-design-engineering", ["cursor-macos", "codex-macos"]),
     "google-workspace": ("google-workspace-operations", ["gws-consumer"]),
-    "hybrid-development": ("hybrid-development-methods", ["cursor-macos", "codex-macos"]),
     "impeccable": ("impeccable-design-system", ["cursor-macos", "codex-macos"]),
     "taste-design": ("taste-design-exploration", ["cursor-macos", "codex-macos"]),
 }

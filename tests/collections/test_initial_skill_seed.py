@@ -40,7 +40,6 @@ ADAPTERS = {
     "taste-design-exploration": "taste-design",
     "emil-design-engineering": "emil-design",
     "awesome-design-presets": "awesome-design",
-    "hybrid-development-methods": "hybrid-development",
 }
 
 
@@ -160,7 +159,6 @@ class InitialSkillSeedTests(unittest.TestCase):
             "taste-design-exploration": ("create a brutalist exploration", "taste-brutalist-skill"),
             "emil-design-engineering": ("write modern Swift concurrency code", "emil-write-swift"),
             "awesome-design-presets": ("use the glassmorphism preset", "awesome-glassmorphism"),
-            "hybrid-development-methods": ("use TDD for this fix", "mattpocock-tdd"),
         }
         for adapter, (task, expected) in probes.items():
             completed = subprocess.run(
@@ -206,11 +204,11 @@ class InitialSkillSeedTests(unittest.TestCase):
 
     def test_activation_manifests_are_exact_and_consumer_owned(self) -> None:
         audit = load(ROOT / "evidence" / "initial-skill-seed" / "member-classification.json")
-        self.assertEqual(audit["summary"]["total"], 207)
+        self.assertEqual(audit["summary"]["total"], 188)
         self.assertEqual(
             audit["summary"]["counts"],
             {
-                "approved_internal_canary": 182,
+                "approved_internal_canary": 163,
                 "needs_correction": 2,
                 "needs_focused_review": 22,
                 "superseded": 1,
@@ -238,7 +236,11 @@ class InitialSkillSeedTests(unittest.TestCase):
 
     def test_canary_publication_receipt_binds_exact_adapter_bundles(self) -> None:
         receipt = load(ROOT / "evidence" / "initial-skill-seed" / "canary-publication-receipt.json")
-        self.assertEqual(len(receipt["releases"]), 6)
+        self.assertEqual(len(receipt["releases"]), 5)
+        self.assertNotIn(
+            "hybrid-development-methods",
+            {release["skill_id"] for release in receipt["releases"]},
+        )
         self.assertFalse(receipt["consumer_activation"])
         self.assertFalse(receipt["current_pointer_changed"])
         self.assertFalse(receipt["live_provider_publication"])

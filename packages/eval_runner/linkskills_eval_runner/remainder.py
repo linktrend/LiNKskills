@@ -1,4 +1,4 @@
-"""Remainder (54-skill) qualification matrix.
+"""Remainder qualification matrix.
 
 The five production-successor releases stay owned by ``ed03``. This module
 inventories every other catalog skill, requires executable confined cases, and
@@ -34,12 +34,16 @@ from .ed03 import (
     classify_case_families,
     classify_combination,
     combination_id,
+    run_combination,
     source_digests,
 )
 
 REMAINDER_KIND = "remainder-release-profile-matrix"
+HOSTED_REMAINDER_KIND = "hosted-remainder-release-profile-matrix"
 INITIAL_SKILL_IDS = frozenset(item["skillId"] for item in INITIAL_RELEASE_PROFILES)
-REQUIRED_REMAINDER_COUNT = 54
+UNPUBLISHED_SKILL_IDS = frozenset({"private-health-wellbeing", "personal-compliance"})
+REQUIRED_REMAINDER_COUNT = 80
+SHARED_FLOOR_REMAINDER_COUNT = 78
 
 
 def catalog_skill_ids(root: Path) -> list[str]:
@@ -49,6 +53,15 @@ def catalog_skill_ids(root: Path) -> list[str]:
 
 def remainder_skill_ids(root: Path) -> list[str]:
     return [skill_id for skill_id in catalog_skill_ids(root) if skill_id not in INITIAL_SKILL_IDS]
+
+
+def shared_floor_remainder_skill_ids(root: Path) -> list[str]:
+    """Remainder ids that may become live. The two private skills stay unpublished."""
+    return [
+        skill_id
+        for skill_id in remainder_skill_ids(root)
+        if skill_id not in UNPUBLISHED_SKILL_IDS
+    ]
 
 
 def declared_remainder_profiles(root: Path) -> list[dict[str, str]]:
@@ -143,6 +156,96 @@ def qualify_remainder_release_profiles(
         "quarantined": quarantined,
         "missingExecutable": missing_execute,
         "missingFamilies": missing_families,
+        "issuerReceipt": inspect_issuer_receipt(),
+        "sealedImageReceipt": inspect_sealed_image_receipt(),
+        "isolatorReceipt": inspect_isolator_receipt(),
+        "liveQualificationBoundary": "server01_hosted_sealed_evaluator",
+    }
+
+
+def qualify_hosted_remainder_release_profiles(
+    root: Path,
+    *,
+    evidence_dir: Optional[Path] = None,
+) -> dict[str, Any]:
+    """Run confined suites for the 78 shared-floor remainder ids.
+
+    Source ``qualify_remainder_release_profiles`` stays uncertified. Usable
+    rows come only from executed bubblewrap receipts with isolation denied.
+    """
+    source = qualify_remainder_release_profiles(root)
+    if source.get("usable") or source.get("usableClaimed") or source.get("authorizesUsable"):
+        raise QualificationError("source_remainder_matrix_claimed_usable")
+    declared = [
+        item
+        for item in declared_remainder_profiles(root)
+        if item["skillId"] not in UNPUBLISHED_SKILL_IDS
+    ]
+    if len(declared) != SHARED_FLOOR_REMAINDER_COUNT:
+        raise QualificationError(f"shared_floor_remainder_count_invalid:{len(declared)}")
+    rows: list[dict[str, Any]] = []
+    for item in declared:
+        try:
+            row = run_combination(root, item, evidence_dir=evidence_dir)
+        except RuntimeError as exc:
+            if "LINKSKILLS_EVAL_RUNNER_ISSUER_KEY" not in str(exc):
+                raise
+            skill_dir = root / "skills" / item["skillId"]
+            cases = case_records(skill_dir)
+            families = classify_case_families(cases)
+            row = classify_combination(
+                skill_id=item["skillId"],
+                version=item["version"],
+                runtime_profile=item["runtimeProfile"],
+                source_version=_frontmatter_version(skill_dir / "SKILL.md"),
+                compatible_profiles=_compatible_profiles(skill_dir) or [item["runtimeProfile"]],
+                families=families,
+                executable_case_ids=[c["id"] for c in cases if c.get("hasExecute")],
+                evidence_kind="independent_deterministic",
+                certified=False,
+                sealed_receipts=False,
+            )
+            row["families"] = families
+            row["skillDir"] = str(skill_dir.relative_to(root).as_posix())
+            row["digests"] = source_digests(skill_dir)
+            row["run"] = {
+                "passed": False,
+                "certified": False,
+                "certifyReason": "issuer_material_missing",
+                "receiptHashes": [],
+                "networkIsolation": [],
+            }
+        if row["skillId"] in UNPUBLISHED_SKILL_IDS:
+            raise QualificationError(f"unpublished_skill_executed:{row['skillId']}")
+        rows.append(row)
+    usable = [row["id"] for row in rows if row["lifecycle"] == USABLE]
+    pending = [row["id"] for row in rows if row["lifecycle"] == EVAL_PENDING]
+    quarantined = [row["id"] for row in rows if row["lifecycle"] == QUARANTINED]
+    sealed = [
+        row["id"]
+        for row in rows
+        if row["lifecycle"] == USABLE
+        and bool((row.get("run") or {}).get("certified"))
+        and bool((row.get("run") or {}).get("receiptHashes"))
+        and all(item == "denied" for item in (row.get("run") or {}).get("networkIsolation") or [])
+    ]
+    if set(usable) != set(sealed):
+        usable = [combo for combo in usable if combo in sealed]
+    return {
+        "schemaVersion": SCHEMA_VERSION,
+        "kind": HOSTED_REMAINDER_KIND,
+        "complete": len(rows) == SHARED_FLOOR_REMAINDER_COUNT,
+        "ok": len(rows) == SHARED_FLOOR_REMAINDER_COUNT and not quarantined,
+        "usableClaimed": bool(usable),
+        "authorizesUsable": bool(usable),
+        "sourceMatrixAuthorizesUsable": False,
+        "unpublished": sorted(UNPUBLISHED_SKILL_IDS),
+        "remainderCount": source["remainderCount"],
+        "sharedFloorCount": len(rows),
+        "combinations": rows,
+        "usable": usable,
+        "evalPending": pending,
+        "quarantined": quarantined,
         "issuerReceipt": inspect_issuer_receipt(),
         "sealedImageReceipt": inspect_sealed_image_receipt(),
         "isolatorReceipt": inspect_isolator_receipt(),
