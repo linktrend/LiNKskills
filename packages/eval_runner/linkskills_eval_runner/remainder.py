@@ -185,7 +185,36 @@ def qualify_hosted_remainder_release_profiles(
         raise QualificationError(f"shared_floor_remainder_count_invalid:{len(declared)}")
     rows: list[dict[str, Any]] = []
     for item in declared:
-        row = run_combination(root, item, evidence_dir=evidence_dir)
+        try:
+            row = run_combination(root, item, evidence_dir=evidence_dir)
+        except RuntimeError as exc:
+            if "LINKSKILLS_EVAL_RUNNER_ISSUER_KEY" not in str(exc):
+                raise
+            skill_dir = root / "skills" / item["skillId"]
+            cases = case_records(skill_dir)
+            families = classify_case_families(cases)
+            row = classify_combination(
+                skill_id=item["skillId"],
+                version=item["version"],
+                runtime_profile=item["runtimeProfile"],
+                source_version=_frontmatter_version(skill_dir / "SKILL.md"),
+                compatible_profiles=_compatible_profiles(skill_dir) or [item["runtimeProfile"]],
+                families=families,
+                executable_case_ids=[c["id"] for c in cases if c.get("hasExecute")],
+                evidence_kind="independent_deterministic",
+                certified=False,
+                sealed_receipts=False,
+            )
+            row["families"] = families
+            row["skillDir"] = str(skill_dir.relative_to(root).as_posix())
+            row["digests"] = source_digests(skill_dir)
+            row["run"] = {
+                "passed": False,
+                "certified": False,
+                "certifyReason": "issuer_material_missing",
+                "receiptHashes": [],
+                "networkIsolation": [],
+            }
         if row["skillId"] in UNPUBLISHED_SKILL_IDS:
             raise QualificationError(f"unpublished_skill_executed:{row['skillId']}")
         rows.append(row)
