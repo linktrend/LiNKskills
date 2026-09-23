@@ -110,7 +110,7 @@ class CurrentPacketLedgerTests(unittest.TestCase):
         publication = json.loads(CANARY.read_text(encoding="utf-8"))
         overlay = self.ledger["issue_299_overlay"]
         self.assertEqual(overlay["member_count"], len(seed["members"]))
-        self.assertEqual(overlay["approved_internal_canary"], 182)
+        self.assertEqual(overlay["approved_internal_canary"], 163)
         self.assertEqual(overlay["ordinary_selectable_count"], 0)
         self.assertEqual(overlay["stable_qualified_count"], 0)
         self.assertFalse(publication["ordinary_selectability"])

@@ -91,6 +91,17 @@ Every material statement is labelled as exactly one of:
 Use the strongest available source hierarchy: primary official documentation,
 first-party records, filings, or datasets first; reputable secondary analysis
 for context; tertiary summaries only when their underlying sources are clear.
+
+## Primary-source investigation in a product repo (Matt research)
+
+When Intake analysis, LiNKlibraries lookup, missing-library search, or license/maintenance/security vetting of a package **not yet adopted** needs a written investigation:
+
+1. Investigate against **primary sources** (official docs, source code, specs, first-party APIs), not a secondary write-up. Follow every claim to the owner of the fact.
+2. Write one Markdown file in the repo, citing each claim.
+3. Save it where the repo already keeps notes; if none, put it somewhere sensible and say where.
+4. Vetting unadopted packages stays investigation. Product security of the running system is `cso`.
+
+Do not spawn a mandatory background agent if this session can finish the file. Keep citation-enforcer rules above.
 Preserve the source URL or file pointer, publisher, publication date, retrieval
 time, and relevant version. Currentness-sensitive claims must say what date the
 evidence represents and must stop or qualify when the freshness window expires.

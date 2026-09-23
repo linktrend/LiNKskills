@@ -1,0 +1,77 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "seo-semantic-auditor",
+  "display_name": "Seo Semantic Auditor",
+  "version": "1.0.0",
+  "description": "Reverse-engineers competitor keyword strategies using research tiers (Brave/Exa) and outputs prioritized content gaps for content operations.",
+  "capability_category": "internal_launch",
+  "lifecycle_state": "draft",
+  "format_profile": "heavy",
+  "compatible_runtime_profiles": [
+    "cursor-macos"
+  ],
+  "min_capability_tier": "high",
+  "routing": {
+    "when_to_use": "Use when SEO strategy requires competitor semantic mapping and a ranked content gap backlog.",
+    "when_not_to_use": [
+      "Do not output keyword insights without source support",
+      "Do not skip prioritized content gap ranking"
+    ],
+    "tags": [
+      "seo",
+      "semantic",
+      "content"
+    ]
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "task",
+        "description": "Operator task"
+      }
+    ],
+    "expected_outputs": [
+      {
+        "name": "result",
+        "description": "Scoped skill result"
+      }
+    ],
+    "forbidden_actions": [
+      "Publish without an issuer-sealed receipt",
+      "Grant permission-to-act"
+    ],
+    "verification_steps": [
+      "Run the confined eval suite",
+      "Confirm cursor-macos is declared"
+    ],
+    "completion_criteria": [
+      "Canonical skill pack and execution profile match this version"
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "suite_hash": "sha256:a9b5f7faa673f678d709168aeb52034b8bc2ae9d39ee89918caa3ac55a30addc"
+  },
+  "telemetry": {
+    "classification": "public_internal",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain_ids_and_hashes"
+  },
+  "release_channel": "eval"
+}

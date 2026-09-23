@@ -1,0 +1,84 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "canary-echo",
+  "display_name": "Canary Echo",
+  "version": "0.2.0",
+  "description": "Stage lifecycle canary that echoes tokens via packaged text-echo under sealed Eval Runner certification. No durable shared/repo/network side effects; workspace-scoped tool writes and mandatory ledger telemetry only.",
+  "capability_category": "internal_launch",
+  "lifecycle_state": "draft",
+  "format_profile": "simple",
+  "compatible_runtime_profiles": [
+    "cursor-macos"
+  ],
+  "min_capability_tier": "low",
+  "routing": {
+    "when_to_use": "Use when proving the certification pipeline or verifying sealed executor receipts with a deterministic echo.",
+    "when_not_to_use": [
+      "Do not perform network calls",
+      "Do not mutate repositories or shared state",
+      "Do not claim certification without sealed executor receipts"
+    ],
+    "tags": [
+      "canary",
+      "certification",
+      "echo",
+      "lifecycle"
+    ]
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "task",
+        "description": "Operator task"
+      }
+    ],
+    "expected_outputs": [
+      {
+        "name": "result",
+        "description": "Scoped skill result"
+      }
+    ],
+    "forbidden_actions": [
+      "Publish without an issuer-sealed receipt",
+      "Grant permission-to-act"
+    ],
+    "verification_steps": [
+      "Run the confined eval suite",
+      "Confirm cursor-macos is declared"
+    ],
+    "completion_criteria": [
+      "Canonical skill pack and execution profile match this version"
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [
+      {
+        "tool_id": "text-echo",
+        "version": "1.0.0"
+      }
+    ],
+    "host_capabilities": [
+      "filesystem_read"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "suite_hash": "sha256:823f5e7eccdc3ca16a54d218b3a6b992c81449d468d1a650f22b77a85226886a"
+  },
+  "telemetry": {
+    "classification": "public_internal",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain_ids_and_hashes"
+  },
+  "release_channel": "eval"
+}

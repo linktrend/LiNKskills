@@ -1,0 +1,86 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "grill-office-hours",
+  "display_name": "grill-office-hours",
+  "version": "1.0.0",
+  "description": "Force a conversation before code: design-tree interview, domain glossary and ADRs in-repo, and office-hours premise challenge with a design doc.",
+  "capability_category": "internal_launch",
+  "lifecycle_state": "draft",
+  "format_profile": "simple",
+  "compatible_runtime_profiles": [
+    "cursor-macos"
+  ],
+  "min_capability_tier": "high",
+  "routing": {
+    "when_to_use": "Force a conversation before code: design-tree interview, domain glossary and ADRs in-repo, and office-hours premise challenge with a design doc.",
+    "when_not_to_use": [
+      "Do not claim usable or live",
+      "Do not grant permission-to-act"
+    ],
+    "tags": [
+      "hybrid",
+      "draft"
+    ]
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "task",
+        "description": "Operator task"
+      }
+    ],
+    "expected_outputs": [
+      {
+        "name": "result",
+        "description": "Procedure result"
+      }
+    ],
+    "forbidden_actions": [
+      "Publish as live",
+      "Print secrets"
+    ],
+    "verification_steps": [
+      "Validate input contract",
+      "Follow SKILL.md"
+    ],
+    "completion_criteria": [
+      "Draft procedure followed",
+      "No live claim"
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read",
+      "filesystem_write"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "suite_hash": "sha256:fb222b77a16f64fb7818bb2c8cce2ae020c4573d31e685bdf13b7bb194584acd"
+  },
+  "telemetry": {
+    "classification": "public_internal",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_private_data",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain_ids_and_hashes"
+  },
+  "fragments": [
+    {
+      "fragment_id": "summary",
+      "disclosure_level": 2,
+      "path": "SKILL.md"
+    }
+  ],
+  "release_channel": "eval"
+}

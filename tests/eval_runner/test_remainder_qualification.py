@@ -1,7 +1,8 @@
-"""Remainder catalog qualification: 54 executable, never usable from source."""
+"""Remainder catalog qualification: executable drafts, never usable from source."""
 
 from __future__ import annotations
 
+import inspect
 import json
 import subprocess
 import sys
@@ -13,7 +14,11 @@ sys.path.insert(0, str(REPO / "packages" / "eval_runner"))
 sys.path.insert(0, str(REPO / "packages" / "core"))
 
 from linkskills_eval_runner.ed03 import INITIAL_RELEASE_PROFILES, REQUIRED_FAMILIES, case_records, classify_case_families
-from linkskills_eval_runner.remainder import qualify_remainder_release_profiles, remainder_skill_ids
+from linkskills_eval_runner.remainder import (
+    qualify_remainder_release_profiles,
+    remainder_skill_ids,
+    shared_floor_remainder_skill_ids,
+)
 
 
 INITIAL = {item["skillId"] for item in INITIAL_RELEASE_PROFILES}
@@ -22,9 +27,12 @@ INITIAL = {item["skillId"] for item in INITIAL_RELEASE_PROFILES}
 class RemainderQualificationTests(unittest.TestCase):
     def test_catalog_split(self) -> None:
         remaining = remainder_skill_ids(REPO)
-        self.assertEqual(len(remaining), 54)
+        skill_count = len(list((REPO / "skills").glob("*/SKILL.md")))
+        self.assertEqual(skill_count, 85)
+        self.assertEqual(len(remaining), skill_count - len(INITIAL))
+        self.assertEqual(len(remaining), 80)
+        self.assertEqual(len(shared_floor_remainder_skill_ids(REPO)), 78)
         self.assertTrue(INITIAL.isdisjoint(remaining))
-        self.assertEqual(len(list((REPO / "skills").glob("*/SKILL.md"))), 59)
 
     def test_every_remainder_suite_is_executable_and_complete(self) -> None:
         for skill_id in remainder_skill_ids(REPO):
@@ -40,8 +48,11 @@ class RemainderQualificationTests(unittest.TestCase):
         self.assertFalse(matrix["usableClaimed"])
         self.assertFalse(matrix["authorizesUsable"])
         self.assertEqual(matrix["usable"], [])
-        self.assertEqual(matrix["remainderCount"], 54)
+        self.assertEqual(matrix["remainderCount"], 80)
         self.assertEqual(matrix["liveQualificationBoundary"], "server01_hosted_sealed_evaluator")
+        source = inspect.getsource(qualify_remainder_release_profiles)
+        self.assertIn("certified=False", source)
+        self.assertIn("sealed_receipts=False", source)
 
     def test_unknown_eval_case_fails_closed(self) -> None:
         skill = next(

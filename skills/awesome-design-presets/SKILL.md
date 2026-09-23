@@ -1,12 +1,12 @@
 ---
 name: awesome-design-presets
-description: "Selects one exact visual-style preset from the complete Awesome Design Skills collection without treating presets as procedural design authorities."
-usage_trigger: "Use when a website or application needs a named aesthetic preset or a brief-to-style recommendation from the Awesome Design Skills library; use Taste for broad divergence and Impeccable for design-quality control."
+description: "Apply one named look — soft, minimal, or brutal — when the plan allows a distinct visual language. Not a router over hidden preset files."
+usage_trigger: "Use after default direction when the product is allowed a distinct named look (soft, minimal, or brutal). Do not load all three."
 version: 1.0.0
 release_tag: v1.0.0
 created: 2026-08-31
 author: LiNKskills Library
-tags: [design, presets, visual-style, website, vertical-kits]
+tags: [design, presets, named-look, visual-style]
 engine:
   min_reasoning_tier: high
   preferred_model: gpt-5
@@ -19,43 +19,35 @@ tooling:
 tools: [write_file, read_file, list_dir, shell_exec, get_tool_details]
 dependencies: []
 permissions: [fs_read, fs_write, shell_exec]
-scope_out: ["Do not load all 67 presets for one task", "Do not treat the awesome-impeccable preset as the official Impeccable system", "Do not override a supplied brand or design system", "Do not let a preset bypass accessibility, responsive, implementation, or consumer gates"]
+scope_out: ["Do not load multiple named looks for one product", "Do not override brand notes or a locked sample", "Do not treat leftover vendor preset folders as the working skill"]
 format_profile: simple
-last_updated: 2026-08-31
+last_updated: 2026-09-22
 ---
 
 # Awesome Design Presets
 
-The complete 67-member collection is retained as a style library. Each member
-is a visual reference, not an independently authoritative design process.
+This card is the **named look**. Default direction is `taste-design-exploration`. Choose **one**.
 
-## Selection
+Full look procedures are in this package: `references/looks/soft.md`, `minimal.md`, `brutal.md`. Follow the chosen file. Do not open a hidden 67-member router.
 
-1. Validate the brief using
-   [`references/schemas.json#/definitions/input`](references/schemas.json).
-2. If the user names a style, select its exact namespaced route from
-   [`references/routing.json`](references/routing.json).
-3. Otherwise compare the brief with the preset names and return at most two
-   candidates. Do not choose based only on a fashionable effect.
-4. Load the selected `SKILL.md` and `DESIGN.md` under the exact
-   `vendor-skills/awesome-design/` member directory.
-   Treat arbitrary example brands, fonts, palettes, and industries as preset
-   defaults—not facts about the user's business.
-5. Apply the selected style through the consumer's frontend implementation
-   process, then use Impeccable and UI/UX verification to test the result.
+## Soft (high-end / calm)
 
-The member named `awesome-impeccable` is deliberately namespaced. It is a
-cream/orange preset and is unrelated to the official Impeccable design system.
+Calm expensive UI: softer contrast, whitespace, premium type, spring motion. Ban Inter/Roboto/Arial, thick generic icons, harsh `shadow-md`, edge-glued nav, linear easing. Pick one vibe (ethereal glass, editorial luxury, or soft structuralism) and one layout archetype from `soft.md`, then collapse it honestly on mobile (`min-h-[100dvh]`, no hover-only).
 
-## Tool and authority protocol
+## Minimal (editorial product)
 
-Use a native CLI for token and component inspection and a CLI wrapper for
-rendering or visual checks. Use a direct API only through an authorized
-consumer adapter; reserve MCP for an approved persistent service. If the task
-becomes generalist or exposes more than ten tools, call `get_tool_details` and
-load only the selected schemas.
+Restrained palette, sharp structure, tight hierarchy (Notion/Linear class). Few weights, real grid, no decorative chrome.
 
-Return the selection under
-[`references/schemas.json#/definitions/output`](references/schemas.json).
-Preset selection does not approve copy, branding, dependencies, publication,
-deployment, or consumer activation.
+## Brutal (industrial)
+
+Swiss type, raw structure, sharp contrast. Hard shadows only in this world. If you did not choose brutal, do not use `box-shadow: 4px 4px 0`.
+
+Write the chosen look into `DESIGN.md` and every screen brief. Then `design-sample` locks pictures. Builders match; they do not mix looks.
+
+If a historical Awesome preset name appears in a brief, translate it to soft, minimal, or brutal using the sample — do not silently load `vendor-skills/awesome-design/*` as the working procedure.
+
+## Tooling protocol (CLI-first)
+
+**Native CLI**, **CLI wrapper**, **direct API** only if authorized, **MCP** only for an approved adapter. Generalist or >10 tools: `get_tool_details`.
+
+Contracts: `references/schemas.json#/definitions/input` and `#/definitions/output`.

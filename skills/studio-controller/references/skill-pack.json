@@ -1,0 +1,79 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "studio-controller",
+  "display_name": "Studio Controller",
+  "version": "1.1.0",
+  "description": "Reusable finance review and close-control primitive for checking evidence, variances, assumptions, and escalation boundaries without owning a ledger, connector, or accounting system.",
+  "capability_category": "internal_launch",
+  "lifecycle_state": "draft",
+  "format_profile": "heavy",
+  "compatible_runtime_profiles": [
+    "cursor-macos"
+  ],
+  "min_capability_tier": "high",
+  "routing": {
+    "when_to_use": "Use when a finance operations brief needs controller-style review, close preparation, variance escalation, or separation of observation from approval.",
+    "when_not_to_use": [
+      "Do not create or mutate a ledger, accounting system, journal, invoice, payment, expense, budget, or period lock",
+      "Do not invoke a connector or direct API",
+      "Do not make tax, legal, audit, or accounting-finality claims"
+    ],
+    "tags": [
+      "finance",
+      "controller",
+      "close",
+      "review"
+    ]
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "task",
+        "description": "Operator task"
+      }
+    ],
+    "expected_outputs": [
+      {
+        "name": "result",
+        "description": "Scoped skill result"
+      }
+    ],
+    "forbidden_actions": [
+      "Publish without an issuer-sealed receipt",
+      "Grant permission-to-act"
+    ],
+    "verification_steps": [
+      "Run the confined eval suite",
+      "Confirm cursor-macos is declared"
+    ],
+    "completion_criteria": [
+      "Canonical skill pack and execution profile match this version"
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "suite_hash": "sha256:9b6c90a7d860ecd7ed81942b6e83cdb82f9bb02648b9dad7656298b21b7799c0"
+  },
+  "telemetry": {
+    "classification": "public_internal",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain_ids_and_hashes"
+  },
+  "release_channel": "eval"
+}

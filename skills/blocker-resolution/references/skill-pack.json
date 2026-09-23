@@ -1,0 +1,77 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "blocker-resolution",
+  "display_name": "Blocker Resolution",
+  "version": "1.0.0",
+  "description": "Fail-fast escalation protocol for stuck worker agents that triggers Root Cause Analysis when PROGRESS.md remains Blocked for more than two turns.",
+  "capability_category": "internal_launch",
+  "lifecycle_state": "draft",
+  "format_profile": "heavy",
+  "compatible_runtime_profiles": [
+    "cursor-macos"
+  ],
+  "min_capability_tier": "high",
+  "routing": {
+    "when_to_use": "Use when developer or worker streams are repeatedly blocked and require structured diagnosis and recovery actions.",
+    "when_not_to_use": [
+      "Do not ignore repeated blocked states",
+      "Do not continue execution without RCA after blocked status persists >2 turns"
+    ],
+    "tags": [
+      "blockers",
+      "escalation",
+      "rca"
+    ]
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "task",
+        "description": "Operator task"
+      }
+    ],
+    "expected_outputs": [
+      {
+        "name": "result",
+        "description": "Scoped skill result"
+      }
+    ],
+    "forbidden_actions": [
+      "Publish without an issuer-sealed receipt",
+      "Grant permission-to-act"
+    ],
+    "verification_steps": [
+      "Run the confined eval suite",
+      "Confirm cursor-macos is declared"
+    ],
+    "completion_criteria": [
+      "Canonical skill pack and execution profile match this version"
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "suite_hash": "sha256:72a056d112f6ef388db3b97ce6b5a7d3f88872b440b008201eda705cadc85a86"
+  },
+  "telemetry": {
+    "classification": "public_internal",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain_ids_and_hashes"
+  },
+  "release_channel": "eval"
+}

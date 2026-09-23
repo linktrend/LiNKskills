@@ -2,7 +2,10 @@
 
 from .certify import CertificationDecision, certify_run
 from .ed03 import qualify_initial_release_profiles
-from .remainder import qualify_remainder_release_profiles
+from .remainder import (
+    qualify_hosted_remainder_release_profiles,
+    qualify_remainder_release_profiles,
+)
 from .models import CaseResult, CaseStatus, EvalCase, EvalSuite, EvidenceArtifact, SuiteResult
 from .runner import load_eval_suite, run_suite
 
@@ -21,6 +24,7 @@ __all__ = [
     "certify_run",
     "load_eval_suite",
     "qualify_initial_release_profiles",
+    "qualify_hosted_remainder_release_profiles",
     "qualify_remainder_release_profiles",
     "run_suite",
 ]

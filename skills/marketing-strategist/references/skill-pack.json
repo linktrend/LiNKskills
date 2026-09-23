@@ -1,0 +1,77 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "marketing-strategist",
+  "display_name": "Marketing Strategist",
+  "version": "1.0.0",
+  "description": "Senior VP of Growth persona that converts product PRDs into multi-channel growth strategies with SEO targets, ad spend projections, and funnel architecture.",
+  "capability_category": "internal_launch",
+  "lifecycle_state": "draft",
+  "format_profile": "heavy",
+  "compatible_runtime_profiles": [
+    "cursor-macos"
+  ],
+  "min_capability_tier": "high",
+  "routing": {
+    "when_to_use": "Use when a product PRD must be translated into an executable growth plan across SEO, paid, and lifecycle channels.",
+    "when_not_to_use": [
+      "Do not produce channel tactics disconnected from product PRD",
+      "Do not finalize without MARKETING_STRATEGY.md deliverable"
+    ],
+    "tags": [
+      "growth",
+      "marketing",
+      "strategy"
+    ]
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "task",
+        "description": "Operator task"
+      }
+    ],
+    "expected_outputs": [
+      {
+        "name": "result",
+        "description": "Scoped skill result"
+      }
+    ],
+    "forbidden_actions": [
+      "Publish without an issuer-sealed receipt",
+      "Grant permission-to-act"
+    ],
+    "verification_steps": [
+      "Run the confined eval suite",
+      "Confirm cursor-macos is declared"
+    ],
+    "completion_criteria": [
+      "Canonical skill pack and execution profile match this version"
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "suite_hash": "sha256:9d28073983e8e564f2736129fffe2146ee268468055887fee25f5efc5135acdd"
+  },
+  "telemetry": {
+    "classification": "public_internal",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain_ids_and_hashes"
+  },
+  "release_channel": "eval"
+}

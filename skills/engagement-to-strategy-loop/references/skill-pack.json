@@ -1,0 +1,77 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "engagement-to-strategy-loop",
+  "display_name": "Engagement To Strategy Loop",
+  "version": "1.0.0",
+  "description": "Analyzes channel metrics (views, CTR, sentiment) and produces high-signal strategic feedback for marketing iteration loops.",
+  "capability_category": "internal_launch",
+  "lifecycle_state": "draft",
+  "format_profile": "heavy",
+  "compatible_runtime_profiles": [
+    "cursor-macos"
+  ],
+  "min_capability_tier": "high",
+  "routing": {
+    "when_to_use": "Use when channel performance signals need to be translated into actionable strategic updates for Marketing and Growth.",
+    "when_not_to_use": [
+      "Do not report metric changes without evidence context",
+      "Do not omit high-signal feedback routing to marketing"
+    ],
+    "tags": [
+      "analytics",
+      "feedback",
+      "strategy"
+    ]
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "task",
+        "description": "Operator task"
+      }
+    ],
+    "expected_outputs": [
+      {
+        "name": "result",
+        "description": "Scoped skill result"
+      }
+    ],
+    "forbidden_actions": [
+      "Publish without an issuer-sealed receipt",
+      "Grant permission-to-act"
+    ],
+    "verification_steps": [
+      "Run the confined eval suite",
+      "Confirm cursor-macos is declared"
+    ],
+    "completion_criteria": [
+      "Canonical skill pack and execution profile match this version"
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "suite_hash": "sha256:ff7caf04104027b7dda668469a4694e22d4b048b6ea0ee9a1dbf2abf01cb5d3b"
+  },
+  "telemetry": {
+    "classification": "public_internal",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain_ids_and_hashes"
+  },
+  "release_channel": "eval"
+}

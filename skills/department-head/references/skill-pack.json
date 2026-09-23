@@ -1,0 +1,77 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "department-head",
+  "display_name": "Department Head",
+  "version": "1.0.0",
+  "description": "COO-level coordination skill for managing Lead Engineer and Persistent QA workstreams through PROGRESS.md-driven governance.",
+  "capability_category": "internal_launch",
+  "lifecycle_state": "draft",
+  "format_profile": "heavy",
+  "compatible_runtime_profiles": [
+    "cursor-macos"
+  ],
+  "min_capability_tier": "high",
+  "routing": {
+    "when_to_use": "Use when Lisa needs to supervise delivery status, unblock teams, and align engineering and QA execution via structured progress reports.",
+    "when_not_to_use": [
+      "Do not edit implementation files directly",
+      "Do not close items without confirming PROGRESS.md evidence"
+    ],
+    "tags": [
+      "operations",
+      "governance",
+      "coordination"
+    ]
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "task",
+        "description": "Operator task"
+      }
+    ],
+    "expected_outputs": [
+      {
+        "name": "result",
+        "description": "Scoped skill result"
+      }
+    ],
+    "forbidden_actions": [
+      "Publish without an issuer-sealed receipt",
+      "Grant permission-to-act"
+    ],
+    "verification_steps": [
+      "Run the confined eval suite",
+      "Confirm cursor-macos is declared"
+    ],
+    "completion_criteria": [
+      "Canonical skill pack and execution profile match this version"
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "suite_hash": "sha256:e06eaa820e9e4b29d4525519a9ca6a8b73ed3a8084e187d4779eb7bbd82e1e13"
+  },
+  "telemetry": {
+    "classification": "public_internal",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain_ids_and_hashes"
+  },
+  "release_channel": "eval"
+}

@@ -12,7 +12,13 @@ import pytest
 
 from linkskills_core.provider_v2 import InMemoryProviderStore, PROTOCOL_VERSION
 from linkskills_gateway.production_v2 import (
-    PostgresProviderStore, ProductionV2Provider, decode_release, manifest_digest,
+    CATALOG_PLACEMENTS,
+    UNFILED_SKILL_IDS,
+    PostgresProviderStore,
+    ProductionV2Provider,
+    decode_release,
+    filed_releases,
+    manifest_digest,
 )
 
 
@@ -59,6 +65,31 @@ def runtime():
     )
     store = Store()
     return ProductionV2Provider(auth, store), auth, store
+
+
+def test_new_drafts_file_on_approved_floors_and_private_cards_stay_off():
+    repo = Path(__file__).resolve().parents[2]
+    catalog_ids = {
+        path.parent.name for path in (repo / "skills").glob("*/SKILL.md")
+    }
+    assert UNFILED_SKILL_IDS == {
+        "private-health-wellbeing",
+        "personal-compliance",
+    }
+    assert UNFILED_SKILL_IDS.isdisjoint(CATALOG_PLACEMENTS)
+    assert catalog_ids - UNFILED_SKILL_IDS == set(CATALOG_PLACEMENTS)
+    assert CATALOG_PLACEMENTS["triage"] == ("software-development", "coding")
+    assert CATALOG_PLACEMENTS["design-sample"] == ("software-development", "design")
+    assert CATALOG_PLACEMENTS["research"] == ("research", "method")
+    filed = filed_releases([decode_release(publication())])
+    by_id = {row["skill_id"]: row for row in filed}
+    assert by_id["git-safeguard"]["qualification"] == "qualified"
+    assert by_id["git-safeguard"]["family_id"] == "software-development"
+    assert by_id["triage"]["qualification"] == "draft"
+    assert "hybrid-development-methods" not in by_id
+    assert "hybrid-development-methods" not in catalog_ids
+    assert "personal-compliance" not in by_id
+    assert "private-health-wellbeing" not in by_id
 
 
 def test_exact_content_and_immediate_revocation():

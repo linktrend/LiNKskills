@@ -1,12 +1,12 @@
 ---
 name: emil-design-engineering
-description: "Routes specialist motion, animation, prototyping, Expo, Apple-interface, Sonner, UI-library, and Swift work through the complete exact Emil Kowalski skill collection."
-usage_trigger: "Use for building or reviewing animation and interaction, finding motion opportunities, prototyping variants, Expo or React Native motion, Apple-style interactions, Sonner, curated UI-library selection, or modern Swift work."
+description: "Motion set: decide whether to animate, build web or Expo motion, review, improve, and name vocabulary. Not look, not visual acceptance."
+usage_trigger: "Use on Execution screen issues when the brief allows motion, or in Verification when motion was in the briefs. Use animate-expo only for native. Toasts are ask-sonner. UI kit pick is pick-ui-library."
 version: 1.0.0
 release_tag: v1.0.0
 created: 2026-08-31
 author: LiNKskills Library
-tags: [design-engineering, motion, animation, expo, apple, swift]
+tags: [design-engineering, motion, animation, expo]
 engine:
   min_reasoning_tier: high
   preferred_model: gpt-5
@@ -19,48 +19,44 @@ tooling:
 tools: [write_file, read_file, list_dir, shell_exec, get_tool_details]
 dependencies: []
 permissions: [fs_read, fs_write, shell_exec]
-scope_out: ["Do not use a web animation route for Expo or a native route for ordinary web work", "Do not turn motion review into general code review", "Do not add animation when the selected source recommends restraint", "Do not bypass consumer dependency, device, review, or release gates"]
+scope_out: ["Do not animate 100+/day or keyboard actions", "Do not use Expo recipes on ordinary web", "Do not restyle the locked sample", "Do not review non-motion diffs"]
 format_profile: simple
-last_updated: 2026-08-31
+last_updated: 2026-09-22
 ---
 
 # Emil Design Engineering
 
-This family is the specialist authority beneath the broader design stack. All
-twelve upstream skills are retained, including `animate-expo`, `apple-design`,
-and `write-swift`, so LiNKdeveloper can use the same qualified family for web
-and application development.
+This card is **motion**. Look is `taste-design-exploration` / `awesome-design-presets`. Craft is `impeccable-design-system`. Visual check is `ui-ux-guardian`.
 
-## Select the specialist
+Companions in this package: `references/animate.md`, `RECIPES.md`, `STANDARDS.md`, `animate-expo.md`, `review-animations.md`, `improve-animations.md`, `find-animation-opportunities.md`, `animation-vocabulary.md`, `impeccable-animate.md`. Follow them; do not open Emil's GitHub.
 
-1. Validate the request with
-   [`references/schemas.json#/definitions/input`](references/schemas.json).
-2. Read [`references/routing.json`](references/routing.json) or run
-   `python3 scripts/helper_tool.py --route "<task>"`.
-3. Load exactly one selected entrypoint under `vendor-skills/emil-design/` and any file
-   it directly references.
-4. Respect the source's explicit separation between building, reviewing,
-   auditing, finding opportunities, and prototyping.
-5. Use Impeccable for broad design reconciliation and final interface polish;
-   do not duplicate those responsibilities here.
+## Build sequence (web)
 
-Consumer routing:
+1. **Should it animate?** 100+/day or keyboard: never. Tens/day: near-imperceptible or nothing. Occasional: standard. Rare: delight budget only.
+2. **Purpose** in one word: feedback, spatial consistency, state indication, preventing a jarring change, explanation (onboarding), or delight (rare only). Can't name it → don't build it.
+3. **Cheapest tool:** CSS transition → `@starting-style` → CSS animation → WAAPI → Motion. Do not install a library for a fade. Components (toast/drawer/menu) go to `pick-ui-library`.
+4. **Properties:** `transform` and `opacity` (clip-path sanctioned; height only for accordions). Never `scale(0)` — start `scale(0.9–0.97)` + opacity. Origin at the trigger for popovers; modals stay centered.
+5. **Curve and duration** from `STANDARDS.md` / `RECIPES.md`. No invented `cubic-bezier(0.4, 0, 0.2, 1)`. `ease-in` on UI entrance is a block. UI under 300ms unless justified. Extend existing tokens.
+6. **Interrupt and exit** must be defined. Reduced motion and hover gating ship with the animation.
 
-- IDE Development and LiNKdeveloper Web may use the web motion, prototype,
-  Sonner, library-selection, and design-engineering routes.
-- LiNKdeveloper Apps may additionally use Expo, Apple, and Swift routes.
-- LiNKsites normally uses web routes; native routes remain available only when
-  its task genuinely targets a native application surface.
+Impeccable animate folds into this same sequence (one authored moment, exponential ease-out, not a fade on every section).
 
-## Tool and authority protocol
+## Expo / RN
 
-Use a native CLI to inspect packages and platform versions, followed by a CLI wrapper
-for deterministic builds or tests. A direct API requires an existing
-consumer grant; MCP is only for an approved persistent adapter. If more than
-ten tools or multiple domains become relevant, call `get_tool_details` and
-load only the selected schemas.
+Only when the brief is native. Use `references/animate-expo.md`: Reanimated, gestures, sheets, haptics, UI thread.
 
-Conform output to
-[`references/schemas.json#/definitions/output`](references/schemas.json).
-Dependency installation, signing, device access, publishing, and activation
-remain consumer-owned operations.
+## Review (Verification or after a motion issue)
+
+Default to flagging. Ten standards: justified; frequency-appropriate; responsive easing; sub-300ms UI; origin/physical correctness; interruptible; no layout-thrashing properties; reduced-motion path; tokens not a fork; no `scale(0)`. Full tables in `STANDARDS.md`.
+
+## Improve / find
+
+Read-only audit → self-contained plans (`improve-animations`). Hunt missing motion with a rejected-candidates list (`find-animation-opportunities`). Vocabulary-only naming is `animation-vocabulary` — it does not implement.
+
+Apple-like **look** is not this card; it is direction (`taste-design-exploration`). Swift language is not design.
+
+## Tooling protocol (CLI-first)
+
+**Native CLI**, then **CLI wrapper**, **direct API** only if authorized, **MCP** only for an approved adapter. Generalist or >10 tools: `get_tool_details`.
+
+Contracts: `references/schemas.json#/definitions/input` and `#/definitions/output`.

@@ -1,0 +1,77 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "revenue-adapter-base",
+  "display_name": "Revenue Adapter Base",
+  "version": "1.0.0",
+  "description": "Foundational revenue protocol that ingests heterogeneous monetization signals (YouTube, AdSense, Stripe) and normalizes them into Venture Studio Transaction records.",
+  "capability_category": "internal_launch",
+  "lifecycle_state": "draft",
+  "format_profile": "heavy",
+  "compatible_runtime_profiles": [
+    "cursor-macos"
+  ],
+  "min_capability_tier": "high",
+  "routing": {
+    "when_to_use": "Use when finance operations need standardized transaction-format outputs from mixed revenue sources.",
+    "when_not_to_use": [
+      "Do not emit raw source-specific payloads as final output",
+      "Do not finalize without Venture Studio Transaction normalization"
+    ],
+    "tags": [
+      "revenue",
+      "finance",
+      "normalization"
+    ]
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "task",
+        "description": "Operator task"
+      }
+    ],
+    "expected_outputs": [
+      {
+        "name": "result",
+        "description": "Scoped skill result"
+      }
+    ],
+    "forbidden_actions": [
+      "Publish without an issuer-sealed receipt",
+      "Grant permission-to-act"
+    ],
+    "verification_steps": [
+      "Run the confined eval suite",
+      "Confirm cursor-macos is declared"
+    ],
+    "completion_criteria": [
+      "Canonical skill pack and execution profile match this version"
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "suite_hash": "sha256:7f26f771c0e982cb24b15db4bf561e0f668f4fd79e087245dc0fbda8307e11ba"
+  },
+  "telemetry": {
+    "classification": "public_internal",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain_ids_and_hashes"
+  },
+  "release_channel": "eval"
+}

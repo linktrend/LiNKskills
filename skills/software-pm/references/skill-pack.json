@@ -1,0 +1,77 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "software-pm",
+  "display_name": "Software Pm",
+  "version": "1.0.0",
+  "description": "Software project management orchestrator that converts PRDs into technical backlogs aligned to SaaS/Web factories and enforces QA-backed Definition of Done.",
+  "capability_category": "internal_launch",
+  "lifecycle_state": "draft",
+  "format_profile": "heavy",
+  "compatible_runtime_profiles": [
+    "cursor-macos"
+  ],
+  "min_capability_tier": "high",
+  "routing": {
+    "when_to_use": "Use when a software project needs structured backlog planning, sprint sequencing, and quality-gated completion criteria.",
+    "when_not_to_use": [
+      "Do not bypass factory alignment when creating backlog items",
+      "Do not mark items Done without QA sign-off evidence"
+    ],
+    "tags": [
+      "software-pm",
+      "backlog",
+      "delivery"
+    ]
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "task",
+        "description": "Operator task"
+      }
+    ],
+    "expected_outputs": [
+      {
+        "name": "result",
+        "description": "Scoped skill result"
+      }
+    ],
+    "forbidden_actions": [
+      "Publish without an issuer-sealed receipt",
+      "Grant permission-to-act"
+    ],
+    "verification_steps": [
+      "Run the confined eval suite",
+      "Confirm cursor-macos is declared"
+    ],
+    "completion_criteria": [
+      "Canonical skill pack and execution profile match this version"
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "suite_hash": "sha256:8e370efff93c87e0598f7c61c75725e8708be4bfd63f634a54c80b0b62a18c25"
+  },
+  "telemetry": {
+    "classification": "public_internal",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain_ids_and_hashes"
+  },
+  "release_channel": "eval"
+}
