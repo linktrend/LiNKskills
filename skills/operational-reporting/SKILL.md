@@ -1,7 +1,7 @@
 ---
 name: operational-reporting
 description: "Reusable multi-mode operational reporting that produces concise, evidence-bounded mobile reports without sending, scheduling, or reading private systems by itself."
-usage_trigger: "Use when an operator needs an Executive Digest, Flash Report, concise no-material-change line, supervised-agent summary, or maintenance-result input."
+usage_trigger: "Use when an operator needs an Executive Digest, Flash Report, concise no-material-change line, supervised-agent summary, maintenance-result input, or evidence-bounded Trading Performance report."
 version: 1.0.0
 release_tag: v1.0.0
 created: 2026-08-24
@@ -26,9 +26,9 @@ last_updated: 2026-08-24
 
 # operational-reporting
 
-This is the modern reporting authority for five bounded modes: **Executive
+This is the modern reporting authority for six bounded modes: **Executive
 Digest**, **Flash Report**, **No Material Change**, **Supervised-Agent Summary**,
-and **Maintenance Result**. It adapts supplied records; it does not collect
+**Maintenance Result**, and **Trading Performance**. It adapts supplied records; it does not collect
 mail, calendars, battery, health, or agent state itself. A consumer owns access,
 privacy filtering, scheduling, exact templates, and delivery.
 
@@ -62,6 +62,44 @@ privacy filtering, scheduling, exact templates, and delivery.
 5. **Maintenance Result:** accept a supplied maintenance result and Battery
    Status; omit absent fields and never request another reading at the final
    checkpoint.
+6. **Trading Performance (optional):** use only the typed `trading_performance`
+   input route. Include the exact `[start_inclusive, end_exclusive)` period,
+   timezone, base currency, and completeness declarations. Convert each supplied
+   amount independently with its sourced base-currency-per-source-currency FX
+   rate effective at the event or valuation timestamp. Missing amount, FX,
+   source, timestamp, or coverage stays unknown; never substitute current or
+   average FX.
+
+   Keep beginning/ending equity, signed deposits and withdrawals, gross realized
+   P&L, positive fee expense, signed funding, and unrealized P&L change separate.
+   The calculation is `net_realized = gross_realized - fees + funding`, then
+   `expected_ending_equity = starting_equity + deposits_withdrawals +
+   net_realized + unrealized_change`. Fees are separate from gross P&L and are
+   deducted once; an already-net fee basis conflicts with this contract and
+   blocks calculation. Report the observed ending-equity residual, and do not
+   claim reconciliation when a required component is incomplete.
+
+   Calculate one row per uniquely identified closed trade. A prior trim belongs
+   once in the completed cohort outcome and must not be added twice to current
+   period realized P&L. All-closed win rate includes breakeven; decided win rate
+   is a separately named wins/(wins+losses) denominator. Unknown cohort outcomes
+   keep full-cohort rates null. Profit factor with no loss denominator is
+   undefined, not infinity. R is signed net cohort P&L divided by positive
+   immutable initial risk derived from entry, original stop, quantity, multiplier,
+   point value, and entry-time FX; validate stop side for long/short. A trailing
+   stop never replaces initial risk. Preserve exact Decimal inputs and additive
+   values without intermediate rounding; division metrics use 18 significant
+   digits with `ROUND_HALF_EVEN` and retain the exact numerator and denominator.
+
+   Keep unrealized marks outside realized cohorts. Name numerators, denominators,
+   units, cohort/period, source pointers, and gaps. Mean currency P&L is not proof
+   of edge; no universal win-rate, PF, or R threshold implies skill or action.
+   Jane may recommend strategy, target/risk, increase, trim, or exit changes when
+   supplied evidence supports them; every recommendation remains advisory and
+   owner-decision-required. Never place orders, approve capital, activate live
+   trading, mutate policy, close books, or make legal/tax conclusions. Route
+   bookkeeping to the accounting owner and software adapters to the engineering
+   owner.
 
 Empty sections are omitted. All outputs are structured for mobile reading with
 short bullets or paragraphs and no emojis by default. A final checkpoint states

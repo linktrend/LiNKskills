@@ -14,7 +14,7 @@ from typing import Any
 
 
 HORIZONS = {"monthly", "rolling_4_week", "quarterly", "annual", "three_year", "five_year"}
-MODES = {"plan_review", "kpi_review", "variance_review", "reprioritization"}
+MODES = {"plan_review", "kpi_review", "variance_review", "reprioritization", "capacity_review"}
 BLOCKED_ACTIONS = {"approve", "activate", "enforce", "send", "schedule", "create_task", "mutate_program", "unknown"}
 SIGNAL_STATES = {"on_track", "late", "blocked", "obsolete"}
 PRIVATE_MARKERS = (
@@ -199,6 +199,39 @@ def _reprioritization(raw: Any, objective_ids: set[str], refs: set[str]) -> tupl
     return {"status": "PROPOSED_FOR_OWNER", "rationale": raw["rationale"], "objective_refs": affected, "evidence_ref": evidence_ref, "activated": False}, None
 
 
+def _capacity_rows(raw: Any, period: str, refs: list[str], request: dict[str, Any]) -> tuple[list[dict[str, Any]], str | None]:
+    """Calculate evidenced capacity and demand, preserving incomplete rows."""
+    fields=("gross_available","planned_unavailable","recurring_load","existing_commitments","proposed_demand")
+    if not isinstance(raw,list) or not raw: return [], "capacity_review requires at least one capacity unit"
+    source_status={x["ref"]:x["status"] for x in request.get("source_evidence",[]) if isinstance(x,dict) and isinstance(x.get("ref"),str)}
+    seen:set[str]=set(); rows:list[dict[str,Any]]=[]
+    for item in raw:
+        if not isinstance(item,dict) or not all(isinstance(item.get(k),str) and item[k].strip() for k in ("unit_ref","role","period")): return [], "each capacity unit requires unit_ref, role, and period"
+        uid=item["unit_ref"]
+        if not re.fullmatch(r"capacity:[A-Za-z0-9][A-Za-z0-9._:-]{2,63}",uid) or uid in seen: return [], "capacity unit references must be unique capacity references"
+        if item.get("time_unit") not in {"hour","day"}: return [], "capacity unit requires hour or day"
+        seen.add(uid); vals:dict[str,Decimal|None]={}; ev:list[str]=[]; gaps:list[str]=[]
+        for field in fields:
+            q=item.get(field)
+            if not isinstance(q,dict) or set(q)!={"value","evidence_ref"}: return [], f"{field} requires value and evidence_ref"
+            value,ref=q["value"],q["evidence_ref"]
+            if value is None:
+                if ref is not None: return [], f"{field} cannot cite evidence when value is unknown"
+                vals[field]=None; gaps.append(f"{field} not supplied"); continue
+            amount=_decimal(value)
+            if amount is None or amount<0: return [], f"{field} must be a finite nonnegative number or null"
+            if not isinstance(ref,str) or ref not in refs or source_status.get(ref)=="not_reported": return [], f"{field} requires matching reported or confirmed evidence"
+            vals[field]=amount; ev.append(ref)
+        if item["period"]!=period:
+            rows.append({"unit_ref":uid,"role":item["role"],"period":item["period"],"time_unit":item["time_unit"],"net_available":None,"total_demand":None,"signed_balance":None,"status":"NOT_COMPARABLE","evidence_refs":sorted(set(ev)),"gaps":["capacity period does not match requested period"]}); continue
+        av=("gross_available","planned_unavailable","recurring_load"); de=("existing_commitments","proposed_demand")
+        net=vals["gross_available"]-vals["planned_unavailable"]-vals["recurring_load"] if all(vals[k] is not None for k in av) else None
+        total=vals["existing_commitments"]+vals["proposed_demand"] if all(vals[k] is not None for k in de) else None
+        balance=net-total if net is not None and total is not None else None
+        rows.append({"unit_ref":uid,"role":item["role"],"period":item["period"],"time_unit":item["time_unit"],"net_available":format(net,"f") if net is not None else None,"total_demand":format(total,"f") if total is not None else None,"signed_balance":format(balance,"f") if balance is not None else None,"status":"COMPARABLE" if balance is not None else "NEEDS_INPUT","evidence_refs":sorted(set(ev)),"gaps":gaps})
+    return rows,None
+
+
 def normalize_request(request: dict[str, Any]) -> dict[str, Any]:
     """Normalize one planning request into a deterministic review artifact."""
     if not isinstance(request, dict):
@@ -235,6 +268,11 @@ def normalize_request(request: dict[str, Any]) -> dict[str, Any]:
         return _failure(request, error, refs)
     result = _base(request, "READY_FOR_OWNER", refs, uncertainty)
     result.update({"objectives": objectives, "kpis": kpis, "signals": signals, "reprioritization": reprioritization})
+    if request["mode"] == "capacity_review":
+        capacity_rows, capacity_error = _capacity_rows(request.get("capacity_units"), request["period"], refs, request)
+        if capacity_error: return _failure(request, capacity_error, refs)
+        result["capacity_review"] = capacity_rows
+        result["uncertainty"].extend(gap for row in capacity_rows for gap in row["gaps"])
     result["uncertainty"].extend(f"{ref} is not_reported" for ref in refs if next(item for item in request["source_evidence"] if item["ref"] == ref).get("status") == "not_reported")
     if statuses == {"not_reported"} or result["uncertainty"]:
         result["status"] = "DRAFT"

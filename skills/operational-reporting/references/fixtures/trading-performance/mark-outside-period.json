@@ -1,0 +1,331 @@
+{
+  "mode": "trading_performance",
+  "window": "custom",
+  "records": [],
+  "evidence": [
+    "fixture://ledger/2026-09",
+    "fixture://closed-cohorts/2026-09",
+    "fixture://equity/period"
+  ],
+  "trading_performance": {
+    "period": {
+      "start_inclusive": "2026-09-01T00:00:00Z",
+      "end_exclusive": "2026-10-01T00:00:00Z",
+      "timezone": "UTC"
+    },
+    "base_currency": "USD",
+    "coverage": "complete",
+    "cost_coverage": "complete",
+    "equity_coverage": "complete",
+    "realized_pnl_basis": "gross_before_fees",
+    "starting_equity": {
+      "amount": "1000",
+      "currency": "USD",
+      "fx_to_base": "1",
+      "fx_effective_at": "2026-09-01T00:00:00Z",
+      "fx_source": "fixture://fx/base-identity",
+      "source_pointer": "fixture://ledger/equity-start",
+      "as_of": "2026-09-01T00:00:00Z"
+    },
+    "ending_equity": {
+      "amount": "1174",
+      "currency": "USD",
+      "fx_to_base": "1",
+      "fx_effective_at": "2026-10-01T00:00:00Z",
+      "fx_source": "fixture://fx/base-identity",
+      "source_pointer": "fixture://ledger/equity-end",
+      "as_of": "2026-10-01T00:00:00Z"
+    },
+    "cash_flows": [
+      {
+        "flow_id": "D1",
+        "kind": "deposit",
+        "occurred_at": "2026-09-05T10:00:00Z",
+        "amount": "100",
+        "currency": "USD",
+        "fx_to_base": "1",
+        "fx_effective_at": "2026-09-05T10:00:00Z",
+        "fx_source": "fixture://fx/base-identity",
+        "source_pointer": "fixture://ledger/D1"
+      },
+      {
+        "flow_id": "W1",
+        "kind": "withdrawal",
+        "occurred_at": "2026-09-25T10:00:00Z",
+        "amount": "-20",
+        "currency": "USD",
+        "fx_to_base": "1",
+        "fx_effective_at": "2026-09-25T10:00:00Z",
+        "fx_source": "fixture://fx/base-identity",
+        "source_pointer": "fixture://ledger/W1"
+      }
+    ],
+    "realized_pnl": [
+      {
+        "event_id": "E1",
+        "trade_id": "T1",
+        "occurred_at": "2026-09-03T12:00:00Z",
+        "amount": "30",
+        "currency": "USD",
+        "fx_to_base": "1",
+        "fx_effective_at": "2026-09-03T12:00:00Z",
+        "fx_source": "fixture://fx/base-identity",
+        "source_pointer": "fixture://ledger/E1"
+      },
+      {
+        "event_id": "E2",
+        "trade_id": "T2",
+        "occurred_at": "2026-09-08T12:00:00Z",
+        "amount": "100",
+        "currency": "USD",
+        "fx_to_base": "1",
+        "fx_effective_at": "2026-09-08T12:00:00Z",
+        "fx_source": "fixture://fx/base-identity",
+        "source_pointer": "fixture://ledger/E2"
+      },
+      {
+        "event_id": "E3",
+        "trade_id": "T3",
+        "occurred_at": "2026-09-14T12:00:00Z",
+        "amount": "-50",
+        "currency": "USD",
+        "fx_to_base": "1",
+        "fx_effective_at": "2026-09-14T12:00:00Z",
+        "fx_source": "fixture://fx/base-identity",
+        "source_pointer": "fixture://ledger/E3"
+      },
+      {
+        "event_id": "E4",
+        "trade_id": "T4",
+        "occurred_at": "2026-09-18T12:00:00Z",
+        "amount": "0",
+        "currency": "USD",
+        "fx_to_base": "1",
+        "fx_effective_at": "2026-09-18T12:00:00Z",
+        "fx_source": "fixture://fx/base-identity",
+        "source_pointer": "fixture://ledger/E4"
+      },
+      {
+        "event_id": "E5",
+        "trade_id": "T5",
+        "occurred_at": "2026-09-24T12:00:00Z",
+        "amount": "10",
+        "currency": "USD",
+        "fx_to_base": "1",
+        "fx_effective_at": "2026-09-24T12:00:00Z",
+        "fx_source": "fixture://fx/base-identity",
+        "source_pointer": "fixture://ledger/E5"
+      },
+      {
+        "event_id": "E-END",
+        "trade_id": "BOUNDARY",
+        "occurred_at": "2026-10-01T00:00:00Z",
+        "amount": "999",
+        "currency": "USD",
+        "fx_to_base": "1",
+        "fx_effective_at": "2026-10-01T00:00:00Z",
+        "fx_source": "fixture://fx/end-boundary",
+        "source_pointer": "fixture://realized/E-END"
+      }
+    ],
+    "fees": [
+      {
+        "fee_id": "F1",
+        "occurred_at": "2026-09-24T12:00:00Z",
+        "amount": "1.25",
+        "currency": "EUR",
+        "fx_to_base": "1.6",
+        "fx_effective_at": "2026-09-24T12:00:00Z",
+        "fx_source": "fixture://fx/fee-eur-usd",
+        "deduction_basis": "subtract_from_gross",
+        "source_pointer": "fixture://fees/F1"
+      }
+    ],
+    "funding": [
+      {
+        "funding_id": "FN1",
+        "occurred_at": "2026-09-25T12:00:00Z",
+        "amount": "1",
+        "currency": "USD",
+        "fx_to_base": "1",
+        "fx_effective_at": "2026-09-25T12:00:00Z",
+        "fx_source": "fixture://fx/funding-identity",
+        "source_pointer": "fixture://funding/FN1"
+      }
+    ],
+    "unrealized_pnl_changes": [
+      {
+        "mark_id": "U1",
+        "trade_id": "OPEN1",
+        "start_mark": {
+          "amount": "20",
+          "currency": "USD",
+          "fx_to_base": "1",
+          "fx_effective_at": "2026-09-02T00:00:00Z",
+          "fx_source": "fixture://fx/base-identity",
+          "source_pointer": "fixture://ledger/unrealized-start",
+          "as_of": "2026-09-02T00:00:00Z"
+        },
+        "end_mark": {
+          "amount": "25",
+          "currency": "USD",
+          "fx_to_base": "1",
+          "fx_effective_at": "2026-10-01T00:00:00Z",
+          "fx_source": "fixture://fx/base-identity",
+          "source_pointer": "fixture://ledger/unrealized-end",
+          "as_of": "2026-10-01T00:00:00Z"
+        }
+      }
+    ],
+    "closed_cohorts": [
+      {
+        "trade_id": "T1",
+        "closed_at": "2026-09-03T12:00:00Z",
+        "net_pnl_base": "50",
+        "source_pointer": "fixture://closed/T1-including-prior-trim",
+        "initial_risk": {
+          "side": "long",
+          "entry_at": "2026-09-01T08:00:00Z",
+          "entry_price": "100",
+          "original_stop": "95",
+          "quantity": "1",
+          "contract_multiplier": "1",
+          "point_value_per_price_unit_per_contract": "1",
+          "quote_currency": "USD",
+          "fx_to_base": "1",
+          "fx_effective_at": "2026-09-01T08:00:00Z",
+          "fx_source": "fixture://fx/risk/T1",
+          "price_unit": "index_point",
+          "quantity_unit": "contract",
+          "source_pointer": "fixture://risk/T1"
+        }
+      },
+      {
+        "trade_id": "T2",
+        "closed_at": "2026-09-08T12:00:00Z",
+        "net_pnl_base": "100",
+        "source_pointer": "fixture://closed/T2",
+        "initial_risk": {
+          "side": "long",
+          "entry_at": "2026-09-02T08:00:00Z",
+          "entry_price": "100",
+          "original_stop": "90",
+          "quantity": "2",
+          "contract_multiplier": "1",
+          "point_value_per_price_unit_per_contract": "1",
+          "quote_currency": "USD",
+          "fx_to_base": "1",
+          "fx_effective_at": "2026-09-02T08:00:00Z",
+          "fx_source": "fixture://fx/risk/T2",
+          "price_unit": "index_point",
+          "quantity_unit": "contract",
+          "source_pointer": "fixture://risk/T2"
+        }
+      },
+      {
+        "trade_id": "T3",
+        "closed_at": "2026-09-14T12:00:00Z",
+        "net_pnl_base": "-50",
+        "source_pointer": "fixture://closed/T3",
+        "initial_risk": {
+          "side": "short",
+          "entry_at": "2026-09-03T08:00:00Z",
+          "entry_price": "100",
+          "original_stop": "110",
+          "quantity": "1",
+          "contract_multiplier": "1",
+          "point_value_per_price_unit_per_contract": "1",
+          "quote_currency": "USD",
+          "fx_to_base": "1",
+          "fx_effective_at": "2026-09-03T08:00:00Z",
+          "fx_source": "fixture://fx/risk/T3",
+          "price_unit": "index_point",
+          "quantity_unit": "contract",
+          "source_pointer": "fixture://risk/T3"
+        }
+      },
+      {
+        "trade_id": "T4",
+        "closed_at": "2026-09-18T12:00:00Z",
+        "net_pnl_base": "0",
+        "source_pointer": "fixture://closed/T4",
+        "initial_risk": {
+          "side": "long",
+          "entry_at": "2026-09-04T08:00:00Z",
+          "entry_price": "100",
+          "original_stop": "90",
+          "quantity": "1",
+          "contract_multiplier": "1",
+          "point_value_per_price_unit_per_contract": "1",
+          "quote_currency": "USD",
+          "fx_to_base": "1",
+          "fx_effective_at": "2026-09-04T08:00:00Z",
+          "fx_source": "fixture://fx/risk/T4",
+          "price_unit": "index_point",
+          "quantity_unit": "contract",
+          "source_pointer": "fixture://risk/T4"
+        }
+      },
+      {
+        "trade_id": "T5",
+        "closed_at": "2026-09-24T12:00:00Z",
+        "net_pnl_base": "10",
+        "source_pointer": "fixture://closed/T5",
+        "initial_risk": {
+          "side": "short",
+          "entry_at": "2026-09-01T12:00:00Z",
+          "entry_price": "100",
+          "original_stop": "110",
+          "quantity": "2",
+          "contract_multiplier": "1",
+          "point_value_per_price_unit_per_contract": "1",
+          "quote_currency": "USD",
+          "fx_to_base": "1",
+          "fx_effective_at": "2026-09-01T12:00:00Z",
+          "fx_source": "fixture://fx/t5-entry",
+          "price_unit": "index_point",
+          "quantity_unit": "contract",
+          "source_pointer": "fixture://risk/T5"
+        }
+      }
+    ],
+    "evidence": [
+      "fixture://closed-cohorts/2026-09",
+      "fixture://closed/T1-including-prior-trim",
+      "fixture://closed/T2",
+      "fixture://closed/T3",
+      "fixture://closed/T4",
+      "fixture://closed/T5",
+      "fixture://equity/period",
+      "fixture://fees/F1",
+      "fixture://funding/FN1",
+      "fixture://fx/base-identity",
+      "fixture://fx/end-boundary",
+      "fixture://fx/fee-eur-usd",
+      "fixture://fx/funding-identity",
+      "fixture://fx/risk/T1",
+      "fixture://fx/risk/T2",
+      "fixture://fx/risk/T3",
+      "fixture://fx/risk/T4",
+      "fixture://fx/t5-entry",
+      "fixture://ledger/2026-09",
+      "fixture://ledger/D1",
+      "fixture://ledger/E1",
+      "fixture://ledger/E2",
+      "fixture://ledger/E3",
+      "fixture://ledger/E4",
+      "fixture://ledger/E5",
+      "fixture://ledger/W1",
+      "fixture://ledger/equity-end",
+      "fixture://ledger/equity-start",
+      "fixture://ledger/unrealized-end",
+      "fixture://ledger/unrealized-start",
+      "fixture://realized/E-END",
+      "fixture://risk/T1",
+      "fixture://risk/T2",
+      "fixture://risk/T3",
+      "fixture://risk/T4",
+      "fixture://risk/T5"
+    ]
+  }
+}

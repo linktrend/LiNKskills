@@ -12,8 +12,8 @@ from typing import Any, Callable
 
 
 ROLLBACK = "ABSENT@517f22ee135c298a17a74f84a84b60accdf22cf4/tree:d2514ee298074c70f9bb5fb19f2fc71af7d43f16"
-MODES = {"role_definition", "rule_selection", "capability_request", "delegation_plan", "workforce_review", "quality_review", "suspend_proposal", "retire_proposal"}
-BLOCKED_ACTIONS = {"activate", "suspend", "retire", "approve_grant", "copy_credentials", "copy_private_memory", "unknown"}
+MODES = {"role_definition", "rule_selection", "capability_request", "delegation_plan", "workforce_review", "quality_review", "suspend_proposal", "retire_proposal", "program_coordination"}
+BLOCKED_ACTIONS = {"activate", "suspend", "retire", "approve_grant", "copy_credentials", "copy_private_memory", "dispatch", "unknown"}
 PRIVATE_MARKERS = ("customer@example.com", "password", "api_key", "access_token", "private key", "private memory", "private_memory", "credential", "oauth", "cookie", "secret token")
 EVIDENCE_REF = re.compile(r"(?:fixture|source|consumer):[^\s]+$")
 OWNER_REF = re.compile(r"(?:owner|consumer):[^\s]+$")
@@ -167,6 +167,88 @@ def _proposal(item: dict[str, Any], refs: set[str]) -> str | None:
     return None
 
 
+
+def _program_coordination(value: Any, refs: set[str], available_evidence: set[str]) -> tuple[dict[str, Any] | None, str | None, list[str]]:
+    """Validate task packages and produce owner-review-only collision and handoff records."""
+    if not isinstance(value, dict) or set(value) != {"accountable_owner_ref", "work_packages", "handoff"} or not _valid_scalar(value.get("accountable_owner_ref"), OWNER_REF):
+        return None, "program coordination needs accountable owner, work packages, and handoff", []
+    rows=value.get("work_packages")
+    if not isinstance(rows,list) or not rows or len(rows)>32: return None,"work_packages must contain one to thirty-two rows",[]
+    pkgpat=re.compile(r"^package:[^\s]+$"); respat=re.compile(r"^resource:[^\s]+$"); critpat=re.compile(r"^criterion:[^\s]+$")
+    packages=[]; ids=set(); uncertainty=[]
+    for row in rows:
+        keys={"package_ref","objective","owner_ref","resource_refs","dependency_refs","required_input_refs","deliverables","acceptance_criteria","reported_status","acceptance_results"}
+        if not isinstance(row,dict) or set(row)!=keys: return None,"work package fields do not match the typed contract",[]
+        if not _valid_scalar(row.get("package_ref"),pkgpat) or row["package_ref"] in ids or not _valid_scalar(row.get("objective")) or not _valid_scalar(row.get("owner_ref"),re.compile(r"^(agent|owner|consumer):[^\s]+$")): return None,"work package identity, owner, or objective is invalid",[]
+        if row.get("reported_status") not in {"queued","in_progress","blocked","completed","not_reported"}: return None,"work package reported_status is unsupported",[]
+        for field,pattern,required in (("resource_refs",respat,True),("dependency_refs",pkgpat,False)):
+            seq=row.get(field)
+            if not isinstance(seq,list) or (required and not seq) or len(seq)>32 or any(not _valid_scalar(x,pattern) for x in seq) or len(set(seq))!=len(seq): return None,f"{field} must contain unique supported references",[]
+        seq=row.get("required_input_refs")
+        if not isinstance(seq,list) or len(seq)>32 or any(not _evidence_ref(x,refs) for x in seq) or len(set(seq))!=len(seq): return None,"required_input_refs must resolve to source evidence",[]
+        seq=row.get("deliverables")
+        if not isinstance(seq,list) or not seq or len(seq)>32 or any(not _valid_scalar(x) for x in seq): return None,"deliverables must be bounded nonempty descriptions",[]
+        criteria=row.get("acceptance_criteria")
+        if not isinstance(criteria,list) or not criteria or len(criteria)>32: return None,"acceptance_criteria must be nonempty and bounded",[]
+        criterion_ids=set()
+        for c in criteria:
+            if not isinstance(c,dict) or set(c)!={"criterion_ref","statement"} or not _valid_scalar(c.get("criterion_ref"),critpat) or c["criterion_ref"] in criterion_ids or not _valid_scalar(c.get("statement")): return None,"acceptance criterion reference or statement is invalid",[]
+            criterion_ids.add(c["criterion_ref"])
+        results=row.get("acceptance_results")
+        if not isinstance(results,list) or len(results)>32: return None,"acceptance_results must be a bounded list",[]
+        result_map={}
+        for result in results:
+            if not isinstance(result,dict) or set(result)!={"criterion_ref","reported_result","evidence_refs"} or not _valid_scalar(result.get("criterion_ref"),critpat) or result["criterion_ref"] not in criterion_ids or result["criterion_ref"] in result_map or result.get("reported_result") not in {"met","not_met","not_reported"}: return None,"acceptance result must match one criterion and valid result state",[]
+            evidence=result.get("evidence_refs")
+            if not isinstance(evidence,list) or len(evidence)>16 or any(not _evidence_ref(x,refs) for x in evidence) or len(set(evidence))!=len(evidence): return None,"acceptance evidence must resolve to supplied evidence",[]
+            if result["reported_result"]=="met" and not evidence: return None,"met acceptance result requires evidence references",[]
+            result_map[result["criterion_ref"]]=result
+        deps=row["dependency_refs"]
+        if row["package_ref"] in deps: return None,"a work package cannot depend on itself",[]
+        assessment="not_reported" if row["reported_status"]=="not_reported" else "not_completed"
+        if row["reported_status"]=="completed":
+            full=all(result_map.get(c,{}).get("reported_result")=="met" and any(ref in available_evidence for ref in result_map[c].get("evidence_refs",[])) for c in criterion_ids)
+            assessment="asserted_with_evidence_unreviewed" if full else "asserted_without_sufficient_evidence"
+            uncertainty.append(f"{row['package_ref']} completion is reported, not independently verified")
+        if row["reported_status"]=="blocked": uncertainty.append(f"{row['package_ref']} is reported blocked")
+        if row["reported_status"]=="not_reported": uncertainty.append(f"{row['package_ref']} status is not_reported")
+        packages.append({**row,"completion_assessment":assessment}); ids.add(row["package_ref"])
+    lookup={p["package_ref"]:p for p in packages}
+    for row in packages:
+        if any(ref not in lookup for ref in row["dependency_refs"]): return None,f"{row['package_ref']} has an unknown dependency",[]
+    visiting=set(); visited=set()
+    def visit(ref):
+        if ref in visiting:return False
+        if ref in visited:return True
+        visiting.add(ref)
+        if any(not visit(child) for child in lookup[ref]["dependency_refs"]):return False
+        visiting.remove(ref);visited.add(ref);return True
+    if any(not visit(ref) for ref in lookup):return None,"work-package dependencies contain a cycle",[]
+    resources={}
+    for row in packages:
+        for ref in row["resource_refs"]:resources.setdefault(ref,[]).append(row)
+    collisions=[]
+    for ref,claims in sorted(resources.items()):
+        if len(claims)>1:
+            collisions.append({"resource_ref":ref,"package_refs":sorted(x["package_ref"] for x in claims),"owner_refs":sorted({x["owner_ref"] for x in claims}),"state":"possible_overlap","owner_decision_required":True})
+            uncertainty.append(f"{ref} is claimed by multiple work packages; owner resolution is required")
+    h=value.get("handoff"); hkeys={"handoff_ref","from_agent_ref","to_agent_ref","package_refs","consumer_session_ref","evidence_refs","open_questions","next_owner_action"}
+    if not isinstance(h,dict) or set(h)!=hkeys or not _valid_scalar(h.get("handoff_ref"),re.compile(r"^handoff:[^\s]+$")):return None,"handoff fields or reference are invalid",[]
+    for field in ("from_agent_ref","to_agent_ref"):
+        v=h.get(field)
+        if v!="not_reported" and not _valid_scalar(v,re.compile(r"^(agent|owner|consumer):[^\s]+$")):return None,f"{field} is invalid",[]
+    p_refs=h.get("package_refs")
+    if not isinstance(p_refs,list) or not p_refs or any(not _valid_scalar(x,pkgpat) or x not in lookup for x in p_refs) or len(set(p_refs))!=len(p_refs):return None,"handoff package_refs must resolve to packages",[]
+    session=h.get("consumer_session_ref")
+    if session!="not_reported" and not _valid_scalar(session,re.compile(r"^consumer:[^\s]+$")):return None,"consumer_session_ref must be a native consumer reference or not_reported",[]
+    if session=="not_reported":uncertainty.append("consumer-native session reference is not_reported; resume is unresolved")
+    evidence=h.get("evidence_refs")
+    if not isinstance(evidence,list) or len(evidence)>32 or any(not _evidence_ref(x,refs) for x in evidence) or len(set(evidence))!=len(evidence):return None,"handoff evidence_refs must resolve to supplied evidence",[]
+    questions=h.get("open_questions")
+    if not isinstance(questions,list) or len(questions)>32 or any(not _valid_scalar(x) for x in questions) or not _valid_scalar(h.get("next_owner_action")):return None,"handoff questions/action must be bounded text",[]
+    if not evidence:uncertainty.append("handoff evidence references are not reported")
+    return {"accountable_owner_ref":value["accountable_owner_ref"],"work_packages":packages,"possible_collisions":collisions,"handoff":h,"permission_to_dispatch":False},None,uncertainty
+
 def normalize_request(request: dict[str, Any]) -> dict[str, Any]:
     """Normalize one workforce request into an owner-review artifact."""
     if not isinstance(request, dict):
@@ -175,6 +257,12 @@ def normalize_request(request: dict[str, Any]) -> dict[str, Any]:
         return _failure(request, "unknown mode is rejected")
     if request.get("privacy_classification") not in {"synthetic", "redacted", "public"}:
         return _failure(request, "privacy classification must be synthetic, redacted, or public")
+    if request["mode"] == "program_coordination":
+        # The public CLI must enforce the same bounds as its declared typed contract.
+        from jsonschema import Draft202012Validator
+        definitions=json.loads((Path(__file__).resolve().parents[1]/"references/schemas.json").read_text())["definitions"]
+        if list(Draft202012Validator({"$ref":"#/definitions/input","definitions":definitions}).iter_errors(request)):
+            return _failure({}, "program coordination input does not match the bounded schema")
     refs, error, uncertainty = _refs(request.get("source_evidence"))
     if error:
         return _failure(request, error, refs)
@@ -185,6 +273,15 @@ def normalize_request(request: dict[str, Any]) -> dict[str, Any]:
     if request.get("requested_action") in BLOCKED_ACTIONS:
         return _failure(request, "the requested action exceeds the workforce authority boundary", refs)
     evidence = set(refs)
+    coordination = None
+    coordination_uncertainty: list[str] = []
+    if request.get("coordination") is not None:
+        available_evidence = {item["ref"] for item in request["source_evidence"] if isinstance(item, dict) and item.get("status") in {"confirmed", "reported"}}
+        coordination, error, coordination_uncertainty = _program_coordination(request.get("coordination"), evidence, available_evidence)
+        if error:
+            return _failure(request, error, refs)
+    if request["mode"] == "program_coordination" and coordination is None:
+        return _failure(request, "program_coordination requires typed coordination input", refs)
     if request.get("role") is not None:
         error = _role(request.get("role"), evidence)
         if error:
@@ -219,6 +316,7 @@ def normalize_request(request: dict[str, Any]) -> dict[str, Any]:
         "quality_review": (quality, "at least one quality observation is required"),
         "suspend_proposal": (proposals, "at least one proposal is required"),
         "retire_proposal": (proposals, "at least one proposal is required"),
+        "program_coordination": (coordination, "program coordination input is required"),
     }
     required, missing_reason = requirements[request["mode"]]
     if not required:
@@ -236,6 +334,13 @@ def normalize_request(request: dict[str, Any]) -> dict[str, Any]:
     result["workload"] = workload
     result["quality"] = quality
     result["proposals"] = proposals
+    uncertainty.extend(coordination_uncertainty)
+    if coordination is not None:
+        result["coordination"] = coordination
+        result["authority"]["owner_ref"] = coordination["accountable_owner_ref"]
+        if coordination_uncertainty:
+            result["status"] = "DRAFT"
+            result["uncertainty"].extend(coordination_uncertainty)
     return result
 
 

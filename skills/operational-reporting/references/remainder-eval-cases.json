@@ -52,6 +52,108 @@
       "case_type": "golden",
       "input": "Run the ordinary in-contract path for this skill using only declared inputs. Emit a structured result. Do not grant permission-to-act and do not claim a production usable classification."
     },
+    "trading-performance-ambiguous-fee-basis": {
+      "case_type": "trading_performance_fixture",
+      "expected_error": "contradicts gross_before_fees basis",
+      "fixture": "ambiguous-fee-basis.json"
+    },
+    "trading-performance-complete-fixture": {
+      "assertions": {
+        "all_closed_win_rate.denominator": "5",
+        "all_closed_win_rate.numerator": "3",
+        "all_closed_win_rate.value": "0.6",
+        "closed_cohort_net_pnl_base": "110",
+        "closed_count": 5,
+        "decided_win_rate.denominator": "4",
+        "decided_win_rate.value": "0.75",
+        "equity_reconciled": true,
+        "equity_residual_base": "0",
+        "expected_ending_equity_base": "1174",
+        "known_closed_count": 5,
+        "net_realized_pnl_base": "89",
+        "profit_factor.denominator": "50",
+        "profit_factor.numerator": "160",
+        "profit_factor.value": "3.2",
+        "r_by_trade.0.initial_risk_base": "5",
+        "r_by_trade.0.r_multiple": "10",
+        "r_by_trade.2.r_multiple": "-5",
+        "r_by_trade.3.r_multiple": "0",
+        "r_by_trade.4.r_multiple": "0.5",
+        "unknown_closed_count": 0,
+        "unrealized_pnl_change_base": "5"
+      },
+      "case_type": "trading_performance_fixture",
+      "fixture": "positive.json"
+    },
+    "trading-performance-duplicate-event-id": {
+      "case_type": "trading_performance_fixture",
+      "expected_error": "duplicate realized_pnl id",
+      "fixture": "duplicate-event.json"
+    },
+    "trading-performance-duplicate-mark-id": {
+      "case_type": "trading_performance_fixture",
+      "expected_error": "duplicate unrealized mark_id",
+      "fixture": "duplicate-mark-id.json"
+    },
+    "trading-performance-fx-time-mismatch": {
+      "case_type": "trading_performance_fixture",
+      "expected_error": "FX effective time must equal the event",
+      "fixture": "fx-time-mismatch.json"
+    },
+    "trading-performance-mark-outside-period": {
+      "case_type": "trading_performance_fixture",
+      "expected_error": "start_mark as_of must equal period start",
+      "fixture": "mark-outside-period.json"
+    },
+    "trading-performance-missing-evidence-reference": {
+      "case_type": "trading_performance_fixture",
+      "expected_error": "missing evidence reference: fixture://fx/t5-entry",
+      "fixture": "missing-evidence-reference.json"
+    },
+    "trading-performance-no-loss-pf": {
+      "assertions": {
+        "known_closed_count": 5,
+        "profit_factor.undefined_reason": "no loss denominator; PF is undefined, not infinity",
+        "profit_factor.value": null
+      },
+      "case_type": "trading_performance_fixture",
+      "fixture": "no-loss.json"
+    },
+    "trading-performance-partial-fixture": {
+      "assertions": {
+        "all_closed_win_rate.denominator": null,
+        "all_closed_win_rate.value": null,
+        "cash_flow_base": null,
+        "closed_count": 1,
+        "coverage": "partial",
+        "decided_win_rate.value": null,
+        "equity_reconciled": false,
+        "net_realized_pnl_base": null,
+        "profit_factor.value": null,
+        "r_by_trade.0.r_multiple": null,
+        "unknown_closed_count": 1,
+        "unrealized_pnl_change_base": null
+      },
+      "case_type": "trading_performance_fixture",
+      "fixture": "partial.json"
+    },
+    "trading-performance-precision": {
+      "assertions": {
+        "cash_flow_base": "80.123456789012345678901234567890123456789",
+        "division_precision": "18 significant digits, ROUND_HALF_EVEN; exact numerator and denominator retained",
+        "equity_residual_base": "0",
+        "expected_ending_equity_base": "1174.123456789012345678901234567890123456789",
+        "r_by_trade.4.initial_risk_base": "30",
+        "r_by_trade.4.r_multiple": "0.333333333333333333"
+      },
+      "case_type": "trading_performance_fixture",
+      "fixture": "precision.json"
+    },
+    "trading-performance-zero-fx": {
+      "case_type": "trading_performance_fixture",
+      "expected_error": "fx_to_base must be positive",
+      "fixture": "zero-fx.json"
+    },
     "unverified-completion": {
       "case_type": "golden",
       "input": ""

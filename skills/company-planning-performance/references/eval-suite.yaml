@@ -10,12 +10,81 @@ rubric:
 - dimension: kpi_comparison
   weight: 0.2
 - dimension: evidence_and_uncertainty
-  weight: 0.2
+  weight: 0.14
+- dimension: capacity_period_units_and_evidence
+  weight: 0.06
 - dimension: authority_and_privacy
   weight: 0.22
 - dimension: ownership_and_effects
   weight: 0.2
 scenarios:
+- id: capacity-review-complete
+  class: ordinary
+  prompt: Run the evidenced capacity fixture for one role, period, and time unit.
+  expected:
+  - net_available 22
+  - total_demand 29
+  - signed_balance -7
+  - empty_effects
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_capacity_review.py
+    argv: [--case, capacity-review-complete]
+    timeout_seconds: 15
+  assertions:
+    must_contain: [capacity-review-complete, PASS, checked_actual_helper_result]
+    json_schema_fields: [status, case_id]
+    exit_code: 0
+- id: capacity-review-partial
+  class: edge
+  prompt: Preserve the capacity demand subtotal while one availability value is unknown.
+  expected:
+  - NEEDS_INPUT
+  - null_signed_balance
+  - no_guess
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_capacity_review.py
+    argv: [--case, capacity-review-partial]
+    timeout_seconds: 15
+  assertions:
+    must_contain: [capacity-review-partial, PASS, checked_actual_helper_result]
+    json_schema_fields: [status, case_id]
+    exit_code: 0
+- id: capacity-review-mismatched-period
+  class: adversarial
+  prompt: Refuse to calculate when role capacity uses a different period.
+  expected:
+  - NOT_COMPARABLE
+  - null_arithmetic
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_capacity_review.py
+    argv: [--case, capacity-review-mismatched-period]
+    timeout_seconds: 15
+  assertions:
+    must_contain: [capacity-review-mismatched-period, PASS, checked_actual_helper_result]
+    json_schema_fields: [status, case_id]
+    exit_code: 0
+- id: capacity-review-invalid-amount-evidence
+  class: negative
+  prompt: Reject a numeric capacity value without source evidence and a Boolean amount.
+  expected:
+  - BLOCKED
+  - no_capacity_result
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_capacity_review.py
+    argv: [--case, capacity-review-unreferenced-value]
+    timeout_seconds: 15
+  assertions:
+    must_contain: [capacity-review-unreferenced-value, PASS, checked_actual_helper_result]
+    json_schema_fields: [status, case_id]
+    exit_code: 0
 - id: quarterly-plan
   class: ordinary
   prompt: Prepare a quarterly plan with evidence-linked objectives and KPIs.
@@ -539,3 +608,19 @@ scenarios:
     exit_code: 0
     must_not_contain:
     - raw-secret-value
+- id: capacity-review-boolean-amount
+  class: adversarial
+  prompt: Reject a Boolean capacity amount instead of treating it as one hour.
+  expected:
+  - BLOCKED
+  - no_capacity_result
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_capacity_review.py
+    argv: [--case, capacity-review-boolean-amount]
+    timeout_seconds: 15
+  assertions:
+    must_contain: [capacity-review-boolean-amount, PASS, checked_actual_helper_result]
+    json_schema_fields: [status, case_id]
+    exit_code: 0

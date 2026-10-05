@@ -1,0 +1,157 @@
+{
+  "kind": "proposed_behavior_evaluation_fixtures_not_run",
+  "skill_id": "compliance-guardian",
+  "mode": "organizational_evidence_map",
+  "cases": [
+    {
+      "case_id": "organizational-evidence-map-partial-owner-review",
+      "case_type": "fictional_golden_fixture",
+      "input": {
+        "mode": "organizational_evidence_map",
+        "privacy_classification": "synthetic",
+        "scope_ref": "synthetic-scope-01",
+        "entity_and_service_boundary": "Fictional single-tenant web service and its operator team",
+        "jurisdiction_or_unknown_reason": {
+          "unknown_reason": "Fictional internal control set; no jurisdictional legal requirements asserted."
+        },
+        "framework_name_and_version_or_unknown_reason": {
+          "framework_name": "Fictional Internal Controls Set",
+          "version": "0.1"
+        },
+        "as_of": "2026-10-05",
+        "decision_owner_ref": "synthetic-owner-ops",
+        "requirement_source_refs": [
+          {
+            "requirement_id": "REQ-01",
+            "source_ref": "synthetic://requirement-set/v0.1/REQ-01",
+            "title": "Fictional owner-supplied requirement set",
+            "statement": "For this fictional example, administrator access must be reviewed quarterly.",
+            "effective_at": "2026-01-01",
+            "accessed_at": "2026-10-05T00:00:00Z"
+          },
+          {
+            "requirement_id": "REQ-02",
+            "source_ref": "synthetic://requirement-set/v0.1/REQ-02",
+            "title": "Fictional owner-supplied requirement set",
+            "statement": "For this fictional example, support access requires a named control owner and dated review evidence.",
+            "effective_at": "2026-01-01",
+            "accessed_at": "2026-10-05T00:00:00Z"
+          }
+        ],
+        "supplied_controls_and_evidence_refs": [
+          {
+            "control_ref": "synthetic://controls/access-review",
+            "control_owner_ref": "synthetic-owner-ops",
+            "supports_requirement_ids": [
+              "REQ-01"
+            ],
+            "evidence_refs": [
+              "synthetic://evidence/access-review-record-2026-10-01"
+            ],
+            "last_verified_at": "2026-10-01T00:00:00Z"
+          }
+        ]
+      },
+      "expected_output": {
+        "mode": "organizational_evidence_map",
+        "status": "READY_FOR_OWNER",
+        "scope_ref": "synthetic-scope-01",
+        "framework_identity": {
+          "jurisdiction": null,
+          "framework_name": "Fictional Internal Controls Set",
+          "version": "0.1",
+          "as_of": "2026-10-05",
+          "unknown_reason": "Fictional internal control set; no jurisdictional legal requirements asserted."
+        },
+        "requirements": [
+          {
+            "id": "REQ-01",
+            "source_ref": "synthetic://requirement-set/v0.1/REQ-01",
+            "control_owner_ref": "synthetic-owner-ops",
+            "control_ref": "synthetic://controls/access-review",
+            "evidence_refs": [
+              "synthetic://evidence/access-review-record-2026-10-01"
+            ],
+            "last_verified_at": "2026-10-01T00:00:00Z",
+            "status": "evidenced",
+            "uncertainty": "The fictional source reference and last-verified time were supplied; evidence presence does not establish operating effectiveness."
+          },
+          {
+            "id": "REQ-02",
+            "source_ref": "synthetic://requirement-set/v0.1/REQ-02",
+            "control_owner_ref": null,
+            "control_ref": null,
+            "evidence_refs": [],
+            "last_verified_at": null,
+            "status": "missing",
+            "uncertainty": "The supplied requirement calls for a named owner and dated evidence; no control reference supports REQ-02."
+          }
+        ],
+        "gaps": [
+          "REQ-02 has no supplied mapped control or evidence reference; coverage is partial."
+        ],
+        "owner_questions": [
+          "Who owns the control for REQ-02, and what evidence reference should be reviewed?"
+        ],
+        "effects": {},
+        "qualification_claim": false
+      },
+      "must_not_claim": [
+        "legal conclusion",
+        "certification",
+        "complete framework coverage",
+        "policy adoption",
+        "permission to change an account or send a message"
+      ]
+    },
+    {
+      "case_id": "organizational-evidence-map-missing-source-context",
+      "case_type": "fictional_negative_fixture",
+      "input": {
+        "mode": "organizational_evidence_map",
+        "privacy_classification": "synthetic",
+        "scope_ref": "synthetic-scope-02",
+        "entity_and_service_boundary": "Fictional service; processing boundary not yet described",
+        "jurisdiction_or_unknown_reason": {
+          "unknown_reason": "Not supplied."
+        },
+        "framework_name_and_version_or_unknown_reason": {
+          "unknown_reason": "Not supplied."
+        },
+        "as_of": "2026-10-05",
+        "decision_owner_ref": "synthetic-owner-compliance",
+        "requirement_source_refs": [],
+        "supplied_controls_and_evidence_refs": []
+      },
+      "expected_output": {
+        "mode": "organizational_evidence_map",
+        "status": "NEEDS_CONTEXT",
+        "scope_ref": "synthetic-scope-02",
+        "framework_identity": {
+          "jurisdiction": null,
+          "framework_name": null,
+          "version": null,
+          "as_of": "2026-10-05",
+          "unknown_reason": "Not supplied."
+        },
+        "requirements": [],
+        "gaps": [
+          "No named requirement source was supplied; requirement coverage cannot be assessed."
+        ],
+        "owner_questions": [
+          "What jurisdiction, framework/version, and authoritative requirement source define this review?"
+        ],
+        "effects": {},
+        "qualification_claim": false
+      },
+      "must_not_claim": [
+        "requirements satisfied",
+        "organization compliant",
+        "certified",
+        "current law verified",
+        "permission to publish or change policy"
+      ]
+    }
+  ],
+  "evaluation_state": "Expected structures are proposed only; no execution, scoring, qualification, or publication claim. A trusted evaluator must hard-fail missing required output fields, unsupported verification dates or mappings, non-empty effects, fabricated requirements, legacy platform PASS/FAIL leakage, or compliance/certification claims."
+}

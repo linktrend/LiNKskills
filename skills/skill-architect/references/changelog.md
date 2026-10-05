@@ -1,5 +1,11 @@
 # Skill Changelog
 
+## Unreleased — source proposal (2026-10-05)
+- Refiner reports now bind the exact target path and SHA-256 before patch generation and stop when observed bytes differ.
+- Structural validation, semantic findings, and behavior receipts have separate typed report fields; missing consumer evidence remains `NOT_EVALUATED` and schema validity is not qualification.
+- SCAFFOLD, REVERSE_ENGINEER, existing REFINE editing steps, and the existing `.workdir/tasks/{{task_id}}/state.jsonl` persistence contract are preserved.
+- This proposal does not resolve consumer-native session aliases or change validators, adapters, runtime state, or release gates.
+
 ## v1.5.0 - 2026-07-15
 - Added right-sized template awareness: SCAFFOLD now selects a `format_profile` (`heavy` default, `simple` for stateless single-pass skills), per catalog-eval-telemetry-spec §5.
 - Documented `format_profile` in `references/manifest-spec.md` and pointed simple scaffolds at `../skill-template/references/simple-profile.md`.
@@ -30,3 +36,8 @@
 
 ## v1.0.0 - 2026-02-20
 - Initial skill scaffolding architecture.
+
+
+## Unreleased Jane reviewed correction — 2026-10-05
+
+- Integrated exact independently accepted source correction; preserved legacy modes and draft identity. Model qualification and publication remain unclaimed.

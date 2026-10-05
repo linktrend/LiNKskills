@@ -148,10 +148,188 @@ def _closure(raw: Any, refs: set[str]) -> tuple[dict[str, Any], str | None]:
     return {"status": raw["status"].upper(), "evidence_refs": evidence_refs, "residual_risks": raw.get("residual_risks", []), "owner_ref": raw.get("owner_ref", "not_reported"), "activated": False}, None
 
 
+
+def _risk_result(request: dict[str, Any], status: str, risks: list[dict[str, Any]], gaps: list[str]) -> dict[str, Any]:
+    """Build a risk-only envelope; never add incident identity/state/closure fields."""
+    # Only validated success data is echoed. Error paths never copy untrusted input.
+    if status == "NEEDS_CONTEXT":
+        scope_ref, as_of = "not_reported", "not_reported"
+    else:
+        scope_ref = request["scope_ref"]
+        as_of = request["as_of"]
+    return {
+        "status": status, "mode": "prospective_risk_register", "scope_ref": scope_ref,
+        "as_of": as_of, "risks": risks, "assumptions": [], "gaps": list(dict.fromkeys(gaps)),
+        "owner_supplied_rating_scale_or_unknown_reason": request["owner_supplied_rating_scale_or_unknown_reason"] if status != "NEEDS_CONTEXT" else {"unknown_reason": "Input was not accepted."},
+        "owner_supplied_tolerance_or_unknown_reason": request["owner_supplied_tolerance_or_unknown_reason"] if status != "NEEDS_CONTEXT" else {"unknown_reason": "Input was not accepted."},
+        "owner_decisions": ["Accountable owner must review treatment and decide risk acceptance; none is applied."],
+        "effects": _effects(), "risk_acceptance_or_control_activation": False,
+    }
+
+
+def _risk_needs_context(request: dict[str, Any], reason: str) -> dict[str, Any]:
+    """Return a non-echoing risk-only missing/invalid-input result."""
+    return _risk_result(request if isinstance(request, dict) else {}, "NEEDS_CONTEXT", [], [reason])
+
+
+def _normalize_risk_register(request: dict[str, Any]) -> dict[str, Any]:
+    """Normalize supplied prospective risk facts without creating ratings or actions."""
+    from jsonschema import Draft202012Validator
+    definitions=json.loads((Path(__file__).resolve().parents[1]/"references/schemas.json").read_text())["definitions"]
+    if list(Draft202012Validator({"$ref":"#/definitions/risk_register_input","definitions":definitions}).iter_errors(request)):
+        return _risk_needs_context(request, "risk input does not match the bounded schema")
+    supported = {"mode", "privacy_classification", "scope_ref", "as_of", "accountable_owner_ref", "risk_sources_and_evidence_refs", "owner_supplied_rating_scale_or_unknown_reason", "owner_supplied_tolerance_or_unknown_reason", "candidate_risks"}
+    if set(request) - supported:
+        return _risk_needs_context(request, "risk request contains fields outside the supported contract")
+    if request.get("privacy_classification") not in {"synthetic", "redacted", "public"}:
+        return _risk_needs_context(request, "privacy classification is missing or unsupported")
+    if _private(request):
+        return _risk_needs_context(request, "private or credential-bearing evidence is not accepted")
+    scope_ref = request.get("scope_ref")
+    as_of = request.get("as_of")
+    owner_ref = request.get("accountable_owner_ref")
+    ref_pattern = r"(?:fixture|source|consumer):[^\s]+"
+    owner_pattern = r"(?:owner|consumer):[^\s]+"
+    if not isinstance(scope_ref, str) or not re.fullmatch(ref_pattern, scope_ref):
+        return _risk_needs_context(request, "scope_ref must identify the reviewed scope")
+    if not isinstance(as_of, str) or len(as_of) < 10:
+        return _risk_needs_context(request, "as_of date is required")
+    if not isinstance(owner_ref, str) or not re.fullmatch(owner_pattern, owner_ref):
+        return _risk_needs_context(request, "accountable_owner_ref is required")
+    evidence_refs, error, unknown_refs = _refs(request.get("risk_sources_and_evidence_refs"))
+    if error:
+        return _risk_needs_context(request, error)
+    if len(evidence_refs) > 64:
+        return _risk_needs_context(request, "risk_sources_and_evidence_refs exceeds the supported bound")
+    evidence_by_ref = {item["ref"]: item for item in request["risk_sources_and_evidence_refs"]}
+
+    def basis(value: Any, ref_key: str) -> tuple[str | None, str | None]:
+        if not isinstance(value, dict):
+            return None, "supply an owner reference or explicit unknown reason"
+        if set(value) == {ref_key, "description"}:
+            ref = value.get(ref_key)
+            description = value.get("description")
+            if isinstance(ref, str) and re.fullmatch(ref_pattern, ref) and ref in evidence_by_ref and evidence_by_ref[ref].get("status") != "not_reported" and isinstance(description, str) and description.strip() and len(description) <= 500:
+                return ref, None
+            return None, "owner scale/tolerance reference must resolve to supplied evidence"
+        if set(value) == {"unknown_reason"} and isinstance(value.get("unknown_reason"), str) and value["unknown_reason"].strip():
+            return None, None
+        return None, "supply exactly an owner reference plus description or an explicit unknown reason"
+
+    scale_ref, error = basis(request.get("owner_supplied_rating_scale_or_unknown_reason"), "scale_ref")
+    if error:
+        return _risk_needs_context(request, error)
+    tolerance_ref, error = basis(request.get("owner_supplied_tolerance_or_unknown_reason"), "tolerance_ref")
+    if error:
+        return _risk_needs_context(request, error)
+    candidates = request.get("candidate_risks")
+    if not isinstance(candidates, list) or not candidates or len(candidates) > 64:
+        return _risk_needs_context(request, "candidate_risks must contain at least one evidence-backed risk")
+
+    seen_ids: set[str] = set()
+    seen_tuples: set[tuple[str, str, str]] = set()
+    risks: list[dict[str, Any]] = []
+    gaps: list[str] = []
+    if scale_ref is None:
+        gaps.append("Owner rating scale is not reported; no rating is assigned.")
+    if tolerance_ref is None:
+        gaps.append("Owner tolerance is not reported; no acceptance decision is made.")
+    for item in candidates:
+        required = ("id", "cause", "event", "consequence", "owner_ref", "evidence_refs")
+        if not isinstance(item, dict) or not all(isinstance(item.get(k), str) and item[k].strip() for k in required[:-1]):
+            return _risk_needs_context(request, "each candidate risk needs id, cause, event, consequence, and owner_ref")
+        if set(item) - {"id", "cause", "event", "consequence", "owner_ref", "evidence_refs", "current_controls", "assessment"}:
+            return _risk_needs_context(request, "candidate risk contains fields outside the supported contract")
+        if any(len(item[k]) > 1000 for k in ("cause", "event", "consequence")):
+            return _risk_needs_context(request, "candidate risk statement exceeds the supported length")
+        if not re.fullmatch(r"risk:[A-Za-z0-9][A-Za-z0-9._:-]{2,63}", item["id"]) or not re.fullmatch(owner_pattern, item["owner_ref"]):
+            return _risk_needs_context(request, "candidate risk id or owner_ref is invalid")
+        if item["id"] in seen_ids:
+            return _risk_needs_context(request, "duplicate candidate risk id")
+        identity = tuple(" ".join(item[k].casefold().split()) for k in ("cause", "event", "consequence"))
+        if identity in seen_tuples:
+            return _risk_needs_context(request, "duplicate cause/event/consequence requires owner resolution")
+        refs = item.get("evidence_refs")
+        if not isinstance(refs, list) or not refs or len(refs) > 32 or any(not isinstance(ref, str) for ref in refs):
+            return _risk_needs_context(request, "each risk evidence_refs entry must resolve to supplied source evidence")
+        if len(set(refs)) != len(refs) or any(ref not in evidence_by_ref for ref in refs):
+            return _risk_needs_context(request, "each risk evidence_refs entry must resolve to supplied source evidence")
+        controls = item.get("current_controls", [])
+        if not isinstance(controls, list) or len(controls) > 32:
+            return _risk_needs_context(request, "current_controls must be an array")
+        normalized_controls = []
+        control_refs: list[str] = []
+        for control in controls:
+            if not isinstance(control, dict) or set(control) - {"control_ref", "status", "evidence_refs"} or not isinstance(control.get("control_ref"), str) or not control["control_ref"].strip() or len(control["control_ref"]) > 256 or control.get("status") not in {"designed", "owner_reported_operating", "unknown"}:
+                return _risk_needs_context(request, "each control needs a reference and supported owner-reported status")
+            control_evidence = control.get("evidence_refs", [])
+            if not isinstance(control_evidence, list) or len(control_evidence) > 32 or any(not isinstance(ref, str) for ref in control_evidence):
+                return _risk_needs_context(request, "control evidence_refs must resolve to supplied source evidence")
+            if len(set(control_evidence)) != len(control_evidence) or any(ref not in evidence_by_ref for ref in control_evidence):
+                return _risk_needs_context(request, "control evidence_refs must resolve to supplied source evidence")
+            status = control["status"]
+            if status == "owner_reported_operating" and (not control_evidence or all(evidence_by_ref[ref].get("status") == "not_reported" for ref in control_evidence)):
+                status = "unknown"
+                gaps.append("Control operating status lacks evidence and remains unknown.")
+            normalized_controls.append({"control_ref": control["control_ref"], "status": status, "evidence_refs": control_evidence})
+            control_refs.extend(control_evidence)
+        assessment = item.get("assessment")
+        if assessment is not None:
+            assessment_fields = {"origin", "likelihood_or_unknown_reason", "impact_or_unknown_reason", "inherent_rating_or_unknown_reason", "treatment_proposal", "review_trigger", "review_date_or_unknown_reason", "residual_statement_or_unknown_reason"}
+            if not isinstance(assessment, dict) or set(assessment) != assessment_fields:
+                return _risk_needs_context(request, "assessment must match the bounded owner/advisory assessment contract")
+            if assessment.get("origin") not in {"jane_advisory", "owner_supplied"} or any(not isinstance(assessment.get(key), str) or not assessment[key].strip() or len(assessment[key]) > limit for key, limit in (("likelihood_or_unknown_reason", 1000), ("impact_or_unknown_reason", 1000), ("inherent_rating_or_unknown_reason", 1000), ("treatment_proposal", 1000), ("review_trigger", 1000), ("review_date_or_unknown_reason", 128), ("residual_statement_or_unknown_reason", 1000))):
+                return _risk_needs_context(request, "assessment values must be bounded nonempty text with an explicit origin")
+            if assessment["origin"] == "owner_supplied" and assessment["inherent_rating_or_unknown_reason"].startswith("Rating:") and scale_ref is None:
+                return _risk_needs_context(request, "an owner-supplied rating requires an evidenced owner scale")
+        seen_ids.add(item["id"])
+        seen_tuples.add(identity)
+        if assessment is None:
+            likelihood = "Unknown: no evidence-bounded likelihood assessment was supplied."
+            impact = "Unknown: no evidence-bounded impact assessment was supplied."
+            inherent = "Unknown: owner rating assessment is pending."
+            treatment = "not_reported"
+            review_trigger = "not_reported"
+            review_date = "Unknown: no review date supplied."
+            residual = "Unknown: residual risk has not been assessed."
+        else:
+            prefix = "Jane advisory proposal (unverified): " if assessment["origin"] == "jane_advisory" else "Owner-supplied, unverified: "
+            likelihood = prefix + assessment["likelihood_or_unknown_reason"]
+            impact = prefix + assessment["impact_or_unknown_reason"]
+            if assessment["origin"] == "jane_advisory" and assessment["inherent_rating_or_unknown_reason"].startswith("Rating:"):
+                return _risk_needs_context(request, "Jane may offer qualitative rationale but may not assign an inherent rating")
+            inherent = prefix + assessment["inherent_rating_or_unknown_reason"]
+            treatment = prefix + assessment["treatment_proposal"]
+            review_trigger = prefix + assessment["review_trigger"]
+            review_date = prefix + assessment["review_date_or_unknown_reason"]
+            residual = prefix + assessment["residual_statement_or_unknown_reason"]
+        risks.append({
+            "id": item["id"], "cause": item["cause"], "event": item["event"],
+            "consequence": item["consequence"], "owner_ref": item["owner_ref"],
+            "evidence_refs": refs,
+            "likelihood_or_unknown_reason": likelihood,
+            "impact_or_unknown_reason": impact,
+            "rating_scale_ref": scale_ref or "not_reported",
+            "inherent_rating_or_unknown_reason": inherent,
+            "current_controls": normalized_controls,
+            "control_evidence_refs": sorted(set(control_refs)),
+            "residual_rating_or_unknown_reason": residual,
+            "treatment_proposal": treatment,
+            "review_trigger": review_trigger,
+            "review_date_or_unknown_reason": review_date,
+        })
+    if unknown_refs:
+        gaps.append("One or more supplied evidence items are explicitly not_reported.")
+    if any("not_reported" == risk["treatment_proposal"] or risk["inherent_rating_or_unknown_reason"].startswith("Unknown:") for risk in risks):
+        gaps.append("One or more likelihood/impact/rating/treatment/residual fields remain unknown or not_reported; accountable owner review is required.")
+    return _risk_result(request, "DRAFT", risks, gaps)
+
 def normalize_request(request: dict[str, Any]) -> dict[str, Any]:
     """Normalize one incident request into a deterministic review artifact."""
     if not isinstance(request, dict):
         return _failure({}, "request must be an object")
+    if request.get("mode") == "prospective_risk_register":
+        return _normalize_risk_register(request)
     if request.get("mode") not in MODES:
         return _failure(request, "unknown incident mode is rejected")
     if request.get("privacy_classification") not in {"synthetic", "redacted", "public"}:

@@ -1,11 +1,9 @@
-"""Confined remainder eval driver — executes declared contract status, never echoes fixtures.
+"""Confined remainder evaluator with a computed trading-performance fixture path.
 
-This module is stdlib-only so it can be copied to ``skills/*/scripts/eval_driver.py``
-and run inside the sealed skill workspace without importing the Eval Runner package.
-
-It must not copy planted expected responses from remainder-eval-cases.json into
-stdout. Case files are inputs (and optional case_type) only.
-It never claims usable, live, selectable, or permission-to-act.
+Ordinary remainder cases keep the existing declared contract-status behavior.
+Trading-performance cases load supplied fixture inputs, call the Decimal helper,
+validate its output schema, and compare only declared assertions. Expected values
+are not copied into the emitted result. Nothing claims live use or authority.
 """
 
 from __future__ import annotations
@@ -134,6 +132,58 @@ def _fail_closed(case_id: str, message: str) -> dict[str, Any]:
     }
 
 
+
+def _get_path(value: Any, path: str) -> Any:
+    for part in path.split("."):
+        if isinstance(value, list):
+            value = value[int(part)]
+        else:
+            value = value[part]
+    return value
+
+
+def _evaluate_trading_fixture(skill_dir: Path, case_id: str, case: dict[str, Any], *, mode: str) -> tuple[dict[str, Any], int]:
+    """Run supplied fixture data through the Decimal calculator and compare declared assertions."""
+    from helper_tool import build_trading_performance_report, validate
+
+    fixture_name = str(case.get("fixture") or "")
+    fixture_path = skill_dir / "references" / "fixtures" / "trading-performance" / fixture_name
+    try:
+        fixture = json.loads(fixture_path.read_text(encoding="utf-8"))
+        if not isinstance(fixture, dict) or fixture.get("mode") != "trading_performance":
+            raise ValueError("fixture must be a trading_performance input object")
+        input_errors = validate(fixture)
+        expected_error = case.get("expected_error")
+        if expected_error:
+            if input_errors:
+                message = "; ".join(input_errors)
+                passed = str(expected_error) in message
+            else:
+                try:
+                    build_trading_performance_report(fixture)
+                    message = "calculator accepted invalid input"
+                    passed = False
+                except (ValueError, KeyError, ArithmeticError) as exc:
+                    message = str(exc)
+                    passed = str(expected_error) in message
+            result = {"case_id": case_id, "mode": mode, "status": "PASS" if passed else "FAIL", "method_fixture_pass": passed, "observed_error": message, "permission_to_act": False, "certification_state": "draft", "selectable": False, "external_calls": [], "mutations": []}
+            return result, 0 if passed else 1
+        if input_errors:
+            raise ValueError("fixture input contract failed: " + "; ".join(input_errors))
+        observed = build_trading_performance_report(fixture)["trading_performance"]
+        mismatches=[]
+        assertions=case.get("assertions")
+        if not isinstance(assertions,dict) or not assertions:
+            raise ValueError("fixture case needs explicit result assertions")
+        for key, expected in assertions.items():
+            actual=_get_path(observed,key)
+            if actual != expected: mismatches.append({"field":key,"expected":expected,"actual":actual})
+        passed=not mismatches
+        result={"case_id":case_id,"mode":mode,"status":"PASS" if passed else "FAIL","method_fixture_pass":passed,"assertions_checked":list(assertions),"mismatches":mismatches,"observed":{"equity_reconciled":observed["equity_reconciled"],"net_realized_pnl_base":observed["net_realized_pnl_base"],"closed_count":observed["closed_count"],"unknown_closed_count":observed["unknown_closed_count"],"all_closed_win_rate":observed["all_closed_win_rate"],"decided_win_rate":observed["decided_win_rate"],"profit_factor":observed["profit_factor"],"r_by_trade":observed["r_by_trade"]},"permission_to_act":False,"certification_state":"draft","selectable":False,"external_calls":[],"mutations":[]}
+        return result,0 if passed else 1
+    except (OSError,ValueError,KeyError,TypeError,json.JSONDecodeError) as exc:
+        return _fail_closed(case_id,str(exc)),1
+
 def evaluate_remainder_case(skill_dir: Path, case_id: str, *, mode: str = "evaluate") -> tuple[dict[str, Any], int]:
     """Execute the confined contract for *case_id*. Never echo planted expected JSON."""
     case_id = str(case_id).strip()
@@ -144,8 +194,10 @@ def evaluate_remainder_case(skill_dir: Path, case_id: str, *, mode: str = "evalu
     case = payload["cases"].get(case_id)
     if not isinstance(case, dict):
         return _fail_closed(case_id, f"unknown case: {case_id}"), 1
+    if case.get("case_type") == "trading_performance_fixture":
+        return _evaluate_trading_fixture(skill_dir, case_id, case, mode=mode)
     if any(key in case for key in ("status", "summary", "contract_tokens", "expected_criteria")):
-        # Inputs may still list case_type/input only. Planted expected fields are ignored.
+        # Legacy status cases may carry descriptive expectations, never result fields.
         pass
     skill_id = str(payload.get("skill_id") or skill_dir.name)
     meta = parse_frontmatter(skill_dir / "SKILL.md")

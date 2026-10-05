@@ -291,6 +291,106 @@ scenarios:
     exit_code: 0
     must_not_contain:
     - raw-secret-value
+
+- id: refiner-review-separated-evidence
+  case_type: golden
+  input: Exact target binding, structural receipt and semantic finding are supplied; behavior receipt is absent.
+  expected_criteria:
+  - Structural receipt is recorded as PASS_REPORTED, not treated as semantic or behavior proof
+  - Material finding is preserved with exact path, line and evidence
+  - Behavior remains NOT_EVALUATED and qualification is NOT_CLAIMED
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_driver.py
+    argv: [--case, refiner-review-separated-evidence]
+    timeout_seconds: 15
+  assertions:
+    must_contain: [refiner-review-separated-evidence, PASS, PASS_REPORTED, FINDINGS_REPORTED, NOT_EVALUATED]
+    json_schema_fields: [status, case_id, refine_review, response_schema_valid]
+    exit_code: 0
+- id: refiner-review-stale-target
+  case_type: adversarial
+  input: Observed target SHA differs from binding; no patch or old finding may be carried forward.
+  expected_criteria:
+  - Disposition is STALE_TARGET
+  - Structural check is not run against stale bytes
+  - Semantic findings are suppressed and behavior is not evaluated
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_driver.py
+    argv: [--case, refiner-review-stale-target]
+    timeout_seconds: 15
+  assertions:
+    must_contain: [refiner-review-stale-target, PASS, STALE_TARGET]
+    json_schema_fields: [status, case_id, refine_review, response_schema_valid]
+    exit_code: 0
+- id: refiner-review-structural-only
+  case_type: uncertainty
+  input: Matching structural receipt exists; semantic and consumer behavior receipts are absent.
+  expected_criteria:
+  - Structural is PASS_REPORTED
+  - Semantic is NOT_REVIEWED
+  - Behavior is NOT_EVALUATED
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_driver.py
+    argv: [--case, refiner-review-structural-only]
+    timeout_seconds: 15
+  assertions:
+    must_contain: [refiner-review-structural-only, PASS, NOT_REVIEWED, NOT_EVALUATED]
+    json_schema_fields: [status, case_id, refine_review, response_schema_valid]
+    exit_code: 0
+- id: refiner-review-line-zero
+  case_type: adversarial
+  input: A finding line number of zero must fail the actual JSON Schema constraint.
+  expected_criteria:
+  - Input is rejected because finding line has minimum 1
+  - No refine_review report or permission to act is emitted
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_driver.py
+    argv: [--case, refiner-review-line-zero]
+    timeout_seconds: 15
+  assertions:
+    must_contain: [refiner-review-line-zero, error, schema]
+    json_schema_fields: [status, case_id]
+    exit_code: 1
+- id: refiner-review-path-traversal
+  case_type: adversarial
+  input: A target path containing parent traversal must be rejected before any report is generated.
+  expected_criteria:
+  - Input is rejected by the path schema
+  - No refine_review report or permission to act is emitted
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_driver.py
+    argv: [--case, refiner-review-path-traversal]
+    timeout_seconds: 15
+  assertions:
+    must_contain: [refiner-review-path-traversal, error, schema]
+    json_schema_fields: [status, case_id]
+    exit_code: 1
+- id: refiner-review-pass-without-receipt
+  case_type: adversarial
+  input: Behavior claims PASS but has no receipt ref or scenario results.
+  expected_criteria:
+  - Behavior becomes MISSING_RECEIPT, never PASS_REPORTED
+  - Qualification remains NOT_CLAIMED
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_driver.py
+    argv: [--case, refiner-review-pass-without-receipt]
+    timeout_seconds: 15
+  assertions:
+    must_contain: [refiner-review-pass-without-receipt, PASS, MISSING_RECEIPT, NOT_CLAIMED]
+    json_schema_fields: [status, case_id, refine_review, response_schema_valid]
+    exit_code: 0
 judge:
   min_reasoning_tier: high
 suite_id: skill-architect-eval

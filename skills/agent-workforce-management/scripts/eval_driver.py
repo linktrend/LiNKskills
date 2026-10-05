@@ -134,6 +134,40 @@ def _fail_closed(case_id: str, message: str) -> dict[str, Any]:
     }
 
 
+
+PROGRAM_COORDINATION_CASES={"program-coordination-evidence-handoff":("asserted_with_evidence_unreviewed",0),"program-coordination-collision":("in_progress",1),"program-coordination-missing-evidence":("asserted_without_sufficient_evidence",0),"program-coordination-injection":("queued",0)}
+
+def evaluate_program_coordination(skill_dir:Path,case_id:str,case:dict[str,Any])->tuple[dict[str,Any],int]:
+    request=case.get("request")
+    if not isinstance(request,dict):return _fail_closed(case_id,"structured coordination request is missing"),1
+    try:
+        from helper_tool import normalize_request
+        output=normalize_request(request)
+    except Exception:return _fail_closed(case_id,"coordination helper failed"),1
+    import jsonschema
+    schema=json.loads((skill_dir/"references/schemas.json").read_text())
+    try:
+        for value, name in ((request,"input"),(output,"output")):
+            jsonschema.validate(value,{"$ref":"#/definitions/"+name,"definitions":schema["definitions"]})
+    except jsonschema.ValidationError:
+        return _fail_closed(case_id,"actual request/output schema validation failed"),1
+    coord=output.get("coordination",{});packages=coord.get("work_packages",[]); expected,collisions=PROGRAM_COORDINATION_CASES[case_id]
+    valid=output.get("mode")=="program_coordination" and output.get("status") in {"DRAFT","READY_FOR_OWNER"}
+    valid=valid and output.get("effects")=={"messages_sent":[],"external_calls":[],"mutations":[]} and coord.get("permission_to_dispatch") is False
+    valid=valid and output.get("authority",{}).get("agents_activated") is False and len(coord.get("possible_collisions",[]))==collisions
+    source_packages=request["coordination"]["work_packages"]
+    valid=valid and len(packages)==len(source_packages)
+    valid=valid and [{k:v for k,v in p.items() if k!="completion_assessment"} for p in packages]==source_packages
+    valid=valid and coord.get("handoff")==request["coordination"]["handoff"]
+    valid=valid and coord.get("accountable_owner_ref")==request["coordination"]["accountable_owner_ref"]
+    valid=valid and output.get("evidence")==[e["ref"] for e in request["source_evidence"]]
+    if case_id=="program-coordination-evidence-handoff":valid=valid and len(packages)==1 and packages[0].get("completion_assessment")==expected and packages[0].get("acceptance_results")==request["coordination"]["work_packages"][0]["acceptance_results"] and coord.get("handoff",{}).get("consumer_session_ref")=="consumer:program-ledger/session-a"
+    elif case_id=="program-coordination-collision":valid=valid and all(x.get("state")=="possible_overlap" and x.get("owner_decision_required") is True for x in coord.get("possible_collisions",[])) and all(x.get("completion_assessment")=="not_completed" for x in packages)
+    elif case_id=="program-coordination-missing-evidence":valid=valid and len(packages)==1 and packages[0].get("completion_assessment")==expected and coord.get("handoff",{}).get("consumer_session_ref")=="not_reported" and any("not independently verified" in x for x in output.get("uncertainty",[]))
+    elif case_id=="program-coordination-injection":valid=valid and coord.get("permission_to_dispatch") is False and coord.get("handoff",{}).get("next_owner_action","").startswith("Owner reviews")
+    result={"case_id":case_id,"status":"PASS" if valid else "FAIL","mode":output.get("mode"),"contract_status":output.get("status"),"package_count":len(packages),"collision_count":len(coord.get("possible_collisions",[])),"completion_assessments":[x.get("completion_assessment") for x in packages],"collision_states":[x.get("state") for x in coord.get("possible_collisions",[])],"permission_to_act":False,"permission_to_dispatch":coord.get("permission_to_dispatch",False),"certification_state":"draft","selectable":False,"external_calls":[],"mutations":[]}
+    return result,0 if valid else 1
+
 def evaluate_remainder_case(skill_dir: Path, case_id: str, *, mode: str = "evaluate") -> tuple[dict[str, Any], int]:
     """Execute the confined contract for *case_id*. Never echo planted expected JSON."""
     case_id = str(case_id).strip()
@@ -144,6 +178,8 @@ def evaluate_remainder_case(skill_dir: Path, case_id: str, *, mode: str = "evalu
     case = payload["cases"].get(case_id)
     if not isinstance(case, dict):
         return _fail_closed(case_id, f"unknown case: {case_id}"), 1
+    if case_id in PROGRAM_COORDINATION_CASES:
+        return evaluate_program_coordination(skill_dir, case_id, case)
     if any(key in case for key in ("status", "summary", "contract_tokens", "expected_criteria")):
         # Inputs may still list case_type/input only. Planted expected fields are ignored.
         pass

@@ -2,49 +2,752 @@
   "definitions": {
     "input": {
       "type": "object",
-      "required": ["agent_id", "project_id", "workflow_name", "objective", "trigger_type"],
+      "required": [
+        "agent_id",
+        "project_id",
+        "workflow_name",
+        "objective",
+        "trigger_type"
+      ],
       "properties": {
-        "agent_id": { "type": "string", "minLength": 1 },
-        "project_id": { "type": "string", "minLength": 1 },
-        "workflow_name": { "type": "string", "minLength": 1 },
-        "objective": { "type": "string", "minLength": 5 },
+        "agent_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "project_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "workflow_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "objective": {
+          "type": "string",
+          "minLength": 5
+        },
         "trigger_type": {
           "type": "string",
-          "enum": ["webhook", "schedule", "manual", "event"]
+          "enum": [
+            "webhook",
+            "schedule",
+            "manual",
+            "event"
+          ]
         },
-        "test_payload": { "type": "object" }
+        "test_payload": {
+          "type": "object"
+        }
       }
     },
     "output": {
       "type": "object",
-      "required": ["status", "workflow_id", "activated", "tested"],
+      "required": [
+        "status",
+        "workflow_id",
+        "activated",
+        "tested"
+      ],
       "properties": {
         "status": {
           "type": "string",
-          "enum": ["SUCCESS", "FAILED"]
+          "enum": [
+            "SUCCESS",
+            "FAILED"
+          ]
         },
-        "workflow_id": { "type": "string", "minLength": 1 },
-        "activated": { "type": "boolean" },
-        "tested": { "type": "boolean" },
-        "execution_id": { "type": "string" }
+        "workflow_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "activated": {
+          "type": "boolean"
+        },
+        "tested": {
+          "type": "boolean"
+        },
+        "execution_id": {
+          "type": "string"
+        }
       }
     },
     "state": {
       "type": "object",
-      "required": ["task_id", "workflow_step", "status", "variables", "last_updated"],
+      "required": [
+        "task_id",
+        "workflow_step",
+        "status",
+        "variables",
+        "last_updated"
+      ],
       "properties": {
         "task_id": {
           "type": "string",
           "pattern": "^\\d{8}-\\d{4}-[A-Z0-9]+-\\d{6}$"
         },
-        "workflow_step": { "type": "integer", "minimum": 1, "maximum": 5 },
+        "workflow_step": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
         "status": {
           "type": "string",
-          "enum": ["INITIALIZED", "IN_PROGRESS", "PENDING_APPROVAL", "COMPLETED", "FAILED"]
+          "enum": [
+            "INITIALIZED",
+            "IN_PROGRESS",
+            "PENDING_APPROVAL",
+            "COMPLETED",
+            "FAILED"
+          ]
         },
-        "variables": { "type": "object" },
-        "last_updated": { "type": "string" },
-        "seek_index": { "type": "object" }
+        "variables": {
+          "type": "object"
+        },
+        "last_updated": {
+          "type": "string"
+        },
+        "seek_index": {
+          "type": "object"
+        }
+      }
+    },
+    "process_review_evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ref",
+        "source_kind",
+        "status",
+        "statement"
+      ],
+      "properties": {
+        "ref": {
+          "type": "string",
+          "pattern": "^(source|fixture):[^\\s]+$"
+        },
+        "source_kind": {
+          "type": "string",
+          "enum": [
+            "document",
+            "system_record",
+            "owner_interview",
+            "reported_recollection",
+            "other"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "observed",
+            "reported",
+            "not_reported"
+          ]
+        },
+        "statement": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        }
+      }
+    },
+    "process_review_step": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "step_ref",
+        "description",
+        "actor_ref",
+        "input_description",
+        "output_description",
+        "decision_ref",
+        "handoff_to_ref",
+        "evidence_refs"
+      ],
+      "properties": {
+        "step_ref": {
+          "type": "string",
+          "pattern": "^(step|control|exception|metric):[A-Za-z0-9][A-Za-z0-9._:-]{1,80}$"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "actor_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "input_description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "output_description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "decision_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "handoff_to_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^(source|fixture):[^\\s]+$"
+          }
+        }
+      }
+    },
+    "process_review_control": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "control_ref",
+        "description",
+        "owner_ref",
+        "required",
+        "evidence_refs"
+      ],
+      "properties": {
+        "control_ref": {
+          "type": "string",
+          "pattern": "^control:[A-Za-z0-9][A-Za-z0-9._:-]{1,80}$"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "owner_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "required": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^(source|fixture):[^\\s]+$"
+          }
+        }
+      }
+    },
+    "process_review_exception": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "exception_ref",
+        "trigger",
+        "disposition",
+        "owner_ref",
+        "evidence_refs"
+      ],
+      "properties": {
+        "exception_ref": {
+          "type": "string",
+          "pattern": "^exception:[A-Za-z0-9][A-Za-z0-9._:-]{1,80}$"
+        },
+        "trigger": {
+          "type": "string",
+          "minLength": 1
+        },
+        "disposition": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "owner_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^(source|fixture):[^\\s]+$"
+          }
+        }
+      }
+    },
+    "process_review_measure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "metric_ref",
+        "name",
+        "value",
+        "unit",
+        "period",
+        "evidence_ref"
+      ],
+      "properties": {
+        "metric_ref": {
+          "type": "string",
+          "pattern": "^metric:[A-Za-z0-9][A-Za-z0-9._:-]{1,80}$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "value": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "unit": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "period": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "evidence_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^(source|fixture):[^\\s]+$"
+        }
+      }
+    },
+    "process_review_future_step": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "description",
+        "owner_ref",
+        "preserved_control_refs",
+        "exception_plan",
+        "basis_refs",
+        "assumptions",
+        "status"
+      ],
+      "properties": {
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "owner_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "preserved_control_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^control:[A-Za-z0-9][A-Za-z0-9._:-]{1,80}$"
+          }
+        },
+        "exception_plan": {
+          "type": "string",
+          "minLength": 1
+        },
+        "basis_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^(source|fixture):[^\\s]+$"
+          }
+        },
+        "assumptions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "PROPOSED_FOR_OWNER"
+          ]
+        }
+      }
+    },
+    "process_review_input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "privacy_classification",
+        "process_ref",
+        "objective",
+        "scope",
+        "as_of",
+        "source_evidence",
+        "known_owner_refs",
+        "current_steps",
+        "controls",
+        "exceptions",
+        "measures"
+      ],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": [
+            "process_review"
+          ]
+        },
+        "privacy_classification": {
+          "type": "string",
+          "enum": [
+            "synthetic",
+            "redacted",
+            "public"
+          ]
+        },
+        "process_ref": {
+          "type": "string",
+          "pattern": "^process:[A-Za-z0-9][A-Za-z0-9._:-]{1,80}$"
+        },
+        "objective": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1
+        },
+        "as_of": {
+          "type": "string",
+          "format": "date"
+        },
+        "source_evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/process_review_evidence"
+          }
+        },
+        "known_owner_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "current_steps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/process_review_step"
+          }
+        },
+        "controls": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/process_review_control"
+          }
+        },
+        "exceptions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/process_review_exception"
+          }
+        },
+        "measures": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/process_review_measure"
+          }
+        }
+      }
+    },
+    "process_review_output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "status",
+        "process_ref",
+        "objective",
+        "scope",
+        "as_of",
+        "source_evidence",
+        "current_steps",
+        "controls",
+        "exceptions",
+        "measures",
+        "gaps",
+        "pain_points",
+        "impact_claims",
+        "future_state_draft",
+        "owner_questions",
+        "effects"
+      ],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": [
+            "process_review"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "DRAFT",
+            "NEEDS_OWNER_REVIEW",
+            "NEEDS_INPUT"
+          ]
+        },
+        "process_ref": {
+          "type": "string"
+        },
+        "objective": {
+          "type": "string"
+        },
+        "scope": {
+          "type": "string"
+        },
+        "as_of": {
+          "type": "string",
+          "format": "date"
+        },
+        "source_evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/process_review_evidence"
+          }
+        },
+        "current_steps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/process_review_output_step"
+          }
+        },
+        "controls": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/process_review_control"
+          }
+        },
+        "exceptions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/process_review_exception"
+          }
+        },
+        "measures": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/process_review_measure"
+          }
+        },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "subject_ref",
+              "field",
+              "status",
+              "reason"
+            ],
+            "properties": {
+              "subject_ref": {
+                "type": "string"
+              },
+              "field": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "not_reported",
+                  "unverified"
+                ]
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "pain_points": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "description",
+              "basis_type",
+              "evidence_refs",
+              "uncertainty"
+            ],
+            "properties": {
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "basis_type": {
+                "type": "string",
+                "enum": [
+                  "observation",
+                  "hypothesis"
+                ]
+              },
+              "evidence_refs": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^(source|fixture):[^\\s]+$"
+                }
+              },
+              "uncertainty": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "impact_claims": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "claim",
+              "claim_type",
+              "evidence_refs"
+            ],
+            "properties": {
+              "claim": {
+                "type": "string",
+                "minLength": 1
+              },
+              "claim_type": {
+                "type": "string",
+                "enum": [
+                  "observed",
+                  "hypothesis"
+                ]
+              },
+              "evidence_refs": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^(source|fixture):[^\\s]+$"
+                }
+              }
+            }
+          }
+        },
+        "future_state_draft": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/process_review_future_step"
+          }
+        },
+        "owner_questions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\?$"
+          }
+        },
+        "effects": {
+          "type": "object",
+          "maxProperties": 0
+        }
+      }
+    },
+    "process_review_output_step": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "step_ref",
+        "description",
+        "actor_ref",
+        "input_description",
+        "output_description",
+        "decision_ref",
+        "handoff_to_ref",
+        "evidence_refs",
+        "source_status"
+      ],
+      "properties": {
+        "step_ref": {
+          "type": "string",
+          "pattern": "^(step|control|exception|metric):[A-Za-z0-9][A-Za-z0-9._:-]{1,80}$"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "actor_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "input_description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "output_description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "decision_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "handoff_to_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^(source|fixture):[^\\s]+$"
+          }
+        },
+        "source_status": {
+          "type": "string",
+          "enum": [
+            "observed",
+            "reported",
+            "not_reported"
+          ]
+        }
       }
     }
   }

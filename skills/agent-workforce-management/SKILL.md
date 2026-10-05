@@ -1,7 +1,7 @@
 ---
 name: agent-workforce-management
 description: "An evidence-bounded method for defining reusable agent roles, selecting supplied Brain rules, drafting capability and delegation requests, monitoring workload and quality, and proposing safe suspension or retirement without granting authority."
-usage_trigger: "Use for a synthetic, redacted, or public workforce matter that needs a role definition, applicable-rule selection, capability request, domain delegation plan, workload/blocker review, quality evaluation, or owner-review suspend/retire proposal."
+usage_trigger: "Use for a synthetic, redacted, or public workforce matter that needs role design, program work-package planning, collision review, evidence-based handoff/resume, rule selection, capability/delegation proposals, workload/quality review, or owner-review suspend/retire proposals."
 version: 1.0.0
 release_tag: v1.0.0
 created: 2026-08-24
@@ -54,6 +54,12 @@ The input, output, and empty-effects contracts are in
 and [`references/schemas.json#/definitions/effects`](references/schemas.json#/definitions/effects).
 The complete canonical
 eval suite is in [`references/eval-suite.json`](references/eval-suite.json).
+
+## Program coordination branch
+
+Use `mode=program_coordination` for a bounded multi-agent program that needs work-package ownership, dependencies, evidence-backed status, collision review, or handoff/resume. Require one accountable owner, packages with scope/resource references, required inputs, deliverables, acceptance criteria, dependency references, reported status, and per-criterion evidence results. Compare resource references across packages and surface overlaps as possible collisions for owner resolution. Reject unknown dependencies and dependency cycles.
+
+Preserve a handoff only as an owner-review artifact tied to the supplied consumer-native session/Program Ledger reference. Keep source evidence, agent assertions, and acceptance evidence distinct. A completed status with evidence is still `asserted_with_evidence_unreviewed`; missing or incomplete evidence is `asserted_without_sufficient_evidence`. Never report helper output as independently verified completion, dispatch work, or claim ownership of native state.
 
 ## Authority and privacy boundary
 

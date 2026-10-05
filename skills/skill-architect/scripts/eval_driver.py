@@ -134,6 +134,66 @@ def _fail_closed(case_id: str, message: str) -> dict[str, Any]:
     }
 
 
+
+
+REFINE_REVIEW_CASES={"refiner-review-cross-file-finding","refiner-review-separated-evidence","refiner-review-stale-target","refiner-review-structural-only","refiner-review-pass-without-receipt","refiner-review-path-traversal","refiner-review-line-zero"}
+
+def _schema_errors(value:Any,definition:dict[str,Any],schemas:dict[str,Any])->list[Any]:
+    from jsonschema import Draft202012Validator
+    root={"$schema":"https://json-schema.org/draft/2020-12/schema","definitions":schemas.get("definitions",{}),**definition}
+    return list(Draft202012Validator(root).iter_errors(value))
+
+def _refine_review(request:dict[str,Any])->dict[str,Any]:
+    binding=request["target_binding"]; observed=request["observed_target_sha256"]; bound=binding["sha256"]
+    report={"target_binding":binding,"observed_target_sha256":observed,"disposition":request["requested_disposition"],"structural":{"status":"NOT_RUN","reason":"No structural receipt supplied."},"semantic":{"status":"NOT_REVIEWED","reason":"No semantic review supplied.","findings":[]},"behavior":{"status":"NOT_EVALUATED","reason":"No consumer behavior receipt supplied.","scenario_count":0,"matched_scenario_count":0},"qualification":"NOT_CLAIMED"}
+    if observed!=bound:
+        report.update(disposition="STALE_TARGET",structural={"status":"STALE_TARGET","reason":"Observed target digest differs from the bound digest."},semantic={"status":"STALE_TARGET","reason":"Findings are suppressed because the target changed.","findings":[]},behavior={"status":"STALE_TARGET","reason":"Behavior evidence cannot be carried across target bytes.","scenario_count":0,"matched_scenario_count":0})
+        return report
+    if request["requested_disposition"]=="PATCH_PROPOSED":
+        if request.get("patch_ref"):report["patch_ref"]=request["patch_ref"]
+        else:report["disposition"]="BLOCKED"
+    receipt=request.get("structural_receipt")
+    if receipt is not None:
+        if receipt.get("target_sha256")!=bound:report["structural"]={"status":"STALE_RECEIPT","reason":"Structural receipt targets different bytes."}
+        elif not receipt.get("receipt_ref"):report["structural"]={"status":"MISSING_RECEIPT","reason":"Structural outcome has no receipt reference."}
+        else:report["structural"]={"status":"PASS_REPORTED" if receipt["reported_status"]=="PASS" else "FAIL_REPORTED","reason":"Structural outcome is recorded as reported evidence, not an independent qualification.","checked_sha256":bound,"receipt_ref":receipt["receipt_ref"]}
+    semantic=request.get("semantic_review")
+    if semantic is not None:
+        if semantic.get("reviewed_sha256")!=bound:report["semantic"]={"status":"STALE_REVIEW","reason":"Semantic findings target different bytes.","findings":[]}
+        elif any(row["path"] != binding["target_path"] for row in semantic.get("findings",[])):
+            report["disposition"]="BLOCKED"
+            report["semantic"]={"status":"NOT_REVIEWED","reason":"Finding path is outside the exact bound target; supply a separate binding and receipt for that file.","findings":[]}
+        elif not semantic.get("reviewer_ref"):report["semantic"]={"status":"NOT_REVIEWED","reason":"Semantic review has no reviewer reference.","findings":[]}
+        elif semantic["status"]=="FINDINGS" and semantic.get("findings"):report["semantic"]={"status":"FINDINGS_REPORTED","reason":"Findings are recorded from the named review; they are not a qualification result.","reviewed_sha256":bound,"reviewer_ref":semantic["reviewer_ref"],"findings":semantic["findings"]}
+        elif semantic["status"]=="NO_FINDINGS" and not semantic.get("findings"):report["semantic"]={"status":"NO_FINDINGS_REPORTED","reason":"No findings were reported by the named review; this is not a behavior pass.","reviewed_sha256":bound,"reviewer_ref":semantic["reviewer_ref"],"findings":[]}
+        else:report["semantic"]={"status":"NOT_REVIEWED","reason":"Semantic review fields are incomplete or inconsistent.","findings":[]}
+    behavior=request.get("behavior_receipt")
+    if behavior is not None:
+        if behavior.get("target_sha256")!=bound:report["behavior"]={"status":"STALE_RECEIPT","reason":"Behavior receipt targets different bytes.","scenario_count":0,"matched_scenario_count":0}
+        elif not behavior.get("receipt_ref") or not behavior.get("scenario_results"):report["behavior"]={"status":"MISSING_RECEIPT","reason":"Claimed behavior outcome lacks a receipt reference or scenario results.","scenario_count":len(behavior.get("scenario_results",[])),"matched_scenario_count":0}
+        else:
+            rows=behavior["scenario_results"]; matched=sum(1 for row in rows if row["reported_status"]=="PASS" and row["expected_conclusion"]==row["observed_conclusion"]); status="PASS_REPORTED" if behavior["reported_status"]=="PASS" and matched==len(rows) else "FAIL_REPORTED"
+            report["behavior"]={"status":status,"reason":"Consumer results are reported against the bound target; receipt authenticity/qualification remains separately owned.","evaluated_sha256":bound,"receipt_ref":behavior["receipt_ref"],"scenario_count":len(rows),"matched_scenario_count":matched}
+    return report
+
+def evaluate_refine_review_case(skill_dir:Path,case_id:str,case:dict[str,Any])->tuple[dict[str,Any],int]:
+    request=case.get("request")
+    if not isinstance(request,dict):return _fail_closed(case_id,"refine review request is missing"),1
+    try:
+        schemas=json.loads((skill_dir/"references"/"schemas.json").read_text(encoding="utf-8")); input_errors=_schema_errors(request,{"$ref":"#/definitions/refine_review_request"},schemas)
+        if input_errors:return _fail_closed(case_id,"refine review request does not match schema"),1
+        review=_refine_review(request); errors=_schema_errors(review,{"$ref":"#/definitions/refine_review"},schemas)
+    except Exception:return _fail_closed(case_id,"review schema evaluation failed"),1
+    conditions={
+      "refiner-review-separated-evidence":review["structural"]["status"]=="PASS_REPORTED" and review["semantic"]["status"]=="FINDINGS_REPORTED" and review["behavior"]["status"]=="NOT_EVALUATED" and review["disposition"]=="PATCH_PROPOSED",
+      "refiner-review-stale-target":review["disposition"]=="STALE_TARGET" and review["structural"]["status"]=="STALE_TARGET" and not review["semantic"]["findings"],
+      "refiner-review-structural-only":review["structural"]["status"]=="PASS_REPORTED" and review["semantic"]["status"]=="NOT_REVIEWED" and review["behavior"]["status"]=="NOT_EVALUATED",
+      "refiner-review-cross-file-finding":review["disposition"]=="BLOCKED" and review["semantic"]["status"]=="NOT_REVIEWED" and not review["semantic"]["findings"],
+      "refiner-review-pass-without-receipt":review["behavior"]["status"]=="MISSING_RECEIPT" and review["behavior"]["status"]!="PASS_REPORTED"}
+    passed=conditions.get(case_id,False) and not errors
+    result={"case_id":case_id,"status":"PASS" if passed else "FAIL","fixture_contract_check":"PASS" if passed else "FAIL","refine_review":review,"response_schema_valid":not errors,"permission_to_act":False,"certification_state":"draft","selectable":False,"external_calls":[],"mutations":[]}
+    return result,0 if passed else 1
+
 def evaluate_remainder_case(skill_dir: Path, case_id: str, *, mode: str = "evaluate") -> tuple[dict[str, Any], int]:
     """Execute the confined contract for *case_id*. Never echo planted expected JSON."""
     case_id = str(case_id).strip()
@@ -147,6 +207,8 @@ def evaluate_remainder_case(skill_dir: Path, case_id: str, *, mode: str = "evalu
     if any(key in case for key in ("status", "summary", "contract_tokens", "expected_criteria")):
         # Inputs may still list case_type/input only. Planted expected fields are ignored.
         pass
+    if case_id in REFINE_REVIEW_CASES:
+        return evaluate_refine_review_case(skill_dir, case_id, case)
     skill_id = str(payload.get("skill_id") or skill_dir.name)
     meta = parse_frontmatter(skill_dir / "SKILL.md")
     declared_name = meta.get("name") or skill_id

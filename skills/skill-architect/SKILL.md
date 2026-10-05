@@ -56,6 +56,8 @@ last_updated: 2026-02-20
       - user-requested new feature
       - tool/interface changes
       - engine-floor adjustments when complexity/context needs changed
+      - Before drafting a REFINE change, bind the exact repository-relative target path and current SHA-256. Re-read the target immediately before generating the patch; if its digest differs, stop and re-audit the new bytes rather than applying the stale plan.
+      - Keep the existing REFINE edit workflow. Emit `report.refine_review` using `references/schemas.json#/definitions/refine_review`. Report structural validator receipts, semantic findings, and consumer behavior-evaluation receipts as separate evidence classes; a pass in one class never stands in for another.
     - IF REQUIRED INPUT MISSING: Request missing parameters and STOP.
 5.  **Collision/Existence Check**:
     - `SCAFFOLD`: If `/skills/{{skill_name}}` exists, STOP and request overwrite/version decision.
@@ -143,6 +145,8 @@ If a third-party skill/prompt/codebase is provided, perform a **Structural Audit
 23. If validation fails, record errors in `state.jsonl` and old-patterns with `status: "VALIDATION_FAILED"`.
 24. Report findings and compatibility notes to the user.
 25. **CHECKPOINT**: Append `VALIDATED` or `VALIDATION_FAILED` to `state.jsonl`.
+
+**REFINE-only report requirements:** Attach the exact target binding and report structural validator receipts, semantic findings, and consumer behavior receipts separately. Behavior remains `NOT_EVALUATED` until a consumer receipt is supplied and bound to the same target digest. Record reported outcomes as evidence, not independent qualification; schema validity proves shape only. Each report covers only its one exact `target_path` and digest; every finding path must equal that path. For a refinement touching SKILL.md, contracts, references, or helper files, produce a separately bound report for every touched file and retain the complete file-to-report inventory. Before presenting the combined patch as reviewed, re-read every file digest and reject any stale or missing member; a single-file receipt cannot establish review of the whole skill or a multi-file patch.
 
 ### Phase 5: Self-Correction & Auditing
 26. **LEDGER**: Append `{ "timestamp", "skill": "skill-architect", "task_id", "status", "summary" }` to root `execution_ledger.jsonl`.

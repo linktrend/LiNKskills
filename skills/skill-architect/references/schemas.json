@@ -1,5 +1,405 @@
 {
   "definitions": {
+    "target_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target_path",
+        "sha256"
+      ],
+      "properties": {
+        "target_path": {
+          "type": "string",
+          "pattern": "^skills/(?!\\.\\.?/)(?!.*\\/\\.\\.?($|/))[A-Za-z0-9._/-]+$"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    },
+    "review_finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "finding_id",
+        "severity",
+        "path",
+        "line",
+        "evidence",
+        "finding",
+        "recommendation"
+      ],
+      "properties": {
+        "finding_id": {
+          "type": "string",
+          "pattern": "^F-[0-9]{2,4}$"
+        },
+        "severity": {
+          "type": "string",
+          "enum": [
+            "low",
+            "moderate",
+            "material",
+            "critical"
+          ]
+        },
+        "path": {
+          "type": "string",
+          "pattern": "^skills/(?!\\.\\.?/)(?!.*\\/\\.\\.?($|/))[A-Za-z0-9._/-]+$"
+        },
+        "line": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "evidence": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "finding": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "recommendation": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        }
+      }
+    },
+    "structural_receipt_input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reported_status",
+        "target_sha256"
+      ],
+      "properties": {
+        "reported_status": {
+          "type": "string",
+          "enum": [
+            "PASS",
+            "FAIL"
+          ]
+        },
+        "target_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "receipt_ref": {
+          "type": "string",
+          "pattern": "^(fixture|artifact|consumer):[^\\s]+$"
+        }
+      }
+    },
+    "semantic_review_input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reviewed_sha256",
+        "status",
+        "findings"
+      ],
+      "properties": {
+        "reviewed_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "reviewer_ref": {
+          "type": "string",
+          "pattern": "^(owner|consumer):[^\\s]+$"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "FINDINGS",
+            "NO_FINDINGS"
+          ]
+        },
+        "findings": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/definitions/review_finding"
+          }
+        }
+      }
+    },
+    "behavior_result_input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scenario_ref",
+        "reported_status",
+        "expected_conclusion",
+        "observed_conclusion"
+      ],
+      "properties": {
+        "scenario_ref": {
+          "type": "string",
+          "pattern": "^(fixture|artifact|consumer):[^\\s]+$"
+        },
+        "reported_status": {
+          "type": "string",
+          "enum": [
+            "PASS",
+            "FAIL"
+          ]
+        },
+        "expected_conclusion": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "observed_conclusion": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        }
+      }
+    },
+    "behavior_receipt_input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reported_status",
+        "target_sha256",
+        "scenario_results"
+      ],
+      "properties": {
+        "reported_status": {
+          "type": "string",
+          "enum": [
+            "PASS",
+            "FAIL"
+          ]
+        },
+        "target_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "receipt_ref": {
+          "type": "string",
+          "pattern": "^(fixture|artifact|consumer):[^\\s]+$"
+        },
+        "scenario_results": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/definitions/behavior_result_input"
+          }
+        }
+      }
+    },
+    "refine_review_request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target_binding",
+        "observed_target_sha256",
+        "requested_disposition"
+      ],
+      "properties": {
+        "target_binding": {
+          "$ref": "#/definitions/target_binding"
+        },
+        "observed_target_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "requested_disposition": {
+          "type": "string",
+          "enum": [
+            "PATCH_PROPOSED",
+            "NO_CHANGE"
+          ]
+        },
+        "patch_ref": {
+          "type": "string",
+          "pattern": "^(fixture|artifact):[^\\s]+$"
+        },
+        "structural_receipt": {
+          "$ref": "#/definitions/structural_receipt_input"
+        },
+        "semantic_review": {
+          "$ref": "#/definitions/semantic_review_input"
+        },
+        "behavior_receipt": {
+          "$ref": "#/definitions/behavior_receipt_input"
+        }
+      }
+    },
+    "structural_review_report": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reason"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "NOT_RUN",
+            "PASS_REPORTED",
+            "FAIL_REPORTED",
+            "MISSING_RECEIPT",
+            "STALE_RECEIPT",
+            "STALE_TARGET"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "checked_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "receipt_ref": {
+          "type": "string",
+          "pattern": "^(fixture|artifact|consumer):[^\\s]+$"
+        }
+      }
+    },
+    "semantic_review_report": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reason",
+        "findings"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "NOT_REVIEWED",
+            "FINDINGS_REPORTED",
+            "NO_FINDINGS_REPORTED",
+            "STALE_REVIEW",
+            "STALE_TARGET"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "reviewed_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "reviewer_ref": {
+          "type": "string",
+          "pattern": "^(owner|consumer):[^\\s]+$"
+        },
+        "findings": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/definitions/review_finding"
+          }
+        }
+      }
+    },
+    "behavior_review_report": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reason",
+        "scenario_count",
+        "matched_scenario_count"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "NOT_EVALUATED",
+            "PASS_REPORTED",
+            "FAIL_REPORTED",
+            "MISSING_RECEIPT",
+            "STALE_RECEIPT",
+            "STALE_TARGET"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "evaluated_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "receipt_ref": {
+          "type": "string",
+          "pattern": "^(fixture|artifact|consumer):[^\\s]+$"
+        },
+        "scenario_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 64
+        },
+        "matched_scenario_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 64
+        }
+      }
+    },
+    "refine_review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target_binding",
+        "observed_target_sha256",
+        "disposition",
+        "structural",
+        "semantic",
+        "behavior",
+        "qualification"
+      ],
+      "properties": {
+        "target_binding": {
+          "$ref": "#/definitions/target_binding"
+        },
+        "observed_target_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "disposition": {
+          "type": "string",
+          "enum": [
+            "PATCH_PROPOSED",
+            "NO_CHANGE",
+            "STALE_TARGET",
+            "BLOCKED"
+          ]
+        },
+        "patch_ref": {
+          "type": "string",
+          "pattern": "^(fixture|artifact):[^\\s]+$"
+        },
+        "structural": {
+          "$ref": "#/definitions/structural_review_report"
+        },
+        "semantic": {
+          "$ref": "#/definitions/semantic_review_report"
+        },
+        "behavior": {
+          "$ref": "#/definitions/behavior_review_report"
+        },
+        "qualification": {
+          "type": "string",
+          "const": "NOT_CLAIMED"
+        }
+      }
+    },
     "spec": {
       "type": "object",
       "description": "Input specification for scaffold, reverse-engineering, or refiner mode.",
@@ -77,8 +477,10 @@
           "type": "array",
           "items": {"type": "string"},
           "description": "Optional permission scopes (e.g., ['fs_read', 'fs_write', 'api_access'])"
-        }
-      }
+        },
+        "target_binding": {"$ref": "#/definitions/target_binding", "description": "Required for REFINER; bind exact target path and digest."}
+      },
+      "allOf": [{"if": {"properties": {"mode": {"const": "REFINER"}}, "required": ["mode"]}, "then": {"required": ["target_binding", "improvement_drivers"], "properties": {"improvement_drivers": {"minItems": 1}}}}]
     },
     "report": {
       "type": "object",
@@ -105,8 +507,10 @@
           "type": "array",
           "items": {"type": "string"},
           "description": "List of file paths created during scaffolding"
-        }
-      }
+        },
+        "refine_review": {"$ref": "#/definitions/refine_review"}
+      },
+      "allOf": [{"if": {"properties": {"mode": {"const": "REFINER"}}, "required": ["mode"]}, "then": {"required": ["refine_review"]}}]
     },
     "state": {
       "type": "object",

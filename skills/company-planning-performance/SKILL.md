@@ -1,7 +1,7 @@
 ---
 name: company-planning-performance
-description: "An evidence-bounded planning and performance review method for company horizons, objectives, KPI variance, delivery signals, and owner-reviewed reprioritization."
-usage_trigger: "Use for synthetic, redacted, or public planning evidence when a consumer needs a concise horizon plan, KPI review, forecast-versus-actual comparison, blocker/late/obsolete detection, or evidence-backed reprioritization draft without mutating Program or Task state."
+description: "An evidence-bounded planning and performance review method for company horizons, objectives, KPI variance, capacity_review, delivery signals, and owner-reviewed reprioritization."
+usage_trigger: "Use for synthetic, redacted, or public planning evidence when a consumer needs a concise horizon plan, KPI review, forecast-versus-actual comparison, blocker/late/obsolete detection, capacity_review, or evidence-backed reprioritization draft without mutating Program or Task state."
 version: 1.0.0
 release_tag: v1.0.0
 created: 2026-08-24
@@ -48,6 +48,10 @@ system. The consumer and named owner retain all authority and mutable state.
 5. Reprioritization is a proposed owner-review record. It requires a rationale,
    affected objective references, and evidence; it never activates, schedules,
    approves, or mutates anything.
+
+## Optional role-capacity comparison
+
+For an explicit `capacity_review`, preserve the existing plan, period, objective, evidence, owner-review, and empty-effects contract. For each role/unit, use supplied gross availability, planned unavailable time, recurring load, existing commitments, and proposed demand in one named time unit and the exact requested period. Keep a separate evidence reference for every non-null quantity. Compute net available = gross availability − planned unavailable − recurring load; total demand = existing commitments + proposed demand; signed balance = net available − total demand (positive is headroom, negative is a demand shortfall). If a quantity is absent, preserve computable subtotals and report `NEEDS_INPUT`; if periods differ, return `NOT_COMPARABLE` with no arithmetic. Do not apply an unprovided buffer or convert a short-period gap into staffing, hiring, task assignment, or plan-change authority.
 
 ## Authority and safety boundary
 
