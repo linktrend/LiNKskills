@@ -9,6 +9,7 @@ import subprocess
 import tempfile
 import unittest
 from pathlib import Path
+from urllib.parse import quote
 from unittest.mock import patch
 
 from scripts.gitops import secret_scan as secret_scan_mod
@@ -129,6 +130,115 @@ class CodeExpressionTests(unittest.TestCase):
             ("payload_secret", f"-{value}"),
             extract_assignments(f"payload_secret: -{value}"),
         )
+
+
+class URLLocatorParsingTests(unittest.TestCase):
+    def test_public_url_locators_and_html_attributes_are_not_findings(self) -> None:
+        public = [
+            "https%3A%2F%2Fcdn.example.invalid%2Fassets%2Fapp.js",
+            "/assets/app.js",
+            "//cdn.example.invalid/assets/app.js",
+            "/redirect?url=%2Fdocs%2Fstart.html",
+        ]
+        text = "\n".join(
+            [
+                *(f'url = "{value}"' for value in public),
+                '<a href="/docs/start.html">docs</a>',
+                '<img src="//cdn.example.invalid/logo.svg">',
+                '<form action="https%3A%2F%2Fexample.invalid%2Fsubmit">',
+            ]
+        )
+        self.assertEqual(secret_scan_mod.scan_text("fixture.html", text), [])
+
+    def test_decoded_database_query_userinfo_and_html_credentials_still_block(self) -> None:
+        password = hashlib.sha256(b"synthetic-sara-password").hexdigest()
+        github = "gh" + "p_" + ("A" * 36)
+        database = "postgres://user:" + password + "@db.example.invalid:5432/app"
+        encoded_database = quote(database, safe="")
+        encoded_query = quote(
+            "https://example.invalid/callback?token=" + github,
+            safe="",
+        )
+        userinfo = "https://user:" + password + "@example.invalid/private"
+        text = "\n".join(
+            [
+                f'url = "{database}"',
+                f'url = "{encoded_database}"',
+                f'url = "{userinfo}"',
+                f'<img src="{encoded_query}">',
+            ]
+        )
+        findings = secret_scan_mod.scan_text("fixture.html", text)
+        self.assertGreaterEqual(len(findings), 4)
+        rules = {row["rule"] for row in findings}
+        self.assertIn("format.database", rules)
+        self.assertIn("format.github", rules)
+
+    def test_malformed_percent_locator_is_not_exempted(self) -> None:
+        opaque = hashlib.sha256(b"malformed-percent-locator").hexdigest()
+        value = "https%3A%2F%2Fexample.invalid%2F" + opaque + "%ZZ"
+        findings = secret_scan_mod.scan_text("fixture.html", f'url = "{value}"')
+        self.assertTrue(findings)
+
+    def test_non_locator_html_attributes_are_not_findings(self) -> None:
+        opaque = hashlib.sha256(b"ordinary-html-attribute").hexdigest()
+        text = f'<a href="{opaque}">label</a>\n<img src="data:image/png;base64,{opaque}">'
+        self.assertEqual(secret_scan_mod.scan_text("fixture.html", text), [])
+
+    def test_all_known_credential_formats_still_block_in_mixed_contexts(self) -> None:
+        cloud = "AKIA" + ("B" * 16)
+        token = "sk-" + ("T" * 20)
+        database = "postgres://user:" + hashlib.sha256(b"mixed-context-db").hexdigest() + "@db.example.invalid/app"
+        private_key = "-----BEGIN RSA " + "PRIVATE KEY-----\n" + ("C" * 48)
+        entropy = hashlib.sha256(b"mixed-context-entropy").hexdigest() + hashlib.sha256(b"more").hexdigest()
+        text = "\n".join(
+            [
+                f'url = "{quote("https://example.invalid/?key=" + cloud, safe="")}"',
+                f'<a href="{quote("https://example.invalid/?token=" + token, safe="")}">x</a>',
+                f'url = "{quote(database, safe="")}"',
+                f'<img src="data:text/plain,{quote(private_key, safe="")}">',
+                f'key = "{entropy}"',
+            ]
+        )
+        rules = {row["rule"] for row in secret_scan_mod.scan_text("fixture.html", text)}
+        self.assertTrue(
+            {
+                "format.cloud",
+                "format.token",
+                "format.database",
+                "format.private_key",
+                "format.high_entropy",
+            }.issubset(rules)
+        )
+
+    def test_url_credentials_take_precedence_over_function_like_paths(self) -> None:
+        userinfo = "https://user:" + ("0123456789abcdefABCDEF") + "@host.example.invalid/callback(foo)"
+        query_name = "tok" + "en"
+        query = "https://host.example.invalid/callback(foo)?" + query_name + "=" + ("Q" * 24)
+        findings = secret_scan_mod.scan_text(
+            "fixture.html",
+            f'url = "{userinfo}"\n<a href="{query}">x</a>',
+        )
+        self.assertEqual(len(findings), 2)
+
+    def test_git_https_transport_locator_is_public(self) -> None:
+        value = "git+https://github.com/muratcankoylan/Agent-Skills-for-Context-Engineering.git"
+        self.assertEqual(secret_scan_mod.scan_text("fixture.json", f'url = "{value}"'), [])
+
+    def test_git_https_transport_credentials_and_unknown_entropy_still_block(self) -> None:
+        password = hashlib.sha256(b"git-https-userinfo").hexdigest()
+        token = "sk-" + ("T" * 20)
+        unknown = hashlib.sha256(b"git-https-query").hexdigest() * 2
+        text = "\n".join(
+            [
+                f'url = "git+https://user:{password}@github.com/example/repo.git"',
+                f'url = "git+https://github.com/example/repo.git?token={token}"',
+                f'url = "git+https://github.com/example/{token}/repo.git#fragment"',
+                f'url = "git+https://github.com/example/repo.git?opaque={unknown}"',
+            ]
+        )
+        findings = secret_scan_mod.scan_text("fixture.json", text)
+        self.assertGreaterEqual(len(findings), 4)
 
 
 class ChangedPathStatusTests(unittest.TestCase):
