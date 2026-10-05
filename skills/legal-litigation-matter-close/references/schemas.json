@@ -1,0 +1,356 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "request_ref",
+        "source_refs",
+        "data_classification",
+        "task_inputs"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "pattern": "^\\d{8}-\\d{4}-[A-Z0-9]+-\\d{6}$"
+        },
+        "request_ref": {
+          "type": "string"
+        },
+        "source_refs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "data_classification": {
+          "type": "string",
+          "enum": [
+            "synthetic",
+            "redacted",
+            "restricted",
+            "sensitive",
+            "unknown"
+          ]
+        },
+        "task_inputs": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "matter_ref_and_current_status",
+            "outcome_and_effective_date",
+            "final_cost_and_exposure",
+            "remaining_obligations",
+            "closure_authority"
+          ],
+          "properties": {
+            "matter_ref_and_current_status": {
+              "type": "string",
+              "description": "Exact matter identity and current record."
+            },
+            "outcome_and_effective_date": {
+              "type": "string",
+              "description": "Source-supported settlement/order/judgment/withdrawal details."
+            },
+            "final_cost_and_exposure": {
+              "type": "string",
+              "description": "Approved/source-supported figures or unknown."
+            },
+            "remaining_obligations": {
+              "type": "string",
+              "description": "Appeal, payment, release, reporting, retention, related matter and hold status evidence."
+            },
+            "closure_authority": {
+              "type": "string",
+              "description": "Authorized owner/counsel direction and retention rules, if supplied."
+            }
+          }
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "status",
+        "artifact_ref",
+        "evidence_refs",
+        "open_questions",
+        "review_owner_role",
+        "external_effects",
+        "mutations",
+        "work_product"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "completed_draft",
+            "needs_context",
+            "escalate",
+            "blocked"
+          ]
+        },
+        "artifact_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "open_questions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "review_owner_role": {
+          "type": "string"
+        },
+        "external_effects": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "mutations": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "work_product": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "closure_record_draft",
+            "remaining_actions",
+            "hold_and_retention_questions",
+            "archive_checklist"
+          ],
+          "properties": {
+            "closure_record_draft": {
+              "type": "string",
+              "description": "Outcome, status proposal, final exposure and lessons with citations."
+            },
+            "remaining_actions": {
+              "type": "string",
+              "description": "Unfinished contractual/court/financial tasks and owners."
+            },
+            "hold_and_retention_questions": {
+              "type": "string",
+              "description": "Separate hold release/retention counsel questions; no release instruction."
+            },
+            "archive_checklist": {
+              "type": "string",
+              "description": "Candidate record locations and preservation requirements for owner."
+            },
+            "partial_work": {
+              "type": "array",
+              "description": "Separable work completed despite a material input gap; empty only when none was possible.",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "section",
+                  "content",
+                  "evidence_refs"
+                ],
+                "properties": {
+                  "section": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "content": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "evidence_refs": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "missing_inputs": {
+              "type": "array",
+              "description": "Exact absent or inaccessible input and why it blocks the dependent conclusion.",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "field",
+                  "reason"
+                ],
+                "properties": {
+                  "field": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "requested_owner": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                }
+              }
+            },
+            "unknown_facts": {
+              "type": "array",
+              "description": "Facts that remain unknown or conflicting; never fill them with invented values.",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "fact",
+                  "why_unknown",
+                  "evidence_refs"
+                ],
+                "properties": {
+                  "fact": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "why_unknown": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "evidence_refs": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "title": "sara-completed-draft-content",
+          "if": {
+            "properties": {
+              "status": {
+                "const": "completed_draft"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "evidence_refs": {
+                "minItems": 1
+              },
+              "work_product": {
+                "required": [
+                  "closure_record_draft",
+                  "remaining_actions",
+                  "archive_checklist"
+                ],
+                "properties": {
+                  "closure_record_draft": {
+                    "minLength": 1
+                  },
+                  "remaining_actions": {
+                    "minLength": 1
+                  },
+                  "archive_checklist": {
+                    "minLength": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "sara-needs-context-record",
+          "if": {
+            "properties": {
+              "status": {
+                "const": "needs_context"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "work_product": {
+                "required": [
+                  "partial_work",
+                  "missing_inputs",
+                  "unknown_facts"
+                ],
+                "properties": {
+                  "missing_inputs": {
+                    "minItems": 1
+                  },
+                  "unknown_facts": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "phase",
+        "status",
+        "updated_at",
+        "source_refs"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string"
+        },
+        "phase": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "updated_at": {
+          "type": "string"
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "open_questions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

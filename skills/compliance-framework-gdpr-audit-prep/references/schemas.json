@@ -1,0 +1,403 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "request_ref",
+        "source_refs",
+        "data_classification",
+        "task_inputs"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string"
+        },
+        "request_ref": {
+          "type": "string"
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "data_classification": {
+          "type": "string",
+          "enum": [
+            "synthetic",
+            "redacted",
+            "restricted",
+            "sensitive",
+            "unknown"
+          ]
+        },
+        "task_inputs": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "task_request",
+            "source_documents",
+            "company_context",
+            "applicability_context",
+            "review_owner",
+            "processing_scope",
+            "privacy_evidence",
+            "audit_trigger",
+            "primary_authorities"
+          ],
+          "properties": {
+            "task_request": {
+              "type": "string",
+              "minLength": 1
+            },
+            "source_documents": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "company_context": {
+              "type": "string"
+            },
+            "applicability_context": {
+              "type": "string"
+            },
+            "review_owner": {
+              "type": "string"
+            },
+            "processing_scope": {
+              "type": "string",
+              "description": "Processing activities, data subjects, controller/processor roles and territories."
+            },
+            "privacy_evidence": {
+              "type": "string",
+              "description": "RoPA, lawful-basis records, DPIAs, DSAR logs, transfer records, processor contracts and breach process."
+            },
+            "audit_trigger": {
+              "type": "string",
+              "description": "Audit, product change, breach, DPA inquiry or periodic review."
+            },
+            "primary_authorities": {
+              "type": "string",
+              "description": "Current GDPR text and official authority guidance references."
+            }
+          }
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "status",
+        "artifact_ref",
+        "evidence_refs",
+        "open_questions",
+        "review_owner_role",
+        "external_effects",
+        "mutations",
+        "work_product"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "completed_draft",
+            "needs_context",
+            "escalate",
+            "blocked"
+          ]
+        },
+        "artifact_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "open_questions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "review_owner_role": {
+          "type": "string"
+        },
+        "external_effects": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "mutations": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "work_product": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "territorial_and_role_scope",
+            "processing_evidence_matrix",
+            "rights_dpia_transfer_contract_gaps",
+            "candidate_deadline_questions",
+            "remediation_and_review_plan"
+          ],
+          "properties": {
+            "territorial_and_role_scope": {
+              "type": "string",
+              "description": "Task-specific draft field: territorial and role scope"
+            },
+            "processing_evidence_matrix": {
+              "type": "array",
+              "description": "Task-specific draft field: processing evidence matrix",
+              "items": {
+                "type": "string"
+              }
+            },
+            "rights_dpia_transfer_contract_gaps": {
+              "type": "array",
+              "description": "Task-specific draft field: rights dpia transfer contract gaps",
+              "items": {
+                "type": "string"
+              }
+            },
+            "candidate_deadline_questions": {
+              "type": "array",
+              "description": "Task-specific draft field: candidate deadline questions",
+              "items": {
+                "type": "string"
+              }
+            },
+            "remediation_and_review_plan": {
+              "type": "string",
+              "description": "Task-specific draft field: remediation and review plan"
+            },
+            "partial_work": {
+              "type": "array",
+              "description": "Separable work completed despite a material input gap; empty only when none was possible.",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "section",
+                  "content",
+                  "evidence_refs"
+                ],
+                "properties": {
+                  "section": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "content": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "evidence_refs": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "missing_inputs": {
+              "type": "array",
+              "description": "Exact absent or inaccessible input and why it blocks the dependent conclusion.",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "field",
+                  "reason"
+                ],
+                "properties": {
+                  "field": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "requested_owner": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                }
+              }
+            },
+            "unknown_facts": {
+              "type": "array",
+              "description": "Facts that remain unknown or conflicting; never fill them with invented values.",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "fact",
+                  "why_unknown",
+                  "evidence_refs"
+                ],
+                "properties": {
+                  "fact": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "why_unknown": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "evidence_refs": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "title": "sara-completed-draft-content",
+          "if": {
+            "properties": {
+              "status": {
+                "const": "completed_draft"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "evidence_refs": {
+                "minItems": 1
+              },
+              "work_product": {
+                "required": [
+                  "territorial_and_role_scope",
+                  "processing_evidence_matrix",
+                  "remediation_and_review_plan"
+                ],
+                "properties": {
+                  "territorial_and_role_scope": {
+                    "minLength": 1
+                  },
+                  "processing_evidence_matrix": {
+                    "minItems": 1
+                  },
+                  "remediation_and_review_plan": {
+                    "minLength": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "sara-needs-context-record",
+          "if": {
+            "properties": {
+              "status": {
+                "const": "needs_context"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "work_product": {
+                "required": [
+                  "partial_work",
+                  "missing_inputs",
+                  "unknown_facts"
+                ],
+                "properties": {
+                  "missing_inputs": {
+                    "minItems": 1
+                  },
+                  "unknown_facts": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "phase",
+        "status",
+        "checkpoint_ref",
+        "updated_at"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string"
+        },
+        "phase": {
+          "type": "string",
+          "enum": [
+            "intake",
+            "evidence",
+            "analysis",
+            "draft",
+            "review",
+            "delivered"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "in_progress",
+            "waiting_for_input",
+            "completed_draft",
+            "blocked"
+          ]
+        },
+        "checkpoint_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Consumer-owner checkpoint reference; no local runtime sidecar."
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "open_questions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

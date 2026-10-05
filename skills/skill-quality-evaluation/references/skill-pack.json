@@ -1,0 +1,290 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "skill-quality-evaluation",
+  "display_name": "Skill Quality Evaluation",
+  "version": "0.1.0",
+  "description": "Evaluate a pinned skill release against frozen task cases, trigger behavior and typed output assertions; deliver bounded evidence and revision recommendations.",
+  "capability_category": "task_specific_operations",
+  "lifecycle_state": "draft",
+  "format_profile": "heavy",
+  "compatible_runtime_profiles": [
+    "lisa-openclaw",
+    "cursor-macos"
+  ],
+  "min_capability_tier": "balanced",
+  "provenance": {
+    "author": "LiNKskills adaptation",
+    "source": "anthropics/skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4:skills/skill-creator/SKILL.md",
+    "license": "Source notices and license evidence retained in references/upstream/SOURCE-MANIFEST.json; licensing review is separate."
+  },
+  "routing": {
+    "when_to_use": "Evaluate a pinned skill release using frozen cases and supplied or owner-authorized evaluation evidence.",
+    "when_not_to_use": [
+      "A distinct task is requested",
+      "Live system mutation, external message, paid run, or final approval is requested"
+    ],
+    "tags": [
+      "task-specific",
+      "draft"
+    ],
+    "exclusion_rules": [
+      "No invented facts, results, approval or current-law applicability",
+      "No external side effect or source-system write"
+    ],
+    "ambiguity_rules": [
+      "Use authorized read evidence; finish separable work and name exact missing inputs"
+    ],
+    "recommended_disclosure_level": 2
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "task_request",
+        "description": "Exact requested task and limits."
+      },
+      {
+        "name": "skill_quality_evaluation_payload",
+        "description": "Typed task-specific source inputs."
+      }
+    ],
+    "expected_outputs": [
+      {
+        "name": "skill_quality_evaluation_work_product",
+        "description": "Distinct task-specific draft per the contract."
+      }
+    ],
+    "forbidden_actions": [
+      "Unapproved external effects, source-system writes or messages",
+      "Inventing facts, applicability, approvals or conclusions",
+      "Exposing private data outside authorized scope"
+    ],
+    "verification_steps": [
+      "Validate typed input/output contract and every task-specific acceptance criterion.",
+      "Tie factual claims to supplied evidence and preserve missing data.",
+      "Keep external_effects and mutations empty.",
+      "Use current native schemas only."
+    ],
+    "completion_criteria": [
+      "Distinct task output is present and traceable.",
+      "Known gaps and accountable owner are clear.",
+      "No external effect or mutation was performed."
+    ],
+    "known_limitations": [
+      "Draft and uncertified; no live semantic evaluation claimed",
+      "Current company facts, legal applicability or system state are not assumed"
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read",
+      "filesystem_write"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [
+      {
+        "key": "min_reasoning_tier",
+        "value": "balanced"
+      },
+      {
+        "key": "context_required",
+        "value": 64000
+      },
+      {
+        "key": "preferred_model",
+        "value": "gpt-6.1-sol"
+      }
+    ],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "required_certification_profiles": [],
+    "verification_refs": [
+      "references/eval-suite.yaml",
+      "references/upstream/SOURCE-MANIFEST.json"
+    ],
+    "suite_hash": "sha256:14b932e0e93b9d2a44619840b11be999c1c0aa973ba70465cdbc395507331d75"
+  },
+  "telemetry": {
+    "classification": "restricted",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_personal_data",
+      "strip_raw_documents",
+      "strip_reasoning"
+    ],
+    "retention_policy": "opaque task/source ids and hashes only"
+  },
+  "fragments": [
+    {
+      "fragment_id": "_gitignore",
+      "disclosure_level": 3,
+      "path": ".gitignore"
+    },
+    {
+      "fragment_id": "SKILL_md",
+      "disclosure_level": 2,
+      "path": "SKILL.md"
+    },
+    {
+      "fragment_id": "advanced_advanced_md",
+      "disclosure_level": 2,
+      "path": "advanced/advanced.md"
+    },
+    {
+      "fragment_id": "examples_error-recovery_md",
+      "disclosure_level": 3,
+      "path": "examples/error-recovery.md"
+    },
+    {
+      "fragment_id": "examples_synthetic-example_md",
+      "disclosure_level": 3,
+      "path": "examples/synthetic-example.md"
+    },
+    {
+      "fragment_id": "references_api-specs_md",
+      "disclosure_level": 3,
+      "path": "references/api-specs.md"
+    },
+    {
+      "fragment_id": "references_changelog_md",
+      "disclosure_level": 3,
+      "path": "references/changelog.md"
+    },
+    {
+      "fragment_id": "references_eval-suite_json",
+      "disclosure_level": 3,
+      "path": "references/eval-suite.json"
+    },
+    {
+      "fragment_id": "references_eval-suite_yaml",
+      "disclosure_level": 3,
+      "path": "references/eval-suite.yaml"
+    },
+    {
+      "fragment_id": "references_execution-profile_json",
+      "disclosure_level": 3,
+      "path": "references/execution-profile.json"
+    },
+    {
+      "fragment_id": "references_old-patterns_md",
+      "disclosure_level": 3,
+      "path": "references/old-patterns.md"
+    },
+    {
+      "fragment_id": "references_schemas_json",
+      "disclosure_level": 3,
+      "path": "references/schemas.json"
+    },
+    {
+      "fragment_id": "references_source-applicability_md",
+      "disclosure_level": 3,
+      "path": "references/source-applicability.md"
+    },
+    {
+      "fragment_id": "references_upstream_SOURCE-MANIFEST_json",
+      "disclosure_level": 3,
+      "path": "references/upstream/SOURCE-MANIFEST.json"
+    },
+    {
+      "fragment_id": "references_upstream_anthropics-skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4_THIRD_PARTY_NOTICES_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/anthropics-skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/THIRD_PARTY_NOTICES.md"
+    },
+    {
+      "fragment_id": "references_upstream_anthropics-skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4_skills_skill-creator_LICENSE_txt",
+      "disclosure_level": 3,
+      "path": "references/upstream/anthropics-skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/skills/skill-creator/LICENSE.txt"
+    },
+    {
+      "fragment_id": "references_upstream_anthropics-skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4_skills_skill-creator_SKILL_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/anthropics-skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/skills/skill-creator/SKILL.md"
+    },
+    {
+      "fragment_id": "references_upstream_anthropics-skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4_skills_skill-creator_agents_analyzer_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/anthropics-skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/skills/skill-creator/agents/analyzer.md"
+    },
+    {
+      "fragment_id": "references_upstream_anthropics-skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4_skills_skill-creator_agents_comparator_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/anthropics-skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/skills/skill-creator/agents/comparator.md"
+    },
+    {
+      "fragment_id": "references_upstream_anthropics-skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4_skills_skill-creator_agents_grader_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/anthropics-skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/skills/skill-creator/agents/grader.md"
+    },
+    {
+      "fragment_id": "references_upstream_anthropics-skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4_skills_skill-creator_assets_eval_review_html",
+      "disclosure_level": 3,
+      "path": "references/upstream/anthropics-skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/skills/skill-creator/assets/eval_review.html"
+    },
+    {
+      "fragment_id": "references_upstream_anthropics-skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4_skills_skill-creator_eval-viewer_generate_review_py",
+      "disclosure_level": 3,
+      "path": "references/upstream/anthropics-skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/skills/skill-creator/eval-viewer/generate_review.py"
+    },
+    {
+      "fragment_id": "references_upstream_anthropics-skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4_skills_skill-creator_eval-viewer_viewer_html",
+      "disclosure_level": 3,
+      "path": "references/upstream/anthropics-skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/skills/skill-creator/eval-viewer/viewer.html"
+    },
+    {
+      "fragment_id": "references_upstream_anthropics-skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4_skills_skill-creator_references_schemas_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/anthropics-skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/skills/skill-creator/references/schemas.md"
+    },
+    {
+      "fragment_id": "references_upstream_anthropics-skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4_skills_skill-creator_scripts___init___py",
+      "disclosure_level": 3,
+      "path": "references/upstream/anthropics-skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/skills/skill-creator/scripts/__init__.py"
+    },
+    {
+      "fragment_id": "references_upstream_anthropics-skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4_skills_skill-creator_scripts_aggregate_benchmark_py",
+      "disclosure_level": 3,
+      "path": "references/upstream/anthropics-skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/skills/skill-creator/scripts/aggregate_benchmark.py"
+    },
+    {
+      "fragment_id": "references_upstream_anthropics-skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4_skills_skill-creator_scripts_generate_report_py",
+      "disclosure_level": 3,
+      "path": "references/upstream/anthropics-skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/skills/skill-creator/scripts/generate_report.py"
+    },
+    {
+      "fragment_id": "references_upstream_anthropics-skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4_skills_skill-creator_scripts_improve_description_py",
+      "disclosure_level": 3,
+      "path": "references/upstream/anthropics-skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/skills/skill-creator/scripts/improve_description.py"
+    },
+    {
+      "fragment_id": "references_upstream_anthropics-skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4_skills_skill-creator_scripts_package_skill_py",
+      "disclosure_level": 3,
+      "path": "references/upstream/anthropics-skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/skills/skill-creator/scripts/package_skill.py"
+    },
+    {
+      "fragment_id": "references_upstream_anthropics-skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4_skills_skill-creator_scripts_quick_validate_py",
+      "disclosure_level": 3,
+      "path": "references/upstream/anthropics-skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/skills/skill-creator/scripts/quick_validate.py"
+    },
+    {
+      "fragment_id": "references_upstream_anthropics-skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4_skills_skill-creator_scripts_run_eval_py",
+      "disclosure_level": 3,
+      "path": "references/upstream/anthropics-skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/skills/skill-creator/scripts/run_eval.py"
+    },
+    {
+      "fragment_id": "references_upstream_anthropics-skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4_skills_skill-creator_scripts_run_loop_py",
+      "disclosure_level": 3,
+      "path": "references/upstream/anthropics-skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/skills/skill-creator/scripts/run_loop.py"
+    },
+    {
+      "fragment_id": "references_upstream_anthropics-skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4_skills_skill-creator_scripts_utils_py",
+      "disclosure_level": 3,
+      "path": "references/upstream/anthropics-skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/skills/skill-creator/scripts/utils.py"
+    }
+  ]
+}

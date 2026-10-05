@@ -1,0 +1,89 @@
+{
+  "schema_version": "1.0",
+  "skill_id": "legal-lawve-pci-compliance-tanaji-hemant-naik",
+  "completed_input": {
+    "task_id": "20261004-1200-LEGAL-000001",
+    "request_ref": "synthetic-case-001",
+    "source_refs": [
+      "lawve-ai/awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290:skills/pci-compliance-tanaji-hemant-naik/SKILL.md"
+    ],
+    "data_classification": "synthetic",
+    "task_inputs": {
+      "entity_role_and_volume": "Synthetic online merchant, transaction volume and validation tier unknown.",
+      "data_flow_inventory": "Hosted checkout returns a payment token; PAN capture is by third party; merchant logs and support tooling not mapped.",
+      "architecture_and_segmentation": "Network diagram missing; segmentation test not supplied.",
+      "control_evidence": "MFA policy exists; latest access review and ASV scan absent.",
+      "current_pci_authority": "No current PCI SSC standard/SAQ supplied.",
+      "scope_and_as_of": "Synthetic scope only; law applicability unknown unless identified in the case facts."
+    }
+  },
+  "completed_output": {
+    "status": "completed_draft",
+    "artifact_type": "legal-lawve-pci-compliance-tanaji-hemant-naik",
+    "task_specific_deliverable": {
+      "scope and role": "Synthetic expected finding; see golden-case criteria for exact task outcome.",
+      "CDE/data-flow map": "Synthetic expected finding; see golden-case criteria for exact task outcome.",
+      "validation route": "Synthetic expected finding; see golden-case criteria for exact task outcome.",
+      "12 requirement evidence matrix": "Synthetic expected finding; see golden-case criteria for exact task outcome.",
+      "critical gaps and remediation": "Synthetic expected finding; see golden-case criteria for exact task outcome.",
+      "assessor/counsel questions": "Synthetic expected finding; see golden-case criteria for exact task outcome."
+    },
+    "evidence_trace": [
+      {
+        "claim": "Synthetic fixture fact was supplied",
+        "source_ref": "lawve-ai/awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290:skills/pci-compliance-tanaji-hemant-naik/SKILL.md",
+        "pinpoint": "synthetic input field",
+        "basis": "verified_fact"
+      }
+    ],
+    "uncertainties": [
+      "Any law/applicability not established by the synthetic fixture"
+    ],
+    "external_effects": [],
+    "mutations": []
+  },
+  "needs_context_input": {
+    "task_id": "20261004-1200-LEGAL-000001",
+    "request_ref": "synthetic-case-001",
+    "source_refs": [
+      "lawve-ai/awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290:skills/pci-compliance-tanaji-hemant-naik/SKILL.md"
+    ],
+    "data_classification": "synthetic",
+    "task_inputs": {
+      "entity_role_and_volume": "UNKNOWN: not supplied in this synthetic needs-context fixture.",
+      "data_flow_inventory": "UNKNOWN: not supplied in this synthetic needs-context fixture.",
+      "architecture_and_segmentation": "UNKNOWN: not supplied in this synthetic needs-context fixture.",
+      "control_evidence": "UNKNOWN: not supplied in this synthetic needs-context fixture.",
+      "current_pci_authority": "UNKNOWN: not supplied in this synthetic needs-context fixture.",
+      "scope_and_as_of": "Synthetic scope only; law applicability unknown unless identified in the case facts."
+    }
+  },
+  "needs_context_output": {
+    "status": "needs_context",
+    "artifact_type": "legal-lawve-pci-compliance-tanaji-hemant-naik",
+    "task_specific_deliverable": {
+      "separable_work": "Complete unaffected portions and identify blocked section."
+    },
+    "evidence_trace": [],
+    "uncertainties": [
+      "Outcome-changing source/input unknown"
+    ],
+    "external_effects": [],
+    "mutations": []
+  },
+  "state_example": {
+    "task_id": "20261004-1200-LEGAL-000001",
+    "phase": "draft",
+    "source_refs": [
+      "lawve-ai/awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290:skills/pci-compliance-tanaji-hemant-naik/SKILL.md"
+    ],
+    "established_facts": [
+      "Synthetic facts only"
+    ],
+    "open_inputs": [
+      "Actual legal applicability not established"
+    ],
+    "next_action": "Request the exact missing evidence from the responsible owner.",
+    "last_updated": "2026-10-04T12:00:00Z"
+  }
+}

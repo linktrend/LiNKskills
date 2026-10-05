@@ -1,0 +1,163 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "legal-borghei-statute-analysis",
+  "input_schema_ref": "references/schemas.json#/definitions/input",
+  "output_schema_ref": "references/schemas.json#/definitions/output",
+  "completion_required_fields": [
+    "statutory_structure_and_scope",
+    "defined_terms_and_role",
+    "requirement_permission_exception_map",
+    "cross_reference_analysis",
+    "effective_date_and_transition_notes"
+  ],
+  "fixtures": [
+    {
+      "fixture_id": "synthetic-task-shaped-completed",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261005-0900-SARA-123456",
+        "request_ref": "fixture:legal-borghei-statute-analysis:request",
+        "source_refs": [
+          "fixture:legal-borghei-statute-analysis:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "task_request": "A fictional regulation excerpt cross-references two definitions and an effective-date clause; trace both references and mark applicability unknown because entity facts are absent.",
+          "source_documents": [
+            "Synthetic input fixture for legal-borghei-statute-analysis: source documents. Fictional test content only; no real-world facts."
+          ],
+          "company_context": "Synthetic input fixture for legal-borghei-statute-analysis: company context. Fictional test content only; no real-world facts.",
+          "applicability_context": "Synthetic input fixture for legal-borghei-statute-analysis: applicability context. Fictional test content only; no real-world facts.",
+          "review_owner": "Synthetic input fixture for legal-borghei-statute-analysis: review owner. Fictional test content only; no real-world facts.",
+          "primary_text": "Synthetic input fixture for legal-borghei-statute-analysis: primary text. Fictional test content only; no real-world facts.",
+          "jurisdiction_and_version": "Synthetic input fixture for legal-borghei-statute-analysis: jurisdiction and version. Fictional test content only; no real-world facts.",
+          "interpretive_question": "Synthetic input fixture for legal-borghei-statute-analysis: interpretive question. Fictional test content only; no real-world facts.",
+          "organization_role": "Synthetic input fixture for legal-borghei-statute-analysis: organization role. Fictional test content only; no real-world facts.",
+          "cross_references": "Synthetic input fixture for legal-borghei-statute-analysis: cross references. Fictional test content only; no real-world facts."
+        }
+      },
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": "fixture:legal-borghei-statute-analysis:draft",
+        "evidence_refs": [
+          "fixture:legal-borghei-statute-analysis:source-1"
+        ],
+        "open_questions": [],
+        "review_owner_role": "Synthetic completed task for legal-borghei-statute-analysis: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "statutory_structure_and_scope": "Fictional legal-borghei-statute-analysis statutory structure and scope section. Scenario: A fictional regulation excerpt cross-references two definitions and an effective-date clause; trace both references and mark applicability unknown because entity facts are absent. Expected handling: Produces the statute and regulation interpretation workpaper deliverable with task-specific fields and not a generic departmental summary. Cites supplied evidence and preserves unknown, conflicting or unsupported facts. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "defined_terms_and_role": [
+            "Fictional legal-borghei-statute-analysis defined terms and role section. Scenario: A fictional regulation excerpt cross-references two definitions and an effective-date clause; trace both references and mark applicability unknown because entity facts are absent. Expected handling: Produces the statute and regulation interpretation workpaper deliverable with task-specific fields and not a generic departmental summary. Cites supplied evidence and preserves unknown, conflicting or unsupported facts. This is illustrative synthetic content only, not a real fact, legal authority, or executed result."
+          ],
+          "requirement_permission_exception_map": "Fictional legal-borghei-statute-analysis requirement permission exception map section. Scenario: A fictional regulation excerpt cross-references two definitions and an effective-date clause; trace both references and mark applicability unknown because entity facts are absent. Expected handling: Produces the statute and regulation interpretation workpaper deliverable with task-specific fields and not a generic departmental summary. Cites supplied evidence and preserves unknown, conflicting or unsupported facts. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "cross_reference_analysis": "Fictional legal-borghei-statute-analysis cross reference analysis section. Scenario: A fictional regulation excerpt cross-references two definitions and an effective-date clause; trace both references and mark applicability unknown because entity facts are absent. Expected handling: Produces the statute and regulation interpretation workpaper deliverable with task-specific fields and not a generic departmental summary. Cites supplied evidence and preserves unknown, conflicting or unsupported facts. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "effective_date_and_transition_notes": "Fictional legal-borghei-statute-analysis effective date and transition notes section. Scenario: A fictional regulation excerpt cross-references two definitions and an effective-date clause; trace both references and mark applicability unknown because entity facts are absent. Expected handling: Produces the statute and regulation interpretation workpaper deliverable with task-specific fields and not a generic departmental summary. Cites supplied evidence and preserves unknown, conflicting or unsupported facts. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "open_authority_questions": [],
+          "partial_work": [],
+          "missing_inputs": [],
+          "unknown_facts": []
+        }
+      }
+    },
+    {
+      "fixture_id": "needs-context-preserves-partial-and-unknowns",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261005-0900-SARA-123456",
+        "request_ref": "fixture:legal-borghei-statute-analysis:request",
+        "source_refs": [
+          "fixture:legal-borghei-statute-analysis:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "task_request": "Prepare a synthetic legal-borghei-statute-analysis deliverable from this fictional test record; make no real-world factual or legal claim.",
+          "source_documents": [
+            "Synthetic input fixture for legal-borghei-statute-analysis: source documents. Fictional test content only; no real-world facts."
+          ],
+          "company_context": "Synthetic input fixture for legal-borghei-statute-analysis: company context. Fictional test content only; no real-world facts.",
+          "applicability_context": "Synthetic input fixture for legal-borghei-statute-analysis: applicability context. Fictional test content only; no real-world facts.",
+          "review_owner": "Synthetic input fixture for legal-borghei-statute-analysis: review owner. Fictional test content only; no real-world facts.",
+          "primary_text": "Synthetic input fixture for legal-borghei-statute-analysis: primary text. Fictional test content only; no real-world facts.",
+          "jurisdiction_and_version": "Synthetic input fixture for legal-borghei-statute-analysis: jurisdiction and version. Fictional test content only; no real-world facts.",
+          "interpretive_question": "Synthetic input fixture for legal-borghei-statute-analysis: interpretive question. Fictional test content only; no real-world facts.",
+          "organization_role": "Synthetic input fixture for legal-borghei-statute-analysis: organization role. Fictional test content only; no real-world facts.",
+          "cross_references": "Synthetic input fixture for legal-borghei-statute-analysis: cross references. Fictional test content only; no real-world facts."
+        }
+      },
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "needs_context",
+        "artifact_ref": "fixture:legal-borghei-statute-analysis:partial",
+        "evidence_refs": [],
+        "open_questions": [
+          "Confirm the named missing input with its owner."
+        ],
+        "review_owner_role": "Synthetic completed task for legal-borghei-statute-analysis: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "statutory_structure_and_scope": "",
+          "defined_terms_and_role": [],
+          "requirement_permission_exception_map": "",
+          "cross_reference_analysis": "",
+          "effective_date_and_transition_notes": "",
+          "open_authority_questions": [],
+          "partial_work": [
+            {
+              "section": "statutory_structure_and_scope",
+              "content": "Partial legal-borghei-statute-analysis fixture: source inventory recorded; one dependent conclusion remains unknown.",
+              "evidence_refs": [
+                "fixture:legal-borghei-statute-analysis:source-1"
+              ]
+            }
+          ],
+          "missing_inputs": [
+            {
+              "field": "authorized_source_or_material_fact",
+              "reason": "Synthetic missing-context scenario: The task arrives with a material missing fact or inaccessible authority needed for one conclusion. Complete separable source-grounded work and state the exact missing evidence, owner and next check.",
+              "requested_owner": "task owner"
+            }
+          ],
+          "unknown_facts": [
+            {
+              "fact": "task-specific applicability or evidence fact",
+              "why_unknown": "The edge scenario intentionally leaves this required fact or authority unresolved; preserve it as unknown.",
+              "evidence_refs": [
+                "fixture:legal-borghei-statute-analysis:source-1"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "fixture_id": "empty-completed-draft-rejected",
+      "expected_valid": false,
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": null,
+        "evidence_refs": [],
+        "open_questions": [],
+        "review_owner_role": "Synthetic completed task for legal-borghei-statute-analysis: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "statutory_structure_and_scope": "",
+          "defined_terms_and_role": [],
+          "requirement_permission_exception_map": "",
+          "cross_reference_analysis": "",
+          "effective_date_and_transition_notes": "",
+          "open_authority_questions": [],
+          "partial_work": [],
+          "missing_inputs": [],
+          "unknown_facts": []
+        }
+      }
+    }
+  ],
+  "fixture_note": "All values are fictional task-shaped contract examples derived from this pack’s golden scenario and criteria; these files are schema evidence, not executed results or business/legal facts."
+}

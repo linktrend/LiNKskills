@@ -1,0 +1,284 @@
+{
+  "schema_ref": "../schemas.json#/definitions/interview_register",
+  "purpose": "Contract-only fixtures; all records and references are synthetic. Does not evaluate interview behavior or authorize writes.",
+  "valid_register": {
+    "schema_version": "1.0",
+    "status": "in_progress",
+    "facts": [
+      {
+        "fact_id": "synthetic:reported-office",
+        "topic": "registered office",
+        "value": "Fictional ExampleCo office",
+        "status": "Principal-reported",
+        "source_ref": "synthetic:interview-note-1",
+        "source_date": "2026-10-01",
+        "owner_role": "Principal",
+        "verified_at": null,
+        "contradicts": [],
+        "implications": [],
+        "follow_up": null
+      },
+      {
+        "fact_id": "synthetic:location-a",
+        "topic": "worker location",
+        "value": "Fictional location A",
+        "status": "conflicting",
+        "source_ref": "synthetic:record-a",
+        "source_date": "2026-10-01",
+        "owner_role": "Sara",
+        "verified_at": null,
+        "contradicts": [
+          "synthetic:location-b"
+        ],
+        "implications": [
+          "Determine applicable jurisdiction after reconciliation."
+        ],
+        "follow_up": "Ask for current work-location evidence."
+      },
+      {
+        "fact_id": "synthetic:location-b",
+        "topic": "worker location",
+        "value": "Fictional location B",
+        "status": "conflicting",
+        "source_ref": "synthetic:record-b",
+        "source_date": "2026-10-02",
+        "owner_role": "Sara",
+        "verified_at": null,
+        "contradicts": [
+          "synthetic:location-a"
+        ],
+        "implications": [
+          "Do not choose payroll treatment yet."
+        ],
+        "follow_up": "Reconcile both dated records."
+      },
+      {
+        "fact_id": "synthetic:tax-election",
+        "topic": "tax election",
+        "value": null,
+        "status": "unknown",
+        "source_ref": "synthetic:missing-record-review",
+        "source_date": "2026-10-03",
+        "owner_role": "Sara",
+        "verified_at": null,
+        "contradicts": [],
+        "implications": [
+          "Tax treatment remains open."
+        ],
+        "follow_up": "Request the formation and tax election records."
+      },
+      {
+        "fact_id": "synthetic:verified-currency",
+        "topic": "fictional-fixture-only",
+        "value": "USD",
+        "status": "verified",
+        "source_ref": "synthetic:currency-record",
+        "source_date": "2026-10-01",
+        "owner_role": "Principal",
+        "verified_at": "2026-10-05T03:00:00Z",
+        "contradicts": [],
+        "implications": [],
+        "follow_up": null
+      }
+    ],
+    "unresolved_decisions": [
+      {
+        "decision_id": "synthetic:accounting-basis",
+        "question": "Which accounting basis is supported by current records and adviser review?",
+        "status": "open",
+        "owner_role": "Principal",
+        "source_ref": "synthetic:interview-module-04",
+        "source_date": "2026-10-03",
+        "follow_up": "Review source records and ask the accountant; do not assume a basis."
+      }
+    ],
+    "answered_questions": [
+      {
+        "question_id": "synthetic:q-01-registered-office",
+        "module_id": "01",
+        "question": "What registered office appears in the formation record?",
+        "answer": "Fictional ExampleCo office",
+        "status": "Principal-reported",
+        "source_ref": "synthetic:interview-note-1",
+        "source_date": "2026-10-01",
+        "owner_role": "Principal",
+        "conflicts_with": [],
+        "follow_up": null
+      },
+      {
+        "question_id": "synthetic:q-02-tax-election",
+        "module_id": "01",
+        "question": "What tax election is evidenced?",
+        "answer": null,
+        "status": "unknown",
+        "source_ref": "synthetic:missing-record-review",
+        "source_date": "2026-10-03",
+        "owner_role": "Sara",
+        "conflicts_with": [],
+        "follow_up": "Request the dated filing/election record."
+      }
+    ],
+    "artifact_refs": [
+      {
+        "artifact_id": "synthetic:formation-record",
+        "artifact_ref": "synthetic://exampleco/formation-record",
+        "kind": "fictional formation record",
+        "status": "available",
+        "owner_role": "Sara",
+        "recorded_at": "2026-10-03T12:00:00Z",
+        "evidence_refs": [
+          "synthetic:record-hash"
+        ],
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      }
+    ],
+    "native_checkpoint_ref": {
+      "task_id": "20261004-1200-SARA-123456",
+      "native_ref": "synthetic://consumer-checkpoint/1",
+      "status": "saved",
+      "recorded_at": "2026-10-03T12:05:00Z",
+      "answered_question_ids": [
+        "synthetic:q-01-registered-office"
+      ],
+      "open_item_ids": [
+        "synthetic:tax-election",
+        "synthetic:accounting-basis"
+      ]
+    },
+    "implementation_acceptance": [
+      {
+        "criterion_id": "synthetic:contract-shape",
+        "criterion": "Register data conforms to the versioned interview contract.",
+        "status": "passed",
+        "owner_role": "Sara",
+        "evidence_refs": [
+          "synthetic:validation-receipt"
+        ],
+        "verified_at": "2026-10-03T12:06:00Z"
+      }
+    ]
+  },
+  "negative_cases": [
+    {
+      "case_id": "missing-fact-provenance",
+      "valid": false,
+      "mutations": [
+        {
+          "op": "remove",
+          "path": "/facts/0/source_ref"
+        }
+      ],
+      "expected_error_path": [
+        "facts",
+        0
+      ]
+    },
+    {
+      "case_id": "invalid-fact-status",
+      "valid": false,
+      "mutations": [
+        {
+          "op": "replace",
+          "path": "/facts/0/status",
+          "value": "assumed"
+        }
+      ],
+      "expected_error_path": [
+        "facts",
+        0,
+        "status"
+      ]
+    },
+    {
+      "case_id": "conflict-without-counterpart",
+      "valid": false,
+      "mutations": [
+        {
+          "op": "replace",
+          "path": "/facts/1/contradicts",
+          "value": []
+        }
+      ],
+      "expected_error_path": [
+        "facts",
+        1,
+        "contradicts"
+      ]
+    },
+    {
+      "case_id": "decision-missing-owner",
+      "valid": false,
+      "mutations": [
+        {
+          "op": "remove",
+          "path": "/unresolved_decisions/0/owner_role"
+        }
+      ],
+      "expected_error_path": [
+        "unresolved_decisions",
+        0
+      ]
+    },
+    {
+      "case_id": "checkpoint-missing-task-binding",
+      "valid": false,
+      "mutations": [
+        {
+          "op": "remove",
+          "path": "/native_checkpoint_ref/task_id"
+        }
+      ],
+      "expected_error_path": [
+        "native_checkpoint_ref"
+      ]
+    },
+    {
+      "case_id": "passed-acceptance-without-proof",
+      "valid": false,
+      "mutations": [
+        {
+          "op": "replace",
+          "path": "/implementation_acceptance/0/evidence_refs",
+          "value": []
+        }
+      ],
+      "expected_error_path": [
+        "implementation_acceptance",
+        0,
+        "evidence_refs"
+      ]
+    },
+    {
+      "case_id": "unknown-cannot-be-zero",
+      "valid": false,
+      "mutations": [
+        {
+          "op": "replace",
+          "path": "/facts/3/value",
+          "value": 0
+        }
+      ],
+      "expected_error_path": [
+        "facts",
+        3,
+        "value"
+      ]
+    },
+    {
+      "case_id": "verified-fact-needs-verification-time",
+      "valid": false,
+      "mutations": [
+        {
+          "op": "replace",
+          "path": "/facts/4/verified_at",
+          "value": null
+        }
+      ],
+      "expected_error_path": [
+        "facts",
+        4,
+        "verified_at"
+      ]
+    }
+  ]
+}

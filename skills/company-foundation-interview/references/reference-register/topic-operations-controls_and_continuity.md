@@ -1,0 +1,32 @@
+# operations.controls_and_continuity
+
+- Operational plan templates — IC-Basic-Operational-Plan-11510.xlsx: `references/reference-register/entries/template-000/INDEX.md`.
+- RACI templates — IC-Simple-RACI-Matrix-11490.xlsx: `references/reference-register/entries/template-001/INDEX.md`.
+- SOP templates — ic-business-sop-template_word.docx: `references/reference-register/entries/template-002/INDEX.md`.
+- Vendor risk assessment templates — IC-Basic-Vendor-Risk-Assessment-Checklist-10772.xlsx: `references/reference-register/entries/template-005/INDEX.md`.
+- Capacity planning templates — IC-Capacity-Planning-11147.xlsx: `references/reference-register/entries/template-006/INDEX.md`.
+- Risk register templates — ic-business-risk-register-template.xlsx: `references/reference-register/entries/template-007/INDEX.md`.
+- Change request forms — IC-Basic-Change-Request-Form_WORD.docx: `references/reference-register/entries/template-008/INDEX.md`.
+- Corrective-action templates — IC-30-Day-Corrective-Action-Plan-11714_WORD.docx: `references/reference-register/entries/template-009/INDEX.md`.
+- Status report templates — IC-Agile-Project-Status-Report-Template-10776.xlsx: `references/reference-register/entries/template-010/INDEX.md`.
+- Compliance risk templates — IC-Compliance-Risk-Assessment-Matrix-Template.xlsx: `references/reference-register/entries/template-022/INDEX.md`.
+- NIST SP 800-34 templates — sp800-34-rev1_bia_template.docx: `references/reference-register/entries/template-023/INDEX.md`.
+- Vendor-registration form — Excel: `references/reference-register/entries/template-033/INDEX.md`.
+- Data-retention schedule — Excel: `references/reference-register/entries/template-039/INDEX.md`.
+- ITIL incident-record template — Excel: `references/reference-register/entries/template-041/INDEX.md`.
+- Risk-control matrix — Excel: `references/reference-register/entries/template-042/INDEX.md`.
+- Corrective-action plan — Word: `references/reference-register/entries/template-043/INDEX.md`.
+- Operational plan templates — IC-3-Year-Operational-Plan-11510.xlsx: `references/reference-register/entries/template-044/INDEX.md`.
+- Operational plan templates — IC-5-Year-Operational-Plan-11510.xlsx: `references/reference-register/entries/template-045/INDEX.md`.
+- RACI templates — IC-Sample-RACI-Chart-11490.xlsx: `references/reference-register/entries/template-046/INDEX.md`.
+- SOP templates — ic-simple-sop-template-example_word.docx: `references/reference-register/entries/template-047/INDEX.md`.
+- Vendor risk assessment templates — IC-Sample-Vendor-Risk-Assessment-Questionnaire-10772.xlsx: `references/reference-register/entries/template-052/INDEX.md`.
+- Change request forms — IC-Basic-Change-Request-Form-Example_WORD.docx: `references/reference-register/entries/template-053/INDEX.md`.
+- Corrective-action templates — IC-Simple-Corrective-Action-Plan-Template-with-Sample-Data-11714_WORD.docx: `references/reference-register/entries/template-054/INDEX.md`.
+- Status report templates — IC-Project-Status-Report-Template-Example-10776.xlsx: `references/reference-register/entries/template-055/INDEX.md`.
+- Status report templates — IC-Weekly-Project-Status-Report-Template-10776.xlsx: `references/reference-register/entries/template-056/INDEX.md`.
+- Team charter templates, including blank and sample versions — IC-Simple-Team-Charter-Template-12117.xlsx: `references/reference-register/entries/template-062/INDEX.md`.
+- Team charter templates, including blank and sample versions — ic-simple-team-charter-template-example-12117_word.docx: `references/reference-register/entries/template-063/INDEX.md`.
+- Compliance risk templates — IC-Compliance-Risk-Assessment-Matrix-Template-Example.xlsx: `references/reference-register/entries/template-071/INDEX.md`.
+- Executive operations report — author-neutral original: `references/reference-register/entries/template-095/INDEX.md`.
+- Monthly operations review — author-neutral original: `references/reference-register/entries/template-096/INDEX.md`.

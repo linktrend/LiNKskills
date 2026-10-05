@@ -1,0 +1,1221 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "legal-lawve-climate-aligned-contracts-the-chancery-lane-project",
+  "display_name": "Climate-Aligned Contract Clauses",
+  "version": "0.1.0",
+  "description": "Draft, adapt or review a contract clause intended to support measurable climate mitigation, adaptation or transition objectives.",
+  "capability_category": "conditional_legal_task",
+  "lifecycle_state": "draft",
+  "format_profile": "heavy",
+  "compatible_runtime_profiles": [
+    "lisa-openclaw",
+    "cursor-macos"
+  ],
+  "min_capability_tier": "balanced",
+  "provenance": {
+    "author": "LiNKskills adaptation",
+    "source": "Full pinned Lawve source subtree and original per-source manifest/notices are retained byte-for-byte in references/upstream/.",
+    "license": "Exact source declarations and notices preserved; permission determination belongs to licensing owner."
+  },
+  "routing": {
+    "when_to_use": "Draft, adapt or review a contract clause intended to support measurable climate mitigation, adaptation or transition objectives.",
+    "when_not_to_use": [
+      "A different, distinct task is requested",
+      "An unapproved external effect, final decision, signature or system mutation is required"
+    ],
+    "tags": [
+      "conditional",
+      "task-specific",
+      "draft"
+    ],
+    "exclusion_rules": [
+      "Do not infer legal, jurisdictional, framework or company applicability.",
+      "No unapproved external effect, final decision, system mutation or claim of compliance."
+    ],
+    "ambiguity_rules": [
+      "Read authorized evidence; ask only materially outcome-changing questions; complete separable work"
+    ],
+    "recommended_disclosure_level": 2
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "contract_context",
+        "description": "Contract type, parties/roles, relevant clause and governing law if supplied."
+      },
+      {
+        "name": "climate_objective",
+        "description": "Specific outcome, metric, baseline, target and time horizon; distinguish aspiration from obligation."
+      },
+      {
+        "name": "operational_evidence",
+        "description": "Data, verification, reporting, supply-chain and remedy capabilities."
+      },
+      {
+        "name": "approved_positions",
+        "description": "Negotiation playbook or business limits, if approved."
+      },
+      {
+        "name": "authority_as_of",
+        "description": "Current legal sources and review date where legal enforceability is analyzed."
+      },
+      {
+        "name": "scope_and_as_of",
+        "description": "Actual jurisdiction/applicability and date; unknown if unavailable."
+      }
+    ],
+    "expected_outputs": [
+      {
+        "name": "legal-lawve-climate-aligned-contracts-the-chancery-lane-project_work_product",
+        "description": "Task-specific draft with evidence trace, applicability, uncertainties and next actions."
+      }
+    ],
+    "forbidden_actions": [
+      "Unapproved external effects, signatures, filings, legal commitments or source-system mutations",
+      "Inventing facts, jurisdiction, legal authority, company policy or approval",
+      "Exposure of confidential or personal data outside authorized scope"
+    ],
+    "verification_steps": [
+      "Targets, definitions, measurement and evidence are operationally testable.",
+      "Aspirations and binding obligations are clearly distinguished.",
+      "No climate or legal outcome is guaranteed.",
+      "Verify current primary authority and source date for material legal/regulatory claims.",
+      "Keep external_effects and mutations empty."
+    ],
+    "completion_criteria": [
+      "Task-specific deliverable is complete or the exact blocker is identified.",
+      "Sources, applicability, uncertainties and owner actions are visible.",
+      "No unapproved external effect or mutation."
+    ],
+    "known_limitations": [
+      "Draft/uncertified; structural validation is not legal or semantic certification.",
+      "No current legal database, external connector or business-system write is assumed."
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read",
+      "filesystem_write"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [
+      {
+        "key": "min_reasoning_tier",
+        "value": "balanced"
+      },
+      {
+        "key": "context_required",
+        "value": 64000
+      },
+      {
+        "key": "preferred_model",
+        "value": "gpt-6.1-sol"
+      }
+    ],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "required_certification_profiles": [],
+    "verification_refs": [
+      "references/eval-suite.yaml",
+      "references/task-contract-shape-fixture.json",
+      "references/source-copy-manifest.json",
+      "references/upstream/SOURCE-MANIFEST.json"
+    ],
+    "suite_hash": "sha256:64cefc1139c0535764b3665e669c79fa633677c738111c91465daa3ef1dcec2c"
+  },
+  "telemetry": {
+    "classification": "restricted",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_personal_data",
+      "strip_raw_documents",
+      "strip_reasoning"
+    ],
+    "retention_policy": "opaque task/source ids and hashes only"
+  },
+  "fragments": [
+    {
+      "fragment_id": "_gitignore",
+      "disclosure_level": 3,
+      "path": ".gitignore"
+    },
+    {
+      "fragment_id": "SKILL_md",
+      "disclosure_level": 2,
+      "path": "SKILL.md"
+    },
+    {
+      "fragment_id": "advanced_advanced_md",
+      "disclosure_level": 2,
+      "path": "advanced/advanced.md"
+    },
+    {
+      "fragment_id": "examples_error-recovery_md",
+      "disclosure_level": 3,
+      "path": "examples/error-recovery.md"
+    },
+    {
+      "fragment_id": "examples_success-pattern_md",
+      "disclosure_level": 3,
+      "path": "examples/success-pattern.md"
+    },
+    {
+      "fragment_id": "examples_synthetic-example_md",
+      "disclosure_level": 3,
+      "path": "examples/synthetic-example.md"
+    },
+    {
+      "fragment_id": "references_api-specs_md",
+      "disclosure_level": 3,
+      "path": "references/api-specs.md"
+    },
+    {
+      "fragment_id": "references_changelog_md",
+      "disclosure_level": 3,
+      "path": "references/changelog.md"
+    },
+    {
+      "fragment_id": "references_eval-suite_json",
+      "disclosure_level": 3,
+      "path": "references/eval-suite.json"
+    },
+    {
+      "fragment_id": "references_eval-suite_yaml",
+      "disclosure_level": 3,
+      "path": "references/eval-suite.yaml"
+    },
+    {
+      "fragment_id": "references_execution-profile_json",
+      "disclosure_level": 3,
+      "path": "references/execution-profile.json"
+    },
+    {
+      "fragment_id": "references_old-patterns_md",
+      "disclosure_level": 3,
+      "path": "references/old-patterns.md"
+    },
+    {
+      "fragment_id": "references_schemas_json",
+      "disclosure_level": 3,
+      "path": "references/schemas.json"
+    },
+    {
+      "fragment_id": "references_source-applicability_md",
+      "disclosure_level": 3,
+      "path": "references/source-applicability.md"
+    },
+    {
+      "fragment_id": "references_source-copy-manifest_json",
+      "disclosure_level": 3,
+      "path": "references/source-copy-manifest.json"
+    },
+    {
+      "fragment_id": "references_task-contract-shape-fixture_json",
+      "disclosure_level": 3,
+      "path": "references/task-contract-shape-fixture.json"
+    },
+    {
+      "fragment_id": "references_upstream_LAWVE-COLLECTION-LICENSE",
+      "disclosure_level": 3,
+      "path": "references/upstream/LAWVE-COLLECTION-LICENSE"
+    },
+    {
+      "fragment_id": "references_upstream_SOURCE-MANIFEST_json",
+      "disclosure_level": 3,
+      "path": "references/upstream/SOURCE-MANIFEST.json"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_README_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/README.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_SKILL_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/SKILL.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_demo_041773-2026_pdf",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/demo/041773-2026.pdf"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_a-beginners-guide-and-checklist-for-accessing-sustainability-linked-loans-slls_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/a-beginners-guide-and-checklist-for-accessing-sustainability-linked-loans-slls.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_align-construction-projects-with-climate-targets_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/align-construction-projects-with-climate-targets.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_allocating-scope-1-2-and-3-emissions-for-leased-assets_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/allocating-scope-1-2-and-3-emissions-for-leased-assets.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_alteration-improvement-provisions-in-leases-to-improve-climate-environmental-impact-of-buildings-and-better-use-of-shared-space_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/alteration-improvement-provisions-in-leases-to-improve-climate-environmental-impact-of-buildings-and-better-use-of-shared-space.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_ambitious-carbon-neutral-clause_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/ambitious-carbon-neutral-clause.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_auditing-water-usage-in-supply-chains_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/auditing-water-usage-in-supply-chains.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_avoiding-excessive-paperwork-in-dispute-resolution_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/avoiding-excessive-paperwork-in-dispute-resolution.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_benchmarking-of-project-greenhouse-gas-emissions_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/benchmarking-of-project-greenhouse-gas-emissions.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_board-minutes-consideration-of-climate-change-factors_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/board-minutes-consideration-of-climate-change-factors.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_board-paper-implementing-net-zero-for-smes_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/board-paper-implementing-net-zero-for-smes.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_carbon-contract-clauses-for-environmental-performance-and-associated-incentives-and-remedies_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/carbon-contract-clauses-for-environmental-performance-and-associated-incentives-and-remedies.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_carbon-footprint-reduction-mutual-notification-right-carbon-footprint-reduction-notice_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/carbon-footprint-reduction-mutual-notification-right-carbon-footprint-reduction-notice.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_carbon-neutral-agreement-clause_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/carbon-neutral-agreement-clause.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_circular-economy-product-design-obligation_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/circular-economy-product-design-obligation.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_climate-aligned-construction-waste-management-2_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/climate-aligned-construction-waste-management-2.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_climate-aligned-construction-waste-management_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/climate-aligned-construction-waste-management.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_climate-aligned-due-diligence-questionnaire_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/climate-aligned-due-diligence-questionnaire.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_climate-and-nature-impact-investing-terms_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/climate-and-nature-impact-investing-terms.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_climate-change-clauses-for-heads-of-terms_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/climate-change-clauses-for-heads-of-terms.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_climate-change-due-diligence-questionnaire-for-suppliers-3_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/climate-change-due-diligence-questionnaire-for-suppliers-3.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_climate-change-due-diligence-questionnaire-for-suppliers_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/climate-change-due-diligence-questionnaire-for-suppliers.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_climate-change-due-diligence-questionnaire_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/climate-change-due-diligence-questionnaire.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_climate-checklist-for-prospectuses-and-other-public-offering-documents_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/climate-checklist-for-prospectuses-and-other-public-offering-documents.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_climate-contract-risk-sharing-ex-force-majeure_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/climate-contract-risk-sharing-ex-force-majeure.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_climate-due-diligence-questionnaire-for-ma-transactions_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/climate-due-diligence-questionnaire-for-ma-transactions.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_climate-linked-contractual-discretions_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/climate-linked-contractual-discretions.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_climate-linked-product-surveillance_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/climate-linked-product-surveillance.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_climate-lobbying-and-responsible-investments-policy-requirements_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/climate-lobbying-and-responsible-investments-policy-requirements.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_climate-policy-footprint_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/climate-policy-footprint.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_climate-purchase-agreement-and-underwriting-sponsor-warranties_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/climate-purchase-agreement-and-underwriting-sponsor-warranties.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_climate-purposed-nda-terms-confidentiality-agreement_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/climate-purposed-nda-terms-confidentiality-agreement.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_climate-recitals_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/climate-recitals.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_climate-related-disclosure-and-emissions-data-in-loans-australian-law-or-aplma_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/climate-related-disclosure-and-emissions-data-in-loans-australian-law-or-aplma.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_climate-related-disclosure-in-loans_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/climate-related-disclosure-in-loans.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_climate-related-knowledge-sharing-between-insurer-and-insured_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/climate-related-knowledge-sharing-between-insurer-and-insured.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_climate-related-liability-cover-commercial-insureds_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/climate-related-liability-cover-commercial-insureds.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_climate-resilient-landscape-design-contracts_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/climate-resilient-landscape-design-contracts.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_climate-solutions-ipr-licence_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/climate-solutions-ipr-licence.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_climate-standard-of-care-construction_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/climate-standard-of-care-construction.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_climate-standard-transaction-terms_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/climate-standard-transaction-terms.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_clls-certificate-of-title-climate-change-disclosures_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/clls-certificate-of-title-climate-change-disclosures.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_commercial-lease-alterations-improve-environmental-performance_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/commercial-lease-alterations-improve-environmental-performance.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_commercial-lease-repairs-and-alterations-circular-economy_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/commercial-lease-repairs-and-alterations-circular-economy.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_condition-to-liability-cover-for-climate-related-claims-commercial-insureds_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/condition-to-liability-cover-for-climate-related-claims-commercial-insureds.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_conservation-covenant-for-soil-preservation-and-enhancement_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/conservation-covenant-for-soil-preservation-and-enhancement.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_consolidated-sustainability-clauses-for-supply-chain-contracts_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/consolidated-sustainability-clauses-for-supply-chain-contracts.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_construction-materials-procurement_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/construction-materials-procurement.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_construction-procuring-materials-and-carbon-budgets_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/construction-procuring-materials-and-carbon-budgets.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_contrato-de-compraventa-contrato-de-inversion-revelacion-de-los-planes-de-cambio-climatico_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/contrato-de-compraventa-contrato-de-inversion-revelacion-de-los-planes-de-cambio-climatico.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_coolerplate-clauses-climate-aligned-boilerplate_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/coolerplate-clauses-climate-aligned-boilerplate.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_corporate-esg-ldd-questionnaire_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/corporate-esg-ldd-questionnaire.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_credito-verde-paquete-inicial_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/credito-verde-paquete-inicial.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_cuadro-de-indicadores-de-las-emisiones-en-la-cadena-de-suministro_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/cuadro-de-indicadores-de-las-emisiones-en-la-cadena-de-suministro.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_cuestionario-para-una-debida-diligencia-due-diligence-sobre-cambio-climatico_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/cuestionario-para-una-debida-diligencia-due-diligence-sobre-cambio-climatico.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_debt-finance-clauses-and-lma-facility-amendments-promoting-sustainable-water-usage_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/debt-finance-clauses-and-lma-facility-amendments-promoting-sustainable-water-usage.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_decrease-dispute-carbon-footprint_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/decrease-dispute-carbon-footprint.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_deforestation-and-land-use-change-clause-and-questionnaire_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/deforestation-and-land-use-change-clause-and-questionnaire.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_dockless-mobility-data-sharing-clauses_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/dockless-mobility-data-sharing-clauses.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_eficiencia-de-energia-en-contratos-epc-y-obligaciones-ambientales_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/eficiencia-de-energia-en-contratos-epc-y-obligaciones-ambientales.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_electronic-board-meetings_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/electronic-board-meetings.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_electronic-notices_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/electronic-notices.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_electronic-signatures_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/electronic-signatures.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_emissions-notification-obligation_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/emissions-notification-obligation.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_employee-climate-engagement-provisions_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/employee-climate-engagement-provisions.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_employer-employee-environmental-obligations_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/employer-employee-environmental-obligations.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_encourage-sourcing-of-greener-fairer-renewable-energy_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/encourage-sourcing-of-greener-fairer-renewable-energy.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_encourage-sustainable-practice-in-arbitrations_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/encourage-sustainable-practice-in-arbitrations.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_entire-business-net-zero-objectives_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/entire-business-net-zero-objectives.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_environmental-business-charter_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/environmental-business-charter.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_environmental-performance-clause-2_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/environmental-performance-clause-2.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_environmental-social-and-governance-esg-based-performance-conditions-for-employee-incentive-awards_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/environmental-social-and-governance-esg-based-performance-conditions-for-employee-incentive-awards.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_environmental-targets-for-a-limited-partnership-agreement_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/environmental-targets-for-a-limited-partnership-agreement.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_esg-aligned-company-articles_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/esg-aligned-company-articles.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_esg-clauses-for-rules-of-procedure-for-managing-directors-of-a-german-limited-liability-company-gmbh_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/esg-clauses-for-rules-of-procedure-for-managing-directors-of-a-german-limited-liability-company-gmbh.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_esg-due-diligence-questionnaire-for-ma-and-capital-markets_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/esg-due-diligence-questionnaire-for-ma-and-capital-markets.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_esg-linked-pricing-adjustment-for-derivatives-transactions_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/esg-linked-pricing-adjustment-for-derivatives-transactions.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_esg-orientierte-vergutung-und-entlohnung-von-geschaftsfuhrenden_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/esg-orientierte-vergutung-und-entlohnung-von-geschaftsfuhrenden.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_film-production-carbon-footprint-disclosure_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/film-production-carbon-footprint-disclosure.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_focus-investment-documents-on-climate-issues_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/focus-investment-documents-on-climate-issues.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_further-assurances_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/further-assurances.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_gain-share-incentive-for-reducing-ghg-emissions_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/gain-share-incentive-for-reducing-ghg-emissions.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_general-condition-to-commercial-insurance-policies-climate-change-risk-assessment_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/general-condition-to-commercial-insurance-policies-climate-change-risk-assessment.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_ghg-emissions-management-plans-in-infrastructure-and-construction-project-finance_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/ghg-emissions-management-plans-in-infrastructure-and-construction-project-finance.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_green-acquisition-obligations_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/green-acquisition-obligations.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_green-assured-shorthold-tenancy-ast-clauses_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/green-assured-shorthold-tenancy-ast-clauses.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_green-coding-green-software-resource-efficient-programming_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/green-coding-green-software-resource-efficient-programming.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_green-commercial-lease-clauses_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/green-commercial-lease-clauses.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_green-company-articles_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/green-company-articles.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_green-dispute-reporting-in-after-the-event-insurance-policies_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/green-dispute-reporting-in-after-the-event-insurance-policies.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_green-dispute-resolution_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/green-dispute-resolution.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_green-film-production-credits_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/green-film-production-credits.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_green-investment-obligations_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/green-investment-obligations.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_green-it-green-hardware-sustainable-data-centers_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/green-it-green-hardware-sustainable-data-centers.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_green-lease-clauses-for-irish-commercial-leases-incorporating-circular-economy-and-sustainability-principles-into-a-service-charge-regime-landlords-regulations-and-landlords-works_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/green-lease-clauses-for-irish-commercial-leases-incorporating-circular-economy-and-sustainability-principles-into-a-service-charge-regime-landlords-regulations-and-landlords-works.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_green-lease-clauses-for-irish-commercial-leases-promoting-co-operation-between-landlords-and-tenants-concerning-the-environmental-performance-of-buildings_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/green-lease-clauses-for-irish-commercial-leases-promoting-co-operation-between-landlords-and-tenants-concerning-the-environmental-performance-of-buildings.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_green-lease-clauses-for-irish-commercial-leases-relating-to-1-sustainable-and-circular-economy-principles-in-repair-and-alteration-covenants-2-rent-review-assumptions-and-3-protecting-energy_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/green-lease-clauses-for-irish-commercial-leases-relating-to-1-sustainable-and-circular-economy-principles-in-repair-and-alteration-covenants-2-rent-review-assumptions-and-3-protecting-energy.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_green-litigation-and-arbitration-protocols-3_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/green-litigation-and-arbitration-protocols-3.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_green-litigation-and-arbitration-protocols_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/green-litigation-and-arbitration-protocols.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_green-loan-starter-pack_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/green-loan-starter-pack.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_green-or-sustainability-linked-lending-requirement_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/green-or-sustainability-linked-lending-requirement.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_green-recitals_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/green-recitals.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_green-residential-lease-clauses_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/green-residential-lease-clauses.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_green-service-charge-provisions-for-commercial-leases_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/green-service-charge-provisions-for-commercial-leases.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_green-shareholders-agreement-short-form-for-smes_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/green-shareholders-agreement-short-form-for-smes.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_green-shareholders-agreement_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/green-shareholders-agreement.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_green-supplier-agreement-terms_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/green-supplier-agreement-terms.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_green-termination-provision-short-form_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/green-termination-provision-short-form.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_green-transaction-execution-protocols_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/green-transaction-execution-protocols.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_greener-and-more-efficient-hgvs-in-road-and-multimodal-transport-agreements_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/greener-and-more-efficient-hgvs-in-road-and-multimodal-transport-agreements.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_heads-of-terms-for-landowner-collaboration-on-environmental-schemes_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/heads-of-terms-for-landowner-collaboration-on-environmental-schemes.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_incentives-for-insured-parties-to-disclose-and-meet-ghg-emissions-targets_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/incentives-for-insured-parties-to-disclose-and-meet-ghg-emissions-targets.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_incentivise-emissions-reductions-through-gain-share_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/incentivise-emissions-reductions-through-gain-share.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_indigenous-local-knowledge-in-board-director-appointments_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/indigenous-local-knowledge-in-board-director-appointments.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_insurance-disclosure-and-mitigation-of-pending-climate-change-litigation_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/insurance-disclosure-and-mitigation-of-pending-climate-change-litigation.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_insurance-premium-adjustment-for-do-climate-related-financial-disclosures_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/insurance-premium-adjustment-for-do-climate-related-financial-disclosures.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_intellectual-property-free-licence-for-climate-purposes_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/intellectual-property-free-licence-for-climate-purposes.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_interest-ratchet-clause-for-carbon-saving_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/interest-ratchet-clause-for-carbon-saving.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_introduce-climate-considerations-to-dispute-resolution_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/introduce-climate-considerations-to-dispute-resolution.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_introduce-emissions-benchmarking_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/introduce-emissions-benchmarking.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_introduce-right-to-terminate-for-greener-supplier_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/introduce-right-to-terminate-for-greener-supplier.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_jct-energy-efficiency-and-environmental-obligations_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/jct-energy-efficiency-and-environmental-obligations.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_land-sustainable-soil-management_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/land-sustainable-soil-management.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_landlord-and-tenant-obligations-to-create-additionality-in-renewable-electricity-generation_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/landlord-and-tenant-obligations-to-create-additionality-in-renewable-electricity-generation.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_landlord-and-tenant-obligations-to-provide-renewable-electricity_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/landlord-and-tenant-obligations-to-provide-renewable-electricity.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_late-payment-green-interest-remedies_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/late-payment-green-interest-remedies.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_lease-renewable-energy-obligations_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/lease-renewable-energy-obligations.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_low-carbon-arbitrations_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/low-carbon-arbitrations.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_management-equity-ratchet-terms_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/management-equity-ratchet-terms.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_manifest_json",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/manifest.json"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_model-smart-mobility-data-sharing-clauses_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/model-smart-mobility-data-sharing-clauses.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_modern-methods-of-construction-mmc-and-net-zero-provisions-for-construction-or-development-agreements_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/modern-methods-of-construction-mmc-and-net-zero-provisions-for-construction-or-development-agreements.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_nachhaltigkeitspolicy_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/nachhaltigkeitspolicy.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_net-zero-aligned-construction-modifications_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/net-zero-aligned-construction-modifications.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_net-zero-completion-adjustment-clause_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/net-zero-completion-adjustment-clause.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_net-zero-convertible-loan-note_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/net-zero-convertible-loan-note.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_net-zero-culture-employment-handbook_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/net-zero-culture-employment-handbook.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_net-zero-land-development_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/net-zero-land-development.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_net-zero-land-promotion-agreement_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/net-zero-land-promotion-agreement.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_net-zero-obligations-in-fidic-engineering-procurement-and-construction-epc-contracts_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/net-zero-obligations-in-fidic-engineering-procurement-and-construction-epc-contracts.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_net-zero-sponsor-activation-clauses_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/net-zero-sponsor-activation-clauses.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_net-zero-target-supply-chain-cascade-clause_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/net-zero-target-supply-chain-cascade-clause.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_net-zero-target-supply-chain-cascade-clauses_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/net-zero-target-supply-chain-cascade-clauses.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_normas-ecologicas-en-diseno-y-construccion_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/normas-ecologicas-en-diseno-y-construccion.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_nota-de-prestamo-convertible-a-cero-neto_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/nota-de-prestamo-convertible-a-cero-neto.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_obligaciones-de-inversion-verde_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/obligaciones-de-inversion-verde.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_obligaciones-de-los-proveedores-con-respecto-a-los-umbrales-medioambientales_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/obligaciones-de-los-proveedores-con-respecto-a-los-umbrales-medioambientales.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_parametric-insurance-incentives-for-the-protection-of-coral-reefs_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/parametric-insurance-incentives-for-the-protection-of-coral-reefs.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_paris-aligned-company-articles_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/paris-aligned-company-articles.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_prestamos-vinculados-a-la-sostenibilidad_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/prestamos-vinculados-a-la-sostenibilidad.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_promotion-of-carbon-sinks-and-ecological-restoration-in-lettings-of-rural-land_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/promotion-of-carbon-sinks-and-ecological-restoration-in-lettings-of-rural-land.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_promotion-of-regenerative-farming-methods-through-profit-of-pasturage-agreements_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/promotion-of-regenerative-farming-methods-through-profit-of-pasturage-agreements.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_promotion-of-sustainable-consumption-and-travel-in-tv-production_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/promotion-of-sustainable-consumption-and-travel-in-tv-production.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_proyecto-de-articulo-que-contiene-el-objeto-social-de-una-sociedad-compatible-con-el-acuerdo-de-paris_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/proyecto-de-articulo-que-contiene-el-objeto-social-de-una-sociedad-compatible-con-el-acuerdo-de-paris.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_reduccion-de-huella-de-carbono-derecho-de-notificacion-mutua-aviso-de-reduccion-de-huella-de-carbono_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/reduccion-de-huella-de-carbono-derecho-de-notificacion-mutua-aviso-de-reduccion-de-huella-de-carbono.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_reduce-food-waste-in-supply-chain_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/reduce-food-waste-in-supply-chain.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_reducing-supply-chain-food-waste_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/reducing-supply-chain-food-waste.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_renewable-energy-requirements-in-supply-contracts_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/renewable-energy-requirements-in-supply-contracts.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_repair-or-refurbishment-in-insurance-claims_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/repair-or-refurbishment-in-insurance-claims.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_report-on-title-climate-change-clauses_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/report-on-title-climate-change-clauses.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_report-on-title-residential-real-estate_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/report-on-title-residential-real-estate.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_require-supplier-to-procure-energy-from-renewable-sources_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/require-supplier-to-procure-energy-from-renewable-sources.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_securing-net-zero-in-planning-development-projects_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/securing-net-zero-in-planning-development-projects.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_set-a-carbon-budget-for-construction-projects_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/set-a-carbon-budget-for-construction-projects.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_shareholder-resolutions-relating-to-a-companys-climate-change-commitments_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/shareholder-resolutions-relating-to-a-companys-climate-change-commitments.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_short-form-green-termination-of-supplier_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/short-form-green-termination-of-supplier.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_short-form-shareholders-agreement_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/short-form-shareholders-agreement.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_smes-net-zero-objectives_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/smes-net-zero-objectives.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_spa-apa-investment-agreement-representations-warranties-and-covenants-re-disclosure-of-climate-change-plans_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/spa-apa-investment-agreement-representations-warranties-and-covenants-re-disclosure-of-climate-change-plans.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_spa-investment-agreement-disclosure-of-climate-change-plans_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/spa-investment-agreement-disclosure-of-climate-change-plans.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_sponsorship-agreement-net-zero-outcome_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/sponsorship-agreement-net-zero-outcome.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_stakeholder-company-climate-questionnaire_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/stakeholder-company-climate-questionnaire.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_subcontractor-supplier-self-assessment-climate-questionnaire-construction_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/subcontractor-supplier-self-assessment-climate-questionnaire-construction.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_supplier-environmental-threshold-obligations_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/supplier-environmental-threshold-obligations.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_supply-chain-emissions-scorecard_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/supply-chain-emissions-scorecard.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_supply-chain-sustainable-land-use-clause-and-questionnaire_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/supply-chain-sustainable-land-use-clause-and-questionnaire.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_supply-due-diligence-questionnaire_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/supply-due-diligence-questionnaire.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_supply-renewable-energy-requirements_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/supply-renewable-energy-requirements.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_supply-termination-for-greener-supplier_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/supply-termination-for-greener-supplier.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_sustainability-clauses-in-supply-chain-contracts_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/sustainability-clauses-in-supply-chain-contracts.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_sustainability-enterprise-delivery-measures-within-construction-works-task-orders_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/sustainability-enterprise-delivery-measures-within-construction-works-task-orders.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_sustainability-key-performance-indicators-in-construction-works-task-orders_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/sustainability-key-performance-indicators-in-construction-works-task-orders.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_sustainability-linked-loans_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/sustainability-linked-loans.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_sustainability-reporting-clause-for-the-constitution-of-a-private-limited-company_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/sustainability-reporting-clause-for-the-constitution-of-a-private-limited-company.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_sustainable-and-circular-economy-principles-in-leasing-arrangements-for-repairs-and-alterations_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/sustainable-and-circular-economy-principles-in-leasing-arrangements-for-repairs-and-alterations.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_sustainable-on-site-working-practices_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/sustainable-on-site-working-practices.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_sustainable-soil-management-obligations_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/sustainable-soil-management-obligations.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_target-product-carbon-footprint-schedule-for-consumer-goods-contracts_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/target-product-carbon-footprint-schedule-for-consumer-goods-contracts.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_template-board-paper-for-significant-contracts-transactions_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/template-board-paper-for-significant-contracts-transactions.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_termination-for-greener-supplier_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/termination-for-greener-supplier.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_the-green-supplier-contract-a-standardised-contractual-pricing-model_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/the-green-supplier-contract-a-standardised-contractual-pricing-model.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_the-net-zero-standard-for-suppliers_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/the-net-zero-standard-for-suppliers.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_climate-aligned-contracts-the-chancery-lane-project_references_clauses_transparent-sourcing-of-greener-fairer-renewable-energy_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/climate-aligned-contracts-the-chancery-lane-project/references/clauses/transparent-sourcing-of-greener-fairer-renewable-energy.md"
+    },
+    {
+      "fragment_id": "scripts_README_md",
+      "disclosure_level": 3,
+      "path": "scripts/README.md"
+    },
+    {
+      "fragment_id": "scripts_helper_tool_py",
+      "disclosure_level": 3,
+      "path": "scripts/helper_tool.py"
+    }
+  ],
+  "release_channel": "development"
+}

@@ -1,0 +1,166 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "austria-regulatory-compliance",
+  "display_name": "Austria Regulatory Compliance Research",
+  "version": "0.1.0",
+  "description": "Analyze a regulatory or compliance question expressly governed by Austrian law.",
+  "capability_category": "conditional_legal_jurisdiction_research",
+  "lifecycle_state": "draft",
+  "format_profile": "heavy",
+  "compatible_runtime_profiles": [
+    "lisa-openclaw",
+    "cursor-macos"
+  ],
+  "min_capability_tier": "balanced",
+  "provenance": {
+    "author": "LiNKskills task adaptation",
+    "source": "https://github.com/ThomasMoreAI/legal-skills-open@c95af087c15ad7f6580c4c95213ccf263b73b1d0:at/regulatory/skills/recht-compliance-momarcode1; exact source subtree copied in references/upstream/source/",
+    "license": "Notices and licenses are preserved where present; Carlos handles licensing; no clearance asserted."
+  },
+  "routing": {
+    "when_to_use": "Analyze a regulatory or compliance question expressly governed by Austrian law.",
+    "when_not_to_use": [
+      "A different task requires a distinct skill",
+      "Unapproved external/legal/business action or missing approval",
+      "Required interface is unavailable"
+    ],
+    "tags": [
+      "legal",
+      "conditional",
+      "jurisdiction-austria"
+    ],
+    "exclusion_rules": [
+      "This is an unbound jurisdiction-specific library capability; it is not Sara-active by default. If no current official source lookup is available in the native interface, report the gap and stop short of a legal conclusion."
+    ],
+    "ambiguity_rules": [
+      "Verify current law and facts for the expressly identified jurisdiction."
+    ],
+    "recommended_disclosure_level": 2
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "case_or_question",
+        "description": "case or question"
+      },
+      {
+        "name": "scope_or_context",
+        "description": "scope or context"
+      },
+      {
+        "name": "evidence_refs",
+        "description": "evidence refs"
+      },
+      {
+        "name": "backend_or_jurisdiction_state",
+        "description": "backend or jurisdiction state"
+      },
+      {
+        "name": "requested_work_product",
+        "description": "requested work product"
+      }
+    ],
+    "expected_outputs": [
+      {
+        "name": "task_analysis",
+        "description": "task analysis"
+      },
+      {
+        "name": "source_and_method",
+        "description": "source and method"
+      },
+      {
+        "name": "findings_or_proposal",
+        "description": "findings or proposal"
+      },
+      {
+        "name": "gaps_and_uncertainty",
+        "description": "gaps and uncertainty"
+      },
+      {
+        "name": "next_owner_actions",
+        "description": "next owner actions"
+      },
+      {
+        "name": "capability_status",
+        "description": "capability status"
+      }
+    ],
+    "forbidden_actions": [
+      "Assumed jurisdiction, current law or authority",
+      "Unapproved legal filing, signature, external communication, profile mutation or technical side effect"
+    ],
+    "verification_steps": [
+      "1. Confirm entity/person, issue, relevant dates and express jurisdictional link from supplied records; if absent, stop at a jurisdiction-identification question. 2. Check current official primary legal sources and effective dates for the precise issue; the included method points to jurisdiction-specific source protocols, but does not substitute for live verification. 3. Separate quoted authority, current rule, supplied facts, analysis, and inference. 4. Apply element-by-element and flag contrary authority, exceptions, transition rules and missing facts. 5. Draft a sourced issue memo with jurisdiction, as-of date, authorities/links, factual application, conclusion confidence, and open questions. 6. Keep filing, representation, legal opinion, entity change or external communication as human-approved actions.",
+      "Validate evidence references, dates and uncertainty; no effect without a separately approved native interface."
+    ],
+    "completion_criteria": [
+      "Task-specific draft/evidence artifact or precise conditional gap returned",
+      "Original sources and license/notice provenance preserved",
+      "No unsupported authority, capability claim, installation or effect"
+    ],
+    "known_limitations": [
+      "This is an unbound jurisdiction-specific library capability; it is not Sara-active by default. If no current official source lookup is available in the native interface, report the gap and stop short of a legal conclusion.",
+      "Draft and uncertified; no live connector/backend or current-law semantic certification claimed"
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read",
+      "filesystem_write"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [
+      {
+        "key": "min_reasoning_tier",
+        "value": "balanced"
+      },
+      {
+        "key": "context_required",
+        "value": 32000
+      },
+      {
+        "key": "preferred_model",
+        "value": "gpt-6.1-sol"
+      }
+    ],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "required_certification_profiles": [],
+    "verification_refs": [
+      "references/eval-suite.yaml",
+      "references/upstream/SOURCE-MANIFEST.json"
+    ],
+    "suite_hash": "sha256:697cce209142e91b771a8e3a6a174c8a6fa962aab810063cd4068f0b9f4bc897"
+  },
+  "telemetry": {
+    "classification": "restricted",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_personal_data",
+      "strip_raw_documents",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain_minimized_ids_hashes_and_owner_approved_summary_only"
+  },
+  "fragments": [
+    {
+      "fragment_id": "skill-md",
+      "disclosure_level": 2,
+      "path": "SKILL.md"
+    },
+    {
+      "fragment_id": "task-method",
+      "disclosure_level": 3,
+      "path": "advanced/advanced.md"
+    }
+  ],
+  "release_channel": "development"
+}

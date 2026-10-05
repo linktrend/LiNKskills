@@ -1,0 +1,156 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "compliance-framework-fda-qsr-audit-prep",
+  "input_schema_ref": "references/schemas.json#/definitions/input",
+  "output_schema_ref": "references/schemas.json#/definitions/output",
+  "completion_required_fields": [
+    "scope_and_current_rule_status",
+    "qms_evidence_sample_matrix",
+    "owner_action_plan"
+  ],
+  "fixtures": [
+    {
+      "fixture_id": "synthetic-task-shaped-completed",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261005-0900-SARA-123456",
+        "request_ref": "fixture:compliance-framework-fda-qsr-audit-prep:request",
+        "source_refs": [
+          "fixture:compliance-framework-fda-qsr-audit-prep:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "task_request": "A fictional device maker provides a small set of CAPA and design records after an inspection notice; identify scope/evidence gaps without declaring QMS compliance or reportability.",
+          "source_documents": [
+            "Synthetic input fixture for compliance-framework-fda-qsr-audit-prep: source documents. Fictional test content only; no real-world facts."
+          ],
+          "company_context": "Synthetic input fixture for compliance-framework-fda-qsr-audit-prep: company context. Fictional test content only; no real-world facts.",
+          "applicability_context": "Synthetic input fixture for compliance-framework-fda-qsr-audit-prep: applicability context. Fictional test content only; no real-world facts.",
+          "review_owner": "Synthetic input fixture for compliance-framework-fda-qsr-audit-prep: review owner. Fictional test content only; no real-world facts.",
+          "device_and_activity_scope": "Synthetic input fixture for compliance-framework-fda-qsr-audit-prep: device and activity scope. Fictional test content only; no real-world facts.",
+          "qms_evidence": "Synthetic input fixture for compliance-framework-fda-qsr-audit-prep: qms evidence. Fictional test content only; no real-world facts.",
+          "inspection_or_event_posture": "Synthetic input fixture for compliance-framework-fda-qsr-audit-prep: inspection or event posture. Fictional test content only; no real-world facts.",
+          "regulatory_status_sources": "Synthetic input fixture for compliance-framework-fda-qsr-audit-prep: regulatory status sources. Fictional test content only; no real-world facts."
+        }
+      },
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": "fixture:compliance-framework-fda-qsr-audit-prep:draft",
+        "evidence_refs": [
+          "fixture:compliance-framework-fda-qsr-audit-prep:source-1"
+        ],
+        "open_questions": [],
+        "review_owner_role": "Synthetic completed task for compliance-framework-fda-qsr-audit-prep: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "scope_and_current_rule_status": "Fictional compliance-framework-fda-qsr-audit-prep scope and current rule status section. Scenario: A fictional device maker provides a small set of CAPA and design records after an inspection notice; identify scope/evidence gaps without declaring QMS compliance or reportability. Expected handling: Produces the fda quality-system audit preparation deliverable with task-specific fields and not a generic departmental summary. Cites supplied evidence and preserves unknown, conflicting or unsupported facts. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "qms_evidence_sample_matrix": [
+            "Fictional compliance-framework-fda-qsr-audit-prep qms evidence sample matrix section. Scenario: A fictional device maker provides a small set of CAPA and design records after an inspection notice; identify scope/evidence gaps without declaring QMS compliance or reportability. Expected handling: Produces the fda quality-system audit preparation deliverable with task-specific fields and not a generic departmental summary. Cites supplied evidence and preserves unknown, conflicting or unsupported facts. This is illustrative synthetic content only, not a real fact, legal authority, or executed result."
+          ],
+          "complaint_mdr_capa_gaps": [],
+          "inspection_readiness_questions": [],
+          "owner_action_plan": "Fictional compliance-framework-fda-qsr-audit-prep owner action plan section. Scenario: A fictional device maker provides a small set of CAPA and design records after an inspection notice; identify scope/evidence gaps without declaring QMS compliance or reportability. Expected handling: Produces the fda quality-system audit preparation deliverable with task-specific fields and not a generic departmental summary. Cites supplied evidence and preserves unknown, conflicting or unsupported facts. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "partial_work": [],
+          "missing_inputs": [],
+          "unknown_facts": []
+        }
+      }
+    },
+    {
+      "fixture_id": "needs-context-preserves-partial-and-unknowns",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261005-0900-SARA-123456",
+        "request_ref": "fixture:compliance-framework-fda-qsr-audit-prep:request",
+        "source_refs": [
+          "fixture:compliance-framework-fda-qsr-audit-prep:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "task_request": "Prepare a synthetic compliance-framework-fda-qsr-audit-prep deliverable from this fictional test record; make no real-world factual or legal claim.",
+          "source_documents": [
+            "Synthetic input fixture for compliance-framework-fda-qsr-audit-prep: source documents. Fictional test content only; no real-world facts."
+          ],
+          "company_context": "Synthetic input fixture for compliance-framework-fda-qsr-audit-prep: company context. Fictional test content only; no real-world facts.",
+          "applicability_context": "Synthetic input fixture for compliance-framework-fda-qsr-audit-prep: applicability context. Fictional test content only; no real-world facts.",
+          "review_owner": "Synthetic input fixture for compliance-framework-fda-qsr-audit-prep: review owner. Fictional test content only; no real-world facts.",
+          "device_and_activity_scope": "Synthetic input fixture for compliance-framework-fda-qsr-audit-prep: device and activity scope. Fictional test content only; no real-world facts.",
+          "qms_evidence": "Synthetic input fixture for compliance-framework-fda-qsr-audit-prep: qms evidence. Fictional test content only; no real-world facts.",
+          "inspection_or_event_posture": "Synthetic input fixture for compliance-framework-fda-qsr-audit-prep: inspection or event posture. Fictional test content only; no real-world facts.",
+          "regulatory_status_sources": "Synthetic input fixture for compliance-framework-fda-qsr-audit-prep: regulatory status sources. Fictional test content only; no real-world facts."
+        }
+      },
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "needs_context",
+        "artifact_ref": "fixture:compliance-framework-fda-qsr-audit-prep:partial",
+        "evidence_refs": [],
+        "open_questions": [
+          "Confirm the named missing input with its owner."
+        ],
+        "review_owner_role": "Synthetic completed task for compliance-framework-fda-qsr-audit-prep: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "scope_and_current_rule_status": "",
+          "qms_evidence_sample_matrix": [],
+          "complaint_mdr_capa_gaps": [],
+          "inspection_readiness_questions": [],
+          "owner_action_plan": "",
+          "partial_work": [
+            {
+              "section": "scope_and_current_rule_status",
+              "content": "Partial compliance-framework-fda-qsr-audit-prep fixture: source inventory recorded; one dependent conclusion remains unknown.",
+              "evidence_refs": [
+                "fixture:compliance-framework-fda-qsr-audit-prep:source-1"
+              ]
+            }
+          ],
+          "missing_inputs": [
+            {
+              "field": "authorized_source_or_material_fact",
+              "reason": "Synthetic missing-context scenario: The task arrives with a material missing fact or inaccessible authority needed for one conclusion. Complete separable source-grounded work and state the exact missing evidence, owner and next check.",
+              "requested_owner": "task owner"
+            }
+          ],
+          "unknown_facts": [
+            {
+              "fact": "task-specific applicability or evidence fact",
+              "why_unknown": "The edge scenario intentionally leaves this required fact or authority unresolved; preserve it as unknown.",
+              "evidence_refs": [
+                "fixture:compliance-framework-fda-qsr-audit-prep:source-1"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "fixture_id": "empty-completed-draft-rejected",
+      "expected_valid": false,
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": null,
+        "evidence_refs": [],
+        "open_questions": [],
+        "review_owner_role": "Synthetic completed task for compliance-framework-fda-qsr-audit-prep: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "scope_and_current_rule_status": "",
+          "qms_evidence_sample_matrix": [],
+          "complaint_mdr_capa_gaps": [],
+          "inspection_readiness_questions": [],
+          "owner_action_plan": "",
+          "partial_work": [],
+          "missing_inputs": [],
+          "unknown_facts": []
+        }
+      }
+    }
+  ],
+  "fixture_note": "All values are fictional task-shaped contract examples derived from this pack’s golden scenario and criteria; these files are schema evidence, not executed results or business/legal facts."
+}

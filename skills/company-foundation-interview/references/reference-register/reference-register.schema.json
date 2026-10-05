@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.invalid/company-foundation-interview/reference-register.schema.json",
+  "title": "Company foundation interview reference registers",
+  "description": "Structural contract for the maintained knowledge and template registers. packaged_files and disclosure_chunks are the only content locators. original_file, readable_text_file, actual_resource_route and related source fields are provenance only and must never be used as active retrieval paths.",
+  "oneOf": [
+    { "$ref": "#/$defs/knowledgeRegister" },
+    { "$ref": "#/$defs/templateRegister" }
+  ],
+  "$defs": {
+    "path": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[^\\u0000]+$",
+      "description": "Skill-root-relative packaged content locator."
+    },
+    "digest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "packagedFile": {
+      "type": "object",
+      "required": ["path", "sha256", "bytes", "media_type"],
+      "properties": {
+        "path": { "$ref": "#/$defs/path" },
+        "sha256": { "$ref": "#/$defs/digest" },
+        "bytes": { "type": "integer", "minimum": 0 },
+        "media_type": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": true
+    },
+    "chunk": {
+      "type": "object",
+      "required": ["path", "sha256", "bytes", "sequence", "original_text_path", "text_sha256"],
+      "properties": {
+        "path": { "$ref": "#/$defs/path" },
+        "sha256": { "$ref": "#/$defs/digest" },
+        "bytes": { "type": "integer", "minimum": 0 },
+        "sequence": { "type": "integer", "minimum": 1 },
+        "original_text_path": { "$ref": "#/$defs/path" },
+        "text_sha256": { "$ref": "#/$defs/digest" }
+      },
+      "additionalProperties": true
+    },
+    "captureRedaction": {
+      "type": "object",
+      "required": ["original_capture_sha256", "current_path", "current_sha256", "current_bytes", "redacted_occurrences", "redaction_scope"],
+      "properties": {
+        "original_capture_sha256": { "$ref": "#/$defs/digest", "description": "Original capture digest retained only as provenance; never dereferenced as publishable content." },
+        "current_path": { "$ref": "#/$defs/path" },
+        "current_sha256": { "$ref": "#/$defs/digest" },
+        "current_bytes": { "type": "integer", "minimum": 0 },
+        "redacted_occurrences": { "type": "integer", "minimum": 1 },
+        "redaction_scope": { "type": "string", "minLength": 1 },
+        "backup_note": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "recordKind": {
+      "type": "string",
+      "enum": ["captured", "authored", "source-gap", "link", "candidate"],
+      "description": "Optional descriptive classification. It does not imply admission or canon status. candidate is also represented by admission_state."
+    },
+    "chunks": {
+      "oneOf": [
+        { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/chunk" } },
+        {
+          "type": "object",
+          "required": ["manifest", "count"],
+          "properties": {
+            "manifest": { "$ref": "#/$defs/path" },
+            "count": { "type": "integer", "minimum": 1 }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "common": {
+      "type": "object",
+      "required": ["title", "source_class", "admission_state", "resource_class", "packaged_files", "disclosure_chunks", "metadata_resource"],
+      "properties": {
+        "title": { "type": "string", "minLength": 1 },
+        "source_class": { "type": "string", "minLength": 1 },
+        "admission_state": { "type": "string", "minLength": 1 },
+        "record_kinds": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/recordKind" }, "description": "Optional overlapping source and lifecycle labels; candidate status remains unadmitted unless the admission_state says otherwise." },
+        "availability": { "type": ["string", "null"] },
+        "download_status": { "type": ["string", "null"] },
+        "resource_class": { "type": "string", "enum": ["knowledge", "template"] },
+        "packaged_files": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/packagedFile" } },
+        "disclosure_chunks": { "$ref": "#/$defs/chunks" },
+        "metadata_resource": { "$ref": "#/$defs/path" },
+        "capture_redaction": { "$ref": "#/$defs/captureRedaction" },
+        "original_file": { "type": ["string", "null"], "description": "Provenance only; never dereference as a content locator." },
+        "readable_text_file": { "type": ["string", "null"], "description": "Provenance only; never dereference as a content locator." },
+        "actual_resource_route": { "type": ["string", "null"], "description": "Provenance only; never dereference as a content locator." },
+        "source_local_artifact": { "type": ["string", "null"], "description": "Provenance only; never dereference as a content locator." },
+        "readable_text_artifact": { "type": ["string", "null"], "description": "Provenance only; never dereference as a content locator." },
+        "source_sha256": { "type": ["string", "null"], "description": "Digest of a source capture retained as provenance; packaged_files hashes identify current publishable bytes." },
+        "task_support_paths": { "type": ["array", "null"], "items": { "type": "string" }, "description": "Legacy/support hints. Active content locators are packaged_files and disclosure_chunks only." }
+      },
+      "additionalProperties": true
+    },
+    "knowledgeRow": {
+      "allOf": [
+        { "$ref": "#/$defs/common" },
+        { "properties": { "resource_class": { "const": "knowledge" } } }
+      ]
+    },
+    "templateRow": {
+      "allOf": [
+        { "$ref": "#/$defs/common" },
+        { "properties": { "resource_class": { "const": "template" } } }
+      ]
+    },
+    "knowledgeRegister": {
+      "type": "object",
+      "required": ["state", "items"],
+      "properties": { "state": { "type": "string" }, "items": { "type": "array", "items": { "$ref": "#/$defs/knowledgeRow" } } },
+      "additionalProperties": true
+    },
+    "templateRegister": {
+      "type": "object",
+      "required": ["state", "items"],
+      "properties": { "state": { "type": "string" }, "items": { "type": "array", "items": { "$ref": "#/$defs/templateRow" } } },
+      "additionalProperties": true
+    }
+  }
+}

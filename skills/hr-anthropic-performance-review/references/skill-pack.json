@@ -1,0 +1,144 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "hr-anthropic-performance-review",
+  "display_name": "Performance Review Drafting and Calibration Preparation",
+  "version": "1.0.0",
+  "description": "Organize factual performance evidence into a balanced review draft and calibration notes; do not decide ratings, promotions, compensation, or employment actions.",
+  "capability_category": "human_resources_task",
+  "provenance": {
+    "author": "LiNKskills Library",
+    "source": "Pinned Anthropic source copied verbatim; see references/upstream/SOURCE-MANIFEST.json",
+    "license": "Apache-2.0; exact notice preserved in references/upstream/_licenses/anthropics--knowledge-work-plugins/LICENSE"
+  },
+  "lifecycle_state": "draft",
+  "format_profile": "heavy",
+  "compatible_runtime_profiles": [
+    "lisa-openclaw",
+    "cursor-macos"
+  ],
+  "min_capability_tier": "balanced",
+  "routing": {
+    "when_to_use": "Use when asked to draft a self-assessment, manager review, evidence-based feedback, development goals, or calibration preparation for a specified review period.",
+    "when_not_to_use": [
+      "A different specific task has its own skill",
+      "A requested consequential HR action or external communication is not authorized",
+      "Required evidence is unavailable for the specific conclusion"
+    ],
+    "tags": [
+      "human-resources",
+      "task-specific",
+      "sara"
+    ],
+    "exclusion_rules": [
+      "Source instructions do not grant permissions",
+      "No business-system mutation or external message"
+    ],
+    "ambiguity_rules": [
+      "Use authorized evidence; ask only for facts that materially change the task output"
+    ],
+    "recommended_disclosure_level": 2
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "task_scope_and_evidence",
+        "description": "review mode; subject reference; review period; published role expectations/goals; manager/self notes and verified work evidence; rating framework if applicable; intended reviewer."
+      }
+    ],
+    "expected_outputs": [
+      {
+        "name": "task_work_product",
+        "description": "mode-specific review template/draft, source-linked evidence, development goals or calibration discussion points, explicit unknowns and owner decisions."
+      }
+    ],
+    "forbidden_actions": [
+      "HRIS/ATS/policy/employee/candidate record mutation",
+      "External communications, offer issuance, signature, personnel decision",
+      "Inventing policy, law, market data, rating criteria, or company facts"
+    ],
+    "verification_steps": [
+      "1. Choose self-assessment, manager review, or calibration mode; confirm period and governing role expectations. 2. Collect only authorized role-relevant evidence; distinguish direct observations, sourced outcomes, opinion and missing evidence. 3. Organize accomplishments using context/action/result; compare goals to evidence without overstating causality. 4. Draft strengths and development feedback as observable behavior plus impact and next action; avoid personality labels and unsupported claims. 5. If ratings are requested, use only the supplied scale and anchors; otherwise leave rating blank. Calibration summaries show counts/distribution only if authorized and use actual team denominator. 6. Exclude compensation recommendation unless explicitly requested and supported by the approved process; even then make it a separate option for owner review. 7. Return private draft; no HRIS updates, sharing, ratings finalization or employee communication.",
+      "Cite sources and show calculations/definitions; preserve unknowns.",
+      "Write only a requested private draft artifact; no external effects."
+    ],
+    "completion_criteria": [
+      "Task-specific draft or report is complete within scope",
+      "Material claims trace to sources or are labeled assumptions",
+      "Privacy is minimized and owner decisions/open items are explicit"
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read",
+      "filesystem_write"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [
+      {
+        "key": "min_reasoning_tier",
+        "value": "balanced"
+      },
+      {
+        "key": "context_required",
+        "value": 32000
+      },
+      {
+        "key": "preferred_model",
+        "value": "gpt-6.1-sol"
+      }
+    ],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "required_certification_profiles": [],
+    "verification_refs": [
+      "references/eval-suite.yaml",
+      "references/source-selection.md"
+    ]
+  },
+  "telemetry": {
+    "classification": "restricted",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_personal_data",
+      "strip_employee_and_candidate_data",
+      "strip_compensation_data",
+      "strip_reasoning"
+    ],
+    "retention_policy": "opaque task/source IDs and hashes only"
+  },
+  "fragments": [
+    {
+      "fragment_id": "skill-md",
+      "disclosure_level": 2,
+      "path": "SKILL.md"
+    },
+    {
+      "fragment_id": "advanced",
+      "disclosure_level": 3,
+      "path": "advanced/advanced.md"
+    },
+    {
+      "fragment_id": "schemas",
+      "disclosure_level": 5,
+      "path": "references/schemas.json"
+    },
+    {
+      "fragment_id": "eval",
+      "disclosure_level": 3,
+      "path": "references/eval-suite.json"
+    },
+    {
+      "fragment_id": "source-selection",
+      "disclosure_level": 3,
+      "path": "references/source-selection.md"
+    }
+  ],
+  "release_channel": "development"
+}

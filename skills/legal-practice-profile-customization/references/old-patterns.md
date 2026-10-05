@@ -1,0 +1,3 @@
+- Do not assume practice mode, jurisdiction, positions, connected tools, or company policy.
+- Never run ~/.claude commands, write local profile files, or probe unavailable integrations.
+- Keep source provenance separate from confirmed company policy.

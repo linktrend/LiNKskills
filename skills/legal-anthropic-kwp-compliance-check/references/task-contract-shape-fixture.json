@@ -1,0 +1,158 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "legal-anthropic-kwp-compliance-check",
+  "input_schema_ref": "references/schemas.json#/definitions/input",
+  "output_schema_ref": "references/schemas.json#/definitions/output",
+  "completion_required_fields": [
+    "scope_and_applicability",
+    "evidence_based_findings",
+    "remediation_options"
+  ],
+  "fixtures": [
+    {
+      "fixture_id": "synthetic-task-shaped-completed",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261005-0900-SARA-123456",
+        "request_ref": "fixture:legal-anthropic-kwp-compliance-check:request",
+        "source_refs": [
+          "fixture:legal-anthropic-kwp-compliance-check:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "task_request": "A fictional marketing feature combines telemetry and customer quotes across unknown markets; map relevant review questions and request evidence instead of applying a blanket law.",
+          "source_documents": [
+            "Synthetic input fixture for legal-anthropic-kwp-compliance-check: source documents. Fictional test content only; no real-world facts."
+          ],
+          "company_context": "Synthetic input fixture for legal-anthropic-kwp-compliance-check: company context. Fictional test content only; no real-world facts.",
+          "applicability_context": "Synthetic input fixture for legal-anthropic-kwp-compliance-check: applicability context. Fictional test content only; no real-world facts.",
+          "review_owner": "Synthetic input fixture for legal-anthropic-kwp-compliance-check: review owner. Fictional test content only; no real-world facts.",
+          "initiative_or_feature": "Synthetic input fixture for legal-anthropic-kwp-compliance-check: initiative or feature. Fictional test content only; no real-world facts.",
+          "data_and_user_flows": "Synthetic input fixture for legal-anthropic-kwp-compliance-check: data and user flows. Fictional test content only; no real-world facts.",
+          "claims_and_policy_refs": "Synthetic input fixture for legal-anthropic-kwp-compliance-check: claims and policy refs. Fictional test content only; no real-world facts.",
+          "requested_review_domains": "Synthetic input fixture for legal-anthropic-kwp-compliance-check: requested review domains. Fictional test content only; no real-world facts."
+        }
+      },
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": "fixture:legal-anthropic-kwp-compliance-check:draft",
+        "evidence_refs": [
+          "fixture:legal-anthropic-kwp-compliance-check:source-1"
+        ],
+        "open_questions": [],
+        "review_owner_role": "Synthetic completed task for legal-anthropic-kwp-compliance-check: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "scope_and_applicability": "Fictional legal-anthropic-kwp-compliance-check scope and applicability section. Scenario: A fictional marketing feature combines telemetry and customer quotes across unknown markets; map relevant review questions and request evidence instead of applying a blanket law. Expected handling: Produces the initiative compliance review deliverable with task-specific fields and not a generic departmental summary. Cites supplied evidence and preserves unknown, conflicting or unsupported facts. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "evidence_based_findings": [
+            "Fictional legal-anthropic-kwp-compliance-check evidence based findings section. Scenario: A fictional marketing feature combines telemetry and customer quotes across unknown markets; map relevant review questions and request evidence instead of applying a blanket law. Expected handling: Produces the initiative compliance review deliverable with task-specific fields and not a generic departmental summary. Cites supplied evidence and preserves unknown, conflicting or unsupported facts. This is illustrative synthetic content only, not a real fact, legal authority, or executed result."
+          ],
+          "privacy_and_contract_questions": [],
+          "risk_and_gap_summary": "No unresolved item in this synthetic complete fixture.",
+          "remediation_options": [
+            "Fictional legal-anthropic-kwp-compliance-check remediation options section. Scenario: A fictional marketing feature combines telemetry and customer quotes across unknown markets; map relevant review questions and request evidence instead of applying a blanket law. Expected handling: Produces the initiative compliance review deliverable with task-specific fields and not a generic departmental summary. Cites supplied evidence and preserves unknown, conflicting or unsupported facts. This is illustrative synthetic content only, not a real fact, legal authority, or executed result."
+          ],
+          "partial_work": [],
+          "missing_inputs": [],
+          "unknown_facts": []
+        }
+      }
+    },
+    {
+      "fixture_id": "needs-context-preserves-partial-and-unknowns",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261005-0900-SARA-123456",
+        "request_ref": "fixture:legal-anthropic-kwp-compliance-check:request",
+        "source_refs": [
+          "fixture:legal-anthropic-kwp-compliance-check:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "task_request": "Prepare a synthetic legal-anthropic-kwp-compliance-check deliverable from this fictional test record; make no real-world factual or legal claim.",
+          "source_documents": [
+            "Synthetic input fixture for legal-anthropic-kwp-compliance-check: source documents. Fictional test content only; no real-world facts."
+          ],
+          "company_context": "Synthetic input fixture for legal-anthropic-kwp-compliance-check: company context. Fictional test content only; no real-world facts.",
+          "applicability_context": "Synthetic input fixture for legal-anthropic-kwp-compliance-check: applicability context. Fictional test content only; no real-world facts.",
+          "review_owner": "Synthetic input fixture for legal-anthropic-kwp-compliance-check: review owner. Fictional test content only; no real-world facts.",
+          "initiative_or_feature": "Synthetic input fixture for legal-anthropic-kwp-compliance-check: initiative or feature. Fictional test content only; no real-world facts.",
+          "data_and_user_flows": "Synthetic input fixture for legal-anthropic-kwp-compliance-check: data and user flows. Fictional test content only; no real-world facts.",
+          "claims_and_policy_refs": "Synthetic input fixture for legal-anthropic-kwp-compliance-check: claims and policy refs. Fictional test content only; no real-world facts.",
+          "requested_review_domains": "Synthetic input fixture for legal-anthropic-kwp-compliance-check: requested review domains. Fictional test content only; no real-world facts."
+        }
+      },
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "needs_context",
+        "artifact_ref": "fixture:legal-anthropic-kwp-compliance-check:partial",
+        "evidence_refs": [],
+        "open_questions": [
+          "Confirm the named missing input with its owner."
+        ],
+        "review_owner_role": "Synthetic completed task for legal-anthropic-kwp-compliance-check: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "scope_and_applicability": "",
+          "evidence_based_findings": [],
+          "privacy_and_contract_questions": [],
+          "risk_and_gap_summary": "",
+          "remediation_options": [],
+          "partial_work": [
+            {
+              "section": "scope_and_applicability",
+              "content": "Partial legal-anthropic-kwp-compliance-check fixture: source inventory recorded; one dependent conclusion remains unknown.",
+              "evidence_refs": [
+                "fixture:legal-anthropic-kwp-compliance-check:source-1"
+              ]
+            }
+          ],
+          "missing_inputs": [
+            {
+              "field": "authorized_source_or_material_fact",
+              "reason": "Synthetic missing-context scenario: The task arrives with a material missing fact or inaccessible authority needed for one conclusion. Complete separable source-grounded work and state the exact missing evidence, owner and next check.",
+              "requested_owner": "task owner"
+            }
+          ],
+          "unknown_facts": [
+            {
+              "fact": "task-specific applicability or evidence fact",
+              "why_unknown": "The edge scenario intentionally leaves this required fact or authority unresolved; preserve it as unknown.",
+              "evidence_refs": [
+                "fixture:legal-anthropic-kwp-compliance-check:source-1"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "fixture_id": "empty-completed-draft-rejected",
+      "expected_valid": false,
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": null,
+        "evidence_refs": [],
+        "open_questions": [],
+        "review_owner_role": "Synthetic completed task for legal-anthropic-kwp-compliance-check: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "scope_and_applicability": "",
+          "evidence_based_findings": [],
+          "privacy_and_contract_questions": [],
+          "risk_and_gap_summary": "",
+          "remediation_options": [],
+          "partial_work": [],
+          "missing_inputs": [],
+          "unknown_facts": []
+        }
+      }
+    }
+  ],
+  "fixture_note": "All values are fictional task-shaped contract examples derived from this pack’s golden scenario and criteria; these files are schema evidence, not executed results or business/legal facts."
+}
