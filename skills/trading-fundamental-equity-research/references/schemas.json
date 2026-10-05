@@ -170,7 +170,8 @@
         "financial_snapshot",
         "valuation",
         "countercase",
-        "gaps"
+        "gaps",
+        "artifact_coverage"
       ],
       "properties": {
         "completion_status": {
@@ -331,6 +332,141 @@
               }
             }
           }
+        },
+        "artifact_coverage": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Conditional artifact coverage. A concise memo-only answer is valid; charts, spreadsheets, and document files are not mandatory. Hashes describe only artifacts actually produced.",
+          "required": [
+            "status",
+            "requested_artifact_types",
+            "artifacts",
+            "uncompleted_deliverables"
+          ],
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "memo_only",
+                "complete",
+                "partial"
+              ]
+            },
+            "requested_artifact_types": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "artifacts": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "artifact_type",
+                  "path",
+                  "sha256",
+                  "status"
+                ],
+                "properties": {
+                  "artifact_type": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "path": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^sha256:[0-9a-fA-F]{64}$"
+                  },
+                  "status": {
+                    "const": "produced"
+                  }
+                }
+              }
+            },
+            "uncompleted_deliverables": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "artifact_type",
+                  "status",
+                  "reason"
+                ],
+                "properties": {
+                  "artifact_type": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "not_generated",
+                      "unavailable",
+                      "not_requested"
+                    ]
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "memo_only"
+                  }
+                },
+                "required": [
+                  "status"
+                ]
+              },
+              "then": {
+                "properties": {
+                  "requested_artifact_types": {
+                    "maxItems": 0
+                  },
+                  "artifacts": {
+                    "maxItems": 0
+                  },
+                  "uncompleted_deliverables": {
+                    "maxItems": 0
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "complete"
+                  }
+                },
+                "required": [
+                  "status"
+                ]
+              },
+              "then": {
+                "properties": {
+                  "uncompleted_deliverables": {
+                    "maxItems": 0
+                  }
+                }
+              }
+            }
+          ]
         }
       }
     }

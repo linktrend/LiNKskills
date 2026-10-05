@@ -502,6 +502,145 @@
         }
       },
       {
+        "name": "artifact_coverage",
+        "description": "Required property `artifact_coverage` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Conditional artifact coverage. A concise memo-only answer is valid; charts, spreadsheets, and document files are not mandatory. Hashes describe only artifacts actually produced.",
+          "required": [
+            "status",
+            "requested_artifact_types",
+            "artifacts",
+            "uncompleted_deliverables"
+          ],
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "memo_only",
+                "complete",
+                "partial"
+              ]
+            },
+            "requested_artifact_types": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "artifacts": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "artifact_type",
+                  "path",
+                  "sha256",
+                  "status"
+                ],
+                "properties": {
+                  "artifact_type": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "path": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^sha256:[0-9a-fA-F]{64}$"
+                  },
+                  "status": {
+                    "const": "produced"
+                  }
+                }
+              }
+            },
+            "uncompleted_deliverables": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "artifact_type",
+                  "status",
+                  "reason"
+                ],
+                "properties": {
+                  "artifact_type": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "not_generated",
+                      "unavailable",
+                      "not_requested"
+                    ]
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "memo_only"
+                  }
+                },
+                "required": [
+                  "status"
+                ]
+              },
+              "then": {
+                "properties": {
+                  "requested_artifact_types": {
+                    "maxItems": 0
+                  },
+                  "artifacts": {
+                    "maxItems": 0
+                  },
+                  "uncompleted_deliverables": {
+                    "maxItems": 0
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "complete"
+                  }
+                },
+                "required": [
+                  "status"
+                ]
+              },
+              "then": {
+                "properties": {
+                  "uncompleted_deliverables": {
+                    "maxItems": 0
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
         "name": "advisory_portfolio_proposal",
         "description": "Optional property `advisory_portfolio_proposal` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
         "schema": {
@@ -625,7 +764,7 @@
   "eval": {
     "suite_path": "references/eval-suite.json",
     "suite_schema_version": "0.1",
-    "suite_hash": "sha256:25c600b8be0e113047ec9667354a553bdeabffcbc624d3944c0be909a186d47b",
+    "suite_hash": "sha256:69744c5974f4f56c7d46d5e333cf41cd57ce6f9942f34057d684ffa0441baf11",
     "verification_refs": [
       "references/schemas.json",
       "references/eval-suite.json"

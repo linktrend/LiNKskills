@@ -171,6 +171,186 @@
                       "boolean",
                       "null"
                     ]
+                  },
+                  "source_provenance": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "description": "Optional source lineage for this historical observation. Omit to preserve legacy input compatibility; the method must mark any calculation relying on absent lineage partial/unavailable and name gaps rather than infer values.",
+                    "required": [
+                      "status",
+                      "missing_fields"
+                    ],
+                    "properties": {
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "complete",
+                          "partial",
+                          "unavailable"
+                        ]
+                      },
+                      "missing_fields": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "uniqueItems": true
+                      },
+                      "source_timestamp": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "format": "date-time"
+                      },
+                      "session_timezone": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "minLength": 1
+                      },
+                      "transformation": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "minLength": 1
+                      },
+                      "transformation_version": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "minLength": 1
+                      },
+                      "adjustment_convention": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "minLength": 1
+                      },
+                      "session_calendar": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "minLength": 1
+                      },
+                      "history_window": {
+                        "type": [
+                          "object",
+                          "null"
+                        ],
+                        "additionalProperties": false,
+                        "required": [
+                          "start_date",
+                          "end_date",
+                          "window_definition"
+                        ],
+                        "properties": {
+                          "start_date": {
+                            "type": "string",
+                            "format": "date"
+                          },
+                          "end_date": {
+                            "type": "string",
+                            "format": "date"
+                          },
+                          "window_definition": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "session_count": {
+                            "type": [
+                              "integer",
+                              "null"
+                            ],
+                            "minimum": 1
+                          }
+                        }
+                      }
+                    },
+                    "allOf": [
+                      {
+                        "if": {
+                          "properties": {
+                            "status": {
+                              "const": "complete"
+                            }
+                          },
+                          "required": [
+                            "status"
+                          ]
+                        },
+                        "then": {
+                          "required": [
+                            "source_timestamp",
+                            "session_timezone",
+                            "transformation",
+                            "transformation_version",
+                            "adjustment_convention",
+                            "session_calendar",
+                            "history_window"
+                          ],
+                          "properties": {
+                            "missing_fields": {
+                              "maxItems": 0
+                            },
+                            "source_timestamp": {
+                              "type": "string",
+                              "format": "date-time"
+                            },
+                            "session_timezone": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "transformation": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "transformation_version": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "adjustment_convention": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "session_calendar": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "history_window": {
+                              "type": "object"
+                            }
+                          }
+                        }
+                      },
+                      {
+                        "if": {
+                          "properties": {
+                            "status": {
+                              "enum": [
+                                "partial",
+                                "unavailable"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "status"
+                          ]
+                        },
+                        "then": {
+                          "properties": {
+                            "missing_fields": {
+                              "minItems": 1
+                            }
+                          }
+                        }
+                      }
+                    ]
                   }
                 }
               }
@@ -223,6 +403,186 @@
                   },
                   "session": {
                     "type": "string"
+                  },
+                  "source_provenance": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "description": "Optional source lineage for this historical observation. Omit to preserve legacy input compatibility; the method must mark any calculation relying on absent lineage partial/unavailable and name gaps rather than infer values.",
+                    "required": [
+                      "status",
+                      "missing_fields"
+                    ],
+                    "properties": {
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "complete",
+                          "partial",
+                          "unavailable"
+                        ]
+                      },
+                      "missing_fields": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "uniqueItems": true
+                      },
+                      "source_timestamp": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "format": "date-time"
+                      },
+                      "session_timezone": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "minLength": 1
+                      },
+                      "transformation": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "minLength": 1
+                      },
+                      "transformation_version": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "minLength": 1
+                      },
+                      "adjustment_convention": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "minLength": 1
+                      },
+                      "session_calendar": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "minLength": 1
+                      },
+                      "history_window": {
+                        "type": [
+                          "object",
+                          "null"
+                        ],
+                        "additionalProperties": false,
+                        "required": [
+                          "start_date",
+                          "end_date",
+                          "window_definition"
+                        ],
+                        "properties": {
+                          "start_date": {
+                            "type": "string",
+                            "format": "date"
+                          },
+                          "end_date": {
+                            "type": "string",
+                            "format": "date"
+                          },
+                          "window_definition": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "session_count": {
+                            "type": [
+                              "integer",
+                              "null"
+                            ],
+                            "minimum": 1
+                          }
+                        }
+                      }
+                    },
+                    "allOf": [
+                      {
+                        "if": {
+                          "properties": {
+                            "status": {
+                              "const": "complete"
+                            }
+                          },
+                          "required": [
+                            "status"
+                          ]
+                        },
+                        "then": {
+                          "required": [
+                            "source_timestamp",
+                            "session_timezone",
+                            "transformation",
+                            "transformation_version",
+                            "adjustment_convention",
+                            "session_calendar",
+                            "history_window"
+                          ],
+                          "properties": {
+                            "missing_fields": {
+                              "maxItems": 0
+                            },
+                            "source_timestamp": {
+                              "type": "string",
+                              "format": "date-time"
+                            },
+                            "session_timezone": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "transformation": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "transformation_version": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "adjustment_convention": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "session_calendar": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "history_window": {
+                              "type": "object"
+                            }
+                          }
+                        }
+                      },
+                      {
+                        "if": {
+                          "properties": {
+                            "status": {
+                              "enum": [
+                                "partial",
+                                "unavailable"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "status"
+                          ]
+                        },
+                        "then": {
+                          "properties": {
+                            "missing_fields": {
+                              "minItems": 1
+                            }
+                          }
+                        }
+                      }
+                    ]
                   }
                 }
               }
@@ -398,6 +758,186 @@
                       "boolean",
                       "null"
                     ]
+                  },
+                  "source_provenance": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "description": "Optional source lineage for this historical observation. Omit to preserve legacy input compatibility; the method must mark any calculation relying on absent lineage partial/unavailable and name gaps rather than infer values.",
+                    "required": [
+                      "status",
+                      "missing_fields"
+                    ],
+                    "properties": {
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "complete",
+                          "partial",
+                          "unavailable"
+                        ]
+                      },
+                      "missing_fields": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "uniqueItems": true
+                      },
+                      "source_timestamp": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "format": "date-time"
+                      },
+                      "session_timezone": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "minLength": 1
+                      },
+                      "transformation": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "minLength": 1
+                      },
+                      "transformation_version": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "minLength": 1
+                      },
+                      "adjustment_convention": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "minLength": 1
+                      },
+                      "session_calendar": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "minLength": 1
+                      },
+                      "history_window": {
+                        "type": [
+                          "object",
+                          "null"
+                        ],
+                        "additionalProperties": false,
+                        "required": [
+                          "start_date",
+                          "end_date",
+                          "window_definition"
+                        ],
+                        "properties": {
+                          "start_date": {
+                            "type": "string",
+                            "format": "date"
+                          },
+                          "end_date": {
+                            "type": "string",
+                            "format": "date"
+                          },
+                          "window_definition": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "session_count": {
+                            "type": [
+                              "integer",
+                              "null"
+                            ],
+                            "minimum": 1
+                          }
+                        }
+                      }
+                    },
+                    "allOf": [
+                      {
+                        "if": {
+                          "properties": {
+                            "status": {
+                              "const": "complete"
+                            }
+                          },
+                          "required": [
+                            "status"
+                          ]
+                        },
+                        "then": {
+                          "required": [
+                            "source_timestamp",
+                            "session_timezone",
+                            "transformation",
+                            "transformation_version",
+                            "adjustment_convention",
+                            "session_calendar",
+                            "history_window"
+                          ],
+                          "properties": {
+                            "missing_fields": {
+                              "maxItems": 0
+                            },
+                            "source_timestamp": {
+                              "type": "string",
+                              "format": "date-time"
+                            },
+                            "session_timezone": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "transformation": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "transformation_version": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "adjustment_convention": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "session_calendar": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "history_window": {
+                              "type": "object"
+                            }
+                          }
+                        }
+                      },
+                      {
+                        "if": {
+                          "properties": {
+                            "status": {
+                              "enum": [
+                                "partial",
+                                "unavailable"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "status"
+                          ]
+                        },
+                        "then": {
+                          "properties": {
+                            "missing_fields": {
+                              "minItems": 1
+                            }
+                          }
+                        }
+                      }
+                    ]
                   }
                 }
               }
@@ -450,6 +990,186 @@
                   },
                   "session": {
                     "type": "string"
+                  },
+                  "source_provenance": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "description": "Optional source lineage for this historical observation. Omit to preserve legacy input compatibility; the method must mark any calculation relying on absent lineage partial/unavailable and name gaps rather than infer values.",
+                    "required": [
+                      "status",
+                      "missing_fields"
+                    ],
+                    "properties": {
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "complete",
+                          "partial",
+                          "unavailable"
+                        ]
+                      },
+                      "missing_fields": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "uniqueItems": true
+                      },
+                      "source_timestamp": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "format": "date-time"
+                      },
+                      "session_timezone": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "minLength": 1
+                      },
+                      "transformation": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "minLength": 1
+                      },
+                      "transformation_version": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "minLength": 1
+                      },
+                      "adjustment_convention": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "minLength": 1
+                      },
+                      "session_calendar": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "minLength": 1
+                      },
+                      "history_window": {
+                        "type": [
+                          "object",
+                          "null"
+                        ],
+                        "additionalProperties": false,
+                        "required": [
+                          "start_date",
+                          "end_date",
+                          "window_definition"
+                        ],
+                        "properties": {
+                          "start_date": {
+                            "type": "string",
+                            "format": "date"
+                          },
+                          "end_date": {
+                            "type": "string",
+                            "format": "date"
+                          },
+                          "window_definition": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "session_count": {
+                            "type": [
+                              "integer",
+                              "null"
+                            ],
+                            "minimum": 1
+                          }
+                        }
+                      }
+                    },
+                    "allOf": [
+                      {
+                        "if": {
+                          "properties": {
+                            "status": {
+                              "const": "complete"
+                            }
+                          },
+                          "required": [
+                            "status"
+                          ]
+                        },
+                        "then": {
+                          "required": [
+                            "source_timestamp",
+                            "session_timezone",
+                            "transformation",
+                            "transformation_version",
+                            "adjustment_convention",
+                            "session_calendar",
+                            "history_window"
+                          ],
+                          "properties": {
+                            "missing_fields": {
+                              "maxItems": 0
+                            },
+                            "source_timestamp": {
+                              "type": "string",
+                              "format": "date-time"
+                            },
+                            "session_timezone": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "transformation": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "transformation_version": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "adjustment_convention": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "session_calendar": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "history_window": {
+                              "type": "object"
+                            }
+                          }
+                        }
+                      },
+                      {
+                        "if": {
+                          "properties": {
+                            "status": {
+                              "enum": [
+                                "partial",
+                                "unavailable"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "status"
+                          ]
+                        },
+                        "then": {
+                          "properties": {
+                            "missing_fields": {
+                              "minItems": 1
+                            }
+                          }
+                        }
+                      }
+                    ]
                   }
                 }
               }
@@ -548,7 +1268,193 @@
         "schema": {
           "type": "array",
           "items": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+              "source_provenance": {
+                "type": "array",
+                "description": "Optional source records for the calculation; when source history is used, retain one row per contributing source series and preserve partial/unavailable lineage.",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "description": "Optional source lineage for this historical observation. Omit to preserve legacy input compatibility; the method must mark any calculation relying on absent lineage partial/unavailable and name gaps rather than infer values.",
+                  "required": [
+                    "status",
+                    "missing_fields"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "complete",
+                        "partial",
+                        "unavailable"
+                      ]
+                    },
+                    "missing_fields": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "uniqueItems": true
+                    },
+                    "source_timestamp": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "format": "date-time"
+                    },
+                    "session_timezone": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "minLength": 1
+                    },
+                    "transformation": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "minLength": 1
+                    },
+                    "transformation_version": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "minLength": 1
+                    },
+                    "adjustment_convention": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "minLength": 1
+                    },
+                    "session_calendar": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "minLength": 1
+                    },
+                    "history_window": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "additionalProperties": false,
+                      "required": [
+                        "start_date",
+                        "end_date",
+                        "window_definition"
+                      ],
+                      "properties": {
+                        "start_date": {
+                          "type": "string",
+                          "format": "date"
+                        },
+                        "end_date": {
+                          "type": "string",
+                          "format": "date"
+                        },
+                        "window_definition": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "session_count": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "minimum": 1
+                        }
+                      }
+                    }
+                  },
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "status": {
+                            "const": "complete"
+                          }
+                        },
+                        "required": [
+                          "status"
+                        ]
+                      },
+                      "then": {
+                        "required": [
+                          "source_timestamp",
+                          "session_timezone",
+                          "transformation",
+                          "transformation_version",
+                          "adjustment_convention",
+                          "session_calendar",
+                          "history_window"
+                        ],
+                        "properties": {
+                          "missing_fields": {
+                            "maxItems": 0
+                          },
+                          "source_timestamp": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "session_timezone": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "transformation": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "transformation_version": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "adjustment_convention": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "session_calendar": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "history_window": {
+                            "type": "object"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "status": {
+                            "enum": [
+                              "partial",
+                              "unavailable"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "status"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "missing_fields": {
+                            "minItems": 1
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
           }
         }
       },
@@ -678,7 +1584,7 @@
   "eval": {
     "suite_path": "references/eval-suite.json",
     "suite_schema_version": "0.1",
-    "suite_hash": "sha256:c4b21a099f4a204fac56d86c81416384cf8a39ef29bebd9032aff14de2295722",
+    "suite_hash": "sha256:c4e3df185916724afbabadf90d419b927843d8aa11b0a6184c784bdedcd4912a",
     "verification_refs": [
       "references/schemas.json",
       "references/eval-suite.json"

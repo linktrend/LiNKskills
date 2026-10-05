@@ -30,5 +30,290 @@
       "Mark distribution-day results unavailable because no OHLCV/session history and no selected event definition were supplied.",
       "Return independent family_status rows so missing OHLCV does not suppress the close-only result; do not treat the two-member fixture as market-wide evidence."
     ]
+  },
+  "trading-market-breadth-history-complete-lineage-but-short-window": {
+    "fixture_id": "trading-market-breadth-history-complete-lineage-but-short-window-fixture",
+    "status": "unexecuted structural contract fixture; no behavior pass is asserted",
+    "task_input": {
+      "as_of_date": "2026-09-30",
+      "universe_definition": "fictional index proxy; two supplied sessions",
+      "horizon": "two-session sample",
+      "requested_families": [
+        "distribution_days"
+      ],
+      "series": [],
+      "family_inputs": {
+        "ohlcv_history": [
+          {
+            "date": "2026-09-29",
+            "instrument": "DEMO-INDEX",
+            "open": 100,
+            "high": 101,
+            "low": 99,
+            "close": 100,
+            "volume": 1000,
+            "currency": "USD",
+            "source": "user-supplied://demo/ohlcv",
+            "session": "regular",
+            "source_provenance": {
+              "status": "complete",
+              "missing_fields": [],
+              "source_timestamp": "2026-09-29T21:05:00Z",
+              "session_timezone": "America/New_York",
+              "transformation": "raw daily OHLCV",
+              "transformation_version": "1",
+              "adjustment_convention": "unadjusted; corporate actions not applied",
+              "session_calendar": "NYSE regular session calendar; supplied",
+              "history_window": {
+                "start_date": "2026-09-29",
+                "end_date": "2026-09-30",
+                "window_definition": "two consecutive supplied sessions",
+                "session_count": 2
+              }
+            }
+          },
+          {
+            "date": "2026-09-30",
+            "instrument": "DEMO-INDEX",
+            "open": 100,
+            "high": 102,
+            "low": 99,
+            "close": 101,
+            "volume": 1200,
+            "currency": "USD",
+            "source": "user-supplied://demo/ohlcv",
+            "session": "regular",
+            "source_provenance": {
+              "status": "complete",
+              "missing_fields": [],
+              "source_timestamp": "2026-09-30T21:05:00Z",
+              "session_timezone": "America/New_York",
+              "transformation": "raw daily OHLCV",
+              "transformation_version": "1",
+              "adjustment_convention": "unadjusted; corporate actions not applied",
+              "session_calendar": "NYSE regular session calendar; supplied",
+              "history_window": {
+                "start_date": "2026-09-29",
+                "end_date": "2026-09-30",
+                "window_definition": "two consecutive supplied sessions",
+                "session_count": 2
+              }
+            }
+          }
+        ],
+        "event_definitions": [
+          {
+            "family": "distribution_days",
+            "definition": "fictional demonstration event definition; not a validated market rule; requires 20 complete trading sessions",
+            "source": "user-supplied://demo/rule",
+            "thresholds_or_parameters": {
+              "required_history_sessions": 20
+            }
+          }
+        ]
+      }
+    },
+    "expected_output_example": {
+      "completion_status": "partial",
+      "as_of_date": "2026-09-30",
+      "universe_definition": "fictional index proxy; two supplied sessions",
+      "breadth_measures": [
+        {
+          "family": "distribution_days",
+          "status": "unavailable_missing_basis",
+          "basis": "Only two sessions supplied; the selected event rule requires a complete lookback window.",
+          "source_provenance": [
+            {
+              "status": "complete",
+              "missing_fields": [],
+              "source_timestamp": "2026-09-29T21:05:00Z",
+              "session_timezone": "America/New_York",
+              "transformation": "raw daily OHLCV",
+              "transformation_version": "1",
+              "adjustment_convention": "unadjusted; corporate actions not applied",
+              "session_calendar": "NYSE regular session calendar; supplied",
+              "history_window": {
+                "start_date": "2026-09-29",
+                "end_date": "2026-09-30",
+                "window_definition": "two consecutive supplied sessions",
+                "session_count": 2
+              }
+            },
+            {
+              "status": "complete",
+              "missing_fields": [],
+              "source_timestamp": "2026-09-30T21:05:00Z",
+              "session_timezone": "America/New_York",
+              "transformation": "raw daily OHLCV",
+              "transformation_version": "1",
+              "adjustment_convention": "unadjusted; corporate actions not applied",
+              "session_calendar": "NYSE regular session calendar; supplied",
+              "history_window": {
+                "start_date": "2026-09-29",
+                "end_date": "2026-09-30",
+                "window_definition": "two consecutive supplied sessions",
+                "session_count": 2
+              }
+            }
+          ]
+        }
+      ],
+      "interpretation": {
+        "summary": "No distribution-day conclusion is made from this insufficient fictional sample."
+      },
+      "disagreements": [],
+      "gaps": [
+        "Required event lookback history is not supplied."
+      ]
+    },
+    "expected_method_constraints": [
+      "Retain the supplied provenance fields on the output series record.",
+      "Mark distribution-day analysis unavailable because a two-session window is insufficient; do not infer an event from an incomplete lookback."
+    ]
+  },
+  "trading-market-breadth-legacy-history-accepted-with-explicit-gaps": {
+    "fixture_id": "trading-market-breadth-legacy-history-accepted-with-explicit-gaps-fixture",
+    "status": "unexecuted structural compatibility fixture; no behavior pass is asserted",
+    "task_input": {
+      "as_of_date": "2026-09-30",
+      "universe_definition": "fictional named index proxy",
+      "horizon": "20 sessions",
+      "series": [],
+      "requested_families": [
+        "distribution_days"
+      ],
+      "family_inputs": {
+        "ohlcv_history": [
+          {
+            "date": "2026-09-30",
+            "instrument": "DEMO-INDEX",
+            "open": 100,
+            "high": 101,
+            "low": 99,
+            "close": 100,
+            "volume": 1000,
+            "currency": "USD",
+            "source": "user-supplied://legacy/ohlcv"
+          }
+        ],
+        "event_definitions": [
+          {
+            "family": "distribution_days",
+            "definition": "rule not supplied",
+            "source": "user-supplied://legacy/rule"
+          }
+        ]
+      }
+    },
+    "expected_output_example": {
+      "completion_status": "partial",
+      "as_of_date": "2026-09-30",
+      "universe_definition": "fictional named index proxy",
+      "breadth_measures": [],
+      "interpretation": {
+        "summary": "No event conclusion; source lineage and sufficient window were not supplied."
+      },
+      "disagreements": [],
+      "gaps": [
+        "OHLCV source timestamp, session timezone, transformation and version, adjustment convention, session calendar, and history window are missing.",
+        "Sufficient event lookback history is missing."
+      ],
+      "family_status": [
+        {
+          "family": "distribution_days",
+          "status": "unavailable_missing_basis",
+          "basis": [
+            "Legacy row remains structurally accepted, but provenance and sufficient history are absent."
+          ]
+        }
+      ]
+    },
+    "expected_method_constraints": [
+      "Legacy history rows without source_provenance remain schema-valid.",
+      "Any calculation dependent on absent lineage/history must be partial or unavailable with named gaps."
+    ]
+  },
+  "trading-market-breadth-complete-provenance-missing-calendar-invalid": {
+    "fixture_id": "trading-market-breadth-complete-provenance-missing-calendar-invalid-fixture",
+    "status": "unexecuted negative structural contract fixture",
+    "task_input": {
+      "as_of_date": "2026-09-30",
+      "universe_definition": "fictional index proxy; two supplied sessions",
+      "horizon": "two-session sample",
+      "requested_families": [
+        "distribution_days"
+      ],
+      "series": [],
+      "family_inputs": {
+        "ohlcv_history": [
+          {
+            "date": "2026-09-29",
+            "instrument": "DEMO-INDEX",
+            "open": 100,
+            "high": 101,
+            "low": 99,
+            "close": 100,
+            "volume": 1000,
+            "currency": "USD",
+            "source": "user-supplied://demo/ohlcv",
+            "session": "regular",
+            "source_provenance": {
+              "status": "complete",
+              "missing_fields": [],
+              "source_timestamp": "2026-09-29T21:05:00Z",
+              "session_timezone": "America/New_York",
+              "transformation": "raw daily OHLCV",
+              "transformation_version": "1",
+              "adjustment_convention": "unadjusted; corporate actions not applied",
+              "history_window": {
+                "start_date": "2026-09-29",
+                "end_date": "2026-09-30",
+                "window_definition": "two consecutive supplied sessions",
+                "session_count": 2
+              }
+            }
+          },
+          {
+            "date": "2026-09-30",
+            "instrument": "DEMO-INDEX",
+            "open": 100,
+            "high": 102,
+            "low": 99,
+            "close": 101,
+            "volume": 1200,
+            "currency": "USD",
+            "source": "user-supplied://demo/ohlcv",
+            "session": "regular",
+            "source_provenance": {
+              "status": "complete",
+              "missing_fields": [],
+              "source_timestamp": "2026-09-30T21:05:00Z",
+              "session_timezone": "America/New_York",
+              "transformation": "raw daily OHLCV",
+              "transformation_version": "1",
+              "adjustment_convention": "unadjusted; corporate actions not applied",
+              "session_calendar": "NYSE regular session calendar; supplied",
+              "history_window": {
+                "start_date": "2026-09-29",
+                "end_date": "2026-09-30",
+                "window_definition": "two consecutive supplied sessions",
+                "session_count": 2
+              }
+            }
+          }
+        ],
+        "event_definitions": [
+          {
+            "family": "distribution_days",
+            "definition": "fictional demonstration event definition; not a validated market rule; requires 20 complete trading sessions",
+            "source": "user-supplied://demo/rule",
+            "thresholds_or_parameters": {
+              "required_history_sessions": 20
+            }
+          }
+        ]
+      }
+    },
+    "expected_structural_result": "reject: source_provenance.status=complete requires session_calendar and every other named provenance field."
   }
 }

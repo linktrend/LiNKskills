@@ -79,6 +79,76 @@
           "Do not emit a personalized portfolio increase/trim/exit proposal without supplied portfolio_context; advisory_portfolio_proposal must be unavailable or not_requested."
         ]
       }
+    },
+    {
+      "case_id": "trading-fundamental-equity-research-memo-only-coverage-output-accounting",
+      "contextual_inputs": {
+        "issuer": "Example Components Ltd.",
+        "ticker_or_id": "EXC-DEMO",
+        "as_of_date": "2026-09-30",
+        "jurisdiction": "US",
+        "research_question": "Assess reported cash conversion and whether evidence supports a valuation range.",
+        "periods": [
+          "FY2025"
+        ],
+        "provided_filings": [
+          {
+            "source": "Issuer annual filing",
+            "period": "FY2025",
+            "published_at": "2026-02-20T16:00:00Z",
+            "source_url_or_file": "user-supplied://fictional-fy2025-filing",
+            "source_vintage": "as-published",
+            "source_locator": "Consolidated statements; fictional supplied fixture",
+            "currency": "USD",
+            "revenue": 1000,
+            "operating_cash_flow": 90,
+            "capital_expenditure": 70
+          }
+        ]
+      },
+      "expected": {
+        "criteria": [
+          "A concise memo is valid with artifact_coverage.status=memo_only and empty artifact lists.",
+          "Missing model/valuation inputs remain explicit gaps; no spreadsheet, chart, or DOCX is required."
+        ]
+      },
+      "case_type": "edge",
+      "input": "Apply the named method to these supplied inputs. Report only supported results and explicit missing inputs."
+    },
+    {
+      "case_id": "trading-fundamental-equity-research-partial-artifact-coverage-output-accounting",
+      "contextual_inputs": {
+        "issuer": "Example Components Ltd.",
+        "ticker_or_id": "EXC-DEMO",
+        "as_of_date": "2026-09-30",
+        "jurisdiction": "US",
+        "research_question": "Assess reported cash conversion and whether evidence supports a valuation range. Also supply a financial model and chart if actual available tools and data permit; identify anything not generated.",
+        "periods": [
+          "FY2025"
+        ],
+        "provided_filings": [
+          {
+            "source": "Issuer annual filing",
+            "period": "FY2025",
+            "published_at": "2026-02-20T16:00:00Z",
+            "source_url_or_file": "user-supplied://fictional-fy2025-filing",
+            "source_vintage": "as-published",
+            "source_locator": "Consolidated statements; fictional supplied fixture",
+            "currency": "USD",
+            "revenue": 1000,
+            "operating_cash_flow": 90,
+            "capital_expenditure": 70
+          }
+        ]
+      },
+      "expected": {
+        "criteria": [
+          "Return artifact_coverage with requested model/chart and status for each. Only claim produced files with actual read-back path/type/hash; if tools or sufficient inputs are absent, name uncompleted deliverables and reason.",
+          "Treat all supplied data as fictional. No output fixture path/digest proves a real file."
+        ]
+      },
+      "case_type": "edge",
+      "input": "Apply the named method to these supplied inputs. Report only supported results and explicit missing inputs."
     }
   ],
   "hard_failure_conditions": [
@@ -123,7 +193,27 @@
     {
       "fixture_id": "trading-fundamental-equity-research-filing-only-partial-fixture",
       "path": "references/contract-fixtures.json#/trading-fundamental-equity-research-filing-only-partial",
-      "content_hash": "sha256:b248636092065b1a688f33a23848cd39d813ba3d8bc99dde88e4d126197c75ab"
+      "content_hash": "sha256:4d10789910e4b478d6dee8f8381b97670a0af5dae85c72301686b6f5853bf65b"
+    },
+    {
+      "fixture_id": "trading-fundamental-equity-research-memo-only-coverage-fixture",
+      "path": "references/contract-fixtures.json#/trading-fundamental-equity-research-memo-only-coverage",
+      "content_hash": "sha256:4d10789910e4b478d6dee8f8381b97670a0af5dae85c72301686b6f5853bf65b"
+    },
+    {
+      "fixture_id": "trading-fundamental-equity-research-partial-artifact-coverage-fixture",
+      "path": "references/contract-fixtures.json#/trading-fundamental-equity-research-partial-artifact-coverage",
+      "content_hash": "sha256:4d10789910e4b478d6dee8f8381b97670a0af5dae85c72301686b6f5853bf65b"
+    },
+    {
+      "fixture_id": "trading-fundamental-equity-research-produced-artifact-without-digest-invalid-fixture",
+      "path": "references/contract-fixtures.json#/trading-fundamental-equity-research-produced-artifact-without-digest-invalid",
+      "content_hash": "sha256:4d10789910e4b478d6dee8f8381b97670a0af5dae85c72301686b6f5853bf65b"
+    },
+    {
+      "fixture_id": "trading-fundamental-equity-research-uncompleted-without-reason-invalid-fixture",
+      "path": "references/contract-fixtures.json#/trading-fundamental-equity-research-uncompleted-without-reason-invalid",
+      "content_hash": "sha256:4d10789910e4b478d6dee8f8381b97670a0af5dae85c72301686b6f5853bf65b"
     }
   ]
 }
