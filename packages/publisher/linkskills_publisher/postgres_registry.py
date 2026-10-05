@@ -162,6 +162,8 @@ class PostgresPublisherRegistry:
                     ):
                         if str(existing["registry_lifecycle"]) != registry_lifecycle:
                             raise ValueError("immutable lifecycle conflict")
+                        if dict(existing["metadata"] or {}) != meta:
+                            raise ValueError("immutable metadata conflict")
                         return PublishedRelease(
                             skill_id=skill_id,
                             version=version,
