@@ -1,0 +1,46 @@
+# finance.accounting_and_tax
+
+- FASB Accounting Standards Codification: `references/reference-register/entries/knowledge-075/INDEX.md`.
+- IRS Publication 583 / IRS recordkeeping guidance: `references/reference-register/entries/knowledge-076/INDEX.md`.
+- IRS Publication 15: `references/reference-register/entries/knowledge-077/INDEX.md`.
+- IRS Publication 509: `references/reference-register/entries/knowledge-078/INDEX.md`.
+- IRS forms, instructions, and publications: `references/reference-register/entries/knowledge-079/INDEX.md`.
+- Florida Department of Revenue — Out-of-State Businesses / Department of Revenue / Florida nexus guidance: `references/reference-register/entries/knowledge-080/INDEX.md`.
+- COSO internal-control guidance / COSO Internal Control—Integrated Framework: `references/reference-register/entries/knowledge-081/INDEX.md`.
+- IIA Global Internal Audit Standards / IIA standards: `references/reference-register/entries/knowledge-082/INDEX.md`.
+- Deloitte revenue-recognition roadmap / Deloitte’s revenue recognition roadmap: `references/reference-register/entries/knowledge-083/INDEX.md`.
+- RACI matrix — Excel: `references/reference-register/entries/knowledge-086/INDEX.md`.
+- Sample fiscal-management policy — PDF: `references/reference-register/entries/knowledge-087/INDEX.md`.
+- Financial-policy guidelines and example — PDF: `references/reference-register/entries/knowledge-088/INDEX.md`.
+- GitLab accounting handbook: `references/reference-register/entries/knowledge-089/INDEX.md`.
+- SJSU journal-upload template — Excel: `references/reference-register/entries/knowledge-090/INDEX.md`.
+- GL reconciliation template — Excel: `references/reference-register/entries/knowledge-091/INDEX.md`.
+- Equipment inventory and depreciation schedule — Excel: `references/reference-register/entries/knowledge-092/INDEX.md`.
+- Official IRS Form W-9 and instructions: `references/reference-register/entries/knowledge-094/INDEX.md`.
+- GitLab accounts-payable handbook: `references/reference-register/entries/knowledge-096/INDEX.md`.
+- Credit-card expense report — PDF: `references/reference-register/entries/knowledge-097/INDEX.md`.
+- Western Oregon University ACH policy: `references/reference-register/entries/knowledge-098/INDEX.md`.
+- GitLab Billing Operations handbook: `references/reference-register/entries/knowledge-099/INDEX.md`.
+- SJSU billing-request template — Excel: `references/reference-register/entries/knowledge-100/INDEX.md`.
+- Credit/debit memo and note templates: `references/reference-register/entries/knowledge-101/INDEX.md`.
+- Small-business bookkeeping templates: `references/reference-register/entries/knowledge-102/INDEX.md`.
+- Monthly bank reconciliation — Excel: `references/reference-register/entries/knowledge-103/INDEX.md`.
+- Credit-card reconciliation — Excel: `references/reference-register/entries/knowledge-104/INDEX.md`.
+- 12-month cash-flow forecast — Excel: `references/reference-register/entries/knowledge-105/INDEX.md`.
+- Financial-statement templates: `references/reference-register/entries/knowledge-106/INDEX.md`.
+- FloQast month-end close checklist: `references/reference-register/entries/knowledge-107/INDEX.md`.
+- Payroll templates: `references/reference-register/entries/knowledge-108/INDEX.md`.
+- IRS Form 1120, schedules, and instructions: `references/reference-register/entries/knowledge-109/INDEX.md`.
+- Compliance risk templates: `references/reference-register/entries/knowledge-110/INDEX.md`.
+- Practitioner discussion: `references/reference-register/entries/knowledge-118/INDEX.md`.
+- Community discussion: `references/reference-register/entries/knowledge-119/INDEX.md`.
+- IRS Form 1120 instructions: `references/reference-register/entries/knowledge-122/INDEX.md`.
+- AICPA auditing standards for nonissuers: `references/reference-register/entries/knowledge-125/INDEX.md`.
+- IRS instructions: `references/reference-register/entries/knowledge-129/INDEX.md`.
+- IRS Publication 583: `references/reference-register/entries/knowledge-137/INDEX.md`.
+- IRS Publication 15: `references/reference-register/entries/knowledge-138/INDEX.md`.
+- IRS Publication 509: `references/reference-register/entries/knowledge-139/INDEX.md`.
+- IRS Form W-9: `references/reference-register/entries/knowledge-140/INDEX.md`.
+- IRS Form W-9 Instructions: `references/reference-register/entries/knowledge-141/INDEX.md`.
+- IRS Form 1120: `references/reference-register/entries/knowledge-142/INDEX.md`.
+- IRS Form 1120 Instructions: `references/reference-register/entries/knowledge-143/INDEX.md`.

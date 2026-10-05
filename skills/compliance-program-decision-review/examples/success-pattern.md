@@ -1,0 +1,5 @@
+# Fictional completed decision-review example
+
+Fictional Acme supplies a dated proposal to pursue voluntary Framework Cedar, an evidence inventory with named owners, a draft annual audit calendar, a mock-audit sample summary, and minutes from a quarterly management review. The source set does not include the jurisdictional applicability review or an owner-approved mock-audit scoring threshold.
+
+Expected work product: six question assessments cite the supplied records; Framework Cedar remains a proposal pending owner confirmation; repeated evidence is listed as a candidate pending control-owner validation; one calendar collision is stated from the supplied dates; the mock-audit counts are reproduced without a healthy/unhealthy label; management-review actions have named roles or are marked unassigned. The packet presents two nonbinding schedule options and an owner decision question. It does not claim legal applicability, compliance, readiness, audit independence, certification, approval, or adoption.

@@ -1,0 +1,43 @@
+{
+  "task_id": "20261005-0900-SARA-123456",
+  "status": "needs_context",
+  "artifact_ref": "fixture:legal-litigation-privilege-log-review:partial",
+  "evidence_refs": [],
+  "open_questions": [
+    "Confirm the named missing input with its owner."
+  ],
+  "review_owner_role": "Synthetic completed task for legal-litigation-privilege-log-review: review owner role. Fictional test content only; no real-world facts.",
+  "external_effects": [],
+  "mutations": [],
+  "work_product": {
+    "qa_table": "",
+    "attorney_review_queue": "",
+    "pattern_summary": "",
+    "limitations": "",
+    "partial_work": [
+      {
+        "section": "qa_table",
+        "content": "Partial legal-litigation-privilege-log-review fixture: source inventory recorded; one dependent conclusion remains unknown.",
+        "evidence_refs": [
+          "fixture:legal-litigation-privilege-log-review:source-1"
+        ]
+      }
+    ],
+    "missing_inputs": [
+      {
+        "field": "authorized_source_or_material_fact",
+        "reason": "Synthetic missing-context scenario: A material source or jurisdiction-specific fact is missing and another portion of the draft remains possible. Complete separable work and mark only dependent conclusions unresolved.",
+        "requested_owner": "task owner"
+      }
+    ],
+    "unknown_facts": [
+      {
+        "fact": "task-specific applicability or evidence fact",
+        "why_unknown": "The edge scenario intentionally leaves this required fact or authority unresolved; preserve it as unknown.",
+        "evidence_refs": [
+          "fixture:legal-litigation-privilege-log-review:source-1"
+        ]
+      }
+    ]
+  }
+}

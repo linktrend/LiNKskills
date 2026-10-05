@@ -1,0 +1,127 @@
+{
+  "schema_version": "1.0",
+  "canonical_task_id": "legal-meeting-briefing",
+  "sources": [
+    {
+      "repository": "anthropics/knowledge-work-plugins",
+      "commit": "8444efcd48f7012f09797778a36a33e73d0861f4",
+      "source_task_dir": "legal/skills/meeting-briefing",
+      "copied_dir": "references/upstream/anthropics-knowledge-work-plugins-meeting-briefing",
+      "license_expression": "Apache-2.0",
+      "files": [
+        {
+          "source_path": "LICENSE",
+          "copied_path": "references/upstream/anthropics-knowledge-work-plugins-meeting-briefing/LICENSE",
+          "sha256": "a6946284993aeec75c7d75906064b66210c46051e562077efb30eb6dcfe72e26",
+          "bytes": 11607
+        },
+        {
+          "source_path": "legal/skills/meeting-briefing/SKILL.md",
+          "copied_path": "references/upstream/anthropics-knowledge-work-plugins-meeting-briefing/legal/skills/meeting-briefing/SKILL.md",
+          "sha256": "4d19bc2ddb2138d1b306b150c5d0900ce0a398d5ab690b8eba8101ef33d98baa",
+          "bytes": 8990
+        }
+      ],
+      "source_disposition": {
+        "canonical_task_id": "legal-meeting-briefing",
+        "decision": "merge_as_same_task",
+        "disposition": "Merge into one legal meeting preparation and action-capture task; keep action tracking as an explicit output.",
+        "preserved_variant": "Borghei has unsupported local scripts and extra action-item taxonomy; KWP/Lawve prescribe connected calendar/email/chat sources. Preserve variants, use only visible approved native sources, and do not copy the unverified connector calls as executable.",
+        "why_same_task": "Same trigger/input: prepare a legal-relevant meeting from meeting purpose, participants, agenda and available context. Same core output: structured pre-read/brief and follow-up action items; Borghei adds richer sectioning and priority/follow-up fields, which extend the same deliverable rather than change the job."
+      }
+    },
+    {
+      "repository": "borghei/Claude-Skills",
+      "commit": "5318eda16c134c500c237425404975545c0eedd2",
+      "source_task_dir": "legal/legal-meeting-briefing",
+      "copied_dir": "references/upstream/borghei-Claude-Skills-legal-meeting-briefing",
+      "license_expression": "Commons Clause License Condition v1.0 + MIT (exact LICENSE heading)",
+      "files": [
+        {
+          "source_path": "LICENSE",
+          "copied_path": "references/upstream/borghei-Claude-Skills-legal-meeting-briefing/LICENSE",
+          "sha256": "df4ce2b2008e621e5e408b0930acc8ec1750253351511778b56c2ba3836b69fd",
+          "bytes": 2718
+        },
+        {
+          "source_path": "legal/legal-meeting-briefing/SKILL.md",
+          "copied_path": "references/upstream/borghei-Claude-Skills-legal-meeting-briefing/legal/legal-meeting-briefing/SKILL.md",
+          "sha256": "275474720e1434e88f6ec8039fef33ce0636723b06dfc3793278a48f7b3b9cfc",
+          "bytes": 12921
+        },
+        {
+          "source_path": "legal/legal-meeting-briefing/references/briefing_templates.md",
+          "copied_path": "references/upstream/borghei-Claude-Skills-legal-meeting-briefing/legal/legal-meeting-briefing/references/briefing_templates.md",
+          "sha256": "f01e5e19fd5ad90cb8d49b40325626eab9e0806f3c3546532f9905ea0edf2586",
+          "bytes": 11279
+        },
+        {
+          "source_path": "legal/legal-meeting-briefing/references/meeting_type_guides.md",
+          "copied_path": "references/upstream/borghei-Claude-Skills-legal-meeting-briefing/legal/legal-meeting-briefing/references/meeting_type_guides.md",
+          "sha256": "e743b3d90c8580ceb70eb9c0db7ae117a6679085c3f07b5a7c3b708be86df34f",
+          "bytes": 13178
+        },
+        {
+          "source_path": "legal/legal-meeting-briefing/scripts/action_item_tracker.py",
+          "copied_path": "references/upstream/borghei-Claude-Skills-legal-meeting-briefing/legal/legal-meeting-briefing/scripts/action_item_tracker.py",
+          "sha256": "d68cf115ae253a2a16ccccb6a34c500398d6a1e3d71d382a60e16c2d30eec768",
+          "bytes": 15555
+        },
+        {
+          "source_path": "legal/legal-meeting-briefing/scripts/meeting_brief_generator.py",
+          "copied_path": "references/upstream/borghei-Claude-Skills-legal-meeting-briefing/legal/legal-meeting-briefing/scripts/meeting_brief_generator.py",
+          "sha256": "8fc88069bbb26277a4a36cee7d9852f6393167bc851c56d43d70ccd499cf0fa4",
+          "bytes": 16635
+        }
+      ],
+      "source_disposition": {
+        "canonical_task_id": "legal-meeting-briefing",
+        "decision": "merge_as_same_task",
+        "disposition": "Merge into one legal meeting preparation and action-capture task; keep action tracking as an explicit output.",
+        "preserved_variant": "Borghei has unsupported local scripts and extra action-item taxonomy; KWP/Lawve prescribe connected calendar/email/chat sources. Preserve variants, use only visible approved native sources, and do not copy the unverified connector calls as executable.",
+        "why_same_task": "Same trigger/input: prepare a legal-relevant meeting from meeting purpose, participants, agenda and available context. Same core output: structured pre-read/brief and follow-up action items; Borghei adds richer sectioning and priority/follow-up fields, which extend the same deliverable rather than change the job."
+      }
+    },
+    {
+      "repository": "lawve-ai/awesome-legal-skills",
+      "commit": "045f738df65ae53867c2f69f7e8a1e4f61816290",
+      "source_task_dir": "skills/meeting-briefing-preparator-anthropic",
+      "copied_dir": "references/upstream/lawve-ai-awesome-legal-skills-meeting-briefing-preparator-anthropic",
+      "license_expression": "CC-BY-NC-ND-4.0",
+      "files": [
+        {
+          "source_path": "LICENSE",
+          "copied_path": "references/upstream/lawve-ai-awesome-legal-skills-meeting-briefing-preparator-anthropic/LICENSE",
+          "sha256": "7683cdb3058c3d76e486995bf5c9d92f0268aaa4bbda924f8644a26fc908174f",
+          "bytes": 19122
+        },
+        {
+          "source_path": "skills/meeting-briefing-preparator-anthropic/LICENSE.txt",
+          "copied_path": "references/upstream/lawve-ai-awesome-legal-skills-meeting-briefing-preparator-anthropic/skills/meeting-briefing-preparator-anthropic/LICENSE.txt",
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+          "bytes": 11358
+        },
+        {
+          "source_path": "skills/meeting-briefing-preparator-anthropic/README.md",
+          "copied_path": "references/upstream/lawve-ai-awesome-legal-skills-meeting-briefing-preparator-anthropic/skills/meeting-briefing-preparator-anthropic/README.md",
+          "sha256": "e59c3757245f40d2efbcc8b1e4481a956d47ac7bc5945470e7e970512bf0251d",
+          "bytes": 265
+        },
+        {
+          "source_path": "skills/meeting-briefing-preparator-anthropic/SKILL.md",
+          "copied_path": "references/upstream/lawve-ai-awesome-legal-skills-meeting-briefing-preparator-anthropic/skills/meeting-briefing-preparator-anthropic/SKILL.md",
+          "sha256": "bfd1e5627d7d901a87f30773cdae3c7293d0e4777ab8a11a8f7625a1ea79cf5c",
+          "bytes": 9074
+        }
+      ],
+      "source_disposition": {
+        "canonical_task_id": "legal-meeting-briefing",
+        "decision": "merge_as_same_task",
+        "disposition": "Merge into one legal meeting preparation and action-capture task; keep action tracking as an explicit output.",
+        "preserved_variant": "Borghei has unsupported local scripts and extra action-item taxonomy; KWP/Lawve prescribe connected calendar/email/chat sources. Preserve variants, use only visible approved native sources, and do not copy the unverified connector calls as executable.",
+        "why_same_task": "Same trigger/input: prepare a legal-relevant meeting from meeting purpose, participants, agenda and available context. Same core output: structured pre-read/brief and follow-up action items; Borghei adds richer sectioning and priority/follow-up fields, which extend the same deliverable rather than change the job."
+      }
+    }
+  ],
+  "copy_policy": "Complete identified skill directory and exact relevant license notice copied unchanged. Active task method is adapted in SKILL.md and advanced/advanced.md; source scripts are preserved as evidence and not executed."
+}

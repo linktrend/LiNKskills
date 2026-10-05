@@ -1,0 +1,156 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "legal-borghei-vendor-due-diligence",
+  "input_schema_ref": "references/schemas.json#/definitions/input",
+  "output_schema_ref": "references/schemas.json#/definitions/output",
+  "completion_required_fields": [
+    "screening_and_scope",
+    "risk_dimension_assessment",
+    "comparison_or_monitoring_plan"
+  ],
+  "fixtures": [
+    {
+      "fixture_id": "synthetic-task-shaped-completed",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261005-0900-SARA-123456",
+        "request_ref": "fixture:legal-borghei-vendor-due-diligence:request",
+        "source_refs": [
+          "fixture:legal-borghei-vendor-due-diligence:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "task_request": "A fictional critical vendor supplies an old SOC report and partial questionnaire; assess evidence limits and list proportionate follow-up before any selection decision.",
+          "source_documents": [
+            "Synthetic input fixture for legal-borghei-vendor-due-diligence: source documents. Fictional test content only; no real-world facts."
+          ],
+          "company_context": "Synthetic input fixture for legal-borghei-vendor-due-diligence: company context. Fictional test content only; no real-world facts.",
+          "applicability_context": "Synthetic input fixture for legal-borghei-vendor-due-diligence: applicability context. Fictional test content only; no real-world facts.",
+          "review_owner": "Synthetic input fixture for legal-borghei-vendor-due-diligence: review owner. Fictional test content only; no real-world facts.",
+          "vendor_and_service": "Synthetic input fixture for legal-borghei-vendor-due-diligence: vendor and service. Fictional test content only; no real-world facts.",
+          "assessment_stage": "Synthetic input fixture for legal-borghei-vendor-due-diligence: assessment stage. Fictional test content only; no real-world facts.",
+          "vendor_evidence": "Synthetic input fixture for legal-borghei-vendor-due-diligence: vendor evidence. Fictional test content only; no real-world facts.",
+          "risk_dimensions": "Synthetic input fixture for legal-borghei-vendor-due-diligence: risk dimensions. Fictional test content only; no real-world facts.",
+          "comparison_set": "Synthetic input fixture for legal-borghei-vendor-due-diligence: comparison set. Fictional test content only; no real-world facts."
+        }
+      },
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": "fixture:legal-borghei-vendor-due-diligence:draft",
+        "evidence_refs": [
+          "fixture:legal-borghei-vendor-due-diligence:source-1"
+        ],
+        "open_questions": [],
+        "review_owner_role": "Synthetic completed task for legal-borghei-vendor-due-diligence: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "screening_and_scope": "Fictional legal-borghei-vendor-due-diligence screening and scope section. Scenario: A fictional critical vendor supplies an old SOC report and partial questionnaire; assess evidence limits and list proportionate follow-up before any selection decision. Expected handling: Produces the vendor legal and compliance due diligence deliverable with task-specific fields and not a generic departmental summary. Cites supplied evidence and preserves unknown, conflicting or unsupported facts. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "evidence_quality_and_gaps": [],
+          "risk_dimension_assessment": "Fictional legal-borghei-vendor-due-diligence risk dimension assessment section. Scenario: A fictional critical vendor supplies an old SOC report and partial questionnaire; assess evidence limits and list proportionate follow-up before any selection decision. Expected handling: Produces the vendor legal and compliance due diligence deliverable with task-specific fields and not a generic departmental summary. Cites supplied evidence and preserves unknown, conflicting or unsupported facts. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "mitigation_and_contract_questions": [],
+          "comparison_or_monitoring_plan": "Fictional legal-borghei-vendor-due-diligence comparison or monitoring plan section. Scenario: A fictional critical vendor supplies an old SOC report and partial questionnaire; assess evidence limits and list proportionate follow-up before any selection decision. Expected handling: Produces the vendor legal and compliance due diligence deliverable with task-specific fields and not a generic departmental summary. Cites supplied evidence and preserves unknown, conflicting or unsupported facts. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "partial_work": [],
+          "missing_inputs": [],
+          "unknown_facts": []
+        }
+      }
+    },
+    {
+      "fixture_id": "needs-context-preserves-partial-and-unknowns",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261005-0900-SARA-123456",
+        "request_ref": "fixture:legal-borghei-vendor-due-diligence:request",
+        "source_refs": [
+          "fixture:legal-borghei-vendor-due-diligence:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "task_request": "Prepare a synthetic legal-borghei-vendor-due-diligence deliverable from this fictional test record; make no real-world factual or legal claim.",
+          "source_documents": [
+            "Synthetic input fixture for legal-borghei-vendor-due-diligence: source documents. Fictional test content only; no real-world facts."
+          ],
+          "company_context": "Synthetic input fixture for legal-borghei-vendor-due-diligence: company context. Fictional test content only; no real-world facts.",
+          "applicability_context": "Synthetic input fixture for legal-borghei-vendor-due-diligence: applicability context. Fictional test content only; no real-world facts.",
+          "review_owner": "Synthetic input fixture for legal-borghei-vendor-due-diligence: review owner. Fictional test content only; no real-world facts.",
+          "vendor_and_service": "Synthetic input fixture for legal-borghei-vendor-due-diligence: vendor and service. Fictional test content only; no real-world facts.",
+          "assessment_stage": "Synthetic input fixture for legal-borghei-vendor-due-diligence: assessment stage. Fictional test content only; no real-world facts.",
+          "vendor_evidence": "Synthetic input fixture for legal-borghei-vendor-due-diligence: vendor evidence. Fictional test content only; no real-world facts.",
+          "risk_dimensions": "Synthetic input fixture for legal-borghei-vendor-due-diligence: risk dimensions. Fictional test content only; no real-world facts.",
+          "comparison_set": "Synthetic input fixture for legal-borghei-vendor-due-diligence: comparison set. Fictional test content only; no real-world facts."
+        }
+      },
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "needs_context",
+        "artifact_ref": "fixture:legal-borghei-vendor-due-diligence:partial",
+        "evidence_refs": [],
+        "open_questions": [
+          "Confirm the named missing input with its owner."
+        ],
+        "review_owner_role": "Synthetic completed task for legal-borghei-vendor-due-diligence: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "screening_and_scope": "",
+          "evidence_quality_and_gaps": [],
+          "risk_dimension_assessment": "",
+          "mitigation_and_contract_questions": [],
+          "comparison_or_monitoring_plan": "",
+          "partial_work": [
+            {
+              "section": "screening_and_scope",
+              "content": "Partial legal-borghei-vendor-due-diligence fixture: source inventory recorded; one dependent conclusion remains unknown.",
+              "evidence_refs": [
+                "fixture:legal-borghei-vendor-due-diligence:source-1"
+              ]
+            }
+          ],
+          "missing_inputs": [
+            {
+              "field": "authorized_source_or_material_fact",
+              "reason": "Synthetic missing-context scenario: The task arrives with a material missing fact or inaccessible authority needed for one conclusion. Complete separable source-grounded work and state the exact missing evidence, owner and next check.",
+              "requested_owner": "task owner"
+            }
+          ],
+          "unknown_facts": [
+            {
+              "fact": "task-specific applicability or evidence fact",
+              "why_unknown": "The edge scenario intentionally leaves this required fact or authority unresolved; preserve it as unknown.",
+              "evidence_refs": [
+                "fixture:legal-borghei-vendor-due-diligence:source-1"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "fixture_id": "empty-completed-draft-rejected",
+      "expected_valid": false,
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": null,
+        "evidence_refs": [],
+        "open_questions": [],
+        "review_owner_role": "Synthetic completed task for legal-borghei-vendor-due-diligence: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "screening_and_scope": "",
+          "evidence_quality_and_gaps": [],
+          "risk_dimension_assessment": "",
+          "mitigation_and_contract_questions": [],
+          "comparison_or_monitoring_plan": "",
+          "partial_work": [],
+          "missing_inputs": [],
+          "unknown_facts": []
+        }
+      }
+    }
+  ],
+  "fixture_note": "All values are fictional task-shaped contract examples derived from this pack’s golden scenario and criteria; these files are schema evidence, not executed results or business/legal facts."
+}

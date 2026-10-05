@@ -1,0 +1,5 @@
+This directory contains the offline input-contract checker for this skill. It reads one JSON object from standard input and validates it against `references/schemas.json#/definitions/input` using the installed `jsonschema` package. It does not generate a work product, assess substantive correctness, perform HR/legal/compliance actions, or write files.
+
+Valid input returns exit code `0` and `status: INPUT_VALID`. Schema-invalid input returns exit code `3` and `status: NEEDS_CONTEXT`, with missing field paths and safe validation locations only. Malformed JSON, a non-object input, or an unavailable/invalid schema returns exit code `2` and `status: FAILED`. Submitted values are never echoed; external effects and mutations are always empty.
+
+Example: `python3 scripts/helper_tool.py < examples/valid-input.json`. This synthetic fixture demonstrates only structural compatibility with the input schema; it is not evidence of task reasoning or readiness. Preserved upstream scripts, if any, are provenance artifacts and are not Sara-callable tools.

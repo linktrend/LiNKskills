@@ -1,0 +1,82 @@
+{
+  "input": {
+    "task_id": "20261004-1200-SARA-123456",
+    "request_ref": "synthetic:contract-probe",
+    "source_refs": [
+      "synthetic:fixture"
+    ],
+    "data_classification": "synthetic",
+    "task_inputs": {
+      "approved_plan_and_reporting_period": {
+        "summary": "Owner says complete but latest acceptance receipt is absent. Mark completion unverified and name the missing evidence.",
+        "evidence_refs": [
+          "synthetic:fixture"
+        ],
+        "fact_status": "proposed"
+      },
+      "current_program_owner_status_evidence": {
+        "summary": "Owner says complete but latest acceptance receipt is absent. Mark completion unverified and name the missing evidence.",
+        "evidence_refs": [
+          "synthetic:fixture"
+        ],
+        "fact_status": "proposed"
+      },
+      "dependencies_decisions_and_blockers": {
+        "summary": "Owner says complete but latest acceptance receipt is absent. Mark completion unverified and name the missing evidence.",
+        "evidence_refs": [
+          "synthetic:fixture"
+        ],
+        "fact_status": "proposed"
+      }
+    }
+  },
+  "output": {
+    "task_id": "20261004-1200-SARA-123456",
+    "status": "COMPLETED",
+    "artifact_ref": "synthetic:work-product",
+    "evidence_refs": [
+      "synthetic:fixture"
+    ],
+    "open_questions": [],
+    "review_owner_role": "Sara",
+    "external_effects": [],
+    "mutations": [],
+    "work_product": {
+      "operating_brief": {
+        "summary": "Synthetic schema shape only, not behavioral completion.",
+        "evidence_refs": [
+          "synthetic:fixture"
+        ],
+        "artifact_refs": []
+      },
+      "decision_action_exception_register": {
+        "summary": "Synthetic schema shape only, not behavioral completion.",
+        "evidence_refs": [
+          "synthetic:fixture"
+        ],
+        "artifact_refs": []
+      },
+      "next_checkpoint": {
+        "summary": "Synthetic schema shape only, not behavioral completion.",
+        "evidence_refs": [
+          "synthetic:fixture"
+        ],
+        "artifact_refs": []
+      }
+    }
+  },
+  "partial_output": {
+    "task_id": "20261004-1200-SARA-123456",
+    "status": "NEEDS_CONTEXT",
+    "artifact_ref": null,
+    "evidence_refs": [
+      "synthetic:fixture"
+    ],
+    "open_questions": [],
+    "review_owner_role": "Sara",
+    "external_effects": [],
+    "mutations": [],
+    "work_product": {}
+  },
+  "scope": "Synthetic contract shape only; no model call or business action"
+}

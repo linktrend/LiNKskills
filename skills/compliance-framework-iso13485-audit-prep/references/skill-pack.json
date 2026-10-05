@@ -1,0 +1,222 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "compliance-framework-iso13485-audit-prep",
+  "display_name": "ISO 13485 QMS Audit Preparation",
+  "version": "0.1.1",
+  "description": "/cs:iso13485-audit-prep <scope> \u2014 ISO 13485 QMS audit 6-question forcing interrogation. Design controls + CAPA + post-market focused. Use before Clause 8.2.4 internal audit, MDR / FDA QSR alignment review, or...",
+  "capability_category": "compliance_framework_iso13485_audit_prep",
+  "provenance": {
+    "author": "LiNKskills adaptation",
+    "source": "Pinned source methodology and complete selected support/license subtree preserved with per-file hashes in references/upstream/SOURCE-MANIFEST.json",
+    "license": "See exact per-source license copy and declared term in SOURCE-MANIFEST.json; no independent publication clearance or license opinion asserted."
+  },
+  "lifecycle_state": "draft",
+  "format_profile": "heavy",
+  "compatible_runtime_profiles": [
+    "lisa-openclaw",
+    "cursor-macos"
+  ],
+  "min_capability_tier": "balanced",
+  "routing": {
+    "when_to_use": "/cs:iso13485-audit-prep <scope> \u2014 ISO 13485 QMS audit 6-question forcing interrogation. Design controls + CAPA + post-market focused. Use before Clause 8.2.4 internal audit, MDR / FDA QSR alignment review, or...",
+    "when_not_to_use": [
+      "A dedicated adjacent pack owns a materially different output or legal regime",
+      "The task requires a final legal decision, certification, official action or unsupported current-law conclusion"
+    ],
+    "tags": [
+      "sara-legal-corporate",
+      "task-specific",
+      "draft"
+    ],
+    "exclusion_rules": [
+      "Source applicability is conditional; verify current law/standard and company facts",
+      "No unapproved external effects or official record mutations"
+    ],
+    "ambiguity_rules": [
+      "Read authorized supplied evidence first; ask only for material facts; complete separable work"
+    ],
+    "recommended_disclosure_level": 2
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "task_request",
+        "description": "Exact requested task and boundaries."
+      },
+      {
+        "name": "source_documents",
+        "description": "Authorized source documents and records."
+      },
+      {
+        "name": "company_context",
+        "description": "Confirmed organization/product/matter facts; unknowns explicit."
+      },
+      {
+        "name": "applicability_context",
+        "description": "Jurisdiction, role, scope/version and as-of date; unknown if not established."
+      },
+      {
+        "name": "review_owner",
+        "description": "Reviewer/decision-owner role."
+      },
+      {
+        "name": "task_request",
+        "description": "Exact task and requested draft/analysis."
+      },
+      {
+        "name": "source_documents",
+        "description": "Authorized source documents/records; use an empty list only when the task is source-free."
+      },
+      {
+        "name": "company_context",
+        "description": "Confirmed company, product, matter or program facts; mark unknowns."
+      },
+      {
+        "name": "applicability_context",
+        "description": "Jurisdiction, scope, actor role, standard version and as-of date, or explicitly unknown."
+      },
+      {
+        "name": "review_owner",
+        "description": "Reviewer or decision-owner role, if known."
+      },
+      {
+        "name": "device_and_qms_scope",
+        "description": "Products, sites, design/manufacturing scope and declared QMS boundary."
+      },
+      {
+        "name": "audit_stage",
+        "description": "Internal audit, certification, surveillance, design closure or post-market review."
+      },
+      {
+        "name": "qms_samples",
+        "description": "DHF/traceability, CAPA, validation, risk files, complaints and post-market evidence."
+      },
+      {
+        "name": "standard_version",
+        "description": "Declared standard edition and any harmonization claims, if verified."
+      }
+    ],
+    "expected_outputs": [
+      {
+        "name": "audit_scope_and_criteria",
+        "description": "Task-specific draft field: audit scope and criteria"
+      },
+      {
+        "name": "design_traceability_samples",
+        "description": "Task-specific draft field: design traceability samples"
+      },
+      {
+        "name": "capa_validation_and_risk_gaps",
+        "description": "Task-specific draft field: capa validation and risk gaps"
+      },
+      {
+        "name": "post_market_evidence",
+        "description": "Task-specific draft field: post market evidence"
+      },
+      {
+        "name": "readiness_questions",
+        "description": "Task-specific draft field: readiness questions"
+      }
+    ],
+    "forbidden_actions": [
+      "No legal advice, final legal determination, certification, audit opinion, regulatory filing, signature, external communication or binding company decision.",
+      "No invented law, facts, company policy, thresholds, dates, approvals, jurisdiction or evidence.",
+      "No external effect, system mutation, notification, submission, publication, record closure, production or deletion.",
+      "No source scripts, shell commands, APIs or connector aliases are callable task tools.",
+      "No unnecessary sensitive, personal, confidential or privileged content in task state or output."
+    ],
+    "verification_steps": [
+      "Trace material claims to authorized evidence and pinpoint.",
+      "Verify jurisdiction/current primary authority or label as unknown.",
+      "Validate typed output and keep external effects/mutations empty.",
+      "Use only current native tools visible in the runtime; no scripts or invented APIs."
+    ],
+    "completion_criteria": [
+      "Task-specific draft matches contract and acceptance conditions.",
+      "Evidence, uncertainty, applicability and owner decisions are visible.",
+      "No unapproved external effects, system changes or unsupported legal claims.",
+      "A completed_draft populates the non-empty task-specific fields in references/task-contract-shape-fixture.json and cites evidence.",
+      "A needs_context response records missing_inputs, unknown_facts and any separable partial_work without fabricating completion."
+    ],
+    "known_limitations": [
+      "Structural validation is not semantic, legal, audit or runtime certification.",
+      "Pack remains draft, uncertified, unadmitted and unpublished."
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read",
+      "filesystem_write"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [
+      {
+        "key": "min_reasoning_tier",
+        "value": "balanced"
+      },
+      {
+        "key": "context_required",
+        "value": 64000
+      },
+      {
+        "key": "preferred_model",
+        "value": "gpt-6.1-sol"
+      }
+    ],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "required_certification_profiles": [],
+    "verification_refs": [
+      "references/eval-suite.yaml",
+      "references/upstream/SOURCE-MANIFEST.json",
+      "references/task-contract-shape-fixture.json"
+    ],
+    "suite_hash": "sha256:f4e138127155843095ff2ea746171d66797c2f3b98b5a84ac97441bd91243b9b"
+  },
+  "telemetry": {
+    "classification": "restricted",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_personal_data",
+      "strip_privileged_content",
+      "strip_raw_documents",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain opaque task/source ids and hashes only"
+  },
+  "fragments": [
+    {
+      "fragment_id": "skill-md",
+      "disclosure_level": 2,
+      "path": "SKILL.md"
+    },
+    {
+      "fragment_id": "advanced",
+      "disclosure_level": 3,
+      "path": "advanced/advanced.md"
+    },
+    {
+      "fragment_id": "contracts",
+      "disclosure_level": 4,
+      "path": "references/schemas.json"
+    },
+    {
+      "fragment_id": "eval",
+      "disclosure_level": 4,
+      "path": "references/eval-suite.json"
+    },
+    {
+      "fragment_id": "source-manifest",
+      "disclosure_level": 3,
+      "path": "references/upstream/SOURCE-MANIFEST.json"
+    }
+  ],
+  "release_channel": "development"
+}

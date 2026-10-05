@@ -1,0 +1,143 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "lbo-transaction-model-candidate",
+  "display_name": "Leveraged Buyout Transaction Model",
+  "version": "1.0.0",
+  "description": "Model sources-and-uses, operating case, debt paydown and investor returns with formula traceability; no investment or transaction decision.",
+  "capability_category": "conditional_finance_task",
+  "provenance": {
+    "author": "LiNKskills Library",
+    "source": "Pinned source subtree copied verbatim; see references/upstream/SOURCE-MANIFEST.json",
+    "license": "Apache-2.0; exact original notice preserved in references/upstream/_licenses"
+  },
+  "lifecycle_state": "draft",
+  "format_profile": "heavy",
+  "compatible_runtime_profiles": [
+    "lisa-openclaw",
+    "cursor-macos"
+  ],
+  "min_capability_tier": "balanced",
+  "routing": {
+    "when_to_use": "Use when explicitly asked to draft or review an LBO transaction model using an approved template and sourced deal/financing assumptions.",
+    "when_not_to_use": [
+      "Entity/fund/task applicability is not confirmed",
+      "A different atomic task has its own skill",
+      "Requested output is an unapproved action or external effect"
+    ],
+    "tags": [
+      "finance",
+      "conditional",
+      "task-specific"
+    ],
+    "exclusion_rules": [
+      "No pack text grants authority",
+      "No system mutation or external communication"
+    ],
+    "ambiguity_rules": [
+      "Continue unaffected work and request only facts that materially change the result"
+    ],
+    "recommended_disclosure_level": 2
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "scope_and_source_inputs",
+        "description": "provided template and its formulas; entry EBITDA/multiple, EV, debt/cash and equity check; fees/uses; debt tranches, rates, amortization and priority; operating and tax assumptions; cash sweep; exit multiple/timing; interim distributions; management rollover/carry; date and units."
+      }
+    ],
+    "expected_outputs": [
+      {
+        "name": "task_work_product",
+        "description": "balanced sources/uses; operating and cash flow case; debt schedule; returns cash flows, IRR/MOIC; sensitivity and formula checks; assumptions/gaps list."
+      }
+    ],
+    "forbidden_actions": [
+      "Mutation of company, fund, Odoo, accounting, payroll or source records",
+      "Payments, filings, signatures, publications, messages, approvals, trades or transaction commitments",
+      "Inventing current law, jurisdiction, entity/fund applicability or missing facts"
+    ],
+    "verification_steps": [
+      "1. Inspect the supplied model/template first: tabs, timeline, sign convention, input/formula cells, existing formulas and template-specific outputs. Preserve working structure. 2. Reconcile purchase EV, net debt, fees and other uses to funding sources; identify only an explicitly defined residual equity plug. Show sources=uses. 3. Build operating projections only from given drivers; flow EBITDA through cash available after taxes, capex, working capital and fees; keep assumptions visible. 4. Build each debt tranche from beginning balance, cash interest, required amortization, optional paydown and ending balance; use the stated priority/cash sweep; cap paydown at available cash and outstanding principal. Use beginning-balance interest if that is the agreed convention to avoid circularity; disclose alternatives. 5. Check debt roll-forward, no negative balance, financing totals, cash balance and any linked statements. 6. Calculate exit EV from exit metric\u00d7multiple, subtract exit debt and other claims, include rollover and transaction costs as specified. Use signed dated investor cash flows for XIRR when dates vary; MOIC=total proceeds/total invested. Include interim distributions. 7. Create odd-dimension sensitivities centered on base assumptions; each cell recalculates output, and center must equal model base. 8. Validate formulas/section ties, signs, cash sweep priority, tax shields only if explicitly modeled, and return-range completeness. Keep tax/legal/treatment assumptions as supplied, not legal advice. 9. Return a draft model audit/assumption table; no template mutation unless explicitly requested for private draft, no transaction execution or approval.",
+      "Show formulas/denominators, evidence dates and assumptions; preserve unresolved conflicts.",
+      "Write only a requested private draft; no external effects."
+    ],
+    "completion_criteria": [
+      "Conditional task scope is evidenced or limitations explicitly bound",
+      "Task method and calculation are reproducible from cited inputs",
+      "Owner decisions, open issues and source limitations are explicit"
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read",
+      "filesystem_write"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [
+      {
+        "key": "min_reasoning_tier",
+        "value": "balanced"
+      },
+      {
+        "key": "context_required",
+        "value": 32000
+      },
+      {
+        "key": "preferred_model",
+        "value": "gpt-6.1-sol"
+      }
+    ],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "required_certification_profiles": [],
+    "verification_refs": [
+      "references/eval-suite.yaml",
+      "references/source-selection.md"
+    ]
+  },
+  "telemetry": {
+    "classification": "restricted",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_personal_data",
+      "strip_private_finance_data",
+      "strip_reasoning"
+    ],
+    "retention_policy": "opaque task/source IDs and hashes only"
+  },
+  "fragments": [
+    {
+      "fragment_id": "skill-md",
+      "disclosure_level": 2,
+      "path": "SKILL.md"
+    },
+    {
+      "fragment_id": "advanced",
+      "disclosure_level": 3,
+      "path": "advanced/advanced.md"
+    },
+    {
+      "fragment_id": "schemas",
+      "disclosure_level": 5,
+      "path": "references/schemas.json"
+    },
+    {
+      "fragment_id": "eval",
+      "disclosure_level": 3,
+      "path": "references/eval-suite.json"
+    },
+    {
+      "fragment_id": "source-selection",
+      "disclosure_level": 3,
+      "path": "references/source-selection.md"
+    }
+  ],
+  "release_channel": "development"
+}

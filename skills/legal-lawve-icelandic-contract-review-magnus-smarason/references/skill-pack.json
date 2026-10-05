@@ -1,0 +1,256 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "legal-lawve-icelandic-contract-review-magnus-smarason",
+  "display_name": "Icelandic Contract Review",
+  "version": "0.1.0",
+  "description": "Review or draft a contract expressly governed by Icelandic law or with a verified Icelandic legal connection.",
+  "capability_category": "conditional_legal_task",
+  "lifecycle_state": "draft",
+  "format_profile": "heavy",
+  "compatible_runtime_profiles": [
+    "lisa-openclaw",
+    "cursor-macos"
+  ],
+  "min_capability_tier": "balanced",
+  "provenance": {
+    "author": "LiNKskills adaptation",
+    "source": "Full pinned Lawve source subtree and original per-source manifest/notices are retained byte-for-byte in references/upstream/.",
+    "license": "Exact source declarations and notices preserved; permission determination belongs to licensing owner."
+  },
+  "routing": {
+    "when_to_use": "Review or draft a contract expressly governed by Icelandic law or with a verified Icelandic legal connection.",
+    "when_not_to_use": [
+      "A different, distinct task is requested",
+      "An unapproved external effect, final decision, signature or system mutation is required"
+    ],
+    "tags": [
+      "conditional",
+      "task-specific",
+      "draft"
+    ],
+    "exclusion_rules": [
+      "Do not infer legal, jurisdictional, framework or company applicability.",
+      "No unapproved external effect, final decision, system mutation or claim of compliance."
+    ],
+    "ambiguity_rules": [
+      "Read authorized evidence; ask only materially outcome-changing questions; complete separable work"
+    ],
+    "recommended_disclosure_level": 2
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "contract_and_version",
+        "description": "Complete agreement, schedules, amendments and version."
+      },
+      {
+        "name": "parties_and_transaction",
+        "description": "Party roles, transaction, performance locations and relevant facts."
+      },
+      {
+        "name": "governing_law_and_forum",
+        "description": "Express clause or evidence-based connection; unknown if absent."
+      },
+      {
+        "name": "business_objectives",
+        "description": "Approved objectives, non-negotiables and practical constraints."
+      },
+      {
+        "name": "primary_authority_snapshot",
+        "description": "Current Icelandic statutes, official translations/case sources and date."
+      },
+      {
+        "name": "scope_and_as_of",
+        "description": "Actual jurisdiction/applicability and date; unknown if unavailable."
+      }
+    ],
+    "expected_outputs": [
+      {
+        "name": "legal-lawve-icelandic-contract-review-magnus-smarason_work_product",
+        "description": "Task-specific draft with evidence trace, applicability, uncertainties and next actions."
+      }
+    ],
+    "forbidden_actions": [
+      "Unapproved external effects, signatures, filings, legal commitments or source-system mutations",
+      "Inventing facts, jurisdiction, legal authority, company policy or approval",
+      "Exposure of confidential or personal data outside authorized scope"
+    ],
+    "verification_steps": [
+      "Icelandic governing-law connection is established or explicitly unresolved.",
+      "Every legal proposition has a current source/date.",
+      "Preferred and fallback positions are distinguished from approved company positions.",
+      "Verify current primary authority and source date for material legal/regulatory claims.",
+      "Keep external_effects and mutations empty."
+    ],
+    "completion_criteria": [
+      "Task-specific deliverable is complete or the exact blocker is identified.",
+      "Sources, applicability, uncertainties and owner actions are visible.",
+      "No unapproved external effect or mutation."
+    ],
+    "known_limitations": [
+      "Draft/uncertified; structural validation is not legal or semantic certification.",
+      "No current legal database, external connector or business-system write is assumed."
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read",
+      "filesystem_write"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [
+      {
+        "key": "min_reasoning_tier",
+        "value": "balanced"
+      },
+      {
+        "key": "context_required",
+        "value": 64000
+      },
+      {
+        "key": "preferred_model",
+        "value": "gpt-6.1-sol"
+      }
+    ],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "required_certification_profiles": [],
+    "verification_refs": [
+      "references/eval-suite.yaml",
+      "references/task-contract-shape-fixture.json",
+      "references/source-copy-manifest.json",
+      "references/upstream/SOURCE-MANIFEST.json"
+    ],
+    "suite_hash": "sha256:e424a3266d5a5573ca81f27c73f0fc302e74b37534542f63829b3d99d7723c66"
+  },
+  "telemetry": {
+    "classification": "restricted",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_personal_data",
+      "strip_raw_documents",
+      "strip_reasoning"
+    ],
+    "retention_policy": "opaque task/source ids and hashes only"
+  },
+  "fragments": [
+    {
+      "fragment_id": "_gitignore",
+      "disclosure_level": 3,
+      "path": ".gitignore"
+    },
+    {
+      "fragment_id": "SKILL_md",
+      "disclosure_level": 2,
+      "path": "SKILL.md"
+    },
+    {
+      "fragment_id": "advanced_advanced_md",
+      "disclosure_level": 2,
+      "path": "advanced/advanced.md"
+    },
+    {
+      "fragment_id": "examples_error-recovery_md",
+      "disclosure_level": 3,
+      "path": "examples/error-recovery.md"
+    },
+    {
+      "fragment_id": "examples_success-pattern_md",
+      "disclosure_level": 3,
+      "path": "examples/success-pattern.md"
+    },
+    {
+      "fragment_id": "examples_synthetic-example_md",
+      "disclosure_level": 3,
+      "path": "examples/synthetic-example.md"
+    },
+    {
+      "fragment_id": "references_api-specs_md",
+      "disclosure_level": 3,
+      "path": "references/api-specs.md"
+    },
+    {
+      "fragment_id": "references_changelog_md",
+      "disclosure_level": 3,
+      "path": "references/changelog.md"
+    },
+    {
+      "fragment_id": "references_eval-suite_json",
+      "disclosure_level": 3,
+      "path": "references/eval-suite.json"
+    },
+    {
+      "fragment_id": "references_eval-suite_yaml",
+      "disclosure_level": 3,
+      "path": "references/eval-suite.yaml"
+    },
+    {
+      "fragment_id": "references_execution-profile_json",
+      "disclosure_level": 3,
+      "path": "references/execution-profile.json"
+    },
+    {
+      "fragment_id": "references_old-patterns_md",
+      "disclosure_level": 3,
+      "path": "references/old-patterns.md"
+    },
+    {
+      "fragment_id": "references_schemas_json",
+      "disclosure_level": 3,
+      "path": "references/schemas.json"
+    },
+    {
+      "fragment_id": "references_source-applicability_md",
+      "disclosure_level": 3,
+      "path": "references/source-applicability.md"
+    },
+    {
+      "fragment_id": "references_source-copy-manifest_json",
+      "disclosure_level": 3,
+      "path": "references/source-copy-manifest.json"
+    },
+    {
+      "fragment_id": "references_task-contract-shape-fixture_json",
+      "disclosure_level": 3,
+      "path": "references/task-contract-shape-fixture.json"
+    },
+    {
+      "fragment_id": "references_upstream_LAWVE-COLLECTION-LICENSE",
+      "disclosure_level": 3,
+      "path": "references/upstream/LAWVE-COLLECTION-LICENSE"
+    },
+    {
+      "fragment_id": "references_upstream_SOURCE-MANIFEST_json",
+      "disclosure_level": 3,
+      "path": "references/upstream/SOURCE-MANIFEST.json"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_icelandic-contract-review-magnus-smarason_README_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/icelandic-contract-review-magnus-smarason/README.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_icelandic-contract-review-magnus-smarason_SKILL_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/icelandic-contract-review-magnus-smarason/SKILL.md"
+    },
+    {
+      "fragment_id": "scripts_README_md",
+      "disclosure_level": 3,
+      "path": "scripts/README.md"
+    },
+    {
+      "fragment_id": "scripts_helper_tool_py",
+      "disclosure_level": 3,
+      "path": "scripts/helper_tool.py"
+    }
+  ],
+  "release_channel": "development"
+}

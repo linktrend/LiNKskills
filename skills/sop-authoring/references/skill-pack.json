@@ -1,0 +1,151 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "sop-authoring",
+  "display_name": "Sop Authoring",
+  "version": "1.0.0",
+  "description": "Turn an established repeatable process into a usable controlled SOP.",
+  "capability_category": "sop_authoring",
+  "provenance": {
+    "author": "LiNKskills Library",
+    "source": "Pinned upstream modules copied with licenses and exact commit identities; see references/upstream/SOURCE-MANIFEST.json",
+    "license": "See per-source upstream license copies and manifest"
+  },
+  "lifecycle_state": "draft",
+  "format_profile": "heavy",
+  "compatible_runtime_profiles": [
+    "lisa-openclaw",
+    "cursor-macos"
+  ],
+  "min_capability_tier": "balanced",
+  "routing": {
+    "when_to_use": "Turn an established repeatable process into a usable controlled SOP.",
+    "when_not_to_use": [
+      "A different task requires its own skill",
+      "Unapproved consequential action",
+      "Unauthorized evidence or audience"
+    ],
+    "tags": [
+      "operations",
+      "task-specific",
+      "sara"
+    ],
+    "exclusion_rules": [
+      "Missing facts block the affected conclusion, not harmless drafting"
+    ],
+    "ambiguity_rules": [
+      "Read existing authorized evidence first; ask only material unanswered questions"
+    ],
+    "recommended_disclosure_level": 2
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "task_inputs",
+        "description": "observed process and responsible roles; trigger, prerequisites and intended reader; approval/exception rules; acceptance evidence"
+      }
+    ],
+    "expected_outputs": [
+      {
+        "name": "work_product",
+        "description": "controlled SOP draft; execution checklist; walkthrough and revision record"
+      }
+    ],
+    "forbidden_actions": [
+      "Unapproved payments, filings, postings, signatures, purchases, external announcements or production changes",
+      "Inventing source facts, approval or canon",
+      "Accessing unrelated private history"
+    ],
+    "verification_steps": [
+      "Use the supplied approved library template, heading/version/naming conventions; record purpose, process owner, audience, trigger, prerequisites and observed evidence. If none is supplied, label the proposed format as a draft.",
+      "Extract the actual process from records or walkthroughs. For every usually, unless, it depends or ask someone branch, ask a targeted gap question about criteria, owner and escalation; mark unresolved actions [TO CONFIRM] rather than invent an answer.",
+      "Write one concrete action per numbered step with actor, input, actual interface, output and check. Specify decision thresholds, exception handoffs, approvals, stop conditions and recovery; keep current practice separate from proposed improvements.",
+      "Include required forms, screenshots/placeholders, RACI, records, metrics and authorized retention/access references. Put fragility and suggested improvements in a separate risk note, not silently into the as-is SOP.",
+      "Pressure-test the draft as a new operator with no prior context using one normal case and one ambiguous exception. Identify each point requiring unstated judgment; repair or mark [TO CONFIRM], retain evidence and obtain the designated controlled-version approval."
+    ],
+    "completion_criteria": [
+      "Task output meets contract and task-specific acceptance criteria",
+      "Sources, uncertainty, exact completion scope and remaining decisions visible",
+      "Any authorized draft write read back"
+    ],
+    "known_limitations": [
+      "Structural qualification does not prove every behavior",
+      "Source originals are provenance; canonical method owns execution",
+      "Specialist content/draft access may be Sara-mediated"
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read",
+      "filesystem_write",
+      "network"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [
+      {
+        "key": "min_reasoning_tier",
+        "value": "balanced"
+      },
+      {
+        "key": "context_required",
+        "value": 128000
+      },
+      {
+        "key": "preferred_model",
+        "value": "gpt-6.1-sol"
+      }
+    ],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "required_certification_profiles": [],
+    "verification_refs": [
+      "references/eval-suite.yaml",
+      "references/source-selection.md"
+    ]
+  },
+  "telemetry": {
+    "classification": "restricted",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_personal_data",
+      "strip_private_finance_tax_and_vendor_data",
+      "strip_raw_documents",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain opaque task/source ids and hashes only"
+  },
+  "fragments": [
+    {
+      "fragment_id": "skill-md",
+      "disclosure_level": 2,
+      "path": "SKILL.md"
+    },
+    {
+      "fragment_id": "advanced",
+      "disclosure_level": 3,
+      "path": "advanced/advanced.md"
+    },
+    {
+      "fragment_id": "schemas",
+      "disclosure_level": 5,
+      "path": "references/schemas.json"
+    },
+    {
+      "fragment_id": "source-selection",
+      "disclosure_level": 3,
+      "path": "references/source-selection.md"
+    },
+    {
+      "fragment_id": "api",
+      "disclosure_level": 3,
+      "path": "references/api-specs.md"
+    }
+  ],
+  "release_channel": "development"
+}

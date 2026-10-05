@@ -1,0 +1,3 @@
+# Native context interface
+
+All abstract tool names remain contract vocabulary: `read_file` maps to native `read`; `write_file` maps to native `write`/`edit` for an approved artifact; `get_tool_details` maps to inspecting current tool schema and owner toolcard; `list_dir` is not callable. OpenClaw runtime state remains SQLite-owned. Use the supported consumer-owned context/session/artifact interface for matter listing, selection and checkpointing only when its visible owner contract supports the operation. If unavailable, produce the matter intake/archive/context packet as a draft and report the missing interface. Never create local matter directories, runtime JSONL, or profile files.

@@ -1,0 +1,23 @@
+# human_resources.workforce
+
+- Vendor onboarding resources — IC-Vendor-Onboarding-Process-10696.xlsx: `references/reference-register/entries/template-004/INDEX.md`.
+- Smartsheet interview templates — IC-Brief-Interview-Form-9264-PDF.pdf: `references/reference-register/entries/template-011/INDEX.md`.
+- Smartsheet onboarding templates — IC-30-60-90-Day-Onboarding-Plan-Template-Example-8779_WORD.docx: `references/reference-register/entries/template-012/INDEX.md`.
+- Employee performance-review templates — IC-360-Degree-Feedback-Template-9431_WORD.docx: `references/reference-register/entries/template-013/INDEX.md`.
+- Performance-improvement-plan templates — IC-Performance-Improvement-Plan-Action-Plan-Template-9258.docx: `references/reference-register/entries/template-014/INDEX.md`.
+- Timesheet and time-card templates — IC-Monthly-Timesheet-Template-8998.xlsx: `references/reference-register/entries/template-015/INDEX.md`.
+- Onboarding and offboarding templates — IC-Offboarding-Checklist-Template-11821_WORD.docx: `references/reference-register/entries/template-017/INDEX.md`.
+- Payroll templates — ic-2026-2027-biweekly-payroll-schedule-template.xlsx: `references/reference-register/entries/template-021/INDEX.md`.
+- USCIS Form I-9 and instructions: `references/reference-register/entries/template-025/INDEX.md`.
+- Workable handbook — PDF: `references/reference-register/entries/template-026/INDEX.md`.
+- Employee onboarding form — PDF: `references/reference-register/entries/template-027/INDEX.md`.
+- Vendor onboarding resources — IC-Vendor-Onboarding-Policy-10696_PDF.pdf: `references/reference-register/entries/template-048/INDEX.md`.
+- Vendor onboarding resources — IC-Vendor-Registration-Form-10696.xlsx: `references/reference-register/entries/template-049/INDEX.md`.
+- Vendor onboarding resources — IC-Vendor-Evaluation-10696.xlsx: `references/reference-register/entries/template-050/INDEX.md`.
+- Vendor onboarding resources — IC-Vendor-Scorecard-10696.xlsx: `references/reference-register/entries/template-051/INDEX.md`.
+- Smartsheet interview templates — IC-Candidate-Comparison-Scorecard-9264-PDF.pdf: `references/reference-register/entries/template-057/INDEX.md`.
+- Smartsheet onboarding templates — IC-New-Hire-Onboarding-Checklist-Template-Example-8779_WORD.docx: `references/reference-register/entries/template-058/INDEX.md`.
+- Employee performance-review templates — IC-Employee-Performance-Review-Template-Example-9431_WORD.docx: `references/reference-register/entries/template-059/INDEX.md`.
+- Onboarding and offboarding templates — IC-Onboarding-Checklist-Template-11821_WORD.docx: `references/reference-register/entries/template-061/INDEX.md`.
+- Payroll templates — ic-payroll-check-stub-template-example.xlsx: `references/reference-register/entries/template-069/INDEX.md`.
+- Payroll templates — ic-payroll-journal-template-example.xlsx: `references/reference-register/entries/template-070/INDEX.md`.
