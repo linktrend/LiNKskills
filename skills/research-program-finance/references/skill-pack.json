@@ -1,0 +1,128 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "research-program-finance",
+  "display_name": "Research Program Finance Evidence",
+  "version": "0.1.1",
+  "description": "Draft method for R&D program budget, restriction, actual/forecast, and milestone cash evidence packets.",
+  "capability_category": "research",
+  "lifecycle_state": "draft",
+  "format_profile": "simple",
+  "compatible_runtime_profiles": [
+    "lisa-openclaw"
+  ],
+  "min_capability_tier": "balanced",
+  "release_channel": "development",
+  "provenance": {
+    "author": "LiNKskills Library (draft)",
+    "source": "Independently authored from audited source entrypoint; see references/source-provenance.md",
+    "license": "MIT source notice recorded; no source text/code copied",
+    "imported_from": "alirezarezvani/claude-skills/research-ops/skills/research-finance/SKILL.md"
+  },
+  "routing": {
+    "when_to_use": "Use for active R&D program period budgets, actual/forecast reconciliation, restricted funding, F&A basis evidence, and milestone cash timing.",
+    "when_not_to_use": [
+      "Do not use for grant discovery; use research-grant-opportunities.",
+      "Do not use for accounting operation or classification decisions; Sara/controller owns them.",
+      "Do not use for broad market sizing, valuation, or program go/kill decisions."
+    ],
+    "tags": [
+      "research",
+      "program-finance",
+      "budget",
+      "cash",
+      "draft"
+    ],
+    "related_skills": [
+      "research-grant-opportunities",
+      "finance-accounting-operations"
+    ]
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "program",
+        "description": "Program and work-package scope."
+      },
+      {
+        "name": "periods",
+        "description": "Reporting periods and currency."
+      },
+      {
+        "name": "purpose",
+        "description": "Decision the packet supports."
+      },
+      {
+        "name": "owner",
+        "description": "Named finance/controller reviewer."
+      }
+    ],
+    "expected_outputs": [
+      {
+        "name": "evidence_packet",
+        "description": "Source-linked period table, actual/forecast distinctions, cash scenarios, exceptions, and owner questions."
+      }
+    ],
+    "forbidden_actions": [
+      "Apply accounting or award rules without current owner-approved authority.",
+      "Write accounting, bank, award, or program records.",
+      "Represent scenario outputs as actuals or approval."
+    ],
+    "verification_steps": [
+      "Check period, currency, value type, source, and as-of date for each figure.",
+      "Trace restrictions and F&A basis to current award-specific sources or mark unresolved.",
+      "Recompute visible arithmetic and keep scenario assumptions explicit.",
+      "Confirm owner questions remain with Sara/controller and no external mutation is claimed."
+    ],
+    "completion_criteria": [
+      "Draft packet separates actual, committed, budget, forecast, and proposed values.",
+      "Material source gaps and accounting-owner questions are visible.",
+      "No business, accounting, or external action is represented as completed."
+    ],
+    "known_limitations": [
+      "No legal/accounting/current policy verification is built into this method.",
+      "No evaluation, certification, release, or source-script admission is claimed."
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "native_session"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1"
+  },
+  "telemetry": {
+    "classification": "public_internal",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_private_data",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain_approved_ids_and_hashes"
+  },
+  "fragments": [
+    {
+      "fragment_id": "method",
+      "disclosure_level": 2,
+      "path": "SKILL.md"
+    },
+    {
+      "fragment_id": "calculations",
+      "disclosure_level": 3,
+      "path": "advanced/advanced.md"
+    },
+    {
+      "fragment_id": "source-provenance",
+      "disclosure_level": 4,
+      "path": "references/source-provenance.md"
+    }
+  ]
+}

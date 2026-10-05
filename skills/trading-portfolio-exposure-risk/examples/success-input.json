@@ -1,0 +1,80 @@
+{
+  "task": "schema fixture only",
+  "as_of": "2026-10-05T09:00:00Z",
+  "question": "Synthetic schema-shape fixture; no market conclusion.",
+  "source_snapshot": {
+    "refs": [
+      {
+        "source_id": "synthetic-fixture",
+        "as_of": "2026-10-05T09:00:00Z",
+        "provenance": "fictional fixture only",
+        "sha256": null
+      }
+    ],
+    "snapshot_id": "fictional-fixture",
+    "version": "fictional-fixture",
+    "notes": []
+  },
+  "reporting_currency": "USD",
+  "task_context": {
+    "as_of": "2026-10-05T09:00:00Z",
+    "reporting_currency": "USD",
+    "nav": {
+      "value": 1000,
+      "currency": "USD",
+      "as_of": "2026-10-05T09:00:00Z",
+      "source_ref": "synthetic-fixture"
+    },
+    "holdings": [
+      {
+        "instrument_id": "ABC",
+        "kind": "equity",
+        "signed_quantity": 10,
+        "quantity_unit": "shares",
+        "mark_price": 100,
+        "price_unit": "quote_currency_per_share",
+        "price_currency": "USD",
+        "market_value_local": 1000,
+        "multiplier": 1,
+        "delta": 1,
+        "delta_unit": "underlying_units_per_contract",
+        "fx_to_reporting": 1,
+        "fx_as_of": "2026-10-05T09:00:00Z",
+        "fx_pair": "USD/USD",
+        "issuer": "ABC Inc",
+        "sector": "Technology",
+        "theme": null,
+        "source_ref": "synthetic-fixture",
+        "instrument_terms": {
+          "underlying_id": "ABC",
+          "expiry": null,
+          "settlement_currency": "USD",
+          "option_type": "not_applicable",
+          "strike": null,
+          "delta_source_ref": "synthetic equity delta=1",
+          "contract_spec_ref": "synthetic share contract"
+        }
+      }
+    ],
+    "scenario_shocks": [
+      {
+        "scenario_id": "down-10",
+        "as_of": "2026-10-05T09:00:00Z",
+        "price_shock_fraction": -0.1,
+        "fx_shock_fraction": 0,
+        "rate_shock_basis_points": 0,
+        "volatility_shock_fraction": 0,
+        "liquidity_haircut_fraction": 0,
+        "horizon": "one day",
+        "source_ref": "synthetic-fixture"
+      }
+    ],
+    "return_series": [],
+    "approved_policy": {
+      "policy_ref": null,
+      "effective_from": null,
+      "effective_to": null,
+      "limits": []
+    }
+  }
+}

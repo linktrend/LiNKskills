@@ -1,0 +1,31 @@
+{
+  "status": "schema_fixture_only_not_behavioral_evaluation",
+  "valid_case": {
+    "schema_ref": "references/schemas.json#/definitions/input",
+    "input": {
+      "syllabus_or_objectives": "fictional course objective: explain experimental design",
+      "learner_level": "intermediate",
+      "language": "English",
+      "recency_balance": "foundational plus current",
+      "topic_constraints": [
+        "randomization",
+        "measurement"
+      ],
+      "time_budget": "4 weeks"
+    },
+    "expected": "accept by JSON Schema"
+  },
+  "invalid_case": {
+    "schema_ref": "references/schemas.json#/definitions/input",
+    "input": {
+      "syllabus_or_objectives": "fictional-input",
+      "learner_level": "fictional-input",
+      "language": "fictional-input",
+      "recency_balance": "fictional-input",
+      "topic_constraints": [],
+      "time_budget": "fictional-input",
+      "unapproved_extra_field": "reject"
+    },
+    "expected": "reject unknown additional property"
+  }
+}

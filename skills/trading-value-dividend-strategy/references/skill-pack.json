@@ -1,0 +1,763 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "trading-value-dividend-strategy",
+  "display_name": "Value and dividend research",
+  "version": "0.1.0",
+  "description": "Evaluate value, current income, dividend growth, pullback and dividend-policy risk under the user’s stated objective.",
+  "capability_category": "trading_research",
+  "provenance": {
+    "author": "LiNKskills Library",
+    "source": "Exact source provenance: references/source-provenance.json (sha256:6617f56bd3a9a03987197fd4dee6b5751f7b1a2b7379497dfb763b3484b802a0); per-entry license/notice/disposition recorded there.",
+    "license": "No package-wide upstream license is asserted; see exact per-file source provenance and notice dispositions in references/source-provenance.json.",
+    "imported_from": "Frozen Jane draft source: skills/trading-value-dividend-strategy; source provenance copied unchanged for this proposal only."
+  },
+  "lifecycle_state": "draft",
+  "format_profile": "simple",
+  "compatible_runtime_profiles": [
+    "jane-openclaw"
+  ],
+  "min_capability_tier": "balanced",
+  "routing": {
+    "when_to_use": "Use for value/dividend screening, income sustainability, dividend growth during pullbacks, Kanchi-style underwriting, or dividend-risk monitoring.",
+    "when_not_to_use": [
+      "Do not place orders, contact a broker, alter a portfolio, or activate live capital.",
+      "Do not invent market data, source access, paid entitlements, historical validation, or method passes.",
+      "Do not treat structural validation or fictional fixtures as strategy validation.",
+      "Do not replace the existing LiNKtrading engine or create runtime JSON state/sidecars."
+    ],
+    "tags": [
+      "trading",
+      "research",
+      "jane",
+      "draft"
+    ],
+    "exclusion_rules": [
+      "Do not place orders, contact a broker, alter a portfolio, or activate live capital.",
+      "Do not invent market data, source access, paid entitlements, historical validation, or method passes.",
+      "Do not treat structural validation or fictional fixtures as strategy validation.",
+      "Do not replace the existing LiNKtrading engine or create runtime JSON state/sidecars."
+    ]
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "request_id",
+        "description": "Required property `request_id` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "objective",
+        "description": "Required property `objective` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "income_now",
+            "balanced",
+            "growth_first",
+            "value",
+            "custom"
+          ]
+        }
+      },
+      {
+        "name": "universe",
+        "description": "Required property `universe` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "as_of_date",
+        "description": "Required property `as_of_date` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "horizon_years",
+        "description": "Required property `horizon_years` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "integer"
+        }
+      },
+      {
+        "name": "holdings_context",
+        "description": "Required property `holdings_context` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": [
+            "string",
+            "number",
+            "boolean",
+            "object",
+            "array",
+            "null"
+          ]
+        }
+      },
+      {
+        "name": "candidates",
+        "description": "Required property `candidates` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "symbol": {
+                "type": "string"
+              },
+              "instrument_type": {
+                "type": "string"
+              },
+              "currency": {
+                "type": "string"
+              },
+              "price": {
+                "type": "object",
+                "properties": {
+                  "value": {
+                    "type": "integer"
+                  },
+                  "as_of": {
+                    "type": "string"
+                  },
+                  "source_id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "value",
+                  "as_of",
+                  "source_id"
+                ],
+                "additionalProperties": false
+              },
+              "dividend_payments": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "amount": {
+                      "type": "number"
+                    },
+                    "currency": {
+                      "type": "string"
+                    },
+                    "declared_on": {
+                      "type": "string"
+                    },
+                    "frequency": {
+                      "type": "string"
+                    },
+                    "classification": {
+                      "type": "string"
+                    },
+                    "source_id": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "amount",
+                    "currency",
+                    "declared_on",
+                    "frequency",
+                    "classification",
+                    "source_id"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "coverage": {
+                "type": "object",
+                "properties": {
+                  "cfo": {
+                    "type": "integer"
+                  },
+                  "capex_outflow": {
+                    "type": "integer"
+                  },
+                  "dividends_paid": {
+                    "type": "integer"
+                  },
+                  "period": {
+                    "type": "string"
+                  },
+                  "unit": {
+                    "type": "string"
+                  },
+                  "source_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "cfo",
+                  "capex_outflow",
+                  "dividends_paid",
+                  "period",
+                  "unit",
+                  "source_ids"
+                ],
+                "additionalProperties": false
+              },
+              "facts": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "metric": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "number"
+                    },
+                    "unit": {
+                      "type": "string"
+                    },
+                    "period": {
+                      "type": "string"
+                    },
+                    "source_ids": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "metric",
+                    "value",
+                    "unit",
+                    "period",
+                    "source_ids"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "required": [
+              "symbol",
+              "instrument_type",
+              "currency",
+              "price",
+              "dividend_payments",
+              "coverage",
+              "facts"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      {
+        "name": "source_ledger",
+        "description": "Required property `source_ledger` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "source_id": {
+                "type": "string"
+              },
+              "kind": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "published_at": {
+                "type": "string"
+              },
+              "retrieved_at": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "source_id",
+              "kind",
+              "url",
+              "published_at",
+              "retrieved_at"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    ],
+    "optional_inputs": [],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "request_id": {
+          "type": "string"
+        },
+        "objective": {
+          "type": "string",
+          "enum": [
+            "income_now",
+            "balanced",
+            "growth_first",
+            "value",
+            "custom"
+          ]
+        },
+        "universe": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "as_of_date": {
+          "type": "string"
+        },
+        "horizon_years": {
+          "type": "integer"
+        },
+        "holdings_context": {
+          "type": [
+            "string",
+            "number",
+            "boolean",
+            "object",
+            "array",
+            "null"
+          ]
+        },
+        "candidates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "symbol": {
+                "type": "string"
+              },
+              "instrument_type": {
+                "type": "string"
+              },
+              "currency": {
+                "type": "string"
+              },
+              "price": {
+                "type": "object",
+                "properties": {
+                  "value": {
+                    "type": "integer"
+                  },
+                  "as_of": {
+                    "type": "string"
+                  },
+                  "source_id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "value",
+                  "as_of",
+                  "source_id"
+                ],
+                "additionalProperties": false
+              },
+              "dividend_payments": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "amount": {
+                      "type": "number"
+                    },
+                    "currency": {
+                      "type": "string"
+                    },
+                    "declared_on": {
+                      "type": "string"
+                    },
+                    "frequency": {
+                      "type": "string"
+                    },
+                    "classification": {
+                      "type": "string"
+                    },
+                    "source_id": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "amount",
+                    "currency",
+                    "declared_on",
+                    "frequency",
+                    "classification",
+                    "source_id"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "coverage": {
+                "type": "object",
+                "properties": {
+                  "cfo": {
+                    "type": "integer"
+                  },
+                  "capex_outflow": {
+                    "type": "integer"
+                  },
+                  "dividends_paid": {
+                    "type": "integer"
+                  },
+                  "period": {
+                    "type": "string"
+                  },
+                  "unit": {
+                    "type": "string"
+                  },
+                  "source_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "cfo",
+                  "capex_outflow",
+                  "dividends_paid",
+                  "period",
+                  "unit",
+                  "source_ids"
+                ],
+                "additionalProperties": false
+              },
+              "facts": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "metric": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "number"
+                    },
+                    "unit": {
+                      "type": "string"
+                    },
+                    "period": {
+                      "type": "string"
+                    },
+                    "source_ids": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "metric",
+                    "value",
+                    "unit",
+                    "period",
+                    "source_ids"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "required": [
+              "symbol",
+              "instrument_type",
+              "currency",
+              "price",
+              "dividend_payments",
+              "coverage",
+              "facts"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "source_ledger": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "source_id": {
+                "type": "string"
+              },
+              "kind": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "published_at": {
+                "type": "string"
+              },
+              "retrieved_at": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "source_id",
+              "kind",
+              "url",
+              "published_at",
+              "retrieved_at"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "request_id",
+        "objective",
+        "universe",
+        "as_of_date",
+        "horizon_years",
+        "holdings_context",
+        "candidates",
+        "source_ledger"
+      ],
+      "additionalProperties": false,
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "urn:linkskills:trading-value-dividend-strategy:0.1.0#/definitions/input"
+    },
+    "expected_outputs": [
+      {
+        "name": "request_id",
+        "description": "Required property `request_id` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "status",
+        "description": "Required property `status` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "enum": [
+            "complete",
+            "partial",
+            "insufficient_input",
+            "no_view"
+          ]
+        }
+      },
+      {
+        "name": "as_of_date",
+        "description": "Required property `as_of_date` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "objective",
+        "description": "Required property `objective` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "income_now",
+            "balanced",
+            "growth_first",
+            "value",
+            "custom"
+          ]
+        }
+      },
+      {
+        "name": "candidates",
+        "description": "Required property `candidates` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "symbol": {
+                "type": "string"
+              },
+              "instrument_type": {
+                "type": "string"
+              },
+              "regular_forward_yield_pct": {
+                "type": "number"
+              },
+              "ttm_yield_pct": {
+                "type": "number"
+              },
+              "special_dividend_excluded": {
+                "type": "boolean"
+              },
+              "coverage": {
+                "type": "object",
+                "properties": {
+                  "basis": {
+                    "type": "string"
+                  },
+                  "value": {
+                    "type": "integer"
+                  },
+                  "dividends_paid": {
+                    "type": "integer"
+                  },
+                  "payout_ratio": {
+                    "type": "number"
+                  },
+                  "unit": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "basis",
+                  "value",
+                  "dividends_paid",
+                  "payout_ratio",
+                  "unit"
+                ],
+                "additionalProperties": false
+              },
+              "sector_safety": {
+                "type": "string"
+              },
+              "valuation_method": {
+                "type": "string"
+              },
+              "event_scan_status": {
+                "type": "string"
+              },
+              "verdict": {
+                "type": "string"
+              },
+              "evidence_source_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "countercase": {
+                "type": "string"
+              },
+              "next_evidence": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "symbol",
+              "instrument_type",
+              "regular_forward_yield_pct",
+              "ttm_yield_pct",
+              "special_dividend_excluded",
+              "coverage",
+              "sector_safety",
+              "valuation_method",
+              "event_scan_status",
+              "verdict",
+              "evidence_source_ids",
+              "countercase",
+              "next_evidence"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      {
+        "name": "monitor_queue",
+        "description": "Required property `monitor_queue` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      },
+      {
+        "name": "unresolved",
+        "description": "Required property `unresolved` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "advisory",
+        "description": "Required property `advisory` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      }
+    ],
+    "procedure_summary": "Source method section `Practical method` in SKILL.md: 1. Identify objective (cash income, dividend growth/total return, or valuation), instrument type, universe, horizon/as-of and user-supplied risk constraints.\n2. For each dividend, retain raw payment history with declared date, ex/pay date, cadence, regular/special status and currency; compute regular forward yield separately from TTM/special-inclusive yield, showing formula and price timestamp.\n3. Assess growth history, cuts/freezes/variable policy and payout on appropriate denominators: stock FCF, REIT FFO/AFFO, BDC NII; for regulated utilities and banks/insurers use sector evidence, not generic FCF payout.\n4. Reconcile GAAP and adjusted earnings, one-off effects, debt/interest coverage and capital return; missing adjusted or sector-critical inputs become review-required/partial, not silently clean.\n5. Select valuation by instrument/sector (e.g. bank P/TBV, REIT P/FFO/AFFO, cash-cow P/FCF) and show own-history/peer comparability and ranges; do not apply source P/E×P/B as universal gate.\n6. Separate backward earnings one-offs from forward structural events; log source tier, publication/retrieval times, URL/file and event scan window. Missing/unavailable scan on a triggered item remains unresolved/review-required.\n7. If requested, calculate pullback triggers from stated yield/valuation history and show hypothetical price/valuation assumptions, invalidation and downside. Jane may recommend conditional strategy/sizing/exit only with holdings, liquidity and risk constraints supplied.\n8. Return objective-specific candidate table/memo/monitor queue, explicit missing evidence and conditional conclusion. No tax/account-location determinations, order submission, auto-add/auto-sell, live portfolio mutation or capital activation.",
+    "forbidden_actions": [
+      "Do not place orders, contact a broker, alter a portfolio, or activate live capital.",
+      "Do not invent market data, source access, paid entitlements, historical validation, or method passes.",
+      "Do not treat structural validation or fictional fixtures as strategy validation.",
+      "Do not replace the existing LiNKtrading engine or create runtime JSON state/sidecars."
+    ],
+    "failure_handling": "Source section `## Failure handling and boundaries` in SKILL.md: - Missing/stale/conflicting data: stop dependent calculations, preserve observed values, mark partial/no-view and name the next evidence needed.\n- Conflicting strategy variants: select by the user’s stated objective; do not average thresholds or silently switch strategy.\n- Jane may give conditional research/strategy/position-sizing/exit recommendations when requested and supplied constraints support them. Recommendations are advice only and never authorize external action.\n- No manual trading, order placement, broker interaction, portfolio mutation or live activation. Any later activation remains on LiNKtrading and requires Lisa plus Carlos independent authenticated approvals over two channels against the exact version.\n- Eric owns software/Nautilus adapters; Sara owns legal/accounting determinations.",
+    "verification_steps": [
+      "Validate the supplied input against references/schemas.json#/definitions/input and report each missing or invalid required field.",
+      "Validate the produced task output against references/schemas.json#/definitions/output; structural validity does not establish method correctness.",
+      "Use references/eval-suite.json criteria only against an actual task output; a schema check or fictional example alone is not a behavioral pass."
+    ],
+    "completion_criteria": [
+      "Include every required output property defined at references/schemas.json#/definitions/output: request_id, status, as_of_date, objective, candidates, monitor_queue, unresolved, advisory.",
+      "If `status` exists, its value must reflect the schema-defined gaps or missing inputs; do not assert a complete result where evidence is absent.",
+      "Keep recommendations advisory; no external action, order, live activation, portfolio mutation, or approval is represented as completed."
+    ],
+    "known_limitations": [
+      "The skill source is an isolated unqualified draft; source-derived pack metadata does not establish selection, registration, method qualification, or production suitability.",
+      "The declared runtime-profile label is preserved as source metadata; runtime-profile binding is not proved."
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read",
+      "filesystem_write"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [
+      {
+        "key": "min_reasoning_tier",
+        "value": "balanced"
+      },
+      {
+        "key": "preferred_model",
+        "value": "gpt-6.1-sol"
+      },
+      {
+        "key": "context_required",
+        "value": 64000
+      }
+    ],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "suite_hash": "sha256:b1c58c017c7d814ed47e3527d31661dda30b1c242f5e88dccdb281df868bb901",
+    "verification_refs": [
+      "references/schemas.json",
+      "references/eval-suite.json"
+    ]
+  },
+  "telemetry": {
+    "classification": "public_internal",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_private_data",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain_only_approved_ids_and_hashes"
+  }
+}

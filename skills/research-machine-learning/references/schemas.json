@@ -1,0 +1,295 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "research-machine-learning task contract draft",
+  "type": "object",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "properties": {
+        "learning_target": {
+          "type": "string"
+        },
+        "data_ref": {
+          "type": "string"
+        },
+        "provenance": {
+          "type": "string"
+        },
+        "observation_unit": {
+          "type": "string"
+        },
+        "feature_timing": {
+          "type": "string"
+        },
+        "target_horizon": {
+          "type": "string"
+        },
+        "train_test_chronology": {
+          "type": "string"
+        },
+        "groups": {
+          "type": "string"
+        },
+        "leakage_risks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "baseline": {
+          "type": "string"
+        },
+        "metric": {
+          "type": "string"
+        },
+        "deployment_decision": {
+          "type": "string"
+        },
+        "constraints": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "learning_target",
+        "data_ref",
+        "provenance",
+        "observation_unit",
+        "feature_timing",
+        "target_horizon",
+        "train_test_chronology",
+        "groups",
+        "leakage_risks",
+        "baseline",
+        "metric",
+        "deployment_decision",
+        "constraints"
+      ],
+      "additionalProperties": false,
+      "title": "Task-specific input"
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "task_frame": {
+          "type": "object",
+          "properties": {
+            "target": {
+              "type": "string"
+            },
+            "observation_unit": {
+              "type": "string"
+            },
+            "horizon": {
+              "type": "string"
+            },
+            "feature_availability": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "target",
+            "observation_unit",
+            "horizon",
+            "feature_availability"
+          ],
+          "additionalProperties": false
+        },
+        "data_checks": {
+          "type": "object",
+          "properties": {
+            "rows": {
+              "type": "integer"
+            },
+            "entities": {
+              "type": "number"
+            },
+            "time_range": {
+              "type": "string"
+            },
+            "missingness": {
+              "type": "string"
+            },
+            "leakage_flags": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "rows",
+            "entities",
+            "time_range",
+            "missingness",
+            "leakage_flags"
+          ],
+          "additionalProperties": false
+        },
+        "validation_design": {
+          "type": "object",
+          "properties": {
+            "split": {
+              "type": "string"
+            },
+            "train": {
+              "type": "string"
+            },
+            "test": {
+              "type": "string"
+            },
+            "grouping": {
+              "type": "string"
+            },
+            "holdout_status": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "split",
+            "train",
+            "test",
+            "grouping",
+            "holdout_status"
+          ],
+          "additionalProperties": false
+        },
+        "baseline": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "score": {
+              "type": [
+                "string",
+                "number",
+                "object",
+                "array",
+                "boolean",
+                "null"
+              ]
+            },
+            "status": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "score",
+            "status"
+          ],
+          "additionalProperties": false
+        },
+        "pipeline": {
+          "type": "object",
+          "properties": {
+            "preprocessing": {
+              "type": "string"
+            },
+            "model": {
+              "type": "string"
+            },
+            "selection": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "preprocessing",
+            "model",
+            "selection"
+          ],
+          "additionalProperties": false
+        },
+        "metrics_and_uncertainty": {
+          "type": "object",
+          "properties": {
+            "metric": {
+              "type": "string"
+            },
+            "estimate": {
+              "type": [
+                "string",
+                "number",
+                "object",
+                "array",
+                "boolean",
+                "null"
+              ]
+            },
+            "interval": {
+              "type": [
+                "string",
+                "number",
+                "object",
+                "array",
+                "boolean",
+                "null"
+              ]
+            },
+            "status": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "metric",
+            "estimate",
+            "interval",
+            "status"
+          ],
+          "additionalProperties": false
+        },
+        "generalization_risks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "status",
+        "task_frame",
+        "data_checks",
+        "validation_design",
+        "baseline",
+        "pipeline",
+        "metrics_and_uncertainty",
+        "generalization_risks",
+        "findings"
+      ],
+      "additionalProperties": false,
+      "title": "Task-specific result"
+    },
+    "state": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "in_progress",
+            "completed",
+            "needs_input",
+            "blocked"
+          ]
+        },
+        "open_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "schema_version": "0.1",
+  "suite_id": "trading-exit-strategy-eval-draft",
+  "skill_id": "trading-exit-strategy",
+  "suite_version": "0.1.0",
+  "rubric": [
+    {
+      "dimension": "method_fit",
+      "weight": 0.4
+    },
+    {
+      "dimension": "units_and_traceability",
+      "weight": 0.35
+    },
+    {
+      "dimension": "scope_and_uncertainty",
+      "weight": 0.25
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "intrabar-order",
+      "case_type": "adversarial",
+      "input": "One OHLC bar spans both proposed stop and take-profit; no lower-resolution data is supplied.",
+      "expected": {
+        "criteria": [
+          "Declare trigger ordering unidentifiable and show bounded/adverse cases; do not select favorable sequence."
+        ]
+      }
+    },
+    {
+      "case_id": "quantity-overrun",
+      "case_type": "adversarial",
+      "input": "Three tranche instructions sell 50%, 50%, and 25% of original quantity.",
+      "expected": {
+        "criteria": [
+          "Reject/flag plan because total is 125% and violates position conservation; request corrected allocation."
+        ]
+      }
+    },
+    {
+      "case_id": "short-direction",
+      "case_type": "adversarial",
+      "input": "A short entry at 100 has stop 110 and target 80.",
+      "expected": {
+        "criteria": [
+          "Calculate directional risk as 10 per unit and preserve short sign; do not apply long-only entry-minus-stop formula."
+        ]
+      }
+    }
+  ],
+  "evidence_policy": {
+    "retain": [
+      "fixture_input",
+      "expected_behavior"
+    ],
+    "redact": [
+      "secrets",
+      "private_data",
+      "raw_transactions_unless_authorized"
+    ]
+  },
+  "skill_version_range": ">=0.1.0",
+  "pass_threshold": 0.85
+}

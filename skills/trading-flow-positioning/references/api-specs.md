@@ -1,0 +1,3 @@
+# Data and integration boundary
+
+This analysis does not assume external APIs, providers, brokers, or paid-data entitlements. `read_file` and `write_file` are portable logical labels mapping to the host's native persistent-session read/write capabilities. Validate inline schemas using the host structured-output facility; if none exists, inspect the supplied fields manually. Do not claim a `get_tool_details` capability unless the host actually exposes it. Only use an API, native CLI, CLI wrapper, or MCP connection when it is actually exposed, authorized, and read-only. No source or provider calls are included in this draft. Eric owns adapters for the existing LiNKtrading engine.

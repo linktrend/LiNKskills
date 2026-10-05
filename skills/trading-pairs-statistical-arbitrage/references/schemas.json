@@ -1,0 +1,310 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:linkskills:trading-pairs-statistical-arbitrage:0.1.0",
+  "title": "trading-pairs-statistical-arbitrage research contract",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "properties": {
+        "request_id": {
+          "type": "string"
+        },
+        "universe": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "as_of_date": {
+          "type": "string"
+        },
+        "frequency": {
+          "type": "string",
+          "enum": [
+            "daily",
+            "weekly",
+            "intraday"
+          ]
+        },
+        "price_basis": {
+          "type": "string",
+          "enum": [
+            "split_adjusted",
+            "split_and_distribution_adjusted",
+            "raw_close"
+          ]
+        },
+        "bars": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "symbol": {
+                "type": "string"
+              },
+              "date": {
+                "type": "string"
+              },
+              "close": {
+                "type": "number"
+              },
+              "source_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "symbol",
+              "date",
+              "close",
+              "source_id"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "model_spec": {
+          "type": "object",
+          "properties": {
+            "test": {
+              "type": "string"
+            },
+            "regression": {
+              "type": "string"
+            },
+            "deterministic": {
+              "type": "string"
+            },
+            "lag_rule": {
+              "type": "string"
+            },
+            "train_end": {
+              "type": "string"
+            },
+            "test_start": {
+              "type": "string"
+            },
+            "search_count": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "test",
+            "regression",
+            "deterministic",
+            "lag_rule",
+            "train_end",
+            "test_start",
+            "search_count"
+          ],
+          "additionalProperties": false
+        },
+        "cost_inputs": {
+          "type": "object",
+          "properties": {
+            "commission_bps": {
+              "type": "integer"
+            },
+            "spread_bps": {
+              "type": "integer"
+            },
+            "borrow_bps_annual": {
+              "type": "integer"
+            },
+            "availability": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "commission_bps",
+            "spread_bps",
+            "borrow_bps_annual",
+            "availability"
+          ],
+          "additionalProperties": false
+        },
+        "controls": {
+          "type": "object",
+          "properties": {
+            "walk_forward_required": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "walk_forward_required"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "request_id",
+        "universe",
+        "as_of_date",
+        "frequency",
+        "price_basis",
+        "bars",
+        "model_spec",
+        "cost_inputs",
+        "controls"
+      ],
+      "additionalProperties": false
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "request_id": {
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "complete",
+            "partial",
+            "insufficient_input",
+            "no_view"
+          ]
+        },
+        "as_of_date": {
+          "type": "string"
+        },
+        "scope": {
+          "type": "string"
+        },
+        "pairs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "symbol_a": {
+                "type": "string"
+              },
+              "symbol_b": {
+                "type": "string"
+              },
+              "integration_order": {
+                "type": "object",
+                "properties": {
+                  "AAA": {
+                    "type": "string"
+                  },
+                  "BBB": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "AAA",
+                  "BBB"
+                ],
+                "additionalProperties": false
+              },
+              "method": {
+                "type": "string"
+              },
+              "train_window": {
+                "type": "string"
+              },
+              "test_window": {
+                "type": "string"
+              },
+              "intercept": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "hedge_ratio_units": {
+                "type": "string"
+              },
+              "hedge_ratio": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "cointegration_statistic": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "cointegration_pvalue": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "critical_values_source": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "rolling_stability": {
+                "type": "string"
+              },
+              "half_life_days": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "current_spread_z": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "multiple_test_adjustment": {
+                "type": "string"
+              },
+              "market_beta_neutrality": {
+                "type": "string"
+              },
+              "borrow_cost_and_availability": {
+                "type": "string"
+              },
+              "transaction_cost_stress": {
+                "type": "string"
+              },
+              "research_view": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "symbol_a",
+              "symbol_b",
+              "integration_order",
+              "method",
+              "train_window",
+              "test_window",
+              "intercept",
+              "hedge_ratio_units",
+              "hedge_ratio",
+              "cointegration_statistic",
+              "cointegration_pvalue",
+              "critical_values_source",
+              "rolling_stability",
+              "half_life_days",
+              "current_spread_z",
+              "multiple_test_adjustment",
+              "market_beta_neutrality",
+              "borrow_cost_and_availability",
+              "transaction_cost_stress",
+              "research_view"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "conclusion": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "request_id",
+        "status",
+        "as_of_date",
+        "scope",
+        "pairs",
+        "conclusion"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,0 +1,552 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "trading-sector-theme-research",
+  "display_name": "Sector and theme research",
+  "version": "0.1.1",
+  "description": "Map sector or theme economics, value-chain exposure, adoption evidence, competition, and scenario drivers; preserve fundamental and momentum evidence as distinct measures.",
+  "capability_category": "trading_research",
+  "provenance": {
+    "author": "LiNKskills Library",
+    "source": "Exact source provenance: references/source-provenance.json (sha256:4d525b1ff4b6e77021df02ad3a7c82c2bed9709a90d79d155479c3786fb94ce5); per-entry license/notice/disposition recorded there.",
+    "license": "No package-wide upstream license is asserted; see exact per-file source provenance and notice dispositions in references/source-provenance.json.",
+    "imported_from": "Frozen Jane draft source: skills/trading-sector-theme-research; source provenance copied unchanged for this proposal only."
+  },
+  "lifecycle_state": "draft",
+  "format_profile": "simple",
+  "compatible_runtime_profiles": [
+    "jane-openclaw"
+  ],
+  "min_capability_tier": "balanced",
+  "routing": {
+    "when_to_use": "Use for sector outlook, industry theme, value chain, or sector rotation.",
+    "when_not_to_use": [
+      "Do not submit orders, call a broker, change portfolio state, or activate a live strategy.",
+      "Do not invent data, paid tool access, historical validation, or source API availability.",
+      "Do not treat a schema-valid example or output as method validation.",
+      "Do not replace LiNKtrading with another execution system."
+    ],
+    "tags": [
+      "trading",
+      "research",
+      "jane",
+      "draft"
+    ],
+    "exclusion_rules": [
+      "Do not submit orders, call a broker, change portfolio state, or activate a live strategy.",
+      "Do not invent data, paid tool access, historical validation, or source API availability.",
+      "Do not treat a schema-valid example or output as method validation.",
+      "Do not replace LiNKtrading with another execution system."
+    ]
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "as_of_date",
+        "description": "Required property `as_of_date` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        }
+      },
+      {
+        "name": "geography",
+        "description": "Required property `geography` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "sector_or_theme",
+        "description": "Required property `sector_or_theme` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "research_question",
+        "description": "Required property `research_question` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "horizon",
+        "description": "Required property `horizon` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "universe",
+        "description": "Required property `universe` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "provided_sources",
+        "description": "Required property `provided_sources` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    ],
+    "optional_inputs": [
+      {
+        "name": "portfolio_context",
+        "description": "Optional property `portfolio_context` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Optional user-supplied portfolio context for advisory sensitivity only; never authorizes changes or execution.",
+          "required": [
+            "as_of",
+            "base_currency",
+            "holdings",
+            "risk_constraints"
+          ],
+          "properties": {
+            "as_of": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "base_currency": {
+              "type": "string"
+            },
+            "nav": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "description": "Amount in base_currency; null when not supplied."
+            },
+            "holdings": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "instrument",
+                  "quantity",
+                  "currency",
+                  "as_of"
+                ],
+                "properties": {
+                  "instrument": {
+                    "type": "string"
+                  },
+                  "quantity": {
+                    "type": "number"
+                  },
+                  "currency": {
+                    "type": "string"
+                  },
+                  "as_of": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "market_value": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "multiplier": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "source_pointer": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "risk_constraints": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "mandate_notes": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    ],
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "as_of_date",
+        "geography",
+        "sector_or_theme",
+        "research_question",
+        "horizon",
+        "universe",
+        "provided_sources"
+      ],
+      "properties": {
+        "as_of_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "geography": {
+          "type": "string"
+        },
+        "sector_or_theme": {
+          "type": "string"
+        },
+        "research_question": {
+          "type": "string"
+        },
+        "horizon": {
+          "type": "string"
+        },
+        "universe": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "provided_sources": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "portfolio_context": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Optional user-supplied portfolio context for advisory sensitivity only; never authorizes changes or execution.",
+          "required": [
+            "as_of",
+            "base_currency",
+            "holdings",
+            "risk_constraints"
+          ],
+          "properties": {
+            "as_of": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "base_currency": {
+              "type": "string"
+            },
+            "nav": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "description": "Amount in base_currency; null when not supplied."
+            },
+            "holdings": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "instrument",
+                  "quantity",
+                  "currency",
+                  "as_of"
+                ],
+                "properties": {
+                  "instrument": {
+                    "type": "string"
+                  },
+                  "quantity": {
+                    "type": "number"
+                  },
+                  "currency": {
+                    "type": "string"
+                  },
+                  "as_of": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "market_value": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "multiplier": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "source_pointer": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "risk_constraints": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "mandate_notes": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "urn:linkskills:trading-sector-theme-research:0.1.1#/definitions/input"
+    },
+    "expected_outputs": [
+      {
+        "name": "completion_status",
+        "description": "Required property `completion_status` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "enum": [
+            "complete",
+            "partial",
+            "insufficient_input"
+          ]
+        }
+      },
+      {
+        "name": "scope",
+        "description": "Required property `scope` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "object"
+        }
+      },
+      {
+        "name": "value_chain",
+        "description": "Required property `value_chain` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      },
+      {
+        "name": "economics",
+        "description": "Required property `economics` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "object"
+        }
+      },
+      {
+        "name": "drivers",
+        "description": "Required property `drivers` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      },
+      {
+        "name": "evidence_ledger",
+        "description": "Required property `evidence_ledger` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      },
+      {
+        "name": "scenarios",
+        "description": "Required property `scenarios` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      },
+      {
+        "name": "countercase",
+        "description": "Required property `countercase` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "gaps",
+        "description": "Required property `gaps` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "advisory_portfolio_proposal",
+        "description": "Optional property `advisory_portfolio_proposal` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Optional sourced advisory sector/asset proposal when user supplied holdings and constraints; no action permission.",
+          "required": [
+            "status",
+            "proposals",
+            "missing_basis"
+          ],
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "advisory_proposal",
+                "partial",
+                "unavailable_missing_basis",
+                "not_requested"
+              ]
+            },
+            "proposals": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "instrument_or_scope",
+                  "proposal",
+                  "basis",
+                  "invalidation"
+                ],
+                "properties": {
+                  "instrument_or_scope": {
+                    "type": "string"
+                  },
+                  "proposal": {
+                    "type": "string"
+                  },
+                  "target_or_risk_level": {
+                    "type": [
+                      "string",
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "basis": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "invalidation": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "missing_basis": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    ],
+    "procedure_summary": "Apply the task-specific integrated method and the named branch input/output and failure rules in references/source-integrated-method.md. Preserve optional/provider distinctions and return bounded partial outputs when independent methods remain valid.",
+    "forbidden_actions": [
+      "Do not submit orders, call a broker, change portfolio state, or activate a live strategy.",
+      "Do not invent data, paid tool access, historical validation, or source API availability.",
+      "Do not treat a schema-valid example or output as method validation.",
+      "Do not replace LiNKtrading with another execution system."
+    ],
+    "failure_handling": "Source section `## Failure handling` in SKILL.md: - Missing, stale, unreconciled or inaccessible critical data: stop the dependent calculation and return a bounded partial result with the exact gap.\n- Incompatible units, periods, event windows or universes: do not merge. Reconcile definitions or report separate views.\n- Source rules conflict or are uncalibrated: show the source-specific rule and treat its result as a hypothesis; do not average contradictory rules into a score.\n- User requests an order, live activation, or unapproved side effect: provide the permitted advisory artifact only. Any later execution requires the existing LiNKtrading route and Lisa + Carlos independent authenticated two-channel exact-version approval.\n- A conditionally recommended size/exit cannot be supported because risk budget, holdings, liquidity, or instrument constraints are missing: omit numeric sizing and state which inputs would change it.",
+    "verification_steps": [
+      "Validate the supplied input against references/schemas.json#/definitions/input and report each missing or invalid required field.",
+      "Validate the produced task output against references/schemas.json#/definitions/output; structural validity does not establish method correctness.",
+      "Use references/eval-suite.json criteria only against an actual task output; a schema check or fictional example alone is not a behavioral pass."
+    ],
+    "completion_criteria": [
+      "Include every required output property defined at references/schemas.json#/definitions/output: completion_status, scope, value_chain, economics, drivers, evidence_ledger, scenarios, countercase, gaps.",
+      "If `completion_status` exists, its value must reflect the schema-defined gaps or missing inputs; do not assert a complete result where evidence is absent.",
+      "Keep recommendations advisory; no external action, order, live activation, portfolio mutation, or approval is represented as completed."
+    ],
+    "known_limitations": [
+      "The skill source is an isolated unqualified draft; source-derived pack metadata does not establish selection, registration, method qualification, or production suitability.",
+      "The declared runtime-profile label is preserved as source metadata; runtime-profile binding is not proved."
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read",
+      "filesystem_write"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [
+      {
+        "key": "min_reasoning_tier",
+        "value": "balanced"
+      },
+      {
+        "key": "preferred_model",
+        "value": "gpt-6.1-sol"
+      },
+      {
+        "key": "context_required",
+        "value": 64000
+      }
+    ],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "suite_hash": "sha256:c598821d8c1bce785ca6f5d179a37ba9b629dda7170196431db5c7e5ce8b3e15",
+    "verification_refs": [
+      "references/schemas.json",
+      "references/eval-suite.json"
+    ]
+  },
+  "telemetry": {
+    "classification": "public_internal",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_private_data",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain_only_approved_ids_and_hashes"
+  },
+  "fragments": [
+    {
+      "fragment_id": "source-integrated-method",
+      "disclosure_level": 3,
+      "path": "references/source-integrated-method.md"
+    },
+    {
+      "fragment_id": "contract-fixtures",
+      "disclosure_level": 4,
+      "path": "references/contract-fixtures.json"
+    }
+  ]
+}

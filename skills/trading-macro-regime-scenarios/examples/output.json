@@ -1,0 +1,64 @@
+{
+  "completion_status": "complete",
+  "as_of_date": "2026-09-30",
+  "regime_view": {
+    "label": "growth moderation with inflation still above fictional target",
+    "evidence": [
+      "Policy rate is held at fictional 4.0%.",
+      "Inflation is reported at fictional 3.2% y/y."
+    ],
+    "confidence_basis": "Two fictional observations are carried into the output ledger; coverage is complete for those supplied rows only, not for a robust macro regime claim."
+  },
+  "observations": [
+    {
+      "series": "policy rate",
+      "value": 4.0,
+      "unit": "fictional percent",
+      "measurement_period": "2026-09",
+      "released_at": "2026-09-20T12:00:00Z",
+      "revision_vintage": null,
+      "source_url_or_file": "https://example.invalid/policy-rate"
+    },
+    {
+      "series": "inflation",
+      "value": 3.2,
+      "unit": "fictional percent y/y",
+      "measurement_period": "2026-08",
+      "released_at": "2026-09-10T12:00:00Z",
+      "revision_vintage": "initial",
+      "source_url_or_file": "https://example.invalid/inflation"
+    }
+  ],
+  "scenarios": [
+    {
+      "name": "gradual disinflation",
+      "assumptions": [
+        "inflation eases over two releases"
+      ],
+      "signposts": [
+        "next two fictional inflation releases"
+      ],
+      "likelihood": "qualitative; no calibration"
+    },
+    {
+      "name": "supply-driven inflation rebound",
+      "assumptions": [
+        "input costs rise while growth slows"
+      ],
+      "signposts": [
+        "commodity prices and survey delivery times"
+      ],
+      "likelihood": "qualitative; no calibration"
+    }
+  ],
+  "countercase": [
+    "Labor or credit data may contradict the limited observation set."
+  ],
+  "update_signposts": [
+    "Next inflation release",
+    "Next policy decision"
+  ],
+  "gaps": [
+    "Only two fictional observations supplied; no broader current macro series checked."
+  ]
+}

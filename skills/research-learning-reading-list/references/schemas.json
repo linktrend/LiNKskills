@@ -1,0 +1,172 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "research-learning-reading-list task contract draft",
+  "type": "object",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "properties": {
+        "syllabus_or_objectives": {
+          "type": "string"
+        },
+        "learner_level": {
+          "type": "string"
+        },
+        "language": {
+          "type": "string"
+        },
+        "recency_balance": {
+          "type": "string"
+        },
+        "topic_constraints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "time_budget": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "syllabus_or_objectives",
+        "learner_level",
+        "language",
+        "recency_balance",
+        "topic_constraints",
+        "time_budget"
+      ],
+      "additionalProperties": false,
+      "title": "Task-specific input"
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "topic_outcome_map": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "outcome": {
+                "type": "string"
+              },
+              "week": {
+                "type": "number"
+              },
+              "assessment": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "outcome",
+              "week",
+              "assessment"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "readings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "source_id": {
+                "type": "string"
+              },
+              "citation": {
+                "type": "string"
+              },
+              "link": {
+                "type": [
+                  "string",
+                  "number",
+                  "object",
+                  "array",
+                  "boolean",
+                  "null"
+                ]
+              },
+              "topic": {
+                "type": "string"
+              },
+              "level": {
+                "type": "string"
+              },
+              "summary": {
+                "type": "string"
+              },
+              "access": {
+                "type": "string"
+              },
+              "citation_verified": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "source_id",
+              "citation",
+              "link",
+              "topic",
+              "level",
+              "summary",
+              "access",
+              "citation_verified"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "sequence_rationale": {
+          "type": "string"
+        },
+        "discussion_and_application_prompts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "evidence_and_access_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "status",
+        "topic_outcome_map",
+        "readings",
+        "sequence_rationale",
+        "discussion_and_application_prompts",
+        "evidence_and_access_gaps"
+      ],
+      "additionalProperties": false,
+      "title": "Task-specific result"
+    },
+    "state": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "in_progress",
+            "completed",
+            "needs_input",
+            "blocked"
+          ]
+        },
+        "open_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

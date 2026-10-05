@@ -1,0 +1,496 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "trading-earnings-event-strategy",
+  "display_name": "Earnings reaction and PEAD research",
+  "version": "0.1.0",
+  "description": "Analyze dated earnings reactions and post-event drift from supplied, timestamped evidence without interpreting grades as odds.",
+  "capability_category": "trading_research",
+  "provenance": {
+    "author": "LiNKskills Library (draft)",
+    "source": "Exact source provenance: references/source-provenance.json (sha256:8d9d9fd88e2809d509ec595c2e5b092f13356795742a3723a3b272ecd3bb959e); per-entry license/notice/disposition recorded there.",
+    "license": "No package-wide upstream license is asserted; see exact per-file source provenance and notice dispositions in references/source-provenance.json.",
+    "imported_from": "Frozen Jane draft source: skills/trading-earnings-event-strategy; source provenance copied unchanged for this proposal only."
+  },
+  "lifecycle_state": "draft",
+  "format_profile": "simple",
+  "compatible_runtime_profiles": [
+    "jane-openclaw"
+  ],
+  "min_capability_tier": "balanced",
+  "routing": {
+    "when_to_use": "Analyze dated earnings reactions and post-event drift from supplied, timestamped evidence without interpreting grades as odds.",
+    "when_not_to_use": [
+      "No order, trade execution, provider activation, capital mutation, or credentials.",
+      "No runtime JSON state or upstream script execution.",
+      "No method qualification or performance claim."
+    ],
+    "tags": [
+      "trading",
+      "research",
+      "jane",
+      "draft"
+    ],
+    "exclusion_rules": [
+      "No order, trade execution, provider activation, capital mutation, or credentials.",
+      "No runtime JSON state or upstream script execution.",
+      "No method qualification or performance claim."
+    ]
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "request_id",
+        "description": "Required property `request_id` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "issuer_id",
+        "description": "Required property `issuer_id` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "venue",
+        "description": "Required property `venue` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "as_of",
+        "description": "Required property `as_of` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      {
+        "name": "event",
+        "description": "Required property `event` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "object",
+          "required": [
+            "event_date",
+            "scheduled_at",
+            "actual_release_at",
+            "timezone",
+            "event_sources"
+          ],
+          "properties": {
+            "event_date": {
+              "type": "string",
+              "format": "date"
+            },
+            "scheduled_at": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "actual_release_at": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "timezone": {
+              "type": "string"
+            },
+            "event_sources": {
+              "type": "array"
+            },
+            "eps_actual": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "eps_consensus": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "revenue_actual": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "revenue_consensus": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "guidance_summary": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "name": "price_snapshot",
+        "description": "Required property `price_snapshot` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "bars",
+        "description": "Required property `bars` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "timestamp",
+              "open",
+              "high",
+              "low",
+              "close",
+              "volume",
+              "source_row"
+            ],
+            "properties": {
+              "timestamp": {
+                "type": "string"
+              },
+              "open": {
+                "type": "number"
+              },
+              "high": {
+                "type": "number"
+              },
+              "low": {
+                "type": "number"
+              },
+              "close": {
+                "type": "number"
+              },
+              "volume": {
+                "type": "number"
+              },
+              "source_row": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "market_control",
+        "description": "Required property `market_control` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "object"
+        }
+      },
+      {
+        "name": "source_provenance",
+        "description": "Required property `source_provenance` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "array"
+        }
+      }
+    ],
+    "optional_inputs": [],
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "request_id",
+        "issuer_id",
+        "venue",
+        "as_of",
+        "event",
+        "price_snapshot",
+        "bars",
+        "market_control",
+        "source_provenance"
+      ],
+      "properties": {
+        "request_id": {
+          "type": "string"
+        },
+        "issuer_id": {
+          "type": "string"
+        },
+        "venue": {
+          "type": "string"
+        },
+        "as_of": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "event": {
+          "type": "object",
+          "required": [
+            "event_date",
+            "scheduled_at",
+            "actual_release_at",
+            "timezone",
+            "event_sources"
+          ],
+          "properties": {
+            "event_date": {
+              "type": "string",
+              "format": "date"
+            },
+            "scheduled_at": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "actual_release_at": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "timezone": {
+              "type": "string"
+            },
+            "event_sources": {
+              "type": "array"
+            },
+            "eps_actual": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "eps_consensus": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "revenue_actual": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "revenue_consensus": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "guidance_summary": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        },
+        "price_snapshot": {
+          "type": "string"
+        },
+        "bars": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "timestamp",
+              "open",
+              "high",
+              "low",
+              "close",
+              "volume",
+              "source_row"
+            ],
+            "properties": {
+              "timestamp": {
+                "type": "string"
+              },
+              "open": {
+                "type": "number"
+              },
+              "high": {
+                "type": "number"
+              },
+              "low": {
+                "type": "number"
+              },
+              "close": {
+                "type": "number"
+              },
+              "volume": {
+                "type": "number"
+              },
+              "source_row": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "market_control": {
+          "type": "object"
+        },
+        "source_provenance": {
+          "type": "array"
+        }
+      },
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "urn:linkskills:trading-earnings-event-strategy:0.1.0#/definitions/input"
+    },
+    "expected_outputs": [
+      {
+        "name": "request_id",
+        "description": "Required property `request_id` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "status",
+        "description": "Required property `status` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "enum": [
+            "complete",
+            "partial",
+            "needs_input",
+            "blocked"
+          ]
+        }
+      },
+      {
+        "name": "event_timing",
+        "description": "Required property `event_timing` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "object"
+        }
+      },
+      {
+        "name": "reaction_metrics",
+        "description": "Required property `reaction_metrics` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array"
+        }
+      },
+      {
+        "name": "post_event_study",
+        "description": "Required property `post_event_study` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "object"
+        }
+      },
+      {
+        "name": "counterevidence",
+        "description": "Required property `counterevidence` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array"
+        }
+      },
+      {
+        "name": "limitations",
+        "description": "Required property `limitations` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array"
+        }
+      },
+      {
+        "name": "recommendation",
+        "description": "Required property `recommendation` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "object",
+          "required": [
+            "stance",
+            "basis",
+            "advisory_only"
+          ],
+          "properties": {
+            "stance": {
+              "enum": [
+                "positive",
+                "negative",
+                "mixed",
+                "no_view"
+              ]
+            },
+            "basis": {
+              "type": "array"
+            },
+            "advisory_only": {
+              "const": true
+            }
+          }
+        }
+      }
+    ],
+    "procedure_summary": "Source method section `Integrated practical method` in SKILL.md: 1. Pin issuer, listing, event date, scheduled and actual release times with timezone, source/vintage, price cutoff and venue calendar. Unknown release timing blocks gap attribution or remains separate scenario; never substitute AMC.\n2. Separate reported EPS/revenue/guidance surprises from price gaps, pre-event trend, volume, sector/index return and subsequent drift. Preserve positive and negative gap direction.\n3. Compute metrics only with supplied observations and explicit denominators/windows. Show source rows, units and whether the price bars were adjusted; missing calendar rows are not evidence of zero events.\n4. If PEAD is requested, compare forward event-window returns with a named market/sector control, avoid overlap, include delisted/history coverage and costs, and keep weekly red-candle stages descriptive.\n5. Treat source 5-factor scores, grades, catalyst labels and stage names as unvalidated summaries, never probabilities or “institutional accumulation.”\n6. Identify counterevidence, data/API degradation, selection bias and sample size. Provide conditional advisory view/watch/no-view; no position sizing, manual order, alert, provider fallback, or persistent state.",
+    "forbidden_actions": [
+      "No order, trade execution, provider activation, capital mutation, or credentials.",
+      "No runtime JSON state or upstream script execution.",
+      "No method qualification or performance claim."
+    ],
+    "failure_handling": "Source-grounded missing/invalid evidence clauses (verbatim, with entrypoint line numbers): L36: 1. Pin issuer, listing, event date, scheduled and actual release times with timezone, source/vintage, price cutoff and venue calendar. Unknown release timing blocks gap attribution or remains separate scenario; never substitute AMC.; L37: 2. Separate reported EPS/revenue/guidance surprises from price gaps, pre-event trend, volume, sector/index return and subsequent drift. Preserve positive and negative gap direction.; L38: 3. Compute metrics only with supplied observations and explicit denominators/windows. Show source rows, units and whether the price bars were adjusted; missing calendar rows are not evidence of zero events.",
+    "verification_steps": [
+      "Validate the supplied input against references/schemas.json#/definitions/input and report each missing or invalid required field.",
+      "Validate the produced task output against references/schemas.json#/definitions/output; structural validity does not establish method correctness.",
+      "Use references/eval-suite.json criteria only against an actual task output; a schema check or fictional example alone is not a behavioral pass."
+    ],
+    "completion_criteria": [
+      "Include every required output property defined at references/schemas.json#/definitions/output: request_id, status, event_timing, reaction_metrics, post_event_study, counterevidence, limitations, recommendation.",
+      "If `status` exists, its value must reflect the schema-defined gaps or missing inputs; do not assert a complete result where evidence is absent.",
+      "Keep recommendations advisory; no external action, order, live activation, portfolio mutation, or approval is represented as completed."
+    ],
+    "known_limitations": [
+      "The skill source is an isolated unqualified draft; source-derived pack metadata does not establish selection, registration, method qualification, or production suitability.",
+      "The declared runtime-profile label is preserved as source metadata; runtime-profile binding is not proved."
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read",
+      "filesystem_write"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [
+      {
+        "key": "min_reasoning_tier",
+        "value": "balanced"
+      },
+      {
+        "key": "preferred_model",
+        "value": "gpt-6.1-sol"
+      },
+      {
+        "key": "context_required",
+        "value": 64000
+      }
+    ],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "suite_hash": "sha256:2dadc559797e91565105635c864ded773ae07dcad7aab6ba7e8f3487f08500c9",
+    "verification_refs": [
+      "references/schemas.json",
+      "references/eval-suite.json"
+    ]
+  },
+  "telemetry": {
+    "classification": "public_internal",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_private_data",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain_only_approved_ids_and_hashes"
+  }
+}

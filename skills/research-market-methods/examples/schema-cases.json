@@ -1,0 +1,47 @@
+{
+  "status": "schema_fixture_only_not_behavioral_evaluation",
+  "valid_case": {
+    "schema_ref": "references/schemas.json#/definitions/input",
+    "input": {
+      "decision": "estimate annual addressable spend for fictional product",
+      "product": "Fictional analytics tool",
+      "geography": "Region R",
+      "period": "2025",
+      "market_boundary": "eligible mid-market firms",
+      "unit": "annual subscription USD",
+      "source_data": "none; synthetic assumptions only",
+      "sizing_assumptions": {
+        "eligible_firms": 1000,
+        "annual_price_usd": 1200
+      },
+      "survey_target": "operators",
+      "segments": [
+        "small",
+        "mid-market"
+      ],
+      "precision_needs": "exploratory only"
+    },
+    "expected": "accept by JSON Schema"
+  },
+  "invalid_case": {
+    "schema_ref": "references/schemas.json#/definitions/input",
+    "input": {
+      "decision": "fictional-input",
+      "product": "fictional-input",
+      "geography": "fictional-input",
+      "period": "fictional-input",
+      "market_boundary": "fictional-input",
+      "unit": "fictional-input",
+      "source_data": "fictional-input",
+      "sizing_assumptions": {
+        "eligible_firms": 1,
+        "annual_price_usd": 1
+      },
+      "survey_target": "fictional-input",
+      "segments": [],
+      "precision_needs": "fictional-input",
+      "unapproved_extra_field": "reject"
+    },
+    "expected": "reject unknown additional property"
+  }
+}

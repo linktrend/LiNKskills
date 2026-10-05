@@ -1,0 +1,67 @@
+{
+  "fictional_fixture": true,
+  "notice": "Synthetic series and outputs only; no inference about a real market or profitable strategy.",
+  "input": {
+    "request_id": "FICTIONAL-MR-01",
+    "instrument": "fictional-spread-A-minus-B",
+    "series_definition": "fictional close A minus beta 1.2 times B, fictional USD",
+    "frequency": "daily",
+    "source_snapshot": "fictional-series-v1",
+    "observations": [
+      {
+        "timestamp": "2026-09-25",
+        "value": 1.1,
+        "unit": "fictional USD",
+        "source_row": "f1"
+      },
+      {
+        "timestamp": "2026-09-26",
+        "value": 0.9,
+        "unit": "fictional USD",
+        "source_row": "f2"
+      },
+      {
+        "timestamp": "2026-09-29",
+        "value": 1.2,
+        "unit": "fictional USD",
+        "source_row": "f3"
+      }
+    ],
+    "test_plan": {
+      "test": "illustrative AR(1)",
+      "window": "3 fictional observations",
+      "parameters_predeclared": false
+    },
+    "cost_inputs": {
+      "commission": null,
+      "slippage": null,
+      "borrow_or_funding": null
+    }
+  },
+  "output": {
+    "request_id": "FICTIONAL-MR-01",
+    "status": "partial",
+    "instrument": "fictional-spread-A-minus-B",
+    "diagnostics": [
+      {
+        "name": "sample adequacy",
+        "result": "insufficient",
+        "evidence": "Only 3 fictional points; no meaningful stationarity/reversion inference."
+      }
+    ],
+    "signal_research": {
+      "candidate_rule": null,
+      "classification": "insufficient_evidence"
+    },
+    "robustness": [
+      "No out-of-sample window or structural-break test."
+    ],
+    "counterevidence": [
+      "The small move sequence does not establish reversibility."
+    ],
+    "gaps": [
+      "Longer point-in-time series and realistic costs not supplied."
+    ],
+    "advisory_only": true
+  }
+}

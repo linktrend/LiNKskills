@@ -1,0 +1,34 @@
+{
+  "trading-market-breadth-close-ratios-independent-of-ohlcv": {
+    "fixture_id": "trading-market-breadth-close-ratios-independent-of-ohlcv-fixture",
+    "status": "unexecuted contract fixture; no output or pass is asserted",
+    "task_input": {
+      "as_of_date": "2026-09-30",
+      "universe_definition": "fictional point-in-time list DEMO-A, DEMO-B",
+      "horizon": "20 sessions",
+      "requested_families": [
+        "advance_decline",
+        "distribution_days"
+      ],
+      "family_inputs": {},
+      "series": [
+        {
+          "measure": "advancers_share",
+          "date": "2026-09-30",
+          "value": {
+            "numerator": 1,
+            "denominator": 2
+          },
+          "unit": "fraction",
+          "source": "fictional daily constituent close summary",
+          "source_definition": "Advancing eligible members divided by total eligible members; same prior/current close session."
+        }
+      ]
+    },
+    "expected_output_assertions": [
+      "Return the supplied close-only advancing share observation as a scoped supplied measure; the named point-in-time universe gives its denominator context and no relative-performance benchmark is requested.",
+      "Mark distribution-day results unavailable because no OHLCV/session history and no selected event definition were supplied.",
+      "Return independent family_status rows so missing OHLCV does not suppress the close-only result; do not treat the two-member fixture as market-wide evidence."
+    ]
+  }
+}

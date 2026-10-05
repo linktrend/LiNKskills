@@ -1,0 +1,401 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "trading-wallet-flow-research task contract draft",
+  "type": "object",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "properties": {
+        "question": {
+          "type": "string"
+        },
+        "asset_or_token": {
+          "type": "string"
+        },
+        "chain": {
+          "type": "string"
+        },
+        "venue_scope": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "wallets_or_cohort_rule": {
+          "type": "string"
+        },
+        "window_start": {
+          "type": "string"
+        },
+        "window_end": {
+          "type": "string"
+        },
+        "as_of": {
+          "type": "string"
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "source": {
+                "type": "string"
+              },
+              "retrieved_at": {
+                "type": "string"
+              },
+              "evidence_ref": {
+                "type": "string"
+              },
+              "units": {
+                "type": "string"
+              },
+              "limitations": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "source",
+              "retrieved_at",
+              "evidence_ref"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "unit_and_timestamp_conventions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "flow_classification_rules": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "monitor_exclude_criteria": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "question",
+        "asset_or_token",
+        "chain",
+        "wallets_or_cohort_rule",
+        "window_start",
+        "window_end",
+        "as_of",
+        "evidence"
+      ],
+      "additionalProperties": false
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "draft_complete",
+            "needs_input",
+            "blocked"
+          ]
+        },
+        "reconstruction": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "wallet_or_group": {
+                "type": "string"
+              },
+              "swaps": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "transfers": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "lp_actions": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "airdrops": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "open_inventory": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "unresolved_events": {
+                "type": "integer"
+              },
+              "evidence_refs": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "wallet_or_group",
+              "evidence_refs"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "metrics": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "wallet_or_group": {
+                "type": "string"
+              },
+              "sample_window": {
+                "type": "string"
+              },
+              "denominator": {
+                "type": "integer"
+              },
+              "value": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "metric": {
+                "type": "string"
+              },
+              "currency_or_unit": {
+                "type": "string"
+              },
+              "limitations": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "wallet_or_group",
+              "sample_window",
+              "denominator",
+              "metric",
+              "limitations"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "behavior_hypotheses": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "label": {
+                "type": "string"
+              },
+              "observable_basis": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "alternative_explanations": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "confidence_limits": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "label",
+              "observable_basis",
+              "alternative_explanations"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "concentration_checks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "measure": {
+                "type": "string"
+              },
+              "value": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "leave_one_out": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "denominator": {
+                "type": "string"
+              },
+              "limitations": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "measure",
+              "denominator",
+              "limitations"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "coordination_indicators": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "indicator": {
+                "type": "string"
+              },
+              "possible_interpretation": {
+                "type": "string"
+              },
+              "false_positives": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "evidence_refs": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "indicator",
+              "possible_interpretation",
+              "false_positives"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "capacity_check": {
+          "type": "object",
+          "properties": {
+            "wallet_or_group": {
+              "type": "string"
+            },
+            "position_notional": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "comparable_volume": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "currency": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "ratio": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "limitations": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "wallet_or_group",
+            "limitations"
+          ],
+          "additionalProperties": false
+        },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "recommendation": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "reconstruction",
+        "metrics",
+        "behavior_hypotheses",
+        "concentration_checks",
+        "coordination_indicators",
+        "gaps"
+      ],
+      "additionalProperties": false
+    },
+    "state": {
+      "type": "object",
+      "description": "Progress in native session and approved Program Ledger, no JSON runtime sidecar.",
+      "properties": {
+        "status": {
+          "enum": [
+            "in_progress",
+            "completed",
+            "needs_input",
+            "blocked"
+          ]
+        },
+        "open_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

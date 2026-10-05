@@ -1,0 +1,30 @@
+{
+  "status": "schema_fixture_only_not_behavioral_evaluation",
+  "valid_case": {
+    "schema_ref": "references/schemas.json#/definitions/input",
+    "input": {
+      "entity_name": "Fictional Example Labs",
+      "identifier": "fictional-registry-id-001",
+      "hypothesis": "The organization launched product Z in 2024.",
+      "purpose": "meeting preparation",
+      "period": "2023-01-01/2025-12-31",
+      "public_source_boundary": "public records supplied by user",
+      "as_of": "2026-10-05"
+    },
+    "expected": "accept by JSON Schema"
+  },
+  "invalid_case": {
+    "schema_ref": "references/schemas.json#/definitions/input",
+    "input": {
+      "entity_name": "fictional-input",
+      "identifier": "fictional-input",
+      "hypothesis": "fictional-input",
+      "purpose": "fictional-input",
+      "period": "fictional-input",
+      "public_source_boundary": "fictional-input",
+      "as_of": "fictional-input",
+      "unapproved_extra_field": "reject"
+    },
+    "expected": "reject unknown additional property"
+  }
+}

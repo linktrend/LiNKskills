@@ -1,0 +1,45 @@
+{
+  "status": "schema_fixture_only_not_behavioral_evaluation",
+  "valid_case": {
+    "schema_ref": "references/schemas.json#/definitions/input",
+    "input": {
+      "learning_target": "predict next-period class Y",
+      "data_ref": "FIC-PANEL-1",
+      "provenance": "synthetic panel",
+      "observation_unit": "entity-day",
+      "feature_timing": "available at prior close",
+      "target_horizon": "next day",
+      "train_test_chronology": "train before 2024-01; test 2024-01 onward",
+      "groups": "entity",
+      "leakage_risks": [
+        "overlap",
+        "scaling"
+      ],
+      "baseline": "majority class",
+      "metric": "balanced accuracy",
+      "deployment_decision": "research only",
+      "constraints": "no deployment"
+    },
+    "expected": "accept by JSON Schema"
+  },
+  "invalid_case": {
+    "schema_ref": "references/schemas.json#/definitions/input",
+    "input": {
+      "learning_target": "fictional-input",
+      "data_ref": "fictional-input",
+      "provenance": "fictional-input",
+      "observation_unit": "fictional-input",
+      "feature_timing": "fictional-input",
+      "target_horizon": "fictional-input",
+      "train_test_chronology": "fictional-input",
+      "groups": "fictional-input",
+      "leakage_risks": [],
+      "baseline": "fictional-input",
+      "metric": "fictional-input",
+      "deployment_decision": "fictional-input",
+      "constraints": "fictional-input",
+      "unapproved_extra_field": "reject"
+    },
+    "expected": "reject unknown additional property"
+  }
+}

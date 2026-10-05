@@ -1,0 +1,44 @@
+{
+  "skill_id": "trading-prediction-market-strategy",
+  "status": "proposed_not_run",
+  "cases": [
+    "Weather \u201cdaily max \u2265 30\u00b0C\u201d market has station timezone and rounding unspecified; reject precise probability because settlement interval/endpoints unresolved, despite a forecast distribution.",
+    "Crypto index market asks \u201cabove 100 at 16:00\u201d but rulebook defines 5-minute average and no source timestamp supplied; do not substitute spot print or missing generic bracket reference.",
+    "Model probability 0.54\u00b10.08, ask 0.50, fee+slippage break-even 0.53: edge is not robust because uncertainty straddles break-even; report conditional watch/no-decision, not a value claim.",
+    "Two complementary contracts appear to pay $1 across states but one outcome overlaps on equality and both carry settlement/collateral timing risk; cannot call risk-free arbitrage until states and failure paths exhaustive."
+  ],
+  "fixtures": [
+    {
+      "id": "typed-success-input",
+      "file": "success-input.json",
+      "schema": "#/definitions/input",
+      "expect": "valid"
+    },
+    {
+      "id": "typed-success-output",
+      "file": "success-output.json",
+      "schema": "#/definitions/output",
+      "expect": "valid-structural-fixture-only"
+    },
+    {
+      "id": "bounded-partial-output",
+      "file": "partial-output.json",
+      "schema": "#/definitions/output",
+      "expect": "valid"
+    }
+  ],
+  "invalid_contract_cases": [
+    {
+      "id": "invalid-unit-or-dimensional-value",
+      "file": "rejected-invalid-unit.json",
+      "schema": "#/definitions/input",
+      "expect": "reject by task-specific typed unit, currency, probability, or range constraint"
+    },
+    {
+      "id": "false-completion-with-unresolved-gap",
+      "file": "rejected-false-completion.json",
+      "schema": "#/definitions/output",
+      "expect": "reject because complete requires complete analysis, no gaps, evidence reference and all evidence-gate flags true"
+    }
+  ]
+}

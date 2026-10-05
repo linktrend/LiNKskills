@@ -1,0 +1,372 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "trading-parabolic-short-strategy",
+  "display_name": "Parabolic short setup research",
+  "version": "0.1.0",
+  "description": "Review supplied dated equity evidence for parabolic extension, exhaustion and short-side risk; return watch-only analysis.",
+  "capability_category": "trading_research",
+  "provenance": {
+    "author": "LiNKskills Library (draft)",
+    "source": "Exact source provenance: references/source-provenance.json (sha256:ed4a7fa38778f54d8eeffbeff9b81f4a4a26ddad3af9c4d242f3d8ea2400c794); per-entry license/notice/disposition recorded there.",
+    "license": "No package-wide upstream license is asserted; see exact per-file source provenance and notice dispositions in references/source-provenance.json.",
+    "imported_from": "Frozen Jane draft source: skills/trading-parabolic-short-strategy; source provenance copied unchanged for this proposal only."
+  },
+  "lifecycle_state": "draft",
+  "format_profile": "simple",
+  "compatible_runtime_profiles": [
+    "jane-openclaw"
+  ],
+  "min_capability_tier": "balanced",
+  "routing": {
+    "when_to_use": "Review supplied dated equity evidence for parabolic extension, exhaustion and short-side risk; return watch-only analysis.",
+    "when_not_to_use": [
+      "No order, trade execution, provider activation, capital mutation, or credentials.",
+      "No runtime JSON state or upstream script execution.",
+      "No method qualification or performance claim."
+    ],
+    "tags": [
+      "trading",
+      "research",
+      "jane",
+      "draft"
+    ],
+    "exclusion_rules": [
+      "No order, trade execution, provider activation, capital mutation, or credentials.",
+      "No runtime JSON state or upstream script execution.",
+      "No method qualification or performance claim."
+    ]
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "request_id",
+        "description": "Required property `request_id` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "symbol",
+        "description": "Required property `symbol` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "venue",
+        "description": "Required property `venue` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "as_of",
+        "description": "Required property `as_of` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      {
+        "name": "calendar",
+        "description": "Required property `calendar` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "source_snapshot",
+        "description": "Required property `source_snapshot` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "bars",
+        "description": "Required property `bars` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "timestamp",
+              "open",
+              "high",
+              "low",
+              "close",
+              "volume",
+              "unit",
+              "source_row"
+            ],
+            "properties": {
+              "timestamp": {
+                "type": "string"
+              },
+              "open": {
+                "type": "number"
+              },
+              "high": {
+                "type": "number"
+              },
+              "low": {
+                "type": "number"
+              },
+              "close": {
+                "type": "number"
+              },
+              "volume": {
+                "type": "number"
+              },
+              "unit": {
+                "type": "string"
+              },
+              "source_row": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "parameters",
+        "description": "Required property `parameters` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "object"
+        }
+      },
+      {
+        "name": "constraints",
+        "description": "Required property `constraints` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "object"
+        }
+      }
+    ],
+    "optional_inputs": [],
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "request_id",
+        "symbol",
+        "venue",
+        "as_of",
+        "calendar",
+        "source_snapshot",
+        "bars",
+        "parameters",
+        "constraints"
+      ],
+      "properties": {
+        "request_id": {
+          "type": "string"
+        },
+        "symbol": {
+          "type": "string"
+        },
+        "venue": {
+          "type": "string"
+        },
+        "as_of": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "calendar": {
+          "type": "string"
+        },
+        "source_snapshot": {
+          "type": "string"
+        },
+        "bars": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "timestamp",
+              "open",
+              "high",
+              "low",
+              "close",
+              "volume",
+              "unit",
+              "source_row"
+            ],
+            "properties": {
+              "timestamp": {
+                "type": "string"
+              },
+              "open": {
+                "type": "number"
+              },
+              "high": {
+                "type": "number"
+              },
+              "low": {
+                "type": "number"
+              },
+              "close": {
+                "type": "number"
+              },
+              "volume": {
+                "type": "number"
+              },
+              "unit": {
+                "type": "string"
+              },
+              "source_row": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "parameters": {
+          "type": "object"
+        },
+        "constraints": {
+          "type": "object"
+        }
+      },
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "urn:linkskills:trading-parabolic-short-strategy:0.1.0#/definitions/input"
+    },
+    "expected_outputs": [
+      {
+        "name": "request_id",
+        "description": "Required property `request_id` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "status",
+        "description": "Required property `status` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "enum": [
+            "complete",
+            "partial",
+            "needs_input",
+            "blocked"
+          ]
+        }
+      },
+      {
+        "name": "symbol",
+        "description": "Required property `symbol` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "observed_factors",
+        "description": "Required property `observed_factors` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array"
+        }
+      },
+      {
+        "name": "risk_flags",
+        "description": "Required property `risk_flags` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array"
+        }
+      },
+      {
+        "name": "unresolved_gates",
+        "description": "Required property `unresolved_gates` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array"
+        }
+      },
+      {
+        "name": "classification",
+        "description": "Required property `classification` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "enum": [
+            "watch",
+            "reject",
+            "insufficient_data"
+          ]
+        }
+      },
+      {
+        "name": "gaps",
+        "description": "Required property `gaps` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array"
+        }
+      },
+      {
+        "name": "advisory_only",
+        "description": "Required property `advisory_only` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "const": true
+        }
+      }
+    ],
+    "procedure_summary": "Source method section `Integrated practical method` in SKILL.md: 1. Confirm symbol, venue, exact as-of, exchange sessions, adjustment status and bar source; separate daily screen context from intraday chronology.\n2. Measure only supplied extension, acceleration, volume, range, liquidity and catalyst facts; state thresholds as user-supplied or unvalidated. Do not infer reversal from extension alone.\n3. Check earnings/event dates against publication time and bar session; stale or uncertain catalysts remain a scenario/gap.\n4. Report candidate/falsifier conditions and gap/squeeze/volatility/liquidity risks. Do not convert patterns into a broker plan, order, entry/stop, account size or trigger.\n5. Treat borrow, locate, short-sale restrictions and applicable law as unknown unless a dated authoritative source/user-supplied evidence establishes them. Never request credentials or call brokers.\n6. With unresolved borrow/SSR/session data, state watch-only or blocked. Eric owns adapters; Sara reviews legal/accounting determinations. No persisted state, schedule or automated monitoring.",
+    "forbidden_actions": [
+      "No order, trade execution, provider activation, capital mutation, or credentials.",
+      "No runtime JSON state or upstream script execution.",
+      "No method qualification or performance claim."
+    ],
+    "failure_handling": "Source-grounded missing/invalid evidence clauses (verbatim, with entrypoint line numbers): L38: 3. Check earnings/event dates against publication time and bar session; stale or uncertain catalysts remain a scenario/gap.; L39: 4. Report candidate/falsifier conditions and gap/squeeze/volatility/liquidity risks. Do not convert patterns into a broker plan, order, entry/stop, account size or trigger.; L40: 5. Treat borrow, locate, short-sale restrictions and applicable law as unknown unless a dated authoritative source/user-supplied evidence establishes them. Never request credentials or call brokers.",
+    "verification_steps": [
+      "Validate the supplied input against references/schemas.json#/definitions/input and report each missing or invalid required field.",
+      "Validate the produced task output against references/schemas.json#/definitions/output; structural validity does not establish method correctness.",
+      "Use references/eval-suite.json criteria only against an actual task output; a schema check or fictional example alone is not a behavioral pass."
+    ],
+    "completion_criteria": [
+      "Include every required output property defined at references/schemas.json#/definitions/output: request_id, status, symbol, observed_factors, risk_flags, unresolved_gates, classification, gaps, advisory_only.",
+      "If `status` exists, its value must reflect the schema-defined gaps or missing inputs; do not assert a complete result where evidence is absent.",
+      "Keep recommendations advisory; no external action, order, live activation, portfolio mutation, or approval is represented as completed."
+    ],
+    "known_limitations": [
+      "The skill source is an isolated unqualified draft; source-derived pack metadata does not establish selection, registration, method qualification, or production suitability.",
+      "The declared runtime-profile label is preserved as source metadata; runtime-profile binding is not proved."
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read",
+      "filesystem_write"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [
+      {
+        "key": "min_reasoning_tier",
+        "value": "balanced"
+      },
+      {
+        "key": "preferred_model",
+        "value": "gpt-6.1-sol"
+      },
+      {
+        "key": "context_required",
+        "value": 64000
+      }
+    ],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "suite_hash": "sha256:29a5f4196033bb100895f9f33c805fbdd03a36dd10ea3156c8666d055aee1083",
+    "verification_refs": [
+      "references/schemas.json",
+      "references/eval-suite.json"
+    ]
+  },
+  "telemetry": {
+    "classification": "public_internal",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_private_data",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain_only_approved_ids_and_hashes"
+  }
+}

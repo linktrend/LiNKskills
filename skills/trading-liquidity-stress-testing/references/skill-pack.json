@@ -1,0 +1,127 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "trading-liquidity-stress-testing",
+  "display_name": "Portfolio Stress and Liquidity",
+  "version": "1.0.0",
+  "description": "Scenario losses, sale capacity, costs and net cash shortfalls.",
+  "capability_category": "trading",
+  "lifecycle_state": "draft",
+  "format_profile": "heavy",
+  "compatible_runtime_profiles": [
+    "lisa-openclaw"
+  ],
+  "min_capability_tier": "balanced",
+  "routing": {
+    "when_to_use": "Portfolio stress, liquidity and what-if scenario analysis",
+    "when_not_to_use": [
+      "Order execution or live activation",
+      "Missing data replaced with samples"
+    ],
+    "tags": [
+      "trading",
+      "liquidity",
+      "portfolio"
+    ],
+    "related_skills": []
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "portfolio_scenario_request",
+        "description": "Scoped exact holdings/data and scenario assumptions"
+      }
+    ],
+    "expected_outputs": [
+      {
+        "name": "portfolio_scenario_report",
+        "description": "Gross/net funding,loss/cost,capacity,sensitivity and gaps"
+      }
+    ],
+    "forbidden_actions": [
+      "Place orders",
+      "Invent holdings or policy",
+      "Claim qualification without proof"
+    ],
+    "verification_steps": [
+      "Reconcile units and gross/net cash",
+      "Inspect assumptions and explicit owner criteria"
+    ],
+    "completion_criteria": [
+      "Actual scoped report and evidence",
+      "No unapproved effects"
+    ],
+    "known_limitations": [
+      "Scenario model, not liquidity/fill guarantee",
+      "Unqualified draft"
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read",
+      "filesystem_write"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "suite_hash": "sha256:f3c56f9517c6fa9c7de84c8b90e001278435908cfcbdce72e849b247ad670c69",
+    "required_certification_profiles": [
+      "trading-liquidity-stress-testing-lisa-openclaw-draft"
+    ]
+  },
+  "telemetry": {
+    "classification": "public_internal",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_private_data",
+      "strip_reasoning",
+      "retain_source_digests_only"
+    ],
+    "retention_policy": "retain_ids_and_hashes"
+  },
+  "fragments": [
+    {
+      "fragment_id": "skill-md",
+      "disclosure_level": 2,
+      "path": "SKILL.md"
+    },
+    {
+      "fragment_id": "advanced",
+      "disclosure_level": 3,
+      "path": "advanced/advanced.md"
+    },
+    {
+      "fragment_id": "schemas",
+      "disclosure_level": 5,
+      "path": "references/schemas.json"
+    },
+    {
+      "fragment_id": "source-disposition",
+      "disclosure_level": 3,
+      "path": "references/source-disposition.json"
+    },
+    {
+      "fragment_id": "source-copy-manifest",
+      "disclosure_level": 3,
+      "path": "references/upstream-copy-manifest.json"
+    },
+    {
+      "fragment_id": "worked-input",
+      "disclosure_level": 5,
+      "path": "examples/worked-input.json"
+    },
+    {
+      "fragment_id": "worked-output",
+      "disclosure_level": 5,
+      "path": "examples/worked-output.json"
+    }
+  ],
+  "release_channel": "canary"
+}

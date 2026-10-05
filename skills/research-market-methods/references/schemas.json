@@ -1,0 +1,248 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "research-market-methods task contract draft",
+  "type": "object",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "properties": {
+        "decision": {
+          "type": "string"
+        },
+        "product": {
+          "type": "string"
+        },
+        "geography": {
+          "type": "string"
+        },
+        "period": {
+          "type": "string"
+        },
+        "market_boundary": {
+          "type": "string"
+        },
+        "unit": {
+          "type": "string"
+        },
+        "source_data": {
+          "type": "string"
+        },
+        "sizing_assumptions": {
+          "type": "object",
+          "properties": {
+            "eligible_firms": {
+              "type": "number"
+            },
+            "annual_price_usd": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "eligible_firms",
+            "annual_price_usd"
+          ],
+          "additionalProperties": false
+        },
+        "survey_target": {
+          "type": "string"
+        },
+        "segments": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "precision_needs": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "decision",
+        "product",
+        "geography",
+        "period",
+        "market_boundary",
+        "unit",
+        "source_data",
+        "sizing_assumptions",
+        "survey_target",
+        "segments",
+        "precision_needs"
+      ],
+      "additionalProperties": false,
+      "title": "Task-specific input"
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "market_boundary": {
+          "type": "string"
+        },
+        "top_down": {
+          "type": "object",
+          "properties": {
+            "eligible_firms": {
+              "type": "number"
+            },
+            "annual_price_usd": {
+              "type": "number"
+            },
+            "calculation": {
+              "type": "string"
+            },
+            "tam_usd": {
+              "type": "number"
+            },
+            "evidence": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "eligible_firms",
+            "annual_price_usd",
+            "calculation",
+            "tam_usd",
+            "evidence"
+          ],
+          "additionalProperties": false
+        },
+        "bottom_up": {
+          "type": "object",
+          "properties": {
+            "calculation": {
+              "type": [
+                "string",
+                "number",
+                "object",
+                "array",
+                "boolean",
+                "null"
+              ]
+            },
+            "status": {
+              "type": "string"
+            },
+            "reason": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "calculation",
+            "status",
+            "reason"
+          ],
+          "additionalProperties": false
+        },
+        "segment_comparison": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "segment": {
+                "type": "string"
+              },
+              "period": {
+                "type": "string"
+              },
+              "basis": {
+                "type": "string"
+              },
+              "value": {
+                "type": "number"
+              },
+              "unit": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "segment",
+              "period",
+              "basis",
+              "value",
+              "unit"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "survey_design": {
+          "type": "object",
+          "properties": {
+            "target": {
+              "type": "string"
+            },
+            "sampling_frame": {
+              "type": "string"
+            },
+            "method": {
+              "type": "string"
+            },
+            "sample_size": {
+              "type": "string"
+            },
+            "limitation": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "target",
+            "sampling_frame",
+            "method",
+            "sample_size",
+            "limitation"
+          ],
+          "additionalProperties": false
+        },
+        "assumption_ledger": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "unresolved_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "status",
+        "market_boundary",
+        "top_down",
+        "bottom_up",
+        "segment_comparison",
+        "survey_design",
+        "assumption_ledger",
+        "unresolved_gaps"
+      ],
+      "additionalProperties": false,
+      "title": "Task-specific result"
+    },
+    "state": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "in_progress",
+            "completed",
+            "needs_input",
+            "blocked"
+          ]
+        },
+        "open_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

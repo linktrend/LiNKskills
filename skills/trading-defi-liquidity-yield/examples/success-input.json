@@ -1,0 +1,60 @@
+{
+  "task": "schema fixture only",
+  "as_of": "2026-10-05T09:00:00Z",
+  "question": "Synthetic schema-shape fixture; no market conclusion.",
+  "source_snapshot": {
+    "refs": [
+      {
+        "source_id": "synthetic-fixture",
+        "as_of": "2026-10-05T09:00:00Z",
+        "provenance": "fictional fixture only",
+        "sha256": null
+      }
+    ],
+    "snapshot_id": "fictional-fixture",
+    "version": "fictional-fixture",
+    "notes": []
+  },
+  "reporting_currency": "USD",
+  "task_context": {
+    "chain_id": "chain-x",
+    "venue_id": "pool-venue",
+    "pool_id": "pool-1",
+    "pool_design": "cpmm",
+    "as_of": "2026-10-05T09:00:00Z",
+    "base_token_id": "TOKEN-A",
+    "quote_token_id": "USD",
+    "base_decimals": 6,
+    "quote_decimals": 2,
+    "spot_quote_per_base": 100.0,
+    "reserve_base_units": 50.0,
+    "reserve_quote_units": 5000.0,
+    "fee_rate_fraction": 0.003,
+    "reporting_currency": "USD",
+    "position": {
+      "base_units": 1.0,
+      "quote_units": 0.0,
+      "entry_value": 100.0,
+      "fees": [],
+      "rewards": []
+    },
+    "matched_hold": {
+      "base_units": 1.0,
+      "quote_units": 0.0,
+      "as_of": "2026-10-05T09:00:00Z"
+    },
+    "quotes": [
+      {
+        "direction": "sell_base",
+        "input_amount": 1.0,
+        "input_token_id": "TOKEN-A",
+        "output_amount": 98.0392156863,
+        "output_token_id": "USD",
+        "as_of": "2026-10-05T09:00:00Z",
+        "source_ref": "synthetic-fixture"
+      }
+    ],
+    "costs": [],
+    "concentrated_state": null
+  }
+}

@@ -1,0 +1,196 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "research-data-visualization task contract draft",
+  "type": "object",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "properties": {
+        "question": {
+          "type": "string"
+        },
+        "audience": {
+          "type": "string"
+        },
+        "dataset_ref": {
+          "type": "string"
+        },
+        "schema": {
+          "type": "string"
+        },
+        "provenance": {
+          "type": "string"
+        },
+        "units": {
+          "type": "string"
+        },
+        "time_period": {
+          "type": "string"
+        },
+        "grouping": {
+          "type": "string"
+        },
+        "output_destination": {
+          "type": "string"
+        },
+        "interactivity_required": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "question",
+        "audience",
+        "dataset_ref",
+        "schema",
+        "provenance",
+        "units",
+        "time_period",
+        "grouping",
+        "output_destination",
+        "interactivity_required"
+      ],
+      "additionalProperties": false,
+      "title": "Task-specific input"
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "chart_choice": {
+          "type": "object",
+          "properties": {
+            "mark": {
+              "type": "string"
+            },
+            "reason": {
+              "type": "string"
+            },
+            "aggregation": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "mark",
+            "reason",
+            "aggregation"
+          ],
+          "additionalProperties": false
+        },
+        "data_transform_notes": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string"
+            },
+            "missing_months": {
+              "type": "string"
+            },
+            "units": {
+              "type": "string"
+            },
+            "denominator": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "source",
+            "missing_months",
+            "units",
+            "denominator"
+          ],
+          "additionalProperties": false
+        },
+        "chart_spec": {
+          "type": "object",
+          "properties": {
+            "x": {
+              "type": "string"
+            },
+            "y": {
+              "type": "string"
+            },
+            "series": {
+              "type": "string"
+            },
+            "title": {
+              "type": "string"
+            },
+            "zero_baseline": {
+              "type": "string"
+            },
+            "uncertainty": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "x",
+            "y",
+            "series",
+            "title",
+            "zero_baseline",
+            "uncertainty"
+          ],
+          "additionalProperties": false
+        },
+        "artifact_status": {
+          "type": "string"
+        },
+        "accessibility_checks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "visual_integrity_checks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "status",
+        "chart_choice",
+        "data_transform_notes",
+        "chart_spec",
+        "artifact_status",
+        "accessibility_checks",
+        "visual_integrity_checks",
+        "limitations"
+      ],
+      "additionalProperties": false,
+      "title": "Task-specific result"
+    },
+    "state": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "in_progress",
+            "completed",
+            "needs_input",
+            "blocked"
+          ]
+        },
+        "open_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

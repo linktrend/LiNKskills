@@ -1,0 +1,83 @@
+{
+  "schema_version": "0.1",
+  "suite_id": "trading-flow-positioning-draft",
+  "skill_id": "trading-flow-positioning",
+  "suite_version": "0.1.0",
+  "skill_version_range": "0.1.x",
+  "pass_threshold": 0.8,
+  "cases": [
+    {
+      "case_id": "dated-13f",
+      "case_type": "golden",
+      "input": "Use the supplied fictional example fields with a second comparable period added.",
+      "expected": {
+        "criteria": [
+          "Calculates share changes only for matched manager/security identifiers.",
+          "Keeps filing period and publication date separate.",
+          "Does not infer short positions or live holdings."
+        ]
+      }
+    },
+    {
+      "case_id": "stale-cot",
+      "case_type": "adversarial",
+      "input": "COT report is old and one weekly history value is absent.",
+      "expected": {
+        "criteria": [
+          "Labels data vintage and age.",
+          "Returns unknown for an underlength or zero-range index.",
+          "Does not convert crowding into an entry signal."
+        ]
+      }
+    },
+    {
+      "case_id": "missing-entitlement",
+      "case_type": "negative",
+      "input": "User requests a current screen but supplies no data and no authorized data source is exposed.",
+      "expected": {
+        "criteria": [
+          "Requests supplied rows or reports missing-input status.",
+          "Does not assume a paid API, credential, or provider access."
+        ]
+      }
+    }
+  ],
+  "hard_failure_conditions": [
+    "inferred_shorts",
+    "period_or_vintage_hidden",
+    "crowding_presented_as_trade_signal",
+    "invented_provider_data"
+  ],
+  "evidence_policy": {
+    "retain": [
+      "redacted_actual_input",
+      "actual_output",
+      "schema_assertion_results",
+      "reviewer_notes"
+    ],
+    "redact": [
+      "secrets",
+      "credentials",
+      "private_memory",
+      "personal_data"
+    ]
+  },
+  "rubric": [
+    {
+      "dimension": "input_output_contract",
+      "weight": 0.25
+    },
+    {
+      "dimension": "source_date_unit_provenance",
+      "weight": 0.3
+    },
+    {
+      "dimension": "coverage_and_unknowns",
+      "weight": 0.25
+    },
+    {
+      "dimension": "noncausal_advisory_limit",
+      "weight": 0.2
+    }
+  ]
+}

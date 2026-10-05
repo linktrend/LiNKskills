@@ -1,0 +1,190 @@
+{
+  "skill_id": "trading-defi-liquidity-yield",
+  "status": "source_audit_only",
+  "entries": [
+    {
+      "role": "complementary source method",
+      "repo": "agiprolabs/claude-trading-skills",
+      "path": "skills/dex-pool-analysis/SKILL.md",
+      "commit": "981e1d736cdc02bdc1c55c74ec9224e956414706",
+      "sha256": "44c65cfdc903434f9015e718ca554ca7e9702a7525875401bd0ba363fde90934",
+      "matrix_hash_matches": true,
+      "branch_method": "Compare pool mechanics and pool state provenance across constant-product, concentrated-liquidity and bin-based designs; distinguish TVL from active depth and record route-specific quote scope.",
+      "disposition": "Read-only source evidence; adapt independently. No upstream code executed, no provider/credential use, no install or publication.",
+      "license_evidence": {
+        "license_path": "LICENSE.md",
+        "license_id": "MIT",
+        "license_sha256": "41c5c4c5e8df2b67fb1d3dc288fad6cb584fab7b50333546d29e8dc6ae941408",
+        "notice_path": null,
+        "notice_sha256": null,
+        "disposition": "Preserve exact root license and copyright notice with any copied substantial source; root license permits the documented grant."
+      },
+      "license_disposition": "Preserve exact root license and copyright notice with any copied substantial source; root license permits the documented grant."
+    },
+    {
+      "role": "complementary source method",
+      "repo": "agiprolabs/claude-trading-skills",
+      "path": "skills/impermanent-loss/SKILL.md",
+      "commit": "981e1d736cdc02bdc1c55c74ec9224e956414706",
+      "sha256": "140149abdc5dc64cf6b2e842757a977e0e220b3727c2153aa69567117fbd99a9",
+      "matrix_hash_matches": true,
+      "branch_method": "Compute LP-versus-hold value under the same relative price path; explain fee-offset break-even and range-specific exposure without treating the closed-form CPMM formula as a CLMM result.",
+      "disposition": "Read-only source evidence; adapt independently. No upstream code executed, no provider/credential use, no install or publication.",
+      "license_evidence": {
+        "license_path": "LICENSE.md",
+        "license_id": "MIT",
+        "license_sha256": "41c5c4c5e8df2b67fb1d3dc288fad6cb584fab7b50333546d29e8dc6ae941408",
+        "notice_path": null,
+        "notice_sha256": null,
+        "disposition": "Preserve exact root license and copyright notice with any copied substantial source; root license permits the documented grant."
+      },
+      "license_disposition": "Preserve exact root license and copyright notice with any copied substantial source; root license permits the documented grant."
+    },
+    {
+      "role": "complementary source method",
+      "repo": "agiprolabs/claude-trading-skills",
+      "path": "skills/liquidity-analysis/SKILL.md",
+      "commit": "981e1d736cdc02bdc1c55c74ec9224e956414706",
+      "sha256": "f13ef38efce8206a212e0f657644aa991f4b4643c23dee9fa73cfdc308cfd334",
+      "matrix_hash_matches": true,
+      "branch_method": "Assess size-dependent depth with reserve math or timestamped quote ladders; separate curve impact, pool fee, aggregator route and execution uncertainty.",
+      "disposition": "Read-only source evidence; adapt independently. No upstream code executed, no provider/credential use, no install or publication.",
+      "license_evidence": {
+        "license_path": "LICENSE.md",
+        "license_id": "MIT",
+        "license_sha256": "41c5c4c5e8df2b67fb1d3dc288fad6cb584fab7b50333546d29e8dc6ae941408",
+        "notice_path": null,
+        "notice_sha256": null,
+        "disposition": "Preserve exact root license and copyright notice with any copied substantial source; root license permits the documented grant."
+      },
+      "license_disposition": "Preserve exact root license and copyright notice with any copied substantial source; root license permits the documented grant."
+    },
+    {
+      "role": "primary method candidate",
+      "repo": "agiprolabs/claude-trading-skills",
+      "path": "skills/lp-math/SKILL.md",
+      "commit": "981e1d736cdc02bdc1c55c74ec9224e956414706",
+      "sha256": "dabe3bc9ef02221c73db258cf159967e16b9a1d549172d96e0e6f1cc5cfbccd3",
+      "matrix_hash_matches": true,
+      "branch_method": "Derive reserve/invariant and position-value equations with explicit token orientation, units, fee treatment and starting inventory.",
+      "disposition": "Read-only source evidence; adapt independently. No upstream code executed, no provider/credential use, no install or publication.",
+      "license_evidence": {
+        "license_path": "LICENSE.md",
+        "license_id": "MIT",
+        "license_sha256": "41c5c4c5e8df2b67fb1d3dc288fad6cb584fab7b50333546d29e8dc6ae941408",
+        "notice_path": null,
+        "notice_sha256": null,
+        "disposition": "Preserve exact root license and copyright notice with any copied substantial source; root license permits the documented grant."
+      },
+      "license_disposition": "Preserve exact root license and copyright notice with any copied substantial source; root license permits the documented grant."
+    },
+    {
+      "role": "complementary source method",
+      "repo": "agiprolabs/claude-trading-skills",
+      "path": "skills/yield-analysis/SKILL.md",
+      "commit": "981e1d736cdc02bdc1c55c74ec9224e956414706",
+      "sha256": "79e3756b74bd02f529f18b548080c09c3a76dae9ef9dd8f0ed28863d91fe45d7",
+      "matrix_hash_matches": true,
+      "branch_method": "Decompose gross fees, LP fee share, incentives, costs, price-path loss and reinvestment assumptions; test reward sustainability and break-even rather than rank nominal APR.",
+      "disposition": "Read-only source evidence; adapt independently. No upstream code executed, no provider/credential use, no install or publication.",
+      "license_evidence": {
+        "license_path": "LICENSE.md",
+        "license_id": "MIT",
+        "license_sha256": "41c5c4c5e8df2b67fb1d3dc288fad6cb584fab7b50333546d29e8dc6ae941408",
+        "notice_path": null,
+        "notice_sha256": null,
+        "disposition": "Preserve exact root license and copyright notice with any copied substantial source; root license permits the documented grant."
+      },
+      "license_disposition": "Preserve exact root license and copyright notice with any copied substantial source; root license permits the documented grant."
+    }
+  ],
+  "release_copy_policy": "Only exact source files included under source-material are retained; MIT or Apache license and NOTICE obligations remain per exact source root. GPL/no-grant sources, if referenced, remain private audit evidence; no copied text/code.",
+  "retained_exact_entrypoints": [
+    {
+      "repo": "agiprolabs/claude-trading-skills",
+      "commit": "981e1d736cdc02bdc1c55c74ec9224e956414706",
+      "source_path": "skills/dex-pool-analysis/SKILL.md",
+      "source_copy_path": "source-material/upstream/agiprolabs--claude-trading-skills/skills/dex-pool-analysis/SKILL.source.md",
+      "source_sha256": "44c65cfdc903434f9015e718ca554ca7e9702a7525875401bd0ba363fde90934",
+      "expected_source_sha256": "44c65cfdc903434f9015e718ca554ca7e9702a7525875401bd0ba363fde90934",
+      "bytes": 13774,
+      "license_id": "MIT",
+      "license_path": "LICENSE.md",
+      "license_sha256": "41c5c4c5e8df2b67fb1d3dc288fad6cb584fab7b50333546d29e8dc6ae941408",
+      "notice_path": null,
+      "notice_sha256": null,
+      "disposition": "Read-only source evidence; adapt independently. No upstream code executed, no provider/credential use, no install or publication."
+    },
+    {
+      "repo": "agiprolabs/claude-trading-skills",
+      "commit": "981e1d736cdc02bdc1c55c74ec9224e956414706",
+      "source_path": "skills/impermanent-loss/SKILL.md",
+      "source_copy_path": "source-material/upstream/agiprolabs--claude-trading-skills/skills/impermanent-loss/SKILL.source.md",
+      "source_sha256": "140149abdc5dc64cf6b2e842757a977e0e220b3727c2153aa69567117fbd99a9",
+      "expected_source_sha256": "140149abdc5dc64cf6b2e842757a977e0e220b3727c2153aa69567117fbd99a9",
+      "bytes": 7696,
+      "license_id": "MIT",
+      "license_path": "LICENSE.md",
+      "license_sha256": "41c5c4c5e8df2b67fb1d3dc288fad6cb584fab7b50333546d29e8dc6ae941408",
+      "notice_path": null,
+      "notice_sha256": null,
+      "disposition": "Read-only source evidence; adapt independently. No upstream code executed, no provider/credential use, no install or publication."
+    },
+    {
+      "repo": "agiprolabs/claude-trading-skills",
+      "commit": "981e1d736cdc02bdc1c55c74ec9224e956414706",
+      "source_path": "skills/liquidity-analysis/SKILL.md",
+      "source_copy_path": "source-material/upstream/agiprolabs--claude-trading-skills/skills/liquidity-analysis/SKILL.source.md",
+      "source_sha256": "f13ef38efce8206a212e0f657644aa991f4b4643c23dee9fa73cfdc308cfd334",
+      "expected_source_sha256": "f13ef38efce8206a212e0f657644aa991f4b4643c23dee9fa73cfdc308cfd334",
+      "bytes": 13908,
+      "license_id": "MIT",
+      "license_path": "LICENSE.md",
+      "license_sha256": "41c5c4c5e8df2b67fb1d3dc288fad6cb584fab7b50333546d29e8dc6ae941408",
+      "notice_path": null,
+      "notice_sha256": null,
+      "disposition": "Read-only source evidence; adapt independently. No upstream code executed, no provider/credential use, no install or publication."
+    },
+    {
+      "repo": "agiprolabs/claude-trading-skills",
+      "commit": "981e1d736cdc02bdc1c55c74ec9224e956414706",
+      "source_path": "skills/lp-math/SKILL.md",
+      "source_copy_path": "source-material/upstream/agiprolabs--claude-trading-skills/skills/lp-math/SKILL.source.md",
+      "source_sha256": "dabe3bc9ef02221c73db258cf159967e16b9a1d549172d96e0e6f1cc5cfbccd3",
+      "expected_source_sha256": "dabe3bc9ef02221c73db258cf159967e16b9a1d549172d96e0e6f1cc5cfbccd3",
+      "bytes": 10035,
+      "license_id": "MIT",
+      "license_path": "LICENSE.md",
+      "license_sha256": "41c5c4c5e8df2b67fb1d3dc288fad6cb584fab7b50333546d29e8dc6ae941408",
+      "notice_path": null,
+      "notice_sha256": null,
+      "disposition": "Read-only source evidence; adapt independently. No upstream code executed, no provider/credential use, no install or publication."
+    },
+    {
+      "repo": "agiprolabs/claude-trading-skills",
+      "commit": "981e1d736cdc02bdc1c55c74ec9224e956414706",
+      "source_path": "skills/yield-analysis/SKILL.md",
+      "source_copy_path": "source-material/upstream/agiprolabs--claude-trading-skills/skills/yield-analysis/SKILL.source.md",
+      "source_sha256": "79e3756b74bd02f529f18b548080c09c3a76dae9ef9dd8f0ed28863d91fe45d7",
+      "expected_source_sha256": "79e3756b74bd02f529f18b548080c09c3a76dae9ef9dd8f0ed28863d91fe45d7",
+      "bytes": 9239,
+      "license_id": "MIT",
+      "license_path": "LICENSE.md",
+      "license_sha256": "41c5c4c5e8df2b67fb1d3dc288fad6cb584fab7b50333546d29e8dc6ae941408",
+      "notice_path": null,
+      "notice_sha256": null,
+      "disposition": "Read-only source evidence; adapt independently. No upstream code executed, no provider/credential use, no install or publication."
+    }
+  ],
+  "root_license_records": {
+    "agiprolabs/claude-trading-skills": {
+      "license_path": "LICENSE.md",
+      "license_id": "MIT",
+      "license_sha256": "41c5c4c5e8df2b67fb1d3dc288fad6cb584fab7b50333546d29e8dc6ae941408",
+      "notice_path": null,
+      "notice_sha256": null,
+      "retained_license_copy_path": "source-material/upstream/agiprolabs--claude-trading-skills/LICENSE.source.txt"
+    }
+  },
+  "license_note": "Every copied entrypoint in this package has a verified pinned MIT or Apache-2.0 root grant; Apache NOTICE is preserved. No GPL or no-grant content copied."
+}

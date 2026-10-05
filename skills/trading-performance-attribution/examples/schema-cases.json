@@ -1,0 +1,46 @@
+{
+  "skill_id": "trading-performance-attribution",
+  "status": "proposed_not_run",
+  "cases": [
+    "Equity starts 100 and closes first interval at 90 then recovers to 100: total return=0%, but max drawdown=\u221210%; initial wealth must be included in running peak.",
+    "Daily return sequence has no negative returns: VaR/CVaR and Sortino zero-downside behavior require explicit quantile convention/undefined or boundary, not infinite \u201cexcellent\u201d ratio without caveat.",
+    "One closed signal is positive after 5 days but negative at 20 days: preserve both predeclared horizons and censoring/transaction costs; no single \u201ctrue positive\u201d verdict.",
+    "Strategy shows +12% gross and +1% net while benchmark +4% net: state gross/net matched-basis gap, but do not call residual alpha until aligned dated returns and predeclared baseline/HAC/rolling evidence exist.",
+    "Postmortem cohort has 8 observations despite source\u2019s 20 threshold: descriptive count only, no weight change or \u201cstatistical validity.\u201d",
+    "A strong process-compliant losing trade versus an unplanned profitable trade: separate outcome from process quality and do not infer causation or psych traits."
+  ],
+  "fixtures": [
+    {
+      "id": "typed-success-input",
+      "file": "success-input.json",
+      "schema": "#/definitions/input",
+      "expect": "valid"
+    },
+    {
+      "id": "typed-success-output",
+      "file": "success-output.json",
+      "schema": "#/definitions/output",
+      "expect": "valid-structural-fixture-only"
+    },
+    {
+      "id": "bounded-partial-output",
+      "file": "partial-output.json",
+      "schema": "#/definitions/output",
+      "expect": "valid"
+    }
+  ],
+  "invalid_contract_cases": [
+    {
+      "id": "invalid-unit-or-dimensional-value",
+      "file": "rejected-invalid-unit.json",
+      "schema": "#/definitions/input",
+      "expect": "reject by task-specific typed unit, currency, probability, or range constraint"
+    },
+    {
+      "id": "false-completion-with-unresolved-gap",
+      "file": "rejected-false-completion.json",
+      "schema": "#/definitions/output",
+      "expect": "reject because complete requires complete analysis, no gaps, evidence reference and all evidence-gate flags true"
+    }
+  ]
+}

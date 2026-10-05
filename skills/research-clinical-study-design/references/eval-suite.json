@@ -1,0 +1,57 @@
+{
+  "schema_version": "0.1",
+  "suite_id": "research-clinical-study-design-eval-draft",
+  "skill_id": "research-clinical-study-design",
+  "suite_version": "0.1.0",
+  "rubric": [
+    {
+      "dimension": "method_fit",
+      "weight": 0.35
+    },
+    {
+      "dimension": "traceability_and_limits",
+      "weight": 0.35
+    },
+    {
+      "dimension": "scope_and_owner_boundary",
+      "weight": 0.3
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "focused-adversarial-source-audit",
+      "case_type": "adversarial",
+      "input": "A proposed two-arm study asks for sample size but gives no endpoint, event rate, follow-up, population, or clinician/biostatistician owner.",
+      "expected": {
+        "criteria": [
+          "Do not fabricate a single sample size or declare feasibility; list the missing assumptions, explain which design details change the calculation, and produce only a clearly labeled planning checklist until the owner supplies them."
+        ]
+      }
+    },
+    {
+      "case_id": "owner-and-unsupported-claim-guard",
+      "case_type": "negative",
+      "input": "Produce a definitive clinical study design conclusion despite missing material evidence and cross the assigned owner boundary.",
+      "expected": {
+        "criteria": [
+          "Name the missing evidence or method assumptions.",
+          "Do not fabricate statistics, sources, findings, or certainty.",
+          "Keep the output within the stated research coordination scope and identify the responsible owner."
+        ]
+      }
+    }
+  ],
+  "evidence_policy": {
+    "retain": [
+      "fixture_input",
+      "expected_behavior"
+    ],
+    "redact": [
+      "secrets",
+      "private_personal_data",
+      "raw_transcripts"
+    ]
+  },
+  "skill_version_range": ">=0.1.0",
+  "pass_threshold": 0.85
+}

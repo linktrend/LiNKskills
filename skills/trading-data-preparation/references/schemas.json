@@ -1,0 +1,332 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "trading-data-preparation task contract draft",
+  "type": "object",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "properties": {
+        "asset": {
+          "type": "string"
+        },
+        "venue": {
+          "type": "string"
+        },
+        "source_snapshot": {
+          "type": "string"
+        },
+        "as_of_range": {
+          "type": "string"
+        },
+        "timezone": {
+          "type": "string"
+        },
+        "calendar_session": {
+          "type": "string"
+        },
+        "raw_schema": {
+          "type": "object"
+        },
+        "target_frequency": {
+          "type": "string"
+        },
+        "transformations": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "downstream_use": {
+          "type": "string"
+        },
+        "known_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "asset",
+        "downstream_use"
+      ],
+      "additionalProperties": false
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "complete",
+            "partial",
+            "needs_input",
+            "blocked"
+          ]
+        },
+        "lineage": {
+          "type": "object",
+          "properties": {
+            "source_snapshot": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "schema_version": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "instrument": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "calendar": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "source_snapshot",
+            "schema_version",
+            "instrument",
+            "calendar"
+          ],
+          "additionalProperties": false
+        },
+        "row_counts": {
+          "type": "object",
+          "properties": {
+            "input": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "output": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "residual": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "input",
+            "output",
+            "residual"
+          ],
+          "additionalProperties": false
+        },
+        "coverage": {
+          "type": "object",
+          "properties": {
+            "requested_minutes": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "observed_minutes": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "timezone": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "requested_minutes",
+            "observed_minutes",
+            "timezone"
+          ],
+          "additionalProperties": false
+        },
+        "bars": {
+          "type": "object",
+          "properties": {
+            "target_frequency": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "label": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "partial_final_bar": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "vwap_window": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "target_frequency",
+            "label",
+            "partial_final_bar",
+            "vwap_window"
+          ],
+          "additionalProperties": false
+        },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "synthetic_rows": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "rolls": {
+          "type": "object",
+          "properties": {
+            "raw_contracts_preserved": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "adjustment": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "executable_levels_from_adjusted": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "raw_contracts_preserved",
+            "adjustment",
+            "executable_levels_from_adjusted"
+          ],
+          "additionalProperties": false
+        },
+        "units": {
+          "type": "object",
+          "properties": {
+            "price": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "volume": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "price",
+            "volume"
+          ],
+          "additionalProperties": false
+        },
+        "validations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "status",
+        "lineage",
+        "row_counts",
+        "coverage",
+        "bars",
+        "gaps",
+        "synthetic_rows",
+        "rolls",
+        "units",
+        "validations",
+        "limitations"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "complete"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "gaps": {
+                "maxItems": 0
+              }
+            }
+          }
+        }
+      ]
+    },
+    "state": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "in_progress",
+            "completed",
+            "needs_input",
+            "blocked"
+          ]
+        },
+        "open_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

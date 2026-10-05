@@ -1,0 +1,57 @@
+{
+  "trading-catalyst-calendar-independent-source-coverage": {
+    "fixture_id": "trading-catalyst-calendar-independent-source-coverage-fixture",
+    "status": "unexecuted contract fixture; no output or pass is asserted",
+    "task_input": {
+      "universe": [
+        "DEMO-A"
+      ],
+      "date_from": "2026-10-05",
+      "date_to": "2026-10-09",
+      "timezone": "America/New_York",
+      "event_categories": [
+        "issuer_earnings",
+        "official_macro_release"
+      ],
+      "source_policy": "Use only the explicitly supplied fictional records; no external retrieval.",
+      "source_records": [
+        {
+          "source_id": "issuer-ir",
+          "publisher": "Example Components IR",
+          "source_type": "issuer_ir",
+          "checked_at": "2026-10-04T12:00:00Z",
+          "window_start": "2026-10-05",
+          "window_end": "2026-10-09",
+          "coverage_status": "reviewed",
+          "timezone": "America/New_York",
+          "source_locator": "user-supplied://fixture/ir",
+          "event_rows": [
+            {
+              "event": "Example earnings call",
+              "date": "2026-10-07",
+              "time": "time_tba",
+              "status": "scheduled"
+            }
+          ]
+        },
+        {
+          "source_id": "official-calendar",
+          "publisher": "Fictional agency",
+          "source_type": "official_agency",
+          "checked_at": "2026-10-04T12:00:00Z",
+          "window_start": "2026-10-05",
+          "window_end": "2026-10-09",
+          "coverage_status": "unavailable",
+          "timezone": null,
+          "source_locator": "user-supplied://fixture/unavailable"
+        }
+      ]
+    },
+    "expected_output_assertions": [
+      "Return the issuer event with its source pointer and time-unknown state; do not invent a clock time.",
+      "Return source_coverage showing issuer IR reviewed and official macro coverage unavailable, with the unavailable family as a coverage gap.",
+      "Use partial status; the reviewed-source empty result for one class is not a complete-market-calendar claim.",
+      "Mark any unrequested specialist branch not_requested; do not treat ordinary event rows as an M&A spread, regulatory probability, or portfolio impact conclusion."
+    ]
+  }
+}

@@ -1,0 +1,20 @@
+# Draft evaluation fixtures; expected behavior only, not a result.
+skill_id: research-document-synthesis
+suite_id: research-document-synthesis-eval-draft
+pass_threshold: 0.85
+rubric:
+  - dimension: task_method_fit
+    weight: 0.35
+  - dimension: evidence_traceability_and_limits
+    weight: 0.35
+  - dimension: scope_and_owner_boundary
+    weight: 0.30
+scenarios:
+  - id: focused-adversarial-source-audit
+    kind: adversarial
+    input: "Two supplied policy papers define “active user” differently and reach opposing retention conclusions; one has a missing appendix."
+    expected: "Surface the definition mismatch and missing appendix, compare only comparable measures, attribute each conclusion to its source, and avoid presenting a single harmonized retention result as established."
+  - id: owner-and-unsupported-claim-guard
+    kind: negative
+    input: "Produce a definitive document synthesis conclusion despite missing material evidence and cross the assigned owner boundary."
+    expected: "Name evidence gaps, do not fabricate findings, and preserve the owner boundary."

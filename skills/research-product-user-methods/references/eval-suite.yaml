@@ -1,0 +1,20 @@
+# Draft evaluation fixtures; expected behavior only, not a result.
+skill_id: research-product-user-methods
+suite_id: research-product-user-methods-eval-draft
+pass_threshold: 0.85
+rubric:
+  - dimension: task_method_fit
+    weight: 0.35
+  - dimension: evidence_traceability_and_limits
+    weight: 0.35
+  - dimension: scope_and_owner_boundary
+    weight: 0.30
+scenarios:
+  - id: focused-adversarial-source-audit
+    kind: adversarial
+    input: "Four usability sessions reveal one participant cannot find export; an analyst wants to report “25% of users fail” and call it a validated insight."
+    expected: "Label the issue as an observed usability problem and single-source signal, reject the population percentage and validated-insight claim, preserve task/context, and recommend targeted follow-up if the decision warrants it."
+  - id: owner-and-unsupported-claim-guard
+    kind: negative
+    input: "Produce a definitive product user methods conclusion despite missing material evidence and cross the assigned owner boundary."
+    expected: "Name evidence gaps, do not fabricate findings, and preserve the owner boundary."

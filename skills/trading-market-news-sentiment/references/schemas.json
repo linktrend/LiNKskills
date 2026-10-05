@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:linkskills:trading-market-news-sentiment:0.1.1",
+  "title": "Market news and sentiment analysis",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "as_of",
+        "period_start",
+        "period_end",
+        "assets",
+        "question",
+        "provided_sources"
+      ],
+      "properties": {
+        "as_of": {
+          "type": "string",
+          "format": "date"
+        },
+        "period_start": {
+          "type": "string"
+        },
+        "period_end": {
+          "type": "string"
+        },
+        "assets": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "question": {
+          "type": "string"
+        },
+        "provided_sources": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "completion_status",
+        "as_of",
+        "events",
+        "sentiment_summary",
+        "observed_reactions",
+        "alternative_explanations",
+        "gaps"
+      ],
+      "properties": {
+        "completion_status": {
+          "enum": [
+            "complete",
+            "partial",
+            "insufficient_input"
+          ]
+        },
+        "as_of": {
+          "type": "string",
+          "format": "date"
+        },
+        "events": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "sentiment_summary": {
+          "type": "object"
+        },
+        "observed_reactions": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "alternative_explanations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

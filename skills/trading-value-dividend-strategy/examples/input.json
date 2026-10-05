@@ -1,0 +1,107 @@
+{
+  "request_id": "VD-2026-10-05-01",
+  "objective": "balanced",
+  "universe": [
+    "FICT"
+  ],
+  "as_of_date": "2026-10-05",
+  "horizon_years": 5,
+  "holdings_context": null,
+  "candidates": [
+    {
+      "symbol": "FICT",
+      "instrument_type": "stock",
+      "currency": "USD",
+      "price": {
+        "value": 40,
+        "as_of": "2026-10-02T20:00:00Z",
+        "source_id": "S1"
+      },
+      "dividend_payments": [
+        {
+          "amount": 0.4,
+          "currency": "USD",
+          "declared_on": "2026-09-01",
+          "frequency": "quarterly",
+          "classification": "regular",
+          "source_id": "S2"
+        },
+        {
+          "amount": 0.2,
+          "currency": "USD",
+          "declared_on": "2026-06-01",
+          "frequency": "one_off",
+          "classification": "special",
+          "source_id": "S3"
+        }
+      ],
+      "coverage": {
+        "cfo": 1200,
+        "capex_outflow": 400,
+        "dividends_paid": 500,
+        "period": "TTM",
+        "unit": "USD_million",
+        "source_ids": [
+          "S4"
+        ]
+      },
+      "facts": [
+        {
+          "metric": "dividend_cagr_5y",
+          "value": 0.08,
+          "unit": "ratio",
+          "period": "FY2020-FY2025",
+          "source_ids": [
+            "S5"
+          ]
+        },
+        {
+          "metric": "net_debt",
+          "value": 500,
+          "unit": "USD_million",
+          "period": "FY2025",
+          "source_ids": [
+            "S4"
+          ]
+        }
+      ]
+    }
+  ],
+  "source_ledger": [
+    {
+      "source_id": "S1",
+      "kind": "quote",
+      "url": "https://example.invalid/q",
+      "published_at": "2026-10-02T20:00:00Z",
+      "retrieved_at": "2026-10-05T00:00:00Z"
+    },
+    {
+      "source_id": "S2",
+      "kind": "issuer_dividend",
+      "url": "https://example.invalid/d",
+      "published_at": "2026-09-01T12:00:00Z",
+      "retrieved_at": "2026-10-05T00:00:00Z"
+    },
+    {
+      "source_id": "S3",
+      "kind": "issuer_dividend",
+      "url": "https://example.invalid/s",
+      "published_at": "2026-06-01T12:00:00Z",
+      "retrieved_at": "2026-10-05T00:00:00Z"
+    },
+    {
+      "source_id": "S4",
+      "kind": "filing",
+      "url": "https://example.invalid/f",
+      "published_at": "2026-02-10T12:00:00Z",
+      "retrieved_at": "2026-10-05T00:00:00Z"
+    },
+    {
+      "source_id": "S5",
+      "kind": "filing",
+      "url": "https://example.invalid/h",
+      "published_at": "2026-02-10T12:00:00Z",
+      "retrieved_at": "2026-10-05T00:00:00Z"
+    }
+  ]
+}

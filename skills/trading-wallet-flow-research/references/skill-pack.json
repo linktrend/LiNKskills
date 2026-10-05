@@ -1,0 +1,119 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "trading-wallet-flow-research",
+  "display_name": "Trading Wallet Flow Research",
+  "version": "0.1.1",
+  "description": "Draft task skill; unqualified and not published.",
+  "capability_category": "trading_research",
+  "lifecycle_state": "draft",
+  "format_profile": "simple",
+  "compatible_runtime_profiles": [
+    "lisa-openclaw"
+  ],
+  "min_capability_tier": "balanced",
+  "routing": {
+    "when_to_use": "trading wallet flow research",
+    "when_not_to_use": [
+      "Outside task-specific scope in SKILL.md.",
+      "Do not execute a trade or represent an owner decision as complete."
+    ],
+    "tags": [
+      "trading",
+      "research",
+      "draft"
+    ]
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "task_inputs",
+        "description": "Use task-specific fields in references/schemas.json#/definitions/input."
+      }
+    ],
+    "expected_outputs": [
+      {
+        "name": "task_result",
+        "description": "Use task-specific result fields in references/schemas.json#/definitions/output; preserve nulls, ambiguity and gaps."
+      }
+    ],
+    "forbidden_actions": [
+      "No orders, trade copying, live monitoring, signing, deployment, or capital activation.",
+      "No invented values, returns, probabilities, fills, or confidence.",
+      "No new spend, provider calls, credentials, or external mutation.",
+      "No runtime JSON/JSONL sidecars.",
+      "No evaluation, certification, admission, release, or publication claim."
+    ],
+    "verification_steps": [
+      "Inspect input/output units, denominators, time window and evidence provenance.",
+      "Inspect assumptions, ambiguity, limitations and alternative explanations.",
+      "Confirm owner handoffs and no external action."
+    ],
+    "completion_criteria": [
+      "Task-specific deliverable fields are present or explicitly marked missing.",
+      "Scope, uncertainty and owner handoffs are stated."
+    ],
+    "known_limitations": [
+      "Draft; not qualified or admitted.",
+      "Proposed fixtures are not evaluated; no live data or provider operation was performed."
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "native_session"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "suite_hash": "sha256:388a070df91b91ff6432634bc3fb5aa53d401cd2905d32b542940dade5f04aea"
+  },
+  "telemetry": {
+    "classification": "public_internal",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_private_data",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain_only_approved_ids_and_hashes"
+  },
+  "fragments": [
+    {
+      "fragment_id": "method",
+      "disclosure_level": 2,
+      "path": "SKILL.md"
+    },
+    {
+      "fragment_id": "advanced-method",
+      "disclosure_level": 3,
+      "path": "advanced/advanced.md"
+    },
+    {
+      "fragment_id": "contracts",
+      "disclosure_level": 4,
+      "path": "references/schemas.json"
+    },
+    {
+      "fragment_id": "source-provenance",
+      "disclosure_level": 4,
+      "path": "references/source-provenance.json"
+    },
+    {
+      "fragment_id": "quarantined-copy-manifest",
+      "disclosure_level": 4,
+      "path": "references/upstream-copy-manifest.json"
+    },
+    {
+      "fragment_id": "fictional-example",
+      "disclosure_level": 5,
+      "path": "examples/success-pattern.md"
+    }
+  ],
+  "release_channel": "development"
+}

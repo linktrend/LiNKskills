@@ -1,0 +1,63 @@
+{
+  "fictional_fixture": true,
+  "notice": "Synthetic prices and labels only; watch classification is not a trade recommendation.",
+  "input": {
+    "request_id": "FICTIONAL-SHORT-01",
+    "symbol": "FIC-S",
+    "venue": "fictional exchange",
+    "as_of": "2026-09-30T20:00:00Z",
+    "calendar": "fictional regular session",
+    "source_snapshot": "fictional-bars-v1",
+    "bars": [
+      {
+        "timestamp": "2026-09-29T20:00:00Z",
+        "open": 90,
+        "high": 100,
+        "low": 88,
+        "close": 98,
+        "volume": 100000,
+        "unit": "fictional USD/share and shares",
+        "source_row": "s1"
+      },
+      {
+        "timestamp": "2026-09-30T20:00:00Z",
+        "open": 99,
+        "high": 103,
+        "low": 95,
+        "close": 97,
+        "volume": 180000,
+        "unit": "fictional USD/share and shares",
+        "source_row": "s2"
+      }
+    ],
+    "parameters": {
+      "thresholds": "none validated"
+    },
+    "constraints": {
+      "borrow_status": null,
+      "short_sale_restriction": null,
+      "earnings_calendar": null
+    }
+  },
+  "output": {
+    "request_id": "FICTIONAL-SHORT-01",
+    "status": "partial",
+    "symbol": "FIC-S",
+    "observed_factors": [
+      "Fictional supplied two-bar range and volume expansion only; no parabolic lookback established."
+    ],
+    "risk_flags": [
+      "Two observations cannot establish acceleration/exhaustion; gap and squeeze risk unknown."
+    ],
+    "unresolved_gates": [
+      "Borrow/locate status unknown.",
+      "Short-sale restriction status unknown.",
+      "No applicable legal or broker rules verified."
+    ],
+    "classification": "insufficient_data",
+    "gaps": [
+      "Extended history, liquidity, catalyst timestamps and source coverage absent."
+    ],
+    "advisory_only": true
+  }
+}

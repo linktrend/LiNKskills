@@ -1,0 +1,101 @@
+{
+  "fictional_fixture": true,
+  "notice": "Invented company, event time and OHLCV; structure/arithmetic only, not a PEAD finding.",
+  "input": {
+    "request_id": "FICTIONAL-EARN-01",
+    "issuer_id": "FIC-CO",
+    "venue": "fictional exchange",
+    "as_of": "2026-09-30T22:00:00Z",
+    "event": {
+      "event_date": "2026-09-30",
+      "scheduled_at": null,
+      "actual_release_at": "2026-09-30T21:30:00Z",
+      "timezone": "UTC",
+      "event_sources": [
+        "fictional-release-1"
+      ],
+      "eps_actual": 1.2,
+      "eps_consensus": 1.0,
+      "revenue_actual": null,
+      "revenue_consensus": null,
+      "guidance_summary": null
+    },
+    "price_snapshot": "fictional-daily-bars-v1",
+    "bars": [
+      {
+        "timestamp": "2026-09-29T20:00:00Z",
+        "open": 100,
+        "high": 102,
+        "low": 99,
+        "close": 100,
+        "volume": 100000,
+        "source_row": "e1"
+      },
+      {
+        "timestamp": "2026-09-30T20:00:00Z",
+        "open": 100,
+        "high": 105,
+        "low": 99,
+        "close": 104,
+        "volume": 150000,
+        "source_row": "e2"
+      }
+    ],
+    "market_control": {
+      "benchmark": "FIC-IDX",
+      "returns": null
+    },
+    "source_provenance": [
+      "fictional inputs"
+    ]
+  },
+  "output": {
+    "request_id": "FICTIONAL-EARN-01",
+    "status": "partial",
+    "event_timing": {
+      "actual_release_at": "2026-09-30T21:30:00Z",
+      "relationship_to_close": "after supplied bar close; next-session reaction not supplied",
+      "attribution": "not established"
+    },
+    "reaction_metrics": [
+      {
+        "name": "EPS surprise",
+        "value": 0.2,
+        "unit": "fictional USD/share",
+        "formula": "1.2 - 1.0",
+        "source_rows": [
+          "fictional-release-1"
+        ]
+      },
+      {
+        "name": "same-session return",
+        "value": 4.0,
+        "unit": "percent",
+        "formula": "(104 / 100 - 1) x 100",
+        "source_rows": [
+          "e1",
+          "e2"
+        ]
+      }
+    ],
+    "post_event_study": {
+      "status": "insufficient",
+      "drift_windows": [],
+      "control_comparison": null
+    },
+    "counterevidence": [
+      "One fictional event; not evidence of persistent drift."
+    ],
+    "limitations": [
+      "Release occurred after bar close; observed price bar is pre-release and cannot be attributed to event.",
+      "No sector/index returns, adjusted history, transaction costs or cohort."
+    ],
+    "recommendation": {
+      "stance": "no_view",
+      "basis": [
+        "Post-release reaction window missing."
+      ],
+      "advisory_only": true
+    }
+  }
+}

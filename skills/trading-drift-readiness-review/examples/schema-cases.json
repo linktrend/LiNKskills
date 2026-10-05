@@ -1,0 +1,45 @@
+{
+  "skill_id": "trading-drift-readiness-review",
+  "status": "proposed_not_run",
+  "cases": [
+    "NAV 100\u219290\u2192100: total return 0%, max drawdown -10%; initial wealth is the opening peak.",
+    "PSI=0.24 only after 30% of current values fall outside frozen reference bins: disclose out-of-range/missing count and sensitivity; do not declare halt.",
+    "Gross performance is flat while net falls after fees double: costs are a plausible contributor; causation still needs aligned reconciled series.",
+    "Breaker state empty and P&L partial: readiness and allowed-risk status unknown, not green.",
+    "Backtest/paper positive but no rollback owner or state reconciliation evidence: readiness remains incomplete; no live activation."
+  ],
+  "fixtures": [
+    {
+      "id": "typed-success-input",
+      "file": "success-input.json",
+      "schema": "#/definitions/input",
+      "expect": "valid"
+    },
+    {
+      "id": "typed-success-output",
+      "file": "success-output.json",
+      "schema": "#/definitions/output",
+      "expect": "valid-structural-fixture-only"
+    },
+    {
+      "id": "bounded-partial-output",
+      "file": "partial-output.json",
+      "schema": "#/definitions/output",
+      "expect": "valid"
+    }
+  ],
+  "invalid_contract_cases": [
+    {
+      "id": "invalid-unit-or-dimensional-value",
+      "file": "rejected-invalid-unit.json",
+      "schema": "#/definitions/input",
+      "expect": "reject by task-specific typed unit, currency, probability, or range constraint"
+    },
+    {
+      "id": "false-completion-with-unresolved-gap",
+      "file": "rejected-false-completion.json",
+      "schema": "#/definitions/output",
+      "expect": "reject because complete requires complete analysis, no gaps, evidence reference and all evidence-gate flags true"
+    }
+  ]
+}

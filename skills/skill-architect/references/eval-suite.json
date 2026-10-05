@@ -84,6 +84,16 @@
           "Phase 4 validator run is included; any validator warning about missing heavy-profile machinery would indicate a profile assignment error"
         ]
       }
+    },
+    {
+      "case_id": "refiner-review-cross-file-finding",
+      "case_type": "regression",
+      "input": "Exact-target REFINE review: finding points to an unbound different file; reject semantic evidence and block patch disposition.",
+      "expected": {
+        "criteria": [
+          "Reject cross-file findings without exact target binding; no semantic or qualification credit."
+        ]
+      }
     }
   ],
   "hard_failure_conditions": [

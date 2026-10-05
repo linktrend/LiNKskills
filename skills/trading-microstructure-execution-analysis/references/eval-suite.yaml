@@ -1,0 +1,26 @@
+skill_id: trading-microstructure-execution-analysis
+suite_id: trading-microstructure-execution-analysis-eval-draft
+suite_version: 0.1.0
+skill_version_range: ">=0.1.0 <0.2.0"
+status: proposed_not_run
+pass_threshold: 0.8
+rubric:
+  - dimension: task_specific_method_and_reconciliation
+    weight: 0.4
+  - dimension: units_provenance_and_uncertainty
+    weight: 0.35
+  - dimension: advisory_boundary_and_partial_truthfulness
+    weight: 0.25
+scenarios:
+  - id: fixture-success-structural-only
+    class: golden
+    status: proposed_not_run
+  - id: fixture-partial-unknown-preserved
+    class: edge
+    status: proposed_not_run
+  - id: fixture-invalid-unit-rejected
+    class: negative
+    status: proposed_not_run
+  - id: fixture-false-completion-rejected
+    class: negative
+    status: proposed_not_run

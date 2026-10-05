@@ -1,0 +1,36 @@
+{
+  "status": "schema_fixture_only_not_behavioral_evaluation",
+  "valid_case": {
+    "schema_ref": "references/schemas.json#/definitions/input",
+    "input": {
+      "project_summary": "fictional early-stage sensor research",
+      "applicant_stage": "early career",
+      "institution": "fictional university",
+      "geography": "US",
+      "funder_scope": "NIH",
+      "project_maturity": "preliminary concept",
+      "preliminary_evidence": "none supplied",
+      "budget_scope": "planning estimate absent",
+      "submission_timing": "next cycle unknown",
+      "named_opportunity": null
+    },
+    "expected": "accept by JSON Schema"
+  },
+  "invalid_case": {
+    "schema_ref": "references/schemas.json#/definitions/input",
+    "input": {
+      "project_summary": "fictional-input",
+      "applicant_stage": "fictional-input",
+      "institution": "fictional-input",
+      "geography": "fictional-input",
+      "funder_scope": "fictional-input",
+      "project_maturity": "fictional-input",
+      "preliminary_evidence": "fictional-input",
+      "budget_scope": "fictional-input",
+      "submission_timing": "fictional-input",
+      "named_opportunity": "fictional-input",
+      "unapproved_extra_field": "reject"
+    },
+    "expected": "reject unknown additional property"
+  }
+}

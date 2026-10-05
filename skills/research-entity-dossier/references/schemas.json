@@ -1,0 +1,246 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "research-entity-dossier task contract draft",
+  "type": "object",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "properties": {
+        "entity_name": {
+          "type": "string"
+        },
+        "identifier": {
+          "type": "string"
+        },
+        "hypothesis": {
+          "type": "string"
+        },
+        "purpose": {
+          "type": "string"
+        },
+        "period": {
+          "type": "string"
+        },
+        "public_source_boundary": {
+          "type": "string"
+        },
+        "as_of": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "entity_name",
+        "identifier",
+        "hypothesis",
+        "purpose",
+        "period",
+        "public_source_boundary",
+        "as_of"
+      ],
+      "additionalProperties": false,
+      "title": "Task-specific input"
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "identity": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "identifier": {
+              "type": "string"
+            },
+            "jurisdiction": {
+              "type": "string"
+            },
+            "disambiguation": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "identifier",
+            "jurisdiction",
+            "disambiguation"
+          ],
+          "additionalProperties": false
+        },
+        "timeline": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "date": {
+                "type": "string"
+              },
+              "event": {
+                "type": "string"
+              },
+              "source_id": {
+                "type": "string"
+              },
+              "source_date": {
+                "type": "string"
+              },
+              "quality": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "date",
+              "event",
+              "source_id",
+              "source_date",
+              "quality"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "hypothesis_evidence": {
+          "type": "object",
+          "properties": {
+            "supports": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "claim": {
+                    "type": "string"
+                  },
+                  "source_id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "claim",
+                  "source_id"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "against": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            },
+            "assessment": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "supports",
+            "against",
+            "assessment"
+          ],
+          "additionalProperties": false
+        },
+        "ownership_product_funding": {
+          "type": "object",
+          "properties": {
+            "ownership": {
+              "type": "string"
+            },
+            "product": {
+              "type": "string"
+            },
+            "funding": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "ownership",
+            "product",
+            "funding"
+          ],
+          "additionalProperties": false
+        },
+        "source_quality_and_recency": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "source_id": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "independent_confirmation": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "source_id",
+              "type",
+              "independent_confirmation"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "unresolved_questions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "citation_audit": {
+          "type": "object",
+          "properties": {
+            "links_opened": {
+              "type": "boolean"
+            },
+            "citation_completeness": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "links_opened",
+            "citation_completeness"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "status",
+        "identity",
+        "timeline",
+        "hypothesis_evidence",
+        "ownership_product_funding",
+        "source_quality_and_recency",
+        "unresolved_questions",
+        "citation_audit"
+      ],
+      "additionalProperties": false,
+      "title": "Task-specific result"
+    },
+    "state": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "in_progress",
+            "completed",
+            "needs_input",
+            "blocked"
+          ]
+        },
+        "open_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

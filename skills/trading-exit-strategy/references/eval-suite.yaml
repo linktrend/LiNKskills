@@ -1,0 +1,17 @@
+skill_id: trading-exit-strategy
+suite_id: trading-exit-strategy-eval-draft
+status: proposed_not_run
+pass_threshold: 0.85
+rubric:
+  - dimension: method_fit
+    weight: 0.4
+  - dimension: units_and_traceability
+    weight: 0.35
+  - dimension: scope_and_uncertainty
+    weight: 0.25
+scenarios:
+  - id: intrabar-order
+  - id: quantity-overrun
+  - id: short-direction
+notes:
+  - Proposed expected behaviors only; no execution, PASS, or certification claimed.

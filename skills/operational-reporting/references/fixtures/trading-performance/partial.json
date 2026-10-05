@@ -1,0 +1,127 @@
+{
+  "mode": "trading_performance",
+  "window": "custom",
+  "records": [],
+  "evidence": [
+    "fixture://ledger/partial",
+    "fixture://closed/partial",
+    "fixture://equity/partial"
+  ],
+  "trading_performance": {
+    "period": {
+      "start_inclusive": "2026-09-01T00:00:00Z",
+      "end_exclusive": "2026-10-01T00:00:00Z",
+      "timezone": "UTC"
+    },
+    "base_currency": "USD",
+    "coverage": "partial",
+    "cost_coverage": "partial",
+    "equity_coverage": "partial",
+    "realized_pnl_basis": "gross_before_fees",
+    "starting_equity": {
+      "amount": "1000",
+      "currency": "USD",
+      "fx_to_base": "1",
+      "fx_effective_at": "2026-09-01T00:00:00Z",
+      "fx_source": "fixture://fx/base-identity",
+      "source_pointer": "fixture://ledger/partial-equity-start",
+      "as_of": "2026-09-01T00:00:00Z"
+    },
+    "ending_equity": {
+      "amount": null,
+      "currency": "USD",
+      "as_of": "2026-10-01T00:00:00Z",
+      "fx_to_base": null,
+      "fx_effective_at": null,
+      "fx_source": null,
+      "source_pointer": "fixture://equity/partial-end"
+    },
+    "cash_flows": [
+      {
+        "flow_id": "D-EUR",
+        "kind": "deposit",
+        "occurred_at": "2026-09-06T10:00:00Z",
+        "amount": "50",
+        "currency": "EUR",
+        "fx_to_base": null,
+        "fx_effective_at": null,
+        "fx_source": null,
+        "source_pointer": "fixture://cash/D-EUR"
+      }
+    ],
+    "realized_pnl": [
+      {
+        "event_id": "E-EUR",
+        "trade_id": "P1",
+        "occurred_at": "2026-09-10T12:00:00Z",
+        "amount": "50",
+        "currency": "EUR",
+        "fx_to_base": null,
+        "fx_effective_at": null,
+        "fx_source": null,
+        "source_pointer": "fixture://realized/E-EUR"
+      }
+    ],
+    "fees": [
+      {
+        "fee_id": "F-UNKNOWN",
+        "occurred_at": "2026-09-10T12:00:00Z",
+        "amount": null,
+        "currency": "USD",
+        "fx_to_base": null,
+        "fx_effective_at": null,
+        "fx_source": null,
+        "deduction_basis": "unknown",
+        "source_pointer": "fixture://fees/F-UNKNOWN"
+      }
+    ],
+    "funding": [],
+    "unrealized_pnl_changes": [
+      {
+        "mark_id": "U-UNKNOWN",
+        "trade_id": "OPEN1",
+        "start_mark": {
+          "amount": "20",
+          "currency": "USD",
+          "fx_to_base": "1",
+          "fx_effective_at": "2026-09-01T00:00:00Z",
+          "fx_source": "fixture://fx/base-identity",
+          "source_pointer": "fixture://ledger/partial-mark-start",
+          "as_of": "2026-09-01T00:00:00Z"
+        },
+        "end_mark": {
+          "amount": null,
+          "currency": "EUR",
+          "as_of": "2026-10-01T00:00:00Z",
+          "fx_to_base": null,
+          "fx_effective_at": null,
+          "fx_source": null,
+          "source_pointer": "fixture://mark/partial-end"
+        }
+      }
+    ],
+    "closed_cohorts": [
+      {
+        "trade_id": "P1",
+        "closed_at": "2026-09-10T12:00:00Z",
+        "net_pnl_base": null,
+        "source_pointer": "fixture://closed/P1",
+        "initial_risk": null
+      }
+    ],
+    "evidence": [
+      "fixture://cash/D-EUR",
+      "fixture://closed/P1",
+      "fixture://closed/partial",
+      "fixture://equity/partial",
+      "fixture://equity/partial-end",
+      "fixture://fees/F-UNKNOWN",
+      "fixture://fx/base-identity",
+      "fixture://ledger/partial",
+      "fixture://ledger/partial-equity-start",
+      "fixture://ledger/partial-mark-start",
+      "fixture://mark/partial-end",
+      "fixture://realized/E-EUR"
+    ]
+  }
+}

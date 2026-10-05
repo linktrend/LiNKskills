@@ -1,0 +1,261 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "research-literature-review task contract draft",
+  "type": "object",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "properties": {
+        "research_question": {
+          "type": "string"
+        },
+        "purpose": {
+          "type": "string"
+        },
+        "review_type": {
+          "type": "string"
+        },
+        "audience": {
+          "type": "string"
+        },
+        "population": {
+          "type": "string"
+        },
+        "concepts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "date_bounds": {
+          "type": "string"
+        },
+        "source_access": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "constraints": {
+          "type": "string"
+        },
+        "as_of": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "research_question",
+        "purpose",
+        "review_type",
+        "audience",
+        "population",
+        "concepts",
+        "date_bounds",
+        "source_access",
+        "constraints",
+        "as_of"
+      ],
+      "additionalProperties": false,
+      "title": "Task-specific input"
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "search_log": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "source": {
+                "type": "string"
+              },
+              "query": {
+                "type": "string"
+              },
+              "searched_on": {
+                "type": "string"
+              },
+              "records_returned": {
+                "type": "integer"
+              },
+              "deduplicated": {
+                "type": "integer"
+              },
+              "coverage_note": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "source",
+              "query",
+              "searched_on",
+              "records_returned",
+              "deduplicated",
+              "coverage_note"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "screening_flow": {
+          "type": "object",
+          "properties": {
+            "retrieved": {
+              "type": "integer"
+            },
+            "duplicates_removed": {
+              "type": "integer"
+            },
+            "screened": {
+              "type": "integer"
+            },
+            "included": {
+              "type": "integer"
+            },
+            "exclusion_reasons": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          },
+          "required": [
+            "retrieved",
+            "duplicates_removed",
+            "screened",
+            "included",
+            "exclusion_reasons"
+          ],
+          "additionalProperties": false
+        },
+        "inclusion_criteria": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "evidence_synthesis": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "theme": {
+                "type": "string"
+              },
+              "claim": {
+                "type": "string"
+              },
+              "source_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "design": {
+                "type": "string"
+              },
+              "quality_limits": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "counterevidence": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "theme",
+              "claim",
+              "source_ids",
+              "design",
+              "quality_limits",
+              "counterevidence"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "bibliography": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "source_id": {
+                "type": "string"
+              },
+              "citation": {
+                "type": "string"
+              },
+              "verified": {
+                "type": "boolean"
+              },
+              "locator": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "source_id",
+              "citation",
+              "verified",
+              "locator"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "coverage_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "review_type_claim": {
+          "type": "string"
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "status",
+        "search_log",
+        "screening_flow",
+        "inclusion_criteria",
+        "evidence_synthesis",
+        "bibliography",
+        "coverage_gaps",
+        "review_type_claim",
+        "limitations"
+      ],
+      "additionalProperties": false,
+      "title": "Task-specific result"
+    },
+    "state": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "in_progress",
+            "completed",
+            "needs_input",
+            "blocked"
+          ]
+        },
+        "open_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

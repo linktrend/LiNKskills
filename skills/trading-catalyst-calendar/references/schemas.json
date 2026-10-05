@@ -1,0 +1,318 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:linkskills:trading-catalyst-calendar:0.1.1",
+  "title": "Catalyst calendar research",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "universe",
+        "date_from",
+        "date_to",
+        "timezone",
+        "event_categories",
+        "source_policy"
+      ],
+      "properties": {
+        "universe": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "date_from": {
+          "type": "string",
+          "format": "date"
+        },
+        "date_to": {
+          "type": "string",
+          "format": "date"
+        },
+        "timezone": {
+          "type": "string"
+        },
+        "event_categories": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "source_policy": {
+          "type": "string"
+        },
+        "source_records": {
+          "type": "array",
+          "description": "Optional source coverage records for the user-supplied/authorized calendar sources actually reviewed; an empty or unavailable feed is not evidence of no events.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "source_id",
+              "publisher",
+              "source_type",
+              "checked_at",
+              "window_start",
+              "window_end",
+              "coverage_status"
+            ],
+            "properties": {
+              "source_id": {
+                "type": "string"
+              },
+              "publisher": {
+                "type": "string"
+              },
+              "source_type": {
+                "type": "string",
+                "enum": [
+                  "official_agency",
+                  "central_bank",
+                  "issuer_ir",
+                  "exchange",
+                  "user_supplied",
+                  "secondary_aggregator",
+                  "other"
+                ]
+              },
+              "checked_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "window_start": {
+                "type": "string",
+                "format": "date"
+              },
+              "window_end": {
+                "type": "string",
+                "format": "date"
+              },
+              "coverage_status": {
+                "type": "string",
+                "enum": [
+                  "reviewed",
+                  "unavailable",
+                  "partial",
+                  "error",
+                  "not_checked"
+                ]
+              },
+              "timezone": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "source_locator": {
+                "type": "string"
+              },
+              "event_rows": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "holdings_watchlist": {
+          "type": "array",
+          "description": "Optional supplied exposure list; omit when only a calendar is requested.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "instrument",
+              "as_of",
+              "currency"
+            ],
+            "properties": {
+              "instrument": {
+                "type": "string"
+              },
+              "as_of": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "currency": {
+                "type": "string"
+              },
+              "quantity": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "exposure_note": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "completion_status",
+        "as_of",
+        "timezone",
+        "events",
+        "coverage_gaps"
+      ],
+      "properties": {
+        "completion_status": {
+          "enum": [
+            "complete",
+            "partial",
+            "insufficient_input"
+          ]
+        },
+        "as_of": {
+          "type": "string",
+          "format": "date"
+        },
+        "timezone": {
+          "type": "string"
+        },
+        "events": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "event",
+              "date_status",
+              "local_datetime",
+              "source_url",
+              "last_verified_at",
+              "impact_hypothesis"
+            ],
+            "properties": {
+              "event": {
+                "type": "string"
+              },
+              "date_status": {
+                "enum": [
+                  "confirmed",
+                  "estimated",
+                  "tentative",
+                  "unknown"
+                ]
+              },
+              "local_datetime": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "source_url": {
+                "type": "string"
+              },
+              "last_verified_at": {
+                "type": "string"
+              },
+              "impact_hypothesis": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "coverage_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "source_coverage": {
+          "type": "array",
+          "description": "Sources actually checked and their bounded date coverage; distinguish unavailable and not-checked sources.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "source_id",
+              "source_type",
+              "checked_at",
+              "window_start",
+              "window_end",
+              "coverage_status"
+            ],
+            "properties": {
+              "source_id": {
+                "type": "string"
+              },
+              "source_type": {
+                "type": "string"
+              },
+              "checked_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "window_start": {
+                "type": "string",
+                "format": "date"
+              },
+              "window_end": {
+                "type": "string",
+                "format": "date"
+              },
+              "coverage_status": {
+                "type": "string",
+                "enum": [
+                  "reviewed",
+                  "unavailable",
+                  "partial",
+                  "error",
+                  "not_checked"
+                ]
+              },
+              "gap": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "specialist_branch_status": {
+          "type": "array",
+          "description": "Status independent optional earnings-event, M&A, regulatory/policy, and portfolio-impact branches; one unavailable branch does not invalidate the calendar.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "branch",
+              "status",
+              "basis"
+            ],
+            "properties": {
+              "branch": {
+                "type": "string",
+                "enum": [
+                  "earnings_event_brief",
+                  "mna_milestone_tracker",
+                  "regulatory_policy_monitor",
+                  "portfolio_impact"
+                ]
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "complete_from_supplied_evidence",
+                  "partial_named_missing_items",
+                  "unavailable_missing_basis",
+                  "not_requested"
+                ]
+              },
+              "basis": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

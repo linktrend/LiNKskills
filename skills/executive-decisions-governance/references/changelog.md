@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased source candidate - 2026-10-05
+
+- Distinguish supplied runtime capability, action-specific owner approval, and quoted instructions before describing an action as available.
+- Preserve the advisory-only contract and empty effects. This source candidate is not a qualified or published replacement for v1.0.0; release version and admission remain owner-controlled.
+
 ## v1.0.0 - 2026-08-24
 
 - Added evidence-bounded executive decision and governance briefs.

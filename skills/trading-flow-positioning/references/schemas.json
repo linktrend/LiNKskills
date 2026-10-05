@@ -1,0 +1,642 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:linkskills:trading-flow-positioning:0.1.0",
+  "title": "Dated positioning research",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "request_id",
+        "source_family",
+        "family_data_status",
+        "as_of_date"
+      ],
+      "properties": {
+        "request_id": {
+          "type": "string"
+        },
+        "as_of_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "source_name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_vintage": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "issuer": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "contract": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "report_period_end": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date"
+        },
+        "published_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "holdings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "manager_id",
+              "security_id",
+              "shares",
+              "unit",
+              "source_row"
+            ],
+            "properties": {
+              "manager_id": {
+                "type": "string"
+              },
+              "security_id": {
+                "type": "string"
+              },
+              "shares": {
+                "type": "number",
+                "minimum": 0
+              },
+              "unit": {
+                "const": "shares"
+              },
+              "source_row": {
+                "type": "string"
+              }
+            }
+          },
+          "minItems": 0
+        },
+        "cot_rows": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "report_date",
+              "published_at",
+              "noncommercial_long",
+              "noncommercial_short",
+              "open_interest"
+            ],
+            "properties": {
+              "report_date": {
+                "type": "string",
+                "format": "date"
+              },
+              "published_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "noncommercial_long": {
+                "type": "number",
+                "minimum": 0
+              },
+              "noncommercial_short": {
+                "type": "number",
+                "minimum": 0
+              },
+              "open_interest": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0
+              }
+            }
+          },
+          "minItems": 0
+        },
+        "comparison_source_vintage": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "requested_lookback_weeks": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 2
+        },
+        "requested_short_lookback_weeks": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 2
+        },
+        "threshold_high": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "threshold_low": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "source_family": {
+          "enum": [
+            "13f",
+            "cot_legacy"
+          ]
+        },
+        "family_data_status": {
+          "enum": [
+            "provided",
+            "not_supplied",
+            "unavailable"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "source_family": {
+                "const": "13f"
+              },
+              "family_data_status": {
+                "const": "provided"
+              }
+            },
+            "required": [
+              "source_family",
+              "family_data_status"
+            ]
+          },
+          "then": {
+            "required": [
+              "holdings",
+              "report_period_end",
+              "published_at",
+              "source_name",
+              "source_vintage"
+            ],
+            "properties": {
+              "holdings": {
+                "minItems": 1
+              },
+              "cot_rows": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "source_family": {
+                "const": "13f"
+              },
+              "family_data_status": {
+                "enum": [
+                  "not_supplied",
+                  "unavailable"
+                ]
+              }
+            },
+            "required": [
+              "source_family",
+              "family_data_status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "holdings": {
+                "maxItems": 0
+              },
+              "cot_rows": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "source_family": {
+                "const": "cot_legacy"
+              },
+              "family_data_status": {
+                "const": "provided"
+              }
+            },
+            "required": [
+              "source_family",
+              "family_data_status"
+            ]
+          },
+          "then": {
+            "required": [
+              "contract",
+              "cot_rows",
+              "source_name",
+              "source_vintage"
+            ],
+            "properties": {
+              "cot_rows": {
+                "minItems": 1
+              },
+              "holdings": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "source_family": {
+                "const": "cot_legacy"
+              },
+              "family_data_status": {
+                "enum": [
+                  "not_supplied",
+                  "unavailable"
+                ]
+              }
+            },
+            "required": [
+              "source_family",
+              "family_data_status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "cot_rows": {
+                "maxItems": 0
+              },
+              "holdings": {
+                "maxItems": 0
+              }
+            }
+          }
+        }
+      ]
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "request_id",
+        "completion_status",
+        "source_family",
+        "as_of_date",
+        "observations",
+        "calculations",
+        "coverage",
+        "interpretation",
+        "limitations",
+        "missing_inputs",
+        "family_result",
+        "family_data_status"
+      ],
+      "properties": {
+        "request_id": {
+          "type": "string"
+        },
+        "completion_status": {
+          "enum": [
+            "complete",
+            "partial",
+            "insufficient_input"
+          ]
+        },
+        "as_of_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "observations": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "calculations": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "coverage": {
+          "type": "object",
+          "required": [
+            "row_count",
+            "unmatched_count",
+            "status"
+          ],
+          "properties": {
+            "row_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "unmatched_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "status": {
+              "enum": [
+                "complete_for_supplied_rows",
+                "partial",
+                "unknown"
+              ]
+            },
+            "scope_note": {
+              "type": "string"
+            }
+          }
+        },
+        "interpretation": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "advisory_recommendation": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "missing_inputs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "family_result": {
+          "type": "object",
+          "required": [
+            "kind"
+          ],
+          "properties": {
+            "kind": {
+              "enum": [
+                "13f",
+                "cot_legacy"
+              ]
+            },
+            "13f": {
+              "type": [
+                "object",
+                "null"
+              ]
+            },
+            "cot_legacy": {
+              "type": [
+                "object",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "source_family": {
+          "enum": [
+            "13f",
+            "cot_legacy"
+          ]
+        },
+        "family_data_status": {
+          "enum": [
+            "provided",
+            "not_supplied",
+            "unavailable"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "family_data_status": {
+                "enum": [
+                  "not_supplied",
+                  "unavailable"
+                ]
+              }
+            },
+            "required": [
+              "family_data_status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "completion_status": {
+                "enum": [
+                  "partial",
+                  "insufficient_input"
+                ]
+              },
+              "family_result": {
+                "properties": {
+                  "13f": {
+                    "type": "null"
+                  },
+                  "cot_legacy": {
+                    "type": "null"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "family_data_status": {
+                "const": "provided"
+              },
+              "source_family": {
+                "const": "13f"
+              }
+            },
+            "required": [
+              "family_data_status",
+              "source_family"
+            ]
+          },
+          "then": {
+            "properties": {
+              "family_result": {
+                "properties": {
+                  "kind": {
+                    "const": "13f"
+                  },
+                  "13f": {
+                    "type": "object"
+                  },
+                  "cot_legacy": {
+                    "type": "null"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "13f",
+                  "cot_legacy"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "family_data_status": {
+                "const": "provided"
+              },
+              "source_family": {
+                "const": "cot_legacy"
+              }
+            },
+            "required": [
+              "family_data_status",
+              "source_family"
+            ]
+          },
+          "then": {
+            "properties": {
+              "family_result": {
+                "properties": {
+                  "kind": {
+                    "const": "cot_legacy"
+                  },
+                  "cot_legacy": {
+                    "type": "object"
+                  },
+                  "13f": {
+                    "type": "null"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "13f",
+                  "cot_legacy"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "family_data_status": {
+                "enum": [
+                  "not_supplied",
+                  "unavailable"
+                ]
+              },
+              "source_family": {
+                "const": "13f"
+              }
+            },
+            "required": [
+              "family_data_status",
+              "source_family"
+            ]
+          },
+          "then": {
+            "properties": {
+              "family_result": {
+                "properties": {
+                  "kind": {
+                    "const": "13f"
+                  },
+                  "13f": {
+                    "type": "null"
+                  },
+                  "cot_legacy": {
+                    "type": "null"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "13f",
+                  "cot_legacy"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "family_data_status": {
+                "enum": [
+                  "not_supplied",
+                  "unavailable"
+                ]
+              },
+              "source_family": {
+                "const": "cot_legacy"
+              }
+            },
+            "required": [
+              "family_data_status",
+              "source_family"
+            ]
+          },
+          "then": {
+            "properties": {
+              "family_result": {
+                "properties": {
+                  "kind": {
+                    "const": "cot_legacy"
+                  },
+                  "cot_legacy": {
+                    "type": "null"
+                  },
+                  "13f": {
+                    "type": "null"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "13f",
+                  "cot_legacy"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "skill_id": "trading-microstructure-execution-analysis",
+  "status": "proposed_not_run",
+  "cases": [
+    "Buy fill at 100.20, contemporaneous midpoint 100.00, sell-side mirror 99.80: signed shortfall should be +20 bps adverse for both directions only under the explicitly defined signed formula; demonstrate source sign ambiguity if formula is unsigned.",
+    "Same DEX swap represented as two routed pool legs in raw event feed: counting both as independent user volume overstates flow; deduplicate transaction route and report unresolved side.",
+    "Ten wallets with equal-size repeated swaps and same-block round trips: anomaly evidence warrants review, but no claim of wash intent absent entity/venue evidence.",
+    "A sampled rolling flow metric uses wall-clock now for historical cutoff or observed spread excludes chain fees: mark the metric non-reproducible/incomplete, not a live fill or protective benefit."
+  ],
+  "fixtures": [
+    {
+      "id": "typed-success-input",
+      "file": "success-input.json",
+      "schema": "#/definitions/input",
+      "expect": "valid"
+    },
+    {
+      "id": "typed-success-output",
+      "file": "success-output.json",
+      "schema": "#/definitions/output",
+      "expect": "valid-structural-fixture-only"
+    },
+    {
+      "id": "bounded-partial-output",
+      "file": "partial-output.json",
+      "schema": "#/definitions/output",
+      "expect": "valid"
+    }
+  ],
+  "invalid_contract_cases": [
+    {
+      "id": "invalid-unit-or-dimensional-value",
+      "file": "rejected-invalid-unit.json",
+      "schema": "#/definitions/input",
+      "expect": "reject by task-specific typed unit, currency, probability, or range constraint"
+    },
+    {
+      "id": "false-completion-with-unresolved-gap",
+      "file": "rejected-false-completion.json",
+      "schema": "#/definitions/output",
+      "expect": "reject because complete requires complete analysis, no gaps, evidence reference and all evidence-gate flags true"
+    }
+  ]
+}

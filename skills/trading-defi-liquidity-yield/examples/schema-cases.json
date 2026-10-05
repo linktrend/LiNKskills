@@ -1,0 +1,44 @@
+{
+  "skill_id": "trading-defi-liquidity-yield",
+  "status": "proposed_not_run",
+  "cases": [
+    "CPMM reserves x=50 SOL,y=5,000,000 token; buy \u0394x=1 SOL before fee: output=5,000,000/51\u224898,039.2 token, effective price\u22480.0000102 SOL/token versus spot 0.00001; report 1/51\u22481.96% curve impact separately from fee.",
+    "CPMM relative price r=.25: IL=2\u221a.25/(1.25)\u22121=\u221220%; if source table says \u22125.72%, identify the mismatch (\u22125.72% corresponds r=2) and do not average the conflict away.",
+    "Two LPs show $1m headline TVL; one has only 3% capital active around spot while the other has 70% active. Conclude TVL alone cannot establish equal executable depth; ask for tick/bin ladder/quote.",
+    "Fee APR extrapolated from one day of unusually high volume with unknown LP fee share and emission token reward priced at a stale mark: no stable net APR or LP recommendation; report required data and scenario only."
+  ],
+  "fixtures": [
+    {
+      "id": "typed-success-input",
+      "file": "success-input.json",
+      "schema": "#/definitions/input",
+      "expect": "valid"
+    },
+    {
+      "id": "typed-success-output",
+      "file": "success-output.json",
+      "schema": "#/definitions/output",
+      "expect": "valid-structural-fixture-only"
+    },
+    {
+      "id": "bounded-partial-output",
+      "file": "partial-output.json",
+      "schema": "#/definitions/output",
+      "expect": "valid"
+    }
+  ],
+  "invalid_contract_cases": [
+    {
+      "id": "invalid-unit-or-dimensional-value",
+      "file": "rejected-invalid-unit.json",
+      "schema": "#/definitions/input",
+      "expect": "reject by task-specific typed unit, currency, probability, or range constraint"
+    },
+    {
+      "id": "false-completion-with-unresolved-gap",
+      "file": "rejected-false-completion.json",
+      "schema": "#/definitions/output",
+      "expect": "reject because complete requires complete analysis, no gaps, evidence reference and all evidence-gate flags true"
+    }
+  ]
+}

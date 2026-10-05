@@ -1,0 +1,77 @@
+{
+  "fictional_fixture": true,
+  "notice": "All names, dates, prices, rates, and quantities are fictional; example shows arithmetic/schema only.",
+  "input": {
+    "currency": "FIC",
+    "as_of": "2026-09-30",
+    "quotes": [
+      {
+        "instrument": "swap",
+        "tenor_years": 2,
+        "rate_pct": 3.2,
+        "unit": "percent"
+      },
+      {
+        "instrument": "swap",
+        "tenor_years": 10,
+        "rate_pct": 3.8,
+        "unit": "percent"
+      },
+      {
+        "instrument": "government",
+        "tenor_years": 2,
+        "rate_pct": 3.0,
+        "unit": "percent"
+      },
+      {
+        "instrument": "government",
+        "tenor_years": 10,
+        "rate_pct": 3.5,
+        "unit": "percent"
+      },
+      {
+        "instrument": "inflation_breakeven",
+        "tenor_years": 2,
+        "rate_pct": 2.0,
+        "unit": "percent"
+      }
+    ],
+    "data_source": "fictional quotes",
+    "index_convention": "fictional, same index basis",
+    "day_count": null,
+    "payment_frequency": null
+  },
+  "output": {
+    "completion_status": "partial",
+    "currency": "FIC",
+    "as_of": "2026-09-30",
+    "metrics": [
+      {
+        "name": "2s10s_swap_slope",
+        "value": 60,
+        "unit": "fictional bp = 3.8%-3.2%"
+      },
+      {
+        "name": "2y_swap_spread",
+        "value": 20,
+        "unit": "fictional bp = 3.2%-3.0%"
+      },
+      {
+        "name": "2y_real_rate_approx",
+        "value": 1.2,
+        "unit": "fictional percent = swap less breakeven"
+      }
+    ],
+    "conventions": [
+      "Percent inputs converted to bp only for spread arithmetic.",
+      "No interpolation performed."
+    ],
+    "limitations": [
+      "Fictional quotes only. Real-rate approximation uses mismatched instruments unless conventions align."
+    ],
+    "missing_inputs": [
+      "Matched inflation curve tenors for all points",
+      "Swap index/day-count/payment conventions"
+    ]
+  }
+}

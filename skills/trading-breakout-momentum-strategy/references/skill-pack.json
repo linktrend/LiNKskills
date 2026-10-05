@@ -1,0 +1,589 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "trading-breakout-momentum-strategy",
+  "display_name": "Breakout and momentum strategy research",
+  "version": "0.1.0",
+  "description": "Research a selected VCP, breakout/momentum, episodic-pivot, large-mover study, or squeeze/pullback variant from dated supplied equity evidence.",
+  "capability_category": "trading_research",
+  "provenance": {
+    "author": "LiNKskills Library (draft)",
+    "source": "Exact source provenance: references/source-provenance.json (sha256:915934294adf4c76370214d9d648dafe1ebc77857205617f79a6dd03975f2d65); per-entry license/notice/disposition recorded there.",
+    "license": "No package-wide upstream license is asserted; see exact per-file source provenance and notice dispositions in references/source-provenance.json.",
+    "imported_from": "Frozen Jane draft source: skills/trading-breakout-momentum-strategy; source provenance copied unchanged for this proposal only."
+  },
+  "lifecycle_state": "draft",
+  "format_profile": "simple",
+  "compatible_runtime_profiles": [
+    "jane-openclaw"
+  ],
+  "min_capability_tier": "balanced",
+  "routing": {
+    "when_to_use": "Breakout, momentum burst, VCP, episodic pivot, 20 percent mover event study, or squeeze/pullback research.",
+    "when_not_to_use": [
+      "No order templates, broker calls, position sizing or execution.",
+      "No provider access or credential use is assumed.",
+      "No persistence sidecar, source scripts or scheduled scan activation.",
+      "No performance edge or profitability claims from scores or selected survivors."
+    ],
+    "tags": [
+      "trading",
+      "equity",
+      "strategy-research",
+      "draft"
+    ],
+    "exclusion_rules": [
+      "No order templates, broker calls, position sizing or execution.",
+      "No provider access or credential use is assumed.",
+      "No persistence sidecar, source scripts or scheduled scan activation.",
+      "No performance edge or profitability claims from scores or selected survivors."
+    ]
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "request_id",
+        "description": "Required property `request_id` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "variant",
+        "description": "Required property `variant` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "enum": [
+            "vcp",
+            "momentum_burst",
+            "episodic_pivot",
+            "twenty_pct_event_study",
+            "squeeze_pullback"
+          ]
+        }
+      },
+      {
+        "name": "as_of_date",
+        "description": "Required property `as_of_date` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        }
+      },
+      {
+        "name": "universe_snapshot",
+        "description": "Required property `universe_snapshot` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "venue_calendar",
+        "description": "Required property `venue_calendar` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "source_snapshot",
+        "description": "Required property `source_snapshot` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "bar_policy",
+        "description": "Required property `bar_policy` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "parameters",
+        "description": "Required property `parameters` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "object"
+        }
+      },
+      {
+        "name": "bars",
+        "description": "Required property `bars` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "symbol",
+              "date",
+              "open",
+              "high",
+              "low",
+              "close",
+              "volume",
+              "price_unit",
+              "volume_unit",
+              "source_row"
+            ],
+            "properties": {
+              "symbol": {
+                "type": "string"
+              },
+              "date": {
+                "type": "string",
+                "format": "date"
+              },
+              "open": {
+                "type": "number"
+              },
+              "high": {
+                "type": "number"
+              },
+              "low": {
+                "type": "number"
+              },
+              "close": {
+                "type": "number"
+              },
+              "volume": {
+                "type": "number",
+                "minimum": 0
+              },
+              "price_unit": {
+                "type": "string"
+              },
+              "volume_unit": {
+                "type": "string"
+              },
+              "source_row": {
+                "type": "string"
+              },
+              "adjusted": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "events",
+        "description": "Required property `events` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "symbol",
+              "event_type",
+              "published_at",
+              "source"
+            ],
+            "properties": {
+              "symbol": {
+                "type": "string"
+              },
+              "event_type": {
+                "type": "string"
+              },
+              "published_at": {
+                "type": "string"
+              },
+              "source": {
+                "type": "string"
+              },
+              "summary": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "controls",
+        "description": "Required property `controls` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "object"
+        }
+      }
+    ],
+    "optional_inputs": [
+      {
+        "name": "benchmark",
+        "description": "Optional property `benchmark` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    ],
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "request_id",
+        "variant",
+        "as_of_date",
+        "universe_snapshot",
+        "venue_calendar",
+        "source_snapshot",
+        "bar_policy",
+        "parameters",
+        "bars",
+        "events",
+        "controls"
+      ],
+      "properties": {
+        "request_id": {
+          "type": "string"
+        },
+        "variant": {
+          "enum": [
+            "vcp",
+            "momentum_burst",
+            "episodic_pivot",
+            "twenty_pct_event_study",
+            "squeeze_pullback"
+          ]
+        },
+        "as_of_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "universe_snapshot": {
+          "type": "string"
+        },
+        "venue_calendar": {
+          "type": "string"
+        },
+        "source_snapshot": {
+          "type": "string"
+        },
+        "bar_policy": {
+          "type": "string"
+        },
+        "benchmark": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "parameters": {
+          "type": "object"
+        },
+        "bars": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "symbol",
+              "date",
+              "open",
+              "high",
+              "low",
+              "close",
+              "volume",
+              "price_unit",
+              "volume_unit",
+              "source_row"
+            ],
+            "properties": {
+              "symbol": {
+                "type": "string"
+              },
+              "date": {
+                "type": "string",
+                "format": "date"
+              },
+              "open": {
+                "type": "number"
+              },
+              "high": {
+                "type": "number"
+              },
+              "low": {
+                "type": "number"
+              },
+              "close": {
+                "type": "number"
+              },
+              "volume": {
+                "type": "number",
+                "minimum": 0
+              },
+              "price_unit": {
+                "type": "string"
+              },
+              "volume_unit": {
+                "type": "string"
+              },
+              "source_row": {
+                "type": "string"
+              },
+              "adjusted": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              }
+            }
+          }
+        },
+        "events": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "symbol",
+              "event_type",
+              "published_at",
+              "source"
+            ],
+            "properties": {
+              "symbol": {
+                "type": "string"
+              },
+              "event_type": {
+                "type": "string"
+              },
+              "published_at": {
+                "type": "string"
+              },
+              "source": {
+                "type": "string"
+              },
+              "summary": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        },
+        "controls": {
+          "type": "object"
+        }
+      },
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "urn:linkskills:trading-breakout-momentum-strategy:0.1.0#/definitions/input"
+    },
+    "expected_outputs": [
+      {
+        "name": "request_id",
+        "description": "Required property `request_id` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "status",
+        "description": "Required property `status` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "enum": [
+            "complete",
+            "partial",
+            "needs_input",
+            "blocked"
+          ]
+        }
+      },
+      {
+        "name": "variant",
+        "description": "Required property `variant` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "enum": [
+            "vcp",
+            "momentum_burst",
+            "episodic_pivot",
+            "twenty_pct_event_study",
+            "squeeze_pullback"
+          ]
+        }
+      },
+      {
+        "name": "as_of_date",
+        "description": "Required property `as_of_date` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        }
+      },
+      {
+        "name": "universe_coverage",
+        "description": "Required property `universe_coverage` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "object"
+        }
+      },
+      {
+        "name": "candidates",
+        "description": "Required property `candidates` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "symbol",
+              "classification",
+              "evidence",
+              "matched_parameters",
+              "invalidation",
+              "source_rows"
+            ],
+            "properties": {
+              "symbol": {
+                "type": "string"
+              },
+              "classification": {
+                "enum": [
+                  "candidate",
+                  "watch",
+                  "reject",
+                  "insufficient_data"
+                ]
+              },
+              "evidence": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "matched_parameters": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "invalidation": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "source_rows": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "counterevidence": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "cohort_summary",
+        "description": "Required property `cohort_summary` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": [
+            "object",
+            "null"
+          ]
+        }
+      },
+      {
+        "name": "method_limits",
+        "description": "Required property `method_limits` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "gaps",
+        "description": "Required property `gaps` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "advisory_only",
+        "description": "Required property `advisory_only` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "const": true
+        }
+      }
+    ],
+    "procedure_summary": "Source method section `Integrated method` in SKILL.md: 1. Choose one branch: VCP contraction, momentum burst, episodic catalyst, 20% mover cohort study, or squeeze/pullback. Keep their features and scores separate.\n2. Pin universe membership, venue calendar, date cutoff, corporate-action treatment, bar source/vintage, price/volume units, benchmark and event publication timestamp. Reject stale/mismatched rows.\n3. Compute only observable branch-specific facts from supplied bars/events: VCP trend/contraction/pivot descriptors; burst close/range expansion and volume ratios; event catalyst plus gap/volume response; or the specified squeeze/pullback indicator state.\n4. Compare only against explicit user-supplied parameters. Label source-derived defaults as unvalidated. Produce candidate/watch/reject with invalidation, failed conditions and conflicting evidence. Do not use another branch’s grade as corroboration.\n5. For cohort research, include failed setups, down movers, delisted names, historical universes, costs and a control group. Point-in-time outcomes require only future bars after each as-of and non-overlapping cohort definitions. Selected winners or a minimum sample count cannot establish edge.\n6. Report coverage, survivorship, lookahead, event timing, liquidity, slippage, borrow and benchmark gaps. Leave performance or causal conclusions unresolved until a separate validated study.\n7. Return a descriptive research watchlist only. Never produce orders, account-sized positions, persistence files, or activation instructions.",
+    "forbidden_actions": [
+      "No order templates, broker calls, position sizing or execution.",
+      "No provider access or credential use is assumed.",
+      "No persistence sidecar, source scripts or scheduled scan activation.",
+      "No performance edge or profitability claims from scores or selected survivors."
+    ],
+    "failure_handling": "Source-grounded missing/invalid evidence clauses (verbatim, with entrypoint line numbers): L37: 2. Pin universe membership, venue calendar, date cutoff, corporate-action treatment, bar source/vintage, price/volume units, benchmark and event publication timestamp. Reject stale/mismatched rows.; L38: 3. Compute only observable branch-specific facts from supplied bars/events: VCP trend/contraction/pivot descriptors; burst close/range expansion and volume ratios; event catalyst plus gap/volume response; or the specified squeeze/pullback indicator state.; L39: 4. Compare only against explicit user-supplied parameters. Label source-derived defaults as unvalidated. Produce candidate/watch/reject with invalidation, failed conditions and conflicting evidence. Do not use another branch’s grade as corroboration.; L41: 6. Report coverage, survivorship, lookahead, event timing, liquidity, slippage, borrow and benchmark gaps. Leave performance or causal conclusions unresolved until a separate validated study.",
+    "verification_steps": [
+      "Validate the supplied input against references/schemas.json#/definitions/input and report each missing or invalid required field.",
+      "Validate the produced task output against references/schemas.json#/definitions/output; structural validity does not establish method correctness.",
+      "Use references/eval-suite.json criteria only against an actual task output; a schema check or fictional example alone is not a behavioral pass."
+    ],
+    "completion_criteria": [
+      "Include every required output property defined at references/schemas.json#/definitions/output: request_id, status, variant, as_of_date, universe_coverage, candidates, cohort_summary, method_limits, gaps, advisory_only.",
+      "If `status` exists, its value must reflect the schema-defined gaps or missing inputs; do not assert a complete result where evidence is absent.",
+      "Keep recommendations advisory; no external action, order, live activation, portfolio mutation, or approval is represented as completed."
+    ],
+    "known_limitations": [
+      "The skill source is an isolated unqualified draft; source-derived pack metadata does not establish selection, registration, method qualification, or production suitability.",
+      "The declared runtime-profile label is preserved as source metadata; runtime-profile binding is not proved."
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read",
+      "filesystem_write"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [
+      {
+        "key": "min_reasoning_tier",
+        "value": "balanced"
+      },
+      {
+        "key": "preferred_model",
+        "value": "gpt-6.1-sol"
+      },
+      {
+        "key": "context_required",
+        "value": 64000
+      }
+    ],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "suite_hash": "sha256:44a2a98f563b3b1db385465dec820b32bf5b9677b85c12be36f85ad6bf6c976e",
+    "verification_refs": [
+      "references/schemas.json",
+      "references/eval-suite.json"
+    ]
+  },
+  "telemetry": {
+    "classification": "public_internal",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_private_data",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain_only_approved_ids_and_hashes"
+  }
+}

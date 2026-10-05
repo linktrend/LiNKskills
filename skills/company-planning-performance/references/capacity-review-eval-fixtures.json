@@ -1,0 +1,341 @@
+{
+  "kind": "proposed_behavior_evaluation_fixtures_not_run",
+  "skill_id": "company-planning-performance",
+  "mode": "capacity_review",
+  "cases": [
+    {
+      "case_id": "capacity-review-complete",
+      "input": {
+        "mode": "capacity_review",
+        "privacy_classification": "synthetic",
+        "plan_ref": "plan:synthetic-q4",
+        "horizon": "quarterly",
+        "period": "week-2026-10-05",
+        "source_evidence": [
+          {
+            "ref": "fixture:capacity",
+            "status": "confirmed"
+          },
+          {
+            "ref": "fixture:commitments",
+            "status": "reported"
+          },
+          {
+            "ref": "fixture:demand",
+            "status": "reported"
+          }
+        ],
+        "objectives": [
+          {
+            "id": "objective:synthetic-capacity",
+            "statement": "Review one fictional role for one stated week.",
+            "evidence_ref": "fixture:capacity",
+            "owner_ref": "owner:synthetic-capacity-review"
+          }
+        ],
+        "capacity_units": [
+          {
+            "unit_ref": "capacity:engineering",
+            "role": "engineering",
+            "period": "week-2026-10-05",
+            "time_unit": "hour",
+            "gross_available": {
+              "value": 32,
+              "evidence_ref": "fixture:capacity"
+            },
+            "planned_unavailable": {
+              "value": 4,
+              "evidence_ref": "fixture:capacity"
+            },
+            "recurring_load": {
+              "value": 6,
+              "evidence_ref": "fixture:capacity"
+            },
+            "existing_commitments": {
+              "value": 17,
+              "evidence_ref": "fixture:commitments"
+            },
+            "proposed_demand": {
+              "value": 12,
+              "evidence_ref": "fixture:demand"
+            }
+          }
+        ]
+      },
+      "expected_helper_status": "READY_FOR_OWNER",
+      "expected_capacity_row": {
+        "net_available": "22",
+        "total_demand": "29",
+        "signed_balance": "-7",
+        "status": "COMPARABLE",
+        "gaps": []
+      }
+    },
+    {
+      "case_id": "capacity-review-partial",
+      "input": {
+        "mode": "capacity_review",
+        "privacy_classification": "synthetic",
+        "plan_ref": "plan:synthetic-q4",
+        "horizon": "quarterly",
+        "period": "week-2026-10-05",
+        "source_evidence": [
+          {
+            "ref": "fixture:capacity",
+            "status": "confirmed"
+          },
+          {
+            "ref": "fixture:commitments",
+            "status": "reported"
+          },
+          {
+            "ref": "fixture:demand",
+            "status": "reported"
+          }
+        ],
+        "objectives": [
+          {
+            "id": "objective:synthetic-capacity",
+            "statement": "Review one fictional role for one stated week.",
+            "evidence_ref": "fixture:capacity",
+            "owner_ref": "owner:synthetic-capacity-review"
+          }
+        ],
+        "capacity_units": [
+          {
+            "unit_ref": "capacity:engineering",
+            "role": "engineering",
+            "period": "week-2026-10-05",
+            "time_unit": "hour",
+            "gross_available": {
+              "value": 32,
+              "evidence_ref": "fixture:capacity"
+            },
+            "planned_unavailable": {
+              "value": null,
+              "evidence_ref": null
+            },
+            "recurring_load": {
+              "value": 6,
+              "evidence_ref": "fixture:capacity"
+            },
+            "existing_commitments": {
+              "value": 17,
+              "evidence_ref": "fixture:commitments"
+            },
+            "proposed_demand": {
+              "value": 12,
+              "evidence_ref": "fixture:demand"
+            }
+          }
+        ]
+      },
+      "expected_helper_status": "DRAFT",
+      "expected_capacity_row": {
+        "net_available": null,
+        "total_demand": "29",
+        "signed_balance": null,
+        "status": "NEEDS_INPUT",
+        "gaps": [
+          "planned_unavailable not supplied"
+        ]
+      }
+    },
+    {
+      "case_id": "capacity-review-mismatched-period",
+      "input": {
+        "mode": "capacity_review",
+        "privacy_classification": "synthetic",
+        "plan_ref": "plan:synthetic-q4",
+        "horizon": "quarterly",
+        "period": "week-2026-10-05",
+        "source_evidence": [
+          {
+            "ref": "fixture:capacity",
+            "status": "confirmed"
+          },
+          {
+            "ref": "fixture:commitments",
+            "status": "reported"
+          },
+          {
+            "ref": "fixture:demand",
+            "status": "reported"
+          }
+        ],
+        "objectives": [
+          {
+            "id": "objective:synthetic-capacity",
+            "statement": "Review one fictional role for one stated week.",
+            "evidence_ref": "fixture:capacity",
+            "owner_ref": "owner:synthetic-capacity-review"
+          }
+        ],
+        "capacity_units": [
+          {
+            "unit_ref": "capacity:engineering",
+            "role": "engineering",
+            "period": "week-2026-10-12",
+            "time_unit": "hour",
+            "gross_available": {
+              "value": 32,
+              "evidence_ref": "fixture:capacity"
+            },
+            "planned_unavailable": {
+              "value": 4,
+              "evidence_ref": "fixture:capacity"
+            },
+            "recurring_load": {
+              "value": 6,
+              "evidence_ref": "fixture:capacity"
+            },
+            "existing_commitments": {
+              "value": 17,
+              "evidence_ref": "fixture:commitments"
+            },
+            "proposed_demand": {
+              "value": 12,
+              "evidence_ref": "fixture:demand"
+            }
+          }
+        ]
+      },
+      "expected_helper_status": "DRAFT",
+      "expected_capacity_row": {
+        "net_available": null,
+        "total_demand": null,
+        "signed_balance": null,
+        "status": "NOT_COMPARABLE",
+        "gaps": [
+          "capacity period does not match requested period"
+        ]
+      }
+    },
+    {
+      "case_id": "capacity-review-unreferenced-value",
+      "input": {
+        "mode": "capacity_review",
+        "privacy_classification": "synthetic",
+        "plan_ref": "plan:synthetic-q4",
+        "horizon": "quarterly",
+        "period": "week-2026-10-05",
+        "source_evidence": [
+          {
+            "ref": "fixture:capacity",
+            "status": "confirmed"
+          },
+          {
+            "ref": "fixture:commitments",
+            "status": "reported"
+          },
+          {
+            "ref": "fixture:demand",
+            "status": "reported"
+          }
+        ],
+        "objectives": [
+          {
+            "id": "objective:synthetic-capacity",
+            "statement": "Review one fictional role for one stated week.",
+            "evidence_ref": "fixture:capacity",
+            "owner_ref": "owner:synthetic-capacity-review"
+          }
+        ],
+        "capacity_units": [
+          {
+            "unit_ref": "capacity:engineering",
+            "role": "engineering",
+            "period": "week-2026-10-05",
+            "time_unit": "hour",
+            "gross_available": {
+              "value": 32,
+              "evidence_ref": null
+            },
+            "planned_unavailable": {
+              "value": 4,
+              "evidence_ref": "fixture:capacity"
+            },
+            "recurring_load": {
+              "value": 6,
+              "evidence_ref": "fixture:capacity"
+            },
+            "existing_commitments": {
+              "value": 17,
+              "evidence_ref": "fixture:commitments"
+            },
+            "proposed_demand": {
+              "value": 12,
+              "evidence_ref": "fixture:demand"
+            }
+          }
+        ]
+      },
+      "expected_helper_status": "BLOCKED",
+      "expected_capacity_row": null
+    },
+    {
+      "case_id": "capacity-review-boolean-amount",
+      "input": {
+        "mode": "capacity_review",
+        "privacy_classification": "synthetic",
+        "plan_ref": "plan:synthetic-q4",
+        "horizon": "quarterly",
+        "period": "week-2026-10-05",
+        "source_evidence": [
+          {
+            "ref": "fixture:capacity",
+            "status": "confirmed"
+          },
+          {
+            "ref": "fixture:commitments",
+            "status": "reported"
+          },
+          {
+            "ref": "fixture:demand",
+            "status": "reported"
+          }
+        ],
+        "objectives": [
+          {
+            "id": "objective:synthetic-capacity",
+            "statement": "Review one fictional role for one stated week.",
+            "evidence_ref": "fixture:capacity",
+            "owner_ref": "owner:synthetic-capacity-review"
+          }
+        ],
+        "capacity_units": [
+          {
+            "unit_ref": "capacity:engineering",
+            "role": "engineering",
+            "period": "week-2026-10-05",
+            "time_unit": "hour",
+            "gross_available": {
+              "value": true,
+              "evidence_ref": "fixture:capacity"
+            },
+            "planned_unavailable": {
+              "value": 4,
+              "evidence_ref": "fixture:capacity"
+            },
+            "recurring_load": {
+              "value": 6,
+              "evidence_ref": "fixture:capacity"
+            },
+            "existing_commitments": {
+              "value": 17,
+              "evidence_ref": "fixture:commitments"
+            },
+            "proposed_demand": {
+              "value": 12,
+              "evidence_ref": "fixture:demand"
+            }
+          }
+        ]
+      },
+      "expected_helper_status": "BLOCKED",
+      "expected_capacity_row": null,
+      "expected_input_schema_valid": false
+    }
+  ],
+  "evaluation_state": "The proposed harness calls normalize_request on each fixture input and checks its actual result. No execution or qualification is claimed."
+}

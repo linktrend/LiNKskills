@@ -1,0 +1,550 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "research-program-finance currency-neutral task contract",
+  "type": "object",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "properties": {
+        "program": {
+          "type": "string"
+        },
+        "periods": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "purpose": {
+          "type": "string"
+        },
+        "actuals_and_forecasts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "period": {
+                "type": "string"
+              },
+              "amount": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "currency": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "classification": {
+                "type": "string"
+              },
+              "source_ref": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "period",
+              "amount",
+              "currency",
+              "classification",
+              "source_ref"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "committed_cash": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "date": {
+                "type": "string"
+              },
+              "amount": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "currency": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "restriction": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "status": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "date",
+              "amount",
+              "currency",
+              "restriction",
+              "status"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "funding_restrictions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "source": {
+                "type": "string"
+              },
+              "amount": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "currency": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "allowable_scope": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "source_ref": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "source",
+              "amount",
+              "currency",
+              "allowable_scope",
+              "source_ref"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "rate_authority": {
+          "type": "object",
+          "properties": {
+            "rate": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0
+            },
+            "base_definition": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "currency": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "source_ref": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "effective_period": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "rate",
+            "base_definition",
+            "currency",
+            "source_ref",
+            "effective_period"
+          ],
+          "additionalProperties": false
+        },
+        "milestones": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "date": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "cash_amount": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "currency": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "condition": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "name",
+              "date",
+              "cash_amount",
+              "currency",
+              "condition"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "applicable_rules": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "finance_owner": {
+          "type": "string"
+        },
+        "as_of": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "program",
+        "periods",
+        "purpose",
+        "actuals_and_forecasts",
+        "committed_cash",
+        "funding_restrictions",
+        "rate_authority",
+        "milestones",
+        "applicable_rules",
+        "finance_owner",
+        "as_of"
+      ],
+      "additionalProperties": false
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "complete",
+            "partial",
+            "needs_input",
+            "blocked"
+          ]
+        },
+        "currency_policy": {
+          "type": "string"
+        },
+        "period_table": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "period": {
+                "type": "string"
+              },
+              "currency": {
+                "type": "string"
+              },
+              "direct_budget": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "eligible_indirect_base": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "indirect_rate": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0
+              },
+              "indirect_amount": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "total_plan": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "actual": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "forecast": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "variance_actual_minus_plan": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "variance_driver": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "basis_source": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "restriction_notes": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "period",
+              "currency",
+              "direct_budget",
+              "eligible_indirect_base",
+              "indirect_rate",
+              "indirect_amount",
+              "total_plan",
+              "actual",
+              "forecast",
+              "variance_actual_minus_plan",
+              "variance_driver",
+              "basis_source",
+              "restriction_notes"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "cash_scenarios": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "scenario": {
+                "type": "string"
+              },
+              "currency": {
+                "type": "string"
+              },
+              "opening_unrestricted_cash": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "restricted_cash_separate": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "receipts": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "date": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "amount": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "condition": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "source_ref": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "date",
+                    "amount",
+                    "condition",
+                    "source_ref"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "outflows": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "period": {
+                      "type": "string"
+                    },
+                    "amount": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "basis": {
+                      "type": "string"
+                    },
+                    "source_ref": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "period",
+                    "amount",
+                    "basis",
+                    "source_ref"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "ending_unrestricted_cash": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "formula": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "scenario",
+              "currency",
+              "opening_unrestricted_cash",
+              "restricted_cash_separate",
+              "receipts",
+              "outflows",
+              "ending_unrestricted_cash",
+              "formula",
+              "status"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "exceptions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "owner_questions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "external_actions_taken": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "status",
+        "currency_policy",
+        "period_table",
+        "cash_scenarios",
+        "exceptions",
+        "owner_questions",
+        "limitations",
+        "external_actions_taken"
+      ],
+      "additionalProperties": false
+    },
+    "state": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "in_progress",
+            "completed",
+            "needs_input",
+            "blocked"
+          ]
+        },
+        "open_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,0 +1,16 @@
+suite_id: trading-pairs-statistical-arbitrage-draft-eval
+skill_id: trading-pairs-statistical-arbitrage
+status: proposed_not_run
+pass_threshold: 0.8
+rubric:
+  - dimension: method_branch_integrity
+  - dimension: input_provenance_and_units
+  - dimension: scope_and_uncertainty
+  - dimension: authority_boundary
+scenarios:
+  - id: valid-task-shaped-output
+    expected: "Each required output field and material claim reconciles to supplied evidence; conclusion scope does not exceed coverage."
+  - id: missing-critical-input
+    expected: "Two unrelated upward trending price series produce 0.91 price-level correlation but each is I(1), the residual test uses ordinary ADF p=.03, and a 4,000-pair search retains the smallest p-value. Expected: reject cointegration claim until proper test critical values and multiplicity/walk-forward/stability checks; no actionable pair thesis."
+  - id: conflicting-or-stale-evidence
+    expected: "Dependent conclusion is withheld; conflict and exact resolving evidence are named."

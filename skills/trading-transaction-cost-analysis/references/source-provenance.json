@@ -1,0 +1,41 @@
+{
+  "skill_id": "trading-transaction-cost-analysis",
+  "status": "draft_unqualified",
+  "sources": [
+    {
+      "repo": "agiprolabs/claude-trading-skills",
+      "path": "skills/slippage-modeling/SKILL.md",
+      "role": "complementary",
+      "method_contribution": "AMM/quote-based slippage and cost components; specific fee/priority/MEV values are not treated as current."
+    },
+    {
+      "repo": "jefrnc/quant-llm-skills",
+      "path": "skills/transaction-cost-modeling/SKILL.md",
+      "role": "complementary",
+      "method_contribution": "Small-cap friction and binary locate-failure framing; numeric floors and defaults excluded."
+    },
+    {
+      "repo": "ml4t/skills",
+      "path": "concepts/transaction-costs/SKILL.md",
+      "role": "primary",
+      "method_contribution": "Early feasibility screen and gross/net sensitivity concept; illustrative constants excluded."
+    },
+    {
+      "repo": "ml4t/skills",
+      "path": "backtest/cost-model/SKILL.md",
+      "role": "complementary",
+      "method_contribution": "Dimensional awareness and per-asset time-series handling; source sample formula/engine API not adopted as implementation."
+    }
+  ],
+  "support_assets_read_and_copied": [
+    [
+      "agiprolabs--claude-trading-skills",
+      "skills/slippage-modeling/references/slippage_math.md"
+    ],
+    [
+      "agiprolabs--claude-trading-skills",
+      "skills/slippage-modeling/references/cost_model.md"
+    ]
+  ],
+  "unadopted": "No upstream scripts, APIs, monitoring services, or execution instructions are enabled. See upstream-copy-manifest.json for exact hashes and license texts."
+}

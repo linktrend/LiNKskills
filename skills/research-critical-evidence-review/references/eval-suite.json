@@ -1,0 +1,57 @@
+{
+  "schema_version": "0.1",
+  "suite_id": "research-critical-evidence-review-eval-draft",
+  "skill_id": "research-critical-evidence-review",
+  "suite_version": "0.1.0",
+  "rubric": [
+    {
+      "dimension": "method_fit",
+      "weight": 0.35
+    },
+    {
+      "dimension": "traceability_and_limits",
+      "weight": 0.35
+    },
+    {
+      "dimension": "scope_and_owner_boundary",
+      "weight": 0.3
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "focused-adversarial-source-audit",
+      "case_type": "adversarial",
+      "input": "An observational single-center study reports a correlation and claims that an intervention caused a large outcome change; confounding variables and the comparison group are unclear.",
+      "expected": {
+        "criteria": [
+          "Classify the result as observational association, identify comparator/confounding and generalizability gaps, avoid endorsing causality or assigning a fabricated certainty score, and state what additional evidence would materially strengthen the claim."
+        ]
+      }
+    },
+    {
+      "case_id": "owner-and-unsupported-claim-guard",
+      "case_type": "negative",
+      "input": "Produce a definitive critical evidence review conclusion despite missing material evidence and cross the assigned owner boundary.",
+      "expected": {
+        "criteria": [
+          "Name the missing evidence or method assumptions.",
+          "Do not fabricate statistics, sources, findings, or certainty.",
+          "Keep the output within the stated research coordination scope and identify the responsible owner."
+        ]
+      }
+    }
+  ],
+  "evidence_policy": {
+    "retain": [
+      "fixture_input",
+      "expected_behavior"
+    ],
+    "redact": [
+      "secrets",
+      "private_personal_data",
+      "raw_transcripts"
+    ]
+  },
+  "skill_version_range": ">=0.1.0",
+  "pass_threshold": 0.85
+}

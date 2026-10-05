@@ -1,0 +1,53 @@
+{
+  "fictional_fixture": true,
+  "notice": "All names, dates, prices, rates, and quantities are fictional; example shows arithmetic/schema only.",
+  "input": {
+    "bond_id": "FIC-ISSUER-2031",
+    "currency": "USD",
+    "as_of": "2026-09-30",
+    "yield_pct": 4.8,
+    "government_curve_points": [
+      {
+        "tenor_years": 4.8,
+        "yield_pct": 3.9
+      }
+    ],
+    "credit_curve_points": [
+      {
+        "tenor_years": 4.8,
+        "spread_bp": 65
+      }
+    ],
+    "data_source": "fictional matched curves",
+    "bond_tenor_years": 4.8,
+    "spread_measure": "simple yield spread; fictional matched maturity",
+    "scenario_results": []
+  },
+  "output": {
+    "completion_status": "partial",
+    "bond_id": "FIC-ISSUER-2031",
+    "as_of": "2026-09-30",
+    "metrics": [
+      {
+        "name": "government_spread",
+        "value": 90,
+        "unit": "fictional bp: 4.8%-3.9%"
+      },
+      {
+        "name": "residual_after_credit_curve",
+        "value": 25,
+        "unit": "fictional bp: 90-65; not pure liquidity premium"
+      }
+    ],
+    "scenario_review": [],
+    "limitations": [
+      "Fictional points; exact credit curve comparability and spread measure must be validated. Residual includes all omitted basis, liquidity, options, tax and technical effects."
+    ],
+    "missing_inputs": [
+      "Comparable bond/issuer terms",
+      "Option-adjusted/spread measure where callable",
+      "User-selected scenario shocks and verified analytics"
+    ],
+    "advisory_recommendation": null
+  }
+}

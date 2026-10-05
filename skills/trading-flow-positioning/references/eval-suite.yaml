@@ -1,0 +1,15 @@
+suite_id: trading-flow-positioning-draft
+skill_id: trading-flow-positioning
+status: proposed_not_run
+pass_threshold: 0.8
+rubric:
+  - dimension: date_and_units
+  - dimension: source_family
+  - dimension: unknowns
+scenarios:
+  - id: dated_13f_comparison
+    expected: Matched rows only; dates and lag visible; no shorts inferred.
+  - id: stale_cot_report
+    expected: Old vintage labeled; underlength history remains unknown.
+  - id: missing_entitlement
+    expected: No provider assumed; request supplied rows or return insufficient_input.

@@ -1,0 +1,65 @@
+{
+  "schema_version": "0.1",
+  "suite_id": "trading-backtest-robustness-eval-draft",
+  "skill_id": "trading-backtest-robustness",
+  "suite_version": "0.1.0",
+  "rubric": [
+    {
+      "dimension": "task_method",
+      "weight": 0.4
+    },
+    {
+      "dimension": "units_and_traceability",
+      "weight": 0.35
+    },
+    {
+      "dimension": "scope_uncertainty_owner_boundaries",
+      "weight": 0.25
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "same-close-fill",
+      "case_type": "adversarial",
+      "input": "Final close used as signal and fill without intrabar timestamp.",
+      "expected": {
+        "criteria": [
+          "Move fill to first eligible subsequent observation or explicitly model known-at path."
+        ]
+      }
+    },
+    {
+      "case_id": "holdout-reuse",
+      "case_type": "adversarial",
+      "input": "Tune parameters after repeated holdout inspection.",
+      "expected": {
+        "criteria": [
+          "Mark holdout contaminated; require new untouched period."
+        ]
+      }
+    },
+    {
+      "case_id": "cost-units",
+      "case_type": "adversarial",
+      "input": "Spread bps added to dollar P&L as raw decimal.",
+      "expected": {
+        "criteria": [
+          "Reject dimensional mismatch and retain partial status."
+        ]
+      }
+    }
+  ],
+  "evidence_policy": {
+    "retain": [
+      "fixture_input",
+      "expected_behavior"
+    ],
+    "redact": [
+      "secrets",
+      "private_data",
+      "raw_transactions_unless_authorized"
+    ]
+  },
+  "skill_version_range": ">=0.1.0",
+  "pass_threshold": 0.85
+}

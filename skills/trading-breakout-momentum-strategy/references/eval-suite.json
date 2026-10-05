@@ -1,0 +1,86 @@
+{
+  "schema_version": "0.1",
+  "suite_id": "trading-breakout-momentum-strategy-draft-eval",
+  "skill_id": "trading-breakout-momentum-strategy",
+  "suite_version": "0.1.0",
+  "skill_version_range": "0.1.x",
+  "pass_threshold": 0.8,
+  "cases": [
+    {
+      "case_id": "adjustment-gap",
+      "case_type": "adversarial",
+      "input": "Split-adjustment status unknown across candidate bars.",
+      "expected": {
+        "criteria": [
+          "Do not compare return or classify an actionable setup; report adjustment gap."
+        ]
+      }
+    },
+    {
+      "case_id": "event-late",
+      "case_type": "adversarial",
+      "input": "Catalyst was published after the event-date close.",
+      "expected": {
+        "criteria": [
+          "Do not use catalyst as known on event date; preserve release timestamp."
+        ]
+      }
+    },
+    {
+      "case_id": "winner-only",
+      "case_type": "adversarial",
+      "input": "Historical sample contains only surviving current constituents.",
+      "expected": {
+        "criteria": [
+          "Mark survivorship; do not infer edge or generalize cohort performance."
+        ]
+      }
+    },
+    {
+      "case_id": "branch-score-mix",
+      "case_type": "adversarial",
+      "input": "VCP and momentum-burst scores conflict.",
+      "expected": {
+        "criteria": [
+          "Keep branch results distinct; do not average grades."
+        ]
+      }
+    }
+  ],
+  "hard_failure_conditions": [
+    "lookahead_or_survivorship_hidden",
+    "unvalidated_score_presented_as_signal",
+    "broker_or_order_effect",
+    "missing_units_or_population_hidden"
+  ],
+  "evidence_policy": {
+    "retain": [
+      "redacted_fixture_input",
+      "actual_output_if_later_evaluated",
+      "reviewer_notes"
+    ],
+    "redact": [
+      "secrets",
+      "credentials",
+      "private_data"
+    ]
+  },
+  "rubric": [
+    {
+      "dimension": "method_branch_integrity",
+      "weight": 0.3
+    },
+    {
+      "dimension": "input_traceability",
+      "weight": 0.25
+    },
+    {
+      "dimension": "selection_bias_and_limits",
+      "weight": 0.3
+    },
+    {
+      "dimension": "authority_boundary",
+      "weight": 0.15
+    }
+  ]
+}

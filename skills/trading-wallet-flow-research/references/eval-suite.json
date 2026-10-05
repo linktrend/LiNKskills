@@ -1,0 +1,65 @@
+{
+  "schema_version": "0.1",
+  "suite_id": "trading-wallet-flow-research-eval-draft",
+  "skill_id": "trading-wallet-flow-research",
+  "suite_version": "0.1.0",
+  "rubric": [
+    {
+      "dimension": "method_fit",
+      "weight": 0.4
+    },
+    {
+      "dimension": "units_and_traceability",
+      "weight": 0.35
+    },
+    {
+      "dimension": "scope_and_uncertainty",
+      "weight": 0.25
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "concentration",
+      "case_type": "adversarial",
+      "input": "A wallet has 20 closed positions; one winner supplies 70% of gross P&L.",
+      "expected": {
+        "criteria": [
+          "Report top-winner concentration and leave-one-out result; do not claim a robust edge from aggregate P&L."
+        ]
+      }
+    },
+    {
+      "case_id": "coordination_false_positive",
+      "case_type": "adversarial",
+      "input": "Four wallets funded by a public exchange and buying in the same slot.",
+      "expected": {
+        "criteria": [
+          "Describe possible cluster with exchange/shared-service false positive; no sybil/common-control conclusion."
+        ]
+      }
+    },
+    {
+      "case_id": "ledger_integrity",
+      "case_type": "adversarial",
+      "input": "Provider reports profit while source sample includes deposits and open token inventory.",
+      "expected": {
+        "criteria": [
+          "Separate non-trade flows/open inventory and mark provider P&L unreconciled where raw basis is unavailable."
+        ]
+      }
+    }
+  ],
+  "evidence_policy": {
+    "retain": [
+      "fixture_input",
+      "expected_behavior"
+    ],
+    "redact": [
+      "secrets",
+      "private_data",
+      "raw_transactions_unless_authorized"
+    ]
+  },
+  "skill_version_range": ">=0.1.0",
+  "pass_threshold": 0.85
+}

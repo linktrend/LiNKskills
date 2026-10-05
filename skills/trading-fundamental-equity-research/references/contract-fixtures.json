@@ -1,0 +1,36 @@
+{
+  "trading-fundamental-equity-research-filing-only-partial": {
+    "fixture_id": "trading-fundamental-equity-research-filing-only-partial-fixture",
+    "status": "unexecuted contract fixture; no output or pass is asserted",
+    "task_input": {
+      "issuer": "Example Components Ltd.",
+      "ticker_or_id": "EXC-DEMO",
+      "as_of_date": "2026-09-30",
+      "jurisdiction": "US",
+      "research_question": "Assess reported cash conversion and whether evidence supports a valuation range.",
+      "periods": [
+        "FY2025"
+      ],
+      "provided_filings": [
+        {
+          "source": "Issuer annual filing",
+          "period": "FY2025",
+          "published_at": "2026-02-20T16:00:00Z",
+          "source_url_or_file": "user-supplied://fictional-fy2025-filing",
+          "source_vintage": "as-published",
+          "source_locator": "Consolidated statements; fictional supplied fixture",
+          "currency": "USD",
+          "revenue": 1000,
+          "operating_cash_flow": 90,
+          "capital_expenditure": 70
+        }
+      ]
+    },
+    "expected_output_assertions": [
+      "Return the filing-supported cash-flow observations with periods, USD units, publication timestamp, vintage, and supplied source pointer.",
+      "Because no shares, net debt, forecast assumptions, or comparable valuation basis are supplied, set valuation to null and name those exact gaps.",
+      "Do not infer valuation from revenue or assert that one fictional filing establishes normalized cash conversion.",
+      "Do not emit a personalized portfolio increase/trim/exit proposal without supplied portfolio_context; advisory_portfolio_proposal must be unavailable or not_requested."
+    ]
+  }
+}

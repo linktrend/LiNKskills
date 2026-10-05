@@ -1,0 +1,544 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "trading-technical-chart-analysis",
+  "display_name": "Technical chart reading",
+  "version": "0.1.0",
+  "description": "Describe user-supplied dated charts or OHLC data: trend structure, levels, moving-average context, volume and patterns with alternate interpretations and invalidation conditions.",
+  "capability_category": "trading_research",
+  "provenance": {
+    "author": "LiNKskills Library",
+    "source": "Exact source provenance: references/source-provenance.json (sha256:4a2307bb939fc44330224a385bfc502f181a56af997e47f3c34a5429ddce2241); per-entry license/notice/disposition recorded there.",
+    "license": "No package-wide upstream license is asserted; see exact per-file source provenance and notice dispositions in references/source-provenance.json.",
+    "imported_from": "Frozen Jane draft source: skills/trading-technical-chart-analysis; source provenance copied unchanged for this proposal only."
+  },
+  "lifecycle_state": "draft",
+  "format_profile": "simple",
+  "compatible_runtime_profiles": [
+    "jane-openclaw"
+  ],
+  "min_capability_tier": "balanced",
+  "routing": {
+    "when_to_use": "User asks for a technical chart reading, support/resistance description, or indicator interpretation from supplied chart or bars.",
+    "when_not_to_use": [
+      "No assumed market data/provider access, indicator library, or prices not visible in supplied evidence.",
+      "No numeric probability, target, performance claim, order, or live activation absent user request and evidence.",
+      "No automatic script or source asset execution."
+    ],
+    "tags": [
+      "trading",
+      "research",
+      "jane",
+      "draft"
+    ],
+    "exclusion_rules": [
+      "No assumed market data/provider access, indicator library, or prices not visible in supplied evidence.",
+      "No numeric probability, target, performance claim, order, or live activation absent user request and evidence.",
+      "No automatic script or source asset execution."
+    ]
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "request_id",
+        "description": "Required property `request_id` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "symbol",
+        "description": "Required property `symbol` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "source",
+        "description": "Required property `source` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "as_of",
+        "description": "Required property `as_of` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        }
+      },
+      {
+        "name": "timeframe",
+        "description": "Required property `timeframe` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "timezone",
+        "description": "Required property `timezone` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "evidence_mode",
+        "description": "Required property `evidence_mode` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "enum": [
+            "chart_image",
+            "ohlcv_bars",
+            "contrarian_checklist"
+          ]
+        }
+      }
+    ],
+    "optional_inputs": [
+      {
+        "name": "venue",
+        "description": "Optional property `venue` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      {
+        "name": "adjustment_basis",
+        "description": "Optional property `adjustment_basis` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      {
+        "name": "bars",
+        "description": "Optional property `bars` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "timestamp",
+              "open",
+              "high",
+              "low",
+              "close",
+              "volume",
+              "price_unit",
+              "volume_unit"
+            ],
+            "properties": {
+              "timestamp": {
+                "type": "string"
+              },
+              "open": {
+                "type": "number"
+              },
+              "high": {
+                "type": "number"
+              },
+              "low": {
+                "type": "number"
+              },
+              "close": {
+                "type": "number"
+              },
+              "volume": {
+                "type": "number",
+                "minimum": 0
+              },
+              "price_unit": {
+                "type": "string"
+              },
+              "volume_unit": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "chart_observations",
+        "description": "Optional property `chart_observations` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "crowd_direction",
+        "description": "Optional property `crowd_direction` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "enum": [
+            "CROWDED_LONG",
+            "CROWDED_SHORT"
+          ]
+        }
+      },
+      {
+        "name": "requested_indicators",
+        "description": "Optional property `requested_indicators` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    ],
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "request_id",
+        "symbol",
+        "source",
+        "as_of",
+        "timeframe",
+        "timezone",
+        "evidence_mode"
+      ],
+      "properties": {
+        "request_id": {
+          "type": "string"
+        },
+        "symbol": {
+          "type": "string"
+        },
+        "venue": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source": {
+          "type": "string"
+        },
+        "as_of": {
+          "type": "string",
+          "format": "date"
+        },
+        "timeframe": {
+          "type": "string"
+        },
+        "timezone": {
+          "type": "string"
+        },
+        "evidence_mode": {
+          "enum": [
+            "chart_image",
+            "ohlcv_bars",
+            "contrarian_checklist"
+          ]
+        },
+        "adjustment_basis": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "bars": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "timestamp",
+              "open",
+              "high",
+              "low",
+              "close",
+              "volume",
+              "price_unit",
+              "volume_unit"
+            ],
+            "properties": {
+              "timestamp": {
+                "type": "string"
+              },
+              "open": {
+                "type": "number"
+              },
+              "high": {
+                "type": "number"
+              },
+              "low": {
+                "type": "number"
+              },
+              "close": {
+                "type": "number"
+              },
+              "volume": {
+                "type": "number",
+                "minimum": 0
+              },
+              "price_unit": {
+                "type": "string"
+              },
+              "volume_unit": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "chart_observations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "crowd_direction": {
+          "enum": [
+            "CROWDED_LONG",
+            "CROWDED_SHORT"
+          ]
+        },
+        "requested_indicators": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "urn:linkskills:trading-technical-chart-analysis:0.1.0#/definitions/input"
+    },
+    "expected_outputs": [
+      {
+        "name": "request_id",
+        "description": "Required property `request_id` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "completion_status",
+        "description": "Required property `completion_status` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "enum": [
+            "complete",
+            "partial",
+            "insufficient_input"
+          ]
+        }
+      },
+      {
+        "name": "symbol",
+        "description": "Required property `symbol` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "as_of",
+        "description": "Required property `as_of` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        }
+      },
+      {
+        "name": "timeframe",
+        "description": "Required property `timeframe` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "observations",
+        "description": "Required property `observations` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "item",
+              "evidence",
+              "classification"
+            ],
+            "properties": {
+              "item": {
+                "type": "string"
+              },
+              "evidence": {
+                "type": "string"
+              },
+              "classification": {
+                "enum": [
+                  "observation",
+                  "calculation",
+                  "interpretation"
+                ]
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "levels",
+        "description": "Required property `levels` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "kind",
+              "price",
+              "unit",
+              "evidence"
+            ],
+            "properties": {
+              "kind": {
+                "enum": [
+                  "support",
+                  "resistance",
+                  "invalidation"
+                ]
+              },
+              "price": {
+                "type": "number"
+              },
+              "unit": {
+                "type": "string"
+              },
+              "evidence": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "scenarios",
+        "description": "Required property `scenarios` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "condition",
+              "interpretation",
+              "invalidation"
+            ],
+            "properties": {
+              "condition": {
+                "type": "string"
+              },
+              "interpretation": {
+                "type": "string"
+              },
+              "invalidation": {
+                "type": "string"
+              },
+              "probability_pct": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "countercase",
+        "description": "Required property `countercase` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "limitations",
+        "description": "Required property `limitations` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "missing_inputs",
+        "description": "Required property `missing_inputs` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    ],
+    "procedure_summary": "Source method section `Method` in SKILL.md: 1. Confirm instrument, venue, timeframe, as-of cutoff, session/calendar, source and adjustment basis. Use completed bars only.\n2. Describe observed swing sequence and range; identify candidate support/resistance zones with the observed pivots and their dates. A level is a historical reference, not a guarantee or price target.\n3. If moving averages or indicators are requested, state formula, period, price basis, warmup rows, missing-bar handling, and library/version if supplied. Do not import source thresholds as universal signals.\n4. Describe volume and candle patterns only where visible and defined; distinguish observed values from interpretation and give a credible opposing explanation.\n5. Offer conditional scenarios through level/invalidation pairs. Do not assign precise probabilities or targets from an uncalibrated chart template. Provide numeric price levels only if they are directly observable or mechanically calculated from complete supplied bars.\n6. A contrarian-confirmation checklist is a separate explicitly requested variant in `references/source-variants.json`; the listed strict rules require completed weekly OHLC and matching crowd direction. Do not execute its source script. If chart resolution cannot establish strict inequalities or bar counts, return `insufficient_input`, not a fabricated verdict.\n7. Return a concise structured memo, preserve source/date/units, uncertainty and limitations, and validate shape. Structural validity is not trading-method validation.",
+    "forbidden_actions": [
+      "No assumed market data/provider access, indicator library, or prices not visible in supplied evidence.",
+      "No numeric probability, target, performance claim, order, or live activation absent user request and evidence.",
+      "No automatic script or source asset execution."
+    ],
+    "failure_handling": "Source-grounded missing/invalid evidence clauses (verbatim, with entrypoint line numbers): L39: 3. If moving averages or indicators are requested, state formula, period, price basis, warmup rows, missing-bar handling, and library/version if supplied. Do not import source thresholds as universal signals.; L41: 5. Offer conditional scenarios through level/invalidation pairs. Do not assign precise probabilities or targets from an uncalibrated chart template. Provide numeric price levels only if they are directly observable or mechanically calculated from complete supplied bars.; L42: 6. A contrarian-confirmation checklist is a separate explicitly requested variant in `references/source-variants.json`; the listed strict rules require completed weekly OHLC and matching crowd direction. Do not execute its source script. If chart resolution cannot establish strict inequalities or bar counts, return `insufficient_input`, not a fabricated verdict.",
+    "verification_steps": [
+      "Validate the supplied input against references/schemas.json#/definitions/input and report each missing or invalid required field.",
+      "Validate the produced task output against references/schemas.json#/definitions/output; structural validity does not establish method correctness.",
+      "Use references/eval-suite.json criteria only against an actual task output; a schema check or fictional example alone is not a behavioral pass."
+    ],
+    "completion_criteria": [
+      "Include every required output property defined at references/schemas.json#/definitions/output: request_id, completion_status, symbol, as_of, timeframe, observations, levels, scenarios, countercase, limitations, missing_inputs.",
+      "If `completion_status` exists, its value must reflect the schema-defined gaps or missing inputs; do not assert a complete result where evidence is absent.",
+      "Keep recommendations advisory; no external action, order, live activation, portfolio mutation, or approval is represented as completed."
+    ],
+    "known_limitations": [
+      "The skill source is an isolated unqualified draft; source-derived pack metadata does not establish selection, registration, method qualification, or production suitability.",
+      "The declared runtime-profile label is preserved as source metadata; runtime-profile binding is not proved."
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read",
+      "filesystem_write"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [
+      {
+        "key": "min_reasoning_tier",
+        "value": "balanced"
+      },
+      {
+        "key": "preferred_model",
+        "value": "gpt-6.1-sol"
+      },
+      {
+        "key": "context_required",
+        "value": 64000
+      }
+    ],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "suite_hash": "sha256:1c83b49a9f32250fa2c7cd7c4c37ea9a52175fd5701e6ae1e3447c81d18593e5",
+    "verification_refs": [
+      "references/schemas.json",
+      "references/eval-suite.json"
+    ]
+  },
+  "telemetry": {
+    "classification": "public_internal",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_private_data",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain_only_approved_ids_and_hashes"
+  }
+}

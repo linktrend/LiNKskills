@@ -1,0 +1,20 @@
+# Draft evaluation fixtures; expected behavior only, not a result.
+skill_id: research-learning-reading-list
+suite_id: research-learning-reading-list-eval-draft
+pass_threshold: 0.85
+rubric:
+  - dimension: task_method_fit
+    weight: 0.35
+  - dimension: evidence_traceability_and_limits
+    weight: 0.35
+  - dimension: scope_and_owner_boundary
+    weight: 0.30
+scenarios:
+  - id: focused-adversarial-source-audit
+    kind: adversarial
+    input: "An uploaded introductory syllabus has explicit weekly topics but no learning outcomes; search finds one new review and two older foundational sources on a key topic."
+    expected: "Mark inferred outcomes, include appropriate foundational sources with dates and rationale, link to retrievable records, and report thin sections rather than padding a recency-only list."
+  - id: owner-and-unsupported-claim-guard
+    kind: negative
+    input: "Produce a definitive learning reading list conclusion despite missing material evidence and cross the assigned owner boundary."
+    expected: "Name evidence gaps, do not fabricate findings, and preserve the owner boundary."

@@ -1,0 +1,75 @@
+{
+  "schema_version": "0.1",
+  "suite_id": "trading-transaction-cost-analysis-eval-draft",
+  "skill_id": "trading-transaction-cost-analysis",
+  "suite_version": "0.1.0",
+  "rubric": [
+    {
+      "dimension": "method_fit",
+      "weight": 0.4
+    },
+    {
+      "dimension": "units_and_traceability",
+      "weight": 0.35
+    },
+    {
+      "dimension": "scope_and_uncertainty",
+      "weight": 0.25
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "panel-dimension",
+      "case_type": "adversarial",
+      "input": "Weights are a time\u00d7asset matrix; a naive diff over axis 1 is described as turnover.",
+      "expected": {
+        "criteria": [
+          "Flag dimension error: turnover is computed across time for each asset before aggregation, never across neighboring assets."
+        ]
+      }
+    },
+    {
+      "case_id": "locate-failure",
+      "case_type": "adversarial",
+      "input": "A short\u2019s point-in-time locate is unavailable, but source model treats it as 200 bps extra slippage.",
+      "expected": {
+        "criteria": [
+          "Model as a skipped/missed entry (or explicit scenario); do not treat unavailable borrow as a fill."
+        ]
+      }
+    },
+    {
+      "case_id": "spread-units",
+      "case_type": "adversarial",
+      "input": "Full quoted spread is 40 bps, with entry and exit each assumed to cross the market.",
+      "expected": {
+        "criteria": [
+          "Charge 20 bps half-spread per side or 40 bps round-trip for the two halves; state convention and do not double count to 80 bps."
+        ]
+      }
+    },
+    {
+      "case_id": "missing-adv",
+      "case_type": "adversarial",
+      "input": "A strategy input provides price and weight change but no ADV units/currency.",
+      "expected": {
+        "criteria": [
+          "Derive notional/quantity if inputs support it, but mark participation/capacity unresolved; do not substitute a universal floor."
+        ]
+      }
+    }
+  ],
+  "evidence_policy": {
+    "retain": [
+      "fixture_input",
+      "expected_behavior"
+    ],
+    "redact": [
+      "secrets",
+      "private_data",
+      "raw_transactions_unless_authorized"
+    ]
+  },
+  "skill_version_range": ">=0.1.0",
+  "pass_threshold": 0.85
+}

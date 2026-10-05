@@ -1,0 +1,38 @@
+{
+  "request_id": "OPT-2026-10-05-01",
+  "status": "partial",
+  "as_of": "2026-10-05T00:00:00Z",
+  "strategy": "single long American call",
+  "legs": [
+    {
+      "option_type": "call",
+      "side": "long",
+      "quantity": 1,
+      "multiplier": 100,
+      "expiry": "2026-11-20",
+      "strike": 105,
+      "entry_price_per_share": 2.5,
+      "expiry_payoff_formula": "max(spot-105,0)*100 - 250 USD",
+      "break_even_at_expiry": 107.5,
+      "max_loss_usd": 250,
+      "max_gain": "unbounded"
+    }
+  ],
+  "greeks": {
+    "available": false,
+    "reason": "No validated model/vendor Greek supplied in fictional fixture",
+    "units_required": [
+      "per share",
+      "per contract",
+      "total position"
+    ]
+  },
+  "scenario_pnl": [],
+  "probability_of_profit": null,
+  "surface_summary": null,
+  "risks": [
+    "American exercise and discrete dividend can affect early exercise/model value",
+    "quote/market data are fictional and no option valuation was performed"
+  ],
+  "advisory": "No order or activation"
+}

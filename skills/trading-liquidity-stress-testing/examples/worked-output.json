@@ -1,0 +1,103 @@
+{
+  "task_id": "JANE-SYNTHETIC-LIQUIDITY-01",
+  "status": "completed_analysis",
+  "scenario_report": {
+    "as_of": "2026-10-05T00:00:00+08:00",
+    "base_currency": "USD",
+    "covered_instruments": [
+      "A",
+      "B"
+    ],
+    "excluded_instruments": [],
+    "scenarios": [
+      {
+        "scenario_id": "illustrative-five-days",
+        "status": "estimated",
+        "position_results": [
+          {
+            "instrument_id": "A",
+            "eligibility": "estimated_linear_long",
+            "stressed_daily_adv": 100,
+            "daily_sale_capacity": 10,
+            "horizon_sale_capacity": 50,
+            "modelled_exit_days": 10,
+            "planned_sale": 50,
+            "gross_proceeds": 50,
+            "estimated_costs": 1,
+            "net_proceeds": 49,
+            "limitations": [
+              "Capacity/fill is an estimate, not a guarantee"
+            ],
+            "evidence_refs": [
+              "fictional-case"
+            ],
+            "currency": "USD",
+            "spread_cost": 1,
+            "impact_cost": 0,
+            "fees_cost": 0,
+            "financing_cost": 0
+          },
+          {
+            "instrument_id": "B",
+            "eligibility": "estimated_linear_long",
+            "stressed_daily_adv": 100,
+            "daily_sale_capacity": 10,
+            "horizon_sale_capacity": 50,
+            "modelled_exit_days": 10,
+            "planned_sale": 50,
+            "gross_proceeds": 50,
+            "estimated_costs": 1,
+            "net_proceeds": 49,
+            "limitations": [
+              "Capacity/fill is an estimate, not a guarantee"
+            ],
+            "evidence_refs": [
+              "fictional-case"
+            ],
+            "currency": "USD",
+            "spread_cost": 1,
+            "impact_cost": 0,
+            "fees_cost": 0,
+            "financing_cost": 0
+          }
+        ],
+        "gross_proceeds": 100,
+        "estimated_costs": 2,
+        "initial_cash": 0,
+        "funding_obligations": 0,
+        "net_available_cash": 98,
+        "requested_cash": 100,
+        "net_cash_shortfall": 2,
+        "valuation_loss": 0,
+        "valuation_model_ref": "explicit zero price shock",
+        "binding_constraints": [
+          "five-day participation capacity"
+        ],
+        "missing_fields": [],
+        "sensitivity_notes": [
+          "Halving volume yields gross50, costs1, net49, shortfall51 under same assumptions."
+        ],
+        "currency": "USD",
+        "aggregation_scope": "full_portfolio",
+        "spread_cost": 2,
+        "impact_cost": 0,
+        "fees_cost": 0,
+        "financing_cost": 0
+      }
+    ]
+  },
+  "evidence_refs": [
+    "fictional-case"
+  ],
+  "assumptions": [
+    "No price shock; zero impact/fees/funding; full spread400bps"
+  ],
+  "limitations": [
+    "Fictional method illustration; no observed business holdings/results or behavior qualification"
+  ],
+  "recommendations": [
+    "Report remaining net funding shortfall; no order or capital action"
+  ],
+  "open_questions": [],
+  "external_effects": []
+}

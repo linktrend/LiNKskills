@@ -1,0 +1,116 @@
+{
+  "status": "partial",
+  "scope": {
+    "as_of": "2026-10-05T09:00:00Z",
+    "period_or_horizon": "fictional-fixture",
+    "currency": "USD",
+    "version": "fictional-fixture",
+    "limitations": [
+      "Synthetic structural arithmetic fixture only; not observed market evidence, behavioral qualification, or a performance claim."
+    ]
+  },
+  "analysis": {
+    "status": "partial",
+    "reconciliation": {
+      "opening_equity": 10000,
+      "external_flows_net": 0,
+      "ending_equity": 10009,
+      "residual": 0,
+      "currency": "USD",
+      "denominator": "opening_equity",
+      "status": "reconciled",
+      "gross_investment_pnl": 10,
+      "fees_and_costs": 1,
+      "net_investment_pnl": 9
+    },
+    "cash_by_period": {
+      "fees": 1,
+      "funding_borrow": 0,
+      "income": 0,
+      "currency": "USD",
+      "start": "2026-10-01T00:00:00Z",
+      "end": "2026-10-05T00:00:00Z",
+      "basis": "dated_cash_events",
+      "gross_realized_cash_pnl": 10,
+      "net_realized_cash_pnl": 9
+    },
+    "closed_cohort": {
+      "cumulative_pnl": 9,
+      "currency": "USD",
+      "closed_trade_n": 1,
+      "trade_ids": [
+        "T1"
+      ],
+      "basis": "cohort_cumulative_not_period_cash"
+    },
+    "attribution_rows": [
+      {
+        "component": "net_trade_pnl",
+        "contribution": 9,
+        "currency": "USD",
+        "denominator_value": 10000,
+        "denominator_unit": "currency_amount",
+        "start": "2026-10-01T00:00:00Z",
+        "end": "2026-10-05T00:00:00Z",
+        "method": "reconciled simple P&L bridge",
+        "status": "calculated",
+        "evidence_refs": [
+          "synthetic-fixture"
+        ]
+      }
+    ],
+    "metric_rows": [
+      {
+        "metric": "simple_return",
+        "value": 0.0009,
+        "unit": "fraction",
+        "denominator": "opening_nav",
+        "elapsed_calendar_days": 4,
+        "annualization_method": "none",
+        "status": "calculated"
+      }
+    ],
+    "evidence_refs": [
+      "synthetic-fixture"
+    ]
+  },
+  "recommendation": {
+    "stance": "no_action",
+    "proposed_target": {
+      "value": 1,
+      "unit": "fictional-fixture",
+      "currency": "USD",
+      "as_of": "2026-10-05T09:00:00Z",
+      "basis": "fictional-fixture"
+    },
+    "proposed_risk_level": {
+      "value": 1,
+      "unit": "fictional-fixture",
+      "currency": "USD",
+      "as_of": "2026-10-05T09:00:00Z",
+      "basis": "fictional-fixture"
+    },
+    "basis": [],
+    "counterevidence": [],
+    "reversal_evidence": [],
+    "advisory_only": true,
+    "approval_required": true
+  },
+  "evidence_gate": {
+    "critical_inputs_resolved": false,
+    "source_timestamps_reconciled": false,
+    "unit_contracts_resolved": false,
+    "limiting_gaps": [
+      "Synthetic fixture intentionally leaves a decision-critical evidence branch unresolved."
+    ]
+  },
+  "gaps": [
+    {
+      "field": "fixture_unresolved_input",
+      "why_it_matters": "The affected conclusion must remain partial.",
+      "owner": null,
+      "blocking": true
+    }
+  ],
+  "external_effects": []
+}

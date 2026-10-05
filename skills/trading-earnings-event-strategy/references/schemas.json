@@ -1,0 +1,214 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:linkskills:trading-earnings-event-strategy:0.1.0",
+  "title": "Earnings reaction and PEAD research",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "request_id",
+        "issuer_id",
+        "venue",
+        "as_of",
+        "event",
+        "price_snapshot",
+        "bars",
+        "market_control",
+        "source_provenance"
+      ],
+      "properties": {
+        "request_id": {
+          "type": "string"
+        },
+        "issuer_id": {
+          "type": "string"
+        },
+        "venue": {
+          "type": "string"
+        },
+        "as_of": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "event": {
+          "type": "object",
+          "required": [
+            "event_date",
+            "scheduled_at",
+            "actual_release_at",
+            "timezone",
+            "event_sources"
+          ],
+          "properties": {
+            "event_date": {
+              "type": "string",
+              "format": "date"
+            },
+            "scheduled_at": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "actual_release_at": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "timezone": {
+              "type": "string"
+            },
+            "event_sources": {
+              "type": "array"
+            },
+            "eps_actual": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "eps_consensus": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "revenue_actual": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "revenue_consensus": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "guidance_summary": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        },
+        "price_snapshot": {
+          "type": "string"
+        },
+        "bars": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "timestamp",
+              "open",
+              "high",
+              "low",
+              "close",
+              "volume",
+              "source_row"
+            ],
+            "properties": {
+              "timestamp": {
+                "type": "string"
+              },
+              "open": {
+                "type": "number"
+              },
+              "high": {
+                "type": "number"
+              },
+              "low": {
+                "type": "number"
+              },
+              "close": {
+                "type": "number"
+              },
+              "volume": {
+                "type": "number"
+              },
+              "source_row": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "market_control": {
+          "type": "object"
+        },
+        "source_provenance": {
+          "type": "array"
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "request_id",
+        "status",
+        "event_timing",
+        "reaction_metrics",
+        "post_event_study",
+        "counterevidence",
+        "limitations",
+        "recommendation"
+      ],
+      "properties": {
+        "request_id": {
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "complete",
+            "partial",
+            "needs_input",
+            "blocked"
+          ]
+        },
+        "event_timing": {
+          "type": "object"
+        },
+        "reaction_metrics": {
+          "type": "array"
+        },
+        "post_event_study": {
+          "type": "object"
+        },
+        "counterevidence": {
+          "type": "array"
+        },
+        "limitations": {
+          "type": "array"
+        },
+        "recommendation": {
+          "type": "object",
+          "required": [
+            "stance",
+            "basis",
+            "advisory_only"
+          ],
+          "properties": {
+            "stance": {
+              "enum": [
+                "positive",
+                "negative",
+                "mixed",
+                "no_view"
+              ]
+            },
+            "basis": {
+              "type": "array"
+            },
+            "advisory_only": {
+              "const": true
+            }
+          }
+        }
+      }
+    }
+  }
+}

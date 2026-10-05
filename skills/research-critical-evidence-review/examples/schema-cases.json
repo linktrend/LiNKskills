@@ -1,0 +1,38 @@
+{
+  "status": "schema_fixture_only_not_behavioral_evaluation",
+  "valid_case": {
+    "schema_ref": "references/schemas.json#/definitions/input",
+    "input": {
+      "claim": "A fictional intervention improves outcome Y.",
+      "decision": "whether evidence supports further study",
+      "population": "fictional population P",
+      "comparator": "usual care",
+      "outcome": "Y at 12 weeks",
+      "study_refs": [
+        "FIC-TRIAL-1"
+      ],
+      "design_details": "parallel randomized design; synthetic summary only",
+      "measurement": "Y units not supplied",
+      "analysis": "results not supplied",
+      "as_of": "2026-10-05"
+    },
+    "expected": "accept by JSON Schema"
+  },
+  "invalid_case": {
+    "schema_ref": "references/schemas.json#/definitions/input",
+    "input": {
+      "claim": "fictional-input",
+      "decision": "fictional-input",
+      "population": "fictional-input",
+      "comparator": "fictional-input",
+      "outcome": "fictional-input",
+      "study_refs": [],
+      "design_details": "fictional-input",
+      "measurement": "fictional-input",
+      "analysis": "fictional-input",
+      "as_of": "fictional-input",
+      "unapproved_extra_field": "reject"
+    },
+    "expected": "reject unknown additional property"
+  }
+}

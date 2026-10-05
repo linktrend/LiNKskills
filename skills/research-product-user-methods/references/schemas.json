@@ -1,0 +1,226 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "research-product-user-methods task contract draft",
+  "type": "object",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "properties": {
+        "decision_goal": {
+          "type": "string"
+        },
+        "product_stage": {
+          "type": "string"
+        },
+        "target_users": {
+          "type": "string"
+        },
+        "segments": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "known_risks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "available_evidence": {
+          "type": "string"
+        },
+        "access_and_consent": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "decision_goal",
+        "product_stage",
+        "target_users",
+        "segments",
+        "known_risks",
+        "available_evidence",
+        "access_and_consent"
+      ],
+      "additionalProperties": false,
+      "title": "Task-specific input"
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "method_rationale": {
+          "type": "string"
+        },
+        "study_plan": {
+          "type": "object",
+          "properties": {
+            "tasks": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "moderator_script": {
+              "type": "string"
+            },
+            "recording": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "tasks",
+            "moderator_script",
+            "recording"
+          ],
+          "additionalProperties": false
+        },
+        "participant_criteria": {
+          "type": "object",
+          "properties": {
+            "target": {
+              "type": "string"
+            },
+            "exclude": {
+              "type": "string"
+            },
+            "recruitment": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "target",
+            "exclude",
+            "recruitment"
+          ],
+          "additionalProperties": false
+        },
+        "sample_and_saturation": {
+          "type": "object",
+          "properties": {
+            "target_sessions": {
+              "type": "integer"
+            },
+            "basis": {
+              "type": "string"
+            },
+            "stop_rule": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "target_sessions",
+            "basis",
+            "stop_rule"
+          ],
+          "additionalProperties": false
+        },
+        "coded_observations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "participant": {
+                "type": "string"
+              },
+              "task": {
+                "type": "string"
+              },
+              "observation": {
+                "type": "string"
+              },
+              "evidence": {
+                "type": "string"
+              },
+              "code": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "participant",
+              "task",
+              "observation",
+              "evidence",
+              "code"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "candidate_insights": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "insight": {
+                "type": "string"
+              },
+              "recurrence": {
+                "type": "string"
+              },
+              "limitation": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "insight",
+              "recurrence",
+              "limitation"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "consent_privacy": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "status",
+        "method_rationale",
+        "study_plan",
+        "participant_criteria",
+        "sample_and_saturation",
+        "coded_observations",
+        "candidate_insights",
+        "consent_privacy",
+        "limitations"
+      ],
+      "additionalProperties": false,
+      "title": "Task-specific result"
+    },
+    "state": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "in_progress",
+            "completed",
+            "needs_input",
+            "blocked"
+          ]
+        },
+        "open_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

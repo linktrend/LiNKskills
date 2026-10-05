@@ -1,0 +1,57 @@
+{
+  "schema_version": "0.1",
+  "suite_id": "research-data-analysis-query-eval-draft",
+  "skill_id": "research-data-analysis-query",
+  "suite_version": "0.1.0",
+  "rubric": [
+    {
+      "dimension": "method_fit",
+      "weight": 0.35
+    },
+    {
+      "dimension": "traceability_and_limits",
+      "weight": 0.35
+    },
+    {
+      "dimension": "scope_and_owner_boundary",
+      "weight": 0.3
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "focused-adversarial-source-audit",
+      "case_type": "adversarial",
+      "input": "A CSV has one row per line item, repeated order IDs, null refunds, and ambiguous “revenue” columns; the user asks for monthly revenue.",
+      "expected": {
+        "criteria": [
+          "Inspect grain and definitions, distinguish gross/net/refund treatment, avoid summing duplicated order-level amounts, state unresolved choices, and provide a query/calculation only once the definition is clear or explicitly assumed."
+        ]
+      }
+    },
+    {
+      "case_id": "owner-and-unsupported-claim-guard",
+      "case_type": "negative",
+      "input": "Produce a definitive data analysis query conclusion despite missing material evidence and cross the assigned owner boundary.",
+      "expected": {
+        "criteria": [
+          "Name the missing evidence or method assumptions.",
+          "Do not fabricate statistics, sources, findings, or certainty.",
+          "Keep the output within the stated research coordination scope and identify the responsible owner."
+        ]
+      }
+    }
+  ],
+  "evidence_policy": {
+    "retain": [
+      "fixture_input",
+      "expected_behavior"
+    ],
+    "redact": [
+      "secrets",
+      "private_personal_data",
+      "raw_transcripts"
+    ]
+  },
+  "skill_version_range": ">=0.1.0",
+  "pass_threshold": 0.85
+}

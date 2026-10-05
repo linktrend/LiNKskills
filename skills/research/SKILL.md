@@ -91,6 +91,35 @@ Every material statement is labelled as exactly one of:
 Use the strongest available source hierarchy: primary official documentation,
 first-party records, filings, or datasets first; reputable secondary analysis
 for context; tertiary summaries only when their underlying sources are clear.
+
+## Trading strategy decision evidence
+
+For a trading or portfolio decision, add a bounded decision lens to this
+research workflow; retain the same intent, claim graph, source hierarchy and
+citation-enforcer gate. Record the instrument and venue, strategy/version,
+observation window, as-of timestamp and timezone, price/return convention,
+currency and FX basis, source coverage, and any owner-supplied NAV, holdings,
+or risk limit used. Use only point-in-time evidence available by the stated
+as-of boundary; identify survivorship, corporate-action, stale-mark, missing
+event, cost, and sample limitations that apply.
+
+Separate observed market or ledger facts from inference, hypothesis, and
+recommendation. Show a counter-thesis and the strongest plausible alternative
+cause for consequential conclusions. Return and risk figures name units,
+currency, denominator, horizon, gross/net convention, and sample. Do not turn
+co-movement, a small backtest, or a missing-driver variance into causation or
+proof of edge. Leave a metric undefined or a conclusion bounded when its
+required inputs are absent; do not replace missing currency, FX, fees, or
+initial-risk data with a proxy.
+
+The trading lead may recommend a strategy change or propose target exposure, risk level,
+increase, trim, or exit when the cited facts and owner-supplied constraints
+support it. State the sizing arithmetic, assumptions, countercase, and what
+evidence would change the proposal. A proposal is advisory only; it does not
+place an order, approve capital, activate a live strategy, or mutate policy.
+Route legal/accounting classification to its accountable domain owner and
+technical adapters or execution implementation to the engineering owner.
+
 Preserve the source URL or file pointer, publisher, publication date, retrieval
 time, and relevant version. Currentness-sensitive claims must say what date the
 evidence represents and must stop or qualify when the freshness window expires.

@@ -1,0 +1,18 @@
+skill_id: trading-position-sizing
+suite_id: trading-position-sizing-eval-draft
+status: proposed_not_run
+pass_threshold: 0.85
+rubric:
+  - dimension: task_method
+    weight: 0.4
+  - dimension: units_and_traceability
+    weight: 0.35
+  - dimension: scope_uncertainty_owner_boundaries
+    weight: 0.25
+scenarios:
+  - id: wrong-way-stop
+  - id: fx-missing
+  - id: round-up
+notes:
+  - Proposed expected behaviors only; no execution, PASS, or certification claimed.
+  - Fixtures inspect response content; no canned runner or asserted literal PASS is proof.

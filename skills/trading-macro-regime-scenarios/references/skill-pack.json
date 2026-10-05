@@ -1,0 +1,1101 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "trading-macro-regime-scenarios",
+  "display_name": "Macro regime and scenario analysis",
+  "version": "0.1.1",
+  "description": "Synthesize dated macro and cross-asset observations into a falsifiable current-regime view and explicit alternative scenarios with uncertainty and revision-vintage discipline.",
+  "capability_category": "trading_research",
+  "provenance": {
+    "author": "LiNKskills Library",
+    "source": "Exact source provenance: references/source-provenance.json (sha256:9ac29da5d024be2de14ce6c1823ca2c643979747ce45a236e0df356adc288eb0); per-entry license/notice/disposition recorded there.",
+    "license": "No package-wide upstream license is asserted; see exact per-file source provenance and notice dispositions in references/source-provenance.json.",
+    "imported_from": "Frozen Jane draft source: skills/trading-macro-regime-scenarios; source provenance copied unchanged for this proposal only."
+  },
+  "lifecycle_state": "draft",
+  "format_profile": "simple",
+  "compatible_runtime_profiles": [
+    "jane-openclaw"
+  ],
+  "min_capability_tier": "balanced",
+  "routing": {
+    "when_to_use": "Use for macro regime, cross-asset market environment, or forward scenarios.",
+    "when_not_to_use": [
+      "Do not submit orders, call a broker, change portfolio state, or activate a live strategy.",
+      "Do not invent data, paid tool access, historical validation, or source API availability.",
+      "Do not treat a schema-valid example or output as method validation.",
+      "Do not replace LiNKtrading with another execution system."
+    ],
+    "tags": [
+      "trading",
+      "research",
+      "jane",
+      "draft"
+    ],
+    "exclusion_rules": [
+      "Do not submit orders, call a broker, change portfolio state, or activate a live strategy.",
+      "Do not invent data, paid tool access, historical validation, or source API availability.",
+      "Do not treat a schema-valid example or output as method validation.",
+      "Do not replace LiNKtrading with another execution system."
+    ]
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "as_of_date",
+        "description": "Required property `as_of_date` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        }
+      },
+      {
+        "name": "horizon",
+        "description": "Required property `horizon` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "geography",
+        "description": "Required property `geography` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "asset_universe",
+        "description": "Required property `asset_universe` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "question",
+        "description": "Required property `question` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "observations",
+        "description": "Required property `observations` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "series",
+              "value",
+              "unit",
+              "measurement_period",
+              "released_at",
+              "revision_vintage",
+              "source_url_or_file"
+            ],
+            "properties": {
+              "series": {
+                "type": "string"
+              },
+              "value": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "unit": {
+                "type": "string"
+              },
+              "measurement_period": {
+                "type": "string"
+              },
+              "released_at": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "revision_vintage": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "source_url_or_file": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "minLength": 1
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "available",
+                  "partial",
+                  "unavailable",
+                  "stale",
+                  "not_comparable",
+                  "not_requested"
+                ]
+              },
+              "unknown_reason": {
+                "type": "string",
+                "minLength": 1
+              },
+              "frequency": {
+                "type": "string"
+              },
+              "currency": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "transformation": {
+                "type": "string"
+              },
+              "publication_vintage": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "anyOf": [
+                    {
+                      "properties": {
+                        "value": {
+                          "type": "null"
+                        }
+                      },
+                      "required": [
+                        "value"
+                      ]
+                    },
+                    {
+                      "properties": {
+                        "released_at": {
+                          "type": "null"
+                        }
+                      },
+                      "required": [
+                        "released_at"
+                      ]
+                    },
+                    {
+                      "properties": {
+                        "source_url_or_file": {
+                          "type": "null"
+                        }
+                      },
+                      "required": [
+                        "source_url_or_file"
+                      ]
+                    }
+                  ]
+                },
+                "then": {
+                  "required": [
+                    "status",
+                    "unknown_reason"
+                  ],
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "partial",
+                        "unavailable",
+                        "not_comparable",
+                        "not_requested"
+                      ]
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "optional_inputs": [
+      {
+        "name": "portfolio_context",
+        "description": "Optional property `portfolio_context` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Optional user-supplied portfolio context for advisory sensitivity only; never authorizes changes or execution.",
+          "required": [
+            "as_of",
+            "base_currency",
+            "holdings",
+            "risk_constraints"
+          ],
+          "properties": {
+            "as_of": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "base_currency": {
+              "type": "string"
+            },
+            "nav": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "description": "Amount in base_currency; null when not supplied."
+            },
+            "holdings": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "instrument",
+                  "quantity",
+                  "currency",
+                  "as_of"
+                ],
+                "properties": {
+                  "instrument": {
+                    "type": "string"
+                  },
+                  "quantity": {
+                    "type": "number"
+                  },
+                  "currency": {
+                    "type": "string"
+                  },
+                  "as_of": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "market_value": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "multiplier": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "source_pointer": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "risk_constraints": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "mandate_notes": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "requested_branches",
+        "description": "Optional property `requested_branches` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "description": "Optional independently requested structural, event, bubble-risk, crypto-only or portfolio-implication branches.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "structural_regime",
+              "event_scenarios",
+              "bubble_risk",
+              "crypto_only",
+              "portfolio_implications"
+            ]
+          },
+          "uniqueItems": true
+        }
+      }
+    ],
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "as_of_date",
+        "horizon",
+        "geography",
+        "asset_universe",
+        "question",
+        "observations"
+      ],
+      "properties": {
+        "as_of_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "horizon": {
+          "type": "string"
+        },
+        "geography": {
+          "type": "string"
+        },
+        "asset_universe": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "question": {
+          "type": "string"
+        },
+        "observations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "series",
+              "value",
+              "unit",
+              "measurement_period",
+              "released_at",
+              "revision_vintage",
+              "source_url_or_file"
+            ],
+            "properties": {
+              "series": {
+                "type": "string"
+              },
+              "value": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "unit": {
+                "type": "string"
+              },
+              "measurement_period": {
+                "type": "string"
+              },
+              "released_at": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "revision_vintage": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "source_url_or_file": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "minLength": 1
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "available",
+                  "partial",
+                  "unavailable",
+                  "stale",
+                  "not_comparable",
+                  "not_requested"
+                ]
+              },
+              "unknown_reason": {
+                "type": "string",
+                "minLength": 1
+              },
+              "frequency": {
+                "type": "string"
+              },
+              "currency": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "transformation": {
+                "type": "string"
+              },
+              "publication_vintage": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "anyOf": [
+                    {
+                      "properties": {
+                        "value": {
+                          "type": "null"
+                        }
+                      },
+                      "required": [
+                        "value"
+                      ]
+                    },
+                    {
+                      "properties": {
+                        "released_at": {
+                          "type": "null"
+                        }
+                      },
+                      "required": [
+                        "released_at"
+                      ]
+                    },
+                    {
+                      "properties": {
+                        "source_url_or_file": {
+                          "type": "null"
+                        }
+                      },
+                      "required": [
+                        "source_url_or_file"
+                      ]
+                    }
+                  ]
+                },
+                "then": {
+                  "required": [
+                    "status",
+                    "unknown_reason"
+                  ],
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "partial",
+                        "unavailable",
+                        "not_comparable",
+                        "not_requested"
+                      ]
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "portfolio_context": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Optional user-supplied portfolio context for advisory sensitivity only; never authorizes changes or execution.",
+          "required": [
+            "as_of",
+            "base_currency",
+            "holdings",
+            "risk_constraints"
+          ],
+          "properties": {
+            "as_of": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "base_currency": {
+              "type": "string"
+            },
+            "nav": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "description": "Amount in base_currency; null when not supplied."
+            },
+            "holdings": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "instrument",
+                  "quantity",
+                  "currency",
+                  "as_of"
+                ],
+                "properties": {
+                  "instrument": {
+                    "type": "string"
+                  },
+                  "quantity": {
+                    "type": "number"
+                  },
+                  "currency": {
+                    "type": "string"
+                  },
+                  "as_of": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "market_value": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "multiplier": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "source_pointer": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "risk_constraints": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "mandate_notes": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "requested_branches": {
+          "type": "array",
+          "description": "Optional independently requested structural, event, bubble-risk, crypto-only or portfolio-implication branches.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "structural_regime",
+              "event_scenarios",
+              "bubble_risk",
+              "crypto_only",
+              "portfolio_implications"
+            ]
+          },
+          "uniqueItems": true
+        }
+      },
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "urn:linkskills:trading-macro-regime-scenarios:0.1.1#/definitions/input"
+    },
+    "expected_outputs": [
+      {
+        "name": "completion_status",
+        "description": "Required property `completion_status` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "enum": [
+            "complete",
+            "partial",
+            "insufficient_input"
+          ]
+        }
+      },
+      {
+        "name": "as_of_date",
+        "description": "Required property `as_of_date` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        }
+      },
+      {
+        "name": "regime_view",
+        "description": "Required property `regime_view` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "object"
+        }
+      },
+      {
+        "name": "observations",
+        "description": "Required property `observations` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "series",
+              "value",
+              "unit",
+              "measurement_period",
+              "released_at",
+              "revision_vintage",
+              "source_url_or_file"
+            ],
+            "properties": {
+              "series": {
+                "type": "string"
+              },
+              "value": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "unit": {
+                "type": "string"
+              },
+              "measurement_period": {
+                "type": "string"
+              },
+              "released_at": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "revision_vintage": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "source_url_or_file": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "minLength": 1
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "available",
+                  "partial",
+                  "unavailable",
+                  "stale",
+                  "not_comparable",
+                  "not_requested"
+                ]
+              },
+              "unknown_reason": {
+                "type": "string",
+                "minLength": 1
+              },
+              "frequency": {
+                "type": "string"
+              },
+              "currency": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "transformation": {
+                "type": "string"
+              },
+              "publication_vintage": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "anyOf": [
+                    {
+                      "properties": {
+                        "value": {
+                          "type": "null"
+                        }
+                      },
+                      "required": [
+                        "value"
+                      ]
+                    },
+                    {
+                      "properties": {
+                        "released_at": {
+                          "type": "null"
+                        }
+                      },
+                      "required": [
+                        "released_at"
+                      ]
+                    },
+                    {
+                      "properties": {
+                        "source_url_or_file": {
+                          "type": "null"
+                        }
+                      },
+                      "required": [
+                        "source_url_or_file"
+                      ]
+                    }
+                  ]
+                },
+                "then": {
+                  "required": [
+                    "status",
+                    "unknown_reason"
+                  ],
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "partial",
+                        "unavailable",
+                        "not_comparable",
+                        "not_requested"
+                      ]
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "scenarios",
+        "description": "Required property `scenarios` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      },
+      {
+        "name": "countercase",
+        "description": "Required property `countercase` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "update_signposts",
+        "description": "Required property `update_signposts` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "gaps",
+        "description": "Required property `gaps` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "advisory_portfolio_proposal",
+        "description": "Optional property `advisory_portfolio_proposal` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Optional sourced advisory sector/asset proposal when user supplied holdings and constraints; no action permission.",
+          "required": [
+            "status",
+            "proposals",
+            "missing_basis"
+          ],
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "advisory_proposal",
+                "partial",
+                "unavailable_missing_basis",
+                "not_requested"
+              ]
+            },
+            "proposals": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "instrument_or_scope",
+                  "proposal",
+                  "basis",
+                  "invalidation"
+                ],
+                "properties": {
+                  "instrument_or_scope": {
+                    "type": "string"
+                  },
+                  "proposal": {
+                    "type": "string"
+                  },
+                  "target_or_risk_level": {
+                    "type": [
+                      "string",
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "basis": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "invalidation": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "missing_basis": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "branch_status",
+        "description": "Optional property `branch_status` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "description": "Independent status per requested evidence branch; absent inputs do not become neutral values.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "branch",
+              "status",
+              "basis"
+            ],
+            "properties": {
+              "branch": {
+                "type": "string",
+                "enum": [
+                  "structural_regime",
+                  "event_scenarios",
+                  "bubble_risk",
+                  "crypto_only",
+                  "portfolio_implications"
+                ]
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "complete_from_supplied_evidence",
+                  "partial_named_missing_items",
+                  "unavailable_missing_basis",
+                  "not_requested"
+                ]
+              },
+              "basis": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "bubble_risk_ledger",
+        "description": "Optional property `bubble_risk_ledger` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "description": "Optional separate evidence ledger for requested bubble-risk branch; no imported score or automatic action.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "factor_family",
+              "status",
+              "evidence",
+              "counterevidence",
+              "missing_basis"
+            ],
+            "properties": {
+              "factor_family": {
+                "type": "string",
+                "enum": [
+                  "valuation_fundamentals",
+                  "leverage_financing",
+                  "issuance_speculation",
+                  "participation_breadth",
+                  "volatility_positioning_sentiment",
+                  "narrative_market_structure"
+                ]
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "available",
+                  "partial",
+                  "unavailable",
+                  "stale",
+                  "not_comparable",
+                  "not_requested"
+                ]
+              },
+              "evidence": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "claim",
+                    "source_pointer"
+                  ],
+                  "properties": {
+                    "claim": {
+                      "type": "string"
+                    },
+                    "source_pointer": {
+                      "type": "string"
+                    },
+                    "observation_vintage": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "measure": {
+                      "type": [
+                        "number",
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "units": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
+                }
+              },
+              "counterevidence": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "missing_basis": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    ],
+    "procedure_summary": "Verbatim source section from `SKILL.md` (`## Integrated method`, lines 68-77):\n\n1. Freeze the as-of date and horizon. Build an observation ledger; keep release date, measurement period, revision vintage, units, and source distinct. Never combine current market prices with unrevised historical data without saying so.\n2. Separate level, change, surprise versus a sourced expectation, and market reaction. For revisions or conflicting vintages, report both and use the source release vintage appropriate to the question.\n3. Describe the current regime with a small set of observable drivers (growth, inflation, policy/liquidity, credit/risk appetite). Treat regime labels as a compact summary of evidence, not a hidden-state fact.\n4. Construct scenarios by changing explicit driver assumptions. Include a base and materially different alternatives, each with signposts and disconfirming evidence. Use probabilities only if a documented calibration set and forecast horizon exist; otherwise use qualitative likelihood.\n5. Run a counter-case: test whether the observed price move fits competing explanations such as positioning, supply shock, policy repricing, or stale inputs. Do not infer causation from correlation or one event window.\n6. State what new release or market evidence would update the view; identify unavailable feeds and stop specialized analysis when required data is inaccessible.\n7. Deliver advisory implications in research language. Jane may recommend a thesis to investigate and explain rationale; Eric owns LiNKtrading/Nautilus implementation, Sara legal/accounting, and Lisa + Carlos must independently authenticate on two channels against exact version before any later execution/activation. No manual trading or capital/live activation.",
+    "forbidden_actions": [
+      "Do not submit orders, call a broker, change portfolio state, or activate a live strategy.",
+      "Do not invent data, paid tool access, historical validation, or source API availability.",
+      "Do not treat a schema-valid example or output as method validation.",
+      "Do not replace LiNKtrading with another execution system."
+    ],
+    "failure_handling": "Source section `## Failure handling` in SKILL.md: - Missing, stale, unreconciled or inaccessible critical data: stop the dependent calculation and return a bounded partial result with the exact gap.\n- Incompatible units, periods, event windows or universes: do not merge. Reconcile definitions or report separate views.\n- Source rules conflict or are uncalibrated: show the source-specific rule and treat its result as a hypothesis; do not average contradictory rules into a score.\n- User requests an order, live activation, or unapproved side effect: provide the permitted advisory artifact only. Any later execution requires the existing LiNKtrading route and Lisa + Carlos independent authenticated two-channel exact-version approval.\n- A conditionally recommended size/exit cannot be supported because risk budget, holdings, liquidity, or instrument constraints are missing: omit numeric sizing and state which inputs would change it.",
+    "verification_steps": [
+      "Validate the supplied input against references/schemas.json#/definitions/input and report each missing or invalid required field.",
+      "Validate the produced task output against references/schemas.json#/definitions/output; structural validity does not establish method correctness.",
+      "Use references/eval-suite.json criteria only against an actual task output; a schema check or fictional example alone is not a behavioral pass."
+    ],
+    "completion_criteria": [
+      "Include every required output property defined at references/schemas.json#/definitions/output: completion_status, as_of_date, regime_view, observations, scenarios, countercase, update_signposts, gaps.",
+      "If `completion_status` exists, its value must reflect the schema-defined gaps or missing inputs; do not assert a complete result where evidence is absent.",
+      "Keep recommendations advisory; no external action, order, live activation, portfolio mutation, or approval is represented as completed."
+    ],
+    "known_limitations": [
+      "The skill source is an isolated unqualified draft; source-derived pack metadata does not establish selection, registration, method qualification, or production suitability.",
+      "The declared runtime-profile label is preserved as source metadata; runtime-profile binding is not proved."
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read",
+      "filesystem_write"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [
+      {
+        "key": "min_reasoning_tier",
+        "value": "balanced"
+      },
+      {
+        "key": "preferred_model",
+        "value": "gpt-6.1-sol"
+      },
+      {
+        "key": "context_required",
+        "value": 64000
+      }
+    ],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "suite_hash": "sha256:70800f57bfad221a52f86f480056b0964fd84f572b466f05d33ce6283355e1bb",
+    "verification_refs": [
+      "references/schemas.json",
+      "references/eval-suite.json"
+    ]
+  },
+  "telemetry": {
+    "classification": "public_internal",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_private_data",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain_only_approved_ids_and_hashes"
+  },
+  "fragments": [
+    {
+      "fragment_id": "source-integrated-method",
+      "disclosure_level": 3,
+      "path": "references/source-integrated-method.md"
+    },
+    {
+      "fragment_id": "contract-fixtures",
+      "disclosure_level": 4,
+      "path": "references/contract-fixtures.json"
+    }
+  ]
+}

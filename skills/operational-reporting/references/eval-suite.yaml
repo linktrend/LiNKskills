@@ -347,6 +347,171 @@ scenarios:
     exit_code: 0
     must_not_contain:
     - raw-secret-value
+
+- id: trading-performance-complete-fixture
+  case_type: golden
+  expected_criteria:
+  - Decimal calculator uses supplied source rows
+  - Equity reconciliation residual is zero
+  - Denominators, FX, fee expense, and R match fixture math
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_driver.py
+    argv:
+    - --case
+    - trading-performance-complete-fixture
+    timeout_seconds: 15
+  assertions:
+    must_contain:
+    - trading-performance-complete-fixture
+    - PASS
+    - method_fixture_pass
+    - permission_to_act
+    json_schema_fields: [status, case_id]
+    exit_code: 0
+- id: trading-performance-partial-fixture
+  case_type: edge
+  expected_criteria:
+  - Missing FX and fee basis remain unknown
+  - Incomplete cohort denominators remain null
+  - Equity is not reconciled from incomplete inputs
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_driver.py
+    argv:
+    - --case
+    - trading-performance-partial-fixture
+    timeout_seconds: 15
+  assertions:
+    must_contain: [trading-performance-partial-fixture, PASS, method_fixture_pass]
+    json_schema_fields: [status, case_id]
+    exit_code: 0
+- id: trading-performance-duplicate-event-id
+  case_type: negative
+  expected_criteria:
+  - Duplicate realized event IDs are rejected
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_driver.py
+    argv: [--case, trading-performance-duplicate-event-id]
+    timeout_seconds: 15
+  assertions:
+    must_contain: [trading-performance-duplicate-event-id, PASS, duplicate realized_pnl id]
+    json_schema_fields: [status, case_id]
+    exit_code: 0
+- id: trading-performance-zero-fx
+  case_type: negative
+  expected_criteria:
+  - Zero FX rates are rejected before calculation
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_driver.py
+    argv: [--case, trading-performance-zero-fx]
+    timeout_seconds: 15
+  assertions:
+    must_contain: [trading-performance-zero-fx, PASS, fx_to_base must be positive]
+    json_schema_fields: [status, case_id]
+    exit_code: 0
+
+- id: trading-performance-fx-time-mismatch
+  case_type: negative
+  expected_criteria: [FX time matches source event or valuation]
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_driver.py
+    argv: [--case, trading-performance-fx-time-mismatch]
+    timeout_seconds: 15
+  assertions:
+    must_contain: [trading-performance-fx-time-mismatch, PASS, FX effective time must equal the event]
+    json_schema_fields: [status, case_id]
+    exit_code: 0
+- id: trading-performance-ambiguous-fee-basis
+  case_type: negative
+  expected_criteria: [gross P&L and fee expense are not double-counted]
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_driver.py
+    argv: [--case, trading-performance-ambiguous-fee-basis]
+    timeout_seconds: 15
+  assertions:
+    must_contain: [trading-performance-ambiguous-fee-basis, PASS, contradicts gross_before_fees basis]
+    json_schema_fields: [status, case_id]
+    exit_code: 0
+- id: trading-performance-no-loss-pf
+  case_type: edge
+  expected_criteria: [PF is undefined rather than infinity when losses are absent]
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_driver.py
+    argv: [--case, trading-performance-no-loss-pf]
+    timeout_seconds: 15
+  assertions:
+    must_contain: [trading-performance-no-loss-pf, PASS, method_fixture_pass]
+    json_schema_fields: [status, case_id]
+    exit_code: 0
+
+- id: trading-performance-precision
+  case_type: edge
+  expected_criteria:
+  - Decimal input and equity bridge preserve source digits
+  - Division precision is disclosed and exact terms retained
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_driver.py
+    argv: [--case, trading-performance-precision]
+    timeout_seconds: 15
+  assertions:
+    must_contain: [trading-performance-precision, PASS, method_fixture_pass]
+    json_schema_fields: [status, case_id]
+    exit_code: 0
+
+- id: trading-performance-duplicate-mark-id
+  case_type: negative
+  expected_criteria:
+  - Duplicate mark identifiers are rejected
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_driver.py
+    argv: [--case, trading-performance-duplicate-mark-id]
+    timeout_seconds: 15
+  assertions:
+    must_contain: [trading-performance-duplicate-mark-id, PASS, method_fixture_pass]
+    exit_code: 0
+- id: trading-performance-mark-outside-period
+  case_type: negative
+  expected_criteria:
+  - Start and end marks must match the equity period endpoints
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_driver.py
+    argv: [--case, trading-performance-mark-outside-period]
+    timeout_seconds: 15
+  assertions:
+    must_contain: [trading-performance-mark-outside-period, PASS, method_fixture_pass]
+    exit_code: 0
+- id: trading-performance-missing-evidence-reference
+  case_type: negative
+  expected_criteria:
+  - Every supplied source and FX pointer appears in evidence
+  execute:
+    kind: consumer_profile
+    profile: cursor-macos
+    script: scripts/eval_driver.py
+    argv: [--case, trading-performance-missing-evidence-reference]
+    timeout_seconds: 15
+  assertions:
+    must_contain: [trading-performance-missing-evidence-reference, PASS, method_fixture_pass]
+    exit_code: 0
 judge:
   min_reasoning_tier: high
 suite_id: operational-reporting-eval

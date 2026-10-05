@@ -1,0 +1,326 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "trading-contrarian-mean-reversion",
+  "display_name": "Contrarian and mean-reversion research",
+  "version": "0.1.0",
+  "description": "Assess a specified price or spread series for reversible behavior and distinguish statistical diagnostics from tradeability.",
+  "capability_category": "trading_research",
+  "provenance": {
+    "author": "LiNKskills Library (draft)",
+    "source": "Exact source provenance: references/source-provenance.json (sha256:280925519f60630e08c9088c94f3a312a7d4556e6dbcb58f670ea243e23d444e); per-entry license/notice/disposition recorded there.",
+    "license": "No package-wide upstream license is asserted; see exact per-file source provenance and notice dispositions in references/source-provenance.json.",
+    "imported_from": "Frozen Jane draft source: skills/trading-contrarian-mean-reversion; source provenance copied unchanged for this proposal only."
+  },
+  "lifecycle_state": "draft",
+  "format_profile": "simple",
+  "compatible_runtime_profiles": [
+    "jane-openclaw"
+  ],
+  "min_capability_tier": "balanced",
+  "routing": {
+    "when_to_use": "Assess a specified price or spread series for reversible behavior and distinguish statistical diagnostics from tradeability.",
+    "when_not_to_use": [
+      "No order, trade execution, provider activation, capital mutation, or credentials.",
+      "No runtime JSON state or upstream script execution.",
+      "No method qualification or performance claim."
+    ],
+    "tags": [
+      "trading",
+      "research",
+      "jane",
+      "draft"
+    ],
+    "exclusion_rules": [
+      "No order, trade execution, provider activation, capital mutation, or credentials.",
+      "No runtime JSON state or upstream script execution.",
+      "No method qualification or performance claim."
+    ]
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "request_id",
+        "description": "Required property `request_id` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "instrument",
+        "description": "Required property `instrument` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "series_definition",
+        "description": "Required property `series_definition` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "frequency",
+        "description": "Required property `frequency` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "source_snapshot",
+        "description": "Required property `source_snapshot` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "observations",
+        "description": "Required property `observations` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "timestamp",
+              "value",
+              "unit",
+              "source_row"
+            ],
+            "properties": {
+              "timestamp": {
+                "type": "string"
+              },
+              "value": {
+                "type": "number"
+              },
+              "unit": {
+                "type": "string"
+              },
+              "source_row": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "test_plan",
+        "description": "Required property `test_plan` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "object"
+        }
+      },
+      {
+        "name": "cost_inputs",
+        "description": "Required property `cost_inputs` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "object"
+        }
+      }
+    ],
+    "optional_inputs": [],
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "request_id",
+        "instrument",
+        "series_definition",
+        "frequency",
+        "source_snapshot",
+        "observations",
+        "test_plan",
+        "cost_inputs"
+      ],
+      "properties": {
+        "request_id": {
+          "type": "string"
+        },
+        "instrument": {
+          "type": "string"
+        },
+        "series_definition": {
+          "type": "string"
+        },
+        "frequency": {
+          "type": "string"
+        },
+        "source_snapshot": {
+          "type": "string"
+        },
+        "observations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "timestamp",
+              "value",
+              "unit",
+              "source_row"
+            ],
+            "properties": {
+              "timestamp": {
+                "type": "string"
+              },
+              "value": {
+                "type": "number"
+              },
+              "unit": {
+                "type": "string"
+              },
+              "source_row": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "test_plan": {
+          "type": "object"
+        },
+        "cost_inputs": {
+          "type": "object"
+        }
+      },
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "urn:linkskills:trading-contrarian-mean-reversion:0.1.0#/definitions/input"
+    },
+    "expected_outputs": [
+      {
+        "name": "request_id",
+        "description": "Required property `request_id` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "status",
+        "description": "Required property `status` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "enum": [
+            "complete",
+            "partial",
+            "needs_input",
+            "blocked"
+          ]
+        }
+      },
+      {
+        "name": "instrument",
+        "description": "Required property `instrument` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "diagnostics",
+        "description": "Required property `diagnostics` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      },
+      {
+        "name": "signal_research",
+        "description": "Required property `signal_research` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "object"
+        }
+      },
+      {
+        "name": "robustness",
+        "description": "Required property `robustness` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array"
+        }
+      },
+      {
+        "name": "counterevidence",
+        "description": "Required property `counterevidence` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array"
+        }
+      },
+      {
+        "name": "gaps",
+        "description": "Required property `gaps` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array"
+        }
+      },
+      {
+        "name": "advisory_only",
+        "description": "Required property `advisory_only` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "const": true
+        }
+      }
+    ],
+    "procedure_summary": "Source method section `Integrated practical method` in SKILL.md: 1. Pin asset/spread definition, venue, units, sampling interval, transformation, source snapshot and full date range. Reject missing/duplicate timestamps and corporate-action inconsistencies.\n2. Plot/check level and return series, autocorrelation, outliers, missing intervals, structural breaks and regime changes; do not presume price stationarity.\n3. Apply prespecified stationarity/reversion diagnostics with test name, null, lags, window, statistic, p-value/interval and limitations. ADF failure to reject a unit root or Hurst below 0.5 alone does not prove tradable mean reversion.\n4. Estimate AR(1)/OU speed, long-run mean and half-life only if parameter sign/stability and sample adequacy support interpretation; show units in bars and convert to calendar time only with calendar mapping.\n5. Compare any proposed z-score entry/exit rule only using past-only rolling estimates and declared thresholds. Identify threshold selection, repeated tests, regime dependence and signal timing.\n6. Include spread/commission/slippage/borrow/funding constraints supplied by the user and an out-of-sample walk-forward design; never derive performance from in-sample fit.\n7. Keep exhaustion-hammer and contrarian confirmation as separate optional descriptive evidence, not proof of reversion. Return candidate/reject/insufficient evidence and conditional advisory view only; no sizing/orders.",
+    "forbidden_actions": [
+      "No order, trade execution, provider activation, capital mutation, or credentials.",
+      "No runtime JSON state or upstream script execution.",
+      "No method qualification or performance claim."
+    ],
+    "failure_handling": "Source-grounded missing/invalid evidence clauses (verbatim, with entrypoint line numbers): L36: 1. Pin asset/spread definition, venue, units, sampling interval, transformation, source snapshot and full date range. Reject missing/duplicate timestamps and corporate-action inconsistencies.; L37: 2. Plot/check level and return series, autocorrelation, outliers, missing intervals, structural breaks and regime changes; do not presume price stationarity.; L38: 3. Apply prespecified stationarity/reversion diagnostics with test name, null, lags, window, statistic, p-value/interval and limitations. ADF failure to reject a unit root or Hurst below 0.5 alone does not prove tradable mean reversion.; L42: 7. Keep exhaustion-hammer and contrarian confirmation as separate optional descriptive evidence, not proof of reversion. Return candidate/reject/insufficient evidence and conditional advisory view only; no sizing/orders.",
+    "verification_steps": [
+      "Validate the supplied input against references/schemas.json#/definitions/input and report each missing or invalid required field.",
+      "Validate the produced task output against references/schemas.json#/definitions/output; structural validity does not establish method correctness.",
+      "Use references/eval-suite.json criteria only against an actual task output; a schema check or fictional example alone is not a behavioral pass."
+    ],
+    "completion_criteria": [
+      "Include every required output property defined at references/schemas.json#/definitions/output: request_id, status, instrument, diagnostics, signal_research, robustness, counterevidence, gaps, advisory_only.",
+      "If `status` exists, its value must reflect the schema-defined gaps or missing inputs; do not assert a complete result where evidence is absent.",
+      "Keep recommendations advisory; no external action, order, live activation, portfolio mutation, or approval is represented as completed."
+    ],
+    "known_limitations": [
+      "The skill source is an isolated unqualified draft; source-derived pack metadata does not establish selection, registration, method qualification, or production suitability.",
+      "The declared runtime-profile label is preserved as source metadata; runtime-profile binding is not proved."
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read",
+      "filesystem_write"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [
+      {
+        "key": "min_reasoning_tier",
+        "value": "balanced"
+      },
+      {
+        "key": "preferred_model",
+        "value": "gpt-6.1-sol"
+      },
+      {
+        "key": "context_required",
+        "value": 64000
+      }
+    ],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "suite_hash": "sha256:300dda0058b0b05acba723bbfee4386de2de05a6ca5ce50aef2e33e9f5af2f9c",
+    "verification_refs": [
+      "references/schemas.json",
+      "references/eval-suite.json"
+    ]
+  },
+  "telemetry": {
+    "classification": "public_internal",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_private_data",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain_only_approved_ids_and_hashes"
+  }
+}

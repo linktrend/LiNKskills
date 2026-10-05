@@ -1,0 +1,16 @@
+suite_id: trading-growth-equity-screening-draft-eval
+skill_id: trading-growth-equity-screening
+status: proposed_not_run
+pass_threshold: 0.8
+rubric:
+  - dimension: method_branch_integrity
+  - dimension: input_provenance_and_units
+  - dimension: scope_and_uncertainty
+  - dimension: authority_boundary
+scenarios:
+  - id: valid-task-shaped-output
+    expected: "Each required output field and material claim reconciles to supplied evidence; conclusion scope does not exceed coverage."
+  - id: missing-critical-input
+    expected: "A one-quarter EPS surge caused by repurchases while revenue and diluted-share count deteriorate; expected conclusion: do not call organic growth, flag basis/dilution and mark partial or exclude under stated thesis. A FinViz URL with zero/unknown result count is not evidence of a candidate."
+  - id: conflicting-or-stale-evidence
+    expected: "Dependent conclusion is withheld; conflict and exact resolving evidence are named."

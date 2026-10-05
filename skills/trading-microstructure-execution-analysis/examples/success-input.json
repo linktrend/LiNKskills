@@ -1,0 +1,99 @@
+{
+  "task": "schema fixture only",
+  "as_of": "2026-10-05T09:00:00Z",
+  "question": "Synthetic schema-shape fixture; no market conclusion.",
+  "source_snapshot": {
+    "refs": [
+      {
+        "source_id": "synthetic-fixture",
+        "as_of": "2026-10-05T09:00:00Z",
+        "provenance": "fictional fixture only",
+        "sha256": null
+      }
+    ],
+    "snapshot_id": "fictional-fixture",
+    "version": "fictional-fixture",
+    "notes": []
+  },
+  "reporting_currency": "USD",
+  "task_context": {
+    "instrument": {
+      "id": "ABC",
+      "kind": "equity",
+      "unit": "shares",
+      "quote_currency": "USD",
+      "multiplier": 1,
+      "tick_size": 0.01,
+      "lot_step": 1,
+      "timezone": "UTC",
+      "session": "regular"
+    },
+    "venue_id": "venue-x",
+    "as_of": "2026-10-05T09:00:00Z",
+    "events": [
+      {
+        "event_time": "2026-10-05T09:00:00Z",
+        "receive_time": "2026-10-05T09:00:00Z",
+        "sequence": 1,
+        "kind": "quote",
+        "side": "buy",
+        "price": 99.99,
+        "quantity": 100,
+        "quantity_unit": "shares",
+        "quote_currency": "USD",
+        "source_ref": "synthetic-fixture"
+      },
+      {
+        "event_time": "2026-10-05T09:00:00Z",
+        "receive_time": "2026-10-05T09:00:00Z",
+        "sequence": 2,
+        "kind": "quote",
+        "side": "sell",
+        "price": 100.01,
+        "quantity": 100,
+        "quantity_unit": "shares",
+        "quote_currency": "USD",
+        "source_ref": "synthetic-fixture"
+      }
+    ],
+    "depth_levels": [
+      {
+        "side": "ask",
+        "price": 101,
+        "quantity": 10,
+        "quantity_unit": "shares",
+        "as_of": "2026-10-05T09:00:00Z",
+        "sequence": 1
+      }
+    ],
+    "benchmark": {
+      "kind": "arrival_mid",
+      "price": 100,
+      "currency": "USD",
+      "as_of": "2026-10-05T09:00:00Z",
+      "source_ref": "synthetic-fixture"
+    },
+    "order": {
+      "side": "buy",
+      "intended_quantity": 10,
+      "quantity_unit": "shares",
+      "arrival_time": "2026-10-05T09:00:00Z",
+      "order_id": "o1"
+    },
+    "fills": [
+      {
+        "fill_id": "f1",
+        "side": "buy",
+        "price": 101,
+        "quantity": 10,
+        "quantity_unit": "shares",
+        "multiplier": 1,
+        "quote_currency": "USD",
+        "fee": 2,
+        "fee_currency": "USD",
+        "as_of": "2026-10-05T09:00:00Z",
+        "source_ref": "synthetic-fixture"
+      }
+    ]
+  }
+}

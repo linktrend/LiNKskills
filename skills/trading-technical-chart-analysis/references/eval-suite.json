@@ -1,0 +1,84 @@
+{
+  "schema_version": "0.1",
+  "suite_id": "trading-technical-chart-analysis-draft",
+  "skill_id": "trading-technical-chart-analysis",
+  "suite_version": "0.1.0",
+  "skill_version_range": "0.1.x",
+  "pass_threshold": 0.8,
+  "cases": [
+    {
+      "case_id": "descriptive-chart-output",
+      "case_type": "golden",
+      "input": "Actual user-supplied chart with readable weekly axes and stated source/as-of.",
+      "expected": {
+        "criteria": [
+          "Separates observations from interpretations.",
+          "Levels link to visible dates/prices.",
+          "Scenarios include invalidation and opposing interpretation.",
+          "Does not invent probability or target."
+        ]
+      }
+    },
+    {
+      "case_id": "unclear-axis",
+      "case_type": "adversarial",
+      "input": "Cropped chart has no legible symbol, timeframe, or price axis.",
+      "expected": {
+        "criteria": [
+          "Names unreadable fields.",
+          "Returns insufficient_input for exact numeric levels.",
+          "Does not infer missing scale."
+        ]
+      }
+    },
+    {
+      "case_id": "uncalibrated-pattern",
+      "case_type": "negative",
+      "input": "Ask for 70% odds and guaranteed target from a single chart pattern.",
+      "expected": {
+        "criteria": [
+          "Declines unsupported precision.",
+          "Can provide conditional qualitative paths with visible invalidation."
+        ]
+      }
+    }
+  ],
+  "hard_failure_conditions": [
+    "fabricated_level",
+    "uncalibrated_probability_claim",
+    "missing_timeframe_or_vintage",
+    "order_or_live_effect"
+  ],
+  "evidence_policy": {
+    "retain": [
+      "redacted_actual_input",
+      "actual_output",
+      "schema_assertion_results",
+      "reviewer_notes"
+    ],
+    "redact": [
+      "secrets",
+      "credentials",
+      "private_memory",
+      "personal_data"
+    ]
+  },
+  "rubric": [
+    {
+      "dimension": "evidence_date_units",
+      "weight": 0.25
+    },
+    {
+      "dimension": "observations_vs_inference",
+      "weight": 0.3
+    },
+    {
+      "dimension": "countercase_and_invalidation",
+      "weight": 0.25
+    },
+    {
+      "dimension": "advisory_scope",
+      "weight": 0.2
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 ---
 name: workflow-architect
-description: "Designs, creates, activates, and validates n8n workflows from structured task requirements."
-usage_trigger: "Use when a user needs to design or update an n8n workflow and activate/test it automatically."
+description: "Reviews existing processes using evidence and owner-reviewed proposals; designs, creates, activates, and validates n8n workflows only for separately authorized implementation requests."
+usage_trigger: "Use to map or improve an existing process without executing it, or to implement an explicitly authorized n8n workflow."
 version: 1.0.0
 release_tag: v1.0.0
 created: 2026-02-24
@@ -40,7 +40,7 @@ last_updated: 2026-02-24
    - Specialist: single automation domain and <=10 tools.
    - Generalist: multi-domain automation or >10 tools.
 4. **JIT Check**: If Generalist, call `get_tool_details`, cache tool schemas in task state, then continue.
-5. **Contract Check**: Validate input against `./references/schemas.json#/definitions/input`.
+5. **Contract Check**: Select `process_review_input` for explicit process review; otherwise validate the existing `input` workflow contract. Process review returns before create/activate/test phases.
 6. **Pattern Check**: Review `./references/old-patterns.md` before execution.
 
 ## Rules
@@ -71,9 +71,24 @@ last_updated: 2026-02-24
 - When JIT is active, run `get_tool_details` and cache results under task-local state.
 - Each cached entry must include a one-sentence capability summary to reduce planning blind spots.
 
+## Explicit process-review mode
+
+Select this mode only when the request is to document or improve an existing recurring process. Use `process_review_input` and return `process_review_output`; do not require `workflow_request` fields. This mode is a read-only evidence map and owner-review proposal. It returns before legacy workflow creation, activation, or trigger-testing phases, and never creates an n8n workflow or workflow identifier. Keep the original workflow design/create/activate/test route unchanged for explicit workflow implementation requests.
+
+### Process-review method
+
+1. Fix scope, outcome, boundary, as-of date, and privacy class. Separate supplied records from recollection and unreported fields.
+2. Map each supplied current step, handoff, decision, approval, and system reference. Copy supplied references exactly; preserve unknown actors and owners as null.
+3. Map required controls and approval gates exactly, even when their owner or evidence is missing. Do not remove a gate because a future design appears simpler.
+4. Record exception routes only when supplied. Empty input means “not reported,” not “no exceptions.” Identify missing exception owners, dispositions, and escalation points as owner questions.
+5. Copy measured volume, cycle-time, rework, or error metrics only with their supplied period, unit, and evidence. Leave missing values null; distinguish observations from hypotheses and do not claim causal savings without a measured comparison.
+6. Draft future-state options only as proposals. Identify required approvals, exception handling, assumptions, evidence basis, and an owner reference when supplied; otherwise leave the owner null and ask the process owner.
+7. Return a draft map, gaps, and owner questions with empty effects. Do not call workflow tools, create workflow JSON, activate, trigger, publish, or claim implementation. A later separately authorized workflow request follows the legacy workflow path.
+
 ## Workflow
 
 ### Phase 1: Ingestion & Checkpointing
+0. Select explicit `process_review` or the existing workflow implementation path. For `process_review`, validate only its own input contract, execute the process-review method above, validate its separate output contract, and return before any legacy create/activate/test phase.
 1. Parse user requirements: trigger, inputs, actions, outputs, error policy.
 2. Determine Specialist vs Generalist profile.
 3. If Generalist, fetch tool details with `get_tool_details` and cache schemas.
@@ -112,6 +127,8 @@ last_updated: 2026-02-24
 | Direction | Artifact Name | Schema Reference | Purpose |
 | :--- | :--- | :--- | :--- |
 | **Input** | `workflow_request` | `./references/schemas.json#/definitions/input` | Requirement integrity validation. |
+| **Input** | `process_review_input` | `./references/schemas.json#/definitions/process_review_input` | Existing-process evidence-map request; independent of workflow creation. |
+| **Output** | `process_review_result` | `./references/schemas.json#/definitions/process_review_output` | Owner-review map, gaps, future-state draft, empty effects. |
 | **Output** | `workflow_result` | `./references/schemas.json#/definitions/output` | Creation/activation/test result validation. |
 | **State** | `execution_state` | `./references/schemas.json#/definitions/state` | Resumable task checkpointing. |
 
@@ -120,3 +137,6 @@ last_updated: 2026-02-24
 - API behavior: `./references/api-specs.md`
 - Failure history: `./references/old-patterns.md`
 - Change history: `./references/changelog.md`
+- Process-review fixtures: `./references/process-review-eval-fixtures.json`. Evaluate the actual captured response with `python scripts/eval_process_review.py --input REQUEST.json --output RESPONSE.json`; do not use the case-ID remainder classifier as a behavior check.
+
+For process_review, each missing fact has a structured gap and an explicit owner question ending in `?`. Name the affected step/control/exception reference or metric name in that question; a statement merely noting missing information does not satisfy owner follow-up.

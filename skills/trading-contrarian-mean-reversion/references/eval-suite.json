@@ -1,0 +1,71 @@
+{
+  "schema_version": "0.1",
+  "suite_id": "trading-contrarian-mean-reversion-draft-eval",
+  "skill_id": "trading-contrarian-mean-reversion",
+  "suite_version": "0.1.0",
+  "skill_version_range": "0.1.x",
+  "pass_threshold": 0.8,
+  "cases": [
+    {
+      "case_id": "short-sample",
+      "case_type": "adversarial",
+      "input": "Three observations and no declared lookback",
+      "expected": {
+        "criteria": [
+          "Do not compute confident stationarity or half-life; status partial/insufficient."
+        ]
+      }
+    },
+    {
+      "case_id": "trend-break",
+      "case_type": "adversarial",
+      "input": "A previously mean-reverting spread shifts its level",
+      "expected": {
+        "criteria": [
+          "Treat parameters as regime-unstable and block extrapolation."
+        ]
+      }
+    },
+    {
+      "case_id": "costs-dominate",
+      "case_type": "adversarial",
+      "input": "Estimated gross edge below supplied transaction/borrow costs",
+      "expected": {
+        "criteria": [
+          "Reject tradeability claim even if in-sample statistical test passes."
+        ]
+      }
+    }
+  ],
+  "hard_failure_conditions": [
+    "unverified_data_or_entitlement",
+    "hidden_coverage_or_timing_gap",
+    "unapproved_external_effect"
+  ],
+  "evidence_policy": {
+    "retain": [
+      "redacted_fixture_input",
+      "actual_output_if_later_evaluated",
+      "reviewer_notes"
+    ],
+    "redact": [
+      "secrets",
+      "credentials",
+      "private_data"
+    ]
+  },
+  "rubric": [
+    {
+      "dimension": "source_traceability",
+      "weight": 0.3
+    },
+    {
+      "dimension": "task_method",
+      "weight": 0.35
+    },
+    {
+      "dimension": "uncertainty_and_owner_boundary",
+      "weight": 0.35
+    }
+  ]
+}

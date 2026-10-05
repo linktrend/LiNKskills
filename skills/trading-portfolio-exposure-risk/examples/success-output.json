@@ -1,0 +1,93 @@
+{
+  "status": "complete",
+  "scope": {
+    "as_of": "2026-10-05T09:00:00Z",
+    "period_or_horizon": "fictional-fixture",
+    "currency": "USD",
+    "version": "fictional-fixture",
+    "limitations": [
+      "Synthetic structural arithmetic fixture only; not observed market evidence, behavioral qualification, or a performance claim."
+    ]
+  },
+  "analysis": {
+    "status": "complete",
+    "reconciliation": {
+      "nav": 1000,
+      "currency": "USD",
+      "marked_holdings_total": 1000,
+      "residual": 0,
+      "as_of": "2026-10-05T09:00:00Z",
+      "status": "reconciled"
+    },
+    "exposure_rows": [
+      {
+        "instrument_id": "ABC",
+        "gross_notional": 1000,
+        "delta_equivalent": 1000,
+        "market_value_reporting": 1000,
+        "exposure_fraction_nav": 1,
+        "currency": "USD",
+        "nav_denominator": 1000,
+        "issuer": "ABC Inc",
+        "sector": "Technology",
+        "theme": null,
+        "risk_factor": null,
+        "status": "classified",
+        "as_of": "2026-10-05T09:00:00Z",
+        "evidence_refs": [
+          "synthetic-fixture"
+        ],
+        "denominator_unit": "reporting_currency"
+      }
+    ],
+    "metric_rows": [],
+    "scenario_rows": [
+      {
+        "scenario_id": "down-10",
+        "instrument_id": "ABC",
+        "price_shock_fraction": -0.1,
+        "fx_shock_fraction": 0,
+        "pnl_reporting_currency": -100,
+        "currency": "USD",
+        "assumptions": [
+          "10% linear price shock; no FX change"
+        ],
+        "status": "calculated"
+      }
+    ],
+    "policy_status": "not_assessed",
+    "evidence_refs": [
+      "synthetic-fixture"
+    ]
+  },
+  "recommendation": {
+    "stance": "no_action",
+    "proposed_target": {
+      "value": 1,
+      "unit": "fictional-fixture",
+      "currency": "USD",
+      "as_of": "2026-10-05T09:00:00Z",
+      "basis": "fictional-fixture"
+    },
+    "proposed_risk_level": {
+      "value": 1,
+      "unit": "fictional-fixture",
+      "currency": "USD",
+      "as_of": "2026-10-05T09:00:00Z",
+      "basis": "fictional-fixture"
+    },
+    "basis": [],
+    "counterevidence": [],
+    "reversal_evidence": [],
+    "advisory_only": true,
+    "approval_required": true
+  },
+  "evidence_gate": {
+    "critical_inputs_resolved": true,
+    "source_timestamps_reconciled": true,
+    "unit_contracts_resolved": true,
+    "limiting_gaps": []
+  },
+  "gaps": [],
+  "external_effects": []
+}

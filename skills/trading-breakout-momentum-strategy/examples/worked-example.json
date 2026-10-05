@@ -1,0 +1,97 @@
+{
+  "fictional_fixture": true,
+  "notice": "Invented security, dates, OHLCV, and parameters demonstrate calculation/schema only; no market recommendation.",
+  "input": {
+    "request_id": "FICTIONAL-BREAKOUT-01",
+    "variant": "momentum_burst",
+    "as_of_date": "2026-09-30",
+    "universe_snapshot": "fictional-universe-v1",
+    "venue_calendar": "fictional exchange daily sessions",
+    "source_snapshot": "fictional-bars-v1",
+    "bar_policy": "split-adjusted daily bars; timestamps represent session date",
+    "benchmark": "FIC-IDX",
+    "parameters": {
+      "user_selected_min_close_return_pct": 4.0,
+      "user_selected_min_volume_ratio": 1.2,
+      "interpretation": "research thresholds; not validated defaults"
+    },
+    "bars": [
+      {
+        "symbol": "FIC-A",
+        "date": "2026-09-29",
+        "open": 99,
+        "high": 102,
+        "low": 98,
+        "close": 100,
+        "volume": 200000,
+        "price_unit": "fictional USD/share",
+        "volume_unit": "shares",
+        "source_row": "fictional-1",
+        "adjusted": true
+      },
+      {
+        "symbol": "FIC-A",
+        "date": "2026-09-30",
+        "open": 101,
+        "high": 106,
+        "low": 100,
+        "close": 104.5,
+        "volume": 240000,
+        "price_unit": "fictional USD/share",
+        "volume_unit": "shares",
+        "source_row": "fictional-2",
+        "adjusted": true
+      }
+    ],
+    "events": [],
+    "controls": {
+      "delisted_history_included": false,
+      "transaction_costs": "not supplied"
+    }
+  },
+  "output": {
+    "request_id": "FICTIONAL-BREAKOUT-01",
+    "status": "partial",
+    "variant": "momentum_burst",
+    "as_of_date": "2026-09-30",
+    "universe_coverage": {
+      "universe_snapshot": "fictional-universe-v1",
+      "rows_supplied": 2,
+      "symbols": 1,
+      "delisted_history_included": false
+    },
+    "candidates": [
+      {
+        "symbol": "FIC-A",
+        "classification": "watch",
+        "evidence": [
+          "Close return = (104.5 / 100 - 1) x 100 = 4.5%.",
+          "Volume ratio = 240000 / 200000 = 1.2x."
+        ],
+        "matched_parameters": [
+          "User-selected 4.0% close-return threshold",
+          "User-selected 1.2x volume threshold"
+        ],
+        "invalidation": [
+          "Pattern persistence and next-session behavior not observed."
+        ],
+        "source_rows": [
+          "fictional-1",
+          "fictional-2"
+        ],
+        "counterevidence": [
+          "Only two fictional bars; no chart review or benchmark-relative evidence."
+        ]
+      }
+    ],
+    "cohort_summary": null,
+    "method_limits": [
+      "Fictional arithmetic only; thresholds user-selected and unvalidated.",
+      "No delisted names or cost model, so no edge or performance conclusion."
+    ],
+    "gaps": [
+      "No extended price history, industry classification, event evidence, or proper population coverage."
+    ],
+    "advisory_only": true
+  }
+}

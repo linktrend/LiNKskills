@@ -1,0 +1,13 @@
+suite_id: trading-breakout-momentum-strategy-draft
+skill_id: trading-breakout-momentum-strategy
+status: proposed_not_run
+pass_threshold: 0.8
+rubric:
+  - dimension: method_branch_integrity
+  - dimension: input_traceability
+  - dimension: selection_bias_and_limits
+scenarios:
+  - id: adjustment_gap
+    expected: Do not compare returns when adjustment status is unknown.
+  - id: winner_only
+    expected: Expose survivorship and refuse edge conclusions.

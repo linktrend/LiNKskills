@@ -1,0 +1,314 @@
+{
+  "schema_ref": "references/schemas.json#/definitions/input",
+  "status": "schema_fixture_only_not_behavioral_evaluation",
+  "valid_case": {
+    "input": {
+      "instrument": "FICTIONAL-MES-DEC26",
+      "side": "long",
+      "as_of": "2026-10-05T09:00:00+08:00",
+      "nav": 1000000,
+      "nav_currency": "TWD",
+      "risk_budget": 0.01,
+      "risk_budget_basis": "fraction_of_nav",
+      "entry": 5500,
+      "stop": 5488,
+      "price_unit": "index_point",
+      "quote_currency": "USD",
+      "multiplier": 5,
+      "fx_to_nav": {
+        "rate": 32,
+        "quote_currency": "USD",
+        "nav_currency": "TWD",
+        "convention": "nav_currency_per_quote_currency",
+        "as_of": "2026-10-05T09:00:00+08:00",
+        "source": "fictional owner-supplied FX quote"
+      },
+      "lot_step": 1,
+      "tick_size": 0.25,
+      "cost_per_unit": {
+        "amount": 1.5,
+        "currency": "USD",
+        "basis": "cash_per_position_unit_round_trip",
+        "source": "fictional round-trip fee estimate"
+      },
+      "gap_stress": {
+        "amount": 3,
+        "price_unit": "index_point",
+        "basis": "additional_adverse_quote_price_units_beyond_stop",
+        "source": "fictional owner-supplied stress"
+      },
+      "caps": null,
+      "volatility_scenarios": [],
+      "known_gaps": []
+    },
+    "expected": "accept numeric futures/FX input; calculation fixture is separately in worked-bounded-sizing.json"
+  },
+  "invalid_case": {
+    "input": {
+      "instrument": "FICTIONAL-MES-DEC26",
+      "side": "long",
+      "as_of": "2026-10-05T09:00:00+08:00",
+      "nav": 1000000,
+      "nav_currency": "TWD",
+      "risk_budget": 0.01,
+      "risk_budget_basis": "fraction_of_nav",
+      "entry": 5500,
+      "stop": 5488,
+      "price_unit": "index_point",
+      "quote_currency": "USD",
+      "multiplier": 5,
+      "fx_to_nav": {
+        "rate": 32,
+        "quote_currency": "USD",
+        "nav_currency": "TWD",
+        "convention": "nav_currency_per_quote_currency",
+        "as_of": "2026-10-05T09:00:00+08:00",
+        "source": "fictional owner-supplied FX quote"
+      },
+      "lot_step": 1,
+      "tick_size": 0.25,
+      "cost_per_unit": {
+        "amount": 1.5,
+        "currency": "USD",
+        "basis": "cash_per_position_unit_round_trip",
+        "source": "fictional round-trip fee estimate"
+      },
+      "gap_stress": {
+        "amount": 3,
+        "price_unit": "index_point",
+        "basis": "cash_per_contract",
+        "source": "fictional owner-supplied stress"
+      },
+      "caps": null,
+      "volatility_scenarios": [],
+      "known_gaps": []
+    },
+    "expected": "reject invalid gap-stress unit basis"
+  },
+  "valid_partial_case": {
+    "schema_ref": "references/schemas.json#/definitions/input",
+    "input": {
+      "instrument": "FICTIONAL-MES",
+      "side": "long",
+      "known_gaps": [
+        "entry/stop absent",
+        "contract unit and multiplier absent",
+        "NAV risk budget absent",
+        "FX/cost/gap assumptions absent"
+      ]
+    },
+    "expected": "accept input; resulting output must remain partial and preserve the gaps"
+  },
+  "partial_output_case": {
+    "schema_ref": "references/schemas.json#/definitions/output",
+    "output": {
+      "status": "partial",
+      "unit_loss": {
+        "side": "long",
+        "entry": null,
+        "stop": null,
+        "distance_quote_price_units": null,
+        "price_unit": null,
+        "quote_currency": null,
+        "multiplier_quote_cash_per_price_unit_per_position_unit": null,
+        "fx_nav_per_quote": null,
+        "stop_loss_nav_currency_per_unit": null,
+        "cost_amount_per_unit": null,
+        "cost_currency": null,
+        "gap_beyond_stop_quote_price_units": null,
+        "gap_loss_nav_currency_per_unit": null,
+        "total_stressed_loss_nav_currency_per_unit": null,
+        "nav_currency": null,
+        "formula": "Not computed; price, contract multiplier, currency conversion, costs and gap assumptions are not supplied."
+      },
+      "risk_budget_nav": null,
+      "raw_quantity": null,
+      "rounded_quantity": null,
+      "recomputed_risk_nav": null,
+      "binding_constraints": [],
+      "scenario_table": [],
+      "assumptions": [],
+      "gaps": [
+        "entry and stop unavailable",
+        "price_unit, quote_currency and multiplier unavailable",
+        "risk budget/NAV unavailable",
+        "FX, round-trip cost and gap stress unavailable"
+      ],
+      "advisory_proposal": null,
+      "owner_handoffs": [
+        "No numeric size proposal until required values and owner limits are supplied."
+      ]
+    },
+    "expected": "accept partial; unknown values remain explicit"
+  },
+  "invalid_completed_case": {
+    "schema_ref": "references/schemas.json#/definitions/output",
+    "output": {
+      "status": "complete",
+      "unit_loss": {
+        "side": "long",
+        "entry": null,
+        "stop": null,
+        "distance_quote_price_units": null,
+        "price_unit": null,
+        "quote_currency": null,
+        "multiplier_quote_cash_per_price_unit_per_position_unit": null,
+        "fx_nav_per_quote": null,
+        "stop_loss_nav_currency_per_unit": null,
+        "cost_amount_per_unit": null,
+        "cost_currency": null,
+        "gap_beyond_stop_quote_price_units": null,
+        "gap_loss_nav_currency_per_unit": null,
+        "total_stressed_loss_nav_currency_per_unit": null,
+        "nav_currency": null,
+        "formula": "Not computed; price, contract multiplier, currency conversion, costs and gap assumptions are not supplied."
+      },
+      "risk_budget_nav": null,
+      "raw_quantity": null,
+      "rounded_quantity": null,
+      "recomputed_risk_nav": null,
+      "binding_constraints": [],
+      "scenario_table": [],
+      "assumptions": [],
+      "gaps": [
+        "entry and stop unavailable",
+        "price_unit, quote_currency and multiplier unavailable",
+        "risk budget/NAV unavailable",
+        "FX, round-trip cost and gap stress unavailable"
+      ],
+      "advisory_proposal": null,
+      "owner_handoffs": [
+        "No numeric size proposal until required values and owner limits are supplied."
+      ]
+    },
+    "expected": "reject complete status with unresolved gaps and null computation fields"
+  },
+  "valid_numeric_futures_fx_case": {
+    "schema_ref": "references/schemas.json#/definitions/input",
+    "input": {
+      "instrument": "FICTIONAL-MES-DEC26",
+      "side": "long",
+      "as_of": "2026-10-05T09:00:00+08:00",
+      "nav": 1000000,
+      "nav_currency": "TWD",
+      "risk_budget": 0.01,
+      "risk_budget_basis": "fraction_of_nav",
+      "entry": 5500,
+      "stop": 5488,
+      "price_unit": "index_point",
+      "quote_currency": "USD",
+      "multiplier": 5,
+      "fx_to_nav": {
+        "rate": 32,
+        "quote_currency": "USD",
+        "nav_currency": "TWD",
+        "convention": "nav_currency_per_quote_currency",
+        "as_of": "2026-10-05T09:00:00+08:00",
+        "source": "fictional owner-supplied FX quote"
+      },
+      "lot_step": 1,
+      "tick_size": 0.25,
+      "cost_per_unit": {
+        "amount": 1.5,
+        "currency": "USD",
+        "basis": "cash_per_position_unit_round_trip",
+        "source": "fictional round-trip fee estimate"
+      },
+      "gap_stress": {
+        "amount": 3,
+        "price_unit": "index_point",
+        "basis": "additional_adverse_quote_price_units_beyond_stop",
+        "source": "fictional owner-supplied stress"
+      },
+      "caps": null,
+      "volatility_scenarios": [],
+      "known_gaps": []
+    },
+    "expected": "accept numeric futures and FX fields with explicitly distinct price unit and quote cash currency"
+  },
+  "invalid_units_case": {
+    "schema_ref": "references/schemas.json#/definitions/input",
+    "input": {
+      "instrument": "FICTIONAL-MES-DEC26",
+      "side": "long",
+      "as_of": "2026-10-05T09:00:00+08:00",
+      "nav": 1000000,
+      "nav_currency": "TWD",
+      "risk_budget": 0.01,
+      "risk_budget_basis": "fraction_of_nav",
+      "entry": 5500,
+      "stop": 5488,
+      "price_unit": "index_point",
+      "quote_currency": "USD",
+      "multiplier": 5,
+      "fx_to_nav": {
+        "rate": 32,
+        "quote_currency": "USD",
+        "nav_currency": "TWD",
+        "convention": "nav_currency_per_quote_currency",
+        "as_of": "2026-10-05T09:00:00+08:00",
+        "source": "fictional owner-supplied FX quote"
+      },
+      "lot_step": 1,
+      "tick_size": 0.25,
+      "cost_per_unit": {
+        "amount": 1.5,
+        "currency": "USD",
+        "basis": "cash_per_position_unit_round_trip",
+        "source": "fictional round-trip fee estimate"
+      },
+      "gap_stress": {
+        "amount": 3,
+        "price_unit": "USD",
+        "basis": "additional_adverse_quote_price_units_beyond_stop",
+        "source": "fictional owner-supplied stress"
+      },
+      "caps": null,
+      "volatility_scenarios": [],
+      "known_gaps": []
+    },
+    "expected": "reject by task method: gap_stress.price_unit must exactly equal input.price_unit before calculation; this cross-field invariant is not established by the JSON Schema fixture validator."
+  },
+  "false_completed_case": {
+    "schema_ref": "references/schemas.json#/definitions/output",
+    "output": {
+      "status": "complete",
+      "unit_loss": {
+        "side": "long",
+        "entry": null,
+        "stop": null,
+        "distance_quote_price_units": null,
+        "price_unit": null,
+        "quote_currency": null,
+        "multiplier_quote_cash_per_price_unit_per_position_unit": null,
+        "fx_nav_per_quote": null,
+        "stop_loss_nav_currency_per_unit": null,
+        "cost_amount_per_unit": null,
+        "cost_currency": null,
+        "gap_beyond_stop_quote_price_units": null,
+        "gap_loss_nav_currency_per_unit": null,
+        "total_stressed_loss_nav_currency_per_unit": null,
+        "nav_currency": null,
+        "formula": "Not computed; price, contract multiplier, currency conversion, costs and gap assumptions are not supplied."
+      },
+      "risk_budget_nav": null,
+      "raw_quantity": null,
+      "rounded_quantity": null,
+      "recomputed_risk_nav": null,
+      "binding_constraints": [],
+      "scenario_table": [],
+      "assumptions": [],
+      "gaps": [
+        "entry and stop unavailable",
+        "price_unit, quote_currency and multiplier unavailable",
+        "risk budget/NAV unavailable",
+        "FX, round-trip cost and gap stress unavailable"
+      ],
+      "advisory_proposal": null,
+      "owner_handoffs": [
+        "No numeric size proposal until required values and owner limits are supplied."
+      ]
+    },
+    "expected": "reject false complete output"
+  }
+}

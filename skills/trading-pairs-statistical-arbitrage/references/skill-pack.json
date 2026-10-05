@@ -1,0 +1,592 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "trading-pairs-statistical-arbitrage",
+  "display_name": "Pairs and statistical-arbitrage research",
+  "version": "0.1.0",
+  "description": "Assess whether a specified pair/universe has a robust, tradable statistical relationship and produce a scoped research dossier.",
+  "capability_category": "trading_research",
+  "provenance": {
+    "author": "LiNKskills Library",
+    "source": "Exact source provenance: references/source-provenance.json (sha256:46d3e236b074257ec4be86eca09e964c17c0c784fd71c58eb7f6a589e2d36f11); per-entry license/notice/disposition recorded there.",
+    "license": "No package-wide upstream license is asserted; see exact per-file source provenance and notice dispositions in references/source-provenance.json.",
+    "imported_from": "Frozen Jane draft source: skills/trading-pairs-statistical-arbitrage; source provenance copied unchanged for this proposal only."
+  },
+  "lifecycle_state": "draft",
+  "format_profile": "simple",
+  "compatible_runtime_profiles": [
+    "jane-openclaw"
+  ],
+  "min_capability_tier": "balanced",
+  "routing": {
+    "when_to_use": "Use for pair screening, cointegration, spread diagnostics, or statistical-arbitrage research.",
+    "when_not_to_use": [
+      "Do not place orders, contact a broker, alter a portfolio, or activate live capital.",
+      "Do not invent market data, source access, paid entitlements, historical validation, or method passes.",
+      "Do not treat structural validation or fictional fixtures as strategy validation.",
+      "Do not replace the existing LiNKtrading engine or create runtime JSON state/sidecars."
+    ],
+    "tags": [
+      "trading",
+      "research",
+      "jane",
+      "draft"
+    ],
+    "exclusion_rules": [
+      "Do not place orders, contact a broker, alter a portfolio, or activate live capital.",
+      "Do not invent market data, source access, paid entitlements, historical validation, or method passes.",
+      "Do not treat structural validation or fictional fixtures as strategy validation.",
+      "Do not replace the existing LiNKtrading engine or create runtime JSON state/sidecars."
+    ]
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "request_id",
+        "description": "Required property `request_id` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "universe",
+        "description": "Required property `universe` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "as_of_date",
+        "description": "Required property `as_of_date` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "frequency",
+        "description": "Required property `frequency` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "daily",
+            "weekly",
+            "intraday"
+          ]
+        }
+      },
+      {
+        "name": "price_basis",
+        "description": "Required property `price_basis` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "split_adjusted",
+            "split_and_distribution_adjusted",
+            "raw_close"
+          ]
+        }
+      },
+      {
+        "name": "bars",
+        "description": "Required property `bars` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "symbol": {
+                "type": "string"
+              },
+              "date": {
+                "type": "string"
+              },
+              "close": {
+                "type": "number"
+              },
+              "source_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "symbol",
+              "date",
+              "close",
+              "source_id"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      {
+        "name": "model_spec",
+        "description": "Required property `model_spec` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "test": {
+              "type": "string"
+            },
+            "regression": {
+              "type": "string"
+            },
+            "deterministic": {
+              "type": "string"
+            },
+            "lag_rule": {
+              "type": "string"
+            },
+            "train_end": {
+              "type": "string"
+            },
+            "test_start": {
+              "type": "string"
+            },
+            "search_count": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "test",
+            "regression",
+            "deterministic",
+            "lag_rule",
+            "train_end",
+            "test_start",
+            "search_count"
+          ],
+          "additionalProperties": false
+        }
+      },
+      {
+        "name": "cost_inputs",
+        "description": "Required property `cost_inputs` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "commission_bps": {
+              "type": "integer"
+            },
+            "spread_bps": {
+              "type": "integer"
+            },
+            "borrow_bps_annual": {
+              "type": "integer"
+            },
+            "availability": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "commission_bps",
+            "spread_bps",
+            "borrow_bps_annual",
+            "availability"
+          ],
+          "additionalProperties": false
+        }
+      },
+      {
+        "name": "controls",
+        "description": "Required property `controls` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "walk_forward_required": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "walk_forward_required"
+          ],
+          "additionalProperties": false
+        }
+      }
+    ],
+    "optional_inputs": [],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "request_id": {
+          "type": "string"
+        },
+        "universe": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "as_of_date": {
+          "type": "string"
+        },
+        "frequency": {
+          "type": "string",
+          "enum": [
+            "daily",
+            "weekly",
+            "intraday"
+          ]
+        },
+        "price_basis": {
+          "type": "string",
+          "enum": [
+            "split_adjusted",
+            "split_and_distribution_adjusted",
+            "raw_close"
+          ]
+        },
+        "bars": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "symbol": {
+                "type": "string"
+              },
+              "date": {
+                "type": "string"
+              },
+              "close": {
+                "type": "number"
+              },
+              "source_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "symbol",
+              "date",
+              "close",
+              "source_id"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "model_spec": {
+          "type": "object",
+          "properties": {
+            "test": {
+              "type": "string"
+            },
+            "regression": {
+              "type": "string"
+            },
+            "deterministic": {
+              "type": "string"
+            },
+            "lag_rule": {
+              "type": "string"
+            },
+            "train_end": {
+              "type": "string"
+            },
+            "test_start": {
+              "type": "string"
+            },
+            "search_count": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "test",
+            "regression",
+            "deterministic",
+            "lag_rule",
+            "train_end",
+            "test_start",
+            "search_count"
+          ],
+          "additionalProperties": false
+        },
+        "cost_inputs": {
+          "type": "object",
+          "properties": {
+            "commission_bps": {
+              "type": "integer"
+            },
+            "spread_bps": {
+              "type": "integer"
+            },
+            "borrow_bps_annual": {
+              "type": "integer"
+            },
+            "availability": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "commission_bps",
+            "spread_bps",
+            "borrow_bps_annual",
+            "availability"
+          ],
+          "additionalProperties": false
+        },
+        "controls": {
+          "type": "object",
+          "properties": {
+            "walk_forward_required": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "walk_forward_required"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "request_id",
+        "universe",
+        "as_of_date",
+        "frequency",
+        "price_basis",
+        "bars",
+        "model_spec",
+        "cost_inputs",
+        "controls"
+      ],
+      "additionalProperties": false,
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "urn:linkskills:trading-pairs-statistical-arbitrage:0.1.0#/definitions/input"
+    },
+    "expected_outputs": [
+      {
+        "name": "request_id",
+        "description": "Required property `request_id` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "status",
+        "description": "Required property `status` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "enum": [
+            "complete",
+            "partial",
+            "insufficient_input",
+            "no_view"
+          ]
+        }
+      },
+      {
+        "name": "as_of_date",
+        "description": "Required property `as_of_date` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "scope",
+        "description": "Required property `scope` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "pairs",
+        "description": "Required property `pairs` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "symbol_a": {
+                "type": "string"
+              },
+              "symbol_b": {
+                "type": "string"
+              },
+              "integration_order": {
+                "type": "object",
+                "properties": {
+                  "AAA": {
+                    "type": "string"
+                  },
+                  "BBB": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "AAA",
+                  "BBB"
+                ],
+                "additionalProperties": false
+              },
+              "method": {
+                "type": "string"
+              },
+              "train_window": {
+                "type": "string"
+              },
+              "test_window": {
+                "type": "string"
+              },
+              "intercept": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "hedge_ratio_units": {
+                "type": "string"
+              },
+              "hedge_ratio": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "cointegration_statistic": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "cointegration_pvalue": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "critical_values_source": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "rolling_stability": {
+                "type": "string"
+              },
+              "half_life_days": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "current_spread_z": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "multiple_test_adjustment": {
+                "type": "string"
+              },
+              "market_beta_neutrality": {
+                "type": "string"
+              },
+              "borrow_cost_and_availability": {
+                "type": "string"
+              },
+              "transaction_cost_stress": {
+                "type": "string"
+              },
+              "research_view": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "symbol_a",
+              "symbol_b",
+              "integration_order",
+              "method",
+              "train_window",
+              "test_window",
+              "intercept",
+              "hedge_ratio_units",
+              "hedge_ratio",
+              "cointegration_statistic",
+              "cointegration_pvalue",
+              "critical_values_source",
+              "rolling_stability",
+              "half_life_days",
+              "current_spread_z",
+              "multiple_test_adjustment",
+              "market_beta_neutrality",
+              "borrow_cost_and_availability",
+              "transaction_cost_stress",
+              "research_view"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      {
+        "name": "conclusion",
+        "description": "Required property `conclusion` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      }
+    ],
+    "procedure_summary": "Source method section `Practical method` in SKILL.md: 1. Define pair universe, listing/industry, as-of, bar frequency, horizon, shortability assumptions and selection search count before looking at outcomes.\n2. Validate identifier/corporate-action adjustments, calendars, missingness and price/return fields. Reject misaligned or stale pairs; do not forward-fill large gaps or mix total-return prices with raw prices.\n3. Check each series’ integration order; use correlation/return co-movement only to reduce candidates. Do not infer cointegration from correlation or ordinary ADF on raw-price spread.\n4. Predeclare model: Engle–Granger regression orientation, intercept/trend, lag selection, sample window and cointegration-specific inference; test both directions and adjust for number of pairs. Use Johansen only for appropriate multivariate design.\n5. Freeze estimation window; derive β/α and a unit-explicit residual or log-ratio. Compute stationarity, rolling hedge stability, structural-break, half-life only if residual model supports it, and train/test diagnostics.\n6. Calculate current spread z-score using only historical training/rolling parameters; state standardization window and avoid look-ahead. A threshold crossing is a hypothesis, not a signal proof.\n7. Evaluate dollar-notional, cointegration unit hedge and market-factor beta separately; include short locate/borrow, dividend financing, fees, spread, impact, gap and legging stress. Missing shortability/cost evidence yields no trade thesis.\n8. Compare walk-forward results to each leg and simple controls, disclose all pair searches and failures, and report candidate/no-view with assumptions/invalidation. Conditional advisory sizing is allowed when budget and constraints are supplied; no orders or execution.",
+    "forbidden_actions": [
+      "Do not place orders, contact a broker, alter a portfolio, or activate live capital.",
+      "Do not invent market data, source access, paid entitlements, historical validation, or method passes.",
+      "Do not treat structural validation or fictional fixtures as strategy validation.",
+      "Do not replace the existing LiNKtrading engine or create runtime JSON state/sidecars."
+    ],
+    "failure_handling": "Source section `## Failure handling and boundaries` in SKILL.md: - Missing/stale/conflicting data: stop dependent calculations, preserve observed values, mark partial/no-view and name the next evidence needed.\n- Conflicting strategy variants: select by the user’s stated objective; do not average thresholds or silently switch strategy.\n- Jane may give conditional research/strategy/position-sizing/exit recommendations when requested and supplied constraints support them. Recommendations are advice only and never authorize external action.\n- No manual trading, order placement, broker interaction, portfolio mutation or live activation. Any later activation remains on LiNKtrading and requires Lisa plus Carlos independent authenticated approvals over two channels against the exact version.\n- Eric owns software/Nautilus adapters; Sara owns legal/accounting determinations.",
+    "verification_steps": [
+      "Validate the supplied input against references/schemas.json#/definitions/input and report each missing or invalid required field.",
+      "Validate the produced task output against references/schemas.json#/definitions/output; structural validity does not establish method correctness.",
+      "Use references/eval-suite.json criteria only against an actual task output; a schema check or fictional example alone is not a behavioral pass."
+    ],
+    "completion_criteria": [
+      "Include every required output property defined at references/schemas.json#/definitions/output: request_id, status, as_of_date, scope, pairs, conclusion.",
+      "If `status` exists, its value must reflect the schema-defined gaps or missing inputs; do not assert a complete result where evidence is absent.",
+      "Keep recommendations advisory; no external action, order, live activation, portfolio mutation, or approval is represented as completed."
+    ],
+    "known_limitations": [
+      "The skill source is an isolated unqualified draft; source-derived pack metadata does not establish selection, registration, method qualification, or production suitability.",
+      "The declared runtime-profile label is preserved as source metadata; runtime-profile binding is not proved."
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read",
+      "filesystem_write"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [
+      {
+        "key": "min_reasoning_tier",
+        "value": "balanced"
+      },
+      {
+        "key": "preferred_model",
+        "value": "gpt-6.1-sol"
+      },
+      {
+        "key": "context_required",
+        "value": 64000
+      }
+    ],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "suite_hash": "sha256:b2681ec910475338410a722c51657199f2ccc0a75df155c049120af903ea72e5",
+    "verification_refs": [
+      "references/schemas.json",
+      "references/eval-suite.json"
+    ]
+  },
+  "telemetry": {
+    "classification": "public_internal",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_private_data",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain_only_approved_ids_and_hashes"
+  }
+}

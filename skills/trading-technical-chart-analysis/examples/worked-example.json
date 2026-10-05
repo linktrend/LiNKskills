@@ -1,0 +1,59 @@
+{
+  "fictional_fixture": true,
+  "notice": "Fictional chart observations and prices only; not a real chart or forecast.",
+  "input": {
+    "request_id": "FICTIONAL-CHART-01",
+    "symbol": "FIC-ABC",
+    "source": "synthetic weekly bars",
+    "as_of": "2026-09-30",
+    "timeframe": "1w",
+    "timezone": "UTC",
+    "evidence_mode": "ohlcv_bars",
+    "adjustment_basis": "synthetic, unadjusted",
+    "bars": [],
+    "chart_observations": [
+      "Fictional 5 weekly closes range from 98 to 103.",
+      "Two fictional swing lows appear near 98."
+    ]
+  },
+  "output": {
+    "request_id": "FICTIONAL-CHART-01",
+    "completion_status": "partial",
+    "symbol": "FIC-ABC",
+    "as_of": "2026-09-30",
+    "timeframe": "1w",
+    "observations": [
+      {
+        "item": "Range-bound fictional closes",
+        "evidence": "Supplied summary: five weekly closes from 98 to 103.",
+        "classification": "observation"
+      }
+    ],
+    "levels": [
+      {
+        "kind": "support",
+        "price": 98,
+        "unit": "fictional USD/share",
+        "evidence": "Two user-described fictional swing lows; actual bars absent."
+      }
+    ],
+    "scenarios": [
+      {
+        "condition": "Close remains above the described 98 area",
+        "interpretation": "Range may persist; unconfirmed",
+        "invalidation": "A completed close below the area would weaken the range thesis."
+      }
+    ],
+    "countercase": [
+      "The level may reflect chart-summary imprecision, not repeated buying."
+    ],
+    "limitations": [
+      "No complete OHLCV rows, volume, MA series, or readable chart. No probability or target assigned."
+    ],
+    "missing_inputs": [
+      "Complete weekly bars or chart image",
+      "Volume series",
+      "Adjustment basis confirmation"
+    ]
+  }
+}

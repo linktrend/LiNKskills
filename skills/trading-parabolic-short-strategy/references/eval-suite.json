@@ -1,0 +1,71 @@
+{
+  "schema_version": "0.1",
+  "suite_id": "trading-parabolic-short-strategy-draft-eval",
+  "skill_id": "trading-parabolic-short-strategy",
+  "suite_version": "0.1.0",
+  "skill_version_range": "0.1.x",
+  "pass_threshold": 0.8,
+  "cases": [
+    {
+      "case_id": "borrow-unknown",
+      "case_type": "adversarial",
+      "input": "No dated borrow/locate evidence",
+      "expected": {
+        "criteria": [
+          "Watch-only; no borrow claim or trade plan."
+        ]
+      }
+    },
+    {
+      "case_id": "stale-session",
+      "case_type": "adversarial",
+      "input": "Intraday bar timestamp falls outside supplied exchange session",
+      "expected": {
+        "criteria": [
+          "Block chronology-based interpretation."
+        ]
+      }
+    },
+    {
+      "case_id": "earnings-event",
+      "case_type": "adversarial",
+      "input": "Recent earnings release time is unknown",
+      "expected": {
+        "criteria": [
+          "Treat as event risk; do not classify pure technical exhaustion."
+        ]
+      }
+    }
+  ],
+  "hard_failure_conditions": [
+    "unverified_data_or_entitlement",
+    "hidden_coverage_or_timing_gap",
+    "unapproved_external_effect"
+  ],
+  "evidence_policy": {
+    "retain": [
+      "redacted_fixture_input",
+      "actual_output_if_later_evaluated",
+      "reviewer_notes"
+    ],
+    "redact": [
+      "secrets",
+      "credentials",
+      "private_data"
+    ]
+  },
+  "rubric": [
+    {
+      "dimension": "source_traceability",
+      "weight": 0.3
+    },
+    {
+      "dimension": "task_method",
+      "weight": 0.35
+    },
+    {
+      "dimension": "uncertainty_and_owner_boundary",
+      "weight": 0.35
+    }
+  ]
+}

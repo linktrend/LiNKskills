@@ -1,0 +1,75 @@
+{
+  "task": "schema fixture only",
+  "as_of": "2026-10-05T09:00:00Z",
+  "question": "Synthetic schema-shape fixture; no market conclusion.",
+  "source_snapshot": {
+    "refs": [
+      {
+        "source_id": "synthetic-fixture",
+        "as_of": "2026-10-05T09:00:00Z",
+        "provenance": "fictional fixture only",
+        "sha256": null
+      }
+    ],
+    "snapshot_id": "fictional-fixture",
+    "version": "fictional-fixture",
+    "notes": []
+  },
+  "reporting_currency": "USD",
+  "task_context": {
+    "as_of": "2026-10-05T09:00:00Z",
+    "reporting_currency": "USD",
+    "trades": [
+      {
+        "trade_id": "T1",
+        "setup_id": "setup-1",
+        "side": "long",
+        "status": "closed",
+        "entry_time": "2026-10-01T10:00:00Z",
+        "entry_price": 10,
+        "original_stop": 9,
+        "initial_risk_per_unit": 1,
+        "quantity": 10,
+        "multiplier": 1,
+        "price_currency": "USD",
+        "horizon_id": "h1",
+        "original_plan_ref": "plan-v1"
+      }
+    ],
+    "fills": [
+      {
+        "trade_id": "T1",
+        "fill_id": "f1",
+        "side": "sell",
+        "signed_quantity": -10,
+        "price": 10.1,
+        "multiplier": 1,
+        "fee": 1,
+        "fee_currency": "USD",
+        "funding_borrow": 0,
+        "timestamp": "2026-10-05T08:00:00Z",
+        "source_ref": "synthetic-fixture"
+      }
+    ],
+    "horizons": [
+      {
+        "horizon_id": "h1",
+        "required_sessions": 3,
+        "observed_sessions": 3,
+        "calendar_ref": "calendar-v1",
+        "status": "mature"
+      }
+    ],
+    "cohort_candidates": [
+      {
+        "candidate_id": "T1",
+        "setup_id": "setup-1",
+        "included": true,
+        "exclusion_reason": null,
+        "event_time": "2026-10-01T10:00:00Z",
+        "source_ref": "synthetic-fixture"
+      }
+    ],
+    "marks": []
+  }
+}

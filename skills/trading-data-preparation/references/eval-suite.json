@@ -1,0 +1,65 @@
+{
+  "schema_version": "0.1",
+  "suite_id": "trading-data-preparation-eval-draft",
+  "skill_id": "trading-data-preparation",
+  "suite_version": "0.1.0",
+  "rubric": [
+    {
+      "dimension": "task_method",
+      "weight": 0.4
+    },
+    {
+      "dimension": "units_and_traceability",
+      "weight": 0.35
+    },
+    {
+      "dimension": "scope_uncertainty_owner_boundaries",
+      "weight": 0.25
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "dst-session",
+      "case_type": "adversarial",
+      "input": "Bars span DST transition and session close.",
+      "expected": {
+        "criteria": [
+          "Use source timezone/calendar; expose duplicate/nonexistent local times and incomplete session."
+        ]
+      }
+    },
+    {
+      "case_id": "coarse-split",
+      "case_type": "adversarial",
+      "input": "Only hourly OHLCV provided but five-minute bars requested.",
+      "expected": {
+        "criteria": [
+          "Refuse fabricated fine bars."
+        ]
+      }
+    },
+    {
+      "case_id": "futures-adjustment",
+      "case_type": "adversarial",
+      "input": "Adjusted futures series requested for executable fill price.",
+      "expected": {
+        "criteria": [
+          "Keep adjusted analytic series distinct; use raw contract marks for fills."
+        ]
+      }
+    }
+  ],
+  "evidence_policy": {
+    "retain": [
+      "fixture_input",
+      "expected_behavior"
+    ],
+    "redact": [
+      "secrets",
+      "private_data",
+      "raw_transactions_unless_authorized"
+    ]
+  },
+  "skill_version_range": ">=0.1.0",
+  "pass_threshold": 0.85
+}

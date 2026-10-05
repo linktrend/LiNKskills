@@ -1,0 +1,121 @@
+{
+  "fictional_fixture": true,
+  "notice": "Invented token, addresses, dates and values. Arithmetic/schema illustration only; not current chain data or recommendation.",
+  "input": {
+    "request_id": "FICTIONAL-TOKEN-01",
+    "network": "fictional-chain",
+    "asset_id": "fictional:mint-xyz",
+    "as_of": "2026-09-30T12:00:00Z",
+    "source_snapshot": "synthetic-snapshot-v1",
+    "source_provenance": [
+      {
+        "source": "fictional supplied export",
+        "retrieved_at": "2026-09-30T12:00:00Z",
+        "coverage": "top 2 of unknown total holder set",
+        "entitlement": null
+      }
+    ],
+    "decimals": 2,
+    "supply_definition": "issued token units; synthetic circulating subset not independently verified",
+    "supply_rows": [
+      {
+        "category": "reported circulating",
+        "amount_raw": "1000000",
+        "source_row": "fictional-supply-1",
+        "status": "issuer-reported"
+      }
+    ],
+    "holders": [
+      {
+        "address_ref": "fictional-holder-A",
+        "amount_raw": "250000",
+        "source_row": "synthetic-holder-1",
+        "classification": null
+      },
+      {
+        "address_ref": "fictional-holder-B",
+        "amount_raw": "100000",
+        "source_row": "synthetic-holder-2",
+        "classification": null
+      }
+    ],
+    "protocol_economics": {},
+    "unlock_scenarios": [],
+    "comparable_set": [],
+    "chain_program_version": null,
+    "research_question": "Describe supply and sample concentration."
+  },
+  "output": {
+    "request_id": "FICTIONAL-TOKEN-01",
+    "status": "partial",
+    "asset_identity": {
+      "network": "fictional-chain",
+      "asset_id": "fictional:mint-xyz",
+      "decimals": 2
+    },
+    "snapshot": {
+      "as_of": "2026-09-30T12:00:00Z",
+      "source_snapshot": "synthetic-snapshot-v1",
+      "provenance": [
+        "fictional supplied export; top 2 only"
+      ]
+    },
+    "supply_reconciliation": {
+      "definition": "issuer-reported circulating subset; not verified total/circulating supply",
+      "items": [
+        {
+          "category": "reported circulating",
+          "amount_raw": "1000000",
+          "source_row": "fictional-supply-1"
+        }
+      ],
+      "reconciled_total_raw": null,
+      "status": "partial"
+    },
+    "holder_sample": {
+      "observed_count": 2,
+      "coverage_frame": "two supplied addresses; share of all holders unknown",
+      "concentration_metrics": [
+        {
+          "name": "observed_top2_over_reported_subset",
+          "value_pct": 35.0,
+          "denominator": "1,000,000 raw units; reported circulating subset only"
+        }
+      ],
+      "identity_limitations": [
+        "Address labels and beneficial ownership unknown."
+      ]
+    },
+    "economics": {
+      "measures": [],
+      "value_capture_status": "not assessed; no cash flow or token entitlement inputs supplied"
+    },
+    "scenarios": [
+      {
+        "name": "no-unlock-data",
+        "assumptions": [
+          "No verified schedule supplied."
+        ],
+        "computed_effect": null,
+        "not_a_forecast": true
+      }
+    ],
+    "findings": [
+      "Observed two-address sum is 350,000 / 1,000,000 = 35% of the issuer-reported subset only."
+    ],
+    "limitations": [
+      "Fictional input; total supply, locks, program accounts, and complete holder coverage absent.",
+      "No valuation or price-impact inference."
+    ],
+    "recommendation": {
+      "stance": "no_view",
+      "basis": [
+        "Supply denominator and population coverage are incomplete."
+      ],
+      "advisory_only": true,
+      "conditions": [
+        "Obtain reconciled supply definitions and a dated coverage-complete holder snapshot."
+      ]
+    }
+  }
+}

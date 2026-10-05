@@ -1,0 +1,162 @@
+{
+  "schema_ref": "references/schemas.json#/definitions/input",
+  "status": "schema_fixture_only_not_behavioral_evaluation",
+  "valid_case": {
+    "input": {
+      "question": "fictional-input",
+      "universe_snapshot": "fictional-input",
+      "decision_time": "fictional-input",
+      "fill_time_convention": "fictional-input",
+      "source_snapshot": "fictional-input",
+      "bar_session": "fictional-input",
+      "feature_specs": [],
+      "label_spec": {},
+      "horizons": [],
+      "fold_plan": {},
+      "cost_inputs": []
+    },
+    "expected": "accept by JSON Schema"
+  },
+  "invalid_case": {
+    "input": {
+      "question": "fictional-input",
+      "universe_snapshot": "fictional-input",
+      "decision_time": "fictional-input",
+      "fill_time_convention": "fictional-input",
+      "source_snapshot": "fictional-input",
+      "bar_session": "fictional-input",
+      "feature_specs": [],
+      "label_spec": {},
+      "horizons": [],
+      "fold_plan": {},
+      "cost_inputs": [],
+      "unexpected_field": "must be rejected"
+    },
+    "expected": "reject additionalProperties"
+  },
+  "valid_partial_case": {
+    "schema_ref": "references/schemas.json#/definitions/input",
+    "input": {
+      "question": "FICTIONAL-input",
+      "decision_time": "FICTIONAL-input",
+      "known_gaps": [
+        "source_snapshot: not supplied; dependent analysis must remain partial."
+      ]
+    },
+    "expected": "accept; return a bounded partial result and preserve each listed gap."
+  },
+  "partial_output_case": {
+    "schema_ref": "references/schemas.json#/definitions/output",
+    "output": {
+      "status": "partial",
+      "definitions": [
+        {
+          "name": "mom_5",
+          "formula": "close[t-1]/close[t-6]-1",
+          "units": "fraction",
+          "entity_group": "instrument",
+          "lookback_bars": 5,
+          "known_at": "bar close plus one bar delay",
+          "warmup": "6 bars",
+          "null_policy": "preserve",
+          "denominator_rule": "prior close must be nonzero",
+          "hypothesis": "short trend persistence; untested"
+        }
+      ],
+      "availability_audit": [
+        {
+          "feature": "close[t]",
+          "decision_time": "same bar close",
+          "finding": "not available before close; lag required"
+        }
+      ],
+      "label_timing": {
+        "target": "5-session arithmetic return",
+        "decision": "close t",
+        "first_fill": "next session open",
+        "exit": "close t+5",
+        "same_bar_tie": "not applicable"
+      },
+      "folds": [
+        {
+          "fold": "fictional-1",
+          "preprocessing_fit": "train only",
+          "purge": "label windows overlap at boundary; 5 observations excluded",
+          "embargo": "not set; dependence analysis missing"
+        }
+      ],
+      "redundancy": [
+        "Pairwise correlations not computed; input data absent."
+      ],
+      "validation": {
+        "status": "not_evaluated",
+        "metrics": []
+      },
+      "proposal": null,
+      "gaps": [
+        "Point-in-time universe and price source not supplied."
+      ],
+      "owner_handoffs": [
+        "Eric: implementation contract if requested."
+      ]
+    },
+    "expected": "accept as partial; unknown/uncomputed values remain explicit."
+  },
+  "invalid_completed_case": {
+    "schema_ref": "references/schemas.json#/definitions/output",
+    "output": {
+      "status": "complete",
+      "definitions": [
+        {
+          "name": "mom_5",
+          "formula": "close[t-1]/close[t-6]-1",
+          "units": "fraction",
+          "entity_group": "instrument",
+          "lookback_bars": 5,
+          "known_at": "bar close plus one bar delay",
+          "warmup": "6 bars",
+          "null_policy": "preserve",
+          "denominator_rule": "prior close must be nonzero",
+          "hypothesis": "short trend persistence; untested"
+        }
+      ],
+      "availability_audit": [
+        {
+          "feature": "close[t]",
+          "decision_time": "same bar close",
+          "finding": "not available before close; lag required"
+        }
+      ],
+      "label_timing": {
+        "target": "5-session arithmetic return",
+        "decision": "close t",
+        "first_fill": "next session open",
+        "exit": "close t+5",
+        "same_bar_tie": "not applicable"
+      },
+      "folds": [
+        {
+          "fold": "fictional-1",
+          "preprocessing_fit": "train only",
+          "purge": "label windows overlap at boundary; 5 observations excluded",
+          "embargo": "not set; dependence analysis missing"
+        }
+      ],
+      "redundancy": [
+        "Pairwise correlations not computed; input data absent."
+      ],
+      "validation": {
+        "status": "not_evaluated",
+        "metrics": []
+      },
+      "proposal": null,
+      "gaps": [
+        "Required evidence or calculation is missing; complete status is false."
+      ],
+      "owner_handoffs": [
+        "Eric: implementation contract if requested."
+      ]
+    },
+    "expected": "reject: complete output cannot contain unresolved required gaps."
+  }
+}

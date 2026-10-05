@@ -1,0 +1,58 @@
+{
+  "request_id": "GE-2026-10-05-01",
+  "status": "partial",
+  "scope_statement": "FICT only; no market-wide coverage claim",
+  "variant": "garp",
+  "as_of_date": "2026-10-05",
+  "universe_audit": {
+    "requested_count": 1,
+    "evaluated_count": 1,
+    "omitted_count": 0,
+    "coverage": "named_list"
+  },
+  "candidates": [
+    {
+      "symbol": "FICT",
+      "decision": "conditional_review",
+      "selection_lane": "core_garp",
+      "metrics": [
+        {
+          "metric": "forward_fcf_yield",
+          "value": 0.06,
+          "unit": "ratio",
+          "period": "FY1",
+          "source_ids": [
+            "S1",
+            "S3"
+          ],
+          "status": "calculated"
+        },
+        {
+          "metric": "diluted_share_cagr_3y",
+          "value": 0.02,
+          "unit": "ratio",
+          "period": "FY2022-FY2025",
+          "source_ids": [
+            "S2"
+          ],
+          "status": "reported"
+        }
+      ],
+      "thesis": "Illustrative candidate merits primary-source follow-up; forecast/coverage incomplete.",
+      "countercase": "Forward FCF may be cyclically elevated; no verified margin bridge.",
+      "risks": [
+        "No source-backed year-2/3 bridge",
+        "Coverage is named-list only"
+      ],
+      "next_evidence": [
+        "Latest audited filing and segment margins",
+        "Source-linked diluted-share roll-forward"
+      ]
+    }
+  ],
+  "excluded_or_unavailable": [],
+  "assumptions": [
+    "All example data are fictional placeholders"
+  ],
+  "research_view": "conditional research view only; no order or activation"
+}

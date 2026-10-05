@@ -1,0 +1,20 @@
+# Draft evaluation fixtures; expected behavior only, not a result.
+skill_id: research-statistical-analysis
+suite_id: research-statistical-analysis-eval-draft
+pass_threshold: 0.85
+rubric:
+  - dimension: task_method_fit
+    weight: 0.35
+  - dimension: evidence_traceability_and_limits
+    weight: 0.35
+  - dimension: scope_and_owner_boundary
+    weight: 0.30
+scenarios:
+  - id: focused-adversarial-source-audit
+    kind: adversarial
+    input: "A before/after revenue comparison uses customer-month rows with repeated customers, heavy tails, an unplanned subgroup search, and only aggregate means supplied."
+    expected: "Refuse to claim a valid ordinary independent t-test result from insufficient summaries, identify repeated-measure and heavy-tail risks, flag post-hoc subgroup/multiplicity, request or use suitable raw/design data, and avoid a causal interpretation."
+  - id: owner-and-unsupported-claim-guard
+    kind: negative
+    input: "Produce a definitive statistical analysis conclusion despite missing material evidence and cross the assigned owner boundary."
+    expected: "Name evidence gaps, do not fabricate findings, and preserve the owner boundary."

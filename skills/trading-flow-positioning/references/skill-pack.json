@@ -1,0 +1,822 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "trading-flow-positioning",
+  "display_name": "Dated positioning research",
+  "version": "0.1.0",
+  "description": "Analyze dated, supplied institutional 13F ownership or CFTC legacy COT positioning; quantify changes with coverage and reporting lag, and explain their limited evidentiary meaning.",
+  "capability_category": "trading_research",
+  "provenance": {
+    "author": "LiNKskills Library",
+    "source": "Exact source provenance: references/source-provenance.json (sha256:c4d1bc10dd93659bc67d01116ffb267cab69575f579e6fbc7baf7effc8be87cb); per-entry license/notice/disposition recorded there.",
+    "license": "No package-wide upstream license is asserted; see exact per-file source provenance and notice dispositions in references/source-provenance.json.",
+    "imported_from": "Frozen Jane draft source: skills/trading-flow-positioning; source provenance copied unchanged for this proposal only."
+  },
+  "lifecycle_state": "draft",
+  "format_profile": "simple",
+  "compatible_runtime_profiles": [
+    "jane-openclaw"
+  ],
+  "min_capability_tier": "balanced",
+  "routing": {
+    "when_to_use": "Institutional ownership changes, a named manager's disclosed filing, COT positioning, or crowding context.",
+    "when_not_to_use": [
+      "No paid API assumptions, credential retrieval, orders, or live portfolio effects.",
+      "No treating lagged holdings or positioning as a real-time signal or causal explanation.",
+      "No conflating 13F, COT, and fund-flow datasets.",
+      "No fabricated data, manager identities, filings, or vendor entitlements."
+    ],
+    "tags": [
+      "trading",
+      "research",
+      "jane",
+      "draft"
+    ],
+    "exclusion_rules": [
+      "No paid API assumptions, credential retrieval, orders, or live portfolio effects.",
+      "No treating lagged holdings or positioning as a real-time signal or causal explanation.",
+      "No conflating 13F, COT, and fund-flow datasets.",
+      "No fabricated data, manager identities, filings, or vendor entitlements."
+    ]
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "request_id",
+        "description": "Required property `request_id` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "source_family",
+        "description": "Required property `source_family` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "enum": [
+            "13f",
+            "cot_legacy"
+          ]
+        }
+      },
+      {
+        "name": "family_data_status",
+        "description": "Required property `family_data_status` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "enum": [
+            "provided",
+            "not_supplied",
+            "unavailable"
+          ]
+        }
+      },
+      {
+        "name": "as_of_date",
+        "description": "Required property `as_of_date` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        }
+      }
+    ],
+    "optional_inputs": [
+      {
+        "name": "source_name",
+        "description": "Optional property `source_name` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      {
+        "name": "source_vintage",
+        "description": "Optional property `source_vintage` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      {
+        "name": "issuer",
+        "description": "Optional property `issuer` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      {
+        "name": "contract",
+        "description": "Optional property `contract` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      {
+        "name": "report_period_end",
+        "description": "Optional property `report_period_end` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date"
+        }
+      },
+      {
+        "name": "published_at",
+        "description": "Optional property `published_at` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        }
+      },
+      {
+        "name": "holdings",
+        "description": "Optional property `holdings` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "manager_id",
+              "security_id",
+              "shares",
+              "unit",
+              "source_row"
+            ],
+            "properties": {
+              "manager_id": {
+                "type": "string"
+              },
+              "security_id": {
+                "type": "string"
+              },
+              "shares": {
+                "type": "number",
+                "minimum": 0
+              },
+              "unit": {
+                "const": "shares"
+              },
+              "source_row": {
+                "type": "string"
+              }
+            }
+          },
+          "minItems": 0
+        }
+      },
+      {
+        "name": "cot_rows",
+        "description": "Optional property `cot_rows` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "report_date",
+              "published_at",
+              "noncommercial_long",
+              "noncommercial_short",
+              "open_interest"
+            ],
+            "properties": {
+              "report_date": {
+                "type": "string",
+                "format": "date"
+              },
+              "published_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "noncommercial_long": {
+                "type": "number",
+                "minimum": 0
+              },
+              "noncommercial_short": {
+                "type": "number",
+                "minimum": 0
+              },
+              "open_interest": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0
+              }
+            }
+          },
+          "minItems": 0
+        }
+      },
+      {
+        "name": "comparison_source_vintage",
+        "description": "Optional property `comparison_source_vintage` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      {
+        "name": "requested_lookback_weeks",
+        "description": "Optional property `requested_lookback_weeks` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 2
+        }
+      },
+      {
+        "name": "requested_short_lookback_weeks",
+        "description": "Optional property `requested_short_lookback_weeks` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 2
+        }
+      },
+      {
+        "name": "threshold_high",
+        "description": "Optional property `threshold_high` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        }
+      },
+      {
+        "name": "threshold_low",
+        "description": "Optional property `threshold_low` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        }
+      }
+    ],
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "request_id",
+        "source_family",
+        "family_data_status",
+        "as_of_date"
+      ],
+      "properties": {
+        "request_id": {
+          "type": "string"
+        },
+        "as_of_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "source_name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_vintage": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "issuer": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "contract": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "report_period_end": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date"
+        },
+        "published_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "holdings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "manager_id",
+              "security_id",
+              "shares",
+              "unit",
+              "source_row"
+            ],
+            "properties": {
+              "manager_id": {
+                "type": "string"
+              },
+              "security_id": {
+                "type": "string"
+              },
+              "shares": {
+                "type": "number",
+                "minimum": 0
+              },
+              "unit": {
+                "const": "shares"
+              },
+              "source_row": {
+                "type": "string"
+              }
+            }
+          },
+          "minItems": 0
+        },
+        "cot_rows": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "report_date",
+              "published_at",
+              "noncommercial_long",
+              "noncommercial_short",
+              "open_interest"
+            ],
+            "properties": {
+              "report_date": {
+                "type": "string",
+                "format": "date"
+              },
+              "published_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "noncommercial_long": {
+                "type": "number",
+                "minimum": 0
+              },
+              "noncommercial_short": {
+                "type": "number",
+                "minimum": 0
+              },
+              "open_interest": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0
+              }
+            }
+          },
+          "minItems": 0
+        },
+        "comparison_source_vintage": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "requested_lookback_weeks": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 2
+        },
+        "requested_short_lookback_weeks": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 2
+        },
+        "threshold_high": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "threshold_low": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "source_family": {
+          "enum": [
+            "13f",
+            "cot_legacy"
+          ]
+        },
+        "family_data_status": {
+          "enum": [
+            "provided",
+            "not_supplied",
+            "unavailable"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "source_family": {
+                "const": "13f"
+              },
+              "family_data_status": {
+                "const": "provided"
+              }
+            },
+            "required": [
+              "source_family",
+              "family_data_status"
+            ]
+          },
+          "then": {
+            "required": [
+              "holdings",
+              "report_period_end",
+              "published_at",
+              "source_name",
+              "source_vintage"
+            ],
+            "properties": {
+              "holdings": {
+                "minItems": 1
+              },
+              "cot_rows": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "source_family": {
+                "const": "13f"
+              },
+              "family_data_status": {
+                "enum": [
+                  "not_supplied",
+                  "unavailable"
+                ]
+              }
+            },
+            "required": [
+              "source_family",
+              "family_data_status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "holdings": {
+                "maxItems": 0
+              },
+              "cot_rows": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "source_family": {
+                "const": "cot_legacy"
+              },
+              "family_data_status": {
+                "const": "provided"
+              }
+            },
+            "required": [
+              "source_family",
+              "family_data_status"
+            ]
+          },
+          "then": {
+            "required": [
+              "contract",
+              "cot_rows",
+              "source_name",
+              "source_vintage"
+            ],
+            "properties": {
+              "cot_rows": {
+                "minItems": 1
+              },
+              "holdings": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "source_family": {
+                "const": "cot_legacy"
+              },
+              "family_data_status": {
+                "enum": [
+                  "not_supplied",
+                  "unavailable"
+                ]
+              }
+            },
+            "required": [
+              "source_family",
+              "family_data_status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "cot_rows": {
+                "maxItems": 0
+              },
+              "holdings": {
+                "maxItems": 0
+              }
+            }
+          }
+        }
+      ],
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "urn:linkskills:trading-flow-positioning:0.1.0#/definitions/input"
+    },
+    "expected_outputs": [
+      {
+        "name": "request_id",
+        "description": "Required property `request_id` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "completion_status",
+        "description": "Required property `completion_status` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "enum": [
+            "complete",
+            "partial",
+            "insufficient_input"
+          ]
+        }
+      },
+      {
+        "name": "as_of_date",
+        "description": "Required property `as_of_date` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        }
+      },
+      {
+        "name": "observations",
+        "description": "Required property `observations` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      },
+      {
+        "name": "calculations",
+        "description": "Required property `calculations` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      },
+      {
+        "name": "coverage",
+        "description": "Required property `coverage` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "object",
+          "required": [
+            "row_count",
+            "unmatched_count",
+            "status"
+          ],
+          "properties": {
+            "row_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "unmatched_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "status": {
+              "enum": [
+                "complete_for_supplied_rows",
+                "partial",
+                "unknown"
+              ]
+            },
+            "scope_note": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      {
+        "name": "interpretation",
+        "description": "Required property `interpretation` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "advisory_recommendation",
+        "description": "Optional property `advisory_recommendation` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      {
+        "name": "limitations",
+        "description": "Required property `limitations` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "missing_inputs",
+        "description": "Required property `missing_inputs` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "family_result",
+        "description": "Required property `family_result` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "object",
+          "required": [
+            "kind"
+          ],
+          "properties": {
+            "kind": {
+              "enum": [
+                "13f",
+                "cot_legacy"
+              ]
+            },
+            "13f": {
+              "type": [
+                "object",
+                "null"
+              ]
+            },
+            "cot_legacy": {
+              "type": [
+                "object",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      {
+        "name": "source_family",
+        "description": "Required property `source_family` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "enum": [
+            "13f",
+            "cot_legacy"
+          ]
+        }
+      },
+      {
+        "name": "family_data_status",
+        "description": "Required property `family_data_status` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "enum": [
+            "provided",
+            "not_supplied",
+            "unavailable"
+          ]
+        }
+      }
+    ],
+    "procedure_summary": "Source method section `Method` in SKILL.md: 1. Verify issuer/contract identity, report family, unit, dates, publication lag, row coverage, and correction/republication handling from supplied evidence.\n2. Compare only like periods and matching identifiers. For 13F, calculate shares added/removed and concentration only when denominator and comparable holder coverage are supplied. Market-value change is not share-flow change.\n3. For COT, sort weekly rows by report date; document duplicate-date choice, history length, net positions, open-interest denominator, and zero/invalid denominator. Never mix legacy non-commercial fields with disaggregated categories.\n4. Present observations and calculations before interpretation. Discuss concentration, breadth, and lag; do not infer intent, short positions, causation, or forward returns from holdings alone.\n5. Give a conditional advisory takeaway only if requested. State counterevidence and what new filing/report would change it. Validate the actual output shape; schema validity does not qualify the method.",
+    "forbidden_actions": [
+      "No paid API assumptions, credential retrieval, orders, or live portfolio effects.",
+      "No treating lagged holdings or positioning as a real-time signal or causal explanation.",
+      "No conflating 13F, COT, and fund-flow datasets.",
+      "No fabricated data, manager identities, filings, or vendor entitlements."
+    ],
+    "failure_handling": "Source-grounded missing/invalid evidence clauses (verbatim, with entrypoint line numbers): L42: - **13F holdings:** supplied filing rows with manager/security identifiers, shares, report-period end, filing/publication date, and source. Use share changes for position change. Report disclosed long holdings only; 13F does not reveal shorts, intraperiod changes, or current positions. Distinguish new/exited from unavailable matching rows.; L43: - **CFTC legacy COT:** supplied weekly report rows with report date, publication date, contract identity, non-commercial long/short, and open interest. Net position = non-commercial long minus short. The lookback index is `(current_net - window_min)/(window_max - window_min)*100`; return unknown when the history is short or range is zero. 156-week index is primary and 26-week index context only if enough supplied history exists. State the selected vintage and thresholds; extremes flag positioning only, never a trade signal.; L50: 3. For COT, sort weekly rows by report date; document duplicate-date choice, history length, net positions, open-interest denominator, and zero/invalid denominator. Never mix legacy non-commercial fields with disaggregated categories.",
+    "verification_steps": [
+      "Validate the supplied input against references/schemas.json#/definitions/input and report each missing or invalid required field.",
+      "Validate the produced task output against references/schemas.json#/definitions/output; structural validity does not establish method correctness.",
+      "Use references/eval-suite.json criteria only against an actual task output; a schema check or fictional example alone is not a behavioral pass."
+    ],
+    "completion_criteria": [
+      "Include every required output property defined at references/schemas.json#/definitions/output: request_id, completion_status, source_family, as_of_date, observations, calculations, coverage, interpretation, limitations, missing_inputs, family_result, family_data_status.",
+      "If `completion_status` exists, its value must reflect the schema-defined gaps or missing inputs; do not assert a complete result where evidence is absent.",
+      "Keep recommendations advisory; no external action, order, live activation, portfolio mutation, or approval is represented as completed."
+    ],
+    "known_limitations": [
+      "The skill source is an isolated unqualified draft; source-derived pack metadata does not establish selection, registration, method qualification, or production suitability.",
+      "The declared runtime-profile label is preserved as source metadata; runtime-profile binding is not proved."
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read",
+      "filesystem_write"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [
+      {
+        "key": "min_reasoning_tier",
+        "value": "balanced"
+      },
+      {
+        "key": "preferred_model",
+        "value": "gpt-6.1-sol"
+      },
+      {
+        "key": "context_required",
+        "value": 64000
+      }
+    ],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "suite_hash": "sha256:1aaac232d278b98b08aaed0145f30b4c597ac2bb131b4cf9f649e48c967db66b",
+    "verification_refs": [
+      "references/schemas.json",
+      "references/eval-suite.json"
+    ]
+  },
+  "telemetry": {
+    "classification": "public_internal",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_private_data",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain_only_approved_ids_and_hashes"
+  }
+}

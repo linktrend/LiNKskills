@@ -1,0 +1,59 @@
+{
+  "fictional_fixture": true,
+  "notice": "All names, dates, observations and values in this worked example are fictional; it demonstrates output shape, not strategy validity.",
+  "input": {
+    "as_of_date": "2026-09-30",
+    "universe_definition": "fictional 20-stock equal-weight universe; no constituent changes in fixture",
+    "benchmark": "fictional index",
+    "horizon": "short tactical and slow strategic",
+    "series": [
+      {
+        "measure": "above-200d average",
+        "date": "2026-09-30",
+        "value": 55,
+        "unit": "percent of universe",
+        "source": "fictional CSV"
+      },
+      {
+        "measure": "above-20d average",
+        "date": "2026-09-30",
+        "value": 70,
+        "unit": "percent of universe",
+        "source": "fictional CSV"
+      }
+    ]
+  },
+  "output": {
+    "completion_status": "complete",
+    "as_of_date": "2026-09-30",
+    "universe_definition": "fictional 20-stock equal-weight universe; no constituent changes in fixture",
+    "breadth_measures": [
+      {
+        "measure": "above-200d average",
+        "value": 55,
+        "unit": "percent",
+        "date": "2026-09-30",
+        "horizon": "slow",
+        "source": "fictional CSV"
+      },
+      {
+        "measure": "above-20d average",
+        "value": 70,
+        "unit": "percent",
+        "date": "2026-09-30",
+        "horizon": "fast",
+        "source": "fictional CSV"
+      }
+    ],
+    "interpretation": {
+      "view": "short-window participation exceeds slow-window participation in this fixture",
+      "advisory": "This could support a conditional tactical improvement hypothesis, but does not establish a buy signal or justify a position size."
+    },
+    "disagreements": [
+      "Fast and slow breadth differ; no composite score used."
+    ],
+    "gaps": [
+      "No history, price returns, real universe, or live data supplied."
+    ]
+  }
+}

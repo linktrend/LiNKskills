@@ -1,0 +1,42 @@
+{
+  "request_id": "PAIR-2026-10-05-01",
+  "universe": [
+    "AAA",
+    "BBB"
+  ],
+  "as_of_date": "2026-10-05",
+  "frequency": "daily",
+  "price_basis": "split_and_distribution_adjusted",
+  "bars": [
+    {
+      "symbol": "AAA",
+      "date": "2025-01-02",
+      "close": 100.0,
+      "source_id": "P1"
+    },
+    {
+      "symbol": "BBB",
+      "date": "2025-01-02",
+      "close": 50.0,
+      "source_id": "P1"
+    }
+  ],
+  "model_spec": {
+    "test": "engle_granger",
+    "regression": "log_A_on_log_B",
+    "deterministic": "constant",
+    "lag_rule": "AIC",
+    "train_end": "2025-09-30",
+    "test_start": "2025-10-01",
+    "search_count": 1
+  },
+  "cost_inputs": {
+    "commission_bps": 5,
+    "spread_bps": 12,
+    "borrow_bps_annual": 75,
+    "availability": "unknown"
+  },
+  "controls": {
+    "walk_forward_required": true
+  }
+}

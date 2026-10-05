@@ -1,0 +1,77 @@
+{
+  "task": "schema fixture only",
+  "as_of": "2026-10-05T09:00:00Z",
+  "question": "Synthetic schema-shape fixture; no market conclusion.",
+  "source_snapshot": {
+    "refs": [
+      {
+        "source_id": "synthetic-fixture",
+        "as_of": "2026-10-05T09:00:00Z",
+        "provenance": "fictional fixture only",
+        "sha256": null
+      }
+    ],
+    "snapshot_id": "fictional-fixture",
+    "version": "fictional-fixture",
+    "notes": []
+  },
+  "reporting_currency": "USD",
+  "task_context": {
+    "period": {
+      "start": "2026-10-01T00:00:00Z",
+      "end": "2026-10-05T00:00:00Z",
+      "timezone": "UTC",
+      "calendar": "daily"
+    },
+    "ledger_snapshot": {
+      "version": "fictional-fixture",
+      "as_of": "2026-10-05T09:00:00Z",
+      "source_ref": "fictional-fixture"
+    },
+    "opening_nav": {
+      "value": 10000,
+      "currency": "USD",
+      "as_of": "2026-10-01T00:00:00Z"
+    },
+    "ending_nav": {
+      "value": 10009,
+      "currency": "USD",
+      "as_of": "2026-10-05T00:00:00Z"
+    },
+    "external_flows": [],
+    "trade_events": [
+      {
+        "trade_id": "T1",
+        "instrument_id": "ABC",
+        "signed_quantity": 10,
+        "price": 100,
+        "multiplier": 1,
+        "quote_currency": "USD",
+        "fees": 0,
+        "funding_borrow": 0,
+        "income": 0,
+        "timestamp": "2026-10-01T10:00:00Z",
+        "source_ref": "synthetic-fixture"
+      },
+      {
+        "trade_id": "T1",
+        "instrument_id": "ABC",
+        "signed_quantity": -10,
+        "price": 101,
+        "multiplier": 1,
+        "quote_currency": "USD",
+        "fees": 1,
+        "funding_borrow": 0,
+        "income": 0,
+        "timestamp": "2026-10-05T00:00:00Z",
+        "source_ref": "synthetic-fixture"
+      }
+    ],
+    "benchmark": {
+      "benchmark_id": "BENCH",
+      "currency": "USDX",
+      "return_series": [],
+      "annual_trading_days": 252
+    }
+  }
+}

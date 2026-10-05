@@ -1,0 +1,144 @@
+{
+  "schema_ref": "references/schemas.json#/definitions/input",
+  "status": "schema_fixture_only_not_behavioral_evaluation",
+  "valid_case": {
+    "input": {
+      "asset": "fictional-input",
+      "venue": "fictional-input",
+      "source_snapshot": "fictional-input",
+      "as_of_range": "fictional-input",
+      "timezone": "fictional-input",
+      "calendar_session": "fictional-input",
+      "raw_schema": {},
+      "target_frequency": "fictional-input",
+      "transformations": [],
+      "downstream_use": "fictional-input"
+    },
+    "expected": "accept by JSON Schema"
+  },
+  "invalid_case": {
+    "input": {
+      "asset": "fictional-input",
+      "venue": "fictional-input",
+      "source_snapshot": "fictional-input",
+      "as_of_range": "fictional-input",
+      "timezone": "fictional-input",
+      "calendar_session": "fictional-input",
+      "raw_schema": {},
+      "target_frequency": "fictional-input",
+      "transformations": [],
+      "downstream_use": "fictional-input",
+      "unexpected_field": "must be rejected"
+    },
+    "expected": "reject additionalProperties"
+  },
+  "valid_partial_case": {
+    "schema_ref": "references/schemas.json#/definitions/input",
+    "input": {
+      "asset": "FICTIONAL-input",
+      "downstream_use": "FICTIONAL-input",
+      "known_gaps": [
+        "source_snapshot: not supplied; dependent analysis must remain partial."
+      ]
+    },
+    "expected": "accept; return a bounded partial result and preserve each listed gap."
+  },
+  "partial_output_case": {
+    "schema_ref": "references/schemas.json#/definitions/output",
+    "output": {
+      "status": "partial",
+      "lineage": {
+        "source_snapshot": "fictional-ES-1m-v2",
+        "schema_version": "bars-v1",
+        "instrument": "ES fictional front contract",
+        "calendar": "CME session, fictional calendar version"
+      },
+      "row_counts": {
+        "input": 3,
+        "output": 2,
+        "residual": 1
+      },
+      "coverage": {
+        "requested_minutes": 3,
+        "observed_minutes": 2,
+        "timezone": "UTC"
+      },
+      "bars": {
+        "target_frequency": "2m",
+        "label": "right-closed",
+        "partial_final_bar": true,
+        "vwap_window": "session"
+      },
+      "gaps": [
+        "Minute 00:01 absent; no fill applied."
+      ],
+      "synthetic_rows": [],
+      "rolls": {
+        "raw_contracts_preserved": true,
+        "adjustment": "none",
+        "executable_levels_from_adjusted": false
+      },
+      "units": {
+        "price": "USD/index point",
+        "volume": "contracts"
+      },
+      "validations": [
+        "OHLC ordering valid for observed rows.",
+        "Input volume 17 contracts; output 12 plus 5 documented residual/partial-window volume."
+      ],
+      "limitations": [
+        "Fictional worked example; source market data not inspected."
+      ]
+    },
+    "expected": "accept as partial; unknown/uncomputed values remain explicit."
+  },
+  "invalid_completed_case": {
+    "schema_ref": "references/schemas.json#/definitions/output",
+    "output": {
+      "status": "complete",
+      "lineage": {
+        "source_snapshot": "fictional-ES-1m-v2",
+        "schema_version": "bars-v1",
+        "instrument": "ES fictional front contract",
+        "calendar": "CME session, fictional calendar version"
+      },
+      "row_counts": {
+        "input": 3,
+        "output": 2,
+        "residual": 1
+      },
+      "coverage": {
+        "requested_minutes": 3,
+        "observed_minutes": 2,
+        "timezone": "UTC"
+      },
+      "bars": {
+        "target_frequency": "2m",
+        "label": "right-closed",
+        "partial_final_bar": true,
+        "vwap_window": "session"
+      },
+      "gaps": [
+        "Required evidence or calculation is missing; complete status is false."
+      ],
+      "synthetic_rows": [],
+      "rolls": {
+        "raw_contracts_preserved": true,
+        "adjustment": "none",
+        "executable_levels_from_adjusted": false
+      },
+      "units": {
+        "price": "USD/index point",
+        "volume": "contracts"
+      },
+      "validations": [
+        "OHLC ordering valid for observed rows.",
+        "Input volume 17 contracts; output 12 plus 5 documented residual/partial-window volume."
+      ],
+      "limitations": [
+        "Fictional worked example; source market data not inspected."
+      ]
+    },
+    "expected": "reject: complete output cannot contain unresolved required gaps."
+  }
+}

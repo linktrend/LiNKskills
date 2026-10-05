@@ -1,0 +1,80 @@
+{
+  "fictional_fixture": true,
+  "notice": "All names, dates, prices, rates, and quantities are fictional; example shows arithmetic/schema only.",
+  "input": {
+    "as_of": "2026-09-30",
+    "data_source": "fictional prospectus snapshots",
+    "funds": [
+      {
+        "ticker": "FIC-X",
+        "holdings_as_of": "2026-09-20",
+        "coverage_status": "complete",
+        "holdings": [
+          {
+            "security_id": "FIC-ALPHA",
+            "weight_pct": 10.0,
+            "sector": "fictional tech",
+            "country": "FIC"
+          },
+          {
+            "security_id": "FIC-BETA",
+            "weight_pct": 5.0,
+            "sector": "fictional health",
+            "country": "FIC"
+          }
+        ]
+      },
+      {
+        "ticker": "FIC-Y",
+        "holdings_as_of": "2026-09-22",
+        "coverage_status": "partial",
+        "holdings": [
+          {
+            "security_id": "FIC-ALPHA",
+            "weight_pct": 7.0,
+            "sector": "fictional tech",
+            "country": "FIC"
+          },
+          {
+            "security_id": "FIC-GAMMA",
+            "weight_pct": 4.0,
+            "sector": "fictional energy",
+            "country": "FIC"
+          }
+        ]
+      }
+    ]
+  },
+  "output": {
+    "completion_status": "partial",
+    "as_of": "2026-09-30",
+    "funds": [
+      "FIC-X",
+      "FIC-Y"
+    ],
+    "common_rows": [
+      {
+        "security_id": "FIC-ALPHA",
+        "FIC-X_weight_pct": 10,
+        "FIC-Y_weight_pct": 7,
+        "common_weight_min_pct": 7
+      }
+    ],
+    "overlap_metrics": [
+      {
+        "name": "observed_common_weight_min_sum",
+        "value": 7,
+        "unit": "fictional percentage points on matched rows only"
+      }
+    ],
+    "limitations": [
+      "Fictional snapshots have different as-of dates and one is partial; not total-fund overlap.",
+      "Security identities are fictional stable IDs."
+    ],
+    "missing_inputs": [
+      "Issuer holdings completeness audit",
+      "Same-date snapshots",
+      "Unreturned holdings rows"
+    ]
+  }
+}

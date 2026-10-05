@@ -1,0 +1,340 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "trading-data-integrity task contract draft",
+  "type": "object",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "properties": {
+        "research_question": {
+          "type": "string"
+        },
+        "as_of": {
+          "type": "string"
+        },
+        "universe_version": {
+          "type": "string"
+        },
+        "source_snapshot": {
+          "type": "string"
+        },
+        "time_keys": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "availability_policy": {
+          "type": "string"
+        },
+        "entity_key": {
+          "type": "string"
+        },
+        "period_range": {
+          "type": "string"
+        },
+        "timezone": {
+          "type": "string"
+        },
+        "known_at_field": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "label_definition": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "known_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "research_question",
+        "as_of"
+      ],
+      "additionalProperties": false
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "complete",
+            "partial",
+            "needs_input",
+            "blocked"
+          ]
+        },
+        "scope": {
+          "type": "object",
+          "properties": {
+            "as_of": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "universe_version": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "snapshot": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "as_of",
+            "universe_version",
+            "snapshot"
+          ],
+          "additionalProperties": false
+        },
+        "checks": {
+          "type": "object",
+          "properties": {
+            "availability": {
+              "type": "string"
+            },
+            "key_uniqueness": {
+              "type": "string"
+            },
+            "join_cardinality": {
+              "type": "string"
+            },
+            "coverage": {
+              "type": "object",
+              "properties": {
+                "expected_sessions": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "observed_sessions": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "unit": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "expected_sessions",
+                "observed_sessions",
+                "unit"
+              ],
+              "additionalProperties": false
+            },
+            "missingness": {
+              "type": "object",
+              "properties": {
+                "null_rows": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "reason": {
+                  "type": "string"
+                },
+                "mechanism": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "null_rows",
+                "reason",
+                "mechanism"
+              ],
+              "additionalProperties": false
+            },
+            "revision_lineage": {
+              "type": "object",
+              "properties": {
+                "amendment_known_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "safe_for_2025-06-30_decision": {
+                  "type": [
+                    "boolean",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "amendment_known_at",
+                "safe_for_2025-06-30_decision"
+              ],
+              "additionalProperties": false
+            },
+            "survivorship": {
+              "type": "object",
+              "properties": {
+                "delisted_entity_rows_retained": {
+                  "type": "boolean"
+                },
+                "terminal_proceeds": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "delisted_entity_rows_retained",
+                "terminal_proceeds"
+              ],
+              "additionalProperties": false
+            },
+            "leakage": {
+              "type": "object",
+              "properties": {
+                "transform_fit_scope": {
+                  "type": "string"
+                },
+                "finding": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "transform_fit_scope",
+                "finding"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "availability",
+            "key_uniqueness",
+            "join_cardinality",
+            "coverage",
+            "missingness",
+            "revision_lineage",
+            "survivorship",
+            "leakage"
+          ],
+          "additionalProperties": false
+        },
+        "exceptions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "sensitivity": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "counterevidence": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "proposed_repairs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "owner_handoffs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "status",
+        "scope",
+        "checks",
+        "exceptions",
+        "sensitivity",
+        "counterevidence",
+        "proposed_repairs",
+        "limitations",
+        "owner_handoffs",
+        "gaps"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "complete"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "gaps": {
+                "maxItems": 0
+              }
+            }
+          }
+        }
+      ]
+    },
+    "state": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "in_progress",
+            "completed",
+            "needs_input",
+            "blocked"
+          ]
+        },
+        "open_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

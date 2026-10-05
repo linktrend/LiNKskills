@@ -1,0 +1,171 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:linkskills:trading-bond-credit-relative-value:0.1.0",
+  "title": "Bond credit relative value",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "bond_id",
+        "currency",
+        "as_of",
+        "yield_pct",
+        "government_curve_points",
+        "credit_curve_points",
+        "data_source"
+      ],
+      "properties": {
+        "bond_id": {
+          "type": "string"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "as_of": {
+          "type": "string",
+          "format": "date"
+        },
+        "yield_pct": {
+          "type": "number"
+        },
+        "government_curve_points": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "tenor_years",
+              "yield_pct"
+            ],
+            "properties": {
+              "tenor_years": {
+                "type": "number"
+              },
+              "yield_pct": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "credit_curve_points": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "tenor_years",
+              "spread_bp"
+            ],
+            "properties": {
+              "tenor_years": {
+                "type": "number"
+              },
+              "spread_bp": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "data_source": {
+          "type": "string"
+        },
+        "bond_tenor_years": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "spread_measure": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "scenario_results": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "completion_status",
+        "bond_id",
+        "as_of",
+        "metrics",
+        "scenario_review",
+        "limitations",
+        "missing_inputs"
+      ],
+      "properties": {
+        "completion_status": {
+          "enum": [
+            "complete",
+            "partial",
+            "insufficient_input"
+          ]
+        },
+        "bond_id": {
+          "type": "string"
+        },
+        "as_of": {
+          "type": "string",
+          "format": "date"
+        },
+        "metrics": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "value",
+              "unit"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "value": {
+                "type": [
+                  "number",
+                  "string",
+                  "null"
+                ]
+              },
+              "unit": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "scenario_review": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "missing_inputs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "advisory_recommendation": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  }
+}

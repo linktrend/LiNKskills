@@ -1,0 +1,30 @@
+{
+  "status": "schema_fixture_only_not_behavioral_evaluation",
+  "valid_case": {
+    "schema_ref": "references/schemas.json#/definitions/input",
+    "input": {
+      "action": "query_existing_notebook",
+      "notebook_identity": "FIC-NB-01",
+      "source_question": "Summarize source A claim about metric Y.",
+      "output_type": "answer",
+      "existing_session_capability": "visible session assumed only for illustration",
+      "write_authorization": "read-only",
+      "as_of": "2026-10-05"
+    },
+    "expected": "accept by JSON Schema"
+  },
+  "invalid_case": {
+    "schema_ref": "references/schemas.json#/definitions/input",
+    "input": {
+      "action": "fictional-input",
+      "notebook_identity": "fictional-input",
+      "source_question": "fictional-input",
+      "output_type": "fictional-input",
+      "existing_session_capability": "fictional-input",
+      "write_authorization": "fictional-input",
+      "as_of": "fictional-input",
+      "unapproved_extra_field": "reject"
+    },
+    "expected": "reject unknown additional property"
+  }
+}

@@ -1,0 +1,110 @@
+{
+  "status": "complete",
+  "scope": {
+    "as_of": "2026-10-05T09:00:00Z",
+    "period_or_horizon": "fictional-fixture",
+    "currency": "USD",
+    "version": "fictional-fixture",
+    "limitations": [
+      "Synthetic structural arithmetic fixture only; not observed market evidence, behavioral qualification, or a performance claim."
+    ]
+  },
+  "analysis": {
+    "status": "partial",
+    "comparability": {
+      "status": "comparable",
+      "baseline_start": "2026-09-01T00:00:00Z",
+      "baseline_end": "2026-09-30T23:59:59Z",
+      "current_start": "2026-10-01T00:00:00Z",
+      "current_end": "2026-10-05T09:00:00Z",
+      "population_match": true,
+      "version_match": true,
+      "baseline_n": 100,
+      "current_n": 100,
+      "exclusions": []
+    },
+    "drift_metrics": [
+      {
+        "category": "input",
+        "metric": "PSI",
+        "baseline_value": 0,
+        "current_value": 0.24,
+        "difference": 0.24,
+        "unit": "dimensionless PSI",
+        "denominator": "frozen reference bins",
+        "baseline_n": 100,
+        "current_n": 100,
+        "out_of_range_n": 30,
+        "frozen_bins_ref": "frozen-bins-v1",
+        "threshold_ref": null,
+        "status": "calculated",
+        "evidence_refs": [
+          "synthetic-fixture"
+        ],
+        "unit_kind": "dimensionless"
+      }
+    ],
+    "drawdown": {
+      "status": "calculated",
+      "opening_wealth": 100,
+      "peak_wealth": 100,
+      "trough_wealth": 90,
+      "max_drawdown_fraction": 0.1,
+      "flow_treatment": "none",
+      "currency": "USD",
+      "as_of": "2026-10-05T09:00:00Z"
+    },
+    "readiness_rows": [
+      {
+        "control": "rollback",
+        "status": "missing",
+        "artifact_ref": null,
+        "owner": "Eric",
+        "follow_up": "Exact version rollback evidence required."
+      }
+    ],
+    "policy_status": "not_assessed",
+    "evidence_refs": [
+      "synthetic-fixture"
+    ]
+  },
+  "recommendation": {
+    "stance": "no_action",
+    "proposed_target": {
+      "value": 1,
+      "unit": "fictional-fixture",
+      "currency": "USD",
+      "as_of": "2026-10-05T09:00:00Z",
+      "basis": "fictional-fixture"
+    },
+    "proposed_risk_level": {
+      "value": 1,
+      "unit": "fictional-fixture",
+      "currency": "USD",
+      "as_of": "2026-10-05T09:00:00Z",
+      "basis": "fictional-fixture"
+    },
+    "basis": [],
+    "counterevidence": [],
+    "reversal_evidence": [],
+    "advisory_only": true,
+    "approval_required": true
+  },
+  "evidence_gate": {
+    "critical_inputs_resolved": false,
+    "source_timestamps_reconciled": false,
+    "unit_contracts_resolved": false,
+    "limiting_gaps": [
+      "Synthetic fixture intentionally leaves a decision-critical evidence branch unresolved."
+    ]
+  },
+  "gaps": [
+    {
+      "field": "fixture_unresolved_input",
+      "why_it_matters": "The affected conclusion must remain partial.",
+      "owner": null,
+      "blocking": true
+    }
+  ],
+  "external_effects": []
+}

@@ -1,0 +1,65 @@
+{
+  "schema_version": "0.1",
+  "suite_id": "trading-filings-insider-dilution-eval-draft",
+  "skill_id": "trading-filings-insider-dilution",
+  "suite_version": "0.1.0",
+  "rubric": [
+    {
+      "dimension": "task_method",
+      "weight": 0.4
+    },
+    {
+      "dimension": "units_and_traceability",
+      "weight": 0.35
+    },
+    {
+      "dimension": "scope_uncertainty_owner_boundaries",
+      "weight": 0.25
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "shelf-only",
+      "case_type": "adversarial",
+      "input": "Effective shelf with no supplement/activity proof.",
+      "expected": {
+        "criteria": [
+          "Classify capacity only or unknown, never active dilution."
+        ]
+      }
+    },
+    {
+      "case_id": "joint-filer",
+      "case_type": "adversarial",
+      "input": "Two joint filers report same shared beneficial position.",
+      "expected": {
+        "criteria": [
+          "Avoid double count; preserve ownership basis."
+        ]
+      }
+    },
+    {
+      "case_id": "xbrl-unit",
+      "case_type": "adversarial",
+      "input": "Fact in USD thousands with quarterly duration context used as shares outstanding.",
+      "expected": {
+        "criteria": [
+          "Reject dimensional/context mismatch."
+        ]
+      }
+    }
+  ],
+  "evidence_policy": {
+    "retain": [
+      "fixture_input",
+      "expected_behavior"
+    ],
+    "redact": [
+      "secrets",
+      "private_data",
+      "raw_transactions_unless_authorized"
+    ]
+  },
+  "skill_version_range": ">=0.1.0",
+  "pass_threshold": 0.85
+}

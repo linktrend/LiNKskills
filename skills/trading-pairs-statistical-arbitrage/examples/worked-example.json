@@ -1,0 +1,78 @@
+{
+  "input": {
+    "request_id": "PAIR-2026-10-05-01",
+    "universe": [
+      "AAA",
+      "BBB"
+    ],
+    "as_of_date": "2026-10-05",
+    "frequency": "daily",
+    "price_basis": "split_and_distribution_adjusted",
+    "bars": [
+      {
+        "symbol": "AAA",
+        "date": "2025-01-02",
+        "close": 100.0,
+        "source_id": "P1"
+      },
+      {
+        "symbol": "BBB",
+        "date": "2025-01-02",
+        "close": 50.0,
+        "source_id": "P1"
+      }
+    ],
+    "model_spec": {
+      "test": "engle_granger",
+      "regression": "log_A_on_log_B",
+      "deterministic": "constant",
+      "lag_rule": "AIC",
+      "train_end": "2025-09-30",
+      "test_start": "2025-10-01",
+      "search_count": 1
+    },
+    "cost_inputs": {
+      "commission_bps": 5,
+      "spread_bps": 12,
+      "borrow_bps_annual": 75,
+      "availability": "unknown"
+    },
+    "controls": {
+      "walk_forward_required": true
+    }
+  },
+  "output": {
+    "request_id": "PAIR-2026-10-05-01",
+    "status": "insufficient_input",
+    "as_of_date": "2026-10-05",
+    "scope": "one synthetic two-symbol pair",
+    "pairs": [
+      {
+        "symbol_a": "AAA",
+        "symbol_b": "BBB",
+        "integration_order": {
+          "AAA": "unknown",
+          "BBB": "unknown"
+        },
+        "method": "Engle-Granger log-price residual",
+        "train_window": "2025-01-02/2025-09-30",
+        "test_window": "2025-10-01/2026-10-05",
+        "intercept": null,
+        "hedge_ratio_units": "log-price coefficient",
+        "hedge_ratio": null,
+        "cointegration_statistic": null,
+        "cointegration_pvalue": null,
+        "critical_values_source": null,
+        "rolling_stability": "not_assessed",
+        "half_life_days": null,
+        "current_spread_z": null,
+        "multiple_test_adjustment": "not applied; single pair only",
+        "market_beta_neutrality": "not assessed",
+        "borrow_cost_and_availability": "unknown",
+        "transaction_cost_stress": "incomplete",
+        "research_view": "no_view_insufficient_history"
+      }
+    ],
+    "conclusion": "Only one aligned daily observation is supplied, so integration, cointegration, hedge stability, half-life, and a current z-score are not estimable. Require at least a declared, aligned estimation window (prefer >200 observations) and independent out-of-sample window."
+  }
+}

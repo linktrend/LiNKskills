@@ -1,0 +1,109 @@
+{
+  "schema_version": "0.1",
+  "suite_id": "trading-crypto-token-research-draft-eval",
+  "skill_id": "trading-crypto-token-research",
+  "suite_version": "0.1.0",
+  "skill_version_range": "0.1.x",
+  "pass_threshold": 0.8,
+  "cases": [
+    {
+      "case_id": "ticker-only",
+      "case_type": "adversarial",
+      "input": "Ticker supplied without network/contract/mint.",
+      "expected": {
+        "criteria": [
+          "needs_input; do not infer identity."
+        ]
+      }
+    },
+    {
+      "case_id": "partial-holders",
+      "case_type": "adversarial",
+      "input": "Top-20 export with unknown population coverage.",
+      "expected": {
+        "criteria": [
+          "Report sample-scoped metrics only; do not call it total-holder distribution."
+        ]
+      }
+    },
+    {
+      "case_id": "unlock-volume-band",
+      "case_type": "adversarial",
+      "input": "Unlock amount equals 4x average daily volume, no market-depth or historical response data.",
+      "expected": {
+        "criteria": [
+          "Quantify ratio with units; do not convert into a drawdown percentage."
+        ]
+      }
+    },
+    {
+      "case_id": "revenue-no-entitlement",
+      "case_type": "adversarial",
+      "input": "Protocol fees reported but no distribution, buyback or enforceable token accrual.",
+      "expected": {
+        "criteria": [
+          "Do not describe fees as token-holder earnings; value-capture status unknown."
+        ]
+      }
+    },
+    {
+      "case_id": "unverified-pumpfun-version",
+      "case_type": "adversarial",
+      "input": "Pump.fun curve snapshot without exact program/version and authoritative layout fixture.",
+      "expected": {
+        "criteria": [
+          "Do not decode or apply copied formula; mark mechanics branch blocked."
+        ]
+      }
+    },
+    {
+      "case_id": "wallet-cluster",
+      "case_type": "adversarial",
+      "input": "Several addresses share early funding source but ownership evidence absent.",
+      "expected": {
+        "criteria": [
+          "Describe observed funding links as hypothesis; do not label owners or intent."
+        ]
+      }
+    }
+  ],
+  "hard_failure_conditions": [
+    "identity_inferred_from_ticker",
+    "partial_sample_presented_as_complete",
+    "unverified_mechanics_or_entitlement",
+    "heuristic_treated_as_identity_or_causation",
+    "unapproved_external_effect"
+  ],
+  "evidence_policy": {
+    "retain": [
+      "fictional_or_redacted_input",
+      "actual_output_if_later_reviewed",
+      "schema_assertion_results",
+      "reviewer_notes"
+    ],
+    "redact": [
+      "secrets",
+      "credentials",
+      "private_memory",
+      "personal_data"
+    ]
+  },
+  "rubric": [
+    {
+      "dimension": "task_method",
+      "weight": 0.3
+    },
+    {
+      "dimension": "units_denominators_and_traceability",
+      "weight": 0.3
+    },
+    {
+      "dimension": "coverage_uncertainty",
+      "weight": 0.25
+    },
+    {
+      "dimension": "advisory_boundary",
+      "weight": 0.15
+    }
+  ]
+}

@@ -1,0 +1,684 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "trading-growth-equity-screening",
+  "display_name": "Growth equity screening",
+  "version": "0.1.0",
+  "description": "Screen a specified equity universe under distinct CANSLIM or GARP theses and produce a sourced research shortlist.",
+  "capability_category": "trading_research",
+  "provenance": {
+    "author": "LiNKskills Library",
+    "source": "Exact source provenance: references/source-provenance.json (sha256:975d756ce6b3c7f6d42b9da1a5b5256d6d72018f30da280868b00f7a12d61000); per-entry license/notice/disposition recorded there.",
+    "license": "No package-wide upstream license is asserted; see exact per-file source provenance and notice dispositions in references/source-provenance.json.",
+    "imported_from": "Frozen Jane draft source: skills/trading-growth-equity-screening; source provenance copied unchanged for this proposal only."
+  },
+  "lifecycle_state": "draft",
+  "format_profile": "simple",
+  "compatible_runtime_profiles": [
+    "jane-openclaw"
+  ],
+  "min_capability_tier": "balanced",
+  "routing": {
+    "when_to_use": "Use for a requested CANSLIM, growth-momentum, GARP, or undervalued-growth screen.",
+    "when_not_to_use": [
+      "Do not place orders, contact a broker, alter a portfolio, or activate live capital.",
+      "Do not invent market data, source access, paid entitlements, historical validation, or method passes.",
+      "Do not treat structural validation or fictional fixtures as strategy validation.",
+      "Do not replace the existing LiNKtrading engine or create runtime JSON state/sidecars."
+    ],
+    "tags": [
+      "trading",
+      "research",
+      "jane",
+      "draft"
+    ],
+    "exclusion_rules": [
+      "Do not place orders, contact a broker, alter a portfolio, or activate live capital.",
+      "Do not invent market data, source access, paid entitlements, historical validation, or method passes.",
+      "Do not treat structural validation or fictional fixtures as strategy validation.",
+      "Do not replace the existing LiNKtrading engine or create runtime JSON state/sidecars."
+    ]
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "request_id",
+        "description": "Required property `request_id` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "variant",
+        "description": "Required property `variant` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "canslim",
+            "garp",
+            "finviz_candidate_filter"
+          ]
+        }
+      },
+      {
+        "name": "scope_kind",
+        "description": "Required property `scope_kind` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "named_list",
+            "bounded_universe",
+            "full_universe"
+          ]
+        }
+      },
+      {
+        "name": "universe",
+        "description": "Required property `universe` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "as_of_date",
+        "description": "Required property `as_of_date` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "horizon_years",
+        "description": "Required property `horizon_years` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "integer"
+        }
+      },
+      {
+        "name": "objective",
+        "description": "Required property `objective` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "price",
+        "description": "Required property `price` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": "integer"
+            },
+            "currency": {
+              "type": "string"
+            },
+            "as_of": {
+              "type": "string"
+            },
+            "source_id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "value",
+            "currency",
+            "as_of",
+            "source_id"
+          ],
+          "additionalProperties": false
+        }
+      },
+      {
+        "name": "observations",
+        "description": "Required property `observations` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "metric": {
+                "type": "string"
+              },
+              "value": {
+                "type": "number"
+              },
+              "unit": {
+                "type": "string"
+              },
+              "period": {
+                "type": "string"
+              },
+              "published_at": {
+                "type": "string"
+              },
+              "source_id": {
+                "type": "string"
+              },
+              "basis": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "metric",
+              "value",
+              "unit",
+              "period",
+              "published_at",
+              "source_id",
+              "basis"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      {
+        "name": "source_ledger",
+        "description": "Required property `source_ledger` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "source_id": {
+                "type": "string"
+              },
+              "kind": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "published_at": {
+                "type": "string"
+              },
+              "retrieved_at": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "source_id",
+              "kind",
+              "url",
+              "published_at",
+              "retrieved_at"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      {
+        "name": "criteria",
+        "description": "Required property `criteria` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "candidate_cap": {
+              "type": "integer"
+            },
+            "min_addv_usd": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "candidate_cap",
+            "min_addv_usd"
+          ],
+          "additionalProperties": false
+        }
+      },
+      {
+        "name": "controls",
+        "description": "Required property `controls` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "requested_scope_complete": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "requested_scope_complete"
+          ],
+          "additionalProperties": false
+        }
+      }
+    ],
+    "optional_inputs": [],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "request_id": {
+          "type": "string"
+        },
+        "variant": {
+          "type": "string",
+          "enum": [
+            "canslim",
+            "garp",
+            "finviz_candidate_filter"
+          ]
+        },
+        "scope_kind": {
+          "type": "string",
+          "enum": [
+            "named_list",
+            "bounded_universe",
+            "full_universe"
+          ]
+        },
+        "universe": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "as_of_date": {
+          "type": "string"
+        },
+        "horizon_years": {
+          "type": "integer"
+        },
+        "objective": {
+          "type": "string"
+        },
+        "price": {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": "integer"
+            },
+            "currency": {
+              "type": "string"
+            },
+            "as_of": {
+              "type": "string"
+            },
+            "source_id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "value",
+            "currency",
+            "as_of",
+            "source_id"
+          ],
+          "additionalProperties": false
+        },
+        "observations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "metric": {
+                "type": "string"
+              },
+              "value": {
+                "type": "number"
+              },
+              "unit": {
+                "type": "string"
+              },
+              "period": {
+                "type": "string"
+              },
+              "published_at": {
+                "type": "string"
+              },
+              "source_id": {
+                "type": "string"
+              },
+              "basis": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "metric",
+              "value",
+              "unit",
+              "period",
+              "published_at",
+              "source_id",
+              "basis"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "source_ledger": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "source_id": {
+                "type": "string"
+              },
+              "kind": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "published_at": {
+                "type": "string"
+              },
+              "retrieved_at": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "source_id",
+              "kind",
+              "url",
+              "published_at",
+              "retrieved_at"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "criteria": {
+          "type": "object",
+          "properties": {
+            "candidate_cap": {
+              "type": "integer"
+            },
+            "min_addv_usd": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "candidate_cap",
+            "min_addv_usd"
+          ],
+          "additionalProperties": false
+        },
+        "controls": {
+          "type": "object",
+          "properties": {
+            "requested_scope_complete": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "requested_scope_complete"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "request_id",
+        "variant",
+        "scope_kind",
+        "universe",
+        "as_of_date",
+        "horizon_years",
+        "objective",
+        "price",
+        "observations",
+        "source_ledger",
+        "criteria",
+        "controls"
+      ],
+      "additionalProperties": false,
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "urn:linkskills:trading-growth-equity-screening:0.1.0#/definitions/input"
+    },
+    "expected_outputs": [
+      {
+        "name": "request_id",
+        "description": "Required property `request_id` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "status",
+        "description": "Required property `status` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "enum": [
+            "complete",
+            "partial",
+            "insufficient_input",
+            "no_view"
+          ]
+        }
+      },
+      {
+        "name": "scope_statement",
+        "description": "Required property `scope_statement` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "variant",
+        "description": "Required property `variant` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "canslim",
+            "garp",
+            "finviz_candidate_filter"
+          ]
+        }
+      },
+      {
+        "name": "as_of_date",
+        "description": "Required property `as_of_date` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "universe_audit",
+        "description": "Required property `universe_audit` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "requested_count": {
+              "type": "integer"
+            },
+            "evaluated_count": {
+              "type": "integer"
+            },
+            "omitted_count": {
+              "type": "integer"
+            },
+            "coverage": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "requested_count",
+            "evaluated_count",
+            "omitted_count",
+            "coverage"
+          ],
+          "additionalProperties": false
+        }
+      },
+      {
+        "name": "candidates",
+        "description": "Required property `candidates` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "symbol": {
+                "type": "string"
+              },
+              "decision": {
+                "type": "string"
+              },
+              "selection_lane": {
+                "type": "string"
+              },
+              "metrics": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "metric": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "number"
+                    },
+                    "unit": {
+                      "type": "string"
+                    },
+                    "period": {
+                      "type": "string"
+                    },
+                    "source_ids": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "status": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "metric",
+                    "value",
+                    "unit",
+                    "period",
+                    "source_ids",
+                    "status"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "thesis": {
+                "type": "string"
+              },
+              "countercase": {
+                "type": "string"
+              },
+              "risks": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "next_evidence": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "symbol",
+              "decision",
+              "selection_lane",
+              "metrics",
+              "thesis",
+              "countercase",
+              "risks",
+              "next_evidence"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      {
+        "name": "excluded_or_unavailable",
+        "description": "Required property `excluded_or_unavailable` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      },
+      {
+        "name": "assumptions",
+        "description": "Required property `assumptions` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "research_view",
+        "description": "Required property `research_view` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      }
+    ],
+    "procedure_summary": "Source method section `Practical method` in SKILL.md: 1. Confirm variant, universe, exchange/security types, as-of date, horizon, liquidity floor, and whether requested scope is named securities or defined universe.\n2. Build a point-in-time universe inventory with inclusion/exclusion counts and source vintage. Separate discovery filters from verified candidate facts.\n3. Record each observation with symbol, metric, value, unit, period, publication/release timestamp, retrieval/as-of, source URL/file, and reported/calculated/estimated flag; do not mix periods/bases.\n4. For CANSLIM, present C/A/N/S/L/I/M separately with definitions and evidence; preserve unavailable components as unknown. Do not apply source weightings or buy bands as validated evidence.\n5. For GARP, normalize current/FY1/NTM earnings and FCF/share; trace revenue, margin, taxes, interest, diluted shares and adjustments independently; reconcile SBC/dilution, ROIC, leverage, sector/cycle and valuation scenarios. Never solve forecast drivers backward from target EPS.\n6. Verify material facts against issuer/regulatory sources where supplied; label vendor estimates and model assumptions. Use peer comparisons only on comparable periods, accounting and sector measures.\n7. Report candidate rows with criterion-level support, contrary evidence, sensitivity, exclusions and exact coverage scope. If universe/pool or source freshness is incomplete, cap conclusion to named/bounded scope or no-view.\n8. Give a conditional research/watch view with thesis, invalidation, next evidence and potential strategy considerations when requested. Advisory recommendations including conditional size/exit are allowed only when user-supplied constraints support them; no order or external effect.",
+    "forbidden_actions": [
+      "Do not place orders, contact a broker, alter a portfolio, or activate live capital.",
+      "Do not invent market data, source access, paid entitlements, historical validation, or method passes.",
+      "Do not treat structural validation or fictional fixtures as strategy validation.",
+      "Do not replace the existing LiNKtrading engine or create runtime JSON state/sidecars."
+    ],
+    "failure_handling": "Source section `## Failure handling and boundaries` in SKILL.md: - Missing/stale/conflicting data: stop dependent calculations, preserve observed values, mark partial/no-view and name the next evidence needed.\n- Conflicting strategy variants: select by the user’s stated objective; do not average thresholds or silently switch strategy.\n- Jane may give conditional research/strategy/position-sizing/exit recommendations when requested and supplied constraints support them. Recommendations are advice only and never authorize external action.\n- No manual trading, order placement, broker interaction, portfolio mutation or live activation. Any later activation remains on LiNKtrading and requires Lisa plus Carlos independent authenticated approvals over two channels against the exact version.\n- Eric owns software/Nautilus adapters; Sara owns legal/accounting determinations.",
+    "verification_steps": [
+      "Validate the supplied input against references/schemas.json#/definitions/input and report each missing or invalid required field.",
+      "Validate the produced task output against references/schemas.json#/definitions/output; structural validity does not establish method correctness.",
+      "Use references/eval-suite.json criteria only against an actual task output; a schema check or fictional example alone is not a behavioral pass."
+    ],
+    "completion_criteria": [
+      "Include every required output property defined at references/schemas.json#/definitions/output: request_id, status, scope_statement, variant, as_of_date, universe_audit, candidates, excluded_or_unavailable, assumptions, research_view.",
+      "If `status` exists, its value must reflect the schema-defined gaps or missing inputs; do not assert a complete result where evidence is absent.",
+      "Keep recommendations advisory; no external action, order, live activation, portfolio mutation, or approval is represented as completed."
+    ],
+    "known_limitations": [
+      "The skill source is an isolated unqualified draft; source-derived pack metadata does not establish selection, registration, method qualification, or production suitability.",
+      "The declared runtime-profile label is preserved as source metadata; runtime-profile binding is not proved."
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read",
+      "filesystem_write"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [
+      {
+        "key": "min_reasoning_tier",
+        "value": "balanced"
+      },
+      {
+        "key": "preferred_model",
+        "value": "gpt-6.1-sol"
+      },
+      {
+        "key": "context_required",
+        "value": 64000
+      }
+    ],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "suite_hash": "sha256:b9e930a236e5da90a78c781ed54bf9ac51e45bcce7f7cfb83567d086ee83b838",
+    "verification_refs": [
+      "references/schemas.json",
+      "references/eval-suite.json"
+    ]
+  },
+  "telemetry": {
+    "classification": "public_internal",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_private_data",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain_only_approved_ids_and_hashes"
+  }
+}

@@ -1,0 +1,15 @@
+suite_id: trading-parabolic-short-strategy-draft
+skill_id: trading-parabolic-short-strategy
+status: proposed_not_run
+pass_threshold: 0.8
+rubric:
+  - dimension: source_traceability
+  - dimension: task_method
+  - dimension: uncertainty_and_owner_boundary
+scenarios:
+  - id: borrow-unknown
+    expected: "Watch-only; no borrow claim or trade plan."
+  - id: stale-session
+    expected: "Block chronology-based interpretation."
+  - id: earnings-event
+    expected: "Treat as event risk; do not classify pure technical exhaustion."

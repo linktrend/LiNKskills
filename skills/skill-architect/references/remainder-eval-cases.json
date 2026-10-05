@@ -35,6 +35,188 @@
     "wrong-profile-assignment-for-hitl-skill": {
       "case_type": "golden",
       "input": "Mode: SCAFFOLD. Name: `outreach-email-sender`. Requirement: the skill\nmust pause for human approval before sending any email, resume after\napproval, and log each approval event in a task ledger.\n"
+    },
+    "refiner-review-separated-evidence": {
+      "case_type": "golden",
+      "input": "Exact target binding, structural receipt and material semantic finding; no consumer behavior receipt.",
+      "request": {
+        "target_binding": {
+          "target_path": "skills/skill-architect/SKILL.md",
+          "sha256": "2bf3bb928e546efe3b95f5d6f5ec22596e0f18f5c9f725acb251615639c24473"
+        },
+        "observed_target_sha256": "2bf3bb928e546efe3b95f5d6f5ec22596e0f18f5c9f725acb251615639c24473",
+        "requested_disposition": "PATCH_PROPOSED",
+        "patch_ref": "fixture:refiner-patch",
+        "structural_receipt": {
+          "reported_status": "PASS",
+          "target_sha256": "2bf3bb928e546efe3b95f5d6f5ec22596e0f18f5c9f725acb251615639c24473",
+          "receipt_ref": "fixture:validator-receipt"
+        },
+        "semantic_review": {
+          "reviewed_sha256": "2bf3bb928e546efe3b95f5d6f5ec22596e0f18f5c9f725acb251615639c24473",
+          "reviewer_ref": "owner:skills",
+          "status": "FINDINGS",
+          "findings": [
+            {
+              "finding_id": "F-01",
+              "severity": "material",
+              "path": "skills/skill-architect/SKILL.md",
+              "line": 111,
+              "evidence": "REFINER reads the existing execution ledger and old-patterns, then patches in place; it does not bind a target digest before generating the plan.",
+              "finding": "A target may change after audit and the planned patch can be based on stale bytes.",
+              "recommendation": "Bind the path and SHA-256 and re-read immediately before patch generation."
+            }
+          ]
+        }
+      }
+    },
+    "refiner-review-stale-target": {
+      "case_type": "adversarial",
+      "input": "Current target digest differs from binding; stop stale review and patch generation.",
+      "request": {
+        "target_binding": {
+          "target_path": "skills/skill-architect/SKILL.md",
+          "sha256": "2bf3bb928e546efe3b95f5d6f5ec22596e0f18f5c9f725acb251615639c24473"
+        },
+        "observed_target_sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+        "requested_disposition": "PATCH_PROPOSED",
+        "patch_ref": "fixture:refiner-patch",
+        "structural_receipt": {
+          "reported_status": "PASS",
+          "target_sha256": "2bf3bb928e546efe3b95f5d6f5ec22596e0f18f5c9f725acb251615639c24473",
+          "receipt_ref": "fixture:validator-receipt"
+        },
+        "semantic_review": {
+          "reviewed_sha256": "2bf3bb928e546efe3b95f5d6f5ec22596e0f18f5c9f725acb251615639c24473",
+          "reviewer_ref": "owner:skills",
+          "status": "FINDINGS",
+          "findings": [
+            {
+              "finding_id": "F-01",
+              "severity": "material",
+              "path": "skills/skill-architect/SKILL.md",
+              "line": 111,
+              "evidence": "REFINER reads the existing execution ledger and old-patterns, then patches in place; it does not bind a target digest before generating the plan.",
+              "finding": "A target may change after audit and the planned patch can be based on stale bytes.",
+              "recommendation": "Bind the path and SHA-256 and re-read immediately before patch generation."
+            }
+          ]
+        }
+      }
+    },
+    "refiner-review-structural-only": {
+      "case_type": "edge",
+      "input": "Matching structural receipt only; semantic and behavior evidence are absent.",
+      "request": {
+        "target_binding": {
+          "target_path": "skills/skill-architect/SKILL.md",
+          "sha256": "2bf3bb928e546efe3b95f5d6f5ec22596e0f18f5c9f725acb251615639c24473"
+        },
+        "observed_target_sha256": "2bf3bb928e546efe3b95f5d6f5ec22596e0f18f5c9f725acb251615639c24473",
+        "requested_disposition": "NO_CHANGE",
+        "structural_receipt": {
+          "reported_status": "PASS",
+          "target_sha256": "2bf3bb928e546efe3b95f5d6f5ec22596e0f18f5c9f725acb251615639c24473",
+          "receipt_ref": "fixture:validator-receipt"
+        }
+      }
+    },
+    "refiner-review-pass-without-receipt": {
+      "case_type": "adversarial",
+      "input": "Behavior claims PASS but has no receipt reference or scenario results; do not report PASS.",
+      "request": {
+        "target_binding": {
+          "target_path": "skills/skill-architect/SKILL.md",
+          "sha256": "2bf3bb928e546efe3b95f5d6f5ec22596e0f18f5c9f725acb251615639c24473"
+        },
+        "observed_target_sha256": "2bf3bb928e546efe3b95f5d6f5ec22596e0f18f5c9f725acb251615639c24473",
+        "requested_disposition": "NO_CHANGE",
+        "behavior_receipt": {
+          "reported_status": "PASS",
+          "target_sha256": "2bf3bb928e546efe3b95f5d6f5ec22596e0f18f5c9f725acb251615639c24473",
+          "scenario_results": []
+        }
+      }
+    },
+    "refiner-review-path-traversal": {
+      "case_type": "adversarial",
+      "input": "Reject a target path that escapes the skills root through parent traversal.",
+      "request": {
+        "target_binding": {
+          "target_path": "skills/../outside/SKILL.md",
+          "sha256": "2bf3bb928e546efe3b95f5d6f5ec22596e0f18f5c9f725acb251615639c24473"
+        },
+        "observed_target_sha256": "2bf3bb928e546efe3b95f5d6f5ec22596e0f18f5c9f725acb251615639c24473",
+        "requested_disposition": "PATCH_PROPOSED"
+      }
+    },
+    "refiner-review-line-zero": {
+      "case_type": "adversarial",
+      "input": "Reject a semantic finding with line zero; source locations begin at line one.",
+      "request": {
+        "target_binding": {
+          "target_path": "skills/skill-architect/SKILL.md",
+          "sha256": "2bf3bb928e546efe3b95f5d6f5ec22596e0f18f5c9f725acb251615639c24473"
+        },
+        "observed_target_sha256": "2bf3bb928e546efe3b95f5d6f5ec22596e0f18f5c9f725acb251615639c24473",
+        "requested_disposition": "PATCH_PROPOSED",
+        "patch_ref": "fixture:refiner-patch",
+        "structural_receipt": {
+          "reported_status": "PASS",
+          "target_sha256": "2bf3bb928e546efe3b95f5d6f5ec22596e0f18f5c9f725acb251615639c24473",
+          "receipt_ref": "fixture:validator-receipt"
+        },
+        "semantic_review": {
+          "reviewed_sha256": "2bf3bb928e546efe3b95f5d6f5ec22596e0f18f5c9f725acb251615639c24473",
+          "reviewer_ref": "owner:skills",
+          "status": "FINDINGS",
+          "findings": [
+            {
+              "finding_id": "F-01",
+              "severity": "material",
+              "path": "skills/skill-architect/SKILL.md",
+              "line": 0,
+              "evidence": "REFINER reads the existing execution ledger and old-patterns, then patches in place; it does not bind a target digest before generating the plan.",
+              "finding": "A target may change after audit and the planned patch can be based on stale bytes.",
+              "recommendation": "Bind the path and SHA-256 and re-read immediately before patch generation."
+            }
+          ]
+        }
+      }
+    },
+    "refiner-review-cross-file-finding": {
+      "case_type": "golden",
+      "input": "Exact-target REFINE review: finding points to an unbound different file; reject semantic evidence and block patch disposition.",
+      "request": {
+        "target_binding": {
+          "target_path": "skills/skill-architect/SKILL.md",
+          "sha256": "2bf3bb928e546efe3b95f5d6f5ec22596e0f18f5c9f725acb251615639c24473"
+        },
+        "observed_target_sha256": "2bf3bb928e546efe3b95f5d6f5ec22596e0f18f5c9f725acb251615639c24473",
+        "requested_disposition": "PATCH_PROPOSED",
+        "patch_ref": "fixture:refiner-patch",
+        "structural_receipt": {
+          "reported_status": "PASS",
+          "target_sha256": "2bf3bb928e546efe3b95f5d6f5ec22596e0f18f5c9f725acb251615639c24473",
+          "receipt_ref": "fixture:validator-receipt"
+        },
+        "semantic_review": {
+          "reviewed_sha256": "2bf3bb928e546efe3b95f5d6f5ec22596e0f18f5c9f725acb251615639c24473",
+          "reviewer_ref": "owner:skills",
+          "status": "FINDINGS",
+          "findings": [
+            {
+              "finding_id": "F-01",
+              "severity": "material",
+              "path": "skills/other-skill/SKILL.md",
+              "line": 111,
+              "evidence": "REFINER reads the existing execution ledger and old-patterns, then patches in place; it does not bind a target digest before generating the plan.",
+              "finding": "A target may change after audit and the planned patch can be based on stale bytes.",
+              "recommendation": "Bind the path and SHA-256 and re-read immediately before patch generation."
+            }
+          ]
+        }
+      }
     }
   },
   "permission_to_act": false,

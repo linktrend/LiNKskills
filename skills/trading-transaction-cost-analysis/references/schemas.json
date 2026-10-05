@@ -1,0 +1,435 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "trading-transaction-cost-analysis task contract draft",
+  "type": "object",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "properties": {
+        "question": {
+          "type": "string"
+        },
+        "instrument": {
+          "type": "string"
+        },
+        "venue": {
+          "type": "string"
+        },
+        "side": {
+          "enum": [
+            "long",
+            "short"
+          ]
+        },
+        "order_notional": {
+          "type": "number"
+        },
+        "order_quantity": {
+          "type": "number"
+        },
+        "price": {
+          "type": "number"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "nav": {
+          "type": "number"
+        },
+        "weight_change": {
+          "type": "number"
+        },
+        "adv_notional": {
+          "type": "number"
+        },
+        "adv_currency": {
+          "type": "string"
+        },
+        "adv_window": {
+          "type": "string"
+        },
+        "full_spread_bps": {
+          "type": "number"
+        },
+        "spread_basis": {
+          "enum": [
+            "full_spread",
+            "half_spread_per_side",
+            "unknown"
+          ]
+        },
+        "commission_bps_per_side": {
+          "type": "number"
+        },
+        "slippage_bps_per_side": {
+          "type": "number"
+        },
+        "impact_model": {
+          "type": "string"
+        },
+        "impact_coefficient": {
+          "type": "number"
+        },
+        "volatility": {
+          "type": "number"
+        },
+        "borrow_apr": {
+          "type": "number"
+        },
+        "holding_days": {
+          "type": "number"
+        },
+        "locate_available": {
+          "type": "boolean"
+        },
+        "as_of": {
+          "type": "string"
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "source": {
+                "type": "string"
+              },
+              "retrieved_at": {
+                "type": "string"
+              },
+              "evidence_ref": {
+                "type": "string"
+              },
+              "units": {
+                "type": "string"
+              },
+              "limitations": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "source",
+              "retrieved_at",
+              "evidence_ref"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "decision_threshold": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "question",
+        "instrument",
+        "venue",
+        "side",
+        "currency",
+        "as_of",
+        "evidence"
+      ],
+      "additionalProperties": false
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "draft_complete",
+            "needs_input",
+            "blocked"
+          ]
+        },
+        "derived_trade": {
+          "type": "object",
+          "properties": {
+            "notional": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "quantity": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "participation": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "currency": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "units_and_formula": {
+              "type": "string"
+            },
+            "limitations": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "units_and_formula",
+            "limitations"
+          ],
+          "additionalProperties": false
+        },
+        "cost_components": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "entry_bps": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "exit_bps": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "round_trip_bps": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "entry_amount": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "exit_amount": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "round_trip_amount": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "currency": {
+                "type": "string"
+              },
+              "basis": {
+                "type": "string"
+              },
+              "evidence_refs": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "limitations": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "name",
+              "currency",
+              "basis",
+              "limitations"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "total_cost": {
+          "type": "object",
+          "properties": {
+            "entry_bps": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "exit_bps": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "round_trip_bps": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "round_trip_amount": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "currency": {
+              "type": "string"
+            },
+            "gross_expected_return_bps": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "net_expected_return_bps": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "double_count_review": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "currency",
+            "double_count_review"
+          ],
+          "additionalProperties": false
+        },
+        "sensitivity": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "multiple": {
+                "type": "number"
+              },
+              "round_trip_cost_bps": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "net_expected_return_bps": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "limitations": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "multiple",
+              "limitations"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "capacity": {
+          "type": "object",
+          "properties": {
+            "adv_currency": {
+              "type": "string"
+            },
+            "adv_window": {
+              "type": "string"
+            },
+            "order_participation": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "capacity_status": {
+              "type": "string"
+            },
+            "limitations": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "adv_currency",
+            "adv_window",
+            "capacity_status",
+            "limitations"
+          ],
+          "additionalProperties": false
+        },
+        "locate_treatment": {
+          "type": "string"
+        },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "owner_handoff": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "status",
+        "derived_trade",
+        "cost_components",
+        "total_cost",
+        "sensitivity",
+        "capacity",
+        "locate_treatment",
+        "gaps"
+      ],
+      "additionalProperties": false
+    },
+    "state": {
+      "type": "object",
+      "description": "Progress in native session and approved Program Ledger, no JSON runtime sidecar.",
+      "properties": {
+        "status": {
+          "enum": [
+            "in_progress",
+            "completed",
+            "needs_input",
+            "blocked"
+          ]
+        },
+        "open_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

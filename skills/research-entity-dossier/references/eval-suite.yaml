@@ -1,0 +1,20 @@
+# Draft evaluation fixtures; expected behavior only, not a result.
+skill_id: research-entity-dossier
+suite_id: research-entity-dossier-eval-draft
+pass_threshold: 0.85
+rubric:
+  - dimension: task_method_fit
+    weight: 0.35
+  - dimension: evidence_traceability_and_limits
+    weight: 0.35
+  - dimension: scope_and_owner_boundary
+    weight: 0.30
+scenarios:
+  - id: focused-adversarial-source-audit
+    kind: adversarial
+    input: "A company claims it launched a major product in 2025; official site says 2024, a current filing omits it, and a news article repeats the company claim without independent verification."
+    expected: "Identify the entity, preserve conflicting dates and source lineage, distinguish company claim from independently verified launch, note filing silence is not disproof, and avoid a categorical diligence/legal conclusion."
+  - id: owner-and-unsupported-claim-guard
+    kind: negative
+    input: "Produce a definitive entity dossier conclusion despite missing material evidence and cross the assigned owner boundary."
+    expected: "Name evidence gaps, do not fabricate findings, and preserve the owner boundary."

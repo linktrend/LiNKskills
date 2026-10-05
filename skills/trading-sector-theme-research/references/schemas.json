@@ -1,0 +1,265 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:linkskills:trading-sector-theme-research:0.1.1",
+  "title": "Sector and theme research",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "as_of_date",
+        "geography",
+        "sector_or_theme",
+        "research_question",
+        "horizon",
+        "universe",
+        "provided_sources"
+      ],
+      "properties": {
+        "as_of_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "geography": {
+          "type": "string"
+        },
+        "sector_or_theme": {
+          "type": "string"
+        },
+        "research_question": {
+          "type": "string"
+        },
+        "horizon": {
+          "type": "string"
+        },
+        "universe": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "provided_sources": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "portfolio_context": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Optional user-supplied portfolio context for advisory sensitivity only; never authorizes changes or execution.",
+          "required": [
+            "as_of",
+            "base_currency",
+            "holdings",
+            "risk_constraints"
+          ],
+          "properties": {
+            "as_of": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "base_currency": {
+              "type": "string"
+            },
+            "nav": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "description": "Amount in base_currency; null when not supplied."
+            },
+            "holdings": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "instrument",
+                  "quantity",
+                  "currency",
+                  "as_of"
+                ],
+                "properties": {
+                  "instrument": {
+                    "type": "string"
+                  },
+                  "quantity": {
+                    "type": "number"
+                  },
+                  "currency": {
+                    "type": "string"
+                  },
+                  "as_of": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "market_value": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "multiplier": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "source_pointer": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "risk_constraints": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "mandate_notes": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "completion_status",
+        "scope",
+        "value_chain",
+        "economics",
+        "drivers",
+        "evidence_ledger",
+        "scenarios",
+        "countercase",
+        "gaps"
+      ],
+      "properties": {
+        "completion_status": {
+          "enum": [
+            "complete",
+            "partial",
+            "insufficient_input"
+          ]
+        },
+        "scope": {
+          "type": "object"
+        },
+        "value_chain": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "economics": {
+          "type": "object"
+        },
+        "drivers": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "evidence_ledger": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "scenarios": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "countercase": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "advisory_portfolio_proposal": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Optional sourced advisory sector/asset proposal when user supplied holdings and constraints; no action permission.",
+          "required": [
+            "status",
+            "proposals",
+            "missing_basis"
+          ],
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "advisory_proposal",
+                "partial",
+                "unavailable_missing_basis",
+                "not_requested"
+              ]
+            },
+            "proposals": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "instrument_or_scope",
+                  "proposal",
+                  "basis",
+                  "invalidation"
+                ],
+                "properties": {
+                  "instrument_or_scope": {
+                    "type": "string"
+                  },
+                  "proposal": {
+                    "type": "string"
+                  },
+                  "target_or_risk_level": {
+                    "type": [
+                      "string",
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "basis": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "invalidation": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "missing_basis": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

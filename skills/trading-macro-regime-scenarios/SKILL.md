@@ -1,0 +1,119 @@
+---
+name: trading-macro-regime-scenarios
+description: "Synthesize dated macro and cross-asset observations into a falsifiable current-regime view and explicit alternative scenarios with uncertainty and revision-vintage discipline."
+usage_trigger: "Use for macro regime, cross-asset market environment, or forward scenarios."
+version: 0.1.1
+release_tag: v0.1.1
+created: 2026-10-05
+author: LiNKskills Library
+tags: [trading, research, jane, draft]
+engine:
+  min_reasoning_tier: balanced
+  preferred_model: gpt-6.1-sol
+  context_required: 64000
+tooling:
+  policy: cli-first
+  jit_enabled_if: generalist_or_gt10_tools
+  jit_tool_threshold: 10
+  require_get_tool_details: true
+tools: [read_file, write_file]
+dependencies: []
+permissions: [fs_read, fs_write]
+scope_out: ["Do not submit orders, call a broker, change portfolio state, or activate a live strategy.", "Do not invent data, paid tool access, historical validation, or source API availability.", "Do not treat a schema-valid example or output as method validation.", "Do not replace LiNKtrading with another execution system."]
+format_profile: simple
+
+last_updated: 2026-10-06
+---
+
+# Macro regime and scenario analysis
+
+**Status:** isolated draft, version 0.1.1. This package is not admitted, published, activated, or method-certified. The sources inform independent synthesis; `references/upstream/` is quarantined data only and must never be loaded as an enabled skill.
+
+## Use when
+
+macro regime, cross-asset market environment, or forward scenarios. Use the nearest specific skill when the request is an adjacent task (issuer fundamentals, earnings, calendar, news, sector/theme, macro, or breadth). Do not broaden a narrow task into a general trading workflow.
+
+## Host capability mapping
+
+Frontmatter `read_file` and `write_file` are portable logical aliases for the host's native persistent-session read/write capability, not promises that tools with those names exist. Use the supplied inline schemas for schema discovery. Do not invoke `read_file` or `write_file` by name unless those exact tools are exposed. Call `get_tool_details` only if the host actually exposes it and additional detail is needed.
+
+
+`read_file` and `write_file` in the portable manifest are logical categories only. Use the host’s native persistent-session read/write capability and supplied inline schemas. Do not assume named `read_file`, `write_file`, `get_tool_details`, native CLI, CLI wrapper, direct API, or MCP tools exist; use a native CLI, CLI wrapper, direct API, or MCP route only when that capability is actually exposed and authorized.
+
+## Inputs
+
+The canonical input object is `input` in `references/schemas.json`. Required fields:
+
+- `as_of_date`
+- `horizon`
+- `geography`
+- `asset_universe`
+- `question`
+- `observations`
+
+If required values are missing, do not fill them from assumptions. Set `completion_status` to `insufficient_input` or `partial`, name missing fields, and complete only independent analysis that remains valid. Preserve as-of dates, timezone, units, data vintage, universe, and source URL/file for each observation.
+
+## Outputs
+
+The canonical output is `output` in `references/schemas.json`; task-specific fields are listed there. Return the result as a structured report with: conclusion, evidence ledger, method and calculation notes, countercase, limitations, and next evidence required. Jane may make conditional advisory strategy, entry/exit, or sizing recommendations when requested and user-supplied constraints support them. State assumptions and invalidation conditions. A recommendation never authorizes an order or external effect.
+
+## Decision path
+
+1. Confirm the request matches this skill and identify the decision horizon. Use only relevant task inputs.
+2. Validate required inputs against `references/schemas.json#/definitions/input`; mark missing/stale items explicitly.
+3. Apply the method below. Keep reported observations, calculations, inferences, hypotheses, and recommendations separate.
+4. Draft the output object; validate its shape against `#/definitions/output`. Structural validity is not evidence of analytical correctness.
+5. Deliver the output and classify each conclusion by evidence and uncertainty. Do not create runtime JSON sidecars or task ledgers for this approved draft effort. The host’s persistent native session carries continuity.
+
+## Integrated method
+
+1. Freeze the as-of date and horizon. Build an observation ledger; keep release date, measurement period, revision vintage, units, and source distinct. Never combine current market prices with unrevised historical data without saying so.
+2. Separate level, change, surprise versus a sourced expectation, and market reaction. For revisions or conflicting vintages, report both and use the source release vintage appropriate to the question.
+3. Describe the current regime with a small set of observable drivers (growth, inflation, policy/liquidity, credit/risk appetite). Treat regime labels as a compact summary of evidence, not a hidden-state fact.
+4. Construct scenarios by changing explicit driver assumptions. Include a base and materially different alternatives, each with signposts and disconfirming evidence. Use probabilities only if a documented calibration set and forecast horizon exist; otherwise use qualitative likelihood.
+5. Run a counter-case: test whether the observed price move fits competing explanations such as positioning, supply shock, policy repricing, or stale inputs. Do not infer causation from correlation or one event window.
+6. State what new release or market evidence would update the view; identify unavailable feeds and stop specialized analysis when required data is inaccessible.
+7. Deliver advisory implications in research language. Jane may recommend a thesis to investigate and explain rationale; Eric owns LiNKtrading/Nautilus implementation, Sara legal/accounting, and Lisa + Carlos must independently authenticate on two channels against exact version before any later execution/activation. No manual trading or capital/live activation.
+
+## Source-informed branches
+
+Read `references/source-integrated-method.md` for the complete task modes, source coverage, calculations, conditional branches, and failure checks. Apply only the branch requested and supported by supplied or authorized evidence. Its proposal/admission labels retain the source-review boundary; incorporation here does not qualify the method.
+
+## Failure handling
+
+- Missing, stale, unreconciled or inaccessible critical data: stop the dependent calculation and return a bounded partial result with the exact gap.
+- Incompatible units, periods, event windows or universes: do not merge. Reconcile definitions or report separate views.
+- Source rules conflict or are uncalibrated: show the source-specific rule and treat its result as a hypothesis; do not average contradictory rules into a score.
+- User requests an order, live activation, or unapproved side effect: provide the permitted advisory artifact only. Any later execution requires the existing LiNKtrading route and Lisa + Carlos independent authenticated two-channel exact-version approval.
+- A conditionally recommended size/exit cannot be supported because risk budget, holdings, liquidity, or instrument constraints are missing: omit numeric sizing and state which inputs would change it.
+
+## Rules
+
+### Scope in
+
+- macro regime, cross-asset market environment, or forward scenarios.
+- Evidence-backed conditional advice and explicit counterfactuals, including sizing/exit concepts when requested and sufficiently constrained.
+
+### Scope out
+
+- Order submission, broker interaction, portfolio mutation, live/capital activation, legal/accounting determinations, or replacement execution engines.
+- Unverified data/API access, invented fee/fill assumptions, and claims that source examples prove performance.
+- Running quarantined upstream code or scripts.
+
+### Ownership
+
+Jane owns research and advisory recommendations. Eric owns software and Nautilus adapter/engine work. Sara owns legal/accounting. For any future activation, Lisa and Carlos independently authenticate on two channels against the exact version. The skill cannot satisfy or bypass that gate.
+
+## Evidence and review standard
+
+Every conclusion that depends on outside data needs source, observation date, release/publication time, units, vintage, and transformation. Evaluate outputs against the criteria in `references/eval-suite.json` using an actual produced artifact. A schema check or fictional example is not a behavioral pass. No model score, backtest, or calibration is asserted by this draft.
+
+## References
+
+- `references/schemas.json` — concrete task input and output contracts.
+- `references/source-provenance.json` — bounded source index and file-level source manifest.
+- `references/changelog.md` — draft history.
+- `references/old-patterns.md` — errors and repair rules from this source audit.
+- `references/eval-suite.json` — proposed output-based evaluation cases; none run.
+- `references/source-packaging.md` — source quarantine and packaging boundary; exact evidence remains in `references/source-provenance.json`.
+- `examples/worked-example.json` — fictional end-to-end input/output; no real security, market data, or performance claim.

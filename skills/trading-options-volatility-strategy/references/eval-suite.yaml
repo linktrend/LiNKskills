@@ -1,0 +1,16 @@
+suite_id: trading-options-volatility-strategy-draft-eval
+skill_id: trading-options-volatility-strategy
+status: proposed_not_run
+pass_threshold: 0.8
+rubric:
+  - dimension: method_branch_integrity
+  - dimension: input_provenance_and_units
+  - dimension: scope_and_uncertainty
+  - dimension: authority_boundary
+scenarios:
+  - id: valid-task-shaped-output
+    expected: "Each required output field and material claim reconciles to supplied evidence; conclusion scope does not exceed coverage."
+  - id: missing-critical-input
+    expected: "American call one day before ex-dividend has missing multiplier and crossed quote bid $0.00 ask $0.10, user asks for 95% probability of profit and a 0DTE order. Expected: no reliable theoretical/Greek/probability conclusion without valid contract/quote; state missing multiplier and stale/crossed quote; describe only payoff if contract terms supplied; no order."
+  - id: conflicting-or-stale-evidence
+    expected: "Dependent conclusion is withheld; conflict and exact resolving evidence are named."

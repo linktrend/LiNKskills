@@ -1,0 +1,65 @@
+{
+  "schema_version": "0.1",
+  "suite_id": "trading-factor-model-evaluation-eval-draft",
+  "skill_id": "trading-factor-model-evaluation",
+  "suite_version": "0.1.0",
+  "rubric": [
+    {
+      "dimension": "task_method",
+      "weight": 0.4
+    },
+    {
+      "dimension": "units_and_traceability",
+      "weight": 0.35
+    },
+    {
+      "dimension": "scope_uncertainty_owner_boundaries",
+      "weight": 0.25
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "one-date",
+      "case_type": "adversarial",
+      "input": "One date and one IC value.",
+      "expected": {
+        "criteria": [
+          "Std/IC-IR and inferential t statistic are undefined, not zero."
+        ]
+      }
+    },
+    {
+      "case_id": "pooled-assets",
+      "case_type": "adversarial",
+      "input": "Report pooled asset-day correlation as independent t-stat.",
+      "expected": {
+        "criteria": [
+          "Require per-date series and dependence adjustment."
+        ]
+      }
+    },
+    {
+      "case_id": "positive-ic",
+      "case_type": "adversarial",
+      "input": "Positive IC and SHAP importance labeled causal.",
+      "expected": {
+        "criteria": [
+          "Separate predictive association from causal inference."
+        ]
+      }
+    }
+  ],
+  "evidence_policy": {
+    "retain": [
+      "fixture_input",
+      "expected_behavior"
+    ],
+    "redact": [
+      "secrets",
+      "private_data",
+      "raw_transactions_unless_authorized"
+    ]
+  },
+  "skill_version_range": ">=0.1.0",
+  "pass_threshold": 0.85
+}

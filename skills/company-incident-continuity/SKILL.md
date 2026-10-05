@@ -1,7 +1,7 @@
 ---
 name: company-incident-continuity
-description: "An evidence-bounded incident and continuity coordination method for outage, security, recovery, communication, evidence capture, and closure review."
-usage_trigger: "Use for synthetic, redacted, or public incident evidence when an owner needs a concise outage/security/continuity review or recovery and closure proposal without deployment, communication, credential, or authority mutation."
+description: "An evidence-bounded method for prospective risk registers and incident and continuity coordination, keeping prospective risk review separate from live response."
+usage_trigger: "Use for synthetic, redacted, or public operational-risk or incident evidence when an owner needs a prospective risk register, outage/security/continuity review, or recovery and closure proposal without control activation, deployment, communication, credential, or authority mutation."
 version: 1.0.0
 release_tag: v1.0.0
 created: 2026-08-25
@@ -33,6 +33,10 @@ This skill prepares an evidence-bound coordination artifact for an outage,
 security incident, continuity concern, or recovery review. It is not an
 incident commander, deployment controller, security authority, customer
 messaging service, backup system, Program Ledger, or durable incident store.
+
+## Prospective risk-register contract
+
+Route `mode=prospective_risk_register` to its own input/output schema and helper branch. This is a prospective inventory and treatment proposal, not incident response. Do not manufacture `incident_ref`, incident type, severity, active state, or closure fields. Each risk preserves the supplied `evidence_refs` for its cause, event, consequence, likelihood/impact statement, current-control evidence, and residual statement. Use only an owner-supplied scale and tolerance; if either is unavailable, retain the explicit unknown reason. The helper may validate and normalize these fields, but it does not score likelihood, estimate probabilities or losses, accept risk, activate controls, notify anyone, or mutate the Program Ledger. Accountable owners decide treatment and acceptance.
 
 ## Incident contract
 
@@ -66,4 +70,4 @@ profile may retain only redacted state in `state.jsonl`; no raw transcript,
 secret, customer record, or transport payload is persisted. Read
 [`references/schemas.json`](references/schemas.json#/definitions/input) and
 [`references/schemas.json`](references/schemas.json#/definitions/output),
-[`advanced/advanced.md`](references/advanced.md), and the eval suite before use.
+[`advanced/advanced.md`](advanced/advanced.md), and the eval suite before use.

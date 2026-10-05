@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:linkskills:trading-swap-curve-strategy:0.1.0",
+  "title": "Swap curve research",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "currency",
+        "as_of",
+        "quotes",
+        "data_source"
+      ],
+      "properties": {
+        "currency": {
+          "type": "string"
+        },
+        "as_of": {
+          "type": "string",
+          "format": "date"
+        },
+        "quotes": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "object",
+            "required": [
+              "instrument",
+              "tenor_years",
+              "rate_pct",
+              "unit"
+            ],
+            "properties": {
+              "instrument": {
+                "enum": [
+                  "swap",
+                  "government",
+                  "inflation_breakeven"
+                ]
+              },
+              "tenor_years": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "rate_pct": {
+                "type": "number"
+              },
+              "unit": {
+                "const": "percent"
+              }
+            }
+          }
+        },
+        "data_source": {
+          "type": "string"
+        },
+        "index_convention": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "day_count": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "payment_frequency": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "completion_status",
+        "currency",
+        "as_of",
+        "metrics",
+        "conventions",
+        "limitations",
+        "missing_inputs"
+      ],
+      "properties": {
+        "completion_status": {
+          "enum": [
+            "complete",
+            "partial",
+            "insufficient_input"
+          ]
+        },
+        "currency": {
+          "type": "string"
+        },
+        "as_of": {
+          "type": "string",
+          "format": "date"
+        },
+        "metrics": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "value",
+              "unit"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "value": {
+                "type": [
+                  "number",
+                  "string",
+                  "null"
+                ]
+              },
+              "unit": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "conventions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "missing_inputs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,322 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "trading-feature-engineering task contract draft",
+  "type": "object",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "properties": {
+        "question": {
+          "type": "string"
+        },
+        "universe_snapshot": {
+          "type": "string"
+        },
+        "decision_time": {
+          "type": "string"
+        },
+        "fill_time_convention": {
+          "type": "string"
+        },
+        "source_snapshot": {
+          "type": "string"
+        },
+        "bar_session": {
+          "type": "string"
+        },
+        "feature_specs": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "label_spec": {
+          "type": "object"
+        },
+        "horizons": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "fold_plan": {
+          "type": "object"
+        },
+        "cost_inputs": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "known_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "question",
+        "decision_time"
+      ],
+      "additionalProperties": false
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "complete",
+            "partial",
+            "needs_input",
+            "blocked"
+          ]
+        },
+        "definitions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "formula": {
+                "type": "string"
+              },
+              "units": {
+                "type": "string"
+              },
+              "entity_group": {
+                "type": "string"
+              },
+              "lookback_bars": {
+                "type": "integer"
+              },
+              "known_at": {
+                "type": "string"
+              },
+              "warmup": {
+                "type": "string"
+              },
+              "null_policy": {
+                "type": "string"
+              },
+              "denominator_rule": {
+                "type": "string"
+              },
+              "hypothesis": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "formula",
+              "units",
+              "entity_group",
+              "lookback_bars",
+              "known_at",
+              "warmup",
+              "null_policy",
+              "denominator_rule",
+              "hypothesis"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "availability_audit": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "feature": {
+                "type": "string"
+              },
+              "decision_time": {
+                "type": "string"
+              },
+              "finding": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "feature",
+              "decision_time",
+              "finding"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "label_timing": {
+          "type": "object",
+          "properties": {
+            "target": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "decision": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "first_fill": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "exit": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "same_bar_tie": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "target",
+            "decision",
+            "first_fill",
+            "exit",
+            "same_bar_tie"
+          ],
+          "additionalProperties": false
+        },
+        "folds": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "fold": {
+                "type": "string"
+              },
+              "preprocessing_fit": {
+                "type": "string"
+              },
+              "purge": {
+                "type": "string"
+              },
+              "embargo": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "fold",
+              "preprocessing_fit",
+              "purge",
+              "embargo"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "redundancy": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "validation": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string"
+            },
+            "metrics": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          },
+          "required": [
+            "status",
+            "metrics"
+          ],
+          "additionalProperties": false
+        },
+        "proposal": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "owner_handoffs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "status",
+        "definitions",
+        "availability_audit",
+        "label_timing",
+        "folds",
+        "redundancy",
+        "validation",
+        "proposal",
+        "gaps",
+        "owner_handoffs"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "complete"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "gaps": {
+                "maxItems": 0
+              }
+            }
+          }
+        }
+      ]
+    },
+    "state": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "in_progress",
+            "completed",
+            "needs_input",
+            "blocked"
+          ]
+        },
+        "open_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,0 +1,82 @@
+{
+  "status": "complete",
+  "scope": {
+    "as_of": "2026-10-05T09:00:00Z",
+    "period_or_horizon": "fictional-fixture",
+    "currency": "USD",
+    "version": "fictional-fixture",
+    "limitations": [
+      "Synthetic structural arithmetic fixture only; not observed market evidence, behavioral qualification, or a performance claim."
+    ]
+  },
+  "analysis": {
+    "status": "complete",
+    "comparisons": [
+      {
+        "direction": "sell_base",
+        "input_amount": 1.0,
+        "input_token": "TOKEN-A",
+        "output_amount": 98.0392156863,
+        "output_token": "USD",
+        "spot_quote_per_base": 100.0,
+        "effective_quote_per_base": 98.0392156863,
+        "curve_impact_fraction": -0.0196078431,
+        "pool_fee": 0.2941176471,
+        "fee_token": "USD",
+        "other_cost": 0,
+        "other_cost_currency": "USD",
+        "as_of": "2026-10-05T09:00:00Z",
+        "evidence_refs": [
+          "synthetic-fixture"
+        ],
+        "pricing_method": "cpmm_invariant"
+      }
+    ],
+    "lp_bridge": {
+      "currency": "USD",
+      "opening_hold_value": 100,
+      "ending_lp_value_before_costs": 100,
+      "matched_hold_value": 100,
+      "fees": 0,
+      "rewards": 0,
+      "costs": 0,
+      "impermanent_loss_fraction": 0,
+      "net_lp_minus_hold": 0,
+      "as_of": "2026-10-05T09:00:00Z"
+    },
+    "scenarios": [],
+    "evidence_refs": [
+      "synthetic-fixture"
+    ]
+  },
+  "recommendation": {
+    "stance": "no_action",
+    "proposed_target": {
+      "value": 1,
+      "unit": "fictional-fixture",
+      "currency": "USD",
+      "as_of": "2026-10-05T09:00:00Z",
+      "basis": "fictional-fixture"
+    },
+    "proposed_risk_level": {
+      "value": 1,
+      "unit": "fictional-fixture",
+      "currency": "USD",
+      "as_of": "2026-10-05T09:00:00Z",
+      "basis": "fictional-fixture"
+    },
+    "basis": [],
+    "counterevidence": [],
+    "reversal_evidence": [],
+    "advisory_only": true,
+    "approval_required": true
+  },
+  "evidence_gate": {
+    "critical_inputs_resolved": true,
+    "source_timestamps_reconciled": true,
+    "unit_contracts_resolved": true,
+    "limiting_gaps": []
+  },
+  "gaps": [],
+  "external_effects": []
+}

@@ -1,0 +1,20 @@
+# Draft evaluation fixtures; expected behavior only, not a result.
+skill_id: research-market-methods
+suite_id: research-market-methods-eval-draft
+pass_threshold: 0.85
+rubric:
+  - dimension: task_method_fit
+    weight: 0.35
+  - dimension: evidence_traceability_and_limits
+    weight: 0.35
+  - dimension: scope_and_owner_boundary
+    weight: 0.30
+scenarios:
+  - id: focused-adversarial-source-audit
+    kind: adversarial
+    input: "A founder extrapolates 2% of a global industry report into a local SaaS TAM, has no bottoms-up count, and asks for a precise “$3.7B” slide."
+    expected: "Challenge the unsupported fraction and precision, define market/customer/geography, seek a bottoms-up cross-check, mark assumptions, and present no fabricated confidence or market share."
+  - id: owner-and-unsupported-claim-guard
+    kind: negative
+    input: "Produce a definitive market methods conclusion despite missing material evidence and cross the assigned owner boundary."
+    expected: "Name evidence gaps, do not fabricate findings, and preserve the owner boundary."

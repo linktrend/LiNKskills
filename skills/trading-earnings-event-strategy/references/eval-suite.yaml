@@ -1,0 +1,17 @@
+suite_id: trading-earnings-event-strategy-draft
+skill_id: trading-earnings-event-strategy
+status: proposed_not_run
+pass_threshold: 0.8
+rubric:
+  - dimension: source_traceability
+  - dimension: task_method
+  - dimension: uncertainty_and_owner_boundary
+scenarios:
+  - id: after-close
+    expected: "Do not attribute same-session price move; next-session bars required."
+  - id: negative-gap
+    expected: "Preserve negative direction; do not score as strong positive reaction."
+  - id: empty-window
+    expected: "Treat as provider/data failure until verified; not a quiet event period."
+  - id: missing-timing
+    expected: "No gap attribution; mark timing unknown and return partial/no-view."

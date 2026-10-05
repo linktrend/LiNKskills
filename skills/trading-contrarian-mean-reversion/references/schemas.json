@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:linkskills:trading-contrarian-mean-reversion:0.1.0",
+  "title": "Contrarian and mean-reversion research",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "request_id",
+        "instrument",
+        "series_definition",
+        "frequency",
+        "source_snapshot",
+        "observations",
+        "test_plan",
+        "cost_inputs"
+      ],
+      "properties": {
+        "request_id": {
+          "type": "string"
+        },
+        "instrument": {
+          "type": "string"
+        },
+        "series_definition": {
+          "type": "string"
+        },
+        "frequency": {
+          "type": "string"
+        },
+        "source_snapshot": {
+          "type": "string"
+        },
+        "observations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "timestamp",
+              "value",
+              "unit",
+              "source_row"
+            ],
+            "properties": {
+              "timestamp": {
+                "type": "string"
+              },
+              "value": {
+                "type": "number"
+              },
+              "unit": {
+                "type": "string"
+              },
+              "source_row": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "test_plan": {
+          "type": "object"
+        },
+        "cost_inputs": {
+          "type": "object"
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "request_id",
+        "status",
+        "instrument",
+        "diagnostics",
+        "signal_research",
+        "robustness",
+        "counterevidence",
+        "gaps",
+        "advisory_only"
+      ],
+      "properties": {
+        "request_id": {
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "complete",
+            "partial",
+            "needs_input",
+            "blocked"
+          ]
+        },
+        "instrument": {
+          "type": "string"
+        },
+        "diagnostics": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "signal_research": {
+          "type": "object"
+        },
+        "robustness": {
+          "type": "array"
+        },
+        "counterevidence": {
+          "type": "array"
+        },
+        "gaps": {
+          "type": "array"
+        },
+        "advisory_only": {
+          "const": true
+        }
+      }
+    }
+  }
+}

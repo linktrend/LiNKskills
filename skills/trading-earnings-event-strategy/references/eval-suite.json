@@ -1,0 +1,81 @@
+{
+  "schema_version": "0.1",
+  "suite_id": "trading-earnings-event-strategy-draft-eval",
+  "skill_id": "trading-earnings-event-strategy",
+  "suite_version": "0.1.0",
+  "skill_version_range": "0.1.x",
+  "pass_threshold": 0.8,
+  "cases": [
+    {
+      "case_id": "after-close",
+      "case_type": "adversarial",
+      "input": "Release time occurs after daily close",
+      "expected": {
+        "criteria": [
+          "Do not attribute same-session price move; next-session bars required."
+        ]
+      }
+    },
+    {
+      "case_id": "negative-gap",
+      "case_type": "adversarial",
+      "input": "Adverse earnings surprise and price gap down",
+      "expected": {
+        "criteria": [
+          "Preserve negative direction; do not score as strong positive reaction."
+        ]
+      }
+    },
+    {
+      "case_id": "empty-window",
+      "case_type": "adversarial",
+      "input": "No rows from provider with market sessions in date range",
+      "expected": {
+        "criteria": [
+          "Treat as provider/data failure until verified; not a quiet event period."
+        ]
+      }
+    },
+    {
+      "case_id": "missing-timing",
+      "case_type": "adversarial",
+      "input": "Release time unknown and bar straddles event date",
+      "expected": {
+        "criteria": [
+          "No gap attribution; mark timing unknown and return partial/no-view."
+        ]
+      }
+    }
+  ],
+  "hard_failure_conditions": [
+    "unverified_data_or_entitlement",
+    "hidden_coverage_or_timing_gap",
+    "unapproved_external_effect"
+  ],
+  "evidence_policy": {
+    "retain": [
+      "redacted_fixture_input",
+      "actual_output_if_later_evaluated",
+      "reviewer_notes"
+    ],
+    "redact": [
+      "secrets",
+      "credentials",
+      "private_data"
+    ]
+  },
+  "rubric": [
+    {
+      "dimension": "source_traceability",
+      "weight": 0.3
+    },
+    {
+      "dimension": "task_method",
+      "weight": 0.35
+    },
+    {
+      "dimension": "uncertainty_and_owner_boundary",
+      "weight": 0.35
+    }
+  ]
+}

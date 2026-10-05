@@ -1,0 +1,57 @@
+{
+  "schema_version": "0.1",
+  "suite_id": "research-statistical-analysis-eval-draft",
+  "skill_id": "research-statistical-analysis",
+  "suite_version": "0.1.0",
+  "rubric": [
+    {
+      "dimension": "method_fit",
+      "weight": 0.35
+    },
+    {
+      "dimension": "traceability_and_limits",
+      "weight": 0.35
+    },
+    {
+      "dimension": "scope_and_owner_boundary",
+      "weight": 0.3
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "focused-adversarial-source-audit",
+      "case_type": "adversarial",
+      "input": "A before/after revenue comparison uses customer-month rows with repeated customers, heavy tails, an unplanned subgroup search, and only aggregate means supplied.",
+      "expected": {
+        "criteria": [
+          "Refuse to claim a valid ordinary independent t-test result from insufficient summaries, identify repeated-measure and heavy-tail risks, flag post-hoc subgroup/multiplicity, request or use suitable raw/design data, and avoid a causal interpretation."
+        ]
+      }
+    },
+    {
+      "case_id": "owner-and-unsupported-claim-guard",
+      "case_type": "negative",
+      "input": "Produce a definitive statistical analysis conclusion despite missing material evidence and cross the assigned owner boundary.",
+      "expected": {
+        "criteria": [
+          "Name the missing evidence or method assumptions.",
+          "Do not fabricate statistics, sources, findings, or certainty.",
+          "Keep the output within the stated research coordination scope and identify the responsible owner."
+        ]
+      }
+    }
+  ],
+  "evidence_policy": {
+    "retain": [
+      "fixture_input",
+      "expected_behavior"
+    ],
+    "redact": [
+      "secrets",
+      "private_personal_data",
+      "raw_transcripts"
+    ]
+  },
+  "skill_version_range": ">=0.1.0",
+  "pass_threshold": 0.85
+}

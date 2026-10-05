@@ -90,6 +90,53 @@ def canonical_assertions(case_id: str, status: str) -> dict[str, Any]:
     return spec
 
 
+RISK_CASE_EXPECTATIONS = {
+    "risk-register-positive": ("DRAFT", 1),
+    "risk-register-unknown-rating": ("DRAFT", 1),
+    "risk-register-approval-injection": ("DRAFT", 1),
+    "risk-register-missing-owner": ("NEEDS_CONTEXT", 0),
+    "incident-mode-regression": ("READY_FOR_OWNER", 0),
+}
+
+
+def _schema_errors(value: Any, definition: dict[str, Any], schemas: dict[str, Any], path: str = "$", depth: int = 0) -> list[str]:
+    """Use the existing JSON Schema implementation rather than a partial validator."""
+    from jsonschema import Draft202012Validator
+    schema={**definition,"definitions":schemas["definitions"]}
+    Draft202012Validator.check_schema(schema)
+    return [error.message for error in Draft202012Validator(schema,format_checker=Draft202012Validator.FORMAT_CHECKER).iter_errors(value)]
+
+
+def evaluate_normalized_contract_case(skill_dir: Path, case_id: str, request: dict[str, Any]) -> tuple[dict[str, Any], int]:
+    try:
+        from helper_tool import normalize_request
+        normalized=normalize_request(request); schemas=json.loads((skill_dir/"references"/"schemas.json").read_text(encoding="utf-8"))
+    except Exception: return _fail_closed(case_id,"contract helper or schema could not be loaded"),1
+    expected_status,expected_count=RISK_CASE_EXPECTATIONS[case_id]; valid=normalized.get("status")==expected_status
+    incident_only={"incident_ref","incident_type","severity","state","closure"}; candidates=request.get("candidate_risks",[]); out=normalized.get("risks",[])
+    expected_ids=[x.get("id") for x in candidates]; output_ids=[x.get("id") for x in out]
+    if case_id=="incident-mode-regression":
+        valid=valid and normalized.get("mode")=="incident_intake" and all(k in normalized for k in incident_only) and "risks" not in normalized; schema_name="incident_output"
+    else:
+        valid=valid and normalized.get("mode")=="prospective_risk_register" and not incident_only.intersection(normalized)
+        valid=valid and normalized.get("effects")=={"messages_sent":[],"external_calls":[],"mutations":[]} and normalized.get("risk_acceptance_or_control_activation") is False
+        valid=valid and len(out)==expected_count and output_ids==expected_ids[:expected_count]
+        if normalized["status"] != "NEEDS_CONTEXT":
+            valid=valid and all(normalized.get(key)==request.get(key) for key in ("owner_supplied_rating_scale_or_unknown_reason","owner_supplied_tolerance_or_unknown_reason"))
+        supplied={x.get("ref") for x in request.get("risk_sources_and_evidence_refs",[]) if isinstance(x,dict)}
+        for source,row in zip(candidates,out):
+            refs=source.get("evidence_refs",[]); valid=valid and row.get("evidence_refs")==refs and bool(refs) and all(ref in supplied for ref in refs)
+        if case_id=="risk-register-positive" and out:
+            row=out[0]; valid=valid and row["likelihood_or_unknown_reason"].startswith("Jane advisory proposal (unverified):") and row["treatment_proposal"].startswith("Jane advisory proposal (unverified):") and row["review_trigger"].startswith("Jane advisory proposal (unverified):") and row["inherent_rating_or_unknown_reason"].startswith("Jane advisory proposal (unverified): Unknown:")
+        if case_id=="risk-register-unknown-rating" and out: valid=valid and out[0]["likelihood_or_unknown_reason"].startswith("Unknown:") and out[0]["impact_or_unknown_reason"].startswith("Unknown:")
+        if case_id=="risk-register-approval-injection" and out: valid=valid and out[0]["treatment_proposal"]=="not_reported" and normalized["risk_acceptance_or_control_activation"] is False
+        schema_name="risk_register_output"
+    validation_errors=_schema_errors(normalized,{"$ref":f"#/definitions/{schema_name}"},schemas); valid=valid and not validation_errors
+    result={"case_id":case_id,"status":"PASS" if valid else "FAIL","contract_status":normalized.get("status"),"mode":normalized.get("mode"),"risk_count":len(out),"risk_ids_exact":case_id=="incident-mode-regression" or output_ids==expected_ids[:expected_count],"risk_evidence_refs_exact":case_id=="incident-mode-regression" or all(a.get("evidence_refs")==s.get("evidence_refs") for s,a in zip(candidates,out)),"response_schema_valid":not validation_errors,"permission_to_act":False,"certification_state":"draft","selectable":False,"external_calls":[],"mutations":[]}
+    if case_id!="incident-mode-regression": result["risk_acceptance_or_control_activation"]=normalized.get("risk_acceptance_or_control_activation")
+    return result,0 if valid else 1
+
+
 def parse_frontmatter(skill_md: Path) -> dict[str, str]:
     meta: dict[str, str] = {}
     if not skill_md.is_file():
@@ -147,6 +194,11 @@ def evaluate_remainder_case(skill_dir: Path, case_id: str, *, mode: str = "evalu
     if any(key in case for key in ("status", "summary", "contract_tokens", "expected_criteria")):
         # Inputs may still list case_type/input only. Planted expected fields are ignored.
         pass
+    request = case.get("request")
+    if case_id in RISK_CASE_EXPECTATIONS:
+        if not isinstance(request, dict):
+            return _fail_closed(case_id, "structured contract request is missing"), 1
+        return evaluate_normalized_contract_case(skill_dir, case_id, request)
     skill_id = str(payload.get("skill_id") or skill_dir.name)
     meta = parse_frontmatter(skill_dir / "SKILL.md")
     declared_name = meta.get("name") or skill_id

@@ -1,0 +1,382 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "trading-fixed-income-portfolio",
+  "display_name": "Fixed income portfolio review",
+  "version": "0.1.0",
+  "description": "Summarize user-supplied bond holdings, weighted risk measures, maturity/rating composition, cashflows and scenario results without assuming custodian access.",
+  "capability_category": "trading_research",
+  "provenance": {
+    "author": "LiNKskills Library",
+    "source": "Exact source provenance: references/source-provenance.json (sha256:38d56a9223a928f31e86871e0717bdcaf5f36534ebdefc81df589a065ed50ac5); per-entry license/notice/disposition recorded there.",
+    "license": "No package-wide upstream license is asserted; see exact per-file source provenance and notice dispositions in references/source-provenance.json.",
+    "imported_from": "Frozen Jane draft source: skills/trading-fixed-income-portfolio; source provenance copied unchanged for this proposal only."
+  },
+  "lifecycle_state": "draft",
+  "format_profile": "simple",
+  "compatible_runtime_profiles": [
+    "jane-openclaw"
+  ],
+  "min_capability_tier": "balanced",
+  "routing": {
+    "when_to_use": "Bond portfolio duration, DV01, cashflow, composition or supplied shock review.",
+    "when_not_to_use": [
+      "No automatic provider calls, assumed entitlements, credentials, transaction, order or portfolio mutation.",
+      "No invented observations or unqualified backtest/model result.",
+      "No runtime sidecars or source scripts."
+    ],
+    "tags": [
+      "trading",
+      "research",
+      "jane",
+      "draft"
+    ],
+    "exclusion_rules": [
+      "No automatic provider calls, assumed entitlements, credentials, transaction, order or portfolio mutation.",
+      "No invented observations or unqualified backtest/model result.",
+      "No runtime sidecars or source scripts."
+    ]
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "portfolio_as_of",
+        "description": "Required property `portfolio_as_of` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        }
+      },
+      {
+        "name": "currency",
+        "description": "Required property `currency` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "holdings",
+        "description": "Required property `holdings` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "security_id",
+              "market_value",
+              "market_value_unit",
+              "modified_duration",
+              "duration_unit",
+              "dv01",
+              "dv01_unit"
+            ],
+            "properties": {
+              "security_id": {
+                "type": "string"
+              },
+              "market_value": {
+                "type": "number",
+                "minimum": 0
+              },
+              "market_value_unit": {
+                "type": "string"
+              },
+              "modified_duration": {
+                "type": "number"
+              },
+              "duration_unit": {
+                "const": "years"
+              },
+              "dv01": {
+                "type": "number"
+              },
+              "dv01_unit": {
+                "type": "string"
+              },
+              "rating": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "maturity_date": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date"
+              },
+              "scenario_pnl": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "data_source",
+        "description": "Required property `data_source` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      }
+    ],
+    "optional_inputs": [
+      {
+        "name": "benchmark",
+        "description": "Optional property `benchmark` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    ],
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "portfolio_as_of",
+        "currency",
+        "holdings",
+        "data_source"
+      ],
+      "properties": {
+        "portfolio_as_of": {
+          "type": "string",
+          "format": "date"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "data_source": {
+          "type": "string"
+        },
+        "holdings": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "security_id",
+              "market_value",
+              "market_value_unit",
+              "modified_duration",
+              "duration_unit",
+              "dv01",
+              "dv01_unit"
+            ],
+            "properties": {
+              "security_id": {
+                "type": "string"
+              },
+              "market_value": {
+                "type": "number",
+                "minimum": 0
+              },
+              "market_value_unit": {
+                "type": "string"
+              },
+              "modified_duration": {
+                "type": "number"
+              },
+              "duration_unit": {
+                "const": "years"
+              },
+              "dv01": {
+                "type": "number"
+              },
+              "dv01_unit": {
+                "type": "string"
+              },
+              "rating": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "maturity_date": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date"
+              },
+              "scenario_pnl": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "benchmark": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "urn:linkskills:trading-fixed-income-portfolio:0.1.0#/definitions/input"
+    },
+    "expected_outputs": [
+      {
+        "name": "completion_status",
+        "description": "Required property `completion_status` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "enum": [
+            "complete",
+            "partial",
+            "insufficient_input"
+          ]
+        }
+      },
+      {
+        "name": "portfolio_as_of",
+        "description": "Required property `portfolio_as_of` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        }
+      },
+      {
+        "name": "currency",
+        "description": "Required property `currency` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "metrics",
+        "description": "Required property `metrics` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "value",
+              "unit"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "value": {
+                "type": [
+                  "number",
+                  "string",
+                  "null"
+                ]
+              },
+              "unit": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "concentration",
+        "description": "Required property `concentration` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      },
+      {
+        "name": "limitations",
+        "description": "Required property `limitations` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "missing_inputs",
+        "description": "Required property `missing_inputs` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    ],
+    "procedure_summary": "Source method section `Integrated method` in SKILL.md: 1. Confirm scope, identifiers, as-of and publication dates, unit/currency, source and conventions. Reject mismatched instruments/periods before arithmetic.\n2. Calculate only task-relevant metrics from supplied rows using the exact formula and denominator recorded in the output. Keep observations separate from derived values.\n3. Preserve incomplete coverage, stale values, missing match, and undefined calculations as unknown; do not rank or infer omitted data.\n4. Explain opposing interpretation, basis/convention sensitivity and evidence needed to complete the analysis.\n5. Provide conditional research advice only when requested; no external effect. Validate the actual output schema; that is structural validation, not method qualification.",
+    "forbidden_actions": [
+      "No automatic provider calls, assumed entitlements, credentials, transaction, order or portfolio mutation.",
+      "No invented observations or unqualified backtest/model result.",
+      "No runtime sidecars or source scripts."
+    ],
+    "failure_handling": "Source-grounded missing/invalid evidence clauses (verbatim, with entrypoint line numbers): L37: 1. Confirm scope, identifiers, as-of and publication dates, unit/currency, source and conventions. Reject mismatched instruments/periods before arithmetic.; L39: 3. Preserve incomplete coverage, stale values, missing match, and undefined calculations as unknown; do not rank or infer omitted data.",
+    "verification_steps": [
+      "Validate the supplied input against references/schemas.json#/definitions/input and report each missing or invalid required field.",
+      "Validate the produced task output against references/schemas.json#/definitions/output; structural validity does not establish method correctness.",
+      "Use references/eval-suite.json criteria only against an actual task output; a schema check or fictional example alone is not a behavioral pass."
+    ],
+    "completion_criteria": [
+      "Include every required output property defined at references/schemas.json#/definitions/output: completion_status, portfolio_as_of, currency, metrics, concentration, limitations, missing_inputs.",
+      "If `completion_status` exists, its value must reflect the schema-defined gaps or missing inputs; do not assert a complete result where evidence is absent.",
+      "Keep recommendations advisory; no external action, order, live activation, portfolio mutation, or approval is represented as completed."
+    ],
+    "known_limitations": [
+      "The skill source is an isolated unqualified draft; source-derived pack metadata does not establish selection, registration, method qualification, or production suitability.",
+      "The declared runtime-profile label is preserved as source metadata; runtime-profile binding is not proved."
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read",
+      "filesystem_write"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [
+      {
+        "key": "min_reasoning_tier",
+        "value": "balanced"
+      },
+      {
+        "key": "preferred_model",
+        "value": "gpt-6.1-sol"
+      },
+      {
+        "key": "context_required",
+        "value": 64000
+      }
+    ],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "suite_hash": "sha256:0f94450df8bf0ae264aed81103276cf9853908c8aa9ec867402a85d65281c853",
+    "verification_refs": [
+      "references/schemas.json",
+      "references/eval-suite.json"
+    ]
+  },
+  "telemetry": {
+    "classification": "public_internal",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_private_data",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain_only_approved_ids_and_hashes"
+  }
+}

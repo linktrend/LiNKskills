@@ -1,0 +1,45 @@
+{
+  "request_id": "FICTIONAL-POS-01",
+  "completion_status": "complete",
+  "as_of_date": "2026-09-30",
+  "observations": [
+    {
+      "security_id": "FICTIONAL-HBR",
+      "manager_count": 2,
+      "disclosed_long_shares": 200000,
+      "period_end": "2026-06-30",
+      "published_at": "2026-08-14T12:00:00Z"
+    }
+  ],
+  "calculations": [],
+  "coverage": {
+    "row_count": 2,
+    "unmatched_count": 0,
+    "status": "complete_for_supplied_rows",
+    "scope_note": "Complete only for these fictional rows; not total actual ownership."
+  },
+  "interpretation": [
+    "This snapshot reports supplied disclosed long holdings as of the period end; it is lagged and does not show shorts or later changes."
+  ],
+  "advisory_recommendation": null,
+  "limitations": [
+    "No previous filing or shares outstanding provided, so share changes and ownership percentage are unavailable."
+  ],
+  "missing_inputs": [
+    "Comparable prior-period rows",
+    "Shares outstanding denominator"
+  ],
+  "family_result": {
+    "kind": "13f",
+    "13f": {
+      "issuer": "Fictional Harbor Tools",
+      "period_end": "2026-06-30",
+      "disclosed_long_shares": 200000,
+      "filing_release": "2026-08-14",
+      "status": "lagged disclosed long-only rows"
+    },
+    "cot_legacy": null
+  },
+  "source_family": "13f",
+  "family_data_status": "provided"
+}

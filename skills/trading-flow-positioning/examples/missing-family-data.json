@@ -1,0 +1,41 @@
+{
+  "fictional_fixture": true,
+  "notice": "No source data was supplied. This is an explicit unknown/partial example, not an analysis result.",
+  "input": {
+    "request_id": "FICTIONAL-COT-MISSING",
+    "source_family": "cot_legacy",
+    "family_data_status": "unavailable",
+    "as_of_date": "2026-09-30",
+    "contract": "FICTIONAL-CONTRACT",
+    "source_name": null,
+    "source_vintage": null
+  },
+  "output": {
+    "request_id": "FICTIONAL-COT-MISSING",
+    "completion_status": "insufficient_input",
+    "source_family": "cot_legacy",
+    "family_data_status": "unavailable",
+    "as_of_date": "2026-09-30",
+    "observations": [],
+    "calculations": [],
+    "coverage": {
+      "row_count": 0,
+      "unmatched_count": 0,
+      "status": "unknown",
+      "scope_note": "No COT rows were supplied or accessible."
+    },
+    "interpretation": [],
+    "advisory_recommendation": null,
+    "limitations": [
+      "No positioning inference is possible without a supplied source row set."
+    ],
+    "missing_inputs": [
+      "CFTC legacy COT rows with report dates, publication timestamps, long/short values, open interest, source, and vintage."
+    ],
+    "family_result": {
+      "kind": "cot_legacy",
+      "13f": null,
+      "cot_legacy": null
+    }
+  }
+}

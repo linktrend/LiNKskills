@@ -1,0 +1,176 @@
+{
+  "schema_ref": "references/schemas.json#/definitions/input",
+  "status": "schema_fixture_only_not_behavioral_evaluation",
+  "valid_case": {
+    "input": {
+      "factor_definition": {},
+      "universe_by_date": "fictional-input",
+      "data_snapshot": "fictional-input",
+      "known_at_policy": "fictional-input",
+      "return_horizon": "fictional-input",
+      "benchmark": "fictional-input",
+      "rebalance": "fictional-input",
+      "cost_model": {},
+      "variants_tried": [],
+      "causal_question": "fictional-input"
+    },
+    "expected": "accept by JSON Schema"
+  },
+  "invalid_case": {
+    "input": {
+      "factor_definition": {},
+      "universe_by_date": "fictional-input",
+      "data_snapshot": "fictional-input",
+      "known_at_policy": "fictional-input",
+      "return_horizon": "fictional-input",
+      "benchmark": "fictional-input",
+      "rebalance": "fictional-input",
+      "cost_model": {},
+      "variants_tried": [],
+      "causal_question": "fictional-input",
+      "unexpected_field": "must be rejected"
+    },
+    "expected": "reject additionalProperties"
+  },
+  "valid_partial_case": {
+    "schema_ref": "references/schemas.json#/definitions/input",
+    "input": {
+      "factor_definition": {
+        "name": "FICTIONAL-factor"
+      },
+      "return_horizon": "FICTIONAL-input",
+      "known_gaps": [
+        "source_snapshot: not supplied; dependent analysis must remain partial."
+      ]
+    },
+    "expected": "accept; return a bounded partial result and preserve each listed gap."
+  },
+  "partial_output_case": {
+    "schema_ref": "references/schemas.json#/definitions/output",
+    "output": {
+      "status": "partial",
+      "coverage_by_date": [
+        {
+          "date": "fictional-D1",
+          "eligible_assets": 4,
+          "valid_pairs": 4,
+          "coverage": "4/4"
+        }
+      ],
+      "ic_by_date": [
+        {
+          "date": "fictional-D1",
+          "rank_ic": 0.6,
+          "valid_pairs": 4
+        }
+      ],
+      "ic_summary": {
+        "mean": 0.6,
+        "median": 0.6,
+        "std": "undefined: n=1",
+        "ic_ir": null,
+        "interpretation": "one synthetic date; no inference"
+      },
+      "dependence_inference": {
+        "method": "not computed",
+        "horizon_overlap": "unknown",
+        "effective_breadth": null
+      },
+      "quantiles": [
+        {
+          "bucket": "Q1",
+          "return": null,
+          "weighting": "not supplied",
+          "return_unit": "fraction",
+          "reason": "Not computed; only one synthetic date is available."
+        }
+      ],
+      "turnover_capacity_costs": {
+        "turnover": null,
+        "costs": null,
+        "capacity": null
+      },
+      "decay": [],
+      "fold_stability": [],
+      "selection_adjustment": {
+        "variants_tried": [
+          "fictional single factor"
+        ],
+        "outer_holdout": "not evaluated"
+      },
+      "causal_assessment": {
+        "status": "not_claimed",
+        "reason": "no intervention/estimand"
+      },
+      "proposal": null,
+      "gaps": [
+        "No real return panel/cost inputs."
+      ]
+    },
+    "expected": "accept as partial; unknown/uncomputed values remain explicit."
+  },
+  "invalid_completed_case": {
+    "schema_ref": "references/schemas.json#/definitions/output",
+    "output": {
+      "status": "complete",
+      "coverage_by_date": [
+        {
+          "date": "fictional-D1",
+          "eligible_assets": 4,
+          "valid_pairs": 4,
+          "coverage": "4/4"
+        }
+      ],
+      "ic_by_date": [
+        {
+          "date": "fictional-D1",
+          "rank_ic": 0.6,
+          "valid_pairs": 4
+        }
+      ],
+      "ic_summary": {
+        "mean": 0.6,
+        "median": 0.6,
+        "std": "undefined: n=1",
+        "ic_ir": null,
+        "interpretation": "one synthetic date; no inference"
+      },
+      "dependence_inference": {
+        "method": "not computed",
+        "horizon_overlap": "unknown",
+        "effective_breadth": null
+      },
+      "quantiles": [
+        {
+          "bucket": "Q1",
+          "return": null,
+          "weighting": "not supplied",
+          "return_unit": "fraction",
+          "reason": "Not computed; only one synthetic date is available."
+        }
+      ],
+      "turnover_capacity_costs": {
+        "turnover": null,
+        "costs": null,
+        "capacity": null
+      },
+      "decay": [],
+      "fold_stability": [],
+      "selection_adjustment": {
+        "variants_tried": [
+          "fictional single factor"
+        ],
+        "outer_holdout": "not evaluated"
+      },
+      "causal_assessment": {
+        "status": "not_claimed",
+        "reason": "no intervention/estimand"
+      },
+      "proposal": null,
+      "gaps": [
+        "Required evidence or calculation is missing; complete status is false."
+      ]
+    },
+    "expected": "reject: complete output cannot contain unresolved required gaps."
+  }
+}

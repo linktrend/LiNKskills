@@ -1,0 +1,258 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "research-clinical-study-design task contract draft",
+  "type": "object",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "properties": {
+        "clinical_question": {
+          "type": "string"
+        },
+        "population": {
+          "type": "string"
+        },
+        "intervention": {
+          "type": "string"
+        },
+        "comparator": {
+          "type": "string"
+        },
+        "design_stage": {
+          "type": "string"
+        },
+        "endpoints": {
+          "type": "object",
+          "properties": {
+            "primary": {
+              "type": "string"
+            },
+            "secondary": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "primary",
+            "secondary"
+          ],
+          "additionalProperties": false
+        },
+        "follow_up": {
+          "type": "string"
+        },
+        "expected_event_or_variance_assumptions": {
+          "type": [
+            "string",
+            "number",
+            "object",
+            "array",
+            "boolean",
+            "null"
+          ]
+        },
+        "recruitment_sites": {
+          "type": "string"
+        },
+        "regulatory_ethics_context": {
+          "type": "string"
+        },
+        "clinical_owner": {
+          "type": "string"
+        },
+        "biostatistician": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "clinical_question",
+        "population",
+        "intervention",
+        "comparator",
+        "design_stage",
+        "endpoints",
+        "follow_up",
+        "expected_event_or_variance_assumptions",
+        "recruitment_sites",
+        "regulatory_ethics_context",
+        "clinical_owner",
+        "biostatistician"
+      ],
+      "additionalProperties": false,
+      "title": "Task-specific input"
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "design_options": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "design": {
+                "type": "string"
+              },
+              "rationale": {
+                "type": "string"
+              },
+              "unresolved": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "design",
+              "rationale",
+              "unresolved"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "population_and_allocation": {
+          "type": "object",
+          "properties": {
+            "eligibility": {
+              "type": "string"
+            },
+            "randomization": {
+              "type": "string"
+            },
+            "masking": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "eligibility",
+            "randomization",
+            "masking"
+          ],
+          "additionalProperties": false
+        },
+        "endpoint_hierarchy": {
+          "type": "object",
+          "properties": {
+            "primary": {
+              "type": "string"
+            },
+            "secondary": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "estimand": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "primary",
+            "secondary",
+            "estimand"
+          ],
+          "additionalProperties": false
+        },
+        "sample_size_power": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string"
+            },
+            "reason": {
+              "type": "string"
+            },
+            "assumptions": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          },
+          "required": [
+            "status",
+            "reason",
+            "assumptions"
+          ],
+          "additionalProperties": false
+        },
+        "feasibility_sensitivity": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "protocol_synopsis_outline": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "owner_review": {
+          "type": "object",
+          "properties": {
+            "clinical_owner": {
+              "type": "string"
+            },
+            "biostatistician": {
+              "type": "string"
+            },
+            "ethics_regulatory": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "clinical_owner",
+            "biostatistician",
+            "ethics_regulatory"
+          ],
+          "additionalProperties": false
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "status",
+        "design_options",
+        "population_and_allocation",
+        "endpoint_hierarchy",
+        "sample_size_power",
+        "feasibility_sensitivity",
+        "protocol_synopsis_outline",
+        "owner_review",
+        "limitations"
+      ],
+      "additionalProperties": false,
+      "title": "Task-specific result"
+    },
+    "state": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "in_progress",
+            "completed",
+            "needs_input",
+            "blocked"
+          ]
+        },
+        "open_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

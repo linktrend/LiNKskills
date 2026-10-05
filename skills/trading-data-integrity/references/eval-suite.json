@@ -1,0 +1,65 @@
+{
+  "schema_version": "0.1",
+  "suite_id": "trading-data-integrity-eval-draft",
+  "skill_id": "trading-data-integrity",
+  "suite_version": "0.1.0",
+  "rubric": [
+    {
+      "dimension": "task_method",
+      "weight": 0.4
+    },
+    {
+      "dimension": "units_and_traceability",
+      "weight": 0.35
+    },
+    {
+      "dimension": "scope_uncertainty_owner_boundaries",
+      "weight": 0.25
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "join-fanout",
+      "case_type": "adversarial",
+      "input": "Two records per ticker are joined to one bar; counts rise 10 to 20.",
+      "expected": {
+        "criteria": [
+          "Flag one-to-many expansion and block aggregate claim."
+        ]
+      }
+    },
+    {
+      "case_id": "late-amendment",
+      "case_type": "adversarial",
+      "input": "An amendment published after historical decision revises period-end data.",
+      "expected": {
+        "criteria": [
+          "Keep original historical known-at and mark amended value unavailable then."
+        ]
+      }
+    },
+    {
+      "case_id": "unknown-delisting",
+      "case_type": "adversarial",
+      "input": "Delisted name lacks terminal proceeds.",
+      "expected": {
+        "criteria": [
+          "Retain membership and mark payoff unknown; never silently set zero."
+        ]
+      }
+    }
+  ],
+  "evidence_policy": {
+    "retain": [
+      "fixture_input",
+      "expected_behavior"
+    ],
+    "redact": [
+      "secrets",
+      "private_data",
+      "raw_transactions_unless_authorized"
+    ]
+  },
+  "skill_version_range": ">=0.1.0",
+  "pass_threshold": 0.85
+}

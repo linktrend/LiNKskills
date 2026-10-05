@@ -1,0 +1,176 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "research-notebooklm task contract draft",
+  "type": "object",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "type": "string"
+        },
+        "notebook_identity": {
+          "type": "string"
+        },
+        "source_question": {
+          "type": "string"
+        },
+        "output_type": {
+          "type": "string"
+        },
+        "existing_session_capability": {
+          "type": "string"
+        },
+        "write_authorization": {
+          "type": "string"
+        },
+        "as_of": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "action",
+        "notebook_identity",
+        "source_question",
+        "output_type",
+        "existing_session_capability",
+        "write_authorization",
+        "as_of"
+      ],
+      "additionalProperties": false,
+      "title": "Task-specific input"
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "operation": {
+          "type": "string"
+        },
+        "notebook_identity": {
+          "type": "string"
+        },
+        "visible_session_evidence": {
+          "type": "string"
+        },
+        "source_attributions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "source_label": {
+                "type": "string"
+              },
+              "citation_location": {
+                "type": "string"
+              },
+              "claim": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "source_label",
+              "citation_location",
+              "claim"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "answer": {
+          "type": "string"
+        },
+        "write_action": {
+          "type": "object",
+          "properties": {
+            "requested": {
+              "type": "boolean"
+            },
+            "performed": {
+              "type": "boolean"
+            },
+            "confirmation": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "requested",
+            "performed",
+            "confirmation"
+          ],
+          "additionalProperties": false
+        },
+        "generated_output": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string"
+            },
+            "prompt_parameters": {
+              "type": [
+                "string",
+                "number",
+                "object",
+                "array",
+                "boolean",
+                "null"
+              ]
+            },
+            "completion_state": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "prompt_parameters",
+            "completion_state"
+          ],
+          "additionalProperties": false
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "status",
+        "operation",
+        "notebook_identity",
+        "visible_session_evidence",
+        "source_attributions",
+        "answer",
+        "write_action",
+        "generated_output",
+        "limitations"
+      ],
+      "additionalProperties": false,
+      "title": "Task-specific result"
+    },
+    "state": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "in_progress",
+            "completed",
+            "needs_input",
+            "blocked"
+          ]
+        },
+        "open_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

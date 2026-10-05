@@ -1,0 +1,78 @@
+{
+  "fictional_fixture": true,
+  "notice": "All names, amounts and dates are invented; this demonstrates structure and arithmetic only.",
+  "input": {
+    "request_id": "FICTIONAL-POS-01",
+    "as_of_date": "2026-09-30",
+    "source_name": "Synthetic filing rows",
+    "source_vintage": "fictional filing vintage 2026-08-14",
+    "issuer": "Fictional Harbor Tools",
+    "report_period_end": "2026-06-30",
+    "published_at": "2026-08-14T12:00:00Z",
+    "holdings": [
+      {
+        "manager_id": "MGR-A",
+        "security_id": "FICTIONAL-HBR",
+        "shares": 120000,
+        "unit": "shares",
+        "source_row": "synthetic-1"
+      },
+      {
+        "manager_id": "MGR-B",
+        "security_id": "FICTIONAL-HBR",
+        "shares": 80000,
+        "unit": "shares",
+        "source_row": "synthetic-2"
+      }
+    ],
+    "comparison_source_vintage": null,
+    "cot_rows": [],
+    "source_family": "13f",
+    "family_data_status": "provided"
+  },
+  "output": {
+    "request_id": "FICTIONAL-POS-01",
+    "completion_status": "complete",
+    "as_of_date": "2026-09-30",
+    "observations": [
+      {
+        "security_id": "FICTIONAL-HBR",
+        "manager_count": 2,
+        "disclosed_long_shares": 200000,
+        "period_end": "2026-06-30",
+        "published_at": "2026-08-14T12:00:00Z"
+      }
+    ],
+    "calculations": [],
+    "coverage": {
+      "row_count": 2,
+      "unmatched_count": 0,
+      "status": "complete_for_supplied_rows",
+      "scope_note": "Complete only for these fictional rows; not total actual ownership."
+    },
+    "interpretation": [
+      "This snapshot reports supplied disclosed long holdings as of the period end; it is lagged and does not show shorts or later changes."
+    ],
+    "advisory_recommendation": null,
+    "limitations": [
+      "No previous filing or shares outstanding provided, so share changes and ownership percentage are unavailable."
+    ],
+    "missing_inputs": [
+      "Comparable prior-period rows",
+      "Shares outstanding denominator"
+    ],
+    "family_result": {
+      "kind": "13f",
+      "13f": {
+        "issuer": "Fictional Harbor Tools",
+        "period_end": "2026-06-30",
+        "disclosed_long_shares": 200000,
+        "filing_release": "2026-08-14",
+        "status": "lagged disclosed long-only rows"
+      },
+      "cot_legacy": null
+    },
+    "source_family": "13f",
+    "family_data_status": "provided"
+  }
+}

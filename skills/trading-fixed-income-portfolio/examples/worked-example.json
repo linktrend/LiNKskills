@@ -1,0 +1,76 @@
+{
+  "fictional_fixture": true,
+  "notice": "All names, dates, prices, rates, and quantities are fictional; example shows arithmetic/schema only.",
+  "input": {
+    "portfolio_as_of": "2026-09-30",
+    "currency": "USD",
+    "data_source": "fictional user workbook",
+    "benchmark": null,
+    "holdings": [
+      {
+        "security_id": "FIC-1",
+        "market_value": 600000,
+        "market_value_unit": "fictional USD",
+        "modified_duration": 2.0,
+        "duration_unit": "years",
+        "dv01": 120,
+        "dv01_unit": "fictional USD/bp",
+        "rating": "FIC-A",
+        "maturity_date": "2028-09-30",
+        "scenario_pnl": []
+      },
+      {
+        "security_id": "FIC-2",
+        "market_value": 400000,
+        "market_value_unit": "fictional USD",
+        "modified_duration": 5.0,
+        "duration_unit": "years",
+        "dv01": 200,
+        "dv01_unit": "fictional USD/bp",
+        "rating": "FIC-B",
+        "maturity_date": "2031-09-30",
+        "scenario_pnl": []
+      }
+    ]
+  },
+  "output": {
+    "completion_status": "partial",
+    "portfolio_as_of": "2026-09-30",
+    "currency": "USD",
+    "metrics": [
+      {
+        "name": "market_value_total",
+        "value": 1000000,
+        "unit": "fictional USD"
+      },
+      {
+        "name": "market_value_weighted_modified_duration",
+        "value": 3.2,
+        "unit": "years = 0.6*2 + 0.4*5"
+      },
+      {
+        "name": "dv01_total",
+        "value": 320,
+        "unit": "fictional USD/bp"
+      }
+    ],
+    "concentration": [
+      {
+        "dimension": "rating",
+        "coverage": "2 of 2 supplied holdings",
+        "distribution": [
+          "FIC-A:60%",
+          "FIC-B:40%"
+        ]
+      }
+    ],
+    "limitations": [
+      "Fictional values; weighted metrics are valid only if valuations/units share the same currency and as-of."
+    ],
+    "missing_inputs": [
+      "Cashflow schedules",
+      "Benchmark holdings/metrics",
+      "Callable/option-adjusted analytics where needed"
+    ]
+  }
+}

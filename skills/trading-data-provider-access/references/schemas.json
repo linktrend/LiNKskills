@@ -1,0 +1,289 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "trading-data-provider-access task contract draft",
+  "type": "object",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "properties": {
+        "data_need": {
+          "type": "object"
+        },
+        "assets": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "time_range": {
+          "type": "string"
+        },
+        "freshness_target": {
+          "type": "string"
+        },
+        "existing_interface_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "candidate_docs": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "reuse_constraints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "as_of": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "data_need",
+        "assets",
+        "fields",
+        "time_range",
+        "freshness_target",
+        "existing_interface_ref",
+        "candidate_docs",
+        "reuse_constraints",
+        "as_of"
+      ],
+      "additionalProperties": false
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "complete",
+            "partial",
+            "needs_input",
+            "blocked"
+          ]
+        },
+        "coverage_matrix": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "provider": {
+                "type": "string"
+              },
+              "field": {
+                "type": "string"
+              },
+              "asset_scope": {
+                "type": "string"
+              },
+              "history": {
+                "type": "string"
+              },
+              "freshness": {
+                "type": "string"
+              },
+              "evidence_ref": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "provider",
+              "field",
+              "asset_scope",
+              "history",
+              "freshness",
+              "evidence_ref"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "freshness_and_history": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "field": {
+                "type": "string"
+              },
+              "timestamp_semantics": {
+                "type": "string"
+              },
+              "history_depth": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "field",
+              "timestamp_semantics",
+              "history_depth"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "units_and_methodology": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "metric": {
+                "type": "string"
+              },
+              "currency": {
+                "type": "string"
+              },
+              "valuation_method": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "metric",
+              "currency",
+              "valuation_method"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "terms_and_reuse": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "string"
+              },
+              "redistribution": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "status",
+              "redistribution"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "quota_cost": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "plan": {
+                "type": "string"
+              },
+              "quota": {
+                "type": "string"
+              },
+              "price": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "plan",
+              "quota",
+              "price"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "disagreement_risks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "existing_path_fit": {
+          "type": "object",
+          "properties": {
+            "interface_ref": {
+              "type": "string"
+            },
+            "assessment": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "interface_ref",
+            "assessment"
+          ],
+          "additionalProperties": false
+        },
+        "smallest_gap": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "handoff": {
+          "type": "object",
+          "properties": {
+            "owner": {
+              "type": "string"
+            },
+            "request": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "owner",
+            "request"
+          ],
+          "additionalProperties": false
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "status",
+        "coverage_matrix",
+        "freshness_and_history",
+        "units_and_methodology",
+        "terms_and_reuse",
+        "quota_cost",
+        "disagreement_risks",
+        "existing_path_fit",
+        "smallest_gap",
+        "handoff",
+        "limitations"
+      ],
+      "additionalProperties": false
+    },
+    "state": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "in_progress",
+            "completed",
+            "needs_input",
+            "blocked"
+          ]
+        },
+        "open_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

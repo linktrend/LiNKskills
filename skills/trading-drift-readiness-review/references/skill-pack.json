@@ -1,0 +1,186 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "trading-drift-readiness-review",
+  "display_name": "Trading Drift Readiness Review",
+  "version": "0.1.0",
+  "description": "Isolated source-audited draft; not admitted, qualified, or published.",
+  "capability_category": "trading_research",
+  "lifecycle_state": "draft",
+  "format_profile": "heavy",
+  "compatible_runtime_profiles": [],
+  "min_capability_tier": "high",
+  "routing": {
+    "when_to_use": "Jane is asked whether a strategy deteriorated, why results changed, what risks deserve attention, or what evidence is needed before readiness can be assessed.",
+    "when_not_to_use": [
+      "No order, signing, provider, credentials, adapter installation, live activation or policy mutation.",
+      "No tax/legal/accounting-final interpretation."
+    ],
+    "tags": [
+      "trading",
+      "research",
+      "advisory",
+      "draft"
+    ]
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "task",
+        "description": "Task request label; schema-shaped input."
+      },
+      {
+        "name": "as_of",
+        "description": "Required timestamp, RFC3339/UTC offset as supplied."
+      },
+      {
+        "name": "question",
+        "description": "Decision question and requested scope."
+      },
+      {
+        "name": "source_snapshot",
+        "description": "Versioned dated evidence references; references may be empty only when explicitly unresolved."
+      },
+      {
+        "name": "reporting_currency",
+        "description": "ISO 4217 code or null when conversion/reporting currency is unresolved."
+      },
+      {
+        "name": "task_context.ledger_snapshot",
+        "description": "Typed domain field; use null only for an unknown scalar and preserve exact unit, sign, date and currency semantics."
+      },
+      {
+        "name": "task_context.baseline_window",
+        "description": "Typed domain field; use null only for an unknown scalar and preserve exact unit, sign, date and currency semantics."
+      },
+      {
+        "name": "task_context.current_window",
+        "description": "Typed domain field; use null only for an unknown scalar and preserve exact unit, sign, date and currency semantics."
+      },
+      {
+        "name": "task_context.metrics",
+        "description": "Typed domain field; use null only for an unknown scalar and preserve exact unit, sign, date and currency semantics."
+      },
+      {
+        "name": "task_context.equity_path",
+        "description": "Typed domain field; use null only for an unknown scalar and preserve exact unit, sign, date and currency semantics."
+      },
+      {
+        "name": "task_context.readiness",
+        "description": "Typed domain field; use null only for an unknown scalar and preserve exact unit, sign, date and currency semantics."
+      },
+      {
+        "name": "task_context.approved_policy",
+        "description": "Typed domain field; use null only for an unknown scalar and preserve exact unit, sign, date and currency semantics."
+      }
+    ],
+    "expected_outputs": [
+      {
+        "name": "status",
+        "description": "Complete, partial, insufficient-evidence, or not-assessed state; complete is gated by the evidence gate."
+      },
+      {
+        "name": "scope",
+        "description": "As-of time, horizon, reporting currency, source version and limitations."
+      },
+      {
+        "name": "analysis",
+        "description": "Task-specific typed rows and reconciliations from definitions/analysis."
+      },
+      {
+        "name": "recommendation",
+        "description": "Advisory proposal only; target/risk include numeric value, unit, currency and date."
+      },
+      {
+        "name": "evidence_gate",
+        "description": "Explicit resolution of critical inputs, source-time alignment and units."
+      },
+      {
+        "name": "gaps",
+        "description": "Typed unresolved fields and their impact/owner; unknown is not zero."
+      },
+      {
+        "name": "external_effects",
+        "description": "Must remain empty; this analysis does not mutate external state."
+      }
+    ],
+    "forbidden_actions": [
+      "Provider or broker calls; credentials; wallet access; order placement/signing/live activation.",
+      "Invented rates, thresholds, confidence, current API/runtime/version claims.",
+      "Runtime JSON/JSONL sidecar, native ledger mutation, unapproved policy change."
+    ],
+    "verification_steps": [
+      "Reconcile input identities, dates, units, signs, precision, currency and provenance.",
+      "Validate output schema, evidence links, uncertainty, recommendation boundary and owner handoffs."
+    ],
+    "completion_criteria": [
+      "Input and output validate against the task-specific schema; valid structural fixtures are not behavioral qualification.",
+      "Any complete result has a complete analysis, no gaps, nonempty evidence references, and all evidence-gate flags true.",
+      "Partial/unknown states preserve null metrics and explain each material gap; no missing value is silently treated as zero.",
+      "Recommendations remain advisory; external_effects is empty; no provider, order, signing, activation, or policy mutation occurs."
+    ],
+    "known_limitations": [
+      "Source audit and structural draft only; no behavior qualification or current integration proof.",
+      "Draft only: eval cases are proposed_not_run; schema/structure checks do not establish behavior qualification.",
+      "The declared logical read_file/write_file aliases are not installed tools; use only host-provided fs_read/fs_write when available."
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "native_session_reference"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "suite_hash": "sha256:ed9d45f3c34ea120c29cf212ceaefbfb1658ded8821748d072ee94092ad7ee54"
+  },
+  "telemetry": {
+    "classification": "public_internal",
+    "redaction_rules": [
+      "remove_secrets",
+      "remove_private_account_data",
+      "remove_reasoning"
+    ],
+    "retention_policy": "native_session_and_approved_ids_only"
+  },
+  "fragments": [
+    {
+      "fragment_id": "method",
+      "disclosure_level": 2,
+      "path": "SKILL.md"
+    },
+    {
+      "fragment_id": "advanced-methods",
+      "disclosure_level": 3,
+      "path": "advanced/advanced.md"
+    },
+    {
+      "fragment_id": "task-schemas",
+      "disclosure_level": 4,
+      "path": "references/schemas.json"
+    },
+    {
+      "fragment_id": "eval-draft",
+      "disclosure_level": 5,
+      "path": "references/eval-suite.json"
+    },
+    {
+      "fragment_id": "source-provenance",
+      "disclosure_level": 5,
+      "path": "references/source-provenance.json"
+    },
+    {
+      "fragment_id": "error-recovery",
+      "disclosure_level": 5,
+      "path": "examples/error-recovery.md"
+    }
+  ],
+  "release_channel": "development"
+}

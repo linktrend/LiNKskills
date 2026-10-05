@@ -1,0 +1,386 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "trading-factor-model-evaluation task contract draft",
+  "type": "object",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "properties": {
+        "factor_definition": {
+          "type": "object"
+        },
+        "universe_by_date": {
+          "type": "string"
+        },
+        "data_snapshot": {
+          "type": "string"
+        },
+        "known_at_policy": {
+          "type": "string"
+        },
+        "return_horizon": {
+          "type": "string"
+        },
+        "benchmark": {
+          "type": "string"
+        },
+        "rebalance": {
+          "type": "string"
+        },
+        "cost_model": {
+          "type": "object"
+        },
+        "variants_tried": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "causal_question": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "known_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "factor_definition",
+        "return_horizon"
+      ],
+      "additionalProperties": false
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "complete",
+            "partial",
+            "needs_input",
+            "blocked"
+          ]
+        },
+        "coverage_by_date": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "date": {
+                "type": "string"
+              },
+              "eligible_assets": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "valid_pairs": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "coverage": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "date",
+              "eligible_assets",
+              "valid_pairs",
+              "coverage"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "ic_by_date": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "date": {
+                "type": "string"
+              },
+              "rank_ic": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "valid_pairs": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "date",
+              "rank_ic",
+              "valid_pairs"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "ic_summary": {
+          "type": "object",
+          "properties": {
+            "mean": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "median": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "std": {
+              "type": [
+                "number",
+                "string",
+                "null"
+              ]
+            },
+            "ic_ir": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "interpretation": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "mean",
+            "median",
+            "std",
+            "ic_ir",
+            "interpretation"
+          ],
+          "additionalProperties": false
+        },
+        "dependence_inference": {
+          "type": "object",
+          "properties": {
+            "method": {
+              "type": "string"
+            },
+            "horizon_overlap": {
+              "type": "string"
+            },
+            "effective_breadth": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "method",
+            "horizon_overlap",
+            "effective_breadth"
+          ],
+          "additionalProperties": false
+        },
+        "quantiles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "bucket": {
+                "type": "string"
+              },
+              "return": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "weighting": {
+                "type": "string"
+              },
+              "return_unit": {
+                "enum": [
+                  "fraction",
+                  "percent",
+                  "currency_per_asset"
+                ]
+              },
+              "reason": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "bucket",
+              "return",
+              "weighting",
+              "return_unit"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "turnover_capacity_costs": {
+          "type": "object",
+          "properties": {
+            "turnover": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "costs": {
+              "type": [
+                "object",
+                "null"
+              ]
+            },
+            "capacity": {
+              "type": [
+                "object",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "turnover",
+            "costs",
+            "capacity"
+          ],
+          "additionalProperties": false
+        },
+        "decay": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "fold_stability": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "selection_adjustment": {
+          "type": "object",
+          "properties": {
+            "variants_tried": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "outer_holdout": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "variants_tried",
+            "outer_holdout"
+          ],
+          "additionalProperties": false
+        },
+        "causal_assessment": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string"
+            },
+            "reason": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "status",
+            "reason"
+          ],
+          "additionalProperties": false
+        },
+        "proposal": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "status",
+        "coverage_by_date",
+        "ic_by_date",
+        "ic_summary",
+        "dependence_inference",
+        "quantiles",
+        "turnover_capacity_costs",
+        "decay",
+        "fold_stability",
+        "selection_adjustment",
+        "causal_assessment",
+        "proposal",
+        "gaps"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "complete"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "gaps": {
+                "maxItems": 0
+              }
+            }
+          }
+        }
+      ]
+    },
+    "state": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "in_progress",
+            "completed",
+            "needs_input",
+            "blocked"
+          ]
+        },
+        "open_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

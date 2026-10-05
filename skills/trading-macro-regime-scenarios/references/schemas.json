@@ -1,0 +1,664 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:linkskills:trading-macro-regime-scenarios:0.1.1",
+  "title": "Macro regime and scenario analysis",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "as_of_date",
+        "horizon",
+        "geography",
+        "asset_universe",
+        "question",
+        "observations"
+      ],
+      "properties": {
+        "as_of_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "horizon": {
+          "type": "string"
+        },
+        "geography": {
+          "type": "string"
+        },
+        "asset_universe": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "question": {
+          "type": "string"
+        },
+        "observations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "series",
+              "value",
+              "unit",
+              "measurement_period",
+              "released_at",
+              "revision_vintage",
+              "source_url_or_file"
+            ],
+            "properties": {
+              "series": {
+                "type": "string"
+              },
+              "value": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "unit": {
+                "type": "string"
+              },
+              "measurement_period": {
+                "type": "string"
+              },
+              "released_at": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "revision_vintage": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "source_url_or_file": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "minLength": 1
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "available",
+                  "partial",
+                  "unavailable",
+                  "stale",
+                  "not_comparable",
+                  "not_requested"
+                ]
+              },
+              "unknown_reason": {
+                "type": "string",
+                "minLength": 1
+              },
+              "frequency": {
+                "type": "string"
+              },
+              "currency": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "transformation": {
+                "type": "string"
+              },
+              "publication_vintage": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "anyOf": [
+                    {
+                      "properties": {
+                        "value": {
+                          "type": "null"
+                        }
+                      },
+                      "required": [
+                        "value"
+                      ]
+                    },
+                    {
+                      "properties": {
+                        "released_at": {
+                          "type": "null"
+                        }
+                      },
+                      "required": [
+                        "released_at"
+                      ]
+                    },
+                    {
+                      "properties": {
+                        "source_url_or_file": {
+                          "type": "null"
+                        }
+                      },
+                      "required": [
+                        "source_url_or_file"
+                      ]
+                    }
+                  ]
+                },
+                "then": {
+                  "required": [
+                    "status",
+                    "unknown_reason"
+                  ],
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "partial",
+                        "unavailable",
+                        "not_comparable",
+                        "not_requested"
+                      ]
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "portfolio_context": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Optional user-supplied portfolio context for advisory sensitivity only; never authorizes changes or execution.",
+          "required": [
+            "as_of",
+            "base_currency",
+            "holdings",
+            "risk_constraints"
+          ],
+          "properties": {
+            "as_of": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "base_currency": {
+              "type": "string"
+            },
+            "nav": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "description": "Amount in base_currency; null when not supplied."
+            },
+            "holdings": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "instrument",
+                  "quantity",
+                  "currency",
+                  "as_of"
+                ],
+                "properties": {
+                  "instrument": {
+                    "type": "string"
+                  },
+                  "quantity": {
+                    "type": "number"
+                  },
+                  "currency": {
+                    "type": "string"
+                  },
+                  "as_of": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "market_value": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "multiplier": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "source_pointer": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "risk_constraints": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "mandate_notes": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "requested_branches": {
+          "type": "array",
+          "description": "Optional independently requested structural, event, bubble-risk, crypto-only or portfolio-implication branches.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "structural_regime",
+              "event_scenarios",
+              "bubble_risk",
+              "crypto_only",
+              "portfolio_implications"
+            ]
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "completion_status",
+        "as_of_date",
+        "regime_view",
+        "observations",
+        "scenarios",
+        "countercase",
+        "update_signposts",
+        "gaps"
+      ],
+      "properties": {
+        "completion_status": {
+          "enum": [
+            "complete",
+            "partial",
+            "insufficient_input"
+          ]
+        },
+        "as_of_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "regime_view": {
+          "type": "object"
+        },
+        "observations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "series",
+              "value",
+              "unit",
+              "measurement_period",
+              "released_at",
+              "revision_vintage",
+              "source_url_or_file"
+            ],
+            "properties": {
+              "series": {
+                "type": "string"
+              },
+              "value": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "unit": {
+                "type": "string"
+              },
+              "measurement_period": {
+                "type": "string"
+              },
+              "released_at": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "revision_vintage": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "source_url_or_file": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "minLength": 1
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "available",
+                  "partial",
+                  "unavailable",
+                  "stale",
+                  "not_comparable",
+                  "not_requested"
+                ]
+              },
+              "unknown_reason": {
+                "type": "string",
+                "minLength": 1
+              },
+              "frequency": {
+                "type": "string"
+              },
+              "currency": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "transformation": {
+                "type": "string"
+              },
+              "publication_vintage": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "anyOf": [
+                    {
+                      "properties": {
+                        "value": {
+                          "type": "null"
+                        }
+                      },
+                      "required": [
+                        "value"
+                      ]
+                    },
+                    {
+                      "properties": {
+                        "released_at": {
+                          "type": "null"
+                        }
+                      },
+                      "required": [
+                        "released_at"
+                      ]
+                    },
+                    {
+                      "properties": {
+                        "source_url_or_file": {
+                          "type": "null"
+                        }
+                      },
+                      "required": [
+                        "source_url_or_file"
+                      ]
+                    }
+                  ]
+                },
+                "then": {
+                  "required": [
+                    "status",
+                    "unknown_reason"
+                  ],
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "partial",
+                        "unavailable",
+                        "not_comparable",
+                        "not_requested"
+                      ]
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "scenarios": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "countercase": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "update_signposts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "advisory_portfolio_proposal": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Optional sourced advisory sector/asset proposal when user supplied holdings and constraints; no action permission.",
+          "required": [
+            "status",
+            "proposals",
+            "missing_basis"
+          ],
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "advisory_proposal",
+                "partial",
+                "unavailable_missing_basis",
+                "not_requested"
+              ]
+            },
+            "proposals": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "instrument_or_scope",
+                  "proposal",
+                  "basis",
+                  "invalidation"
+                ],
+                "properties": {
+                  "instrument_or_scope": {
+                    "type": "string"
+                  },
+                  "proposal": {
+                    "type": "string"
+                  },
+                  "target_or_risk_level": {
+                    "type": [
+                      "string",
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "basis": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "invalidation": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "missing_basis": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "branch_status": {
+          "type": "array",
+          "description": "Independent status per requested evidence branch; absent inputs do not become neutral values.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "branch",
+              "status",
+              "basis"
+            ],
+            "properties": {
+              "branch": {
+                "type": "string",
+                "enum": [
+                  "structural_regime",
+                  "event_scenarios",
+                  "bubble_risk",
+                  "crypto_only",
+                  "portfolio_implications"
+                ]
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "complete_from_supplied_evidence",
+                  "partial_named_missing_items",
+                  "unavailable_missing_basis",
+                  "not_requested"
+                ]
+              },
+              "basis": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "bubble_risk_ledger": {
+          "type": "array",
+          "description": "Optional separate evidence ledger for requested bubble-risk branch; no imported score or automatic action.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "factor_family",
+              "status",
+              "evidence",
+              "counterevidence",
+              "missing_basis"
+            ],
+            "properties": {
+              "factor_family": {
+                "type": "string",
+                "enum": [
+                  "valuation_fundamentals",
+                  "leverage_financing",
+                  "issuance_speculation",
+                  "participation_breadth",
+                  "volatility_positioning_sentiment",
+                  "narrative_market_structure"
+                ]
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "available",
+                  "partial",
+                  "unavailable",
+                  "stale",
+                  "not_comparable",
+                  "not_requested"
+                ]
+              },
+              "evidence": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "claim",
+                    "source_pointer"
+                  ],
+                  "properties": {
+                    "claim": {
+                      "type": "string"
+                    },
+                    "source_pointer": {
+                      "type": "string"
+                    },
+                    "observation_vintage": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "measure": {
+                      "type": [
+                        "number",
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "units": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
+                }
+              },
+              "counterevidence": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "missing_basis": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

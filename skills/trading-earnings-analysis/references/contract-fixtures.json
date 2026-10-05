@@ -1,0 +1,222 @@
+{
+  "trading-earnings-analysis-estimate-change-without-actuals": {
+    "fixture_id": "trading-earnings-analysis-estimate-change-without-actuals-fixture",
+    "status": "unexecuted contract fixture; no output or pass is asserted",
+    "task_input": {
+      "issuer": "Example Components Ltd.",
+      "fiscal_period": "FY2026 Q3",
+      "event_datetime": "2026-10-01T20:00:00Z",
+      "timezone": "UTC",
+      "analysis_mode": "estimate_change",
+      "consensus_vintage": null,
+      "metrics": [
+        "revenue",
+        "operating margin"
+      ],
+      "reaction_window": null,
+      "source_observations": [
+        {
+          "metric": "revenue estimate",
+          "value": 110,
+          "unit": "USD millions",
+          "status": "estimate",
+          "fiscal_period": "FY2026 Q3",
+          "source_pointer": "user-supplied://fixture/A",
+          "source_published_at": "2026-09-10T10:00:00Z",
+          "source_vintage": "A"
+        },
+        {
+          "metric": "revenue estimate",
+          "value": 114,
+          "unit": "USD millions",
+          "status": "estimate",
+          "fiscal_period": "FY2026 Q3",
+          "source_pointer": "user-supplied://fixture/B",
+          "source_published_at": "2026-09-25T10:00:00Z",
+          "source_vintage": "B"
+        }
+      ]
+    },
+    "expected_output_assertions": [
+      "Accept analysis_mode=estimate_change and return an estimate_revisions row only if the source vintages and period are comparable.",
+      "Do not label a beat/miss because no released actual or consensus baseline is supplied; mark actual_vs_expectation empty and name that missing basis.",
+      "Keep event reaction unavailable because the benchmark/price observations are absent; do not attribute a move.",
+      "Accept null reaction_window for estimate_change mode; use reaction and consensus branch status as unavailable/not_requested rather than inventing a reaction or beat/miss.",
+      "Without supplied portfolio_context, do not create a personalized size/target proposal; keep advisory_portfolio_proposal not_requested or unavailable."
+    ]
+  },
+  "trading-earnings-analysis-estimate-change-unknown-event-date": {
+    "fixture_id": "trading-earnings-analysis-estimate-change-unknown-event-date-fixture",
+    "status": "unexecuted structural contract fixture; no behavior pass is asserted",
+    "task_input": {
+      "issuer": "Example Components Ltd.",
+      "fiscal_period": "FY2026 Q3",
+      "event_datetime": null,
+      "event_datetime_unknown_reason": "The supplied estimate snapshots do not include a confirmed company release timestamp.",
+      "timezone": "UTC",
+      "analysis_mode": "estimate_change",
+      "consensus_vintage": null,
+      "metrics": [
+        "revenue"
+      ],
+      "reaction_window": null,
+      "source_observations": [
+        {
+          "metric": "revenue estimate",
+          "value": 110,
+          "unit": "USD millions",
+          "status": "estimate",
+          "fiscal_period": "FY2026 Q3",
+          "source_pointer": "user-supplied://fixture/A",
+          "source_published_at": "2026-09-10T10:00:00Z",
+          "source_vintage": "A"
+        },
+        {
+          "metric": "revenue estimate",
+          "value": 114,
+          "unit": "USD millions",
+          "status": "estimate",
+          "fiscal_period": "FY2026 Q3",
+          "source_pointer": "user-supplied://fixture/B",
+          "source_published_at": "2026-09-25T10:00:00Z",
+          "source_vintage": "B"
+        }
+      ]
+    },
+    "expected_structural_result": "input accepted by the successor input schema; output may contain a revision only if the two source records are comparable; each output side retains its own published time, pointer and vintage; event reaction remains unavailable.",
+    "expected_method_constraints": [
+      "Do not infer a release/event date from estimate snapshot dates.",
+      "Do not emit beat/miss without an actual and comparable pre-release consensus.",
+      "Do not infer reaction or causation from the revision snapshots."
+    ],
+    "expected_output_example": {
+      "completion_status": "partial",
+      "issuer": "Example Components Ltd.",
+      "fiscal_period": "FY2026 Q3",
+      "actual_vs_expectation": [],
+      "guidance_changes": [],
+      "reaction": null,
+      "causal_limits": [
+        "Estimate snapshots do not establish an event reaction or causal effect."
+      ],
+      "missing_inputs": [
+        "Confirmed release timestamp",
+        "Released actuals and comparable pre-release consensus",
+        "Aligned market and benchmark observations"
+      ],
+      "estimate_revisions": [
+        {
+          "metric": "revenue estimate",
+          "comparison_status": "comparable",
+          "basis_note": "Same supplied fiscal period and unit; two dated estimate snapshots.",
+          "old_observation": {
+            "value": 110,
+            "unit": "USD millions",
+            "fiscal_period": "FY2026 Q3",
+            "source_pointer": "user-supplied://fixture/A",
+            "source_published_at": "2026-09-10T10:00:00Z",
+            "source_vintage": "A"
+          },
+          "new_observation": {
+            "value": 114,
+            "unit": "USD millions",
+            "fiscal_period": "FY2026 Q3",
+            "source_pointer": "user-supplied://fixture/B",
+            "source_published_at": "2026-09-25T10:00:00Z",
+            "source_vintage": "B"
+          },
+          "change": 4,
+          "change_unit": "USD millions"
+        }
+      ],
+      "branch_status": [
+        {
+          "branch": "estimate_change",
+          "status": "complete_from_supplied_evidence",
+          "basis": [
+            "Two same-period, same-unit revenue estimate snapshots are supplied with separate dates, pointers and vintages."
+          ]
+        },
+        {
+          "branch": "event_reaction",
+          "status": "unavailable_missing_basis",
+          "basis": [
+            "No confirmed event timestamp, market series or benchmark series is supplied."
+          ]
+        },
+        {
+          "branch": "actual_vs_expectation",
+          "status": "unavailable_missing_basis",
+          "basis": [
+            "No released actual or comparable pre-release consensus is supplied."
+          ]
+        }
+      ]
+    },
+    "expected_output_invalid_examples": [
+      {
+        "id": "missing_new_source_timestamp",
+        "output_delta": {
+          "estimate_revisions": [
+            {
+              "metric": "revenue estimate",
+              "comparison_status": "comparable",
+              "basis_note": "Same period and unit.",
+              "old_observation": {
+                "value": 110,
+                "unit": "USD millions",
+                "fiscal_period": "FY2026 Q3",
+                "source_pointer": "user-supplied://fixture/A",
+                "source_published_at": "2026-09-10T10:00:00Z",
+                "source_vintage": "A"
+              },
+              "new_observation": {
+                "value": 114,
+                "unit": "USD millions",
+                "fiscal_period": "FY2026 Q3",
+                "source_pointer": "user-supplied://fixture/B",
+                "source_vintage": "B"
+              }
+            }
+          ]
+        },
+        "expected": "rejected because each estimate observation requires its own source_published_at."
+      }
+    ]
+  },
+  "trading-earnings-analysis-estimate-change-missing-date-reason-invalid": {
+    "fixture_id": "trading-earnings-analysis-estimate-change-missing-date-reason-invalid-fixture",
+    "status": "unexecuted negative structural contract fixture; no behavior pass is asserted",
+    "task_input": {
+      "issuer": "Example Components Ltd.",
+      "fiscal_period": "FY2026 Q3",
+      "event_datetime": null,
+      "timezone": "UTC",
+      "analysis_mode": "estimate_change",
+      "consensus_vintage": null,
+      "metrics": [
+        "revenue"
+      ],
+      "reaction_window": null
+    },
+    "expected_structural_result": "input rejected because estimate_change with null event_datetime must include a nonempty event_datetime_unknown_reason."
+  },
+  "trading-earnings-analysis-results-null-date-invalid": {
+    "fixture_id": "trading-earnings-analysis-results-null-date-invalid-fixture",
+    "status": "unexecuted negative structural contract fixture; no behavior pass is asserted",
+    "task_input": {
+      "issuer": "Example Components Ltd.",
+      "fiscal_period": "FY2026 Q3",
+      "event_datetime": null,
+      "event_datetime_unknown_reason": "Not supplied.",
+      "timezone": "UTC",
+      "analysis_mode": "results",
+      "consensus_vintage": null,
+      "metrics": [
+        "revenue"
+      ],
+      "reaction_window": null
+    },
+    "expected_structural_result": "input rejected because results mode retains the existing required known event_datetime string contract; the estimate_change exception does not apply."
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "trading-market-news-sentiment-event-without-reaction-data": {
+    "fixture_id": "trading-market-news-sentiment-event-without-reaction-data-fixture",
+    "status": "unexecuted contract fixture; no output or pass is asserted",
+    "task_input": {
+      "as_of": "2026-10-05",
+      "period_start": "2026-10-04T00:00:00Z",
+      "period_end": "2026-10-05T00:00:00Z",
+      "assets": [
+        "DEMO-A"
+      ],
+      "question": "Summarize the event and assess evidence limits.",
+      "provided_sources": [
+        {
+          "source_id": "fictional-news-1",
+          "publisher": "Example Wire",
+          "published_at": "2026-10-04T12:00:00Z",
+          "event_time": "2026-10-04T11:30:00Z",
+          "source_url_or_file": "user-supplied://fictional/news",
+          "claim": "Supplier announced a temporary plant outage.",
+          "source_tier": "user_supplied"
+        }
+      ]
+    },
+    "expected_output_assertions": [
+      "Return the supplied event as a dated sourced claim and label sentiment interpretation as inference, not fact.",
+      "Mark observed market reaction unavailable because no asset/benchmark prices or aligned window observations were supplied.",
+      "Keep price causation, crowding, social consensus, and commodity spillover unclaimed; record those as separate missing branches if relevant."
+    ]
+  }
+}

@@ -1,0 +1,326 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:linkskills:trading-market-breadth:0.1.1",
+  "title": "Market breadth research",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "as_of_date",
+        "universe_definition",
+        "horizon",
+        "series"
+      ],
+      "properties": {
+        "as_of_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "universe_definition": {
+          "type": "string"
+        },
+        "benchmark": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Optional; required only for an explicitly requested relative-performance comparison. The named point-in-time universe is the denominator/context for ratio families."
+        },
+        "horizon": {
+          "type": "string"
+        },
+        "series": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "measure",
+              "date",
+              "value",
+              "unit",
+              "source"
+            ],
+            "properties": {
+              "measure": {
+                "type": "string"
+              },
+              "date": {
+                "type": "string",
+                "format": "date"
+              },
+              "value": {},
+              "unit": {
+                "type": "string"
+              },
+              "source": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "requested_families": {
+          "type": "array",
+          "description": "Optional independent analysis families; missing inputs for one family do not block supported other families.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "close_based_ratios",
+              "moving_average_participation",
+              "advance_decline",
+              "distribution_days",
+              "follow_through_day",
+              "market_top_factors",
+              "chart_review"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "family_inputs": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Conditional source data by family. Supply only the data required by requested_families; omitted families remain unavailable without blocking other results.",
+          "properties": {
+            "close_history": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "date",
+                  "instrument",
+                  "close",
+                  "currency",
+                  "source"
+                ],
+                "properties": {
+                  "date": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "instrument": {
+                    "type": "string"
+                  },
+                  "close": {
+                    "type": "number"
+                  },
+                  "currency": {
+                    "type": "string"
+                  },
+                  "source": {
+                    "type": "string"
+                  },
+                  "point_in_time_member": {
+                    "type": [
+                      "boolean",
+                      "null"
+                    ]
+                  }
+                }
+              }
+            },
+            "ohlcv_history": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "date",
+                  "instrument",
+                  "open",
+                  "high",
+                  "low",
+                  "close",
+                  "volume",
+                  "currency",
+                  "source"
+                ],
+                "properties": {
+                  "date": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "instrument": {
+                    "type": "string"
+                  },
+                  "open": {
+                    "type": "number"
+                  },
+                  "high": {
+                    "type": "number"
+                  },
+                  "low": {
+                    "type": "number"
+                  },
+                  "close": {
+                    "type": "number"
+                  },
+                  "volume": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "currency": {
+                    "type": "string"
+                  },
+                  "source": {
+                    "type": "string"
+                  },
+                  "session": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "event_definitions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "family",
+                  "definition",
+                  "source"
+                ],
+                "properties": {
+                  "family": {
+                    "type": "string",
+                    "enum": [
+                      "distribution_days",
+                      "follow_through_day",
+                      "market_top_factors"
+                    ]
+                  },
+                  "definition": {
+                    "type": "string"
+                  },
+                  "source": {
+                    "type": "string"
+                  },
+                  "thresholds_or_parameters": {
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "chart_observations": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "date",
+                  "description",
+                  "source"
+                ],
+                "properties": {
+                  "date": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "source": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "completion_status",
+        "as_of_date",
+        "universe_definition",
+        "breadth_measures",
+        "interpretation",
+        "disagreements",
+        "gaps"
+      ],
+      "properties": {
+        "completion_status": {
+          "enum": [
+            "complete",
+            "partial",
+            "insufficient_input"
+          ]
+        },
+        "as_of_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "universe_definition": {
+          "type": "string"
+        },
+        "breadth_measures": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "interpretation": {
+          "type": "object"
+        },
+        "disagreements": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "family_status": {
+          "type": "array",
+          "description": "Independent family outcomes; an unavailable family must not suppress another family with adequate inputs.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "family",
+              "status",
+              "basis"
+            ],
+            "properties": {
+              "family": {
+                "type": "string",
+                "enum": [
+                  "close_based_ratios",
+                  "moving_average_participation",
+                  "advance_decline",
+                  "distribution_days",
+                  "follow_through_day",
+                  "market_top_factors",
+                  "chart_review"
+                ]
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "complete_from_supplied_evidence",
+                  "partial_named_missing_items",
+                  "unavailable_missing_basis",
+                  "not_requested"
+                ]
+              },
+              "basis": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

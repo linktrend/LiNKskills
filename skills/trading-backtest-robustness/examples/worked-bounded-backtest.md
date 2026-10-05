@@ -1,0 +1,75 @@
+# Fictional bounded backtest arithmetic
+
+This calculation demonstrates one fully specified fictional trade only. It is not a strategy backtest, behavioral evaluation, or evidence of performance.
+
+```json
+{
+  "status": "complete",
+  "protocol_card": {
+    "hypothesis_version": "fictional-arithmetic-v1",
+    "signal_time": "2025-01-02T16:00:00Z close",
+    "first_fill": "2025-01-03T09:30:00Z next open at 101.00 USD",
+    "data_window": "one fictional position; entry 2025-01-03, exit 2025-01-03 close at 103.00 USD",
+    "train_validation_holdout": "No model selection or generalization claim; single bounded trade arithmetic only.",
+    "cost_stack": "Commission 1 bp per side on actual notional; spread and impact supplied as 0 for this fictional calculation."
+  },
+  "fold_results": [
+    {
+      "fold": "fictional-single-trade",
+      "gross_return": "2.00 USD / 10,000 USD initial NAV = 0.0200%",
+      "net_return": "1.9796 USD / 10,000 USD = 0.019796%",
+      "status": "bounded arithmetic complete",
+      "observation_count": 1,
+      "trade_count": 1,
+      "gross_pnl": 2.0,
+      "net_pnl": 1.9796,
+      "currency": "USD",
+      "max_drawdown": null,
+      "turnover": 0.0204
+    }
+  ],
+  "portfolio_series": {
+    "initial_nav": 10000.0,
+    "currency": "USD",
+    "values": [
+      10000.0,
+      10001.9796
+    ],
+    "fictional": true,
+    "reconciliation": "Entry 1 × 101.00 USD; exit 1 × 103.00 USD; gross P&L 2.00 USD; commissions 0.0101 + 0.0103 = 0.0204 USD; ending NAV 10,001.9796 USD."
+  },
+  "cost_sensitivity": [
+    {
+      "case": "supplied base assumptions",
+      "status": "calculated",
+      "missing": [],
+      "commission_usd": 0.0204,
+      "spread_usd": 0.0,
+      "impact_usd": 0.0,
+      "total_cost_usd": 0.0204,
+      "net_pnl_usd": 1.9796,
+      "currency": "USD",
+      "formula": "gross P&L − entry commission − exit commission"
+    }
+  ],
+  "parameter_surface": [],
+  "trial_adjustment": {
+    "variants_recorded": 1,
+    "untouched_holdout": "not applicable to this arithmetic illustration",
+    "DSR": "not computed",
+    "trial_count": 1,
+    "reason_uncomputed": "One synthetic trade cannot estimate a strategy distribution or selection-adjusted performance."
+  },
+  "worst_case": {
+    "status": "not estimated; no adverse path/depth scenarios supplied"
+  },
+  "limitations": [
+    "Synthetic arithmetic demonstrates accounting only; it is not a backtest result or evidence of edge.",
+    "No annualized metric, inference, capacity, or future performance claim."
+  ],
+  "decision": "inconclusive",
+  "advisory_proposal": null,
+  "gaps": [],
+  "handoffs": []
+}
+```

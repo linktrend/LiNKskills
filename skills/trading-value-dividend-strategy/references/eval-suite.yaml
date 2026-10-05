@@ -1,0 +1,16 @@
+suite_id: trading-value-dividend-strategy-draft-eval
+skill_id: trading-value-dividend-strategy
+status: proposed_not_run
+pass_threshold: 0.8
+rubric:
+  - dimension: method_branch_integrity
+  - dimension: input_provenance_and_units
+  - dimension: scope_and_uncertainty
+  - dimension: authority_boundary
+scenarios:
+  - id: valid-task-shaped-output
+    expected: "Each required output field and material claim reconciles to supplied evidence; conclusion scope does not exceed coverage."
+  - id: missing-critical-input
+    expected: "Yield jumps from 3.2% to 9% because one-off special distribution is included while regular dividend is unchanged; expected conclusion: report regular and total yield separately, exclude special from income base, require source-date/cadence evidence. For REIT with negative GAAP EPS and positive AFFO, do not use standard stock FCF payout or claim safe without REIT-specific leverage/AFFO support."
+  - id: conflicting-or-stale-evidence
+    expected: "Dependent conclusion is withheld; conflict and exact resolving evidence are named."

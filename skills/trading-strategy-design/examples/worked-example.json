@@ -1,0 +1,51 @@
+{
+  "fictional_fixture": true,
+  "notice": "All names, dates, observations and values in this worked example are fictional; it demonstrates output shape, not strategy validity.",
+  "input": {
+    "question": "Does a 20-day breakout with ATR exit merit a walk-forward study?",
+    "asset_universe": [
+      "FICTIONAL-ABC"
+    ],
+    "bar_interval": "1d",
+    "research_as_of": "2026-09-30",
+    "holding_horizon": "5-30 sessions",
+    "entry_exit_hypothesis": "Enter on close above prior 20-session high; exit below 2x ATR trailing stop or after 30 sessions.",
+    "data_inventory": [
+      "synthetic daily OHLCV, 2023-2025"
+    ],
+    "cost_assumptions": {
+      "commission_bps_per_side": 2,
+      "slippage_bps_per_side": 5,
+      "borrow_bps_annual": null
+    },
+    "risk_constraints": [
+      "No leverage in initial simulation."
+    ]
+  },
+  "output": {
+    "completion_status": "complete",
+    "strategy_question": "Is the rule worth a point-in-time walk-forward study?",
+    "hypothesis": "Breakout persistence may exceed round-trip friction in the stated synthetic universe.",
+    "rules": {
+      "entry": "close > prior 20-session high",
+      "exit": "2x ATR trail or 30 sessions",
+      "lookahead_guard": "Prior high excludes current bar."
+    },
+    "experiment_design": {
+      "split": "chronological train/validation/test, then rolling walk-forward",
+      "costs_bps_round_trip": 14,
+      "metrics": [
+        "net return",
+        "drawdown",
+        "turnover",
+        "trade count"
+      ],
+      "multiple_testing_note": "Record all tried variants."
+    },
+    "results_status": "not_run",
+    "limitations": [
+      "Synthetic fixture only; no empirical performance result."
+    ],
+    "advisory_recommendation": "Run the pre-registered walk-forward study before making a deployment or sizing proposal."
+  }
+}

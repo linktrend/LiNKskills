@@ -1,0 +1,174 @@
+{
+  "schema_ref": "references/schemas.json#/definitions/input",
+  "status": "schema_fixture_only_not_behavioral_evaluation",
+  "valid_case": {
+    "input": {
+      "hypothesis_version": "fictional-input",
+      "signal_and_fill_timeline": {},
+      "data_manifest": {},
+      "universe_membership": "fictional-input",
+      "nav_currency": "fictional-input",
+      "positions": "fictional-input",
+      "cost_model": {},
+      "fold_ranges": [],
+      "trial_ledger": [],
+      "benchmark": "fictional-input",
+      "as_of": "fictional-input"
+    },
+    "expected": "accept by JSON Schema"
+  },
+  "invalid_case": {
+    "input": {
+      "hypothesis_version": "fictional-input",
+      "signal_and_fill_timeline": {},
+      "data_manifest": {},
+      "universe_membership": "fictional-input",
+      "nav_currency": "fictional-input",
+      "positions": "fictional-input",
+      "cost_model": {},
+      "fold_ranges": [],
+      "trial_ledger": [],
+      "benchmark": "fictional-input",
+      "as_of": "fictional-input",
+      "unexpected_field": "must be rejected"
+    },
+    "expected": "reject additionalProperties"
+  },
+  "valid_partial_case": {
+    "schema_ref": "references/schemas.json#/definitions/input",
+    "input": {
+      "hypothesis_version": "FICTIONAL-input",
+      "as_of": "FICTIONAL-input",
+      "known_gaps": [
+        "source_snapshot: not supplied; dependent analysis must remain partial."
+      ]
+    },
+    "expected": "accept; return a bounded partial result and preserve each listed gap."
+  },
+  "partial_output_case": {
+    "schema_ref": "references/schemas.json#/definitions/output",
+    "output": {
+      "status": "partial",
+      "protocol_card": {
+        "hypothesis_version": "fictional-v1",
+        "signal_time": "session close",
+        "first_fill": "next session open",
+        "data_window": "fictional 3 sessions",
+        "train_validation_holdout": "not defined",
+        "cost_stack": "commission supplied as fictional 1 bp/side; spread/impact missing"
+      },
+      "fold_results": [
+        {
+          "fold": "fictional-fold-1",
+          "gross_return": "not computed",
+          "net_return": "not computed",
+          "status": "insufficient observations"
+        }
+      ],
+      "portfolio_series": {
+        "initial_nav": 100000,
+        "currency": "USD",
+        "values": [
+          100000,
+          100100
+        ],
+        "fictional": true,
+        "reconciliation": "two synthetic marks; not a performance estimate"
+      },
+      "cost_sensitivity": [
+        {
+          "case": "base",
+          "status": "partial",
+          "missing": [
+            "spread",
+            "impact"
+          ]
+        }
+      ],
+      "parameter_surface": [],
+      "trial_adjustment": {
+        "variants_recorded": 1,
+        "untouched_holdout": "not evaluated",
+        "DSR": "not computed"
+      },
+      "worst_case": {
+        "status": "unknown"
+      },
+      "limitations": [
+        "Synthetic illustration only."
+      ],
+      "decision": "inconclusive",
+      "advisory_proposal": null,
+      "gaps": [
+        "No point-in-time market history or execution assumptions."
+      ],
+      "handoffs": [
+        "Eric for event-level simulator if authorized."
+      ]
+    },
+    "expected": "accept as partial; unknown/uncomputed values remain explicit."
+  },
+  "invalid_completed_case": {
+    "schema_ref": "references/schemas.json#/definitions/output",
+    "output": {
+      "status": "complete",
+      "protocol_card": {
+        "hypothesis_version": "fictional-v1",
+        "signal_time": "session close",
+        "first_fill": "next session open",
+        "data_window": "fictional 3 sessions",
+        "train_validation_holdout": "not defined",
+        "cost_stack": "commission supplied as fictional 1 bp/side; spread/impact missing"
+      },
+      "fold_results": [
+        {
+          "fold": "fictional-fold-1",
+          "gross_return": "not computed",
+          "net_return": "not computed",
+          "status": "insufficient observations"
+        }
+      ],
+      "portfolio_series": {
+        "initial_nav": 100000,
+        "currency": "USD",
+        "values": [
+          100000,
+          100100
+        ],
+        "fictional": true,
+        "reconciliation": "two synthetic marks; not a performance estimate"
+      },
+      "cost_sensitivity": [
+        {
+          "case": "base",
+          "status": "partial",
+          "missing": [
+            "spread",
+            "impact"
+          ]
+        }
+      ],
+      "parameter_surface": [],
+      "trial_adjustment": {
+        "variants_recorded": 1,
+        "untouched_holdout": "not evaluated",
+        "DSR": "not computed"
+      },
+      "worst_case": {
+        "status": "unknown"
+      },
+      "limitations": [
+        "Synthetic illustration only."
+      ],
+      "decision": "inconclusive",
+      "advisory_proposal": null,
+      "gaps": [
+        "Required evidence or calculation is missing; complete status is false."
+      ],
+      "handoffs": [
+        "Eric for event-level simulator if authorized."
+      ]
+    },
+    "expected": "reject: complete output cannot contain unresolved required gaps."
+  }
+}

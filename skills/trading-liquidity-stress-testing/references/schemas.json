@@ -1,0 +1,955 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "owner": {
+          "type": "string",
+          "minLength": 1
+        },
+        "as_of": {
+          "type": "string",
+          "minLength": 1
+        },
+        "base_currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "holdings_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scenario_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "requested_outputs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "holdings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/holding"
+          },
+          "minItems": 1
+        },
+        "scenarios": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/scenario"
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "task_id",
+        "owner",
+        "as_of",
+        "base_currency",
+        "requested_outputs"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "anyOf": [
+            {
+              "required": [
+                "holdings"
+              ]
+            },
+            {
+              "required": [
+                "holdings_ref"
+              ]
+            }
+          ]
+        },
+        {
+          "anyOf": [
+            {
+              "required": [
+                "scenarios"
+              ]
+            },
+            {
+              "required": [
+                "scenario_ref"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": [
+            "completed_analysis",
+            "needs_context",
+            "failed"
+          ]
+        },
+        "scenario_report": {
+          "type": "object",
+          "properties": {
+            "as_of": {
+              "type": "string",
+              "minLength": 1
+            },
+            "base_currency": {
+              "type": "string",
+              "minLength": 1
+            },
+            "covered_instruments": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "excluded_instruments": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "scenarios": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/scenario_result"
+              },
+              "minItems": 1
+            }
+          },
+          "required": [
+            "as_of",
+            "base_currency",
+            "covered_instruments",
+            "excluded_instruments",
+            "scenarios"
+          ],
+          "additionalProperties": false
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "assumptions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "recommendations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "open_questions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "external_effects": {
+          "type": "array",
+          "maxItems": 0
+        }
+      },
+      "required": [
+        "task_id",
+        "status",
+        "scenario_report",
+        "evidence_refs",
+        "assumptions",
+        "limitations",
+        "recommendations",
+        "open_questions",
+        "external_effects"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "completed_analysis"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "scenario_report": {
+                "properties": {
+                  "excluded_instruments": {
+                    "maxItems": 0
+                  },
+                  "scenarios": {
+                    "items": {
+                      "properties": {
+                        "status": {
+                          "const": "estimated"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "open_questions": {
+                "maxItems": 0
+              }
+            }
+          }
+        }
+      ]
+    },
+    "state": {
+      "type": "object",
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "input_digest": {
+          "type": "string",
+          "minLength": 1
+        },
+        "state": {
+          "enum": [
+            "INITIALIZED",
+            "IN_PROGRESS",
+            "PENDING_APPROVAL",
+            "COMPLETED",
+            "FAILED"
+          ]
+        },
+        "next_actions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "task_id",
+        "input_digest",
+        "state",
+        "next_actions"
+      ],
+      "additionalProperties": false
+    },
+    "holding": {
+      "type": "object",
+      "properties": {
+        "instrument_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "instrument_kind": {
+          "enum": [
+            "linear_long_asset",
+            "short",
+            "derivative",
+            "other"
+          ]
+        },
+        "quantity": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "position_value": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "value_currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "value_adv": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "full_spread_bps": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "volatility_fraction": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "data_as_of": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "missing_fields": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "fx_to_base": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "properties": {
+            "from_currency": {
+              "type": "string",
+              "pattern": "^[A-Z]{3}$"
+            },
+            "to_currency": {
+              "type": "string",
+              "pattern": "^[A-Z]{3}$"
+            },
+            "base_per_value_unit": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "as_of": {
+              "type": "string",
+              "minLength": 1
+            },
+            "source_ref": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "from_currency",
+            "to_currency",
+            "base_per_value_unit",
+            "as_of",
+            "source_ref"
+          ],
+          "additionalProperties": false
+        },
+        "fees_base": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "financing_cost_base": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        }
+      },
+      "required": [
+        "instrument_id",
+        "instrument_kind",
+        "quantity",
+        "position_value",
+        "value_currency",
+        "value_adv",
+        "full_spread_bps",
+        "volatility_fraction",
+        "data_as_of",
+        "evidence_refs",
+        "missing_fields",
+        "fx_to_base",
+        "fees_base",
+        "financing_cost_base"
+      ],
+      "additionalProperties": false
+    },
+    "scenario": {
+      "type": "object",
+      "properties": {
+        "scenario_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "horizon_days": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "exclusiveMinimum": 0
+        },
+        "volume_multiplier": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "participation_fraction": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "impact_eta": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "requested_cash": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "initial_cash": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "funding_obligations": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "price_shocks_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "allocation_method": {
+          "type": "string",
+          "minLength": 1
+        },
+        "assumptions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "missing_fields": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "scenario_id",
+        "horizon_days",
+        "volume_multiplier",
+        "participation_fraction",
+        "impact_eta",
+        "requested_cash",
+        "initial_cash",
+        "funding_obligations",
+        "price_shocks_ref",
+        "allocation_method",
+        "assumptions",
+        "missing_fields"
+      ],
+      "additionalProperties": false
+    },
+    "position_result": {
+      "type": "object",
+      "properties": {
+        "instrument_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "eligibility": {
+          "enum": [
+            "estimated_linear_long",
+            "not_modelled",
+            "needs_data"
+          ]
+        },
+        "stressed_daily_adv": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "daily_sale_capacity": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "horizon_sale_capacity": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "modelled_exit_days": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "planned_sale": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "gross_proceeds": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "estimated_costs": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "net_proceeds": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "spread_cost": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "impact_cost": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "fees_cost": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "financing_cost": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        }
+      },
+      "required": [
+        "instrument_id",
+        "eligibility",
+        "stressed_daily_adv",
+        "daily_sale_capacity",
+        "horizon_sale_capacity",
+        "modelled_exit_days",
+        "planned_sale",
+        "gross_proceeds",
+        "estimated_costs",
+        "net_proceeds",
+        "limitations",
+        "evidence_refs",
+        "currency",
+        "spread_cost",
+        "impact_cost",
+        "fees_cost",
+        "financing_cost"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "eligibility": {
+                "enum": [
+                  "not_modelled",
+                  "needs_data"
+                ]
+              }
+            },
+            "required": [
+              "eligibility"
+            ]
+          },
+          "then": {
+            "properties": {
+              "stressed_daily_adv": {
+                "type": "null"
+              },
+              "daily_sale_capacity": {
+                "type": "null"
+              },
+              "horizon_sale_capacity": {
+                "type": "null"
+              },
+              "modelled_exit_days": {
+                "type": "null"
+              },
+              "planned_sale": {
+                "type": "null"
+              },
+              "gross_proceeds": {
+                "type": "null"
+              },
+              "estimated_costs": {
+                "type": "null"
+              },
+              "net_proceeds": {
+                "type": "null"
+              },
+              "spread_cost": {
+                "type": "null"
+              },
+              "impact_cost": {
+                "type": "null"
+              },
+              "fees_cost": {
+                "type": "null"
+              },
+              "financing_cost": {
+                "type": "null"
+              },
+              "limitations": {
+                "minItems": 1
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "stressed_daily_adv": {
+                "type": "number"
+              },
+              "daily_sale_capacity": {
+                "type": "number"
+              },
+              "horizon_sale_capacity": {
+                "type": "number"
+              },
+              "planned_sale": {
+                "type": "number"
+              },
+              "gross_proceeds": {
+                "type": "number"
+              },
+              "estimated_costs": {
+                "type": "number"
+              },
+              "net_proceeds": {
+                "type": "number"
+              },
+              "spread_cost": {
+                "type": "number"
+              },
+              "impact_cost": {
+                "type": "number"
+              },
+              "fees_cost": {
+                "type": "number"
+              },
+              "financing_cost": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "modelled_exit_days": {
+                "type": "null"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "limitations": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "scenario_result": {
+      "type": "object",
+      "properties": {
+        "scenario_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": [
+            "estimated",
+            "partial",
+            "unavailable"
+          ]
+        },
+        "position_results": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/position_result"
+          }
+        },
+        "gross_proceeds": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "estimated_costs": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "initial_cash": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "funding_obligations": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "net_available_cash": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "requested_cash": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "net_cash_shortfall": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "valuation_loss": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "valuation_model_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "binding_constraints": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "missing_fields": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "sensitivity_notes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "spread_cost": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "impact_cost": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "fees_cost": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "financing_cost": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "aggregation_scope": {
+          "enum": [
+            "full_portfolio",
+            "covered_instruments_only"
+          ]
+        }
+      },
+      "required": [
+        "scenario_id",
+        "status",
+        "position_results",
+        "gross_proceeds",
+        "estimated_costs",
+        "initial_cash",
+        "funding_obligations",
+        "net_available_cash",
+        "requested_cash",
+        "net_cash_shortfall",
+        "valuation_loss",
+        "valuation_model_ref",
+        "binding_constraints",
+        "missing_fields",
+        "sensitivity_notes",
+        "currency",
+        "spread_cost",
+        "impact_cost",
+        "fees_cost",
+        "financing_cost",
+        "aggregation_scope"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "estimated"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "aggregation_scope": {
+                "const": "full_portfolio"
+              },
+              "position_results": {
+                "items": {
+                  "properties": {
+                    "eligibility": {
+                      "const": "estimated_linear_long"
+                    }
+                  }
+                },
+                "minItems": 1
+              },
+              "missing_fields": {
+                "maxItems": 0
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

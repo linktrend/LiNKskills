@@ -1,0 +1,35 @@
+{
+  "status": "schema_fixture_only_not_behavioral_evaluation",
+  "valid_case": {
+    "schema_ref": "references/schemas.json#/definitions/input",
+    "input": {
+      "decision_goal": "identify onboarding friction in a prototype",
+      "product_stage": "prototype",
+      "target_users": "new administrators",
+      "segments": [
+        "first-time",
+        "experienced"
+      ],
+      "known_risks": [
+        "recruiting only advocates"
+      ],
+      "available_evidence": "no sessions supplied",
+      "access_and_consent": "consent process required"
+    },
+    "expected": "accept by JSON Schema"
+  },
+  "invalid_case": {
+    "schema_ref": "references/schemas.json#/definitions/input",
+    "input": {
+      "decision_goal": "fictional-input",
+      "product_stage": "fictional-input",
+      "target_users": "fictional-input",
+      "segments": [],
+      "known_risks": [],
+      "available_evidence": "fictional-input",
+      "access_and_consent": "fictional-input",
+      "unapproved_extra_field": "reject"
+    },
+    "expected": "reject unknown additional property"
+  }
+}

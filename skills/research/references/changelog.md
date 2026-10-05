@@ -15,3 +15,8 @@
 - Removed the reverse `search-strategy` dependency (one-way facade only).
 - Added conflict-set, negative-evidence, and provider-neutral / legacy-router
   exclusions. Qualification remains HOLD until external qualification exists.
+
+## Unreleased trading-decision source candidate - 2026-10-05
+
+- Add evidence-bounded trading-decision research, counter-thesis and sizing arithmetic with supplied constraints, point-in-time data and explicit unknowns.
+- Retain the canonical report, citation and authority contracts; domain routing uses roles rather than personal names. No qualification or published v1.0.0 replacement is claimed.

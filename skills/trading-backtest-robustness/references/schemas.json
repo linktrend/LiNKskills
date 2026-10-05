@@ -1,0 +1,394 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "trading-backtest-robustness task contract draft",
+  "type": "object",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "properties": {
+        "hypothesis_version": {
+          "type": "string"
+        },
+        "signal_and_fill_timeline": {
+          "type": "object"
+        },
+        "data_manifest": {
+          "type": "object"
+        },
+        "universe_membership": {
+          "type": "string"
+        },
+        "nav_currency": {
+          "type": "string"
+        },
+        "positions": {
+          "type": "string"
+        },
+        "cost_model": {
+          "type": "object"
+        },
+        "fold_ranges": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "trial_ledger": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "benchmark": {
+          "type": "string"
+        },
+        "as_of": {
+          "type": "string"
+        },
+        "known_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "hypothesis_version",
+        "as_of"
+      ],
+      "additionalProperties": false
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "complete",
+            "partial",
+            "needs_input",
+            "blocked"
+          ]
+        },
+        "protocol_card": {
+          "type": "object",
+          "properties": {
+            "hypothesis_version": {
+              "type": "string"
+            },
+            "signal_time": {
+              "type": "string"
+            },
+            "first_fill": {
+              "type": "string"
+            },
+            "data_window": {
+              "type": "string"
+            },
+            "train_validation_holdout": {
+              "type": "string"
+            },
+            "cost_stack": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "hypothesis_version",
+            "signal_time",
+            "first_fill",
+            "data_window",
+            "train_validation_holdout",
+            "cost_stack"
+          ],
+          "additionalProperties": false
+        },
+        "fold_results": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "fold": {
+                "type": "string"
+              },
+              "gross_return": {
+                "type": "string"
+              },
+              "net_return": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "observation_count": {
+                "type": "integer"
+              },
+              "trade_count": {
+                "type": "integer"
+              },
+              "gross_pnl": {
+                "type": "number"
+              },
+              "net_pnl": {
+                "type": "number"
+              },
+              "currency": {
+                "type": "string"
+              },
+              "max_drawdown": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "turnover": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "fold",
+              "gross_return",
+              "net_return",
+              "status"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "portfolio_series": {
+          "type": "object",
+          "properties": {
+            "initial_nav": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "currency": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "values": {
+              "type": "array",
+              "items": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              }
+            },
+            "fictional": {
+              "type": "boolean"
+            },
+            "reconciliation": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "initial_nav",
+            "currency",
+            "values",
+            "fictional",
+            "reconciliation"
+          ],
+          "additionalProperties": false
+        },
+        "cost_sensitivity": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "case": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "missing": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "currency": {
+                "type": "string"
+              },
+              "formula": {
+                "type": "string"
+              },
+              "commission": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "spread": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "impact": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "total_cost": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "net_pnl": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "case",
+              "status",
+              "missing"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "parameter_surface": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "trial_adjustment": {
+          "type": "object",
+          "properties": {
+            "variants_recorded": {
+              "type": "integer"
+            },
+            "untouched_holdout": {
+              "type": "string"
+            },
+            "DSR": {
+              "type": "string"
+            },
+            "trial_count": {
+              "type": "integer"
+            },
+            "reason_uncomputed": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "variants_recorded",
+            "untouched_holdout",
+            "DSR"
+          ],
+          "additionalProperties": false
+        },
+        "worst_case": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "status"
+          ],
+          "additionalProperties": false
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "decision": {
+          "type": "string"
+        },
+        "advisory_proposal": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "handoffs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "status",
+        "protocol_card",
+        "fold_results",
+        "portfolio_series",
+        "cost_sensitivity",
+        "parameter_surface",
+        "trial_adjustment",
+        "worst_case",
+        "limitations",
+        "decision",
+        "advisory_proposal",
+        "gaps",
+        "handoffs"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "complete"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "gaps": {
+                "maxItems": 0
+              }
+            }
+          }
+        }
+      ]
+    },
+    "state": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "in_progress",
+            "completed",
+            "needs_input",
+            "blocked"
+          ]
+        },
+        "open_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

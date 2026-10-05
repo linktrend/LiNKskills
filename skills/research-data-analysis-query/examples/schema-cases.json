@@ -1,0 +1,48 @@
+{
+  "status": "schema_fixture_only_not_behavioral_evaluation",
+  "valid_case": {
+    "schema_ref": "references/schemas.json#/definitions/input",
+    "input": {
+      "question": "How many fictional events occurred by category in period P?",
+      "data_ref": "FIC-TABLE-1",
+      "schema": {
+        "table": "events",
+        "columns": [
+          "event_id",
+          "category",
+          "event_date"
+        ]
+      },
+      "dialect": "SQLite",
+      "definitions": {
+        "event": "one row per event"
+      },
+      "units": "count",
+      "time_range": "2025-01-01/2025-12-31",
+      "population": "all rows in fixture table",
+      "permissions": "read-only"
+    },
+    "expected": "accept by JSON Schema"
+  },
+  "invalid_case": {
+    "schema_ref": "references/schemas.json#/definitions/input",
+    "input": {
+      "question": "fictional-input",
+      "data_ref": "fictional-input",
+      "schema": {
+        "table": "fictional-input",
+        "columns": []
+      },
+      "dialect": "fictional-input",
+      "definitions": {
+        "event": "fictional-input"
+      },
+      "units": "fictional-input",
+      "time_range": "fictional-input",
+      "population": "fictional-input",
+      "permissions": "fictional-input",
+      "unapproved_extra_field": "reject"
+    },
+    "expected": "reject unknown additional property"
+  }
+}

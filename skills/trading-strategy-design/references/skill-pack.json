@@ -1,0 +1,568 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "trading-strategy-design",
+  "display_name": "Trading strategy research design",
+  "version": "0.1.1",
+  "description": "Turn a strategy idea into a falsifiable, cost-aware research design, then analyze user-supplied results without claiming unsupported performance.",
+  "capability_category": "trading_research",
+  "provenance": {
+    "author": "LiNKskills Library",
+    "source": "Exact source provenance: references/source-provenance.json (sha256:bbe88af74e9480f3c55c0b716aa4577e8a37890c416a6890bd14787164b0ce46); per-entry license/notice/disposition recorded there.",
+    "license": "No package-wide upstream license is asserted; see exact per-file source provenance and notice dispositions in references/source-provenance.json.",
+    "imported_from": "Frozen Jane draft source: skills/trading-strategy-design; source provenance copied unchanged for this proposal only."
+  },
+  "lifecycle_state": "draft",
+  "format_profile": "simple",
+  "compatible_runtime_profiles": [
+    "jane-openclaw"
+  ],
+  "min_capability_tier": "balanced",
+  "routing": {
+    "when_to_use": "Use for strategy question, mechanism, and experiment plan.",
+    "when_not_to_use": [
+      "Do not submit orders, call a broker, change portfolio state, or activate a live strategy.",
+      "Do not invent data, paid tool access, historical validation, or source API availability.",
+      "Do not treat a schema-valid example or output as method validation.",
+      "Do not replace LiNKtrading with another execution system."
+    ],
+    "tags": [
+      "trading",
+      "research",
+      "jane",
+      "draft"
+    ],
+    "exclusion_rules": [
+      "Do not submit orders, call a broker, change portfolio state, or activate a live strategy.",
+      "Do not invent data, paid tool access, historical validation, or source API availability.",
+      "Do not treat a schema-valid example or output as method validation.",
+      "Do not replace LiNKtrading with another execution system."
+    ]
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "question",
+        "description": "Required property `question` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "asset_universe",
+        "description": "Required property `asset_universe` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "bar_interval",
+        "description": "Required property `bar_interval` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "research_as_of",
+        "description": "Required property `research_as_of` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        }
+      },
+      {
+        "name": "holding_horizon",
+        "description": "Required property `holding_horizon` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "entry_exit_hypothesis",
+        "description": "Required property `entry_exit_hypothesis` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "data_inventory",
+        "description": "Required property `data_inventory` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "cost_assumptions",
+        "description": "Required property `cost_assumptions` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "commission_bps_per_side": {
+              "type": "number",
+              "minimum": 0
+            },
+            "slippage_bps_per_side": {
+              "type": "number",
+              "minimum": 0
+            },
+            "borrow_bps_annual": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0
+            }
+          }
+        }
+      },
+      {
+        "name": "risk_constraints",
+        "description": "Required property `risk_constraints` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    ],
+    "optional_inputs": [
+      {
+        "name": "candidate_hypotheses",
+        "description": "Optional property `candidate_hypotheses` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "minItems": 1,
+          "description": "Optional additional strategy candidates for the approved comparison branch; preserve entry_exit_hypothesis as the legacy single-candidate path.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "candidate_id",
+              "hypothesis",
+              "instrument_universe",
+              "side",
+              "holding_horizon",
+              "entry_rule",
+              "exit_rule",
+              "risk_invalidator",
+              "mechanism",
+              "data_requirements"
+            ],
+            "properties": {
+              "candidate_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "hypothesis": {
+                "type": "string",
+                "minLength": 1
+              },
+              "instrument_universe": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "side": {
+                "type": "string",
+                "enum": [
+                  "long",
+                  "short",
+                  "long_short",
+                  "market_neutral",
+                  "unspecified"
+                ]
+              },
+              "holding_horizon": {
+                "type": "string"
+              },
+              "entry_rule": {
+                "type": "string"
+              },
+              "exit_rule": {
+                "type": "string"
+              },
+              "risk_invalidator": {
+                "type": "string"
+              },
+              "mechanism": {
+                "type": "string"
+              },
+              "data_requirements": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    ],
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "question",
+        "asset_universe",
+        "bar_interval",
+        "research_as_of",
+        "holding_horizon",
+        "entry_exit_hypothesis",
+        "data_inventory",
+        "cost_assumptions",
+        "risk_constraints"
+      ],
+      "properties": {
+        "question": {
+          "type": "string"
+        },
+        "asset_universe": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "bar_interval": {
+          "type": "string"
+        },
+        "research_as_of": {
+          "type": "string",
+          "format": "date"
+        },
+        "holding_horizon": {
+          "type": "string"
+        },
+        "entry_exit_hypothesis": {
+          "type": "string"
+        },
+        "data_inventory": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "cost_assumptions": {
+          "type": "object",
+          "properties": {
+            "commission_bps_per_side": {
+              "type": "number",
+              "minimum": 0
+            },
+            "slippage_bps_per_side": {
+              "type": "number",
+              "minimum": 0
+            },
+            "borrow_bps_annual": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0
+            }
+          }
+        },
+        "risk_constraints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "candidate_hypotheses": {
+          "type": "array",
+          "minItems": 1,
+          "description": "Optional additional strategy candidates for the approved comparison branch; preserve entry_exit_hypothesis as the legacy single-candidate path.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "candidate_id",
+              "hypothesis",
+              "instrument_universe",
+              "side",
+              "holding_horizon",
+              "entry_rule",
+              "exit_rule",
+              "risk_invalidator",
+              "mechanism",
+              "data_requirements"
+            ],
+            "properties": {
+              "candidate_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "hypothesis": {
+                "type": "string",
+                "minLength": 1
+              },
+              "instrument_universe": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "side": {
+                "type": "string",
+                "enum": [
+                  "long",
+                  "short",
+                  "long_short",
+                  "market_neutral",
+                  "unspecified"
+                ]
+              },
+              "holding_horizon": {
+                "type": "string"
+              },
+              "entry_rule": {
+                "type": "string"
+              },
+              "exit_rule": {
+                "type": "string"
+              },
+              "risk_invalidator": {
+                "type": "string"
+              },
+              "mechanism": {
+                "type": "string"
+              },
+              "data_requirements": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "urn:linkskills:trading-strategy-design:0.1.1#/definitions/input"
+    },
+    "expected_outputs": [
+      {
+        "name": "completion_status",
+        "description": "Required property `completion_status` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "enum": [
+            "complete",
+            "partial",
+            "insufficient_input"
+          ]
+        }
+      },
+      {
+        "name": "strategy_question",
+        "description": "Required property `strategy_question` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "hypothesis",
+        "description": "Required property `hypothesis` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "rules",
+        "description": "Required property `rules` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "object"
+        }
+      },
+      {
+        "name": "experiment_design",
+        "description": "Required property `experiment_design` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "object"
+        }
+      },
+      {
+        "name": "results_status",
+        "description": "Required property `results_status` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "enum": [
+            "not_run",
+            "illustrative_only",
+            "user_results_reviewed",
+            "independently_validated"
+          ]
+        }
+      },
+      {
+        "name": "limitations",
+        "description": "Required property `limitations` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "advisory_recommendation",
+        "description": "Required property `advisory_recommendation` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "candidate_comparison",
+        "description": "Optional property `candidate_comparison` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "description": "Optional side-by-side comparison for two or more supplied candidates; no winner if criteria or evidence are incomparable.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "candidate_id",
+              "comparability_status",
+              "dimensions",
+              "evidence_gaps"
+            ],
+            "properties": {
+              "candidate_id": {
+                "type": "string"
+              },
+              "comparability_status": {
+                "type": "string",
+                "enum": [
+                  "comparable",
+                  "partially_comparable",
+                  "not_comparable",
+                  "insufficient_evidence"
+                ]
+              },
+              "dimensions": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "dimension",
+                    "assessment",
+                    "basis"
+                  ],
+                  "properties": {
+                    "dimension": {
+                      "type": "string"
+                    },
+                    "assessment": {
+                      "type": "string"
+                    },
+                    "basis": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "supported",
+                        "partial",
+                        "unavailable",
+                        "not_comparable"
+                      ]
+                    }
+                  }
+                }
+              },
+              "evidence_gaps": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    ],
+    "procedure_summary": "Apply the task-specific integrated method and the named branch input/output and failure rules in references/source-integrated-method.md. Preserve optional/provider distinctions and return bounded partial outputs when independent methods remain valid.",
+    "forbidden_actions": [
+      "Do not submit orders, call a broker, change portfolio state, or activate a live strategy.",
+      "Do not invent data, paid tool access, historical validation, or source API availability.",
+      "Do not treat a schema-valid example or output as method validation.",
+      "Do not replace LiNKtrading with another execution system."
+    ],
+    "failure_handling": "Source section `## Failure handling` in SKILL.md: - Missing, stale, unreconciled or inaccessible critical data: stop the dependent calculation and return a bounded partial result with the exact gap.\n- Incompatible units, periods, event windows or universes: do not merge. Reconcile definitions or report separate views.\n- Source rules conflict or are uncalibrated: show the source-specific rule and treat its result as a hypothesis; do not average contradictory rules into a score.\n- User requests an order, live activation, or unapproved side effect: provide the permitted advisory artifact only. Any later execution requires the existing LiNKtrading route and Lisa + Carlos independent authenticated two-channel exact-version approval.\n- A conditionally recommended size/exit cannot be supported because risk budget, holdings, liquidity, or instrument constraints are missing: omit numeric sizing and state which inputs would change it.",
+    "verification_steps": [
+      "Validate the supplied input against references/schemas.json#/definitions/input and report each missing or invalid required field.",
+      "Validate the produced task output against references/schemas.json#/definitions/output; structural validity does not establish method correctness.",
+      "Use references/eval-suite.json criteria only against an actual task output; a schema check or fictional example alone is not a behavioral pass."
+    ],
+    "completion_criteria": [
+      "Include every required output property defined at references/schemas.json#/definitions/output: completion_status, strategy_question, hypothesis, rules, experiment_design, results_status, limitations, advisory_recommendation.",
+      "If `completion_status` exists, its value must reflect the schema-defined gaps or missing inputs; do not assert a complete result where evidence is absent.",
+      "Keep recommendations advisory; no external action, order, live activation, portfolio mutation, or approval is represented as completed."
+    ],
+    "known_limitations": [
+      "The skill source is an isolated unqualified draft; source-derived pack metadata does not establish selection, registration, method qualification, or production suitability.",
+      "The declared runtime-profile label is preserved as source metadata; runtime-profile binding is not proved."
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read",
+      "filesystem_write"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [
+      {
+        "key": "min_reasoning_tier",
+        "value": "balanced"
+      },
+      {
+        "key": "preferred_model",
+        "value": "gpt-6.1-sol"
+      },
+      {
+        "key": "context_required",
+        "value": 64000
+      }
+    ],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "suite_hash": "sha256:fa3e2ff98264587db5b091e097a6b27e4c2bb66a99ef13de386064025e32dcb4",
+    "verification_refs": [
+      "references/schemas.json",
+      "references/eval-suite.json"
+    ]
+  },
+  "telemetry": {
+    "classification": "public_internal",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_private_data",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain_only_approved_ids_and_hashes"
+  },
+  "fragments": [
+    {
+      "fragment_id": "source-integrated-method",
+      "disclosure_level": 3,
+      "path": "references/source-integrated-method.md"
+    },
+    {
+      "fragment_id": "contract-fixtures",
+      "disclosure_level": 4,
+      "path": "references/contract-fixtures.json"
+    }
+  ]
+}

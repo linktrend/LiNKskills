@@ -1,0 +1,185 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "research-document-synthesis task contract draft",
+  "type": "object",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "properties": {
+        "question": {
+          "type": "string"
+        },
+        "documents": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "source_id": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "version": {
+                "type": "string"
+              },
+              "locator": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "source_id",
+              "title",
+              "version",
+              "locator"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "desired_depth": {
+          "type": "string"
+        },
+        "audience": {
+          "type": "string"
+        },
+        "output_format": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "question",
+        "documents",
+        "desired_depth",
+        "audience",
+        "output_format"
+      ],
+      "additionalProperties": false,
+      "title": "Task-specific input"
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "source_notes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "source_id": {
+                "type": "string"
+              },
+              "claim": {
+                "type": "string"
+              },
+              "evidence_locator": {
+                "type": "string"
+              },
+              "method": {
+                "type": "string"
+              },
+              "limitation": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "source_id",
+              "claim",
+              "evidence_locator",
+              "method",
+              "limitation"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "comparison_table": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "dimension": {
+                "type": "string"
+              },
+              "FIC-A": {
+                "type": "string"
+              },
+              "FIC-B": {
+                "type": "string"
+              },
+              "implication": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "dimension",
+              "FIC-A",
+              "FIC-B",
+              "implication"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "argument_map": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "synthesis": {
+          "type": "string"
+        },
+        "omissions_and_conflicts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "source_list": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "citations_verified": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "status",
+        "source_notes",
+        "comparison_table",
+        "argument_map",
+        "synthesis",
+        "omissions_and_conflicts",
+        "source_list",
+        "citations_verified"
+      ],
+      "additionalProperties": false,
+      "title": "Task-specific result"
+    },
+    "state": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "in_progress",
+            "completed",
+            "needs_input",
+            "blocked"
+          ]
+        },
+        "open_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

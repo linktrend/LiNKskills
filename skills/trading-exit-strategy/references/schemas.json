@@ -1,0 +1,286 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "trading-exit-strategy task contract draft",
+  "type": "object",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "properties": {
+        "question": {
+          "type": "string"
+        },
+        "instrument": {
+          "type": "string"
+        },
+        "venue": {
+          "type": "string"
+        },
+        "side": {
+          "enum": [
+            "long",
+            "short"
+          ]
+        },
+        "quantity": {
+          "type": "number"
+        },
+        "contract_multiplier": {
+          "type": "number"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "entry_time": {
+          "type": "string"
+        },
+        "entry_price": {
+          "type": "number"
+        },
+        "bar_interval": {
+          "type": "string"
+        },
+        "timezone": {
+          "type": "string"
+        },
+        "price_data_ref": {
+          "type": "string"
+        },
+        "cost_assumptions": {
+          "type": "object",
+          "properties": {
+            "full_spread_bps": {
+              "type": "number"
+            },
+            "commission_bps_per_side": {
+              "type": "number"
+            },
+            "slippage_bps_per_side": {
+              "type": "number"
+            },
+            "impact_assumption": {
+              "type": "string"
+            }
+          },
+          "required": [],
+          "additionalProperties": false
+        },
+        "variants": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "rule": {
+                "type": "string"
+              },
+              "trigger_priority": {
+                "type": "integer"
+              },
+              "partial_fraction": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "name",
+              "rule"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "as_of": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "question",
+        "instrument",
+        "venue",
+        "side",
+        "quantity",
+        "currency",
+        "entry_time",
+        "entry_price",
+        "bar_interval",
+        "timezone",
+        "price_data_ref",
+        "variants",
+        "as_of"
+      ],
+      "additionalProperties": false
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "draft_complete",
+            "needs_input",
+            "blocked"
+          ]
+        },
+        "unit_risk": {
+          "type": "object",
+          "properties": {
+            "stop_price": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "per_unit_risk": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "total_initial_risk": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "currency": {
+              "type": "string"
+            },
+            "formula": {
+              "type": "string"
+            },
+            "assumptions": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "currency",
+            "formula",
+            "assumptions"
+          ],
+          "additionalProperties": false
+        },
+        "variant_results": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "trigger_event": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "modeled_fill_price": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "quantity_filled": {
+                "type": "number"
+              },
+              "quantity_remaining": {
+                "type": "number"
+              },
+              "gross_pnl": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "estimated_cost": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "net_pnl": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "currency": {
+                "type": "string"
+              },
+              "ambiguous_path": {
+                "type": "boolean"
+              },
+              "limitations": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "name",
+              "quantity_filled",
+              "quantity_remaining",
+              "currency",
+              "ambiguous_path",
+              "limitations"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "intrabar_ambiguities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "owner_handoffs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "status",
+        "unit_risk",
+        "variant_results",
+        "intrabar_ambiguities",
+        "gaps",
+        "owner_handoffs"
+      ],
+      "additionalProperties": false
+    },
+    "state": {
+      "type": "object",
+      "description": "Progress in native session and approved Program Ledger, no JSON runtime sidecar.",
+      "properties": {
+        "status": {
+          "enum": [
+            "in_progress",
+            "completed",
+            "needs_input",
+            "blocked"
+          ]
+        },
+        "open_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,0 +1,162 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:linkskills:trading-fx-carry-strategy:0.1.0",
+  "title": "FX carry research",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pair",
+        "quote_convention",
+        "as_of",
+        "spot",
+        "forward",
+        "tenor_days",
+        "implied_vol_pct",
+        "data_source"
+      ],
+      "properties": {
+        "pair": {
+          "type": "string"
+        },
+        "quote_convention": {
+          "type": "string"
+        },
+        "as_of": {
+          "type": "string",
+          "format": "date"
+        },
+        "spot": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "forward": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "tenor_days": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "implied_vol_pct": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "data_source": {
+          "type": "string"
+        },
+        "rate_differential_pct": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "carry_convention": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "historical_vol_pct": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "event_risks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "completion_status",
+        "pair",
+        "as_of",
+        "calculation_basis",
+        "metrics",
+        "countercase",
+        "limitations",
+        "missing_inputs"
+      ],
+      "properties": {
+        "completion_status": {
+          "enum": [
+            "complete",
+            "partial",
+            "insufficient_input"
+          ]
+        },
+        "pair": {
+          "type": "string"
+        },
+        "as_of": {
+          "type": "string",
+          "format": "date"
+        },
+        "calculation_basis": {
+          "type": "string"
+        },
+        "metrics": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "value",
+              "unit"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "value": {
+                "type": [
+                  "number",
+                  "string",
+                  "null"
+                ]
+              },
+              "unit": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "countercase": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "missing_inputs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "advisory_recommendation": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "schema_version": "0.1",
+  "suite_id": "trading-position-sizing-eval-draft",
+  "skill_id": "trading-position-sizing",
+  "suite_version": "0.1.0",
+  "rubric": [
+    {
+      "dimension": "task_method",
+      "weight": 0.4
+    },
+    {
+      "dimension": "units_and_traceability",
+      "weight": 0.35
+    },
+    {
+      "dimension": "scope_uncertainty_owner_boundaries",
+      "weight": 0.25
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "wrong-way-stop",
+      "case_type": "adversarial",
+      "input": "Long entry 100 stop 110.",
+      "expected": {
+        "criteria": [
+          "Reject side mismatch; do not abs() distance."
+        ]
+      }
+    },
+    {
+      "case_id": "fx-missing",
+      "case_type": "adversarial",
+      "input": "GBP contract but NAV is USD and FX unavailable.",
+      "expected": {
+        "criteria": [
+          "Leave converted risk/size unresolved; no silent 1:1."
+        ]
+      }
+    },
+    {
+      "case_id": "round-up",
+      "case_type": "adversarial",
+      "input": "Raw size 9.7, lot step 1, budget 100.",
+      "expected": {
+        "criteria": [
+          "Round down to 9, recompute risk and constraints."
+        ]
+      }
+    }
+  ],
+  "evidence_policy": {
+    "retain": [
+      "fixture_input",
+      "expected_behavior"
+    ],
+    "redact": [
+      "secrets",
+      "private_data",
+      "raw_transactions_unless_authorized"
+    ]
+  },
+  "skill_version_range": ">=0.1.0",
+  "pass_threshold": 0.85
+}

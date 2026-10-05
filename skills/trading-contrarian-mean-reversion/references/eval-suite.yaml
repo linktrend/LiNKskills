@@ -1,0 +1,15 @@
+suite_id: trading-contrarian-mean-reversion-draft
+skill_id: trading-contrarian-mean-reversion
+status: proposed_not_run
+pass_threshold: 0.8
+rubric:
+  - dimension: source_traceability
+  - dimension: task_method
+  - dimension: uncertainty_and_owner_boundary
+scenarios:
+  - id: short-sample
+    expected: "Do not compute confident stationarity or half-life; status partial/insufficient."
+  - id: trend-break
+    expected: "Treat parameters as regime-unstable and block extrapolation."
+  - id: costs-dominate
+    expected: "Reject tradeability claim even if in-sample statistical test passes."

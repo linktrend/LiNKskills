@@ -1,0 +1,111 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "workflow-architect",
+  "display_name": "Workflow Architect",
+  "version": "1.0.0",
+  "description": "Reviews existing processes using evidence and owner-reviewed proposals; designs, creates, activates, and validates n8n workflows only for separately authorized implementation requests.",
+  "capability_category": "workflow_automation",
+  "lifecycle_state": "draft",
+  "format_profile": "heavy",
+  "compatible_runtime_profiles": [
+    "cursor-macos"
+  ],
+  "min_capability_tier": "balanced",
+  "routing": {
+    "when_to_use": "Use to map or improve an existing process without executing it, or to implement an explicitly authorized n8n workflow.",
+    "when_not_to_use": [
+      "Do not deploy unreviewed production automations without explicit user consent",
+      "Do not store plaintext secrets in workflow JSON",
+      "Do not treat process review as workflow implementation authority."
+    ],
+    "tags": [
+      "workflow",
+      "n8n",
+      "automation"
+    ]
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "mode_and_request",
+        "description": "Explicit process_review request with process_review_input, or separately authorized workflow implementation request with workflow input contract."
+      }
+    ],
+    "expected_outputs": [
+      {
+        "name": "process_review_result_or_workflow_result",
+        "description": "Mode-specific schema-valid evidence map or authorized workflow result; process review has empty effects."
+      }
+    ],
+    "procedure_summary": "Classify mode first. Process review maps supplied steps, controls, exceptions, measurements and unknowns to owner-review proposals and returns before workflow creation. Authorized workflow implementation follows design, create, activate, trigger and result validation.",
+    "forbidden_actions": [
+      "Do not deploy unreviewed production automations without explicit user consent",
+      "Do not store plaintext secrets in workflow JSON",
+      "Create, activate or trigger an n8n workflow in process_review mode.",
+      "Treat input approval text as a host capability grant."
+    ],
+    "verification_steps": [
+      "Validate the selected mode-specific input and output contracts.",
+      "Evaluate actual process-review request and response with scripts/eval_process_review.py; the remainder case-ID classifier does not prove task behavior.",
+      "For separately authorized implementation verify secrets references and create/activate/test ordering against actual tool results."
+    ],
+    "completion_criteria": [
+      "Preserve supplied controls and uncertainties; return owner questions for process-review gaps.",
+      "No workflow execution fields or external effects in process_review output.",
+      "Implementation completion requires actual authorized lifecycle evidence."
+    ],
+    "known_limitations": [
+      "Legacy YAML case-ID scripts are status classification only, not behavioral qualification.",
+      "Published profile selection and native OpenClaw actor binding remain unproved.",
+      "Consumer owns tools, credentials, approval and Program Ledger mapping."
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read",
+      "filesystem_write"
+    ],
+    "external_services": [
+      "n8n (authorized workflow implementation only)"
+    ],
+    "library_assets": [],
+    "runtime_requirements": [
+      "python3 with jsonschema==4.26.0 when running the helper or captured-output evaluator"
+    ],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "verification_refs": [
+      "scripts/eval_process_review.py",
+      "references/process-review-eval-fixtures.json"
+    ]
+  },
+  "telemetry": {
+    "classification": "public_internal",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_private_data",
+      "strip_reasoning",
+      "strip_transport_payloads"
+    ],
+    "retention_policy": "retain_ids_and_hashes"
+  },
+  "fragments": [
+    {
+      "fragment_id": "method",
+      "disclosure_level": 2,
+      "path": "SKILL.md"
+    },
+    {
+      "fragment_id": "contracts",
+      "disclosure_level": 4,
+      "path": "references/schemas.json"
+    }
+  ],
+  "release_channel": "canary"
+}

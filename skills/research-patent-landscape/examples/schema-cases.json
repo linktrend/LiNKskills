@@ -1,0 +1,32 @@
+{
+  "status": "schema_fixture_only_not_behavioral_evaluation",
+  "valid_case": {
+    "schema_ref": "references/schemas.json#/definitions/input",
+    "input": {
+      "invention_or_identifier": "fictional modular sensor interface",
+      "purpose": "landscape",
+      "jurisdictions": [
+        "US"
+      ],
+      "as_of": "2026-10-05",
+      "known_art": [
+        "FIC-PAT-1"
+      ],
+      "public_source_boundary": "user-supplied fictional documents"
+    },
+    "expected": "accept by JSON Schema"
+  },
+  "invalid_case": {
+    "schema_ref": "references/schemas.json#/definitions/input",
+    "input": {
+      "invention_or_identifier": "fictional-input",
+      "purpose": "fictional-input",
+      "jurisdictions": [],
+      "as_of": "fictional-input",
+      "known_art": [],
+      "public_source_boundary": "fictional-input",
+      "unapproved_extra_field": "reject"
+    },
+    "expected": "reject unknown additional property"
+  }
+}

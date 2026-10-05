@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:linkskills:trading-parabolic-short-strategy:0.1.0",
+  "title": "Parabolic short setup research",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "request_id",
+        "symbol",
+        "venue",
+        "as_of",
+        "calendar",
+        "source_snapshot",
+        "bars",
+        "parameters",
+        "constraints"
+      ],
+      "properties": {
+        "request_id": {
+          "type": "string"
+        },
+        "symbol": {
+          "type": "string"
+        },
+        "venue": {
+          "type": "string"
+        },
+        "as_of": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "calendar": {
+          "type": "string"
+        },
+        "source_snapshot": {
+          "type": "string"
+        },
+        "bars": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "timestamp",
+              "open",
+              "high",
+              "low",
+              "close",
+              "volume",
+              "unit",
+              "source_row"
+            ],
+            "properties": {
+              "timestamp": {
+                "type": "string"
+              },
+              "open": {
+                "type": "number"
+              },
+              "high": {
+                "type": "number"
+              },
+              "low": {
+                "type": "number"
+              },
+              "close": {
+                "type": "number"
+              },
+              "volume": {
+                "type": "number"
+              },
+              "unit": {
+                "type": "string"
+              },
+              "source_row": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "parameters": {
+          "type": "object"
+        },
+        "constraints": {
+          "type": "object"
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "request_id",
+        "status",
+        "symbol",
+        "observed_factors",
+        "risk_flags",
+        "unresolved_gates",
+        "classification",
+        "gaps",
+        "advisory_only"
+      ],
+      "properties": {
+        "request_id": {
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "complete",
+            "partial",
+            "needs_input",
+            "blocked"
+          ]
+        },
+        "symbol": {
+          "type": "string"
+        },
+        "observed_factors": {
+          "type": "array"
+        },
+        "risk_flags": {
+          "type": "array"
+        },
+        "unresolved_gates": {
+          "type": "array"
+        },
+        "classification": {
+          "enum": [
+            "watch",
+            "reject",
+            "insufficient_data"
+          ]
+        },
+        "gaps": {
+          "type": "array"
+        },
+        "advisory_only": {
+          "const": true
+        }
+      }
+    }
+  }
+}

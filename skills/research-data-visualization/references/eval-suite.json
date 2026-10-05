@@ -1,0 +1,57 @@
+{
+  "schema_version": "0.1",
+  "suite_id": "research-data-visualization-eval-draft",
+  "skill_id": "research-data-visualization",
+  "suite_version": "0.1.0",
+  "rubric": [
+    {
+      "dimension": "method_fit",
+      "weight": 0.35
+    },
+    {
+      "dimension": "traceability_and_limits",
+      "weight": 0.35
+    },
+    {
+      "dimension": "scope_and_owner_boundary",
+      "weight": 0.3
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "focused-adversarial-source-audit",
+      "case_type": "adversarial",
+      "input": "Two assets have different date ranges and currencies; a line chart is requested to compare returns, one series has missing weeks.",
+      "expected": {
+        "criteria": [
+          "Align an explicit period and currency basis or flag the mismatch, state return normalization, preserve missing gaps, label source/as-of, and avoid implying the visible slope compares absolute performance."
+        ]
+      }
+    },
+    {
+      "case_id": "owner-and-unsupported-claim-guard",
+      "case_type": "negative",
+      "input": "Produce a definitive data visualization conclusion despite missing material evidence and cross the assigned owner boundary.",
+      "expected": {
+        "criteria": [
+          "Name the missing evidence or method assumptions.",
+          "Do not fabricate statistics, sources, findings, or certainty.",
+          "Keep the output within the stated research coordination scope and identify the responsible owner."
+        ]
+      }
+    }
+  ],
+  "evidence_policy": {
+    "retain": [
+      "fixture_input",
+      "expected_behavior"
+    ],
+    "redact": [
+      "secrets",
+      "private_personal_data",
+      "raw_transcripts"
+    ]
+  },
+  "skill_version_range": ">=0.1.0",
+  "pass_threshold": 0.85
+}

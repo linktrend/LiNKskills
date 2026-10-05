@@ -1,0 +1,97 @@
+{
+  "task": "schema fixture only",
+  "as_of": "2026-10-05T09:00:00Z",
+  "question": "Synthetic schema-shape fixture; no market conclusion.",
+  "source_snapshot": {
+    "refs": [
+      {
+        "source_id": "synthetic-fixture",
+        "as_of": "2026-10-05T09:00:00Z",
+        "provenance": "fictional fixture only",
+        "sha256": null
+      }
+    ],
+    "snapshot_id": "fictional-fixture",
+    "version": "fictional-fixture",
+    "notes": []
+  },
+  "reporting_currency": "USD",
+  "task_context": {
+    "ledger_snapshot": {
+      "version": "strategy-v1",
+      "as_of": "2026-10-05T09:00:00Z",
+      "currency": "USD",
+      "source_ref": "fictional-fixture"
+    },
+    "baseline_window": {
+      "start": "2026-09-01T00:00:00Z",
+      "end": "2026-09-30T23:59:59Z",
+      "population_id": "universe-v1",
+      "feature_version": "f1",
+      "sample_count": 100
+    },
+    "current_window": {
+      "start": "2026-10-01T00:00:00Z",
+      "end": "2026-10-05T09:00:00Z",
+      "population_id": "universe-v1",
+      "feature_version": "f1",
+      "sample_count": 100
+    },
+    "metrics": [
+      {
+        "category": "input",
+        "name": "PSI",
+        "baseline_value": 0,
+        "current_value": 0.24,
+        "unit": "dimensionless PSI",
+        "denominator": "frozen reference bin counts",
+        "baseline_n": 100,
+        "current_n": 100,
+        "out_of_range_n": 30,
+        "frozen_bins_ref": "frozen-bins-v1",
+        "threshold_ref": null,
+        "source_ref": "synthetic-fixture",
+        "unit_kind": "dimensionless"
+      }
+    ],
+    "equity_path": [
+      {
+        "timestamp": "2026-10-01T00:00:00Z",
+        "equity": 100,
+        "currency": "USD",
+        "external_flow": 0,
+        "source_ref": "synthetic-fixture"
+      },
+      {
+        "timestamp": "2026-10-02T00:00:00Z",
+        "equity": 90,
+        "currency": "USD",
+        "external_flow": 0,
+        "source_ref": "synthetic-fixture"
+      },
+      {
+        "timestamp": "2026-10-03T00:00:00Z",
+        "equity": 100,
+        "currency": "USD",
+        "external_flow": 0,
+        "source_ref": "synthetic-fixture"
+      }
+    ],
+    "readiness": [
+      {
+        "control": "rollback",
+        "status": "missing",
+        "artifact_ref": null,
+        "owner": "Eric",
+        "as_of": "2026-10-05T09:00:00Z",
+        "follow_up": "Provide exact-version rollback evidence."
+      }
+    ],
+    "approved_policy": {
+      "policy_ref": null,
+      "effective_from": null,
+      "effective_to": null,
+      "limits": []
+    }
+  }
+}

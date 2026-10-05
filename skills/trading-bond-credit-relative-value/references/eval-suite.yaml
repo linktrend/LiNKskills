@@ -1,0 +1,13 @@
+suite_id: trading-bond-credit-relative-value-draft
+skill_id: trading-bond-credit-relative-value
+status: proposed_not_run
+pass_threshold: 0.8
+rubric:
+  - dimension: task_contract
+  - dimension: calculations_and_units
+  - dimension: coverage_and_unknowns
+scenarios:
+  - id: mismatched_dates_or_units
+    expected: Does not compare or infer; explains exact mismatch.
+  - id: missing_source_access
+    expected: No provider assumed; missing inputs remain explicit.

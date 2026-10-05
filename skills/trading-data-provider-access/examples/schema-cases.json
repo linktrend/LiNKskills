@@ -1,0 +1,33 @@
+{
+  "schema_ref": "references/schemas.json#/definitions/input",
+  "status": "schema_fixture_only_not_behavioral_evaluation",
+  "valid_case": {
+    "input": {
+      "data_need": {},
+      "assets": [],
+      "fields": [],
+      "time_range": "fictional-input",
+      "freshness_target": "fictional-input",
+      "existing_interface_ref": "fictional-input",
+      "candidate_docs": [],
+      "reuse_constraints": [],
+      "as_of": "fictional-input"
+    },
+    "expected": "accept by JSON Schema"
+  },
+  "invalid_case": {
+    "input": {
+      "data_need": {},
+      "assets": [],
+      "fields": [],
+      "time_range": "fictional-input",
+      "freshness_target": "fictional-input",
+      "existing_interface_ref": "fictional-input",
+      "candidate_docs": [],
+      "reuse_constraints": [],
+      "as_of": "fictional-input",
+      "unexpected_field": "must be rejected"
+    },
+    "expected": "reject additionalProperties"
+  }
+}

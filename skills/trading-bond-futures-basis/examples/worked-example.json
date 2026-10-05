@@ -1,0 +1,39 @@
+{
+  "fictional_fixture": true,
+  "notice": "All names, dates, prices, rates, and quantities are fictional; example shows arithmetic/schema only.",
+  "input": {
+    "contract": "FICTIONAL-TREASURY-SEP",
+    "as_of": "2026-09-30",
+    "future_price": 112.0,
+    "ctd_identifier": "FIC-BOND-01",
+    "ctd_clean_price": 110.5,
+    "conversion_factor": 0.95,
+    "price_unit": "fictional points per 100 par",
+    "data_source": "fictional user-supplied sheet",
+    "accrued_interest": null,
+    "coupon_cashflows": [],
+    "repo_rate_pct": null,
+    "delivery_dates": []
+  },
+  "output": {
+    "completion_status": "partial",
+    "contract": "FICTIONAL-TREASURY-SEP",
+    "as_of": "2026-09-30",
+    "ctd_check": "User-supplied CTD identifier retained; delivery basket not supplied, so cheapest status is unverified.",
+    "metrics": [
+      {
+        "name": "gross_basis",
+        "value": 4.1,
+        "unit": "fictional points per 100 par; clean-price approximation = 110.5 - 112.0*0.95"
+      }
+    ],
+    "limitations": [
+      "Fictional values; clean-price calculation only. This is not net basis or implied repo."
+    ],
+    "missing_inputs": [
+      "Full delivery basket and conversion factors",
+      "Accrued interest and coupon dates",
+      "Financing/repo and delivery window conventions"
+    ]
+  }
+}

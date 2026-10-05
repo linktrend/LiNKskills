@@ -1,0 +1,51 @@
+{
+  "fictional_fixture": true,
+  "notice": "All names, dates, prices, rates, and quantities are fictional; example shows arithmetic/schema only.",
+  "input": {
+    "pair": "FIC-EUR/USD",
+    "quote_convention": "USD per EUR; forward and spot same convention",
+    "as_of": "2026-09-30",
+    "spot": 1.04,
+    "forward": 1.05,
+    "tenor_days": 90,
+    "implied_vol_pct": 8.0,
+    "data_source": "fictional user-provided quote sheet",
+    "rate_differential_pct": null,
+    "carry_convention": "simple (F/S - 1) * 360 / days; illustrative only",
+    "historical_vol_pct": null,
+    "event_risks": [
+      "fictional central bank meeting"
+    ]
+  },
+  "output": {
+    "completion_status": "partial",
+    "pair": "FIC-EUR/USD",
+    "as_of": "2026-09-30",
+    "calculation_basis": "Fictional simple forward premium: (1.05/1.04 - 1) * 360/90; not convention-validated FX carry.",
+    "metrics": [
+      {
+        "name": "annualized_forward_premium_approx",
+        "value": 4.3269,
+        "unit": "fictional percent per year"
+      },
+      {
+        "name": "carry_to_implied_vol_approx",
+        "value": 0.5409,
+        "unit": "ratio"
+      }
+    ],
+    "countercase": [
+      "A forward premium is not a guaranteed realized return; spot moves can dominate it."
+    ],
+    "limitations": [
+      "Fictional values; no collateral, cross-currency basis, transaction cost, funding or path-risk inputs.",
+      "No LSEG/LLMQuant provider contract or tool output used."
+    ],
+    "missing_inputs": [
+      "Day-count/collateral convention validation",
+      "Bid-ask and transaction costs",
+      "Dated risk/volatility history"
+    ],
+    "advisory_recommendation": null
+  }
+}

@@ -1,0 +1,141 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:linkskills:trading-etf-exposure-research:0.1.0",
+  "title": "ETF holdings exposure comparison",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "as_of",
+        "funds",
+        "data_source"
+      ],
+      "properties": {
+        "as_of": {
+          "type": "string",
+          "format": "date"
+        },
+        "data_source": {
+          "type": "string"
+        },
+        "funds": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "object",
+            "required": [
+              "ticker",
+              "holdings_as_of",
+              "holdings"
+            ],
+            "properties": {
+              "ticker": {
+                "type": "string"
+              },
+              "holdings_as_of": {
+                "type": "string",
+                "format": "date"
+              },
+              "coverage_status": {
+                "enum": [
+                  "complete",
+                  "partial",
+                  "unknown"
+                ]
+              },
+              "holdings": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "security_id",
+                    "weight_pct"
+                  ],
+                  "properties": {
+                    "security_id": {
+                      "type": "string"
+                    },
+                    "weight_pct": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 100
+                    },
+                    "sector": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "country": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "completion_status",
+        "as_of",
+        "funds",
+        "common_rows",
+        "overlap_metrics",
+        "limitations",
+        "missing_inputs"
+      ],
+      "properties": {
+        "completion_status": {
+          "enum": [
+            "complete",
+            "partial",
+            "insufficient_input"
+          ]
+        },
+        "as_of": {
+          "type": "string",
+          "format": "date"
+        },
+        "funds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "common_rows": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "overlap_metrics": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "missing_inputs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

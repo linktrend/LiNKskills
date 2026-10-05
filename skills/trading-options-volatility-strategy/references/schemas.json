@@ -1,0 +1,426 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:linkskills:trading-options-volatility-strategy:0.1.0",
+  "title": "trading-options-volatility-strategy research contract",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "properties": {
+        "request_id": {
+          "type": "string"
+        },
+        "as_of": {
+          "type": "string"
+        },
+        "underlying": {
+          "type": "object",
+          "properties": {
+            "symbol": {
+              "type": "string"
+            },
+            "spot": {
+              "type": "number"
+            },
+            "currency": {
+              "type": "string"
+            },
+            "source_id": {
+              "type": "string"
+            },
+            "as_of": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "symbol",
+            "spot",
+            "currency",
+            "source_id",
+            "as_of"
+          ],
+          "additionalProperties": false
+        },
+        "contracts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "option_type": {
+                "type": "string",
+                "enum": [
+                  "call",
+                  "put"
+                ]
+              },
+              "side": {
+                "type": "string",
+                "enum": [
+                  "long",
+                  "short"
+                ]
+              },
+              "quantity": {
+                "type": "integer"
+              },
+              "multiplier": {
+                "type": "integer"
+              },
+              "deliverable": {
+                "type": "string"
+              },
+              "exercise_style": {
+                "type": "string"
+              },
+              "settlement": {
+                "type": "string"
+              },
+              "strike": {
+                "type": "integer"
+              },
+              "expiry": {
+                "type": "string"
+              },
+              "entry_price_per_share": {
+                "type": "number"
+              },
+              "quote": {
+                "type": "object",
+                "properties": {
+                  "bid": {
+                    "type": "number"
+                  },
+                  "ask": {
+                    "type": "number"
+                  },
+                  "as_of": {
+                    "type": "string"
+                  },
+                  "source_id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "bid",
+                  "ask",
+                  "as_of",
+                  "source_id"
+                ],
+                "additionalProperties": false
+              },
+              "implied_volatility": {
+                "type": "number"
+              },
+              "iv_unit": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "option_type",
+              "side",
+              "quantity",
+              "multiplier",
+              "deliverable",
+              "exercise_style",
+              "settlement",
+              "strike",
+              "expiry",
+              "entry_price_per_share",
+              "quote",
+              "implied_volatility",
+              "iv_unit"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "rates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "tenor_days": {
+                "type": "integer"
+              },
+              "rate": {
+                "type": "number"
+              },
+              "unit": {
+                "type": "string"
+              },
+              "source_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "tenor_days",
+              "rate",
+              "unit",
+              "source_id"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "dividends": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ex_date": {
+                "type": "string"
+              },
+              "amount_per_share": {
+                "type": "number"
+              },
+              "source_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "ex_date",
+              "amount_per_share",
+              "source_id"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "scenarios": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "spot_shock_pct": {
+                "type": "number"
+              },
+              "iv_shock_points": {
+                "type": "integer"
+              },
+              "days_elapsed": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "spot_shock_pct",
+              "iv_shock_points",
+              "days_elapsed"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "controls": {
+          "type": "object",
+          "properties": {
+            "probability_request": {
+              "type": [
+                "string",
+                "number",
+                "boolean",
+                "object",
+                "array",
+                "null"
+              ]
+            },
+            "account_constraints": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "probability_request",
+            "account_constraints"
+          ],
+          "additionalProperties": false
+        },
+        "source_ledger": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "source_id": {
+                "type": "string"
+              },
+              "kind": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "published_at": {
+                "type": "string"
+              },
+              "retrieved_at": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "source_id",
+              "kind",
+              "url",
+              "published_at",
+              "retrieved_at"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "request_id",
+        "as_of",
+        "underlying",
+        "contracts",
+        "rates",
+        "dividends",
+        "scenarios",
+        "controls",
+        "source_ledger"
+      ],
+      "additionalProperties": false
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "request_id": {
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "complete",
+            "partial",
+            "insufficient_input",
+            "no_view"
+          ]
+        },
+        "as_of": {
+          "type": "string"
+        },
+        "strategy": {
+          "type": "string"
+        },
+        "legs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "option_type": {
+                "type": "string"
+              },
+              "side": {
+                "type": "string"
+              },
+              "quantity": {
+                "type": "integer"
+              },
+              "multiplier": {
+                "type": "integer"
+              },
+              "expiry": {
+                "type": "string"
+              },
+              "strike": {
+                "type": "integer"
+              },
+              "entry_price_per_share": {
+                "type": "number"
+              },
+              "expiry_payoff_formula": {
+                "type": "string"
+              },
+              "break_even_at_expiry": {
+                "type": "number"
+              },
+              "max_loss_usd": {
+                "type": "integer"
+              },
+              "max_gain": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "option_type",
+              "side",
+              "quantity",
+              "multiplier",
+              "expiry",
+              "strike",
+              "entry_price_per_share",
+              "expiry_payoff_formula",
+              "break_even_at_expiry",
+              "max_loss_usd",
+              "max_gain"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "greeks": {
+          "type": "object",
+          "properties": {
+            "available": {
+              "type": "boolean"
+            },
+            "reason": {
+              "type": "string"
+            },
+            "units_required": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "available",
+            "reason",
+            "units_required"
+          ],
+          "additionalProperties": false
+        },
+        "scenario_pnl": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "probability_of_profit": {
+          "type": [
+            "string",
+            "number",
+            "boolean",
+            "object",
+            "array",
+            "null"
+          ]
+        },
+        "surface_summary": {
+          "type": [
+            "string",
+            "number",
+            "boolean",
+            "object",
+            "array",
+            "null"
+          ]
+        },
+        "risks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "advisory": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "request_id",
+        "status",
+        "as_of",
+        "strategy",
+        "legs",
+        "greeks",
+        "scenario_pnl",
+        "probability_of_profit",
+        "surface_summary",
+        "risks",
+        "advisory"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

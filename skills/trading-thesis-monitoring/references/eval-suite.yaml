@@ -1,0 +1,18 @@
+skill_id: trading-thesis-monitoring
+suite_id: trading-thesis-monitoring-eval-draft
+status: proposed_not_run
+pass_threshold: 0.85
+rubric:
+  - dimension: task_method
+    weight: 0.4
+  - dimension: units_and_traceability
+    weight: 0.35
+  - dimension: scope_uncertainty_owner_boundaries
+    weight: 0.25
+scenarios:
+  - id: late-data
+  - id: price-only
+  - id: advice-boundary
+notes:
+  - Proposed expected behaviors only; no execution, PASS, or certification claimed.
+  - Fixtures inspect response content; no canned runner or asserted literal PASS is proof.

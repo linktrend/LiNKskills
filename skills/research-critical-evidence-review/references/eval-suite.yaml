@@ -1,0 +1,20 @@
+# Draft evaluation fixtures; expected behavior only, not a result.
+skill_id: research-critical-evidence-review
+suite_id: research-critical-evidence-review-eval-draft
+pass_threshold: 0.85
+rubric:
+  - dimension: task_method_fit
+    weight: 0.35
+  - dimension: evidence_traceability_and_limits
+    weight: 0.35
+  - dimension: scope_and_owner_boundary
+    weight: 0.30
+scenarios:
+  - id: focused-adversarial-source-audit
+    kind: adversarial
+    input: "An observational single-center study reports a correlation and claims that an intervention caused a large outcome change; confounding variables and the comparison group are unclear."
+    expected: "Classify the result as observational association, identify comparator/confounding and generalizability gaps, avoid endorsing causality or assigning a fabricated certainty score, and state what additional evidence would materially strengthen the claim."
+  - id: owner-and-unsupported-claim-guard
+    kind: negative
+    input: "Produce a definitive critical evidence review conclusion despite missing material evidence and cross the assigned owner boundary."
+    expected: "Name evidence gaps, do not fabricate findings, and preserve the owner boundary."

@@ -1,0 +1,349 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:linkskills:trading-growth-equity-screening:0.1.0",
+  "title": "trading-growth-equity-screening research contract",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "properties": {
+        "request_id": {
+          "type": "string"
+        },
+        "variant": {
+          "type": "string",
+          "enum": [
+            "canslim",
+            "garp",
+            "finviz_candidate_filter"
+          ]
+        },
+        "scope_kind": {
+          "type": "string",
+          "enum": [
+            "named_list",
+            "bounded_universe",
+            "full_universe"
+          ]
+        },
+        "universe": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "as_of_date": {
+          "type": "string"
+        },
+        "horizon_years": {
+          "type": "integer"
+        },
+        "objective": {
+          "type": "string"
+        },
+        "price": {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": "integer"
+            },
+            "currency": {
+              "type": "string"
+            },
+            "as_of": {
+              "type": "string"
+            },
+            "source_id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "value",
+            "currency",
+            "as_of",
+            "source_id"
+          ],
+          "additionalProperties": false
+        },
+        "observations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "metric": {
+                "type": "string"
+              },
+              "value": {
+                "type": "number"
+              },
+              "unit": {
+                "type": "string"
+              },
+              "period": {
+                "type": "string"
+              },
+              "published_at": {
+                "type": "string"
+              },
+              "source_id": {
+                "type": "string"
+              },
+              "basis": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "metric",
+              "value",
+              "unit",
+              "period",
+              "published_at",
+              "source_id",
+              "basis"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "source_ledger": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "source_id": {
+                "type": "string"
+              },
+              "kind": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "published_at": {
+                "type": "string"
+              },
+              "retrieved_at": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "source_id",
+              "kind",
+              "url",
+              "published_at",
+              "retrieved_at"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "criteria": {
+          "type": "object",
+          "properties": {
+            "candidate_cap": {
+              "type": "integer"
+            },
+            "min_addv_usd": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "candidate_cap",
+            "min_addv_usd"
+          ],
+          "additionalProperties": false
+        },
+        "controls": {
+          "type": "object",
+          "properties": {
+            "requested_scope_complete": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "requested_scope_complete"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "request_id",
+        "variant",
+        "scope_kind",
+        "universe",
+        "as_of_date",
+        "horizon_years",
+        "objective",
+        "price",
+        "observations",
+        "source_ledger",
+        "criteria",
+        "controls"
+      ],
+      "additionalProperties": false
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "request_id": {
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "complete",
+            "partial",
+            "insufficient_input",
+            "no_view"
+          ]
+        },
+        "scope_statement": {
+          "type": "string"
+        },
+        "variant": {
+          "type": "string",
+          "enum": [
+            "canslim",
+            "garp",
+            "finviz_candidate_filter"
+          ]
+        },
+        "as_of_date": {
+          "type": "string"
+        },
+        "universe_audit": {
+          "type": "object",
+          "properties": {
+            "requested_count": {
+              "type": "integer"
+            },
+            "evaluated_count": {
+              "type": "integer"
+            },
+            "omitted_count": {
+              "type": "integer"
+            },
+            "coverage": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "requested_count",
+            "evaluated_count",
+            "omitted_count",
+            "coverage"
+          ],
+          "additionalProperties": false
+        },
+        "candidates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "symbol": {
+                "type": "string"
+              },
+              "decision": {
+                "type": "string"
+              },
+              "selection_lane": {
+                "type": "string"
+              },
+              "metrics": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "metric": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "number"
+                    },
+                    "unit": {
+                      "type": "string"
+                    },
+                    "period": {
+                      "type": "string"
+                    },
+                    "source_ids": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "status": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "metric",
+                    "value",
+                    "unit",
+                    "period",
+                    "source_ids",
+                    "status"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "thesis": {
+                "type": "string"
+              },
+              "countercase": {
+                "type": "string"
+              },
+              "risks": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "next_evidence": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "symbol",
+              "decision",
+              "selection_lane",
+              "metrics",
+              "thesis",
+              "countercase",
+              "risks",
+              "next_evidence"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "excluded_or_unavailable": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "assumptions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "research_view": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "request_id",
+        "status",
+        "scope_statement",
+        "variant",
+        "as_of_date",
+        "universe_audit",
+        "candidates",
+        "excluded_or_unavailable",
+        "assumptions",
+        "research_view"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,0 +1,200 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "research-grant-opportunities task contract draft",
+  "type": "object",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "properties": {
+        "project_summary": {
+          "type": "string"
+        },
+        "applicant_stage": {
+          "type": "string"
+        },
+        "institution": {
+          "type": "string"
+        },
+        "geography": {
+          "type": "string"
+        },
+        "funder_scope": {
+          "type": "string"
+        },
+        "project_maturity": {
+          "type": "string"
+        },
+        "preliminary_evidence": {
+          "type": "string"
+        },
+        "budget_scope": {
+          "type": "string"
+        },
+        "submission_timing": {
+          "type": "string"
+        },
+        "named_opportunity": {
+          "type": [
+            "string",
+            "number",
+            "object",
+            "array",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "project_summary",
+        "applicant_stage",
+        "institution",
+        "geography",
+        "funder_scope",
+        "project_maturity",
+        "preliminary_evidence",
+        "budget_scope",
+        "submission_timing",
+        "named_opportunity"
+      ],
+      "additionalProperties": false,
+      "title": "Task-specific input"
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "opportunity_table": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "opportunity_id": {
+                "type": "string"
+              },
+              "official_source": {
+                "type": "string"
+              },
+              "source_checked_on": {
+                "type": "string"
+              },
+              "eligibility": {
+                "type": "string"
+              },
+              "mechanism": {
+                "type": "string"
+              },
+              "scope_fit": {
+                "type": "string"
+              },
+              "deadline": {
+                "type": "string"
+              },
+              "budget_period": {
+                "type": "string"
+              },
+              "fit_evidence": {
+                "type": "string"
+              },
+              "open_questions": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "opportunity_id",
+              "official_source",
+              "source_checked_on",
+              "eligibility",
+              "mechanism",
+              "scope_fit",
+              "deadline",
+              "budget_period",
+              "fit_evidence",
+              "open_questions"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "nih_evidence": {
+          "type": "object",
+          "properties": {
+            "institute": {
+              "type": "string"
+            },
+            "study_section": {
+              "type": "string"
+            },
+            "reporter_comparison": {
+              "type": "string"
+            },
+            "nosi": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "institute",
+            "study_section",
+            "reporter_comparison",
+            "nosi"
+          ],
+          "additionalProperties": false
+        },
+        "proposal_evidence_outline": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "next_steps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "status",
+        "opportunity_table",
+        "nih_evidence",
+        "proposal_evidence_outline",
+        "next_steps",
+        "limitations"
+      ],
+      "additionalProperties": false,
+      "title": "Task-specific result"
+    },
+    "state": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "in_progress",
+            "completed",
+            "needs_input",
+            "blocked"
+          ]
+        },
+        "open_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

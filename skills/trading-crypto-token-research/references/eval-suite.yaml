@@ -1,0 +1,15 @@
+suite_id: trading-crypto-token-research-draft
+skill_id: trading-crypto-token-research
+status: proposed_not_run
+pass_threshold: 0.8
+rubric:
+  - dimension: task_method
+  - dimension: units_denominators_and_traceability
+  - dimension: coverage_uncertainty
+scenarios:
+  - id: ticker_only
+    expected: Needs canonical network and asset identity.
+  - id: partial_holders
+    expected: Restricts claims to observed sample and denominator.
+  - id: unverified_program
+    expected: Blocks mechanics branch without exact version and authoritative fixture.

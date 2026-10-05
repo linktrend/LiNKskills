@@ -1,0 +1,136 @@
+{
+  "input": {
+    "request_id": "GE-2026-10-05-01",
+    "variant": "garp",
+    "scope_kind": "named_list",
+    "universe": [
+      "FICT"
+    ],
+    "as_of_date": "2026-10-05",
+    "horizon_years": 3,
+    "objective": "compound EPS or FCF per share without multiple expansion",
+    "price": {
+      "value": 50,
+      "currency": "USD",
+      "as_of": "2026-10-02T20:00:00Z",
+      "source_id": "S1"
+    },
+    "observations": [
+      {
+        "metric": "revenue_growth_yoy",
+        "value": 0.14,
+        "unit": "ratio",
+        "period": "FY2025",
+        "published_at": "2026-02-15T12:00:00Z",
+        "source_id": "S2",
+        "basis": "reported"
+      },
+      {
+        "metric": "diluted_share_cagr_3y",
+        "value": 0.02,
+        "unit": "ratio",
+        "period": "FY2022-FY2025",
+        "published_at": "2026-02-15T12:00:00Z",
+        "source_id": "S2",
+        "basis": "calculated"
+      },
+      {
+        "metric": "fcf_per_share_fy1",
+        "value": 3.0,
+        "unit": "USD/share",
+        "period": "FY1",
+        "published_at": "2026-09-30T12:00:00Z",
+        "source_id": "S3",
+        "basis": "consensus"
+      }
+    ],
+    "source_ledger": [
+      {
+        "source_id": "S1",
+        "kind": "quote",
+        "url": "https://example.invalid/quote",
+        "published_at": "2026-10-02T20:00:00Z",
+        "retrieved_at": "2026-10-05T00:00:00Z"
+      },
+      {
+        "source_id": "S2",
+        "kind": "filing",
+        "url": "https://example.invalid/filing",
+        "published_at": "2026-02-15T12:00:00Z",
+        "retrieved_at": "2026-10-05T00:00:00Z"
+      },
+      {
+        "source_id": "S3",
+        "kind": "estimate",
+        "url": "https://example.invalid/estimate",
+        "published_at": "2026-09-30T12:00:00Z",
+        "retrieved_at": "2026-10-05T00:00:00Z"
+      }
+    ],
+    "criteria": {
+      "candidate_cap": 5,
+      "min_addv_usd": 1000000
+    },
+    "controls": {
+      "requested_scope_complete": false
+    }
+  },
+  "output": {
+    "request_id": "GE-2026-10-05-01",
+    "status": "partial",
+    "scope_statement": "FICT only; no market-wide coverage claim",
+    "variant": "garp",
+    "as_of_date": "2026-10-05",
+    "universe_audit": {
+      "requested_count": 1,
+      "evaluated_count": 1,
+      "omitted_count": 0,
+      "coverage": "named_list"
+    },
+    "candidates": [
+      {
+        "symbol": "FICT",
+        "decision": "conditional_review",
+        "selection_lane": "core_garp",
+        "metrics": [
+          {
+            "metric": "forward_fcf_yield",
+            "value": 0.06,
+            "unit": "ratio",
+            "period": "FY1",
+            "source_ids": [
+              "S1",
+              "S3"
+            ],
+            "status": "calculated"
+          },
+          {
+            "metric": "diluted_share_cagr_3y",
+            "value": 0.02,
+            "unit": "ratio",
+            "period": "FY2022-FY2025",
+            "source_ids": [
+              "S2"
+            ],
+            "status": "reported"
+          }
+        ],
+        "thesis": "Illustrative candidate merits primary-source follow-up; forecast/coverage incomplete.",
+        "countercase": "Forward FCF may be cyclically elevated; no verified margin bridge.",
+        "risks": [
+          "No source-backed year-2/3 bridge",
+          "Coverage is named-list only"
+        ],
+        "next_evidence": [
+          "Latest audited filing and segment margins",
+          "Source-linked diluted-share roll-forward"
+        ]
+      }
+    ],
+    "excluded_or_unavailable": [],
+    "assumptions": [
+      "All example data are fictional placeholders"
+    ],
+    "research_view": "conditional research view only; no order or activation"
+  }
+}

@@ -1,0 +1,148 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "trading-data-preparation",
+  "display_name": "Trading Data Preparation",
+  "version": "0.1.1",
+  "description": "Task-specific draft. Unqualified and unpublished.",
+  "capability_category": "trading_research",
+  "lifecycle_state": "draft",
+  "format_profile": "simple",
+  "compatible_runtime_profiles": [
+    "lisa-openclaw"
+  ],
+  "min_capability_tier": "balanced",
+  "routing": {
+    "when_to_use": "Prepare or specify bars, calendars, futures rolls, schemas or exports from supplied data.",
+    "when_not_to_use": [
+      "Out-of-scope execution, deployment, credentials, or domain-owner determinations."
+    ],
+    "tags": [
+      "trading",
+      "research",
+      "draft"
+    ]
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "asset",
+        "description": "Use task-shaped fields in references/schemas.json."
+      },
+      {
+        "name": "downstream_use",
+        "description": "Use task-shaped fields in references/schemas.json."
+      }
+    ],
+    "expected_outputs": [
+      {
+        "name": "status",
+        "description": "Use task-shaped fields in references/schemas.json; preserve uncertainty and gaps."
+      },
+      {
+        "name": "lineage",
+        "description": "Use task-shaped fields in references/schemas.json; preserve uncertainty and gaps."
+      },
+      {
+        "name": "row_counts",
+        "description": "Use task-shaped fields in references/schemas.json; preserve uncertainty and gaps."
+      },
+      {
+        "name": "coverage",
+        "description": "Use task-shaped fields in references/schemas.json; preserve uncertainty and gaps."
+      },
+      {
+        "name": "bars",
+        "description": "Use task-shaped fields in references/schemas.json; preserve uncertainty and gaps."
+      },
+      {
+        "name": "gaps",
+        "description": "Use task-shaped fields in references/schemas.json; preserve uncertainty and gaps."
+      },
+      {
+        "name": "synthetic_rows",
+        "description": "Use task-shaped fields in references/schemas.json; preserve uncertainty and gaps."
+      },
+      {
+        "name": "rolls",
+        "description": "Use task-shaped fields in references/schemas.json; preserve uncertainty and gaps."
+      },
+      {
+        "name": "units",
+        "description": "Use task-shaped fields in references/schemas.json; preserve uncertainty and gaps."
+      },
+      {
+        "name": "validations",
+        "description": "Use task-shaped fields in references/schemas.json; preserve uncertainty and gaps."
+      },
+      {
+        "name": "limitations",
+        "description": "Use task-shaped fields in references/schemas.json; preserve uncertainty and gaps."
+      }
+    ],
+    "forbidden_actions": [
+      "No order, execution, deployment, provider activation, or owner-policy change.",
+      "No invented data, prices, limits, or confidence.",
+      "No new subscription, API/provider calls or credential use.",
+      "No JSON runtime sidecar."
+    ],
+    "verification_steps": [
+      "Check task units, dates, denominators and source lineage.",
+      "Check method limits, alternatives, uncertainties and owner boundaries."
+    ],
+    "completion_criteria": [
+      "Task-shaped deliverable fields exist or are explicitly missing.",
+      "Advisory proposals are separated from action."
+    ],
+    "known_limitations": [
+      "Draft is unqualified. Proposed fixtures are not run. Native-use validation pending."
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "native_session"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1"
+  },
+  "telemetry": {
+    "classification": "public_internal",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_private_data",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain_only_approved_ids_and_hashes"
+  },
+  "fragments": [
+    {
+      "fragment_id": "method",
+      "disclosure_level": 2,
+      "path": "SKILL.md"
+    },
+    {
+      "fragment_id": "task-contract",
+      "disclosure_level": 4,
+      "path": "references/schemas.json"
+    },
+    {
+      "fragment_id": "source-provenance",
+      "disclosure_level": 4,
+      "path": "references/source-provenance.json"
+    },
+    {
+      "fragment_id": "fictional-example",
+      "disclosure_level": 5,
+      "path": "examples/success-pattern.md"
+    }
+  ],
+  "release_channel": "development"
+}

@@ -1,0 +1,222 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "research-critical-evidence-review task contract draft",
+  "type": "object",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "properties": {
+        "claim": {
+          "type": "string"
+        },
+        "decision": {
+          "type": "string"
+        },
+        "population": {
+          "type": "string"
+        },
+        "comparator": {
+          "type": "string"
+        },
+        "outcome": {
+          "type": "string"
+        },
+        "study_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "design_details": {
+          "type": "string"
+        },
+        "measurement": {
+          "type": "string"
+        },
+        "analysis": {
+          "type": "string"
+        },
+        "as_of": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "claim",
+        "decision",
+        "population",
+        "comparator",
+        "outcome",
+        "study_refs",
+        "design_details",
+        "measurement",
+        "analysis",
+        "as_of"
+      ],
+      "additionalProperties": false,
+      "title": "Task-specific input"
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "claim_evidence_matrix": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "claim": {
+                "type": "string"
+              },
+              "source_id": {
+                "type": "string"
+              },
+              "estimate": {
+                "type": [
+                  "string",
+                  "number",
+                  "object",
+                  "array",
+                  "boolean",
+                  "null"
+                ]
+              },
+              "unit": {
+                "type": "string"
+              },
+              "direction": {
+                "type": "string"
+              },
+              "supports": {
+                "type": "string"
+              },
+              "contradicts": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "claim",
+              "source_id",
+              "estimate",
+              "unit",
+              "direction",
+              "supports",
+              "contradicts"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "design_appraisal": {
+          "type": "object",
+          "properties": {
+            "design": {
+              "type": "string"
+            },
+            "allocation": {
+              "type": "string"
+            },
+            "masking": {
+              "type": "string"
+            },
+            "follow_up": {
+              "type": "string"
+            },
+            "analysis_population": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "design",
+            "allocation",
+            "masking",
+            "follow_up",
+            "analysis_population"
+          ],
+          "additionalProperties": false
+        },
+        "bias_and_validity": {
+          "type": "object",
+          "properties": {
+            "selection": {
+              "type": "string"
+            },
+            "measurement": {
+              "type": "string"
+            },
+            "missing_outcome": {
+              "type": "string"
+            },
+            "confounding": {
+              "type": "string"
+            },
+            "selective_reporting": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "selection",
+            "measurement",
+            "missing_outcome",
+            "confounding",
+            "selective_reporting"
+          ],
+          "additionalProperties": false
+        },
+        "uncertainty_and_alternatives": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "conclusion": {
+          "type": "string"
+        },
+        "evidence_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "causal_limits": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "claim_evidence_matrix",
+        "design_appraisal",
+        "bias_and_validity",
+        "uncertainty_and_alternatives",
+        "conclusion",
+        "evidence_gaps",
+        "causal_limits"
+      ],
+      "additionalProperties": false,
+      "title": "Task-specific result"
+    },
+    "state": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "in_progress",
+            "completed",
+            "needs_input",
+            "blocked"
+          ]
+        },
+        "open_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

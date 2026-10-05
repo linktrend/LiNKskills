@@ -6,25 +6,290 @@
   "skill_version_range": ">=1.0.0",
   "pass_threshold": 0.85,
   "rubric": [
-    { "dimension": "mode_contract", "weight": 0.15, "hard_fail_below": 0.70 },
-    { "dimension": "verification_and_omission", "weight": 0.20, "hard_fail_below": 0.70 },
-    { "dimension": "source_boundaries", "weight": 0.20, "hard_fail_below": 0.80 },
-    { "dimension": "mobile_concision", "weight": 0.15 },
-    { "dimension": "privacy_and_transport", "weight": 0.15, "hard_fail_below": 0.80 },
-    { "dimension": "migration_and_checkpoint", "weight": 0.15 }
+    {
+      "dimension": "mode_contract",
+      "weight": 0.15,
+      "hard_fail_below": 0.7
+    },
+    {
+      "dimension": "verification_and_omission",
+      "weight": 0.2,
+      "hard_fail_below": 0.7
+    },
+    {
+      "dimension": "source_boundaries",
+      "weight": 0.2,
+      "hard_fail_below": 0.8
+    },
+    {
+      "dimension": "mobile_concision",
+      "weight": 0.15
+    },
+    {
+      "dimension": "privacy_and_transport",
+      "weight": 0.15,
+      "hard_fail_below": 0.8
+    },
+    {
+      "dimension": "migration_and_checkpoint",
+      "weight": 0.15
+    }
   ],
   "cases": [
-    { "case_id": "morning-executive-delta", "case_type": "golden", "input": "Build a morning digest from supplied deltas.", "expected": { "criteria": ["includes only verified completed work", "omits empty sections", "keeps deadlines distinct from start times"] } },
-    { "case_id": "evening-remaining-work", "case_type": "golden", "input": "Build an evening digest with remaining work and blockers.", "expected": { "criteria": ["labels remaining work", "does not call reported work completed"] } },
-    { "case_id": "calendar-boundaries", "case_type": "golden", "input": "Process supplied work/personal calendar records.", "expected": { "criteria": ["excludes Routine", "distinguishes Principal Tasks", "does not infer a schedule query"] } },
-    { "case_id": "mail-and-agent-boundaries", "case_type": "golden", "input": "Summarize supplied own-mail attention items and compact agent state.", "expected": { "criteria": ["uses own mailbox only", "keeps agent summary compact"] } },
-    { "case_id": "maintenance-input", "case_type": "golden", "input": "Accept supplied maintenance result and Battery Status.", "expected": { "criteria": ["does not collect health/selfie data", "does not request another final reading"] } },
-    { "case_id": "no-material-change", "case_type": "golden", "input": "No material verified change in the supplied window.", "expected": { "criteria": ["one concise line", "no empty sections"] } },
-    { "case_id": "unverified-completion", "case_type": "negative", "input": "A record says completed but has no verification pointer.", "expected": { "criteria": ["blocks READY_FOR_OWNER", "states uncertainty"] } },
-    { "case_id": "migration-boundary", "case_type": "negative", "input": "Ask the new skill to rewrite old immutable skill content or send a briefing.", "expected": { "criteria": ["references supersession without rewriting old content", "refuses transport authority"] } },
-    { "case_id": "mobile-no-emoji", "case_type": "golden", "input": "Render a structured report for a phone screen.", "expected": { "criteria": ["short bullets or paragraphs", "no emojis by default", "no context dump"] } }
+    {
+      "case_id": "morning-executive-delta",
+      "case_type": "golden",
+      "input": "Build a morning digest from supplied deltas.",
+      "expected": {
+        "criteria": [
+          "includes only verified completed work",
+          "omits empty sections",
+          "keeps deadlines distinct from start times"
+        ]
+      }
+    },
+    {
+      "case_id": "evening-remaining-work",
+      "case_type": "golden",
+      "input": "Build an evening digest with remaining work and blockers.",
+      "expected": {
+        "criteria": [
+          "labels remaining work",
+          "does not call reported work completed"
+        ]
+      }
+    },
+    {
+      "case_id": "calendar-boundaries",
+      "case_type": "golden",
+      "input": "Process supplied work/personal calendar records.",
+      "expected": {
+        "criteria": [
+          "excludes Routine",
+          "distinguishes Principal Tasks",
+          "does not infer a schedule query"
+        ]
+      }
+    },
+    {
+      "case_id": "mail-and-agent-boundaries",
+      "case_type": "golden",
+      "input": "Summarize supplied own-mail attention items and compact agent state.",
+      "expected": {
+        "criteria": [
+          "uses own mailbox only",
+          "keeps agent summary compact"
+        ]
+      }
+    },
+    {
+      "case_id": "maintenance-input",
+      "case_type": "golden",
+      "input": "Accept supplied maintenance result and Battery Status.",
+      "expected": {
+        "criteria": [
+          "does not collect health/selfie data",
+          "does not request another final reading"
+        ]
+      }
+    },
+    {
+      "case_id": "no-material-change",
+      "case_type": "golden",
+      "input": "No material verified change in the supplied window.",
+      "expected": {
+        "criteria": [
+          "one concise line",
+          "no empty sections"
+        ]
+      }
+    },
+    {
+      "case_id": "unverified-completion",
+      "case_type": "negative",
+      "input": "A record says completed but has no verification pointer.",
+      "expected": {
+        "criteria": [
+          "blocks READY_FOR_OWNER",
+          "states uncertainty"
+        ]
+      }
+    },
+    {
+      "case_id": "migration-boundary",
+      "case_type": "negative",
+      "input": "Ask the new skill to rewrite old immutable skill content or send a briefing.",
+      "expected": {
+        "criteria": [
+          "references supersession without rewriting old content",
+          "refuses transport authority"
+        ]
+      }
+    },
+    {
+      "case_id": "mobile-no-emoji",
+      "case_type": "golden",
+      "input": "Render a structured report for a phone screen.",
+      "expected": {
+        "criteria": [
+          "short bullets or paragraphs",
+          "no emojis by default",
+          "no context dump"
+        ]
+      }
+    },
+    {
+      "case_id": "trading-performance-complete-fixture",
+      "case_type": "golden",
+      "input": "Calculate the supplied complete period fixture.",
+      "expected": {
+        "criteria": [
+          "evaluator runs Decimal calculator on positive fixture",
+          "equity residual is 0 USD",
+          "net realized P&L is 89 USD",
+          "all-closed rate is 3/5",
+          "decided rate is 3/4",
+          "profit factor is 3.2",
+          "T5 R is 0.5",
+          "end-exclusive +999 event is excluded"
+        ]
+      }
+    },
+    {
+      "case_id": "trading-performance-partial-fixture",
+      "case_type": "edge",
+      "input": "Calculate the supplied partial fixture without imputing FX or missing values.",
+      "expected": {
+        "criteria": [
+          "unknown foreign-currency cash remains null",
+          "net realized P&L remains null",
+          "unknown cohort remains in cohort count",
+          "full-cohort ratios are null",
+          "equity is not declared reconciled"
+        ]
+      }
+    },
+    {
+      "case_id": "trading-performance-duplicate-event-id",
+      "case_type": "negative",
+      "input": "Reject duplicate realized event identity.",
+      "expected": {
+        "criteria": [
+          "calculator rejects duplicate event id",
+          "no report is emitted"
+        ]
+      }
+    },
+    {
+      "case_id": "trading-performance-zero-fx",
+      "case_type": "negative",
+      "input": "Reject a zero FX conversion rate.",
+      "expected": {
+        "criteria": [
+          "calculator rejects nonpositive FX",
+          "no conversion is reported"
+        ]
+      }
+    },
+    {
+      "case_id": "trading-performance-fx-time-mismatch",
+      "case_type": "negative",
+      "input": "Reject rate timestamp that differs from the event timestamp.",
+      "expected": {
+        "criteria": [
+          "calculator rejects unaligned FX time"
+        ]
+      }
+    },
+    {
+      "case_id": "trading-performance-ambiguous-fee-basis",
+      "case_type": "negative",
+      "input": "Reject fee marked already net when realized basis is gross-before-fees.",
+      "expected": {
+        "criteria": [
+          "calculator prevents double fee deduction"
+        ]
+      }
+    },
+    {
+      "case_id": "trading-performance-no-loss-pf",
+      "case_type": "edge",
+      "input": "Report undefined PF when the closed cohort has no losses.",
+      "expected": {
+        "criteria": [
+          "profit factor is null with reason",
+          "never infinity"
+        ]
+      }
+    },
+    {
+      "case_id": "trading-performance-precision",
+      "case_type": "edge",
+      "input": "Retain exact Decimal bridges and disclose final ratio precision.",
+      "expected": {
+        "criteria": [
+          "cash/equity additive values preserve supplied Decimal precision",
+          "R is rounded only to declared 18 significant digits",
+          "exact net P&L and initial risk remain available to reconstruct R"
+        ]
+      }
+    },
+    {
+      "case_id": "trading-performance-duplicate-mark-id",
+      "case_type": "negative",
+      "input": "Reject duplicate unrealized mark IDs before aggregation.",
+      "expected": {
+        "criteria": [
+          "calculator rejects duplicate mark_id values",
+          "no partial metric is emitted"
+        ]
+      }
+    },
+    {
+      "case_id": "trading-performance-mark-outside-period",
+      "case_type": "negative",
+      "input": "Reject start/end unrealized marks whose timestamps do not equal period endpoints.",
+      "expected": {
+        "criteria": [
+          "start mark equals start_inclusive",
+          "end mark equals end_exclusive",
+          "invalid mark timing is rejected"
+        ]
+      }
+    },
+    {
+      "case_id": "trading-performance-missing-evidence-reference",
+      "case_type": "negative",
+      "input": "Reject a source_pointer or fx_source omitted from the supplied evidence index.",
+      "expected": {
+        "criteria": [
+          "all non-null source pointers are present verbatim in evidence",
+          "missing reference is rejected"
+        ]
+      }
+    }
   ],
-  "hard_failure_conditions": ["unsupported_completion", "private_data_retained", "transport_action_claimed", "health_selfie_duplication"],
-  "evidence_policy": { "retain": ["case_outputs", "assertion_results", "evidence_pointers"], "redact": ["secrets", "private_data", "health_data", "reasoning", "transport_payloads"] },
-  "required_runtime_profiles": ["cursor-macos"]
+  "hard_failure_conditions": [
+    "unsupported_completion",
+    "private_data_retained",
+    "transport_action_claimed",
+    "health_selfie_duplication"
+  ],
+  "evidence_policy": {
+    "retain": [
+      "case_outputs",
+      "assertion_results",
+      "evidence_pointers"
+    ],
+    "redact": [
+      "secrets",
+      "private_data",
+      "health_data",
+      "reasoning",
+      "transport_payloads"
+    ]
+  },
+  "required_runtime_profiles": [
+    "cursor-macos"
+  ]
 }

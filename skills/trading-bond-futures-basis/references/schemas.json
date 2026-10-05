@@ -1,0 +1,143 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:linkskills:trading-bond-futures-basis:0.1.0",
+  "title": "Bond futures basis research",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract",
+        "as_of",
+        "future_price",
+        "ctd_identifier",
+        "ctd_clean_price",
+        "conversion_factor",
+        "price_unit",
+        "data_source"
+      ],
+      "properties": {
+        "contract": {
+          "type": "string"
+        },
+        "as_of": {
+          "type": "string",
+          "format": "date"
+        },
+        "future_price": {
+          "type": "number"
+        },
+        "ctd_identifier": {
+          "type": "string"
+        },
+        "ctd_clean_price": {
+          "type": "number"
+        },
+        "conversion_factor": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "price_unit": {
+          "type": "string"
+        },
+        "data_source": {
+          "type": "string"
+        },
+        "accrued_interest": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "coupon_cashflows": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "repo_rate_pct": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "delivery_dates": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "completion_status",
+        "contract",
+        "as_of",
+        "ctd_check",
+        "metrics",
+        "limitations",
+        "missing_inputs"
+      ],
+      "properties": {
+        "completion_status": {
+          "enum": [
+            "complete",
+            "partial",
+            "insufficient_input"
+          ]
+        },
+        "contract": {
+          "type": "string"
+        },
+        "as_of": {
+          "type": "string",
+          "format": "date"
+        },
+        "ctd_check": {
+          "type": "string"
+        },
+        "metrics": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "value",
+              "unit"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "value": {
+                "type": [
+                  "number",
+                  "string",
+                  "null"
+                ]
+              },
+              "unit": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "missing_inputs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

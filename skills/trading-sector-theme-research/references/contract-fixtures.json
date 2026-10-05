@@ -1,0 +1,43 @@
+{
+  "trading-sector-theme-research-role-map-without-rotation-series": {
+    "fixture_id": "trading-sector-theme-research-role-map-without-rotation-series-fixture",
+    "status": "unexecuted contract fixture; no output or pass is asserted",
+    "task_input": {
+      "as_of_date": "2026-09-30",
+      "geography": "US",
+      "sector_or_theme": "fictional grid storage supply chain",
+      "research_question": "Map economic roles and identify evidence gaps.",
+      "horizon": "12 months",
+      "universe": [
+        "DEMO-A",
+        "DEMO-B"
+      ],
+      "provided_sources": [
+        {
+          "source_id": "filing-A",
+          "publisher": "Example Components filing",
+          "published_at": "2026-09-20T16:00:00Z",
+          "period": "FY2025",
+          "unit": "USD millions",
+          "source_url_or_file": "user-supplied://fictional/A",
+          "claim": "DEMO-A reports battery enclosure revenue."
+        },
+        {
+          "source_id": "report-B",
+          "publisher": "Example Industry Report",
+          "published_at": "2026-09-15T00:00:00Z",
+          "period": "2025",
+          "unit": "qualitative",
+          "source_url_or_file": "user-supplied://fictional/B",
+          "claim": "DEMO-B supplies thermal controls."
+        }
+      ]
+    },
+    "expected_output_assertions": [
+      "Return sourced value-chain roles and identify the filing/report pointers for each role.",
+      "Describe economic mechanisms and counterevidence qualitatively; do not infer actual market share or numeric rotation from the two claims.",
+      "Mark comparable member returns, point-in-time classification, FX, and coverage as unavailable and keep any quantitative comparison uncomputed.",
+      "Do not add personalized increase/trim/exit, target, or risk proposals without supplied holdings and constraints."
+    ]
+  }
+}

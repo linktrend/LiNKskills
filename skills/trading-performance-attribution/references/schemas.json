@@ -1,0 +1,1330 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "trading-performance-attribution task contract draft",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "properties": {
+        "task": {
+          "type": "string",
+          "minLength": 1
+        },
+        "as_of": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "question": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_snapshot": {
+          "type": "object",
+          "properties": {
+            "refs": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/source_ref"
+              }
+            },
+            "snapshot_id": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "version": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "notes": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "required": [
+            "refs",
+            "snapshot_id",
+            "version",
+            "notes"
+          ],
+          "additionalProperties": false
+        },
+        "reporting_currency": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^(?:[A-Z]{3})?$"
+        },
+        "task_context": {
+          "type": "object",
+          "properties": {
+            "period": {
+              "type": "object",
+              "properties": {
+                "start": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time"
+                },
+                "end": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time"
+                },
+                "timezone": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "calendar": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "start",
+                "end",
+                "timezone",
+                "calendar"
+              ],
+              "additionalProperties": false
+            },
+            "ledger_snapshot": {
+              "type": "object",
+              "properties": {
+                "version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time"
+                },
+                "source_ref": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "version",
+                "as_of",
+                "source_ref"
+              ],
+              "additionalProperties": false
+            },
+            "opening_nav": {
+              "type": "object",
+              "properties": {
+                "value": {
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "exclusiveMinimum": 0
+                },
+                "currency": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "pattern": "^(?:[A-Z]{3})?$"
+                },
+                "as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time"
+                }
+              },
+              "required": [
+                "value",
+                "currency",
+                "as_of"
+              ],
+              "additionalProperties": false
+            },
+            "ending_nav": {
+              "type": "object",
+              "properties": {
+                "value": {
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "minimum": 0
+                },
+                "currency": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "pattern": "^(?:[A-Z]{3})?$"
+                },
+                "as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time"
+                }
+              },
+              "required": [
+                "value",
+                "currency",
+                "as_of"
+              ],
+              "additionalProperties": false
+            },
+            "external_flows": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "flow_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "signed_amount": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "currency": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "pattern": "^(?:[A-Z]{3})?$"
+                  },
+                  "timestamp": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "contribution",
+                      "withdrawal",
+                      "transfer",
+                      "other"
+                    ]
+                  },
+                  "source_ref": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "flow_id",
+                  "signed_amount",
+                  "currency",
+                  "timestamp",
+                  "kind",
+                  "source_ref"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "trade_events": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "trade_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "instrument_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "signed_quantity": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "price": {
+                    "type": [
+                      "number",
+                      "null"
+                    ],
+                    "exclusiveMinimum": 0
+                  },
+                  "multiplier": {
+                    "type": [
+                      "number",
+                      "null"
+                    ],
+                    "exclusiveMinimum": 0
+                  },
+                  "quote_currency": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "pattern": "^(?:[A-Z]{3})?$"
+                  },
+                  "fees": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "funding_borrow": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "income": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "timestamp": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "source_ref": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "trade_id",
+                  "instrument_id",
+                  "signed_quantity",
+                  "price",
+                  "multiplier",
+                  "quote_currency",
+                  "fees",
+                  "funding_borrow",
+                  "income",
+                  "timestamp",
+                  "source_ref"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "benchmark": {
+              "type": "object",
+              "properties": {
+                "benchmark_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "currency": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "pattern": "^(?:[A-Z]{3})?$"
+                },
+                "return_series": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "period_end": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "format": "date-time"
+                      },
+                      "return_fraction": {
+                        "type": [
+                          "number",
+                          "null"
+                        ]
+                      },
+                      "source_ref": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": [
+                      "period_end",
+                      "return_fraction",
+                      "source_ref"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "annual_trading_days": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ],
+                  "minimum": 1
+                }
+              },
+              "required": [
+                "benchmark_id",
+                "currency",
+                "return_series",
+                "annual_trading_days"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "period",
+            "ledger_snapshot",
+            "opening_nav",
+            "ending_nav",
+            "external_flows",
+            "trade_events",
+            "benchmark"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "task",
+        "as_of",
+        "question",
+        "source_snapshot",
+        "reporting_currency",
+        "task_context"
+      ],
+      "additionalProperties": false
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "complete",
+            "partial",
+            "insufficient_evidence",
+            "not_assessed",
+            "policy_not_assessed"
+          ]
+        },
+        "scope": {
+          "$ref": "#/definitions/scope"
+        },
+        "analysis": {
+          "$ref": "#/definitions/analysis"
+        },
+        "recommendation": {
+          "$ref": "#/definitions/recommendation"
+        },
+        "evidence_gate": {
+          "$ref": "#/definitions/evidence_gate"
+        },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/gap"
+          }
+        },
+        "external_effects": {
+          "type": "array",
+          "maxItems": 0
+        }
+      },
+      "required": [
+        "status",
+        "scope",
+        "analysis",
+        "recommendation",
+        "evidence_gate",
+        "gaps",
+        "external_effects"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "complete"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "analysis": {
+                "properties": {
+                  "status": {
+                    "const": "complete"
+                  },
+                  "evidence_refs": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                },
+                "required": [
+                  "status",
+                  "evidence_refs"
+                ]
+              },
+              "gaps": {
+                "maxItems": 0
+              },
+              "evidence_gate": {
+                "properties": {
+                  "critical_inputs_resolved": {
+                    "const": true
+                  },
+                  "source_timestamps_reconciled": {
+                    "const": true
+                  },
+                  "unit_contracts_resolved": {
+                    "const": true
+                  },
+                  "limiting_gaps": {
+                    "maxItems": 0
+                  }
+                },
+                "required": [
+                  "critical_inputs_resolved",
+                  "source_timestamps_reconciled",
+                  "unit_contracts_resolved",
+                  "limiting_gaps"
+                ]
+              }
+            },
+            "required": [
+              "analysis",
+              "gaps",
+              "evidence_gate"
+            ]
+          }
+        }
+      ]
+    },
+    "analysis": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "complete",
+            "partial",
+            "not_assessed"
+          ]
+        },
+        "reconciliation": {
+          "type": "object",
+          "properties": {
+            "opening_equity": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "exclusiveMinimum": 0
+            },
+            "external_flows_net": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "ending_equity": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0
+            },
+            "residual": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "currency": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "pattern": "^(?:[A-Z]{3})?$"
+            },
+            "denominator": {
+              "type": "string",
+              "enum": [
+                "opening_equity",
+                "flow_adjusted_capital",
+                "not_applicable"
+              ]
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "reconciled",
+                "provisional",
+                "unreconciled",
+                "unknown"
+              ]
+            },
+            "gross_investment_pnl": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "fees_and_costs": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0
+            },
+            "net_investment_pnl": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "opening_equity",
+            "external_flows_net",
+            "ending_equity",
+            "residual",
+            "currency",
+            "denominator",
+            "status",
+            "gross_investment_pnl",
+            "fees_and_costs",
+            "net_investment_pnl"
+          ],
+          "additionalProperties": false
+        },
+        "cash_by_period": {
+          "type": "object",
+          "properties": {
+            "fees": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0
+            },
+            "funding_borrow": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "income": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "currency": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "pattern": "^(?:[A-Z]{3})?$"
+            },
+            "start": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "date-time"
+            },
+            "end": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "date-time"
+            },
+            "basis": {
+              "type": "string",
+              "enum": [
+                "dated_cash_events"
+              ]
+            },
+            "gross_realized_cash_pnl": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "net_realized_cash_pnl": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "fees",
+            "funding_borrow",
+            "income",
+            "currency",
+            "start",
+            "end",
+            "basis",
+            "gross_realized_cash_pnl",
+            "net_realized_cash_pnl"
+          ],
+          "additionalProperties": false
+        },
+        "closed_cohort": {
+          "type": "object",
+          "properties": {
+            "cumulative_pnl": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "currency": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "pattern": "^(?:[A-Z]{3})?$"
+            },
+            "closed_trade_n": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 0
+            },
+            "trade_ids": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "basis": {
+              "type": "string",
+              "enum": [
+                "cohort_cumulative_not_period_cash"
+              ]
+            }
+          },
+          "required": [
+            "cumulative_pnl",
+            "currency",
+            "closed_trade_n",
+            "trade_ids",
+            "basis"
+          ],
+          "additionalProperties": false
+        },
+        "attribution_rows": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "component": {
+                "type": "string",
+                "minLength": 1
+              },
+              "contribution": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "currency": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "pattern": "^(?:[A-Z]{3})?$"
+              },
+              "denominator_value": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "exclusiveMinimum": 0
+              },
+              "denominator_unit": {
+                "type": "string",
+                "enum": [
+                  "currency_amount",
+                  "return_fraction",
+                  "basis_points",
+                  "trade_count",
+                  "calendar_days",
+                  "not_applicable"
+                ]
+              },
+              "start": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "end": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "method": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "calculated",
+                  "partial",
+                  "residual",
+                  "unknown"
+                ]
+              },
+              "evidence_refs": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "required": [
+              "component",
+              "contribution",
+              "currency",
+              "denominator_value",
+              "denominator_unit",
+              "start",
+              "end",
+              "method",
+              "status",
+              "evidence_refs"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "metric_rows": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "metric": {
+                "type": "string",
+                "enum": [
+                  "simple_return",
+                  "time_weighted_return",
+                  "money_weighted_return",
+                  "benchmark_excess",
+                  "cagr",
+                  "max_drawdown",
+                  "volatility",
+                  "other"
+                ]
+              },
+              "value": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "unit": {
+                "type": "string",
+                "enum": [
+                  "fraction",
+                  "basis_points",
+                  "currency_amount",
+                  "trading_days",
+                  "calendar_days",
+                  "count",
+                  "not_applicable"
+                ]
+              },
+              "denominator": {
+                "type": "string",
+                "enum": [
+                  "opening_nav",
+                  "flow_adjusted_capital",
+                  "benchmark_return",
+                  "peak_wealth",
+                  "not_applicable"
+                ]
+              },
+              "elapsed_calendar_days": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 0
+              },
+              "annualization_method": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "calculated",
+                  "partial",
+                  "undefined",
+                  "unknown"
+                ]
+              }
+            },
+            "required": [
+              "metric",
+              "value",
+              "unit",
+              "denominator",
+              "elapsed_calendar_days",
+              "annualization_method",
+              "status"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "status",
+        "reconciliation",
+        "cash_by_period",
+        "closed_cohort",
+        "attribution_rows",
+        "metric_rows",
+        "evidence_refs"
+      ],
+      "additionalProperties": false
+    },
+    "scope": {
+      "type": "object",
+      "properties": {
+        "as_of": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "period_or_horizon": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "currency": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^(?:[A-Z]{3})?$"
+        },
+        "version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "as_of",
+        "period_or_horizon",
+        "currency",
+        "version",
+        "limitations"
+      ],
+      "additionalProperties": false
+    },
+    "recommendation": {
+      "type": "object",
+      "properties": {
+        "stance": {
+          "type": "string",
+          "enum": [
+            "no_action",
+            "monitor",
+            "increase",
+            "trim",
+            "exit",
+            "avoid",
+            "not_assessed"
+          ]
+        },
+        "proposed_target": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "properties": {
+            "value": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "unit": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "currency": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "pattern": "^(?:[A-Z]{3})?$"
+            },
+            "as_of": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "date-time"
+            },
+            "basis": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "value",
+            "unit",
+            "currency",
+            "as_of",
+            "basis"
+          ],
+          "additionalProperties": false
+        },
+        "proposed_risk_level": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "properties": {
+            "value": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "unit": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "currency": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "pattern": "^(?:[A-Z]{3})?$"
+            },
+            "as_of": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "date-time"
+            },
+            "basis": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "value",
+            "unit",
+            "currency",
+            "as_of",
+            "basis"
+          ],
+          "additionalProperties": false
+        },
+        "basis": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "counterevidence": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "reversal_evidence": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "advisory_only": {
+          "const": true
+        },
+        "approval_required": {
+          "const": true
+        }
+      },
+      "required": [
+        "stance",
+        "proposed_target",
+        "proposed_risk_level",
+        "basis",
+        "counterevidence",
+        "reversal_evidence",
+        "advisory_only",
+        "approval_required"
+      ],
+      "additionalProperties": false
+    },
+    "evidence_gate": {
+      "type": "object",
+      "properties": {
+        "critical_inputs_resolved": {
+          "type": "boolean"
+        },
+        "source_timestamps_reconciled": {
+          "type": "boolean"
+        },
+        "unit_contracts_resolved": {
+          "type": "boolean"
+        },
+        "limiting_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "critical_inputs_resolved",
+        "source_timestamps_reconciled",
+        "unit_contracts_resolved",
+        "limiting_gaps"
+      ],
+      "additionalProperties": false
+    },
+    "gap": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "type": "string",
+          "minLength": 1
+        },
+        "why_it_matters": {
+          "type": "string",
+          "minLength": 1
+        },
+        "owner": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "blocking": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "field",
+        "why_it_matters",
+        "owner",
+        "blocking"
+      ],
+      "additionalProperties": false
+    },
+    "source_ref": {
+      "type": "object",
+      "properties": {
+        "source_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "as_of": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "provenance": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^(?:[0-9a-f]{64})?$"
+        }
+      },
+      "required": [
+        "source_id",
+        "as_of",
+        "provenance",
+        "sha256"
+      ],
+      "additionalProperties": false
+    },
+    "execution_state": {
+      "type": "object",
+      "properties": {
+        "native_session_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "ledger_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "initialized",
+            "in_progress",
+            "partial",
+            "complete",
+            "blocked"
+          ]
+        },
+        "last_updated": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "native_session_ref",
+        "ledger_refs",
+        "status",
+        "last_updated"
+      ],
+      "additionalProperties": false
+    },
+    "state": {
+      "type": "object",
+      "required": [
+        "task_id",
+        "status",
+        "updated_at",
+        "native_state_ref"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "pattern": "^\\d{8}-\\d{4}-[A-Z0-9]+-\\d{6}$"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "in_progress",
+            "partial",
+            "complete",
+            "blocked"
+          ]
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "native_state_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "completed_steps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "pending_steps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "output_artifact_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "task": "schema fixture only",
+  "as_of": "2026-10-05T09:00:00Z",
+  "question": "Synthetic schema-shape fixture; no market conclusion.",
+  "source_snapshot": {
+    "refs": [
+      {
+        "source_id": "synthetic-fixture",
+        "as_of": "2026-10-05T09:00:00Z",
+        "provenance": "fictional fixture only",
+        "sha256": null
+      }
+    ],
+    "snapshot_id": "fictional-fixture",
+    "version": "fictional-fixture",
+    "notes": []
+  },
+  "reporting_currency": "USD",
+  "task_context": {
+    "venue_id": "venue-x",
+    "contract_id": "event-1",
+    "as_of": "2026-10-05T09:00:00Z",
+    "rulebook": {
+      "version": "rule-v1",
+      "text_ref": "fictional clause set",
+      "retrieved_at": "2026-10-05T09:00:00Z",
+      "timezone": "UTC",
+      "observation_start": "2026-10-05T09:00:00Z",
+      "observation_end": "2026-10-05T09:00:00Z",
+      "settlement_source": "specified index",
+      "tie_void_cancel_rule": "tie resolves no",
+      "rounding_rule": "nearest cent",
+      "redemption_rule": "$1 per winning contract"
+    },
+    "outcomes": [
+      {
+        "outcome_id": "yes",
+        "condition_ref": "fictional clause",
+        "payout_per_contract": 1.0,
+        "payout_currency": "USD",
+        "mutually_exclusive": true,
+        "exhaustive": true
+      }
+    ],
+    "quotes": [
+      {
+        "outcome_id": "yes",
+        "bid": 0.4,
+        "ask": 0.42,
+        "bid_size_contracts": 100,
+        "ask_size_contracts": 100,
+        "tick_size": 0.01,
+        "quote_currency": "USD",
+        "as_of": "2026-10-05T09:00:00Z",
+        "source_ref": "synthetic-fixture"
+      }
+    ],
+    "probability_evidence": [
+      {
+        "outcome_id": "yes",
+        "estimate": 1.2,
+        "interval_low": 0.45,
+        "interval_high": 0.55,
+        "as_of": "2026-10-05T08:50:00Z",
+        "horizon": "one day",
+        "method": "fictional calibrated estimate",
+        "calibration_n": 100,
+        "source_ref": "synthetic-fixture"
+      }
+    ],
+    "fees": {
+      "rate_fraction": 0.02,
+      "per_contract": 0,
+      "currency": "USD",
+      "charged_on": "entry"
+    },
+    "capital": {
+      "collateral_per_contract": 0.42,
+      "currency": "USD",
+      "maximum_loss_per_contract": 0.42,
+      "redemption_delay_days": 1,
+      "redemption_fee": 0
+    }
+  }
+}

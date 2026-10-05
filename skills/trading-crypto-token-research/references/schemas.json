@@ -1,0 +1,355 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:linkskills:trading-crypto-token-research:0.1.0",
+  "title": "Crypto token research contract",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "request_id",
+        "network",
+        "asset_id",
+        "as_of",
+        "source_snapshot",
+        "source_provenance",
+        "decimals",
+        "supply_definition"
+      ],
+      "properties": {
+        "request_id": {
+          "type": "string"
+        },
+        "network": {
+          "type": "string"
+        },
+        "asset_id": {
+          "type": "string"
+        },
+        "as_of": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "source_snapshot": {
+          "type": "string"
+        },
+        "source_provenance": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "source",
+              "retrieved_at",
+              "coverage"
+            ],
+            "properties": {
+              "source": {
+                "type": "string"
+              },
+              "retrieved_at": {
+                "type": "string"
+              },
+              "coverage": {
+                "type": "string"
+              },
+              "entitlement": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        },
+        "decimals": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "supply_definition": {
+          "type": "string"
+        },
+        "supply_rows": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "category",
+              "amount_raw",
+              "source_row"
+            ],
+            "properties": {
+              "category": {
+                "type": "string"
+              },
+              "amount_raw": {
+                "type": "string"
+              },
+              "source_row": {
+                "type": "string"
+              },
+              "status": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        },
+        "holders": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "address_ref",
+              "amount_raw",
+              "source_row"
+            ],
+            "properties": {
+              "address_ref": {
+                "type": "string"
+              },
+              "amount_raw": {
+                "type": "string"
+              },
+              "source_row": {
+                "type": "string"
+              },
+              "classification": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        },
+        "protocol_economics": {
+          "type": "object"
+        },
+        "unlock_scenarios": {
+          "type": "array"
+        },
+        "comparable_set": {
+          "type": "array"
+        },
+        "chain_program_version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "research_question": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "request_id",
+        "status",
+        "asset_identity",
+        "snapshot",
+        "supply_reconciliation",
+        "holder_sample",
+        "economics",
+        "scenarios",
+        "findings",
+        "limitations",
+        "recommendation"
+      ],
+      "properties": {
+        "request_id": {
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "complete",
+            "partial",
+            "needs_input",
+            "blocked"
+          ]
+        },
+        "asset_identity": {
+          "type": "object",
+          "required": [
+            "network",
+            "asset_id",
+            "decimals"
+          ],
+          "properties": {
+            "network": {
+              "type": "string"
+            },
+            "asset_id": {
+              "type": "string"
+            },
+            "decimals": {
+              "type": "integer"
+            }
+          }
+        },
+        "snapshot": {
+          "type": "object",
+          "required": [
+            "as_of",
+            "source_snapshot"
+          ],
+          "properties": {
+            "as_of": {
+              "type": "string"
+            },
+            "source_snapshot": {
+              "type": "string"
+            },
+            "provenance": {
+              "type": "array"
+            }
+          }
+        },
+        "supply_reconciliation": {
+          "type": "object",
+          "required": [
+            "definition",
+            "items",
+            "reconciled_total_raw",
+            "status"
+          ],
+          "properties": {
+            "definition": {
+              "type": "string"
+            },
+            "items": {
+              "type": "array"
+            },
+            "reconciled_total_raw": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "status": {
+              "enum": [
+                "reconciled",
+                "partial",
+                "unresolved"
+              ]
+            }
+          }
+        },
+        "holder_sample": {
+          "type": "object",
+          "required": [
+            "observed_count",
+            "coverage_frame",
+            "concentration_metrics",
+            "identity_limitations"
+          ],
+          "properties": {
+            "observed_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "coverage_frame": {
+              "type": "string"
+            },
+            "concentration_metrics": {
+              "type": "array"
+            },
+            "identity_limitations": {
+              "type": "array"
+            }
+          }
+        },
+        "economics": {
+          "type": "object",
+          "required": [
+            "measures",
+            "value_capture_status"
+          ],
+          "properties": {
+            "measures": {
+              "type": "array"
+            },
+            "value_capture_status": {
+              "type": "string"
+            }
+          }
+        },
+        "scenarios": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "assumptions",
+              "computed_effect",
+              "not_a_forecast"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "assumptions": {
+                "type": "array"
+              },
+              "computed_effect": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "not_a_forecast": {
+                "const": true
+              }
+            }
+          }
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "recommendation": {
+          "type": "object",
+          "required": [
+            "stance",
+            "basis",
+            "advisory_only"
+          ],
+          "properties": {
+            "stance": {
+              "enum": [
+                "positive",
+                "negative",
+                "mixed",
+                "no_view"
+              ]
+            },
+            "basis": {
+              "type": "array"
+            },
+            "advisory_only": {
+              "const": true
+            },
+            "conditions": {
+              "type": "array"
+            }
+          }
+        }
+      }
+    }
+  }
+}

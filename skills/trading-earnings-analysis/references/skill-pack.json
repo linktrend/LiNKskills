@@ -1,0 +1,957 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "trading-earnings-analysis",
+  "display_name": "Earnings analysis",
+  "version": "0.1.1",
+  "description": "Compare reported results and guidance with a dated consensus vintage, normalize metric definitions, and explain the market reaction window without claiming causation.",
+  "capability_category": "trading_research",
+  "provenance": {
+    "author": "LiNKskills Library",
+    "source": "Exact source provenance: references/source-provenance.json (sha256:8c230dc9115803f425a90b5edbcf25f827047cd3af58182fbf5bf144c98280a1); per-entry license/notice/disposition recorded there.",
+    "license": "No package-wide upstream license is asserted; see exact per-file source provenance and notice dispositions in references/source-provenance.json.",
+    "imported_from": "Frozen Jane draft source: skills/trading-earnings-analysis; source provenance copied unchanged for this proposal only."
+  },
+  "lifecycle_state": "draft",
+  "format_profile": "simple",
+  "compatible_runtime_profiles": [
+    "jane-openclaw"
+  ],
+  "min_capability_tier": "balanced",
+  "routing": {
+    "when_to_use": "Use for quarterly earnings preview or post-release analysis.",
+    "when_not_to_use": [
+      "Do not submit orders, call a broker, change portfolio state, or activate a live strategy.",
+      "Do not invent data, paid tool access, historical validation, or source API availability.",
+      "Do not treat a schema-valid example or output as method validation.",
+      "Do not replace LiNKtrading with another execution system."
+    ],
+    "tags": [
+      "trading",
+      "research",
+      "jane",
+      "draft"
+    ],
+    "exclusion_rules": [
+      "Do not submit orders, call a broker, change portfolio state, or activate a live strategy.",
+      "Do not invent data, paid tool access, historical validation, or source API availability.",
+      "Do not treat a schema-valid example or output as method validation.",
+      "Do not replace LiNKtrading with another execution system."
+    ]
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "issuer",
+        "description": "Required property `issuer` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "fiscal_period",
+        "description": "Required property `fiscal_period` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "event_datetime",
+        "description": "Required property `event_datetime` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "description": "Required event time for preview/results/combined. Null is permitted only for estimate_change when event timing is unresolved and event_datetime_unknown_reason is supplied."
+        }
+      },
+      {
+        "name": "timezone",
+        "description": "Required property `timezone` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "analysis_mode",
+        "description": "Required property `analysis_mode` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "enum": [
+            "preview",
+            "results",
+            "estimate_change",
+            "combined"
+          ]
+        }
+      },
+      {
+        "name": "consensus_vintage",
+        "description": "Required property `consensus_vintage` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": [
+            "object",
+            "null"
+          ]
+        }
+      },
+      {
+        "name": "metrics",
+        "description": "Required property `metrics` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "reaction_window",
+        "description": "Required property `reaction_window` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Null or empty when reaction analysis is not requested or lacks aligned market evidence; estimate-change analysis does not require a market-reaction basis."
+        }
+      }
+    ],
+    "optional_inputs": [
+      {
+        "name": "portfolio_context",
+        "description": "Optional property `portfolio_context` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Optional user-supplied portfolio context for advisory sensitivity only; never authorizes changes or execution.",
+          "required": [
+            "as_of",
+            "base_currency",
+            "holdings",
+            "risk_constraints"
+          ],
+          "properties": {
+            "as_of": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "base_currency": {
+              "type": "string"
+            },
+            "nav": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "description": "Amount in base_currency; null when not supplied."
+            },
+            "holdings": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "instrument",
+                  "quantity",
+                  "currency",
+                  "as_of"
+                ],
+                "properties": {
+                  "instrument": {
+                    "type": "string"
+                  },
+                  "quantity": {
+                    "type": "number"
+                  },
+                  "currency": {
+                    "type": "string"
+                  },
+                  "as_of": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "market_value": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "multiplier": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "source_pointer": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "risk_constraints": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "mandate_notes": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "source_observations",
+        "description": "Optional property `source_observations` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "description": "Optional actual/estimate/guidance observations for the requested earnings branch; all comparisons require matching period, definition, unit, source vintage and timestamps.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "metric",
+              "value",
+              "unit",
+              "status",
+              "fiscal_period",
+              "source_pointer",
+              "source_published_at",
+              "source_vintage"
+            ],
+            "properties": {
+              "metric": {
+                "type": "string"
+              },
+              "value": {
+                "type": [
+                  "number",
+                  "string"
+                ]
+              },
+              "unit": {
+                "type": "string"
+              },
+              "currency": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "basis": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "actual",
+                  "estimate",
+                  "guidance",
+                  "prior_estimate",
+                  "new_estimate",
+                  "previous_guidance",
+                  "new_guidance"
+                ]
+              },
+              "fiscal_period": {
+                "type": "string"
+              },
+              "source_pointer": {
+                "type": "string"
+              },
+              "source_published_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "source_vintage": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "event_datetime_unknown_reason",
+        "description": "Optional property `event_datetime_unknown_reason` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Required when estimate_change has an unresolved event_datetime; describe why the date is unknown. Does not authorize event-window or causal analysis."
+        }
+      }
+    ],
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "issuer",
+        "fiscal_period",
+        "event_datetime",
+        "timezone",
+        "analysis_mode",
+        "consensus_vintage",
+        "metrics",
+        "reaction_window"
+      ],
+      "properties": {
+        "issuer": {
+          "type": "string"
+        },
+        "fiscal_period": {
+          "type": "string"
+        },
+        "event_datetime": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "description": "Required event time for preview/results/combined. Null is permitted only for estimate_change when event timing is unresolved and event_datetime_unknown_reason is supplied."
+        },
+        "timezone": {
+          "type": "string"
+        },
+        "analysis_mode": {
+          "enum": [
+            "preview",
+            "results",
+            "estimate_change",
+            "combined"
+          ]
+        },
+        "consensus_vintage": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "metrics": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "reaction_window": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Null or empty when reaction analysis is not requested or lacks aligned market evidence; estimate-change analysis does not require a market-reaction basis."
+        },
+        "portfolio_context": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Optional user-supplied portfolio context for advisory sensitivity only; never authorizes changes or execution.",
+          "required": [
+            "as_of",
+            "base_currency",
+            "holdings",
+            "risk_constraints"
+          ],
+          "properties": {
+            "as_of": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "base_currency": {
+              "type": "string"
+            },
+            "nav": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "description": "Amount in base_currency; null when not supplied."
+            },
+            "holdings": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "instrument",
+                  "quantity",
+                  "currency",
+                  "as_of"
+                ],
+                "properties": {
+                  "instrument": {
+                    "type": "string"
+                  },
+                  "quantity": {
+                    "type": "number"
+                  },
+                  "currency": {
+                    "type": "string"
+                  },
+                  "as_of": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "market_value": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "multiplier": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "source_pointer": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "risk_constraints": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "mandate_notes": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "source_observations": {
+          "type": "array",
+          "description": "Optional actual/estimate/guidance observations for the requested earnings branch; all comparisons require matching period, definition, unit, source vintage and timestamps.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "metric",
+              "value",
+              "unit",
+              "status",
+              "fiscal_period",
+              "source_pointer",
+              "source_published_at",
+              "source_vintage"
+            ],
+            "properties": {
+              "metric": {
+                "type": "string"
+              },
+              "value": {
+                "type": [
+                  "number",
+                  "string"
+                ]
+              },
+              "unit": {
+                "type": "string"
+              },
+              "currency": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "basis": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "actual",
+                  "estimate",
+                  "guidance",
+                  "prior_estimate",
+                  "new_estimate",
+                  "previous_guidance",
+                  "new_guidance"
+                ]
+              },
+              "fiscal_period": {
+                "type": "string"
+              },
+              "source_pointer": {
+                "type": "string"
+              },
+              "source_published_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "source_vintage": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "event_datetime_unknown_reason": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Required when estimate_change has an unresolved event_datetime; describe why the date is unknown. Does not authorize event-window or causal analysis."
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "analysis_mode": {
+                "const": "estimate_change"
+              }
+            },
+            "required": [
+              "analysis_mode"
+            ]
+          },
+          "then": {
+            "if": {
+              "properties": {
+                "event_datetime": {
+                  "type": "null"
+                }
+              },
+              "required": [
+                "event_datetime"
+              ]
+            },
+            "then": {
+              "required": [
+                "event_datetime_unknown_reason"
+              ]
+            },
+            "else": {
+              "properties": {
+                "event_datetime": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "event_datetime": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        }
+      ],
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "urn:linkskills:trading-earnings-analysis:0.1.1#/definitions/input"
+    },
+    "expected_outputs": [
+      {
+        "name": "completion_status",
+        "description": "Required property `completion_status` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "enum": [
+            "complete",
+            "partial",
+            "insufficient_input"
+          ]
+        }
+      },
+      {
+        "name": "issuer",
+        "description": "Required property `issuer` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "fiscal_period",
+        "description": "Required property `fiscal_period` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "actual_vs_expectation",
+        "description": "Required property `actual_vs_expectation` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      },
+      {
+        "name": "guidance_changes",
+        "description": "Required property `guidance_changes` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      },
+      {
+        "name": "reaction",
+        "description": "Required property `reaction` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": [
+            "object",
+            "null"
+          ]
+        }
+      },
+      {
+        "name": "causal_limits",
+        "description": "Required property `causal_limits` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "missing_inputs",
+        "description": "Required property `missing_inputs` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "estimate_revisions",
+        "description": "Optional property `estimate_revisions` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "description": "Optional metric-level estimate revisions. Each side retains its own value, unit, period, dated source pointer and vintage. Compare only when the two observations align in period, definition and units.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "metric",
+              "old_observation",
+              "new_observation",
+              "comparison_status",
+              "basis_note"
+            ],
+            "properties": {
+              "metric": {
+                "type": "string",
+                "minLength": 1
+              },
+              "old_observation": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "value",
+                  "unit",
+                  "fiscal_period",
+                  "source_pointer",
+                  "source_published_at",
+                  "source_vintage"
+                ],
+                "properties": {
+                  "value": {
+                    "type": [
+                      "number",
+                      "string"
+                    ]
+                  },
+                  "unit": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "definition": {
+                    "type": "string"
+                  },
+                  "currency": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "fiscal_period": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "source_pointer": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "source_published_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "source_vintage": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              },
+              "new_observation": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "value",
+                  "unit",
+                  "fiscal_period",
+                  "source_pointer",
+                  "source_published_at",
+                  "source_vintage"
+                ],
+                "properties": {
+                  "value": {
+                    "type": [
+                      "number",
+                      "string"
+                    ]
+                  },
+                  "unit": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "definition": {
+                    "type": "string"
+                  },
+                  "currency": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "fiscal_period": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "source_pointer": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "source_published_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "source_vintage": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              },
+              "comparison_status": {
+                "type": "string",
+                "enum": [
+                  "comparable",
+                  "not_comparable",
+                  "partial_named_missing_items"
+                ]
+              },
+              "change": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "change_unit": {
+                "type": "string"
+              },
+              "basis_note": {
+                "type": "string"
+              }
+            },
+            "description": "Two independent estimate snapshots with their own dated provenance. Include comparison_status and basis_note when emitting this row; do not compute change across unlike units, definitions, or fiscal periods."
+          }
+        }
+      },
+      {
+        "name": "advisory_portfolio_proposal",
+        "description": "Optional property `advisory_portfolio_proposal` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Advisory proposal only. Does not authorize orders, signing, live activation or policy changes.",
+          "required": [
+            "status",
+            "proposals",
+            "missing_basis"
+          ],
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "advisory_proposal",
+                "partial",
+                "unavailable_missing_basis",
+                "not_requested"
+              ]
+            },
+            "proposals": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "instrument_or_scope",
+                  "proposal",
+                  "basis",
+                  "invalidation"
+                ],
+                "properties": {
+                  "instrument_or_scope": {
+                    "type": "string"
+                  },
+                  "proposal": {
+                    "type": "string"
+                  },
+                  "target_or_risk_level": {
+                    "type": [
+                      "string",
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "basis": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "invalidation": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "missing_basis": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "branch_status",
+        "description": "Optional property `branch_status` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "description": "Independent status for estimate-change, surprise, guidance, reaction and thesis/valuation branches. Missing evidence in one branch does not suppress other supported findings.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "branch",
+              "status",
+              "basis"
+            ],
+            "properties": {
+              "branch": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "complete_from_supplied_evidence",
+                  "partial_named_missing_items",
+                  "unavailable_missing_basis",
+                  "not_requested"
+                ]
+              },
+              "basis": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    ],
+    "procedure_summary": "Verbatim source section from `SKILL.md` (`## Integrated method`, lines 70-78):\n\n1. Verify event/time/period and distinguish preview from actuals\n2. Use primary release and dated consensus vintage\n3. Normalize GAAP/non-GAAP and one-offs\n4. Measure explicit event window vs benchmark\n5. Separate correlation from causal hypothesis\n6. State gaps",
+    "forbidden_actions": [
+      "Do not submit orders, call a broker, change portfolio state, or activate a live strategy.",
+      "Do not invent data, paid tool access, historical validation, or source API availability.",
+      "Do not treat a schema-valid example or output as method validation.",
+      "Do not replace LiNKtrading with another execution system."
+    ],
+    "failure_handling": "Source section `## Failure handling` in SKILL.md: - Missing, stale, unreconciled or inaccessible critical data: stop the dependent calculation and return a bounded partial result with the exact gap.\n- Incompatible units, periods, event windows or universes: do not merge. Reconcile definitions or report separate views.\n- Source rules conflict or are uncalibrated: show the source-specific rule and treat its result as a hypothesis; do not average contradictory rules into a score.\n- User requests an order, live activation, or unapproved side effect: provide the permitted advisory artifact only. Any later execution requires the existing LiNKtrading route and Lisa + Carlos independent authenticated two-channel exact-version approval.\n- A conditionally recommended size/exit cannot be supported because risk budget, holdings, liquidity, or instrument constraints are missing: omit numeric sizing and state which inputs would change it.",
+    "verification_steps": [
+      "Validate the supplied input against references/schemas.json#/definitions/input and report each missing or invalid required field.",
+      "Validate the produced task output against references/schemas.json#/definitions/output; structural validity does not establish method correctness.",
+      "Use references/eval-suite.json criteria only against an actual task output; a schema check or fictional example alone is not a behavioral pass."
+    ],
+    "completion_criteria": [
+      "Include every required output property defined at references/schemas.json#/definitions/output: completion_status, issuer, fiscal_period, actual_vs_expectation, guidance_changes, reaction, causal_limits, missing_inputs.",
+      "If `completion_status` exists, its value must reflect the schema-defined gaps or missing inputs; do not assert a complete result where evidence is absent.",
+      "Keep recommendations advisory; no external action, order, live activation, portfolio mutation, or approval is represented as completed."
+    ],
+    "known_limitations": [
+      "The skill source is an isolated unqualified draft; source-derived pack metadata does not establish selection, registration, method qualification, or production suitability.",
+      "The declared runtime-profile label is preserved as source metadata; runtime-profile binding is not proved."
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read",
+      "filesystem_write"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [
+      {
+        "key": "min_reasoning_tier",
+        "value": "balanced"
+      },
+      {
+        "key": "preferred_model",
+        "value": "gpt-6.1-sol"
+      },
+      {
+        "key": "context_required",
+        "value": 64000
+      }
+    ],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "suite_hash": "sha256:1149aac4a8659730ee2f357d35a0dc381b3215b824ac5d3ff79191feca519a04",
+    "verification_refs": [
+      "references/schemas.json",
+      "references/eval-suite.json"
+    ]
+  },
+  "telemetry": {
+    "classification": "public_internal",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_private_data",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain_only_approved_ids_and_hashes"
+  },
+  "fragments": [
+    {
+      "fragment_id": "source-integrated-method",
+      "disclosure_level": 3,
+      "path": "references/source-integrated-method.md"
+    },
+    {
+      "fragment_id": "contract-fixtures",
+      "disclosure_level": 4,
+      "path": "references/contract-fixtures.json"
+    }
+  ]
+}

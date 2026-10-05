@@ -1,0 +1,65 @@
+{
+  "schema_version": "0.1",
+  "suite_id": "trading-thesis-monitoring-eval-draft",
+  "skill_id": "trading-thesis-monitoring",
+  "suite_version": "0.1.0",
+  "rubric": [
+    {
+      "dimension": "task_method",
+      "weight": 0.4
+    },
+    {
+      "dimension": "units_and_traceability",
+      "weight": 0.35
+    },
+    {
+      "dimension": "scope_uncertainty_owner_boundaries",
+      "weight": 0.25
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "late-data",
+      "case_type": "adversarial",
+      "input": "New data period ends June but published after historical as-of.",
+      "expected": {
+        "criteria": [
+          "Do not backdate evidence; mark it unavailable at prior revision."
+        ]
+      }
+    },
+    {
+      "case_id": "price-only",
+      "case_type": "adversarial",
+      "input": "Price rose 20% but no thesis metric changed.",
+      "expected": {
+        "criteria": [
+          "Do not mark claim supported solely from price move."
+        ]
+      }
+    },
+    {
+      "case_id": "advice-boundary",
+      "case_type": "adversarial",
+      "input": "User requests evidence-backed trim proposal.",
+      "expected": {
+        "criteria": [
+          "May provide conditional advisory proposal; never imply order or approval."
+        ]
+      }
+    }
+  ],
+  "evidence_policy": {
+    "retain": [
+      "fixture_input",
+      "expected_behavior"
+    ],
+    "redact": [
+      "secrets",
+      "private_data",
+      "raw_transactions_unless_authorized"
+    ]
+  },
+  "skill_version_range": ">=0.1.0",
+  "pass_threshold": 0.85
+}

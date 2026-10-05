@@ -1,0 +1,849 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "trading-options-volatility-strategy",
+  "display_name": "Options strategy and volatility research",
+  "version": "0.1.0",
+  "description": "Analyze supplied options contracts or market view with exact payoff, Greeks, volatility surface/context and downside scenarios.",
+  "capability_category": "trading_research",
+  "provenance": {
+    "author": "LiNKskills Library",
+    "source": "Exact source provenance: references/source-provenance.json (sha256:45d89cd85f115775acf12a737d5e0521a45e862407c2b603f23e455fedf5ab69); per-entry license/notice/disposition recorded there.",
+    "license": "No package-wide upstream license is asserted; see exact per-file source provenance and notice dispositions in references/source-provenance.json.",
+    "imported_from": "Frozen Jane draft source: skills/trading-options-volatility-strategy; source provenance copied unchanged for this proposal only."
+  },
+  "lifecycle_state": "draft",
+  "format_profile": "simple",
+  "compatible_runtime_profiles": [
+    "jane-openclaw"
+  ],
+  "min_capability_tier": "balanced",
+  "routing": {
+    "when_to_use": "Use for options strategy design, payoff/Greeks, implied-versus-realized volatility, earnings/0DTE risk, or multi-leg scenario analysis.",
+    "when_not_to_use": [
+      "Do not place orders, contact a broker, alter a portfolio, or activate live capital.",
+      "Do not invent market data, source access, paid entitlements, historical validation, or method passes.",
+      "Do not treat structural validation or fictional fixtures as strategy validation.",
+      "Do not replace the existing LiNKtrading engine or create runtime JSON state/sidecars."
+    ],
+    "tags": [
+      "trading",
+      "research",
+      "jane",
+      "draft"
+    ],
+    "exclusion_rules": [
+      "Do not place orders, contact a broker, alter a portfolio, or activate live capital.",
+      "Do not invent market data, source access, paid entitlements, historical validation, or method passes.",
+      "Do not treat structural validation or fictional fixtures as strategy validation.",
+      "Do not replace the existing LiNKtrading engine or create runtime JSON state/sidecars."
+    ]
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "request_id",
+        "description": "Required property `request_id` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "as_of",
+        "description": "Required property `as_of` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "underlying",
+        "description": "Required property `underlying` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "symbol": {
+              "type": "string"
+            },
+            "spot": {
+              "type": "number"
+            },
+            "currency": {
+              "type": "string"
+            },
+            "source_id": {
+              "type": "string"
+            },
+            "as_of": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "symbol",
+            "spot",
+            "currency",
+            "source_id",
+            "as_of"
+          ],
+          "additionalProperties": false
+        }
+      },
+      {
+        "name": "contracts",
+        "description": "Required property `contracts` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "option_type": {
+                "type": "string",
+                "enum": [
+                  "call",
+                  "put"
+                ]
+              },
+              "side": {
+                "type": "string",
+                "enum": [
+                  "long",
+                  "short"
+                ]
+              },
+              "quantity": {
+                "type": "integer"
+              },
+              "multiplier": {
+                "type": "integer"
+              },
+              "deliverable": {
+                "type": "string"
+              },
+              "exercise_style": {
+                "type": "string"
+              },
+              "settlement": {
+                "type": "string"
+              },
+              "strike": {
+                "type": "integer"
+              },
+              "expiry": {
+                "type": "string"
+              },
+              "entry_price_per_share": {
+                "type": "number"
+              },
+              "quote": {
+                "type": "object",
+                "properties": {
+                  "bid": {
+                    "type": "number"
+                  },
+                  "ask": {
+                    "type": "number"
+                  },
+                  "as_of": {
+                    "type": "string"
+                  },
+                  "source_id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "bid",
+                  "ask",
+                  "as_of",
+                  "source_id"
+                ],
+                "additionalProperties": false
+              },
+              "implied_volatility": {
+                "type": "number"
+              },
+              "iv_unit": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "option_type",
+              "side",
+              "quantity",
+              "multiplier",
+              "deliverable",
+              "exercise_style",
+              "settlement",
+              "strike",
+              "expiry",
+              "entry_price_per_share",
+              "quote",
+              "implied_volatility",
+              "iv_unit"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      {
+        "name": "rates",
+        "description": "Required property `rates` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "tenor_days": {
+                "type": "integer"
+              },
+              "rate": {
+                "type": "number"
+              },
+              "unit": {
+                "type": "string"
+              },
+              "source_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "tenor_days",
+              "rate",
+              "unit",
+              "source_id"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      {
+        "name": "dividends",
+        "description": "Required property `dividends` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ex_date": {
+                "type": "string"
+              },
+              "amount_per_share": {
+                "type": "number"
+              },
+              "source_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "ex_date",
+              "amount_per_share",
+              "source_id"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      {
+        "name": "scenarios",
+        "description": "Required property `scenarios` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "spot_shock_pct": {
+                "type": "number"
+              },
+              "iv_shock_points": {
+                "type": "integer"
+              },
+              "days_elapsed": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "spot_shock_pct",
+              "iv_shock_points",
+              "days_elapsed"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      {
+        "name": "controls",
+        "description": "Required property `controls` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "probability_request": {
+              "type": [
+                "string",
+                "number",
+                "boolean",
+                "object",
+                "array",
+                "null"
+              ]
+            },
+            "account_constraints": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "probability_request",
+            "account_constraints"
+          ],
+          "additionalProperties": false
+        }
+      },
+      {
+        "name": "source_ledger",
+        "description": "Required property `source_ledger` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "source_id": {
+                "type": "string"
+              },
+              "kind": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "published_at": {
+                "type": "string"
+              },
+              "retrieved_at": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "source_id",
+              "kind",
+              "url",
+              "published_at",
+              "retrieved_at"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    ],
+    "optional_inputs": [],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "request_id": {
+          "type": "string"
+        },
+        "as_of": {
+          "type": "string"
+        },
+        "underlying": {
+          "type": "object",
+          "properties": {
+            "symbol": {
+              "type": "string"
+            },
+            "spot": {
+              "type": "number"
+            },
+            "currency": {
+              "type": "string"
+            },
+            "source_id": {
+              "type": "string"
+            },
+            "as_of": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "symbol",
+            "spot",
+            "currency",
+            "source_id",
+            "as_of"
+          ],
+          "additionalProperties": false
+        },
+        "contracts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "option_type": {
+                "type": "string",
+                "enum": [
+                  "call",
+                  "put"
+                ]
+              },
+              "side": {
+                "type": "string",
+                "enum": [
+                  "long",
+                  "short"
+                ]
+              },
+              "quantity": {
+                "type": "integer"
+              },
+              "multiplier": {
+                "type": "integer"
+              },
+              "deliverable": {
+                "type": "string"
+              },
+              "exercise_style": {
+                "type": "string"
+              },
+              "settlement": {
+                "type": "string"
+              },
+              "strike": {
+                "type": "integer"
+              },
+              "expiry": {
+                "type": "string"
+              },
+              "entry_price_per_share": {
+                "type": "number"
+              },
+              "quote": {
+                "type": "object",
+                "properties": {
+                  "bid": {
+                    "type": "number"
+                  },
+                  "ask": {
+                    "type": "number"
+                  },
+                  "as_of": {
+                    "type": "string"
+                  },
+                  "source_id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "bid",
+                  "ask",
+                  "as_of",
+                  "source_id"
+                ],
+                "additionalProperties": false
+              },
+              "implied_volatility": {
+                "type": "number"
+              },
+              "iv_unit": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "option_type",
+              "side",
+              "quantity",
+              "multiplier",
+              "deliverable",
+              "exercise_style",
+              "settlement",
+              "strike",
+              "expiry",
+              "entry_price_per_share",
+              "quote",
+              "implied_volatility",
+              "iv_unit"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "rates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "tenor_days": {
+                "type": "integer"
+              },
+              "rate": {
+                "type": "number"
+              },
+              "unit": {
+                "type": "string"
+              },
+              "source_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "tenor_days",
+              "rate",
+              "unit",
+              "source_id"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "dividends": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ex_date": {
+                "type": "string"
+              },
+              "amount_per_share": {
+                "type": "number"
+              },
+              "source_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "ex_date",
+              "amount_per_share",
+              "source_id"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "scenarios": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "spot_shock_pct": {
+                "type": "number"
+              },
+              "iv_shock_points": {
+                "type": "integer"
+              },
+              "days_elapsed": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "spot_shock_pct",
+              "iv_shock_points",
+              "days_elapsed"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "controls": {
+          "type": "object",
+          "properties": {
+            "probability_request": {
+              "type": [
+                "string",
+                "number",
+                "boolean",
+                "object",
+                "array",
+                "null"
+              ]
+            },
+            "account_constraints": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "probability_request",
+            "account_constraints"
+          ],
+          "additionalProperties": false
+        },
+        "source_ledger": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "source_id": {
+                "type": "string"
+              },
+              "kind": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "published_at": {
+                "type": "string"
+              },
+              "retrieved_at": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "source_id",
+              "kind",
+              "url",
+              "published_at",
+              "retrieved_at"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "request_id",
+        "as_of",
+        "underlying",
+        "contracts",
+        "rates",
+        "dividends",
+        "scenarios",
+        "controls",
+        "source_ledger"
+      ],
+      "additionalProperties": false,
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "urn:linkskills:trading-options-volatility-strategy:0.1.0#/definitions/input"
+    },
+    "expected_outputs": [
+      {
+        "name": "request_id",
+        "description": "Required property `request_id` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "status",
+        "description": "Required property `status` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "enum": [
+            "complete",
+            "partial",
+            "insufficient_input",
+            "no_view"
+          ]
+        }
+      },
+      {
+        "name": "as_of",
+        "description": "Required property `as_of` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "strategy",
+        "description": "Required property `strategy` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "legs",
+        "description": "Required property `legs` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "option_type": {
+                "type": "string"
+              },
+              "side": {
+                "type": "string"
+              },
+              "quantity": {
+                "type": "integer"
+              },
+              "multiplier": {
+                "type": "integer"
+              },
+              "expiry": {
+                "type": "string"
+              },
+              "strike": {
+                "type": "integer"
+              },
+              "entry_price_per_share": {
+                "type": "number"
+              },
+              "expiry_payoff_formula": {
+                "type": "string"
+              },
+              "break_even_at_expiry": {
+                "type": "number"
+              },
+              "max_loss_usd": {
+                "type": "integer"
+              },
+              "max_gain": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "option_type",
+              "side",
+              "quantity",
+              "multiplier",
+              "expiry",
+              "strike",
+              "entry_price_per_share",
+              "expiry_payoff_formula",
+              "break_even_at_expiry",
+              "max_loss_usd",
+              "max_gain"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      {
+        "name": "greeks",
+        "description": "Required property `greeks` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "available": {
+              "type": "boolean"
+            },
+            "reason": {
+              "type": "string"
+            },
+            "units_required": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "available",
+            "reason",
+            "units_required"
+          ],
+          "additionalProperties": false
+        }
+      },
+      {
+        "name": "scenario_pnl",
+        "description": "Required property `scenario_pnl` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      },
+      {
+        "name": "probability_of_profit",
+        "description": "Required property `probability_of_profit` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": [
+            "string",
+            "number",
+            "boolean",
+            "object",
+            "array",
+            "null"
+          ]
+        }
+      },
+      {
+        "name": "surface_summary",
+        "description": "Required property `surface_summary` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": [
+            "string",
+            "number",
+            "boolean",
+            "object",
+            "array",
+            "null"
+          ]
+        }
+      },
+      {
+        "name": "risks",
+        "description": "Required property `risks` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "advisory",
+        "description": "Required property `advisory` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      }
+    ],
+    "procedure_summary": "Source method section `Practical method` in SKILL.md: 1. Parse the view, task horizon, contract(s), style, settlement, multiplier, deliverables, corporate-action adjustments, signed quantity, position basis/entry price and user risk constraints. Missing any term that changes payoff blocks dependent calculations.\n2. Validate dated underlying and option quotes, bid/ask/size, expiry calendar, rates curve, discrete dividends, distributions and catalysts. Do not use historical volatility as implied volatility; if IV absent, mark IV/Greeks/surface unavailable or explicitly model a separate assumption.\n3. Check quote coherence, contract identity, no-arbitrage bounds/parity under matching style/dividends and liquidity. Reject crossed/zero/stale markets or mismatched deliverables rather than choosing a convenient midpoint.\n4. Compute exact expiration payoff per leg (signed quantity × multiplier) and strategy aggregate. Derive break-evens and maximum gain/loss; explicitly identify theoretically unbounded losses and assignment/exercise/settlement exposure.\n5. For pre-expiry valuation, specify model/style and calibrated/supplied surface; show model value distinct from executable market quote. Report Greek convention and units; aggregate only with exact position quantities.\n6. If surface supplied, report timestamp, spot, term structure, ATM vols, skew/smile, relative-value metrics and quote quality; compare realized vol only at matched return definition/calendar and tenor.\n7. Stress spot gaps, IV level/skew/term, time, rates/dividends, event gap, liquidity and assignment; probability/expected value only when a calibrated distribution, sample and assumptions are explicit. Never use a plotted grid share as probability.\n8. Compare conditional structures by capital/max loss, tail/assignment/liquidity and risk factors. Jane may recommend strategies, sizing, exit or adjustments as conditional advisory when inputs support them; no order, broker call or live activation.",
+    "forbidden_actions": [
+      "Do not place orders, contact a broker, alter a portfolio, or activate live capital.",
+      "Do not invent market data, source access, paid entitlements, historical validation, or method passes.",
+      "Do not treat structural validation or fictional fixtures as strategy validation.",
+      "Do not replace the existing LiNKtrading engine or create runtime JSON state/sidecars."
+    ],
+    "failure_handling": "Source section `## Failure handling and boundaries` in SKILL.md: - Missing/stale/conflicting data: stop dependent calculations, preserve observed values, mark partial/no-view and name the next evidence needed.\n- Conflicting strategy variants: select by the user’s stated objective; do not average thresholds or silently switch strategy.\n- Jane may give conditional research/strategy/position-sizing/exit recommendations when requested and supplied constraints support them. Recommendations are advice only and never authorize external action.\n- No manual trading, order placement, broker interaction, portfolio mutation or live activation. Any later activation remains on LiNKtrading and requires Lisa plus Carlos independent authenticated approvals over two channels against the exact version.\n- Eric owns software/Nautilus adapters; Sara owns legal/accounting determinations.",
+    "verification_steps": [
+      "Validate the supplied input against references/schemas.json#/definitions/input and report each missing or invalid required field.",
+      "Validate the produced task output against references/schemas.json#/definitions/output; structural validity does not establish method correctness.",
+      "Use references/eval-suite.json criteria only against an actual task output; a schema check or fictional example alone is not a behavioral pass."
+    ],
+    "completion_criteria": [
+      "Include every required output property defined at references/schemas.json#/definitions/output: request_id, status, as_of, strategy, legs, greeks, scenario_pnl, probability_of_profit, surface_summary, risks, advisory.",
+      "If `status` exists, its value must reflect the schema-defined gaps or missing inputs; do not assert a complete result where evidence is absent.",
+      "Keep recommendations advisory; no external action, order, live activation, portfolio mutation, or approval is represented as completed."
+    ],
+    "known_limitations": [
+      "The skill source is an isolated unqualified draft; source-derived pack metadata does not establish selection, registration, method qualification, or production suitability.",
+      "The declared runtime-profile label is preserved as source metadata; runtime-profile binding is not proved."
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read",
+      "filesystem_write"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [
+      {
+        "key": "min_reasoning_tier",
+        "value": "balanced"
+      },
+      {
+        "key": "preferred_model",
+        "value": "gpt-6.1-sol"
+      },
+      {
+        "key": "context_required",
+        "value": 64000
+      }
+    ],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "suite_hash": "sha256:28c6d64d98dfeef3615c2e3a9f28ebe8ab226af801652fc9b2abd858fa0cd33d",
+    "verification_refs": [
+      "references/schemas.json",
+      "references/eval-suite.json"
+    ]
+  },
+  "telemetry": {
+    "classification": "public_internal",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_private_data",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain_only_approved_ids_and_hashes"
+  }
+}

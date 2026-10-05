@@ -85,6 +85,21 @@ authorities.
 Every phase is idempotent. Rollback discards an unapproved draft and restores the exact
 absent PKT-19 release state; it never issues a compensating supplier call.
 
+## Total-cost comparison method
+
+For `supplier_comparison` or `pricing_verification`, first fix a common service
+scope, currency, and decision horizon. Sum evidenced components for that horizon:
+recurring price × covered periods + known setup/onboarding + known usage/support +
+known renewal/exit costs. Keep taxes, FX, and estimated items separate with their
+source and assumptions. Missing or unquoted components remain unknown, never zero.
+Label the figure a known-cost subtotal; full TCO is `not_comparable` when a material
+component is unresolved. Convert currencies only with a supplied, dated rate and
+its source. Return the calculation, source references, exclusions, and comparison
+limits in the existing `decision.rationale`; unresolved items go in `next_actions`.
+This is a model-executed comparison method. The offline helper validates a safe
+preparation envelope; its `prepared` result does not prove these calculations.
+No supplier selection, purchase, negotiation, or account action is authorized.
+
 ## Authority, evidence, and privacy
 
 - Every material claim is labelled `confirmed`, `inferred`, or `not_reported` with a

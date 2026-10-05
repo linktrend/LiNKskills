@@ -1,0 +1,48 @@
+{
+  "status": "schema_fixture_only_not_behavioral_evaluation",
+  "valid_case": {
+    "schema_ref": "references/schemas.json#/definitions/input",
+    "input": {
+      "clinical_question": "Does intervention X improve outcome Y?",
+      "population": "fictional adults meeting criterion P",
+      "intervention": "X",
+      "comparator": "usual care",
+      "design_stage": "concept",
+      "endpoints": {
+        "primary": "Y at week 12",
+        "secondary": [
+          "safety events"
+        ]
+      },
+      "follow_up": "12 weeks",
+      "expected_event_or_variance_assumptions": null,
+      "recruitment_sites": "unknown",
+      "regulatory_ethics_context": "jurisdiction not specified",
+      "clinical_owner": "named owner required",
+      "biostatistician": "named owner required"
+    },
+    "expected": "accept by JSON Schema"
+  },
+  "invalid_case": {
+    "schema_ref": "references/schemas.json#/definitions/input",
+    "input": {
+      "clinical_question": "fictional-input",
+      "population": "fictional-input",
+      "intervention": "fictional-input",
+      "comparator": "fictional-input",
+      "design_stage": "fictional-input",
+      "endpoints": {
+        "primary": "fictional-input",
+        "secondary": []
+      },
+      "follow_up": "fictional-input",
+      "expected_event_or_variance_assumptions": "fictional-input",
+      "recruitment_sites": "fictional-input",
+      "regulatory_ethics_context": "fictional-input",
+      "clinical_owner": "fictional-input",
+      "biostatistician": "fictional-input",
+      "unapproved_extra_field": "reject"
+    },
+    "expected": "reject unknown additional property"
+  }
+}

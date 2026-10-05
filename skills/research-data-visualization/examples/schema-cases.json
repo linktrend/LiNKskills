@@ -1,0 +1,36 @@
+{
+  "status": "schema_fixture_only_not_behavioral_evaluation",
+  "valid_case": {
+    "schema_ref": "references/schemas.json#/definitions/input",
+    "input": {
+      "question": "Show monthly fictional signup counts by channel.",
+      "audience": "product team",
+      "dataset_ref": "FIC-SIGNUPS",
+      "schema": "month, channel, count",
+      "provenance": "synthetic",
+      "units": "users",
+      "time_period": "2025-Q1",
+      "grouping": "month and channel",
+      "output_destination": "static slide",
+      "interactivity_required": false
+    },
+    "expected": "accept by JSON Schema"
+  },
+  "invalid_case": {
+    "schema_ref": "references/schemas.json#/definitions/input",
+    "input": {
+      "question": "fictional-input",
+      "audience": "fictional-input",
+      "dataset_ref": "fictional-input",
+      "schema": "fictional-input",
+      "provenance": "fictional-input",
+      "units": "fictional-input",
+      "time_period": "fictional-input",
+      "grouping": "fictional-input",
+      "output_destination": "fictional-input",
+      "interactivity_required": false,
+      "unapproved_extra_field": "reject"
+    },
+    "expected": "reject unknown additional property"
+  }
+}

@@ -1,0 +1,237 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "research-patent-landscape task contract draft",
+  "type": "object",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "properties": {
+        "invention_or_identifier": {
+          "type": "string"
+        },
+        "purpose": {
+          "type": "string"
+        },
+        "jurisdictions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "as_of": {
+          "type": "string"
+        },
+        "known_art": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "public_source_boundary": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "invention_or_identifier",
+        "purpose",
+        "jurisdictions",
+        "as_of",
+        "known_art",
+        "public_source_boundary"
+      ],
+      "additionalProperties": false,
+      "title": "Task-specific input"
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "search_log": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "source": {
+                "type": "string"
+              },
+              "query": {
+                "type": "string"
+              },
+              "searched_on": {
+                "type": "string"
+              },
+              "result_count": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "source",
+              "query",
+              "searched_on",
+              "result_count"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "families": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "family_id": {
+                "type": "string"
+              },
+              "members": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "deduplication_basis": {
+                "type": "string"
+              },
+              "priority_date": {
+                "type": "string"
+              },
+              "publication_date": {
+                "type": "string"
+              },
+              "grant_date": {
+                "type": [
+                  "string",
+                  "number",
+                  "object",
+                  "array",
+                  "boolean",
+                  "null"
+                ]
+              },
+              "status": {
+                "type": "string"
+              },
+              "jurisdiction": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "family_id",
+              "members",
+              "deduplication_basis",
+              "priority_date",
+              "publication_date",
+              "grant_date",
+              "status",
+              "jurisdiction"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "claim_passages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "document": {
+                "type": "string"
+              },
+              "claim": {
+                "type": "string"
+              },
+              "locator": {
+                "type": "string"
+              },
+              "relevance": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "document",
+              "claim",
+              "locator",
+              "relevance"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "coverage": {
+          "type": "object",
+          "properties": {
+            "jurisdictions": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "databases": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "cutoff": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "jurisdictions",
+            "databases",
+            "cutoff"
+          ],
+          "additionalProperties": false
+        },
+        "unresolved_checks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "legal_handoff": {
+          "type": "string"
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "status",
+        "search_log",
+        "families",
+        "claim_passages",
+        "coverage",
+        "unresolved_checks",
+        "legal_handoff",
+        "limitations"
+      ],
+      "additionalProperties": false,
+      "title": "Task-specific result"
+    },
+    "state": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "in_progress",
+            "completed",
+            "needs_input",
+            "blocked"
+          ]
+        },
+        "open_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

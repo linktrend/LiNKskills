@@ -1,0 +1,134 @@
+{
+  "input": {
+    "request_id": "OPT-2026-10-05-01",
+    "as_of": "2026-10-05T00:00:00Z",
+    "underlying": {
+      "symbol": "FICT",
+      "spot": 100.0,
+      "currency": "USD",
+      "source_id": "S1",
+      "as_of": "2026-10-02T20:00:00Z"
+    },
+    "contracts": [
+      {
+        "option_type": "call",
+        "side": "long",
+        "quantity": 1,
+        "multiplier": 100,
+        "deliverable": "100 FICT shares",
+        "exercise_style": "American",
+        "settlement": "physical",
+        "strike": 105,
+        "expiry": "2026-11-20",
+        "entry_price_per_share": 2.5,
+        "quote": {
+          "bid": 2.4,
+          "ask": 2.6,
+          "as_of": "2026-10-02T20:00:00Z",
+          "source_id": "S2"
+        },
+        "implied_volatility": 0.3,
+        "iv_unit": "annual_decimal"
+      }
+    ],
+    "rates": [
+      {
+        "tenor_days": 49,
+        "rate": 0.04,
+        "unit": "annual_decimal",
+        "source_id": "S3"
+      }
+    ],
+    "dividends": [
+      {
+        "ex_date": "2026-11-01",
+        "amount_per_share": 0.25,
+        "source_id": "S4"
+      }
+    ],
+    "scenarios": [
+      {
+        "spot_shock_pct": -0.1,
+        "iv_shock_points": 5,
+        "days_elapsed": 10
+      },
+      {
+        "spot_shock_pct": 0.1,
+        "iv_shock_points": -5,
+        "days_elapsed": 10
+      }
+    ],
+    "controls": {
+      "probability_request": null,
+      "account_constraints": "not supplied"
+    },
+    "source_ledger": [
+      {
+        "source_id": "S1",
+        "kind": "underlying_quote",
+        "url": "https://example.invalid/u",
+        "published_at": "2026-10-02T20:00:00Z",
+        "retrieved_at": "2026-10-05T00:00:00Z"
+      },
+      {
+        "source_id": "S2",
+        "kind": "option_quote",
+        "url": "https://example.invalid/o",
+        "published_at": "2026-10-02T20:00:00Z",
+        "retrieved_at": "2026-10-05T00:00:00Z"
+      },
+      {
+        "source_id": "S3",
+        "kind": "rates",
+        "url": "https://example.invalid/r",
+        "published_at": "2026-10-02T20:00:00Z",
+        "retrieved_at": "2026-10-05T00:00:00Z"
+      },
+      {
+        "source_id": "S4",
+        "kind": "dividend",
+        "url": "https://example.invalid/d",
+        "published_at": "2026-09-01T12:00:00Z",
+        "retrieved_at": "2026-10-05T00:00:00Z"
+      }
+    ]
+  },
+  "output": {
+    "request_id": "OPT-2026-10-05-01",
+    "status": "partial",
+    "as_of": "2026-10-05T00:00:00Z",
+    "strategy": "single long American call",
+    "legs": [
+      {
+        "option_type": "call",
+        "side": "long",
+        "quantity": 1,
+        "multiplier": 100,
+        "expiry": "2026-11-20",
+        "strike": 105,
+        "entry_price_per_share": 2.5,
+        "expiry_payoff_formula": "max(spot-105,0)*100 - 250 USD",
+        "break_even_at_expiry": 107.5,
+        "max_loss_usd": 250,
+        "max_gain": "unbounded"
+      }
+    ],
+    "greeks": {
+      "available": false,
+      "reason": "No validated model/vendor Greek supplied in fictional fixture",
+      "units_required": [
+        "per share",
+        "per contract",
+        "total position"
+      ]
+    },
+    "scenario_pnl": [],
+    "probability_of_profit": null,
+    "surface_summary": null,
+    "risks": [
+      "American exercise and discrete dividend can affect early exercise/model value",
+      "quote/market data are fictional and no option valuation was performed"
+    ],
+    "advisory": "No order or activation"
+  }
+}

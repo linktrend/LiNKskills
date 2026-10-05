@@ -1,0 +1,46 @@
+{
+  "skill_id": "trading-portfolio-exposure-risk",
+  "status": "proposed_not_run",
+  "cases": [
+    "Two accounts hold the same underlying asset through direct and fund look-through: aggregate economic exposure after deduplication; if fund holdings unknown, show known lower bound and unclassified remainder.",
+    "Portfolio equity $100, long $130, short $20 and cash \u2212$10: report gross=150/equity=150%, net exposure=110/equity=110% with the given conventions; gross-only or position-count-only summaries miss leverage.",
+    "Returns have 40 daily observations and estimated lower-tail co-crashes of 3/5 X-tail events: report finite sample conditional estimate and wide uncertainty; do not call asymptotic \u03bbL=0.6 or reliable stress correlation.",
+    "Equity starts 100 then first period 90 then recovers 100; drawdown must show \u221210% from initial NAV. A method using first observed cumulative point as peak reports 0% and fails.",
+    "A long-short portfolio has signed weights sum zero and absolute weights sum two: HHI on raw signed weights/equity is not an effective independent bet count; define normalized gross sleeve and show limitation.",
+    "Strongly collinear factors / non-PSD sample covariance: do not emit precise factor attribution or optimizer target without diagnostics, conditioning and sensitivity."
+  ],
+  "fixtures": [
+    {
+      "id": "typed-success-input",
+      "file": "success-input.json",
+      "schema": "#/definitions/input",
+      "expect": "valid"
+    },
+    {
+      "id": "typed-success-output",
+      "file": "success-output.json",
+      "schema": "#/definitions/output",
+      "expect": "valid-structural-fixture-only"
+    },
+    {
+      "id": "bounded-partial-output",
+      "file": "partial-output.json",
+      "schema": "#/definitions/output",
+      "expect": "valid"
+    }
+  ],
+  "invalid_contract_cases": [
+    {
+      "id": "invalid-unit-or-dimensional-value",
+      "file": "rejected-invalid-unit.json",
+      "schema": "#/definitions/input",
+      "expect": "reject by task-specific typed unit, currency, probability, or range constraint"
+    },
+    {
+      "id": "false-completion-with-unresolved-gap",
+      "file": "rejected-false-completion.json",
+      "schema": "#/definitions/output",
+      "expect": "reject because complete requires complete analysis, no gaps, evidence reference and all evidence-gate flags true"
+    }
+  ]
+}

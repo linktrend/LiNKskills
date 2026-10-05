@@ -1,0 +1,69 @@
+{
+  "fictional_fixture": true,
+  "notice": "All names, dates, observations and values in this worked example are fictional; it demonstrates output shape, not strategy validity.",
+  "input": {
+    "issuer": "Fictional Harbor Tools",
+    "fiscal_period": "Q2 FY2026",
+    "event_datetime": "2026-08-12T16:05:00-04:00",
+    "timezone": "America/New_York",
+    "analysis_mode": "results",
+    "consensus_vintage": {
+      "source": "fictional consensus snapshot",
+      "captured_at": "2026-08-11T20:00:00-04:00",
+      "currency": "USD"
+    },
+    "metrics": [
+      "revenue",
+      "adjusted EPS"
+    ],
+    "reaction_window": {
+      "start": "2026-08-12 close",
+      "end": "2026-08-13 close",
+      "benchmark": "fictional broad index"
+    }
+  },
+  "output": {
+    "completion_status": "complete",
+    "issuer": "Fictional Harbor Tools",
+    "fiscal_period": "Q2 FY2026",
+    "actual_vs_expectation": [
+      {
+        "metric": "revenue",
+        "actual": 505,
+        "consensus": 500,
+        "unit": "fictional USD millions",
+        "difference": 5,
+        "difference_pct": 1
+      },
+      {
+        "metric": "adjusted EPS",
+        "actual": 1.02,
+        "consensus": 1.05,
+        "unit": "fictional USD/share",
+        "difference": -0.03,
+        "definition": "issuer non-GAAP; not reconciled in fixture"
+      }
+    ],
+    "guidance_changes": [
+      {
+        "metric": "FY revenue guidance",
+        "prior_midpoint": 2000,
+        "new_midpoint": 1980,
+        "unit": "fictional USD millions"
+      }
+    ],
+    "reaction": {
+      "window": "close-to-next-close",
+      "asset_return_pct": -2.0,
+      "benchmark_return_pct": -0.5,
+      "relative_return_pct": -1.5,
+      "status": "fictional example"
+    },
+    "causal_limits": [
+      "One-day relative move does not establish earnings causation; other news and positioning may contribute."
+    ],
+    "missing_inputs": [
+      "No source filing/consensus is real; values are fictional."
+    ]
+  }
+}

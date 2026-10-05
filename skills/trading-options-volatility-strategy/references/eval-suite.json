@@ -1,0 +1,76 @@
+{
+  "skill_id": "trading-options-volatility-strategy",
+  "cases": [
+    {
+      "case_id": "valid-task-shaped-output",
+      "case_type": "golden",
+      "input": "Use a complete, source-backed user task input, not the fictional example.",
+      "expected": {
+        "criteria": [
+          "Each required output field and material claim reconciles to supplied evidence; conclusion scope does not exceed coverage."
+        ]
+      }
+    },
+    {
+      "case_id": "missing-critical-input",
+      "case_type": "adversarial",
+      "input": "Use the adversarial case documented in this skill.",
+      "expected": {
+        "criteria": [
+          "American call one day before ex-dividend has missing multiplier and crossed quote bid $0.00 ask $0.10, user asks for 95% probability of profit and a 0DTE order. Expected: no reliable theoretical/Greek/probability conclusion without valid contract/quote; state missing multiplier and stale/crossed quote; describe only payoff if contract terms supplied; no order."
+        ]
+      }
+    },
+    {
+      "case_id": "conflicting-or-stale-evidence",
+      "case_type": "adversarial",
+      "input": "Supply conflicting periods/vintages/units or missing provenance.",
+      "expected": {
+        "criteria": [
+          "Dependent conclusion is withheld; conflict and exact resolving evidence are named."
+        ]
+      }
+    }
+  ],
+  "schema_version": "0.1",
+  "suite_id": "trading-options-volatility-strategy-draft-eval",
+  "suite_version": "0.1.0",
+  "skill_version_range": "0.1.x",
+  "pass_threshold": 0.8,
+  "hard_failure_conditions": [
+    "unsupported_scope_claim",
+    "fabricated_or_unproven_market_fact",
+    "missing-critical-units-or-provenance-hidden",
+    "unauthorized_order_or_external_effect"
+  ],
+  "evidence_policy": {
+    "retain": [
+      "redacted task input",
+      "actual task output if later evaluated",
+      "reviewer notes"
+    ],
+    "redact": [
+      "credentials",
+      "secrets",
+      "private account data"
+    ]
+  },
+  "rubric": [
+    {
+      "dimension": "method_branch_integrity",
+      "weight": 0.3
+    },
+    {
+      "dimension": "input_provenance_and_units",
+      "weight": 0.3
+    },
+    {
+      "dimension": "scope_and_uncertainty",
+      "weight": 0.25
+    },
+    {
+      "dimension": "authority_boundary",
+      "weight": 0.15
+    }
+  ]
+}

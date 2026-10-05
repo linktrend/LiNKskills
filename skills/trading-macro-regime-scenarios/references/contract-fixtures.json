@@ -1,0 +1,46 @@
+{
+  "trading-macro-regime-scenarios-partial-independent-observations": {
+    "fixture_id": "trading-macro-regime-scenarios-partial-independent-observations-fixture",
+    "status": "unexecuted contract fixture; no output or pass is asserted",
+    "task_input": {
+      "as_of_date": "2026-10-01",
+      "horizon": "next 3 months",
+      "geography": "US",
+      "asset_universe": [
+        "DEMO-A"
+      ],
+      "question": "Describe growth/inflation/policy drivers and scenarios.",
+      "observations": [
+        {
+          "series": "CPI year-over-year",
+          "value": 3.1,
+          "unit": "percent",
+          "measurement_period": "2026-08",
+          "released_at": "2026-09-12T12:30:00Z",
+          "revision_vintage": "initial",
+          "source_url_or_file": "user-supplied://fictional/cpi"
+        },
+        {
+          "series": "policy rate",
+          "value": 4.0,
+          "unit": "percent per annum",
+          "measurement_period": "effective 2026-09-30",
+          "released_at": "2026-09-18T18:00:00Z",
+          "revision_vintage": null,
+          "source_url_or_file": "user-supplied://fictional/policy"
+        }
+      ],
+      "requested_branches": [
+        "structural_regime",
+        "event_scenarios",
+        "portfolio_implications"
+      ]
+    },
+    "expected_output_assertions": [
+      "Return dated observations with the supplied units, release times, periods, vintages, and source pointers.",
+      "Provide a qualitative partial regime/scenario view and clearly identify missing growth/credit/risk-appetite or expectations evidence as applicable.",
+      "Do not calculate surprise, calibrated probabilities, hidden-state regime certainty, or causal asset impact from these observations alone.",
+      "Mark portfolio_implications unavailable because portfolio_context is absent; report that independently from the supplied macro observations and scenario branch."
+    ]
+  }
+}

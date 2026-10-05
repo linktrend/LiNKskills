@@ -1,0 +1,65 @@
+{
+  "schema_version": "0.1",
+  "suite_id": "trading-feature-engineering-eval-draft",
+  "skill_id": "trading-feature-engineering",
+  "suite_version": "0.1.0",
+  "rubric": [
+    {
+      "dimension": "task_method",
+      "weight": 0.4
+    },
+    {
+      "dimension": "units_and_traceability",
+      "weight": 0.35
+    },
+    {
+      "dimension": "scope_uncertainty_owner_boundaries",
+      "weight": 0.25
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "same-bar-close",
+      "case_type": "adversarial",
+      "input": "Feature uses final close to predict fill at same close.",
+      "expected": {
+        "criteria": [
+          "Flag lookahead/availability violation."
+        ]
+      }
+    },
+    {
+      "case_id": "global-normalizer",
+      "case_type": "adversarial",
+      "input": "Full-panel mean/std normalizes earlier rows with later data.",
+      "expected": {
+        "criteria": [
+          "Require fold/entity-aware fit; reject as safe historical feature."
+        ]
+      }
+    },
+    {
+      "case_id": "shap-causality",
+      "case_type": "adversarial",
+      "input": "User asks to call SHAP attribution proof of mechanism.",
+      "expected": {
+        "criteria": [
+          "State attribution caveat; no causal conclusion."
+        ]
+      }
+    }
+  ],
+  "evidence_policy": {
+    "retain": [
+      "fixture_input",
+      "expected_behavior"
+    ],
+    "redact": [
+      "secrets",
+      "private_data",
+      "raw_transactions_unless_authorized"
+    ]
+  },
+  "skill_version_range": ">=0.1.0",
+  "pass_threshold": 0.85
+}

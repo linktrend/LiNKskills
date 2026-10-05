@@ -1,0 +1,682 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "trading-crypto-token-research",
+  "display_name": "Crypto token research",
+  "version": "0.1.0",
+  "description": "Research token supply, unlocks, protocol economics, holder coverage, chain risks, and conditional valuation using supplied dated evidence.",
+  "capability_category": "trading_research",
+  "provenance": {
+    "author": "LiNKskills Library (draft)",
+    "source": "Exact source provenance: references/source-provenance.json (sha256:f0a2778b829c06d5e8f8a732e72a206694a6efe53ae08bf82c924dec3c4f7aed); per-entry license/notice/disposition recorded there.",
+    "license": "No package-wide upstream license is asserted; see exact per-file source provenance and notice dispositions in references/source-provenance.json.",
+    "imported_from": "Frozen Jane draft source: skills/trading-crypto-token-research; source provenance copied unchanged for this proposal only."
+  },
+  "lifecycle_state": "draft",
+  "format_profile": "simple",
+  "compatible_runtime_profiles": [
+    "jane-openclaw"
+  ],
+  "min_capability_tier": "balanced",
+  "routing": {
+    "when_to_use": "Tokenomics, circulating supply, unlocks, holder concentration, protocol value capture, or crypto asset research.",
+    "when_not_to_use": [
+      "No wallet interaction, transaction, order, or trade execution.",
+      "No credentials, paid service, RPC, or API assumed.",
+      "No address ownership or malicious intent inferred from heuristics.",
+      "No price-impact or valuation claims from generic thresholds.",
+      "No runtime JSON state or source script execution."
+    ],
+    "tags": [
+      "trading",
+      "crypto",
+      "research",
+      "jane",
+      "draft"
+    ],
+    "exclusion_rules": [
+      "No wallet interaction, transaction, order, or trade execution.",
+      "No credentials, paid service, RPC, or API assumed.",
+      "No address ownership or malicious intent inferred from heuristics.",
+      "No price-impact or valuation claims from generic thresholds.",
+      "No runtime JSON state or source script execution."
+    ]
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "request_id",
+        "description": "Required property `request_id` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "network",
+        "description": "Required property `network` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "asset_id",
+        "description": "Required property `asset_id` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "as_of",
+        "description": "Required property `as_of` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      {
+        "name": "source_snapshot",
+        "description": "Required property `source_snapshot` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "source_provenance",
+        "description": "Required property `source_provenance` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "source",
+              "retrieved_at",
+              "coverage"
+            ],
+            "properties": {
+              "source": {
+                "type": "string"
+              },
+              "retrieved_at": {
+                "type": "string"
+              },
+              "coverage": {
+                "type": "string"
+              },
+              "entitlement": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "decimals",
+        "description": "Required property `decimals` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      {
+        "name": "supply_definition",
+        "description": "Required property `supply_definition` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      }
+    ],
+    "optional_inputs": [
+      {
+        "name": "supply_rows",
+        "description": "Optional property `supply_rows` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "category",
+              "amount_raw",
+              "source_row"
+            ],
+            "properties": {
+              "category": {
+                "type": "string"
+              },
+              "amount_raw": {
+                "type": "string"
+              },
+              "source_row": {
+                "type": "string"
+              },
+              "status": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "holders",
+        "description": "Optional property `holders` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "address_ref",
+              "amount_raw",
+              "source_row"
+            ],
+            "properties": {
+              "address_ref": {
+                "type": "string"
+              },
+              "amount_raw": {
+                "type": "string"
+              },
+              "source_row": {
+                "type": "string"
+              },
+              "classification": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "protocol_economics",
+        "description": "Optional property `protocol_economics` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "object"
+        }
+      },
+      {
+        "name": "unlock_scenarios",
+        "description": "Optional property `unlock_scenarios` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "array"
+        }
+      },
+      {
+        "name": "comparable_set",
+        "description": "Optional property `comparable_set` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "array"
+        }
+      },
+      {
+        "name": "chain_program_version",
+        "description": "Optional property `chain_program_version` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      {
+        "name": "research_question",
+        "description": "Optional property `research_question` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    ],
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "request_id",
+        "network",
+        "asset_id",
+        "as_of",
+        "source_snapshot",
+        "source_provenance",
+        "decimals",
+        "supply_definition"
+      ],
+      "properties": {
+        "request_id": {
+          "type": "string"
+        },
+        "network": {
+          "type": "string"
+        },
+        "asset_id": {
+          "type": "string"
+        },
+        "as_of": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "source_snapshot": {
+          "type": "string"
+        },
+        "source_provenance": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "source",
+              "retrieved_at",
+              "coverage"
+            ],
+            "properties": {
+              "source": {
+                "type": "string"
+              },
+              "retrieved_at": {
+                "type": "string"
+              },
+              "coverage": {
+                "type": "string"
+              },
+              "entitlement": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        },
+        "decimals": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "supply_definition": {
+          "type": "string"
+        },
+        "supply_rows": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "category",
+              "amount_raw",
+              "source_row"
+            ],
+            "properties": {
+              "category": {
+                "type": "string"
+              },
+              "amount_raw": {
+                "type": "string"
+              },
+              "source_row": {
+                "type": "string"
+              },
+              "status": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        },
+        "holders": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "address_ref",
+              "amount_raw",
+              "source_row"
+            ],
+            "properties": {
+              "address_ref": {
+                "type": "string"
+              },
+              "amount_raw": {
+                "type": "string"
+              },
+              "source_row": {
+                "type": "string"
+              },
+              "classification": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        },
+        "protocol_economics": {
+          "type": "object"
+        },
+        "unlock_scenarios": {
+          "type": "array"
+        },
+        "comparable_set": {
+          "type": "array"
+        },
+        "chain_program_version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "research_question": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "urn:linkskills:trading-crypto-token-research:0.1.0#/definitions/input"
+    },
+    "expected_outputs": [
+      {
+        "name": "request_id",
+        "description": "Required property `request_id` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "status",
+        "description": "Required property `status` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "enum": [
+            "complete",
+            "partial",
+            "needs_input",
+            "blocked"
+          ]
+        }
+      },
+      {
+        "name": "asset_identity",
+        "description": "Required property `asset_identity` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "object",
+          "required": [
+            "network",
+            "asset_id",
+            "decimals"
+          ],
+          "properties": {
+            "network": {
+              "type": "string"
+            },
+            "asset_id": {
+              "type": "string"
+            },
+            "decimals": {
+              "type": "integer"
+            }
+          }
+        }
+      },
+      {
+        "name": "snapshot",
+        "description": "Required property `snapshot` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "object",
+          "required": [
+            "as_of",
+            "source_snapshot"
+          ],
+          "properties": {
+            "as_of": {
+              "type": "string"
+            },
+            "source_snapshot": {
+              "type": "string"
+            },
+            "provenance": {
+              "type": "array"
+            }
+          }
+        }
+      },
+      {
+        "name": "supply_reconciliation",
+        "description": "Required property `supply_reconciliation` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "object",
+          "required": [
+            "definition",
+            "items",
+            "reconciled_total_raw",
+            "status"
+          ],
+          "properties": {
+            "definition": {
+              "type": "string"
+            },
+            "items": {
+              "type": "array"
+            },
+            "reconciled_total_raw": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "status": {
+              "enum": [
+                "reconciled",
+                "partial",
+                "unresolved"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "name": "holder_sample",
+        "description": "Required property `holder_sample` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "object",
+          "required": [
+            "observed_count",
+            "coverage_frame",
+            "concentration_metrics",
+            "identity_limitations"
+          ],
+          "properties": {
+            "observed_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "coverage_frame": {
+              "type": "string"
+            },
+            "concentration_metrics": {
+              "type": "array"
+            },
+            "identity_limitations": {
+              "type": "array"
+            }
+          }
+        }
+      },
+      {
+        "name": "economics",
+        "description": "Required property `economics` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "object",
+          "required": [
+            "measures",
+            "value_capture_status"
+          ],
+          "properties": {
+            "measures": {
+              "type": "array"
+            },
+            "value_capture_status": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      {
+        "name": "scenarios",
+        "description": "Required property `scenarios` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "assumptions",
+              "computed_effect",
+              "not_a_forecast"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "assumptions": {
+                "type": "array"
+              },
+              "computed_effect": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "not_a_forecast": {
+                "const": true
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "findings",
+        "description": "Required property `findings` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "limitations",
+        "description": "Required property `limitations` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "recommendation",
+        "description": "Required property `recommendation` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "object",
+          "required": [
+            "stance",
+            "basis",
+            "advisory_only"
+          ],
+          "properties": {
+            "stance": {
+              "enum": [
+                "positive",
+                "negative",
+                "mixed",
+                "no_view"
+              ]
+            },
+            "basis": {
+              "type": "array"
+            },
+            "advisory_only": {
+              "const": true
+            },
+            "conditions": {
+              "type": "array"
+            }
+          }
+        }
+      }
+    ],
+    "procedure_summary": "Source method section `Method` in SKILL.md: 1. Confirm network, canonical mint/contract, token standard, decimals, point-in-time and source vintage. A ticker or symbol alone is not identity.\n2. Reconcile supply definitions by source row: issued/minted, burned, reported circulating, vesting/locked, treasury, staked, bridged, and maximum. Do not assume staked or treasury units are non-circulating; label the source's definition and show unreconciled balances.\n3. For dated emission/unlock scenarios, calculate token quantities and value only from supplied prices and schedule data. Compare to explicitly named volume/liquidity windows as descriptive ratios. Do not translate a ratio into a drawdown without a separately supported empirical model.\n4. Separate gross activity, protocol fees, net revenue, treasury receipts, burns, buybacks, and token-holder entitlements. A valuation multiple called P/E is inappropriate without evidenced equity-like earnings rights; distinguish activity multiples from cash flows.\n5. Calculate holder metrics only on an explicit observed sample and denominator. Disclose missing coverage, exclusions, program accounts, and snapshot date. Gini/HHI/Nakamoto values from truncated lists are sample measures, not proof of decentralization or ownership.\n6. Describe early buys, shared funders, creator balances, authority settings, and vendor risk scores as observations or hypotheses. Do not call addresses insiders, coordinated, or malicious without independently verified identity and evidence.\n7. Keep chain-specific mechanics optional. Pump.fun calculations require current official program/version/layout, exact integer units, fee and rounding conventions, and independently checked fixtures. Until supplied, omit decoding and calculations.\n8. Give counterevidence, unresolved gaps, and a conditional advisory stance or `no_view`. Separate sourced facts, calculated values, assumptions, and hypotheses.",
+    "forbidden_actions": [
+      "No wallet interaction, transaction, order, or trade execution.",
+      "No credentials, paid service, RPC, or API assumed.",
+      "No address ownership or malicious intent inferred from heuristics.",
+      "No price-impact or valuation claims from generic thresholds.",
+      "No runtime JSON state or source script execution."
+    ],
+    "failure_handling": "Source-grounded missing/invalid evidence clauses (verbatim, with entrypoint line numbers): L42: 5. Calculate holder metrics only on an explicit observed sample and denominator. Disclose missing coverage, exclusions, program accounts, and snapshot date. Gini/HHI/Nakamoto values from truncated lists are sample measures, not proof of decentralization or ownership.; L45: 8. Give counterevidence, unresolved gaps, and a conditional advisory stance or `no_view`. Separate sourced facts, calculated values, assumptions, and hypotheses.",
+    "verification_steps": [
+      "Validate the supplied input against references/schemas.json#/definitions/input and report each missing or invalid required field.",
+      "Validate the produced task output against references/schemas.json#/definitions/output; structural validity does not establish method correctness.",
+      "Use references/eval-suite.json criteria only against an actual task output; a schema check or fictional example alone is not a behavioral pass."
+    ],
+    "completion_criteria": [
+      "Include every required output property defined at references/schemas.json#/definitions/output: request_id, status, asset_identity, snapshot, supply_reconciliation, holder_sample, economics, scenarios, findings, limitations, recommendation.",
+      "If `status` exists, its value must reflect the schema-defined gaps or missing inputs; do not assert a complete result where evidence is absent.",
+      "Keep recommendations advisory; no external action, order, live activation, portfolio mutation, or approval is represented as completed."
+    ],
+    "known_limitations": [
+      "The skill source is an isolated unqualified draft; source-derived pack metadata does not establish selection, registration, method qualification, or production suitability.",
+      "The declared runtime-profile label is preserved as source metadata; runtime-profile binding is not proved."
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read",
+      "filesystem_write"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [
+      {
+        "key": "min_reasoning_tier",
+        "value": "balanced"
+      },
+      {
+        "key": "preferred_model",
+        "value": "gpt-6.1-sol"
+      },
+      {
+        "key": "context_required",
+        "value": 64000
+      }
+    ],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "suite_hash": "sha256:1f14a34883996dc143861b1c42de852568a688defa7befe91ea21b31876de3cf",
+    "verification_refs": [
+      "references/schemas.json",
+      "references/eval-suite.json"
+    ]
+  },
+  "telemetry": {
+    "classification": "public_internal",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_private_data",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain_only_approved_ids_and_hashes"
+  }
+}

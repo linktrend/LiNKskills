@@ -1,0 +1,71 @@
+{
+  "trading-strategy-design-two-candidate-partial-comparison": {
+    "fixture_id": "trading-strategy-design-two-candidate-partial-comparison-fixture-cost-provenance-successor",
+    "status": "unexecuted contract fixture successor; no output or pass is asserted",
+    "task_input": {
+      "question": "Compare two research candidates on the same instrument universe and one-month horizon.",
+      "asset_universe": [
+        "DEMO-A"
+      ],
+      "bar_interval": "1d",
+      "research_as_of": "2026-10-01",
+      "holding_horizon": "20 sessions",
+      "entry_exit_hypothesis": "Legacy primary candidate: close above prior 20-session high; exit below prior 10-session low.",
+      "candidate_hypotheses": [
+        {
+          "candidate_id": "breakout",
+          "hypothesis": "A 20-session high breakout may capture sustained demand.",
+          "instrument_universe": [
+            "DEMO-A"
+          ],
+          "side": "long",
+          "holding_horizon": "20 sessions",
+          "entry_rule": "Buy after a daily close above the prior 20-session high; trigger data not supplied.",
+          "exit_rule": "Close below prior 10-session low.",
+          "risk_invalidator": "No supplied stop or capital risk limit.",
+          "mechanism": "Continuation after demand shock; untested hypothesis.",
+          "data_requirements": [
+            "point-in-time daily OHLCV",
+            "fees",
+            "spread/slippage"
+          ]
+        },
+        {
+          "candidate_id": "mean-reversion",
+          "hypothesis": "A two-standard-deviation close deviation may revert over five sessions.",
+          "instrument_universe": [
+            "DEMO-A"
+          ],
+          "side": "long_short",
+          "holding_horizon": "5 sessions",
+          "entry_rule": "Enter only when z-score crosses +/-2; feature formula/version not supplied.",
+          "exit_rule": "Exit at mean or after five sessions.",
+          "risk_invalidator": "No supplied short borrow or stop rule.",
+          "mechanism": "Temporary dislocation may normalize; untested hypothesis.",
+          "data_requirements": [
+            "point-in-time daily close",
+            "short borrow",
+            "fees",
+            "spread/slippage"
+          ]
+        }
+      ],
+      "data_inventory": [
+        "No observations supplied."
+      ],
+      "cost_assumptions": {
+        "commission_bps_per_side": 0,
+        "slippage_bps_per_side": 0,
+        "borrow_bps_annual": null
+      },
+      "risk_constraints": []
+    },
+    "expected_output_assertions": [
+      "Return both candidates in candidate_comparison and mark the comparison partial or not_comparable where common horizon, short-borrow, cost evidence, or point-in-time observations are absent.",
+      "The task_input explicitly supplies fictional zero commission and slippage assumptions; report those as supplied assumptions, not as sourced/verified transaction-cost evidence. Do not describe the numeric fields as absent.",
+      "Because no cost source or validation record is supplied, mark the cost basis unverified/partial and name the evidence needed to replace the illustrative zero assumptions; do not silently treat them as actual costs.",
+      "Do not claim a tested winner or performance result; results_status remains not_run.",
+      "State the missing data and criteria needed for a fair prospective experiment."
+    ]
+  }
+}

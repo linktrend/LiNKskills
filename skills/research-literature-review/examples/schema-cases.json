@@ -1,0 +1,42 @@
+{
+  "status": "schema_fixture_only_not_behavioral_evaluation",
+  "valid_case": {
+    "schema_ref": "references/schemas.json#/definitions/input",
+    "input": {
+      "research_question": "How does intervention X affect outcome Y in population P?",
+      "purpose": "orientation",
+      "review_type": "scoping",
+      "audience": "research team",
+      "population": "fictional adults with condition P",
+      "concepts": [
+        "intervention X",
+        "outcome Y"
+      ],
+      "date_bounds": "2019-01-01/2026-10-05",
+      "source_access": [
+        "fictional database A",
+        "user-supplied reports"
+      ],
+      "constraints": "English, abstracts available",
+      "as_of": "2026-10-05"
+    },
+    "expected": "accept by JSON Schema"
+  },
+  "invalid_case": {
+    "schema_ref": "references/schemas.json#/definitions/input",
+    "input": {
+      "research_question": "fictional-input",
+      "purpose": "fictional-input",
+      "review_type": "fictional-input",
+      "audience": "fictional-input",
+      "population": "fictional-input",
+      "concepts": [],
+      "date_bounds": "fictional-input",
+      "source_access": [],
+      "constraints": "fictional-input",
+      "as_of": "fictional-input",
+      "unapproved_extra_field": "reject"
+    },
+    "expected": "reject unknown additional property"
+  }
+}

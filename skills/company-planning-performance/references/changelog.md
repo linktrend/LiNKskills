@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased source candidate - 2026-10-05
+- Add evidenced capacity-review arithmetic, period/unknown handling, and actual helper/schema tests.
+- Five fictional cases validated; no model or runtime skill qualification claimed.
+
 ## v1.0.0 — 2026-08-24
 
 - Added evidence-bounded company planning across six supported horizons.
@@ -8,3 +12,6 @@
 - Added late, blocked, obsolete, and on-track signal reporting.
 - Added owner-review-only reprioritization records and strict no-mutation
   effects.
+
+### Independent source-review correction — 2026-10-05 (unreleased)
+Closed bounded routing or evidence-preservation findings. Source checks are not model qualification or publication. Existing release identity remains unchanged pending owner release decision.

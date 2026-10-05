@@ -1,0 +1,264 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:linkskills:trading-strategy-design:0.1.1",
+  "title": "Trading strategy research design",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "question",
+        "asset_universe",
+        "bar_interval",
+        "research_as_of",
+        "holding_horizon",
+        "entry_exit_hypothesis",
+        "data_inventory",
+        "cost_assumptions",
+        "risk_constraints"
+      ],
+      "properties": {
+        "question": {
+          "type": "string"
+        },
+        "asset_universe": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "bar_interval": {
+          "type": "string"
+        },
+        "research_as_of": {
+          "type": "string",
+          "format": "date"
+        },
+        "holding_horizon": {
+          "type": "string"
+        },
+        "entry_exit_hypothesis": {
+          "type": "string"
+        },
+        "data_inventory": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "cost_assumptions": {
+          "type": "object",
+          "properties": {
+            "commission_bps_per_side": {
+              "type": "number",
+              "minimum": 0
+            },
+            "slippage_bps_per_side": {
+              "type": "number",
+              "minimum": 0
+            },
+            "borrow_bps_annual": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0
+            }
+          }
+        },
+        "risk_constraints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "candidate_hypotheses": {
+          "type": "array",
+          "minItems": 1,
+          "description": "Optional additional strategy candidates for the approved comparison branch; preserve entry_exit_hypothesis as the legacy single-candidate path.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "candidate_id",
+              "hypothesis",
+              "instrument_universe",
+              "side",
+              "holding_horizon",
+              "entry_rule",
+              "exit_rule",
+              "risk_invalidator",
+              "mechanism",
+              "data_requirements"
+            ],
+            "properties": {
+              "candidate_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "hypothesis": {
+                "type": "string",
+                "minLength": 1
+              },
+              "instrument_universe": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "side": {
+                "type": "string",
+                "enum": [
+                  "long",
+                  "short",
+                  "long_short",
+                  "market_neutral",
+                  "unspecified"
+                ]
+              },
+              "holding_horizon": {
+                "type": "string"
+              },
+              "entry_rule": {
+                "type": "string"
+              },
+              "exit_rule": {
+                "type": "string"
+              },
+              "risk_invalidator": {
+                "type": "string"
+              },
+              "mechanism": {
+                "type": "string"
+              },
+              "data_requirements": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "completion_status",
+        "strategy_question",
+        "hypothesis",
+        "rules",
+        "experiment_design",
+        "results_status",
+        "limitations",
+        "advisory_recommendation"
+      ],
+      "properties": {
+        "completion_status": {
+          "enum": [
+            "complete",
+            "partial",
+            "insufficient_input"
+          ]
+        },
+        "strategy_question": {
+          "type": "string"
+        },
+        "hypothesis": {
+          "type": "string"
+        },
+        "rules": {
+          "type": "object"
+        },
+        "experiment_design": {
+          "type": "object"
+        },
+        "results_status": {
+          "enum": [
+            "not_run",
+            "illustrative_only",
+            "user_results_reviewed",
+            "independently_validated"
+          ]
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "advisory_recommendation": {
+          "type": "string"
+        },
+        "candidate_comparison": {
+          "type": "array",
+          "description": "Optional side-by-side comparison for two or more supplied candidates; no winner if criteria or evidence are incomparable.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "candidate_id",
+              "comparability_status",
+              "dimensions",
+              "evidence_gaps"
+            ],
+            "properties": {
+              "candidate_id": {
+                "type": "string"
+              },
+              "comparability_status": {
+                "type": "string",
+                "enum": [
+                  "comparable",
+                  "partially_comparable",
+                  "not_comparable",
+                  "insufficient_evidence"
+                ]
+              },
+              "dimensions": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "dimension",
+                    "assessment",
+                    "basis"
+                  ],
+                  "properties": {
+                    "dimension": {
+                      "type": "string"
+                    },
+                    "assessment": {
+                      "type": "string"
+                    },
+                    "basis": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "supported",
+                        "partial",
+                        "unavailable",
+                        "not_comparable"
+                      ]
+                    }
+                  }
+                }
+              },
+              "evidence_gaps": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

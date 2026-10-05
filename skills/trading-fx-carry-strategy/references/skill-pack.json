@@ -1,0 +1,393 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "trading-fx-carry-strategy",
+  "display_name": "FX carry research",
+  "version": "0.1.0",
+  "description": "Analyze supplied FX spot, forward, rate differential, volatility and risk context with clear currency/tenor conventions.",
+  "capability_category": "trading_research",
+  "provenance": {
+    "author": "LiNKskills Library",
+    "source": "Exact source provenance: references/source-provenance.json (sha256:20a4de650af713fe0874714c0e75aec20b35c8b2b8a6a17f931546b5bba3a2de); per-entry license/notice/disposition recorded there.",
+    "license": "No package-wide upstream license is asserted; see exact per-file source provenance and notice dispositions in references/source-provenance.json.",
+    "imported_from": "Frozen Jane draft source: skills/trading-fx-carry-strategy; source provenance copied unchanged for this proposal only."
+  },
+  "lifecycle_state": "draft",
+  "format_profile": "simple",
+  "compatible_runtime_profiles": [
+    "jane-openclaw"
+  ],
+  "min_capability_tier": "balanced",
+  "routing": {
+    "when_to_use": "FX carry, forward points, carry-to-vol context or currency hedge research.",
+    "when_not_to_use": [
+      "No automatic provider calls, assumed entitlements, credentials, transaction, order or portfolio mutation.",
+      "No invented observations or unqualified backtest/model result.",
+      "No runtime sidecars or source scripts."
+    ],
+    "tags": [
+      "trading",
+      "research",
+      "jane",
+      "draft"
+    ],
+    "exclusion_rules": [
+      "No automatic provider calls, assumed entitlements, credentials, transaction, order or portfolio mutation.",
+      "No invented observations or unqualified backtest/model result.",
+      "No runtime sidecars or source scripts."
+    ]
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "pair",
+        "description": "Required property `pair` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "quote_convention",
+        "description": "Required property `quote_convention` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "as_of",
+        "description": "Required property `as_of` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        }
+      },
+      {
+        "name": "spot",
+        "description": "Required property `spot` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      },
+      {
+        "name": "forward",
+        "description": "Required property `forward` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      },
+      {
+        "name": "tenor_days",
+        "description": "Required property `tenor_days` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      {
+        "name": "implied_vol_pct",
+        "description": "Required property `implied_vol_pct` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        }
+      },
+      {
+        "name": "data_source",
+        "description": "Required property `data_source` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      }
+    ],
+    "optional_inputs": [
+      {
+        "name": "rate_differential_pct",
+        "description": "Optional property `rate_differential_pct` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      {
+        "name": "carry_convention",
+        "description": "Optional property `carry_convention` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      {
+        "name": "historical_vol_pct",
+        "description": "Optional property `historical_vol_pct` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      {
+        "name": "event_risks",
+        "description": "Optional property `event_risks` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    ],
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pair",
+        "quote_convention",
+        "as_of",
+        "spot",
+        "forward",
+        "tenor_days",
+        "implied_vol_pct",
+        "data_source"
+      ],
+      "properties": {
+        "pair": {
+          "type": "string"
+        },
+        "quote_convention": {
+          "type": "string"
+        },
+        "as_of": {
+          "type": "string",
+          "format": "date"
+        },
+        "spot": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "forward": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "tenor_days": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "implied_vol_pct": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "data_source": {
+          "type": "string"
+        },
+        "rate_differential_pct": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "carry_convention": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "historical_vol_pct": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "event_risks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "urn:linkskills:trading-fx-carry-strategy:0.1.0#/definitions/input"
+    },
+    "expected_outputs": [
+      {
+        "name": "completion_status",
+        "description": "Required property `completion_status` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "enum": [
+            "complete",
+            "partial",
+            "insufficient_input"
+          ]
+        }
+      },
+      {
+        "name": "pair",
+        "description": "Required property `pair` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "as_of",
+        "description": "Required property `as_of` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        }
+      },
+      {
+        "name": "calculation_basis",
+        "description": "Required property `calculation_basis` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "metrics",
+        "description": "Required property `metrics` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "value",
+              "unit"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "value": {
+                "type": [
+                  "number",
+                  "string",
+                  "null"
+                ]
+              },
+              "unit": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "countercase",
+        "description": "Required property `countercase` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "limitations",
+        "description": "Required property `limitations` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "missing_inputs",
+        "description": "Required property `missing_inputs` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "advisory_recommendation",
+        "description": "Optional property `advisory_recommendation` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    ],
+    "procedure_summary": "Source method section `Integrated method` in SKILL.md: 1. Confirm scope, identifiers, as-of and publication dates, unit/currency, source and conventions. Reject mismatched instruments/periods before arithmetic.\n2. Calculate only task-relevant metrics from supplied rows using the exact formula and denominator recorded in the output. Keep observations separate from derived values.\n3. Preserve incomplete coverage, stale values, missing match, and undefined calculations as unknown; do not rank or infer omitted data.\n4. Explain opposing interpretation, basis/convention sensitivity and evidence needed to complete the analysis.\n5. Provide conditional research advice only when requested; no external effect. Validate the actual output schema; that is structural validation, not method qualification.",
+    "forbidden_actions": [
+      "No automatic provider calls, assumed entitlements, credentials, transaction, order or portfolio mutation.",
+      "No invented observations or unqualified backtest/model result.",
+      "No runtime sidecars or source scripts."
+    ],
+    "failure_handling": "Source-grounded missing/invalid evidence clauses (verbatim, with entrypoint line numbers): L37: 1. Confirm scope, identifiers, as-of and publication dates, unit/currency, source and conventions. Reject mismatched instruments/periods before arithmetic.; L39: 3. Preserve incomplete coverage, stale values, missing match, and undefined calculations as unknown; do not rank or infer omitted data.",
+    "verification_steps": [
+      "Validate the supplied input against references/schemas.json#/definitions/input and report each missing or invalid required field.",
+      "Validate the produced task output against references/schemas.json#/definitions/output; structural validity does not establish method correctness.",
+      "Use references/eval-suite.json criteria only against an actual task output; a schema check or fictional example alone is not a behavioral pass."
+    ],
+    "completion_criteria": [
+      "Include every required output property defined at references/schemas.json#/definitions/output: completion_status, pair, as_of, calculation_basis, metrics, countercase, limitations, missing_inputs.",
+      "If `completion_status` exists, its value must reflect the schema-defined gaps or missing inputs; do not assert a complete result where evidence is absent.",
+      "Keep recommendations advisory; no external action, order, live activation, portfolio mutation, or approval is represented as completed."
+    ],
+    "known_limitations": [
+      "The skill source is an isolated unqualified draft; source-derived pack metadata does not establish selection, registration, method qualification, or production suitability.",
+      "The declared runtime-profile label is preserved as source metadata; runtime-profile binding is not proved."
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read",
+      "filesystem_write"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [
+      {
+        "key": "min_reasoning_tier",
+        "value": "balanced"
+      },
+      {
+        "key": "preferred_model",
+        "value": "gpt-6.1-sol"
+      },
+      {
+        "key": "context_required",
+        "value": 64000
+      }
+    ],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "suite_hash": "sha256:11c5a712f11ae123a1a7216e65c601ee6bb541f7f85ba05174bf9be5bde99b2e",
+    "verification_refs": [
+      "references/schemas.json",
+      "references/eval-suite.json"
+    ]
+  },
+  "telemetry": {
+    "classification": "public_internal",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_private_data",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain_only_approved_ids_and_hashes"
+  }
+}

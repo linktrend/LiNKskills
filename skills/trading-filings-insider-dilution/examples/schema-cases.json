@@ -1,0 +1,162 @@
+{
+  "schema_ref": "references/schemas.json#/definitions/input",
+  "status": "schema_fixture_only_not_behavioral_evaluation",
+  "valid_case": {
+    "input": {
+      "issuer": "fictional-input",
+      "cik": "fictional-input",
+      "as_of": "fictional-input",
+      "filings": [],
+      "accession_chain": [],
+      "share_count_sources": [],
+      "xbrl_facts": [],
+      "ownership_filings": [],
+      "market_price_ref": "fictional-input"
+    },
+    "expected": "accept by JSON Schema"
+  },
+  "invalid_case": {
+    "input": {
+      "issuer": "fictional-input",
+      "cik": "fictional-input",
+      "as_of": "fictional-input",
+      "filings": [],
+      "accession_chain": [],
+      "share_count_sources": [],
+      "xbrl_facts": [],
+      "ownership_filings": [],
+      "market_price_ref": "fictional-input",
+      "unexpected_field": "must be rejected"
+    },
+    "expected": "reject additionalProperties"
+  },
+  "valid_partial_case": {
+    "schema_ref": "references/schemas.json#/definitions/input",
+    "input": {
+      "issuer": "FICTIONAL-input",
+      "as_of": "FICTIONAL-input",
+      "known_gaps": [
+        "source_snapshot: not supplied; dependent analysis must remain partial."
+      ]
+    },
+    "expected": "accept; return a bounded partial result and preserve each listed gap."
+  },
+  "partial_output_case": {
+    "schema_ref": "references/schemas.json#/definitions/output",
+    "output": {
+      "status": "partial",
+      "identity": {
+        "issuer": "Fictional Co.",
+        "cik": null,
+        "as_of": "2025-07-10T00:00:00Z",
+        "cik_status": "unknown",
+        "cik_reason": "No verified identifier was supplied in this fictional partial fixture."
+      },
+      "filing_timeline": [
+        {
+          "form": "S-3",
+          "accepted": "2025-06-01T15:00:00Z",
+          "interpretation": "registered capacity only",
+          "accession": "fictional-a1"
+        },
+        {
+          "form": "424B",
+          "accepted": null,
+          "interpretation": "not supplied; no active takedown conclusion",
+          "accession": "fictional-a2"
+        }
+      ],
+      "facts": [
+        {
+          "name": "shares_outstanding",
+          "value": 1000000,
+          "unit": "shares",
+          "period": "2025-06-30",
+          "context": "cover page",
+          "known_at": "2025-07-08",
+          "source": "fictional filing p.1"
+        }
+      ],
+      "ownership_reconciliation": [],
+      "offering_state": "capacity_only",
+      "dilution_calculation": {
+        "status": "not_calculated",
+        "reason": "no executed issuance numerator/date"
+      },
+      "xbrl_fallback": {
+        "status": "not_needed",
+        "text_source": null
+      },
+      "conflicts": [],
+      "limitations": [
+        "Fictional evidence. Filing form not legal advice."
+      ],
+      "owner_handoffs": [
+        "Sara: legal/accounting conclusion if requested."
+      ],
+      "gaps": [
+        "Required source evidence is incomplete; dependent conclusions remain partial."
+      ]
+    },
+    "expected": "accept as partial; unknown/uncomputed values remain explicit."
+  },
+  "invalid_completed_case": {
+    "schema_ref": "references/schemas.json#/definitions/output",
+    "output": {
+      "status": "complete",
+      "identity": {
+        "issuer": "Fictional Co.",
+        "cik": null,
+        "as_of": "2025-07-10T00:00:00Z",
+        "cik_status": "unknown",
+        "cik_reason": "No verified identifier was supplied in this fictional partial fixture."
+      },
+      "filing_timeline": [
+        {
+          "form": "S-3",
+          "accepted": "2025-06-01T15:00:00Z",
+          "interpretation": "registered capacity only",
+          "accession": "fictional-a1"
+        },
+        {
+          "form": "424B",
+          "accepted": null,
+          "interpretation": "not supplied; no active takedown conclusion",
+          "accession": "fictional-a2"
+        }
+      ],
+      "facts": [
+        {
+          "name": "shares_outstanding",
+          "value": 1000000,
+          "unit": "shares",
+          "period": "2025-06-30",
+          "context": "cover page",
+          "known_at": "2025-07-08",
+          "source": "fictional filing p.1"
+        }
+      ],
+      "ownership_reconciliation": [],
+      "offering_state": "capacity_only",
+      "dilution_calculation": {
+        "status": "not_calculated",
+        "reason": "no executed issuance numerator/date"
+      },
+      "xbrl_fallback": {
+        "status": "not_needed",
+        "text_source": null
+      },
+      "conflicts": [],
+      "limitations": [
+        "Fictional evidence. Filing form not legal advice."
+      ],
+      "owner_handoffs": [
+        "Sara: legal/accounting conclusion if requested."
+      ],
+      "gaps": [
+        "Required evidence or calculation is missing; complete status is false."
+      ]
+    },
+    "expected": "reject: complete output cannot contain unresolved required gaps."
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "skill_id": "trading-journal-learning",
+  "status": "proposed_not_run",
+  "cases": [
+    "Long 10 units at $10; exit 4 at $12 and 6 at $9; $1 fees: gross +$2, net +$1; weighted exit legs and fee currency shown.",
+    "Only two sessions observed for a three-session horizon although intraday MFE is +9%: outcome stays pending.",
+    "Cohort omits rejected candidates: selection bias blocks a general setup-performance claim.",
+    "Entry eight minutes after losing exit: flag chronology for review only; motive is unproven.",
+    "Identical setup files/cutoffs across two sources: count one method and treat cutoffs as uncalibrated."
+  ],
+  "fixtures": [
+    {
+      "id": "typed-success-input",
+      "file": "success-input.json",
+      "schema": "#/definitions/input",
+      "expect": "valid"
+    },
+    {
+      "id": "typed-success-output",
+      "file": "success-output.json",
+      "schema": "#/definitions/output",
+      "expect": "valid-structural-fixture-only"
+    },
+    {
+      "id": "bounded-partial-output",
+      "file": "partial-output.json",
+      "schema": "#/definitions/output",
+      "expect": "valid"
+    }
+  ],
+  "invalid_contract_cases": [
+    {
+      "id": "invalid-unit-or-dimensional-value",
+      "file": "rejected-invalid-unit.json",
+      "schema": "#/definitions/input",
+      "expect": "reject by task-specific typed unit, currency, probability, or range constraint"
+    },
+    {
+      "id": "false-completion-with-unresolved-gap",
+      "file": "rejected-false-completion.json",
+      "schema": "#/definitions/output",
+      "expect": "reject because complete requires complete analysis, no gaps, evidence reference and all evidence-gate flags true"
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "status": "complete",
+  "scope": {
+    "as_of": "2026-10-05T09:00:00Z",
+    "period_or_horizon": "fictional-fixture",
+    "currency": "USD",
+    "version": "fictional-fixture",
+    "limitations": [
+      "Synthetic structural arithmetic fixture only; not observed market evidence, behavioral qualification, or a performance claim."
+    ]
+  },
+  "analysis": {
+    "status": "partial",
+    "settlement_rows": [
+      {
+        "outcome_id": "yes",
+        "condition_ref": "fictional clause",
+        "payout_per_contract": 1,
+        "payout_currency": "USD",
+        "resolution_status": "verified",
+        "source_ref": "synthetic-fixture"
+      }
+    ],
+    "value_rows": [
+      {
+        "outcome_id": "yes",
+        "probability": 0.5,
+        "probability_low": 0.45,
+        "probability_high": 0.55,
+        "ask": 0.42,
+        "gross_ev_per_contract": 0.08,
+        "fee_per_contract": 0.0084,
+        "net_ev_per_contract": 0.0716,
+        "break_even_probability": 0.4284,
+        "quote_currency": "USD",
+        "collateral_locked_per_contract": 0.42,
+        "maximum_capital_loss_per_contract": 0.42,
+        "as_of": "2026-10-05T09:00:00Z",
+        "status": "calculated",
+        "evidence_refs": [
+          "synthetic-fixture"
+        ]
+      }
+    ],
+    "relative_value_status": "none",
+    "capital_path_status": "specified",
+    "evidence_refs": [
+      "synthetic-fixture"
+    ]
+  },
+  "recommendation": {
+    "stance": "no_action",
+    "proposed_target": {
+      "value": 1,
+      "unit": "fictional-fixture",
+      "currency": "USD",
+      "as_of": "2026-10-05T09:00:00Z",
+      "basis": "fictional-fixture"
+    },
+    "proposed_risk_level": {
+      "value": 1,
+      "unit": "fictional-fixture",
+      "currency": "USD",
+      "as_of": "2026-10-05T09:00:00Z",
+      "basis": "fictional-fixture"
+    },
+    "basis": [],
+    "counterevidence": [],
+    "reversal_evidence": [],
+    "advisory_only": true,
+    "approval_required": true
+  },
+  "evidence_gate": {
+    "critical_inputs_resolved": false,
+    "source_timestamps_reconciled": false,
+    "unit_contracts_resolved": false,
+    "limiting_gaps": [
+      "Synthetic fixture intentionally leaves a decision-critical evidence branch unresolved."
+    ]
+  },
+  "gaps": [
+    {
+      "field": "fixture_unresolved_input",
+      "why_it_matters": "The affected conclusion must remain partial.",
+      "owner": null,
+      "blocking": true
+    }
+  ],
+  "external_effects": []
+}

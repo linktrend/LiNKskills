@@ -1,0 +1,72 @@
+{
+  "schema_version": "0.1",
+  "suite_id": "trading-swap-curve-strategy-draft-eval",
+  "skill_id": "trading-swap-curve-strategy",
+  "suite_version": "0.1.0",
+  "skill_version_range": "0.1.x",
+  "pass_threshold": 0.8,
+  "cases": [
+    {
+      "case_id": "matched-input",
+      "case_type": "golden",
+      "input": "Actual user-supplied, dated evidence with consistent units and conventions.",
+      "expected": {
+        "criteria": [
+          "Every reported figure derives from identified input and formula.",
+          "Dates, units, denominator and coverage remain visible.",
+          "Recommendations remain conditional and do not cause external effects."
+        ]
+      }
+    },
+    {
+      "case_id": "missing-method-critical",
+      "case_type": "adversarial",
+      "input": "Missing source coverage or mismatched conventions.",
+      "expected": {
+        "criteria": [
+          "Returns partial/insufficient status.",
+          "Names missing fields; does not impute.",
+          "Does not label unmatched data as a complete comparison."
+        ]
+      }
+    }
+  ],
+  "hard_failure_conditions": [
+    "unit_or_convention_mismatch_hidden",
+    "invented_data_or_entitlement",
+    "complete_coverage_claim_from_partial_rows",
+    "unapproved_external_effect"
+  ],
+  "evidence_policy": {
+    "retain": [
+      "redacted_actual_input",
+      "actual_output",
+      "schema_assertion_results",
+      "reviewer_notes"
+    ],
+    "redact": [
+      "secrets",
+      "credentials",
+      "private_memory",
+      "personal_data"
+    ]
+  },
+  "rubric": [
+    {
+      "dimension": "task_contract",
+      "weight": 0.25
+    },
+    {
+      "dimension": "calculations_and_units",
+      "weight": 0.3
+    },
+    {
+      "dimension": "coverage_and_unknowns",
+      "weight": 0.25
+    },
+    {
+      "dimension": "advisory_boundary",
+      "weight": 0.2
+    }
+  ]
+}

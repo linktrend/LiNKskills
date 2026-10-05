@@ -1,0 +1,39 @@
+{
+  "status": "schema_fixture_only_not_behavioral_evaluation",
+  "valid_case": {
+    "schema_ref": "references/schemas.json#/definitions/input",
+    "input": {
+      "question": "Compare how two fictional reports define outcome Y.",
+      "documents": [
+        {
+          "source_id": "FIC-A",
+          "title": "Synthetic report A",
+          "version": "1",
+          "locator": "pp. 2-3"
+        },
+        {
+          "source_id": "FIC-B",
+          "title": "Synthetic report B",
+          "version": "1",
+          "locator": "section 4"
+        }
+      ],
+      "desired_depth": "comparative",
+      "audience": "analyst",
+      "output_format": "markdown"
+    },
+    "expected": "accept by JSON Schema"
+  },
+  "invalid_case": {
+    "schema_ref": "references/schemas.json#/definitions/input",
+    "input": {
+      "question": "fictional-input",
+      "documents": [],
+      "desired_depth": "fictional-input",
+      "audience": "fictional-input",
+      "output_format": "fictional-input",
+      "unapproved_extra_field": "reject"
+    },
+    "expected": "reject unknown additional property"
+  }
+}

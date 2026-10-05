@@ -1,0 +1,51 @@
+{
+  "fictional_fixture": true,
+  "notice": "All names, dates, observations and values in this worked example are fictional; it demonstrates output shape, not strategy validity.",
+  "input": {
+    "as_of": "2026-09-30",
+    "period_start": "2026-09-29T00:00:00Z",
+    "period_end": "2026-09-30T00:00:00Z",
+    "assets": [
+      "FICTIONAL-ABC"
+    ],
+    "question": "Did the fictional announcement coincide with a change in market tone?",
+    "provided_sources": [
+      {
+        "source": "fictional issuer notice",
+        "published_at": "2026-09-29T14:00:00Z"
+      }
+    ]
+  },
+  "output": {
+    "completion_status": "complete",
+    "as_of": "2026-09-30",
+    "events": [
+      {
+        "event": "fictional product announcement",
+        "source_class": "issuer primary",
+        "published_at": "2026-09-29T14:00:00Z",
+        "observed_at": "2026-09-29T14:00:00Z"
+      }
+    ],
+    "sentiment_summary": {
+      "sample_size": 4,
+      "period": "fictional sample",
+      "classification": "mixed",
+      "method": "manual labels; no validated sentiment model"
+    },
+    "observed_reactions": [
+      {
+        "asset": "FICTIONAL-ABC",
+        "return_pct": 1.2,
+        "window": "fictional same-day",
+        "benchmark_relative_pct": 0.4
+      }
+    ],
+    "alternative_explanations": [
+      "Concurrent fictional index rally could explain part of the move."
+    ],
+    "gaps": [
+      "All instruments and data are invented; no current search or quote checked."
+    ]
+  }
+}

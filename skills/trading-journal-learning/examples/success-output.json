@@ -1,0 +1,108 @@
+{
+  "status": "complete",
+  "scope": {
+    "as_of": "2026-10-05T09:00:00Z",
+    "period_or_horizon": "fictional-fixture",
+    "currency": "USD",
+    "version": "fictional-fixture",
+    "limitations": [
+      "Synthetic structural arithmetic fixture only; not observed market evidence, behavioral qualification, or a performance claim."
+    ]
+  },
+  "analysis": {
+    "status": "complete",
+    "reconciliation_rows": [
+      {
+        "trade_id": "T1",
+        "gross_pnl": 1,
+        "fees": 1,
+        "funding_borrow": 0,
+        "net_pnl": 0,
+        "currency": "USD",
+        "residual": 0,
+        "status": "reconciled",
+        "evidence_refs": [
+          "synthetic-fixture"
+        ]
+      }
+    ],
+    "period_cash": {
+      "realized_cash_pnl": 0,
+      "currency": "USD",
+      "start": "2026-10-01T00:00:00Z",
+      "end": "2026-10-05T09:00:00Z",
+      "basis": "dated_cash_events"
+    },
+    "cohort_rows": [
+      {
+        "setup_id": "setup-1",
+        "horizon_id": "h1",
+        "eligible_n": 1,
+        "mature_n": 1,
+        "pending_n": 0,
+        "cohort_cumulative_pnl": 0,
+        "currency": "USD",
+        "all_closed_n": 1,
+        "all_closed_wins": 0,
+        "decided_n": 0,
+        "breakeven_n": 1,
+        "win_rate_all_closed": 0,
+        "win_rate_decided": null,
+        "profit_factor": null,
+        "profit_factor_status": "undefined_no_losses",
+        "sample_std": null,
+        "sample_std_status": "undefined_singleton",
+        "denominator": "all closed trades incl breakeven"
+      }
+    ],
+    "risk_rows": [
+      {
+        "trade_id": "T1",
+        "initial_risk_per_unit": 1,
+        "multiplier": 1,
+        "realized_pnl": 0,
+        "r_multiple": 0,
+        "r_status": "calculated",
+        "mae_raw": -1,
+        "mfe_raw": 1,
+        "price_unit": "quote_currency_per_share",
+        "currency": "USD",
+        "as_of": "2026-10-05T09:00:00Z"
+      }
+    ],
+    "behavioral_notes": [],
+    "evidence_refs": [
+      "synthetic-fixture"
+    ]
+  },
+  "recommendation": {
+    "stance": "no_action",
+    "proposed_target": {
+      "value": 1,
+      "unit": "fictional-fixture",
+      "currency": "USD",
+      "as_of": "2026-10-05T09:00:00Z",
+      "basis": "fictional-fixture"
+    },
+    "proposed_risk_level": {
+      "value": 1,
+      "unit": "fictional-fixture",
+      "currency": "USD",
+      "as_of": "2026-10-05T09:00:00Z",
+      "basis": "fictional-fixture"
+    },
+    "basis": [],
+    "counterevidence": [],
+    "reversal_evidence": [],
+    "advisory_only": true,
+    "approval_required": true
+  },
+  "evidence_gate": {
+    "critical_inputs_resolved": true,
+    "source_timestamps_reconciled": true,
+    "unit_contracts_resolved": true,
+    "limiting_gaps": []
+  },
+  "gaps": [],
+  "external_effects": []
+}

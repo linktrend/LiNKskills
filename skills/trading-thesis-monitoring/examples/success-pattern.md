@@ -1,0 +1,53 @@
+# Fictional worked example
+
+The following synthetic example demonstrates the output shape only. It is not a real analysis, evaluated fixture, or evidence of runtime behavior.
+
+```json
+{
+  "status": "partial",
+  "revision": {
+    "previous_ref": null,
+    "new_ref": "fictional-draft-v2",
+    "as_of": "2025-07-10",
+    "previous_ref_reason": "No prior revision reference was supplied; this review cannot compare revisions."
+  },
+  "claim_updates": [
+    {
+      "claim_id": "C1",
+      "claim": "gross margin expansion in FY25",
+      "state": "pending",
+      "evidence_ref": "fictional release dated 2025-07-08",
+      "period": "Q2 2025",
+      "finding": "reported margin is up 0.4 percentage points; one quarter does not establish annual trend",
+      "alternative": "product mix and one-time credits may explain change"
+    }
+  ],
+  "milestone_table": [
+    {
+      "milestone": "Q2 earnings",
+      "due": "2025-07-08",
+      "state": "observed",
+      "source_ref": "fictional release"
+    }
+  ],
+  "contradictory_evidence": [],
+  "stale_claims": [
+    "Annual margin target lacks current guidance confirmation."
+  ],
+  "advisory_proposals": [
+    {
+      "proposal": "wait for next quarterly confirmation before raising target",
+      "basis": "single-period evidence",
+      "uncertainty": "high; no valuation inputs",
+      "approval_required": true
+    }
+  ],
+  "next_review": null,
+  "gaps": [
+    "Prior thesis document and full filing absent."
+  ],
+  "owner_handoffs": [
+    "Owner to approve review cadence and any portfolio action."
+  ]
+}
+```

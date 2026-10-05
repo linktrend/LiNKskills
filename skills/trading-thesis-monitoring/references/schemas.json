@@ -1,0 +1,285 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "trading-thesis-monitoring task contract draft",
+  "type": "object",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "properties": {
+        "entity": {
+          "type": "string"
+        },
+        "as_of": {
+          "type": "string"
+        },
+        "previous_revision_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "thesis_claims": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "milestones": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "new_evidence": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "review_owner": {
+          "type": "string"
+        },
+        "review_date": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "portfolio_scope": {
+          "type": "string"
+        },
+        "known_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "entity",
+        "as_of"
+      ],
+      "additionalProperties": false
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "complete",
+            "partial",
+            "needs_input",
+            "blocked"
+          ]
+        },
+        "revision": {
+          "type": "object",
+          "properties": {
+            "previous_ref": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "new_ref": {
+              "type": "string"
+            },
+            "as_of": {
+              "type": "string"
+            },
+            "previous_ref_reason": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "previous_ref",
+            "previous_ref_reason",
+            "new_ref",
+            "as_of"
+          ],
+          "additionalProperties": false
+        },
+        "claim_updates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "claim_id": {
+                "type": "string"
+              },
+              "claim": {
+                "type": "string"
+              },
+              "state": {
+                "type": "string"
+              },
+              "evidence_ref": {
+                "type": "string"
+              },
+              "period": {
+                "type": "string"
+              },
+              "finding": {
+                "type": "string"
+              },
+              "alternative": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "claim_id",
+              "claim",
+              "state",
+              "evidence_ref",
+              "period",
+              "finding",
+              "alternative"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "milestone_table": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "milestone": {
+                "type": "string"
+              },
+              "due": {
+                "type": "string"
+              },
+              "state": {
+                "type": "string"
+              },
+              "source_ref": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "milestone",
+              "due",
+              "state",
+              "source_ref"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "contradictory_evidence": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "stale_claims": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "advisory_proposals": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "proposal": {
+                "type": "string"
+              },
+              "basis": {
+                "type": "string"
+              },
+              "uncertainty": {
+                "type": "string"
+              },
+              "approval_required": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "proposal",
+              "basis",
+              "uncertainty",
+              "approval_required"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "next_review": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "owner_handoffs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "status",
+        "revision",
+        "claim_updates",
+        "milestone_table",
+        "contradictory_evidence",
+        "stale_claims",
+        "advisory_proposals",
+        "next_review",
+        "gaps",
+        "owner_handoffs"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "complete"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "gaps": {
+                "maxItems": 0
+              }
+            }
+          }
+        }
+      ]
+    },
+    "state": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "in_progress",
+            "completed",
+            "needs_input",
+            "blocked"
+          ]
+        },
+        "open_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

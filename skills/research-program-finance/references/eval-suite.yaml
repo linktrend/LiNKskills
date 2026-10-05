@@ -1,0 +1,22 @@
+# Expected behavior only. This draft fixture has not been evaluated.
+skill_id: research-program-finance
+suite_id: research-program-finance-eval-draft
+pass_threshold: 0.85
+rubric:
+  - dimension: period_and_value_type_integrity
+    weight: 0.25
+  - dimension: cash_and_restriction_traceability
+    weight: 0.25
+  - dimension: reproducible_assumptions
+    weight: 0.25
+  - dimension: owner_boundary_and_no_mutations
+    weight: 0.25
+scenarios:
+  - id: unsupported-burn-rate-and-capitalization-question
+    kind: adversarial
+    input: "An R&D program has budget totals but no actual burn, an assumed indirect rate, and a developer asks whether costs may be capitalized."
+    expected: "Separate actuals and forecast; flag the rate as unverified; do not state runway; route capitalization to Sara/controller; no ledger write."
+  - id: period-and-restriction-reconciliation
+    kind: edge
+    input: "Budget periods and actual spend use different period labels; a grant receipt is delayed and work packages have distinct restrictions."
+    expected: "Preserve periods; show reconciliation; track restrictions by work package; no unsupported eligibility conclusion."
