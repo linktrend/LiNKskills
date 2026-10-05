@@ -172,6 +172,14 @@ def _risk_needs_context(request: dict[str, Any], reason: str) -> dict[str, Any]:
     return _risk_result(request if isinstance(request, dict) else {}, "NEEDS_CONTEXT", [], [reason])
 
 
+def _has_explicit_unknown_reason(value: Any) -> bool:
+    """Require the exact Unknown marker and a nonempty reason after it."""
+    if not isinstance(value, str):
+        return False
+    marker, separator, reason = value.partition(":")
+    return marker == "Unknown" and bool(separator) and bool(reason.strip())
+
+
 def _normalize_risk_register(request: dict[str, Any]) -> dict[str, Any]:
     """Normalize supplied prospective risk facts without creating ratings or actions."""
     from jsonschema import Draft202012Validator
@@ -230,6 +238,7 @@ def _normalize_risk_register(request: dict[str, Any]) -> dict[str, Any]:
     seen_tuples: set[tuple[str, str, str]] = set()
     risks: list[dict[str, Any]] = []
     gaps: list[str] = []
+    unknown_inherent_rating_present = False
     if scale_ref is None:
         gaps.append("Owner rating scale is not reported; no rating is assigned.")
     if tolerance_ref is None:
@@ -278,13 +287,19 @@ def _normalize_risk_register(request: dict[str, Any]) -> dict[str, Any]:
             assessment_fields = {"origin", "likelihood_or_unknown_reason", "impact_or_unknown_reason", "inherent_rating_or_unknown_reason", "treatment_proposal", "review_trigger", "review_date_or_unknown_reason", "residual_statement_or_unknown_reason"}
             if not isinstance(assessment, dict) or set(assessment) != assessment_fields:
                 return _risk_needs_context(request, "assessment must match the bounded owner/advisory assessment contract")
-            if assessment.get("origin") not in {"jane_advisory", "owner_supplied"} or any(not isinstance(assessment.get(key), str) or not assessment[key].strip() or len(assessment[key]) > limit for key, limit in (("likelihood_or_unknown_reason", 1000), ("impact_or_unknown_reason", 1000), ("inherent_rating_or_unknown_reason", 1000), ("treatment_proposal", 1000), ("review_trigger", 1000), ("review_date_or_unknown_reason", 128), ("residual_statement_or_unknown_reason", 1000))):
+            if assessment.get("origin") not in {"caller_advisory", "owner_supplied"} or any(not isinstance(assessment.get(key), str) or not assessment[key].strip() or len(assessment[key]) > limit for key, limit in (("likelihood_or_unknown_reason", 1000), ("impact_or_unknown_reason", 1000), ("inherent_rating_or_unknown_reason", 1000), ("treatment_proposal", 1000), ("review_trigger", 1000), ("review_date_or_unknown_reason", 128), ("residual_statement_or_unknown_reason", 1000))):
                 return _risk_needs_context(request, "assessment values must be bounded nonempty text with an explicit origin")
-            if assessment["origin"] == "owner_supplied" and assessment["inherent_rating_or_unknown_reason"].startswith("Rating:") and scale_ref is None:
-                return _risk_needs_context(request, "an owner-supplied rating requires an evidenced owner scale")
+            raw_inherent = assessment["inherent_rating_or_unknown_reason"]
+            has_unknown_reason = _has_explicit_unknown_reason(raw_inherent)
+            if assessment["origin"] == "caller_advisory" and not has_unknown_reason:
+                return _risk_needs_context(request, "Caller may offer qualitative rationale but may not assign an inherent rating; use Unknown: followed by a nonempty reason")
+            if assessment["origin"] == "owner_supplied" and scale_ref is None and not has_unknown_reason:
+                return _risk_needs_context(request, "an owner-supplied rating requires an evidenced owner scale or an explicit Unknown: reason")
+            unknown_inherent_rating_present = unknown_inherent_rating_present or has_unknown_reason
         seen_ids.add(item["id"])
         seen_tuples.add(identity)
         if assessment is None:
+            unknown_inherent_rating_present = True
             likelihood = "Unknown: no evidence-bounded likelihood assessment was supplied."
             impact = "Unknown: no evidence-bounded impact assessment was supplied."
             inherent = "Unknown: owner rating assessment is pending."
@@ -293,11 +308,9 @@ def _normalize_risk_register(request: dict[str, Any]) -> dict[str, Any]:
             review_date = "Unknown: no review date supplied."
             residual = "Unknown: residual risk has not been assessed."
         else:
-            prefix = "Jane advisory proposal (unverified): " if assessment["origin"] == "jane_advisory" else "Owner-supplied, unverified: "
+            prefix = "Caller advisory proposal (unverified): " if assessment["origin"] == "caller_advisory" else "Owner-supplied, unverified: "
             likelihood = prefix + assessment["likelihood_or_unknown_reason"]
             impact = prefix + assessment["impact_or_unknown_reason"]
-            if assessment["origin"] == "jane_advisory" and assessment["inherent_rating_or_unknown_reason"].startswith("Rating:"):
-                return _risk_needs_context(request, "Jane may offer qualitative rationale but may not assign an inherent rating")
             inherent = prefix + assessment["inherent_rating_or_unknown_reason"]
             treatment = prefix + assessment["treatment_proposal"]
             review_trigger = prefix + assessment["review_trigger"]
@@ -320,7 +333,7 @@ def _normalize_risk_register(request: dict[str, Any]) -> dict[str, Any]:
         })
     if unknown_refs:
         gaps.append("One or more supplied evidence items are explicitly not_reported.")
-    if any("not_reported" == risk["treatment_proposal"] or risk["inherent_rating_or_unknown_reason"].startswith("Unknown:") for risk in risks):
+    if unknown_inherent_rating_present or any("not_reported" == risk["treatment_proposal"] or risk["inherent_rating_or_unknown_reason"].startswith("Unknown:") for risk in risks):
         gaps.append("One or more likelihood/impact/rating/treatment/residual fields remain unknown or not_reported; accountable owner review is required.")
     return _risk_result(request, "DRAFT", risks, gaps)
 

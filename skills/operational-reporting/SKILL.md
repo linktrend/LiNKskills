@@ -2,8 +2,8 @@
 name: operational-reporting
 description: "Reusable multi-mode operational reporting that produces concise, evidence-bounded mobile reports without sending, scheduling, or reading private systems by itself."
 usage_trigger: "Use when an operator needs an Executive Digest, Flash Report, concise no-material-change line, supervised-agent summary, maintenance-result input, or evidence-bounded Trading Performance report."
-version: 1.0.0
-release_tag: v1.0.0
+version: 1.0.1
+release_tag: v1.0.1
 created: 2026-08-24
 author: LiNKskills Library
 tags: [operations, reporting, executive, mobile, evidence]
@@ -21,7 +21,7 @@ dependencies: [company-communication]
 permissions: [fs_read, fs_write]
 scope_out: ["Do not read private systems without supplied consumer-owned inputs", "Do not send, schedule, publish, or choose transport", "Do not claim completion without verification", "Do not include health or selfie content", "Do not use emojis unless explicitly requested"]
 format_profile: simple
-last_updated: 2026-08-24
+last_updated: 2026-10-06
 ---
 
 # operational-reporting

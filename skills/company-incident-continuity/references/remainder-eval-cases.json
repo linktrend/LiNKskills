@@ -139,10 +139,10 @@
               }
             ],
             "assessment": {
-              "origin": "jane_advisory",
+              "origin": "caller_advisory",
               "likelihood_or_unknown_reason": "No occurrence history supports frequency; the missing restore exercise is a qualitative uncertainty signal, not a probability estimate.",
               "impact_or_unknown_reason": "If restoration fails, recovery may exceed the owner target; no quantified impact is supplied.",
-              "inherent_rating_or_unknown_reason": "Unknown: Jane does not assign an inherent rating.",
+              "inherent_rating_or_unknown_reason": "Unknown: caller does not assign an inherent rating.",
               "treatment_proposal": "Owner may consider scheduling a restore exercise; no exercise is initiated.",
               "review_trigger": "Owner review after a restore exercise or a changed recovery objective.",
               "review_date_or_unknown_reason": "Unknown: owner has not supplied a review date.",
@@ -347,6 +347,597 @@
             "ref": "fixture:outage-report",
             "status": "confirmed",
             "claim": "Fictional outage report."
+          }
+        ]
+      }
+    },
+    "risk-register-caller-secondary-owner": {
+      "case_type": "edge",
+      "input": "Review the same fictional risk under a second accountable owner reference; preserve caller advisory limits.",
+      "request": {
+        "mode": "prospective_risk_register",
+        "privacy_classification": "synthetic",
+        "scope_ref": "fixture:backup-program",
+        "as_of": "2026-10-05",
+        "accountable_owner_ref": "owner:security",
+        "risk_sources_and_evidence_refs": [
+          {
+            "ref": "fixture:owner-scale",
+            "status": "confirmed",
+            "claim": "Fictional owner scale with Low, Moderate, High labels; no probability mappings supplied."
+          },
+          {
+            "ref": "fixture:backup-policy",
+            "status": "reported",
+            "claim": "Fictional scheduled backup policy."
+          },
+          {
+            "ref": "fixture:restore-history",
+            "status": "not_reported",
+            "claim": "No restore exercise evidence supplied."
+          }
+        ],
+        "owner_supplied_rating_scale_or_unknown_reason": {
+          "scale_ref": "fixture:owner-scale",
+          "description": "Use supplied labels only; do not infer numeric probabilities."
+        },
+        "owner_supplied_tolerance_or_unknown_reason": {
+          "unknown_reason": "Fictional owner has not supplied risk tolerance."
+        },
+        "candidate_risks": [
+          {
+            "id": "risk:restore-evidence-gap",
+            "cause": "Restore exercise evidence is absent.",
+            "event": "Required backup cannot be restored when needed.",
+            "consequence": "Recovery may exceed the owner target.",
+            "owner_ref": "owner:security",
+            "evidence_refs": [
+              "fixture:owner-scale",
+              "fixture:backup-policy",
+              "fixture:restore-history"
+            ],
+            "current_controls": [
+              {
+                "control_ref": "control:scheduled-backup",
+                "status": "designed",
+                "evidence_refs": [
+                  "fixture:backup-policy"
+                ]
+              }
+            ],
+            "assessment": {
+              "origin": "caller_advisory",
+              "likelihood_or_unknown_reason": "No occurrence history supports frequency; the missing restore exercise is a qualitative uncertainty signal, not a probability estimate.",
+              "impact_or_unknown_reason": "If restoration fails, recovery may exceed the owner target; no quantified impact is supplied.",
+              "inherent_rating_or_unknown_reason": "Unknown: caller does not assign an inherent rating.",
+              "treatment_proposal": "Owner may consider scheduling a restore exercise; no exercise is initiated.",
+              "review_trigger": "Owner review after a restore exercise or a changed recovery objective.",
+              "review_date_or_unknown_reason": "Unknown: owner has not supplied a review date.",
+              "residual_statement_or_unknown_reason": "Unknown: restore effectiveness and residual exposure have not been assessed."
+            }
+          }
+        ]
+      }
+    },
+    "risk-register-advisory-rating-needs-context": {
+      "case_type": "negative",
+      "input": "A caller advisory supplies an inherent rating without owner authority; request context and emit no risk row.",
+      "request": {
+        "mode": "prospective_risk_register",
+        "privacy_classification": "synthetic",
+        "scope_ref": "fixture:backup-program",
+        "as_of": "2026-10-05",
+        "accountable_owner_ref": "owner:infrastructure",
+        "risk_sources_and_evidence_refs": [
+          {
+            "ref": "fixture:owner-scale",
+            "status": "confirmed",
+            "claim": "Fictional owner scale with Low, Moderate, High labels; no probability mappings supplied."
+          },
+          {
+            "ref": "fixture:backup-policy",
+            "status": "reported",
+            "claim": "Fictional scheduled backup policy."
+          },
+          {
+            "ref": "fixture:restore-history",
+            "status": "not_reported",
+            "claim": "No restore exercise evidence supplied."
+          }
+        ],
+        "owner_supplied_rating_scale_or_unknown_reason": {
+          "scale_ref": "fixture:owner-scale",
+          "description": "Use supplied labels only; do not infer numeric probabilities."
+        },
+        "owner_supplied_tolerance_or_unknown_reason": {
+          "unknown_reason": "Fictional owner has not supplied risk tolerance."
+        },
+        "candidate_risks": [
+          {
+            "id": "risk:restore-evidence-gap",
+            "cause": "Restore exercise evidence is absent.",
+            "event": "Required backup cannot be restored when needed.",
+            "consequence": "Recovery may exceed the owner target.",
+            "owner_ref": "owner:infrastructure",
+            "evidence_refs": [
+              "fixture:owner-scale",
+              "fixture:backup-policy",
+              "fixture:restore-history"
+            ],
+            "current_controls": [
+              {
+                "control_ref": "control:scheduled-backup",
+                "status": "designed",
+                "evidence_refs": [
+                  "fixture:backup-policy"
+                ]
+              }
+            ],
+            "assessment": {
+              "origin": "caller_advisory",
+              "likelihood_or_unknown_reason": "No occurrence history supports frequency; the missing restore exercise is a qualitative uncertainty signal, not a probability estimate.",
+              "impact_or_unknown_reason": "If restoration fails, recovery may exceed the owner target; no quantified impact is supplied.",
+              "inherent_rating_or_unknown_reason": "Rating: High",
+              "treatment_proposal": "Owner may consider scheduling a restore exercise; no exercise is initiated.",
+              "review_trigger": "Owner review after a restore exercise or a changed recovery objective.",
+              "review_date_or_unknown_reason": "Unknown: owner has not supplied a review date.",
+              "residual_statement_or_unknown_reason": "Unknown: restore effectiveness and residual exposure have not been assessed."
+            }
+          }
+        ]
+      }
+    },
+    "risk-register-owner-rating-needs-context": {
+      "case_type": "negative",
+      "input": "An owner-supplied rating has no evidenced owner scale; request context and emit no risk row.",
+      "request": {
+        "mode": "prospective_risk_register",
+        "privacy_classification": "synthetic",
+        "scope_ref": "fixture:backup-program",
+        "as_of": "2026-10-05",
+        "accountable_owner_ref": "owner:infrastructure",
+        "risk_sources_and_evidence_refs": [
+          {
+            "ref": "fixture:backup-policy",
+            "status": "reported",
+            "claim": "Fictional scheduled backup policy."
+          },
+          {
+            "ref": "fixture:restore-history",
+            "status": "not_reported",
+            "claim": "No restore exercise evidence supplied."
+          }
+        ],
+        "owner_supplied_rating_scale_or_unknown_reason": {
+          "unknown_reason": "Fictional owner has not supplied a rating scale."
+        },
+        "owner_supplied_tolerance_or_unknown_reason": {
+          "unknown_reason": "Fictional owner has not supplied risk tolerance."
+        },
+        "candidate_risks": [
+          {
+            "id": "risk:restore-evidence-gap",
+            "cause": "Restore exercise evidence is absent.",
+            "event": "Required backup cannot be restored when needed.",
+            "consequence": "Recovery may exceed the owner target.",
+            "owner_ref": "owner:infrastructure",
+            "evidence_refs": [
+              "fixture:backup-policy",
+              "fixture:restore-history"
+            ],
+            "current_controls": [
+              {
+                "control_ref": "control:scheduled-backup",
+                "status": "designed",
+                "evidence_refs": [
+                  "fixture:backup-policy"
+                ]
+              }
+            ],
+            "assessment": {
+              "origin": "owner_supplied",
+              "likelihood_or_unknown_reason": "No occurrence history supports frequency; the missing restore exercise is a qualitative uncertainty signal, not a probability estimate.",
+              "impact_or_unknown_reason": "If restoration fails, recovery may exceed the owner target; no quantified impact is supplied.",
+              "inherent_rating_or_unknown_reason": "Rating: High",
+              "treatment_proposal": "Owner may consider scheduling a restore exercise; no exercise is initiated.",
+              "review_trigger": "Owner review after a restore exercise or a changed recovery objective.",
+              "review_date_or_unknown_reason": "Unknown: owner has not supplied a review date.",
+              "residual_statement_or_unknown_reason": "Unknown: restore effectiveness and residual exposure have not been assessed."
+            }
+          }
+        ]
+      }
+    },
+    "risk-register-owner-supplied-context": {
+      "case_type": "edge",
+      "input": "Preserve an owner-supplied qualitative assessment with an evidenced owner scale and explicit no-action boundaries.",
+      "request": {
+        "mode": "prospective_risk_register",
+        "privacy_classification": "synthetic",
+        "scope_ref": "fixture:backup-program",
+        "as_of": "2026-10-05",
+        "accountable_owner_ref": "owner:security",
+        "risk_sources_and_evidence_refs": [
+          {
+            "ref": "fixture:owner-scale",
+            "status": "confirmed",
+            "claim": "Fictional owner scale with Low, Moderate, High labels; no probability mappings supplied."
+          },
+          {
+            "ref": "fixture:backup-policy",
+            "status": "reported",
+            "claim": "Fictional scheduled backup policy."
+          },
+          {
+            "ref": "fixture:restore-history",
+            "status": "not_reported",
+            "claim": "No restore exercise evidence supplied."
+          }
+        ],
+        "owner_supplied_rating_scale_or_unknown_reason": {
+          "scale_ref": "fixture:owner-scale",
+          "description": "Use supplied labels only; do not infer numeric probabilities."
+        },
+        "owner_supplied_tolerance_or_unknown_reason": {
+          "unknown_reason": "Fictional owner has not supplied risk tolerance."
+        },
+        "candidate_risks": [
+          {
+            "id": "risk:restore-evidence-gap",
+            "cause": "Restore exercise evidence is absent.",
+            "event": "Required backup cannot be restored when needed.",
+            "consequence": "Recovery may exceed the owner target.",
+            "owner_ref": "owner:security",
+            "evidence_refs": [
+              "fixture:owner-scale",
+              "fixture:backup-policy",
+              "fixture:restore-history"
+            ],
+            "current_controls": [
+              {
+                "control_ref": "control:scheduled-backup",
+                "status": "designed",
+                "evidence_refs": [
+                  "fixture:backup-policy"
+                ]
+              }
+            ],
+            "assessment": {
+              "origin": "owner_supplied",
+              "likelihood_or_unknown_reason": "No occurrence history supports frequency; the missing restore exercise is a qualitative uncertainty signal, not a probability estimate.",
+              "impact_or_unknown_reason": "If restoration fails, recovery may exceed the owner target; no quantified impact is supplied.",
+              "inherent_rating_or_unknown_reason": "Rating: Moderate",
+              "treatment_proposal": "Owner may consider scheduling a restore exercise; no exercise is initiated.",
+              "review_trigger": "Owner review after a restore exercise or a changed recovery objective.",
+              "review_date_or_unknown_reason": "Unknown: owner has not supplied a review date.",
+              "residual_statement_or_unknown_reason": "Unknown: restore effectiveness and residual exposure have not been assessed."
+            }
+          }
+        ]
+      }
+    },
+    "risk-register-caller-unprefixed-rating-needs-context": {
+      "case_type": "negative",
+      "input": "A caller advisory supplies High without an Unknown reason; request context and emit no risk row.",
+      "request": {
+        "mode": "prospective_risk_register",
+        "privacy_classification": "synthetic",
+        "scope_ref": "fixture:backup-program",
+        "as_of": "2026-10-05",
+        "accountable_owner_ref": "owner:infrastructure",
+        "risk_sources_and_evidence_refs": [
+          {
+            "ref": "fixture:owner-scale",
+            "status": "confirmed",
+            "claim": "Fictional owner scale with Low, Moderate, High labels; no probability mappings supplied."
+          },
+          {
+            "ref": "fixture:backup-policy",
+            "status": "reported",
+            "claim": "Fictional scheduled backup policy."
+          },
+          {
+            "ref": "fixture:restore-history",
+            "status": "not_reported",
+            "claim": "No restore exercise evidence supplied."
+          }
+        ],
+        "owner_supplied_rating_scale_or_unknown_reason": {
+          "scale_ref": "fixture:owner-scale",
+          "description": "Use supplied labels only; do not infer numeric probabilities."
+        },
+        "owner_supplied_tolerance_or_unknown_reason": {
+          "unknown_reason": "Fictional owner has not supplied risk tolerance."
+        },
+        "candidate_risks": [
+          {
+            "id": "risk:restore-evidence-gap",
+            "cause": "Restore exercise evidence is absent.",
+            "event": "Required backup cannot be restored when needed.",
+            "consequence": "Recovery may exceed the owner target.",
+            "owner_ref": "owner:infrastructure",
+            "evidence_refs": [
+              "fixture:owner-scale",
+              "fixture:backup-policy",
+              "fixture:restore-history"
+            ],
+            "current_controls": [
+              {
+                "control_ref": "control:scheduled-backup",
+                "status": "designed",
+                "evidence_refs": [
+                  "fixture:backup-policy"
+                ]
+              }
+            ],
+            "assessment": {
+              "origin": "caller_advisory",
+              "likelihood_or_unknown_reason": "No occurrence history supports frequency; the missing restore exercise is a qualitative uncertainty signal, not a probability estimate.",
+              "impact_or_unknown_reason": "If restoration fails, recovery may exceed the owner target; no quantified impact is supplied.",
+              "inherent_rating_or_unknown_reason": "High",
+              "treatment_proposal": "Owner may consider scheduling a restore exercise; no exercise is initiated.",
+              "review_trigger": "Owner review after a restore exercise or a changed recovery objective.",
+              "review_date_or_unknown_reason": "Unknown: owner has not supplied a review date.",
+              "residual_statement_or_unknown_reason": "Unknown: restore effectiveness and residual exposure have not been assessed."
+            }
+          }
+        ]
+      }
+    },
+    "risk-register-caller-lowercase-rating-needs-context": {
+      "case_type": "negative",
+      "input": "A caller advisory supplies rating: High; the unrecognized case variant must not bypass the rating boundary.",
+      "request": {
+        "mode": "prospective_risk_register",
+        "privacy_classification": "synthetic",
+        "scope_ref": "fixture:backup-program",
+        "as_of": "2026-10-05",
+        "accountable_owner_ref": "owner:infrastructure",
+        "risk_sources_and_evidence_refs": [
+          {
+            "ref": "fixture:owner-scale",
+            "status": "confirmed",
+            "claim": "Fictional owner scale with Low, Moderate, High labels; no probability mappings supplied."
+          },
+          {
+            "ref": "fixture:backup-policy",
+            "status": "reported",
+            "claim": "Fictional scheduled backup policy."
+          },
+          {
+            "ref": "fixture:restore-history",
+            "status": "not_reported",
+            "claim": "No restore exercise evidence supplied."
+          }
+        ],
+        "owner_supplied_rating_scale_or_unknown_reason": {
+          "scale_ref": "fixture:owner-scale",
+          "description": "Use supplied labels only; do not infer numeric probabilities."
+        },
+        "owner_supplied_tolerance_or_unknown_reason": {
+          "unknown_reason": "Fictional owner has not supplied risk tolerance."
+        },
+        "candidate_risks": [
+          {
+            "id": "risk:restore-evidence-gap",
+            "cause": "Restore exercise evidence is absent.",
+            "event": "Required backup cannot be restored when needed.",
+            "consequence": "Recovery may exceed the owner target.",
+            "owner_ref": "owner:infrastructure",
+            "evidence_refs": [
+              "fixture:owner-scale",
+              "fixture:backup-policy",
+              "fixture:restore-history"
+            ],
+            "current_controls": [
+              {
+                "control_ref": "control:scheduled-backup",
+                "status": "designed",
+                "evidence_refs": [
+                  "fixture:backup-policy"
+                ]
+              }
+            ],
+            "assessment": {
+              "origin": "caller_advisory",
+              "likelihood_or_unknown_reason": "No occurrence history supports frequency; the missing restore exercise is a qualitative uncertainty signal, not a probability estimate.",
+              "impact_or_unknown_reason": "If restoration fails, recovery may exceed the owner target; no quantified impact is supplied.",
+              "inherent_rating_or_unknown_reason": "rating: High",
+              "treatment_proposal": "Owner may consider scheduling a restore exercise; no exercise is initiated.",
+              "review_trigger": "Owner review after a restore exercise or a changed recovery objective.",
+              "review_date_or_unknown_reason": "Unknown: owner has not supplied a review date.",
+              "residual_statement_or_unknown_reason": "Unknown: restore effectiveness and residual exposure have not been assessed."
+            }
+          }
+        ]
+      }
+    },
+    "risk-register-caller-empty-unknown-needs-context": {
+      "case_type": "negative",
+      "input": "A caller advisory supplies Unknown: without a reason; request context and emit no risk row.",
+      "request": {
+        "mode": "prospective_risk_register",
+        "privacy_classification": "synthetic",
+        "scope_ref": "fixture:backup-program",
+        "as_of": "2026-10-05",
+        "accountable_owner_ref": "owner:infrastructure",
+        "risk_sources_and_evidence_refs": [
+          {
+            "ref": "fixture:owner-scale",
+            "status": "confirmed",
+            "claim": "Fictional owner scale with Low, Moderate, High labels; no probability mappings supplied."
+          },
+          {
+            "ref": "fixture:backup-policy",
+            "status": "reported",
+            "claim": "Fictional scheduled backup policy."
+          },
+          {
+            "ref": "fixture:restore-history",
+            "status": "not_reported",
+            "claim": "No restore exercise evidence supplied."
+          }
+        ],
+        "owner_supplied_rating_scale_or_unknown_reason": {
+          "scale_ref": "fixture:owner-scale",
+          "description": "Use supplied labels only; do not infer numeric probabilities."
+        },
+        "owner_supplied_tolerance_or_unknown_reason": {
+          "unknown_reason": "Fictional owner has not supplied risk tolerance."
+        },
+        "candidate_risks": [
+          {
+            "id": "risk:restore-evidence-gap",
+            "cause": "Restore exercise evidence is absent.",
+            "event": "Required backup cannot be restored when needed.",
+            "consequence": "Recovery may exceed the owner target.",
+            "owner_ref": "owner:infrastructure",
+            "evidence_refs": [
+              "fixture:owner-scale",
+              "fixture:backup-policy",
+              "fixture:restore-history"
+            ],
+            "current_controls": [
+              {
+                "control_ref": "control:scheduled-backup",
+                "status": "designed",
+                "evidence_refs": [
+                  "fixture:backup-policy"
+                ]
+              }
+            ],
+            "assessment": {
+              "origin": "caller_advisory",
+              "likelihood_or_unknown_reason": "No occurrence history supports frequency; the missing restore exercise is a qualitative uncertainty signal, not a probability estimate.",
+              "impact_or_unknown_reason": "If restoration fails, recovery may exceed the owner target; no quantified impact is supplied.",
+              "inherent_rating_or_unknown_reason": "Unknown:   ",
+              "treatment_proposal": "Owner may consider scheduling a restore exercise; no exercise is initiated.",
+              "review_trigger": "Owner review after a restore exercise or a changed recovery objective.",
+              "review_date_or_unknown_reason": "Unknown: owner has not supplied a review date.",
+              "residual_statement_or_unknown_reason": "Unknown: restore effectiveness and residual exposure have not been assessed."
+            }
+          }
+        ]
+      }
+    },
+    "risk-register-owner-unprefixed-rating-needs-context": {
+      "case_type": "negative",
+      "input": "An owner assessment supplies High without an evidenced scale or explicit Unknown reason.",
+      "request": {
+        "mode": "prospective_risk_register",
+        "privacy_classification": "synthetic",
+        "scope_ref": "fixture:backup-program",
+        "as_of": "2026-10-05",
+        "accountable_owner_ref": "owner:infrastructure",
+        "risk_sources_and_evidence_refs": [
+          {
+            "ref": "fixture:backup-policy",
+            "status": "reported",
+            "claim": "Fictional scheduled backup policy."
+          },
+          {
+            "ref": "fixture:restore-history",
+            "status": "not_reported",
+            "claim": "No restore exercise evidence supplied."
+          }
+        ],
+        "owner_supplied_rating_scale_or_unknown_reason": {
+          "unknown_reason": "Fictional owner has not supplied a rating scale."
+        },
+        "owner_supplied_tolerance_or_unknown_reason": {
+          "unknown_reason": "Fictional owner has not supplied risk tolerance."
+        },
+        "candidate_risks": [
+          {
+            "id": "risk:restore-evidence-gap",
+            "cause": "Restore exercise evidence is absent.",
+            "event": "Required backup cannot be restored when needed.",
+            "consequence": "Recovery may exceed the owner target.",
+            "owner_ref": "owner:infrastructure",
+            "evidence_refs": [
+              "fixture:backup-policy",
+              "fixture:restore-history"
+            ],
+            "current_controls": [
+              {
+                "control_ref": "control:scheduled-backup",
+                "status": "designed",
+                "evidence_refs": [
+                  "fixture:backup-policy"
+                ]
+              }
+            ],
+            "assessment": {
+              "origin": "owner_supplied",
+              "likelihood_or_unknown_reason": "No occurrence history supports frequency; the missing restore exercise is a qualitative uncertainty signal, not a probability estimate.",
+              "impact_or_unknown_reason": "If restoration fails, recovery may exceed the owner target; no quantified impact is supplied.",
+              "inherent_rating_or_unknown_reason": "High",
+              "treatment_proposal": "Owner may consider scheduling a restore exercise; no exercise is initiated.",
+              "review_trigger": "Owner review after a restore exercise or a changed recovery objective.",
+              "review_date_or_unknown_reason": "Unknown: owner has not supplied a review date.",
+              "residual_statement_or_unknown_reason": "Unknown: restore effectiveness and residual exposure have not been assessed."
+            }
+          }
+        ]
+      }
+    },
+    "risk-register-owner-unknown-without-scale": {
+      "case_type": "edge",
+      "input": "An owner assessment without an evidenced scale explicitly retains inherent rating as unknown.",
+      "request": {
+        "mode": "prospective_risk_register",
+        "privacy_classification": "synthetic",
+        "scope_ref": "fixture:backup-program",
+        "as_of": "2026-10-05",
+        "accountable_owner_ref": "owner:infrastructure",
+        "risk_sources_and_evidence_refs": [
+          {
+            "ref": "fixture:backup-policy",
+            "status": "reported",
+            "claim": "Fictional scheduled backup policy."
+          },
+          {
+            "ref": "fixture:restore-history",
+            "status": "not_reported",
+            "claim": "No restore exercise evidence supplied."
+          }
+        ],
+        "owner_supplied_rating_scale_or_unknown_reason": {
+          "unknown_reason": "Fictional owner has not supplied a rating scale."
+        },
+        "owner_supplied_tolerance_or_unknown_reason": {
+          "unknown_reason": "Fictional owner has not supplied risk tolerance."
+        },
+        "candidate_risks": [
+          {
+            "id": "risk:restore-evidence-gap",
+            "cause": "Restore exercise evidence is absent.",
+            "event": "Required backup cannot be restored when needed.",
+            "consequence": "Recovery may exceed the owner target.",
+            "owner_ref": "owner:infrastructure",
+            "evidence_refs": [
+              "fixture:backup-policy",
+              "fixture:restore-history"
+            ],
+            "current_controls": [
+              {
+                "control_ref": "control:scheduled-backup",
+                "status": "designed",
+                "evidence_refs": [
+                  "fixture:backup-policy"
+                ]
+              }
+            ],
+            "assessment": {
+              "origin": "owner_supplied",
+              "likelihood_or_unknown_reason": "No occurrence history supports frequency; the missing restore exercise is a qualitative uncertainty signal, not a probability estimate.",
+              "impact_or_unknown_reason": "If restoration fails, recovery may exceed the owner target; no quantified impact is supplied.",
+              "inherent_rating_or_unknown_reason": "Unknown: owner rating remains unassessed because no scale was supplied.",
+              "treatment_proposal": "Owner may consider scheduling a restore exercise; no exercise is initiated.",
+              "review_trigger": "Owner review after a restore exercise or a changed recovery objective.",
+              "review_date_or_unknown_reason": "Unknown: owner has not supplied a review date.",
+              "residual_statement_or_unknown_reason": "Unknown: restore effectiveness and residual exposure have not been assessed."
+            }
           }
         ]
       }

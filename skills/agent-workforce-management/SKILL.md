@@ -2,8 +2,8 @@
 name: agent-workforce-management
 description: "An evidence-bounded method for defining reusable agent roles, selecting supplied Brain rules, drafting capability and delegation requests, monitoring workload and quality, and proposing safe suspension or retirement without granting authority."
 usage_trigger: "Use for a synthetic, redacted, or public workforce matter that needs role design, program work-package planning, collision review, evidence-based handoff/resume, rule selection, capability/delegation proposals, workload/quality review, or owner-review suspend/retire proposals."
-version: 1.0.0
-release_tag: v1.0.0
+version: 1.0.2
+release_tag: v1.0.2
 created: 2026-08-24
 author: LiNKskills Library
 tags: [agent-workforce, roles, delegation, evidence, suspension]
@@ -24,7 +24,7 @@ persistence:
   required: false
   state_model: stateless_single_pass
 format_profile: simple
-last_updated: 2026-08-24
+last_updated: 2026-10-06
 ---
 
 # Agent Workforce Management

@@ -2,8 +2,8 @@
 name: compliance-guardian
 description: "Platform legal and terms specialist that monitors YouTube/Meta policy requirements, AI disclosure obligations, and safety standards before publication."
 usage_trigger: "Use when content needs platform terms validation, disclosure checks, and safety gating before release."
-version: 1.0.0
-release_tag: v1.0.0
+version: 1.0.1
+release_tag: v1.0.1
 created: 2026-02-25
 author: LiNKskills Library
 tags: [compliance, legal, safety]
@@ -23,7 +23,7 @@ scope_out: ["Do not approve posts that lack required AI disclosures", "Do not ig
 persistence:
   required: true
   state_path: ".workdir/tasks/{{task_id}}/state.jsonl"
-last_updated: 2026-02-25
+last_updated: 2026-10-06
 ---
 
 # compliance-guardian

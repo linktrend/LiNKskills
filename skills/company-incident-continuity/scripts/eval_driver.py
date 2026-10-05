@@ -92,8 +92,17 @@ def canonical_assertions(case_id: str, status: str) -> dict[str, Any]:
 
 RISK_CASE_EXPECTATIONS = {
     "risk-register-positive": ("DRAFT", 1),
+    "risk-register-caller-secondary-owner": ("DRAFT", 1),
+    "risk-register-owner-supplied-context": ("DRAFT", 1),
     "risk-register-unknown-rating": ("DRAFT", 1),
     "risk-register-approval-injection": ("DRAFT", 1),
+    "risk-register-advisory-rating-needs-context": ("NEEDS_CONTEXT", 0),
+    "risk-register-owner-rating-needs-context": ("NEEDS_CONTEXT", 0),
+    "risk-register-caller-unprefixed-rating-needs-context": ("NEEDS_CONTEXT", 0),
+    "risk-register-caller-lowercase-rating-needs-context": ("NEEDS_CONTEXT", 0),
+    "risk-register-caller-empty-unknown-needs-context": ("NEEDS_CONTEXT", 0),
+    "risk-register-owner-unprefixed-rating-needs-context": ("NEEDS_CONTEXT", 0),
+    "risk-register-owner-unknown-without-scale": ("DRAFT", 1),
     "risk-register-missing-owner": ("NEEDS_CONTEXT", 0),
     "incident-mode-regression": ("READY_FOR_OWNER", 0),
 }
@@ -126,8 +135,18 @@ def evaluate_normalized_contract_case(skill_dir: Path, case_id: str, request: di
         supplied={x.get("ref") for x in request.get("risk_sources_and_evidence_refs",[]) if isinstance(x,dict)}
         for source,row in zip(candidates,out):
             refs=source.get("evidence_refs",[]); valid=valid and row.get("evidence_refs")==refs and bool(refs) and all(ref in supplied for ref in refs)
-        if case_id=="risk-register-positive" and out:
-            row=out[0]; valid=valid and row["likelihood_or_unknown_reason"].startswith("Jane advisory proposal (unverified):") and row["treatment_proposal"].startswith("Jane advisory proposal (unverified):") and row["review_trigger"].startswith("Jane advisory proposal (unverified):") and row["inherent_rating_or_unknown_reason"].startswith("Jane advisory proposal (unverified): Unknown:")
+        if case_id in {"risk-register-positive", "risk-register-caller-secondary-owner"} and out:
+            row=out[0]; valid=valid and row["likelihood_or_unknown_reason"].startswith("Caller advisory proposal (unverified):") and row["treatment_proposal"].startswith("Caller advisory proposal (unverified):") and row["review_trigger"].startswith("Caller advisory proposal (unverified):") and row["inherent_rating_or_unknown_reason"].startswith("Caller advisory proposal (unverified): Unknown:") and row["residual_rating_or_unknown_reason"].startswith("Caller advisory proposal (unverified): Unknown:") and any("One or more likelihood/impact/rating/treatment/residual fields remain unknown or not_reported" in str(x) for x in normalized.get("gaps",[]))
+            if case_id=="risk-register-caller-secondary-owner": valid=valid and request.get("accountable_owner_ref")=="owner:security" and row.get("owner_ref")=="owner:security"
+        if case_id=="risk-register-owner-supplied-context" and out:
+            row=out[0]; valid=valid and request.get("accountable_owner_ref")=="owner:security" and row.get("owner_ref")=="owner:security" and row["likelihood_or_unknown_reason"].startswith("Owner-supplied, unverified:") and row["treatment_proposal"].startswith("Owner-supplied, unverified:") and row["review_trigger"].startswith("Owner-supplied, unverified:") and row["inherent_rating_or_unknown_reason"]=="Owner-supplied, unverified: Rating: Moderate" and row["rating_scale_ref"]=="fixture:owner-scale"
+        if case_id in {"risk-register-advisory-rating-needs-context", "risk-register-owner-rating-needs-context", "risk-register-caller-unprefixed-rating-needs-context", "risk-register-caller-lowercase-rating-needs-context", "risk-register-caller-empty-unknown-needs-context", "risk-register-owner-unprefixed-rating-needs-context"}:
+            expected_gap = "Caller may offer qualitative rationale but may not assign an inherent rating" if "caller-" in case_id or case_id == "risk-register-advisory-rating-needs-context" else "owner-supplied rating requires an evidenced owner scale"
+            valid = valid and normalized.get("status")=="NEEDS_CONTEXT" and not out and any(expected_gap in str(x) for x in normalized.get("gaps",[]))
+        if case_id=="risk-register-owner-unknown-without-scale" and out:
+            row=out[0]; valid=valid and row["inherent_rating_or_unknown_reason"].startswith("Owner-supplied, unverified: Unknown:") and any("One or more likelihood/impact/rating/treatment/residual fields remain unknown or not_reported" in str(x) for x in normalized.get("gaps",[]))
+        if case_id=="risk-register-advisory-rating-needs-context": valid=valid and normalized.get("status")=="NEEDS_CONTEXT" and not out and any("Caller may offer qualitative rationale but may not assign an inherent rating" in str(x) for x in normalized.get("gaps",[]))
+        if case_id=="risk-register-owner-rating-needs-context": valid=valid and normalized.get("status")=="NEEDS_CONTEXT" and not out and any("owner-supplied rating requires an evidenced owner scale" in str(x) for x in normalized.get("gaps",[]))
         if case_id=="risk-register-unknown-rating" and out: valid=valid and out[0]["likelihood_or_unknown_reason"].startswith("Unknown:") and out[0]["impact_or_unknown_reason"].startswith("Unknown:")
         if case_id=="risk-register-approval-injection" and out: valid=valid and out[0]["treatment_proposal"]=="not_reported" and normalized["risk_acceptance_or_control_activation"] is False
         schema_name="risk_register_output"

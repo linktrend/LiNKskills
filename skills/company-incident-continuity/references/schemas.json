@@ -313,7 +313,7 @@
         "origin": {
           "type": "string",
           "enum": [
-            "jane_advisory",
+            "caller_advisory",
             "owner_supplied"
           ]
         },
@@ -329,6 +329,7 @@
         },
         "inherent_rating_or_unknown_reason": {
           "type": "string",
+          "description": "Caller advisory and owner-supplied input without an evidenced owner scale must use Unknown: followed by a nonempty reason. A supplied Rating: label is accepted only from the owner when the owner scale is evidenced.",
           "minLength": 1,
           "maxLength": 1000
         },

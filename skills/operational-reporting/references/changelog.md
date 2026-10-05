@@ -1,5 +1,9 @@
 # Unreleased source candidate — 2026-10-05
 
+## 1.0.1 — draft source candidate identity (2026-10-06)
+
+- Assigns the next available patch identity to the changed source candidate; the registered catalog entry and qualification/publication state remain unchanged.
+
 - Add evidence-linked Decimal trading-performance calculations and bounded actual-fixture evaluations. Preserve five existing reporting modes and advisory-only authority. No release or qualification claimed.
 
 # Changelog

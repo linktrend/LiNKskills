@@ -1,5 +1,9 @@
 # Skill Changelog
 
+## 1.0.1 — draft source candidate identity (2026-10-06)
+
+- Assigns the next available patch identity to the changed source candidate; the registered catalog entry and qualification/publication state remain unchanged.
+
 ## Unreleased source candidate - 2026-10-05
 - Add separately selected organizational requirement/control/evidence mapping for owner review; preserve content mode.
 - Add grounded fixtures and actual-response schema/provenance evaluator; no model qualification or publication claimed.

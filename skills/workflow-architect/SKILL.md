@@ -2,8 +2,8 @@
 name: workflow-architect
 description: "Reviews existing processes using evidence and owner-reviewed proposals; designs, creates, activates, and validates n8n workflows only for separately authorized implementation requests."
 usage_trigger: "Use to map or improve an existing process without executing it, or to implement an explicitly authorized n8n workflow."
-version: 1.0.0
-release_tag: v1.0.0
+version: 1.0.1
+release_tag: v1.0.1
 created: 2026-02-24
 author: LiNKskills Library
 tags: [workflow, n8n, automation]
@@ -23,7 +23,7 @@ scope_out: ["Do not deploy unreviewed production automations without explicit us
 persistence:
   required: true
   state_path: ".workdir/tasks/{{task_id}}/state.jsonl"
-last_updated: 2026-02-24
+last_updated: 2026-10-06
 ---
 
 # workflow-architect

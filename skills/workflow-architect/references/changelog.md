@@ -1,5 +1,9 @@
 # Unreleased source candidate — 2026-10-05
 
+## 1.0.1 — draft source candidate identity (2026-10-06)
+
+- Assigns the next available patch identity to the changed source candidate; the registered catalog entry and qualification/publication state remain unchanged.
+
 - Add evidence-linked process review with preserved controls, unknown owners and metrics, separate schemas, and no workflow execution. Add actual request/response checks; no model qualification or release claimed.
 
 # Changelog

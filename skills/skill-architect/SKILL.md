@@ -2,8 +2,8 @@
 name: skill-architect
 description: "Designs, migrates, and refines production-grade skills following the LiNKskills Golden Template."
 usage_trigger: "Use when the user wants to create a new skill, reverse-engineer a third-party skill/prompt into LiNKskills standards, or improve an existing LiNKskills skill."
-version: 1.5.0
-release_tag: v1.5.0
+version: 1.5.1
+release_tag: v1.5.1
 created: 2026-02-20
 author: LiNKskills Library
 tags: [meta, generator, migration, refiner]
@@ -24,7 +24,7 @@ format_profile: heavy
 persistence:
   required: true
   state_path: ".workdir/tasks/{{task_id}}/state.jsonl"
-last_updated: 2026-02-20
+last_updated: 2026-10-06
 ---
 
 # Skill Architect

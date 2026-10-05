@@ -2,8 +2,8 @@
 name: research
 description: "Canonical evidence-first research methodology: acyclic workstreams, conflict and negative-evidence methods, provider-neutral retrieval requirements, and citation-enforcer composition."
 usage_trigger: "Use when a Principal needs a research brief, source comparison, or evidence-backed decision input and the answer may require current public research."
-version: 1.0.0
-release_tag: v1.0.0
+version: 1.0.1
+release_tag: v1.0.1
 created: 2026-08-24
 author: LiNKskills Library
 tags: [research, evidence, sources, citations]
@@ -24,7 +24,7 @@ format_profile: heavy
 persistence:
   required: true
   state_path: ".workdir/tasks/{{task_id}}/state.jsonl"
-last_updated: 2026-08-31
+last_updated: 2026-10-06
 ---
 
 # research

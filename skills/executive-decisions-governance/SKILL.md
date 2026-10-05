@@ -2,8 +2,8 @@
 name: executive-decisions-governance
 description: "An evidence-bounded executive decision and governance brief method that separates choices, recommendation, rule impact, implementation tracking, and owner authority."
 usage_trigger: "Use for a synthetic, redacted, or public matter that needs a mobile-readable decision brief, choice set, rule-impact record, or implementation-tracking draft without approving, activating, scheduling, or mutating anything."
-version: 1.0.0
-release_tag: v1.0.0
+version: 1.0.1
+release_tag: v1.0.1
 created: 2026-08-24
 author: LiNKskills Library
 tags: [executive, decisions, governance, evidence, authority]
@@ -21,7 +21,7 @@ dependencies: [company-communication]
 permissions: [fs_read, fs_write]
 scope_out: ["Do not approve, reject, activate, or enforce a decision or governance rule", "Do not create mutable task, project, calendar, meeting, Program, or workforce state", "Do not send, publish, schedule, select a transport, call a connector, or mutate an external system", "Do not expose credentials, private records, customer data, or confidential company material in releases, fixtures, telemetry, or subordinate access"]
 format_profile: simple
-last_updated: 2026-08-24
+last_updated: 2026-10-06
 ---
 
 # Executive Decisions and Governance

@@ -2,8 +2,8 @@
 name: company-planning-performance
 description: "An evidence-bounded planning and performance review method for company horizons, objectives, KPI variance, capacity_review, delivery signals, and owner-reviewed reprioritization."
 usage_trigger: "Use for synthetic, redacted, or public planning evidence when a consumer needs a concise horizon plan, KPI review, forecast-versus-actual comparison, blocker/late/obsolete detection, capacity_review, or evidence-backed reprioritization draft without mutating Program or Task state."
-version: 1.0.0
-release_tag: v1.0.0
+version: 1.0.1
+release_tag: v1.0.1
 created: 2026-08-24
 author: LiNKskills Library
 tags: [planning, performance, objectives, kpis, forecasting, evidence]
@@ -24,7 +24,7 @@ format_profile: heavy
 persistence:
   required: true
   state_path: ".workdir/tasks/{{task_id}}/state.jsonl"
-last_updated: 2026-08-24
+last_updated: 2026-10-06
 ---
 
 # Company Planning and Performance

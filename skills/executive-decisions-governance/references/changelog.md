@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.1 — draft source candidate identity (2026-10-06)
+
+- Assigns the next available patch identity to the changed source candidate; the registered catalog entry and qualification/publication state remain unchanged.
+
 ## Unreleased source candidate - 2026-10-05
 
 - Distinguish supplied runtime capability, action-specific owner approval, and quoted instructions before describing an action as available.

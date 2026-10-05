@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.1 — draft source candidate identity (2026-10-06)
+
+- Assigns the next available patch identity to the changed source candidate; the registered catalog entry and qualification/publication state remain unchanged.
+
 ## Unreleased source candidate - 2026-10-05
 - Add evidenced capacity-review arithmetic, period/unknown handling, and actual helper/schema tests.
 - Five fictional cases validated; no model or runtime skill qualification claimed.

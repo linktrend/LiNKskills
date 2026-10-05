@@ -2,8 +2,8 @@
 name: company-incident-continuity
 description: "An evidence-bounded method for prospective risk registers and incident and continuity coordination, keeping prospective risk review separate from live response."
 usage_trigger: "Use for synthetic, redacted, or public operational-risk or incident evidence when an owner needs a prospective risk register, outage/security/continuity review, or recovery and closure proposal without control activation, deployment, communication, credential, or authority mutation."
-version: 1.0.0
-release_tag: v1.0.0
+version: 1.0.1
+release_tag: v1.0.1
 created: 2026-08-25
 author: LiNKskills Library
 tags: [incident, outage, security, continuity, recovery, evidence]
@@ -24,7 +24,7 @@ format_profile: heavy
 persistence:
   required: true
   state_path: ".workdir/tasks/{{task_id}}/state.jsonl"
-last_updated: 2026-08-25
+last_updated: 2026-10-06
 ---
 
 # Company Incident and Continuity Management
@@ -36,7 +36,7 @@ messaging service, backup system, Program Ledger, or durable incident store.
 
 ## Prospective risk-register contract
 
-Route `mode=prospective_risk_register` to its own input/output schema and helper branch. This is a prospective inventory and treatment proposal, not incident response. Do not manufacture `incident_ref`, incident type, severity, active state, or closure fields. Each risk preserves the supplied `evidence_refs` for its cause, event, consequence, likelihood/impact statement, current-control evidence, and residual statement. Use only an owner-supplied scale and tolerance; if either is unavailable, retain the explicit unknown reason. The helper may validate and normalize these fields, but it does not score likelihood, estimate probabilities or losses, accept risk, activate controls, notify anyone, or mutate the Program Ledger. Accountable owners decide treatment and acceptance.
+Route `mode=prospective_risk_register` to its own input/output schema and helper branch. This is a prospective inventory and treatment proposal, not incident response. Do not manufacture `incident_ref`, incident type, severity, active state, or closure fields. Each risk preserves the supplied `evidence_refs` for its cause, event, consequence, likelihood/impact statement, current-control evidence, and residual statement. Use only an owner-supplied scale and tolerance. A caller advisory, and an owner assessment without an evidenced scale, must state `Unknown:` followed by a nonempty reason for inherent rating; only an owner with an evidenced scale may supply `Rating: <label>`. Keep those unknown ratings visible as gaps even when output text is prefixed to identify its source. The helper may validate and normalize these fields, but it does not score likelihood, estimate probabilities or losses, accept risk, activate controls, notify anyone, or mutate the Program Ledger. Accountable owners decide treatment and acceptance.
 
 ## Incident contract
 

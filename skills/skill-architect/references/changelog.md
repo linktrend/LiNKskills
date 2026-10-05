@@ -1,5 +1,9 @@
 # Skill Changelog
 
+## 1.5.1 — draft source candidate identity (2026-10-06)
+
+- Assigns the next available patch identity to the changed source candidate; the registered catalog entry and qualification/publication state remain unchanged.
+
 ## Unreleased — source proposal (2026-10-05)
 - Refiner reports now bind the exact target path and SHA-256 before patch generation and stop when observed bytes differ.
 - Structural validation, semantic findings, and behavior receipts have separate typed report fields; missing consumer evidence remains `NOT_EVALUATED` and schema validity is not qualification.

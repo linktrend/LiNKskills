@@ -2,8 +2,8 @@
 name: procurement-vendor-management
 description: "Evidence-grounded supplier comparison, pricing verification, contract and renewal review, performance tracking, continuity-risk assessment, and approval-brief preparation."
 usage_trigger: "Use when supplied procurement or vendor evidence needs structured comparison, risk review, or an approval brief without spending, acceptance, or vendor-system action."
-version: 1.0.0
-release_tag: v1.0.0
+version: 1.0.2
+release_tag: v1.0.2
 created: 2026-08-24
 author: LiNKskills Library
 tags: [procurement, vendors, suppliers, pricing, renewals, continuity]
@@ -24,7 +24,7 @@ format_profile: heavy
 persistence:
   required: true
   state_path: ".workdir/tasks/{{task_id}}/state.jsonl"
-last_updated: 2026-08-24
+last_updated: 2026-10-06
 ---
 
 # Procurement and Vendor Management
