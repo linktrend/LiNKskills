@@ -116,6 +116,7 @@ class PostgresPublisherRegistry:
         *,
         channel: str = "internal",
         metadata: Optional[Mapping[str, Any]] = None,
+        registry_lifecycle: str = "published",
         transactional: bool = True,
     ) -> PublishedRelease:
         """Build bundle manifest and register release + bundle atomically."""
@@ -126,6 +127,8 @@ class PostgresPublisherRegistry:
         release_hash = bundle_hash.removeprefix("sha256:")
         published_at = _utc_now()
         meta = dict(metadata or {})
+        if registry_lifecycle not in {"quarantined", "published", "retired"}:
+            raise ValueError("invalid_registry_lifecycle")
 
         def _write() -> PublishedRelease:
             with self._conn.cursor() as cur:
@@ -176,10 +179,10 @@ class PostgresPublisherRegistry:
                     """
                     insert into lskills.releases (
                       skill_id, version, release_hash, channel,
-                      content_manifest, published_at, metadata
+                      content_manifest, published_at, metadata, registry_lifecycle
                     ) values (
                       %s, %s, %s, %s::lskills.release_channel,
-                      %s, %s::timestamptz, %s
+                      %s, %s::timestamptz, %s, %s
                     )
                     returning release_id, published_at
                     """,
@@ -191,6 +194,7 @@ class PostgresPublisherRegistry:
                         _as_jsonb(manifest),
                         published_at,
                         _as_jsonb(meta),
+                        registry_lifecycle,
                     ),
                 )
                 release_row = cur.fetchone()
