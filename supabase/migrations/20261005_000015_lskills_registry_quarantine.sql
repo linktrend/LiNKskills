@@ -3,6 +3,22 @@ alter table lskills.releases
   add column if not exists registry_lifecycle text not null default 'published'
   check (registry_lifecycle in ('quarantined','published','retired'));
 
+do $$
+declare
+  actual_type text;
+begin
+  select format_type(a.atttypid, a.atttypmod)
+    into actual_type
+  from pg_attribute a
+  join pg_class c on c.oid = a.attrelid
+  join pg_namespace n on n.oid = c.relnamespace
+  where n.nspname='lskills' and c.relname='releases'
+    and a.attname='registry_lifecycle' and not a.attisdropped;
+  if actual_type is distinct from 'text' then
+    raise exception 'registry_lifecycle existing column has incompatible type: %', actual_type;
+  end if;
+end $$;
+
 drop policy if exists lskills_releases_runtime_read on lskills.releases;
 create policy lskills_releases_runtime_read on lskills.releases
   for select to svc_lskills_runtime

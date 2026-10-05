@@ -135,7 +135,7 @@ class PostgresPublisherRegistry:
                 self._apply_identity(cur)
                 cur.execute(
                     """
-                    select release_id, release_hash, channel, published_at, metadata
+                    select release_id, release_hash, channel, published_at, metadata, registry_lifecycle
                     from lskills.releases
                     where skill_id = %s and version = %s
                     """,
@@ -160,6 +160,8 @@ class PostgresPublisherRegistry:
                         existing_bundle == bundle_hash
                         and str(existing["release_hash"]) == release_hash
                     ):
+                        if str(existing["registry_lifecycle"]) != registry_lifecycle:
+                            raise ValueError("immutable lifecycle conflict")
                         return PublishedRelease(
                             skill_id=skill_id,
                             version=version,
