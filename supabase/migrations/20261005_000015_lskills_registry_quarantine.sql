@@ -9,6 +9,8 @@ declare
   actual_not_null boolean;
   actual_default text;
   check_count integer;
+  lifecycle_check_count integer;
+  lifecycle_attnum smallint;
 begin
   select format_type(a.atttypid, a.atttypmod), a.attnotnull, pg_get_expr(d.adbin, d.adrelid)
     into actual_type, actual_not_null, actual_default
@@ -24,15 +26,20 @@ begin
   if not actual_not_null or actual_default is distinct from '''published''::text' then
     raise exception 'registry_lifecycle existing column has incompatible nullability/default';
   end if;
-  select count(*) into check_count
+  select attnum into lifecycle_attnum from pg_attribute
+  where attrelid = 'lskills.releases'::regclass
+    and attname = 'registry_lifecycle' and not attisdropped;
+  select count(*), count(*) filter (where
+    c.convalidated
+    and c.conkey = array[lifecycle_attnum]::smallint[]
+    and regexp_replace(pg_get_constraintdef(c.oid), '[[:space:]]', '', 'g') =
+      'CHECK((registry_lifecycle=ANY(ARRAY[''quarantined''::text,''published''::text,''retired''::text])))'
+  ) into lifecycle_check_count, check_count
   from pg_constraint c join pg_class r on r.oid=c.conrelid join pg_namespace n on n.oid=r.relnamespace
   where n.nspname='lskills' and r.relname='releases' and c.contype='c'
-    and pg_get_constraintdef(c.oid) like '%registry_lifecycle%'
-    and pg_get_constraintdef(c.oid) like '%quarantined%'
-    and pg_get_constraintdef(c.oid) like '%published%'
-    and pg_get_constraintdef(c.oid) like '%retired%';
-  if check_count = 0 then
-    raise exception 'registry_lifecycle allowed-values check is missing';
+    and c.conkey @> array[lifecycle_attnum]::smallint[];
+  if lifecycle_check_count <> 1 or check_count <> 1 then
+    raise exception 'registry_lifecycle allowed-values check must be validated and match the exact state set';
   end if;
 end $$;
 
