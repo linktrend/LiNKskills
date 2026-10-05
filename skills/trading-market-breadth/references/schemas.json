@@ -628,8 +628,11 @@
                 "items": {
                   "type": "object",
                   "additionalProperties": false,
-                  "description": "Optional source lineage for this historical observation. Omit to preserve legacy input compatibility; the method must mark any calculation relying on absent lineage partial/unavailable and name gaps rather than infer values.",
+                  "description": "Lineage for one contributing input history row. Copy the exact outer input instrument, session date, and source identifier along with processing metadata; output consumers must be able to identify the row without relying on array order.",
                   "required": [
+                    "instrument",
+                    "date",
+                    "source",
                     "status",
                     "missing_fields"
                   ],
@@ -723,6 +726,18 @@
                           "minimum": 1
                         }
                       }
+                    },
+                    "instrument": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "date": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "source": {
+                      "type": "string",
+                      "minLength": 1
                     }
                   },
                   "allOf": [

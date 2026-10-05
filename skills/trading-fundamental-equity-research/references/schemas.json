@@ -155,6 +155,15 @@
               }
             }
           }
+        },
+        "requested_artifact_types": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "Optional user-requested file/artifact types for coverage accounting. Omit or use an empty array when the user requests only a concise memo; no file format or tool is mandatory."
         }
       }
     },
@@ -336,12 +345,10 @@
         "artifact_coverage": {
           "type": "object",
           "additionalProperties": false,
-          "description": "Conditional artifact coverage. A concise memo-only answer is valid; charts, spreadsheets, and document files are not mandatory. Hashes describe only artifacts actually produced.",
+          "description": "Single coverage ledger. Each row accounts for one requested file/artifact. A memo-only result has no ledger rows; no spreadsheet, chart, or document is mandatory.",
           "required": [
             "status",
-            "requested_artifact_types",
-            "artifacts",
-            "uncompleted_deliverables"
+            "deliverables"
           ],
           "properties": {
             "status": {
@@ -352,45 +359,7 @@
                 "partial"
               ]
             },
-            "requested_artifact_types": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "minLength": 1
-              },
-              "uniqueItems": true
-            },
-            "artifacts": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "additionalProperties": false,
-                "required": [
-                  "artifact_type",
-                  "path",
-                  "sha256",
-                  "status"
-                ],
-                "properties": {
-                  "artifact_type": {
-                    "type": "string",
-                    "minLength": 1
-                  },
-                  "path": {
-                    "type": "string",
-                    "minLength": 1
-                  },
-                  "sha256": {
-                    "type": "string",
-                    "pattern": "^sha256:[0-9a-fA-F]{64}$"
-                  },
-                  "status": {
-                    "const": "produced"
-                  }
-                }
-              }
-            },
-            "uncompleted_deliverables": {
+            "deliverables": {
               "type": "array",
               "items": {
                 "type": "object",
@@ -398,6 +367,8 @@
                 "required": [
                   "artifact_type",
                   "status",
+                  "path",
+                  "sha256",
                   "reason"
                 ],
                 "properties": {
@@ -408,16 +379,91 @@
                   "status": {
                     "type": "string",
                     "enum": [
+                      "produced",
                       "not_generated",
-                      "unavailable",
-                      "not_requested"
+                      "unavailable"
                     ]
                   },
+                  "path": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "minLength": 1
+                  },
+                  "sha256": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "pattern": "^sha256:[0-9a-fA-F]{64}$"
+                  },
                   "reason": {
-                    "type": "string",
+                    "type": [
+                      "string",
+                      "null"
+                    ],
                     "minLength": 1
                   }
-                }
+                },
+                "allOf": [
+                  {
+                    "if": {
+                      "properties": {
+                        "status": {
+                          "const": "produced"
+                        }
+                      },
+                      "required": [
+                        "status"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "path": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "sha256": {
+                          "type": "string",
+                          "pattern": "^sha256:[0-9a-fA-F]{64}$"
+                        },
+                        "reason": {
+                          "type": "null"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "status": {
+                          "enum": [
+                            "not_generated",
+                            "unavailable"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "status"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "path": {
+                          "type": "null"
+                        },
+                        "sha256": {
+                          "type": "null"
+                        },
+                        "reason": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    }
+                  }
+                ]
               }
             }
           },
@@ -435,13 +481,7 @@
               },
               "then": {
                 "properties": {
-                  "requested_artifact_types": {
-                    "maxItems": 0
-                  },
-                  "artifacts": {
-                    "maxItems": 0
-                  },
-                  "uncompleted_deliverables": {
+                  "deliverables": {
                     "maxItems": 0
                   }
                 }
@@ -460,8 +500,57 @@
               },
               "then": {
                 "properties": {
-                  "uncompleted_deliverables": {
-                    "maxItems": 0
+                  "deliverables": {
+                    "minItems": 1,
+                    "items": {
+                      "properties": {
+                        "status": {
+                          "const": "produced"
+                        },
+                        "path": {
+                          "type": "string"
+                        },
+                        "sha256": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "status",
+                        "path",
+                        "sha256"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "partial"
+                  }
+                },
+                "required": [
+                  "status"
+                ]
+              },
+              "then": {
+                "properties": {
+                  "deliverables": {
+                    "minItems": 1,
+                    "not": {
+                      "items": {
+                        "properties": {
+                          "status": {
+                            "const": "produced"
+                          }
+                        },
+                        "required": [
+                          "status"
+                        ]
+                      }
+                    }
                   }
                 }
               }

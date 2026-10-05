@@ -1276,8 +1276,11 @@
                 "items": {
                   "type": "object",
                   "additionalProperties": false,
-                  "description": "Optional source lineage for this historical observation. Omit to preserve legacy input compatibility; the method must mark any calculation relying on absent lineage partial/unavailable and name gaps rather than infer values.",
+                  "description": "Lineage for one contributing input history row. Copy the exact outer input instrument, session date, and source identifier along with processing metadata; output consumers must be able to identify the row without relying on array order.",
                   "required": [
+                    "instrument",
+                    "date",
+                    "source",
                     "status",
                     "missing_fields"
                   ],
@@ -1371,6 +1374,18 @@
                           "minimum": 1
                         }
                       }
+                    },
+                    "instrument": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "date": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "source": {
+                      "type": "string",
+                      "minLength": 1
                     }
                   },
                   "allOf": [
@@ -1543,7 +1558,8 @@
     "verification_steps": [
       "Validate the supplied input against references/schemas.json#/definitions/input and report each missing or invalid required field.",
       "Validate the produced task output against references/schemas.json#/definitions/output; structural validity does not establish method correctness.",
-      "Use references/eval-suite.json criteria only against an actual task output; a schema check or fictional example alone is not a behavioral pass."
+      "Use references/eval-suite.json criteria only against an actual task output; a schema check or fictional example alone is not a behavioral pass.",
+      "When retaining source history, every output provenance record must copy instrument/date/source from the contributing input row and retain its supplied lineage metadata; reject attribution to another row, even if metadata or array position matches. Name absent lineage rather than inventing it."
     ],
     "completion_criteria": [
       "Include every required output property defined at references/schemas.json#/definitions/output: completion_status, as_of_date, universe_definition, breadth_measures, interpretation, disagreements, gaps.",
@@ -1584,7 +1600,7 @@
   "eval": {
     "suite_path": "references/eval-suite.json",
     "suite_schema_version": "0.1",
-    "suite_hash": "sha256:c4e3df185916724afbabadf90d419b927843d8aa11b0a6184c784bdedcd4912a",
+    "suite_hash": "sha256:31e9b9583cc29728512a9d28b8bf1adfcb146e7a8ff368cf0a86c1d581219b8e",
     "verification_refs": [
       "references/schemas.json",
       "references/eval-suite.json"

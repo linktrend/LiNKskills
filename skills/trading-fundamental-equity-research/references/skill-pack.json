@@ -213,6 +213,19 @@
             }
           }
         }
+      },
+      {
+        "name": "requested_artifact_types",
+        "description": "Optional property `requested_artifact_types` from references/schemas.json#/definitions/input. Its accepted shape is included below.",
+        "schema": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "Optional user-requested file/artifact types for coverage accounting. Omit or use an empty array when the user requests only a concise memo; no file format or tool is mandatory."
+        }
       }
     ],
     "input_schema": {
@@ -367,6 +380,15 @@
               }
             }
           }
+        },
+        "requested_artifact_types": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "Optional user-requested file/artifact types for coverage accounting. Omit or use an empty array when the user requests only a concise memo; no file format or tool is mandatory."
         }
       },
       "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -502,145 +524,6 @@
         }
       },
       {
-        "name": "artifact_coverage",
-        "description": "Required property `artifact_coverage` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
-        "schema": {
-          "type": "object",
-          "additionalProperties": false,
-          "description": "Conditional artifact coverage. A concise memo-only answer is valid; charts, spreadsheets, and document files are not mandatory. Hashes describe only artifacts actually produced.",
-          "required": [
-            "status",
-            "requested_artifact_types",
-            "artifacts",
-            "uncompleted_deliverables"
-          ],
-          "properties": {
-            "status": {
-              "type": "string",
-              "enum": [
-                "memo_only",
-                "complete",
-                "partial"
-              ]
-            },
-            "requested_artifact_types": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "minLength": 1
-              },
-              "uniqueItems": true
-            },
-            "artifacts": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "additionalProperties": false,
-                "required": [
-                  "artifact_type",
-                  "path",
-                  "sha256",
-                  "status"
-                ],
-                "properties": {
-                  "artifact_type": {
-                    "type": "string",
-                    "minLength": 1
-                  },
-                  "path": {
-                    "type": "string",
-                    "minLength": 1
-                  },
-                  "sha256": {
-                    "type": "string",
-                    "pattern": "^sha256:[0-9a-fA-F]{64}$"
-                  },
-                  "status": {
-                    "const": "produced"
-                  }
-                }
-              }
-            },
-            "uncompleted_deliverables": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "additionalProperties": false,
-                "required": [
-                  "artifact_type",
-                  "status",
-                  "reason"
-                ],
-                "properties": {
-                  "artifact_type": {
-                    "type": "string",
-                    "minLength": 1
-                  },
-                  "status": {
-                    "type": "string",
-                    "enum": [
-                      "not_generated",
-                      "unavailable",
-                      "not_requested"
-                    ]
-                  },
-                  "reason": {
-                    "type": "string",
-                    "minLength": 1
-                  }
-                }
-              }
-            }
-          },
-          "allOf": [
-            {
-              "if": {
-                "properties": {
-                  "status": {
-                    "const": "memo_only"
-                  }
-                },
-                "required": [
-                  "status"
-                ]
-              },
-              "then": {
-                "properties": {
-                  "requested_artifact_types": {
-                    "maxItems": 0
-                  },
-                  "artifacts": {
-                    "maxItems": 0
-                  },
-                  "uncompleted_deliverables": {
-                    "maxItems": 0
-                  }
-                }
-              }
-            },
-            {
-              "if": {
-                "properties": {
-                  "status": {
-                    "const": "complete"
-                  }
-                },
-                "required": [
-                  "status"
-                ]
-              },
-              "then": {
-                "properties": {
-                  "uncompleted_deliverables": {
-                    "maxItems": 0
-                  }
-                }
-              }
-            }
-          ]
-        }
-      },
-      {
         "name": "advisory_portfolio_proposal",
         "description": "Optional property `advisory_portfolio_proposal` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
         "schema": {
@@ -710,6 +593,225 @@
             }
           }
         }
+      },
+      {
+        "name": "artifact_coverage",
+        "description": "Required property `artifact_coverage` from references/schemas.json#/definitions/output. Its accepted shape is included below.",
+        "schema": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Single coverage ledger. Each row accounts for one requested file/artifact. A memo-only result has no ledger rows; no spreadsheet, chart, or document is mandatory.",
+          "required": [
+            "status",
+            "deliverables"
+          ],
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "memo_only",
+                "complete",
+                "partial"
+              ]
+            },
+            "deliverables": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "artifact_type",
+                  "status",
+                  "path",
+                  "sha256",
+                  "reason"
+                ],
+                "properties": {
+                  "artifact_type": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "produced",
+                      "not_generated",
+                      "unavailable"
+                    ]
+                  },
+                  "path": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "minLength": 1
+                  },
+                  "sha256": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "pattern": "^sha256:[0-9a-fA-F]{64}$"
+                  },
+                  "reason": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "minLength": 1
+                  }
+                },
+                "allOf": [
+                  {
+                    "if": {
+                      "properties": {
+                        "status": {
+                          "const": "produced"
+                        }
+                      },
+                      "required": [
+                        "status"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "path": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "sha256": {
+                          "type": "string",
+                          "pattern": "^sha256:[0-9a-fA-F]{64}$"
+                        },
+                        "reason": {
+                          "type": "null"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "status": {
+                          "enum": [
+                            "not_generated",
+                            "unavailable"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "status"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "path": {
+                          "type": "null"
+                        },
+                        "sha256": {
+                          "type": "null"
+                        },
+                        "reason": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "memo_only"
+                  }
+                },
+                "required": [
+                  "status"
+                ]
+              },
+              "then": {
+                "properties": {
+                  "deliverables": {
+                    "maxItems": 0
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "complete"
+                  }
+                },
+                "required": [
+                  "status"
+                ]
+              },
+              "then": {
+                "properties": {
+                  "deliverables": {
+                    "minItems": 1,
+                    "items": {
+                      "properties": {
+                        "status": {
+                          "const": "produced"
+                        },
+                        "path": {
+                          "type": "string"
+                        },
+                        "sha256": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "status",
+                        "path",
+                        "sha256"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "partial"
+                  }
+                },
+                "required": [
+                  "status"
+                ]
+              },
+              "then": {
+                "properties": {
+                  "deliverables": {
+                    "minItems": 1,
+                    "not": {
+                      "items": {
+                        "properties": {
+                          "status": {
+                            "const": "produced"
+                          }
+                        },
+                        "required": [
+                          "status"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
       }
     ],
     "procedure_summary": "Apply the task-specific integrated method and the named branch input/output and failure rules in references/source-integrated-method.md. Preserve optional/provider distinctions and return bounded partial outputs when independent methods remain valid.",
@@ -723,7 +825,8 @@
     "verification_steps": [
       "Validate the supplied input against references/schemas.json#/definitions/input and report each missing or invalid required field.",
       "Validate the produced task output against references/schemas.json#/definitions/output; structural validity does not establish method correctness.",
-      "Use references/eval-suite.json criteria only against an actual task output; a schema check or fictional example alone is not a behavioral pass."
+      "Use references/eval-suite.json criteria only against an actual task output; a schema check or fictional example alone is not a behavioral pass.",
+      "Compare actual output deliverables artifact_type values with requested_artifact_types when supplied: reject missing, extra, or duplicate types. Each produced row requires actual file read-back path and hash; each uncompleted row requires a reason. Memo-only requires no requested files and an empty ledger."
     ],
     "completion_criteria": [
       "Include every required output property defined at references/schemas.json#/definitions/output: completion_status, issuer, as_of_date, thesis, fact_ledger, financial_snapshot, valuation, countercase, gaps.",
@@ -764,7 +867,7 @@
   "eval": {
     "suite_path": "references/eval-suite.json",
     "suite_schema_version": "0.1",
-    "suite_hash": "sha256:69744c5974f4f56c7d46d5e333cf41cd57ce6f9942f34057d684ffa0441baf11",
+    "suite_hash": "sha256:a96732129c8cacef2a31677b66e6f539f9cef1328dd9b4b8e80d2b7337f11be8",
     "verification_refs": [
       "references/schemas.json",
       "references/eval-suite.json"

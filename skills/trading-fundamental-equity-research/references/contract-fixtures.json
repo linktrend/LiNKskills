@@ -92,9 +92,7 @@
       ],
       "artifact_coverage": {
         "status": "memo_only",
-        "requested_artifact_types": [],
-        "artifacts": [],
-        "uncompleted_deliverables": []
+        "deliverables": []
       }
     },
     "expected_output_assertions": [
@@ -127,6 +125,10 @@
           "operating_cash_flow": 90,
           "capital_expenditure": 70
         }
+      ],
+      "requested_artifact_types": [
+        "financial_model",
+        "chart"
       ]
     },
     "expected_output_example": {
@@ -161,30 +163,27 @@
       ],
       "artifact_coverage": {
         "status": "partial",
-        "requested_artifact_types": [
-          "financial_model",
-          "chart"
-        ],
-        "artifacts": [
+        "deliverables": [
           {
             "artifact_type": "financial_model",
+            "status": "produced",
             "path": "examples/fictional-model.xlsx",
             "sha256": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
-            "status": "produced"
-          }
-        ],
-        "uncompleted_deliverables": [
+            "reason": null
+          },
           {
             "artifact_type": "chart",
             "status": "not_generated",
+            "path": null,
+            "sha256": null,
             "reason": "No chart capability was supplied; the memo contains a textual chart specification."
           }
         ]
       }
     },
     "expected_output_assertions": [
-      "Every produced artifact row includes path, type, and SHA-256.",
-      "Every requested but uncompleted deliverable has a typed status and reason.",
+      "The deliverables ledger has exactly one row for each requested artifact type, with no duplicates or omissions.",
+      "Produced records include path and SHA-256; uncompleted records have null path/hash and a specific reason.",
       "Only artifacts actually produced in the real task may be recorded as produced."
     ]
   },
@@ -218,17 +217,15 @@
     "invalid_output_delta": {
       "artifact_coverage": {
         "status": "partial",
-        "requested_artifact_types": [
-          "financial_model"
-        ],
-        "artifacts": [
+        "deliverables": [
           {
             "artifact_type": "financial_model",
+            "status": "produced",
             "path": "outputs/model.xlsx",
-            "status": "produced"
+            "sha256": null,
+            "reason": null
           }
-        ],
-        "uncompleted_deliverables": []
+        ]
       }
     },
     "expected_structural_result": "reject: a produced artifact must include a sha256 digest."
@@ -263,18 +260,236 @@
     "invalid_output_delta": {
       "artifact_coverage": {
         "status": "partial",
-        "requested_artifact_types": [
-          "chart"
-        ],
-        "artifacts": [],
-        "uncompleted_deliverables": [
+        "deliverables": [
           {
             "artifact_type": "chart",
-            "status": "not_generated"
+            "status": "not_generated",
+            "path": null,
+            "sha256": null,
+            "reason": null
           }
         ]
       }
     },
     "expected_structural_result": "reject: each uncompleted deliverable must explain why it was not produced."
+  },
+  "trading-fundamental-equity-research-complete-ledger-example": {
+    "fixture_id": "trading-fundamental-equity-research-complete-ledger-example-fixture",
+    "status": "unexecuted structural fixture; the path and digest are fictional and no artifact was created",
+    "task_input": {
+      "issuer": "Example Components Ltd.",
+      "ticker_or_id": "EXC-DEMO",
+      "as_of_date": "2026-09-30",
+      "jurisdiction": "US",
+      "research_question": "Assess reported cash conversion and whether evidence supports a valuation range.",
+      "periods": [
+        "FY2025"
+      ],
+      "provided_filings": [
+        {
+          "source": "Issuer annual filing",
+          "period": "FY2025",
+          "published_at": "2026-02-20T16:00:00Z",
+          "source_url_or_file": "user-supplied://fictional-fy2025-filing",
+          "source_vintage": "as-published",
+          "source_locator": "Consolidated statements; fictional supplied fixture",
+          "currency": "USD",
+          "revenue": 1000,
+          "operating_cash_flow": 90,
+          "capital_expenditure": 70
+        }
+      ],
+      "requested_artifact_types": [
+        "financial_model"
+      ]
+    },
+    "expected_output_example": {
+      "completion_status": "partial",
+      "issuer": "Example Components Ltd.",
+      "as_of_date": "2026-09-30",
+      "thesis": {
+        "view": "The supplied fictional filing supports a cash-flow observation only.",
+        "confidence_basis": "One supplied filing; no normalized multi-period model or valuation basis."
+      },
+      "fact_ledger": [
+        {
+          "claim": "FY2025 operating cash flow",
+          "value": 90,
+          "unit": "USD millions",
+          "period": "FY2025",
+          "published_at": "2026-02-20T16:00:00Z",
+          "source_url_or_file": "user-supplied://fictional-fy2025-filing",
+          "source_vintage": "as-published"
+        }
+      ],
+      "financial_snapshot": {},
+      "valuation": null,
+      "countercase": [
+        "A single fictional filing does not establish normalized cash conversion."
+      ],
+      "gaps": [
+        "Forecast assumptions",
+        "Share count",
+        "Net debt",
+        "Comparable valuation basis"
+      ],
+      "artifact_coverage": {
+        "status": "complete",
+        "deliverables": [
+          {
+            "artifact_type": "financial_model",
+            "status": "produced",
+            "path": "examples/fictional-model.xlsx",
+            "sha256": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+            "reason": null
+          }
+        ]
+      }
+    },
+    "expected_output_assertions": [
+      "The single requested output type appears once in the unified deliverables ledger and is marked produced with path and digest."
+    ]
+  },
+  "trading-fundamental-equity-research-complete-omits-requested-deliverable-invalid": {
+    "fixture_id": "trading-fundamental-equity-research-complete-omits-requested-deliverable-invalid-fixture",
+    "status": "unexecuted negative structural fixture",
+    "task_input": {
+      "issuer": "Example Components Ltd.",
+      "ticker_or_id": "EXC-DEMO",
+      "as_of_date": "2026-09-30",
+      "jurisdiction": "US",
+      "research_question": "Assess reported cash conversion and whether evidence supports a valuation range.",
+      "periods": [
+        "FY2025"
+      ],
+      "provided_filings": [
+        {
+          "source": "Issuer annual filing",
+          "period": "FY2025",
+          "published_at": "2026-02-20T16:00:00Z",
+          "source_url_or_file": "user-supplied://fictional-fy2025-filing",
+          "source_vintage": "as-published",
+          "source_locator": "Consolidated statements; fictional supplied fixture",
+          "currency": "USD",
+          "revenue": 1000,
+          "operating_cash_flow": 90,
+          "capital_expenditure": 70
+        }
+      ],
+      "requested_artifact_types": [
+        "chart"
+      ]
+    },
+    "invalid_output_example": {
+      "completion_status": "partial",
+      "issuer": "Example Components Ltd.",
+      "as_of_date": "2026-09-30",
+      "thesis": {
+        "view": "The supplied fictional filing supports a cash-flow observation only.",
+        "confidence_basis": "One supplied filing; no normalized multi-period model or valuation basis."
+      },
+      "fact_ledger": [
+        {
+          "claim": "FY2025 operating cash flow",
+          "value": 90,
+          "unit": "USD millions",
+          "period": "FY2025",
+          "published_at": "2026-02-20T16:00:00Z",
+          "source_url_or_file": "user-supplied://fictional-fy2025-filing",
+          "source_vintage": "as-published"
+        }
+      ],
+      "financial_snapshot": {},
+      "valuation": null,
+      "countercase": [
+        "A single fictional filing does not establish normalized cash conversion."
+      ],
+      "gaps": [
+        "Forecast assumptions",
+        "Share count",
+        "Net debt",
+        "Comparable valuation basis"
+      ],
+      "artifact_coverage": {
+        "status": "complete",
+        "deliverables": []
+      }
+    },
+    "expected_structural_result": "reject: complete requires at least one ledger row and every row must be produced."
+  },
+  "trading-fundamental-equity-research-complete-ledger-wrong-request-eval": {
+    "fixture_id": "trading-fundamental-equity-research-complete-ledger-wrong-request-eval-fixture",
+    "status": "unexecuted cross-input/output evaluation fixture; schema-valid output is expected to fail request-coverage evaluation",
+    "task_input": {
+      "issuer": "Example Components Ltd.",
+      "ticker_or_id": "EXC-DEMO",
+      "as_of_date": "2026-09-30",
+      "jurisdiction": "US",
+      "research_question": "Assess reported cash conversion and whether evidence supports a valuation range.",
+      "periods": [
+        "FY2025"
+      ],
+      "provided_filings": [
+        {
+          "source": "Issuer annual filing",
+          "period": "FY2025",
+          "published_at": "2026-02-20T16:00:00Z",
+          "source_url_or_file": "user-supplied://fictional-fy2025-filing",
+          "source_vintage": "as-published",
+          "source_locator": "Consolidated statements; fictional supplied fixture",
+          "currency": "USD",
+          "revenue": 1000,
+          "operating_cash_flow": 90,
+          "capital_expenditure": 70
+        }
+      ],
+      "requested_artifact_types": [
+        "chart"
+      ]
+    },
+    "expected_output_example": {
+      "completion_status": "partial",
+      "issuer": "Example Components Ltd.",
+      "as_of_date": "2026-09-30",
+      "thesis": {
+        "view": "The supplied fictional filing supports a cash-flow observation only.",
+        "confidence_basis": "One supplied filing; no normalized multi-period model or valuation basis."
+      },
+      "fact_ledger": [
+        {
+          "claim": "FY2025 operating cash flow",
+          "value": 90,
+          "unit": "USD millions",
+          "period": "FY2025",
+          "published_at": "2026-02-20T16:00:00Z",
+          "source_url_or_file": "user-supplied://fictional-fy2025-filing",
+          "source_vintage": "as-published"
+        }
+      ],
+      "financial_snapshot": {},
+      "valuation": null,
+      "countercase": [
+        "A single fictional filing does not establish normalized cash conversion."
+      ],
+      "gaps": [
+        "Forecast assumptions",
+        "Share count",
+        "Net debt",
+        "Comparable valuation basis"
+      ],
+      "artifact_coverage": {
+        "status": "complete",
+        "deliverables": [
+          {
+            "artifact_type": "financial_model",
+            "status": "produced",
+            "path": "examples/fictional-model.xlsx",
+            "sha256": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+            "reason": null
+          }
+        ]
+      }
+    },
+    "expected_evaluation_result": "fail: deliverables ledger type financial_model does not account for requested chart; compare actual output ledger against task_input.requested_artifact_types, rejecting missing, extra, or duplicate types."
   }
 }

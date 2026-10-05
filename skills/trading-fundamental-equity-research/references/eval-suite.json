@@ -108,8 +108,9 @@
       },
       "expected": {
         "criteria": [
-          "A concise memo is valid with artifact_coverage.status=memo_only and empty artifact lists.",
-          "Missing model/valuation inputs remain explicit gaps; no spreadsheet, chart, or DOCX is required."
+          "A concise memo is valid with artifact_coverage.status=memo_only and an empty deliverables ledger.",
+          "Missing model/valuation inputs remain explicit gaps; no spreadsheet, chart, or DOCX is required.",
+          "Compare actual output deliverables artifact_type values with requested_artifact_types when supplied: reject missing, extra, or duplicate types. Each produced row requires actual file read-back path and hash; each uncompleted row requires a reason. Memo-only requires no requested files and an empty ledger."
         ]
       },
       "case_type": "edge",
@@ -144,18 +145,94 @@
       "expected": {
         "criteria": [
           "Return artifact_coverage with requested model/chart and status for each. Only claim produced files with actual read-back path/type/hash; if tools or sufficient inputs are absent, name uncompleted deliverables and reason.",
-          "Treat all supplied data as fictional. No output fixture path/digest proves a real file."
+          "Treat all supplied data as fictional. No output fixture path/digest proves a real file.",
+          "Compare actual output deliverables artifact_type values with requested_artifact_types when supplied: reject missing, extra, or duplicate types. Each produced row requires actual file read-back path and hash; each uncompleted row requires a reason. Memo-only requires no requested files and an empty ledger."
         ]
       },
       "case_type": "edge",
       "input": "Apply the named method to these supplied inputs. Report only supported results and explicit missing inputs."
+    },
+    {
+      "case_id": "trading-fundamental-equity-research-complete-ledger-example-actual-output-review",
+      "case_type": "edge",
+      "input": "Produce the requested task result using the supplied fictional inputs. Do not copy fictional output paths or hashes as actual file evidence.",
+      "contextual_inputs": {
+        "issuer": "Example Components Ltd.",
+        "ticker_or_id": "EXC-DEMO",
+        "as_of_date": "2026-09-30",
+        "jurisdiction": "US",
+        "research_question": "Assess reported cash conversion and whether evidence supports a valuation range.",
+        "periods": [
+          "FY2025"
+        ],
+        "provided_filings": [
+          {
+            "source": "Issuer annual filing",
+            "period": "FY2025",
+            "published_at": "2026-02-20T16:00:00Z",
+            "source_url_or_file": "user-supplied://fictional-fy2025-filing",
+            "source_vintage": "as-published",
+            "source_locator": "Consolidated statements; fictional supplied fixture",
+            "currency": "USD",
+            "revenue": 1000,
+            "operating_cash_flow": 90,
+            "capital_expenditure": 70
+          }
+        ],
+        "requested_artifact_types": [
+          "financial_model"
+        ]
+      },
+      "expected": {
+        "criteria": [
+          "Compare actual output deliverables artifact_type values with requested_artifact_types when supplied: reject missing, extra, or duplicate types. Each produced row requires actual file read-back path and hash; each uncompleted row requires a reason. Memo-only requires no requested files and an empty ledger."
+        ]
+      }
+    },
+    {
+      "case_id": "trading-fundamental-equity-research-complete-ledger-wrong-request-eval-actual-output-review",
+      "case_type": "adversarial",
+      "input": "Produce the requested task result using the supplied fictional inputs. Do not copy fictional output paths or hashes as actual file evidence.",
+      "contextual_inputs": {
+        "issuer": "Example Components Ltd.",
+        "ticker_or_id": "EXC-DEMO",
+        "as_of_date": "2026-09-30",
+        "jurisdiction": "US",
+        "research_question": "Assess reported cash conversion and whether evidence supports a valuation range.",
+        "periods": [
+          "FY2025"
+        ],
+        "provided_filings": [
+          {
+            "source": "Issuer annual filing",
+            "period": "FY2025",
+            "published_at": "2026-02-20T16:00:00Z",
+            "source_url_or_file": "user-supplied://fictional-fy2025-filing",
+            "source_vintage": "as-published",
+            "source_locator": "Consolidated statements; fictional supplied fixture",
+            "currency": "USD",
+            "revenue": 1000,
+            "operating_cash_flow": 90,
+            "capital_expenditure": 70
+          }
+        ],
+        "requested_artifact_types": [
+          "chart"
+        ]
+      },
+      "expected": {
+        "criteria": [
+          "Compare actual output deliverables artifact_type values with requested_artifact_types when supplied: reject missing, extra, or duplicate types. Each produced row requires actual file read-back path and hash; each uncompleted row requires a reason. Memo-only requires no requested files and an empty ledger."
+        ]
+      }
     }
   ],
   "hard_failure_conditions": [
     "invented-source-data",
     "unit-or-date-mismatch-hidden",
     "unqualified-performance-claim",
-    "unapproved-side-effect"
+    "unapproved-side-effect",
+    "requested-artifact-coverage-mismatch-or-false-completion"
   ],
   "evidence_policy": {
     "retain": [
@@ -193,27 +270,42 @@
     {
       "fixture_id": "trading-fundamental-equity-research-filing-only-partial-fixture",
       "path": "references/contract-fixtures.json#/trading-fundamental-equity-research-filing-only-partial",
-      "content_hash": "sha256:4d10789910e4b478d6dee8f8381b97670a0af5dae85c72301686b6f5853bf65b"
+      "content_hash": "sha256:48ad13b8ac690cc896a86053ccee5be728f08f5b4c6c70e6d168ee3b7d88f701"
     },
     {
       "fixture_id": "trading-fundamental-equity-research-memo-only-coverage-fixture",
       "path": "references/contract-fixtures.json#/trading-fundamental-equity-research-memo-only-coverage",
-      "content_hash": "sha256:4d10789910e4b478d6dee8f8381b97670a0af5dae85c72301686b6f5853bf65b"
+      "content_hash": "sha256:48ad13b8ac690cc896a86053ccee5be728f08f5b4c6c70e6d168ee3b7d88f701"
     },
     {
       "fixture_id": "trading-fundamental-equity-research-partial-artifact-coverage-fixture",
       "path": "references/contract-fixtures.json#/trading-fundamental-equity-research-partial-artifact-coverage",
-      "content_hash": "sha256:4d10789910e4b478d6dee8f8381b97670a0af5dae85c72301686b6f5853bf65b"
+      "content_hash": "sha256:48ad13b8ac690cc896a86053ccee5be728f08f5b4c6c70e6d168ee3b7d88f701"
     },
     {
       "fixture_id": "trading-fundamental-equity-research-produced-artifact-without-digest-invalid-fixture",
       "path": "references/contract-fixtures.json#/trading-fundamental-equity-research-produced-artifact-without-digest-invalid",
-      "content_hash": "sha256:4d10789910e4b478d6dee8f8381b97670a0af5dae85c72301686b6f5853bf65b"
+      "content_hash": "sha256:48ad13b8ac690cc896a86053ccee5be728f08f5b4c6c70e6d168ee3b7d88f701"
     },
     {
       "fixture_id": "trading-fundamental-equity-research-uncompleted-without-reason-invalid-fixture",
       "path": "references/contract-fixtures.json#/trading-fundamental-equity-research-uncompleted-without-reason-invalid",
-      "content_hash": "sha256:4d10789910e4b478d6dee8f8381b97670a0af5dae85c72301686b6f5853bf65b"
+      "content_hash": "sha256:48ad13b8ac690cc896a86053ccee5be728f08f5b4c6c70e6d168ee3b7d88f701"
+    },
+    {
+      "fixture_id": "trading-fundamental-equity-research-complete-ledger-example-fixture",
+      "path": "references/contract-fixtures.json#/trading-fundamental-equity-research-complete-ledger-example",
+      "content_hash": "sha256:48ad13b8ac690cc896a86053ccee5be728f08f5b4c6c70e6d168ee3b7d88f701"
+    },
+    {
+      "fixture_id": "trading-fundamental-equity-research-complete-omits-requested-deliverable-invalid-fixture",
+      "path": "references/contract-fixtures.json#/trading-fundamental-equity-research-complete-omits-requested-deliverable-invalid",
+      "content_hash": "sha256:48ad13b8ac690cc896a86053ccee5be728f08f5b4c6c70e6d168ee3b7d88f701"
+    },
+    {
+      "fixture_id": "trading-fundamental-equity-research-complete-ledger-wrong-request-eval-fixture",
+      "path": "references/contract-fixtures.json#/trading-fundamental-equity-research-complete-ledger-wrong-request-eval",
+      "content_hash": "sha256:48ad13b8ac690cc896a86053ccee5be728f08f5b4c6c70e6d168ee3b7d88f701"
     }
   ]
 }

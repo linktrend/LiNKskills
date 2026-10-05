@@ -162,7 +162,8 @@
       "expected": {
         "criteria": [
           "Retain the supplied provenance fields on the output series record.",
-          "Mark distribution-day analysis unavailable because a two-session window is insufficient; do not infer an event from an incomplete lookback."
+          "Mark distribution-day analysis unavailable because a two-session window is insufficient; do not infer an event from an incomplete lookback.",
+          "When retaining source history, every output provenance record must copy instrument/date/source from the contributing input row and retain its supplied lineage metadata; reject attribution to another row, even if metadata or array position matches. Name absent lineage rather than inventing it."
         ]
       },
       "case_type": "edge",
@@ -204,18 +205,109 @@
       "expected": {
         "criteria": [
           "Legacy history rows without source_provenance remain schema-valid.",
-          "Any calculation dependent on absent lineage/history must be partial or unavailable with named gaps."
+          "Any calculation dependent on absent lineage/history must be partial or unavailable with named gaps.",
+          "When retaining source history, every output provenance record must copy instrument/date/source from the contributing input row and retain its supplied lineage metadata; reject attribution to another row, even if metadata or array position matches. Name absent lineage rather than inventing it."
         ]
       },
       "case_type": "edge",
       "input": "Apply the named method to these supplied inputs. Report only supported results and explicit missing inputs."
+    },
+    {
+      "case_id": "trading-market-breadth-output-lineage-wrong-row-attribution-eval-actual-output-review",
+      "case_type": "adversarial",
+      "input": "Produce the requested task result using the supplied fictional inputs. Do not copy fictional output paths or hashes as actual file evidence.",
+      "contextual_inputs": {
+        "as_of_date": "2026-09-30",
+        "universe_definition": "fictional index proxy; two supplied sessions",
+        "horizon": "two-session sample",
+        "requested_families": [
+          "distribution_days"
+        ],
+        "series": [],
+        "family_inputs": {
+          "ohlcv_history": [
+            {
+              "date": "2026-09-29",
+              "instrument": "DEMO-INDEX",
+              "open": 100,
+              "high": 101,
+              "low": 99,
+              "close": 100,
+              "volume": 1000,
+              "currency": "USD",
+              "source": "user-supplied://demo/ohlcv",
+              "session": "regular",
+              "source_provenance": {
+                "status": "complete",
+                "missing_fields": [],
+                "source_timestamp": "2026-09-29T21:05:00Z",
+                "session_timezone": "America/New_York",
+                "transformation": "raw daily OHLCV",
+                "transformation_version": "1",
+                "adjustment_convention": "unadjusted; corporate actions not applied",
+                "session_calendar": "NYSE regular session calendar; supplied",
+                "history_window": {
+                  "start_date": "2026-09-29",
+                  "end_date": "2026-09-30",
+                  "window_definition": "two consecutive supplied sessions",
+                  "session_count": 2
+                }
+              }
+            },
+            {
+              "date": "2026-09-30",
+              "instrument": "DEMO-INDEX",
+              "open": 100,
+              "high": 102,
+              "low": 99,
+              "close": 101,
+              "volume": 1200,
+              "currency": "USD",
+              "source": "user-supplied://demo/ohlcv",
+              "session": "regular",
+              "source_provenance": {
+                "status": "complete",
+                "missing_fields": [],
+                "source_timestamp": "2026-09-30T21:05:00Z",
+                "session_timezone": "America/New_York",
+                "transformation": "raw daily OHLCV",
+                "transformation_version": "1",
+                "adjustment_convention": "unadjusted; corporate actions not applied",
+                "session_calendar": "NYSE regular session calendar; supplied",
+                "history_window": {
+                  "start_date": "2026-09-29",
+                  "end_date": "2026-09-30",
+                  "window_definition": "two consecutive supplied sessions",
+                  "session_count": 2
+                }
+              }
+            }
+          ],
+          "event_definitions": [
+            {
+              "family": "distribution_days",
+              "definition": "fictional demonstration event definition; not a validated market rule; requires 20 complete trading sessions",
+              "source": "user-supplied://demo/rule",
+              "thresholds_or_parameters": {
+                "required_history_sessions": 20
+              }
+            }
+          ]
+        }
+      },
+      "expected": {
+        "criteria": [
+          "When retaining source history, every output provenance record must copy instrument/date/source from the contributing input row and retain its supplied lineage metadata; reject attribution to another row, even if metadata or array position matches. Name absent lineage rather than inventing it."
+        ]
+      }
     }
   ],
   "hard_failure_conditions": [
     "invented-source-data",
     "unit-or-date-mismatch-hidden",
     "unqualified-performance-claim",
-    "unapproved-side-effect"
+    "unapproved-side-effect",
+    "source-history-attribution-mismatch"
   ],
   "evidence_policy": {
     "retain": [
@@ -253,22 +345,32 @@
     {
       "fixture_id": "trading-market-breadth-close-ratios-independent-of-ohlcv-fixture",
       "path": "references/contract-fixtures.json#/trading-market-breadth-close-ratios-independent-of-ohlcv",
-      "content_hash": "sha256:1bc25481f5f6a7c7bd177b4a8854f5bb415cac380e9e082928bd8cc19ec0d1e9"
+      "content_hash": "sha256:8d28a65a9c1e0b0f15de66fcc7a1ffcb03d91c80aaff177eb83d0e6e5c5d04cc"
     },
     {
       "fixture_id": "trading-market-breadth-history-complete-lineage-but-short-window-fixture",
       "path": "references/contract-fixtures.json#/trading-market-breadth-history-complete-lineage-but-short-window",
-      "content_hash": "sha256:1bc25481f5f6a7c7bd177b4a8854f5bb415cac380e9e082928bd8cc19ec0d1e9"
+      "content_hash": "sha256:8d28a65a9c1e0b0f15de66fcc7a1ffcb03d91c80aaff177eb83d0e6e5c5d04cc"
     },
     {
       "fixture_id": "trading-market-breadth-legacy-history-accepted-with-explicit-gaps-fixture",
       "path": "references/contract-fixtures.json#/trading-market-breadth-legacy-history-accepted-with-explicit-gaps",
-      "content_hash": "sha256:1bc25481f5f6a7c7bd177b4a8854f5bb415cac380e9e082928bd8cc19ec0d1e9"
+      "content_hash": "sha256:8d28a65a9c1e0b0f15de66fcc7a1ffcb03d91c80aaff177eb83d0e6e5c5d04cc"
     },
     {
       "fixture_id": "trading-market-breadth-complete-provenance-missing-calendar-invalid-fixture",
       "path": "references/contract-fixtures.json#/trading-market-breadth-complete-provenance-missing-calendar-invalid",
-      "content_hash": "sha256:1bc25481f5f6a7c7bd177b4a8854f5bb415cac380e9e082928bd8cc19ec0d1e9"
+      "content_hash": "sha256:8d28a65a9c1e0b0f15de66fcc7a1ffcb03d91c80aaff177eb83d0e6e5c5d04cc"
+    },
+    {
+      "fixture_id": "trading-market-breadth-output-lineage-missing-source-identity-invalid-fixture",
+      "path": "references/contract-fixtures.json#/trading-market-breadth-output-lineage-missing-source-identity-invalid",
+      "content_hash": "sha256:8d28a65a9c1e0b0f15de66fcc7a1ffcb03d91c80aaff177eb83d0e6e5c5d04cc"
+    },
+    {
+      "fixture_id": "trading-market-breadth-output-lineage-wrong-row-attribution-eval-fixture",
+      "path": "references/contract-fixtures.json#/trading-market-breadth-output-lineage-wrong-row-attribution-eval",
+      "content_hash": "sha256:8d28a65a9c1e0b0f15de66fcc7a1ffcb03d91c80aaff177eb83d0e6e5c5d04cc"
     }
   ]
 }
