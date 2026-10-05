@@ -1,0 +1,175 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "agent-production-operations",
+  "display_name": "Agent Production Operations",
+  "version": "0.1.0",
+  "description": "Monitor approved production agent evidence and prepare an evidence-linked runtime operating plan for quality, cost, latency, tool health, escalation and trace-to-eval feedback.",
+  "capability_category": "agent_production_operations",
+  "lifecycle_state": "draft",
+  "format_profile": "heavy",
+  "compatible_runtime_profiles": [
+    "lisa-openclaw",
+    "cursor-macos"
+  ],
+  "min_capability_tier": "balanced",
+  "provenance": {
+    "author": "LiNKskills adaptation",
+    "source": "magnus919/agent-skills@affec9d8cba35a3b8d632a64ab547ea8fcc53380:agent-production-operations; complete copy at references/upstream/source/",
+    "license": "Exact root license preserved; Carlos handles licensing; no clearance asserted."
+  },
+  "routing": {
+    "when_to_use": "Use for ongoing operational status or a staged-control proposal for an existing evaluated production agent.",
+    "when_not_to_use": [
+      "Building agents or designing/scoring eval suites",
+      "Postmortem analysis/verified closure (incident-learning owns it)",
+      "Runtime, release, infrastructure or provider configuration changes without Eric and owner authorization"
+    ],
+    "tags": [
+      "agent",
+      "production-operations",
+      "quality-monitoring"
+    ],
+    "exclusion_rules": [
+      "No authority grants, runtime controls, rollout, fallback execution or external notification"
+    ],
+    "ambiguity_rules": [
+      "Use approved evidence and owner thresholds only; if they are absent, report gap and do not infer policy."
+    ],
+    "recommended_disclosure_level": 2
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "agent_identity",
+        "description": "agent identity"
+      },
+      {
+        "name": "measurement_window",
+        "description": "measurement window"
+      },
+      {
+        "name": "approved_baseline_ref",
+        "description": "approved baseline ref"
+      },
+      {
+        "name": "owner_thresholds_ref",
+        "description": "owner thresholds ref"
+      },
+      {
+        "name": "run_trace_refs",
+        "description": "run trace refs"
+      },
+      {
+        "name": "current_native_capabilities",
+        "description": "current native capabilities"
+      }
+    ],
+    "expected_outputs": [
+      {
+        "name": "operating_contract_gaps",
+        "description": "operating contract gaps"
+      },
+      {
+        "name": "metric_observations",
+        "description": "metric observations"
+      },
+      {
+        "name": "quality_and_service_findings",
+        "description": "quality and service findings"
+      },
+      {
+        "name": "authority_fallback_signals",
+        "description": "authority fallback signals"
+      },
+      {
+        "name": "trace_to_eval_proposals",
+        "description": "trace to eval proposals"
+      },
+      {
+        "name": "owner_recommendations",
+        "description": "owner recommendations"
+      },
+      {
+        "name": "capability_and_effect_status",
+        "description": "capability and effect status"
+      }
+    ],
+    "forbidden_actions": [
+      "Runtime change, disablement, traffic shift, config/deployment write, or external notification",
+      "Invented threshold, sample, permission, baseline, or quality certification"
+    ],
+    "verification_steps": [
+      "Record agent release identity, cohort, window, metric definition and evidence refs.",
+      "Compare only with approved owner baseline/threshold; state uncertainty and sample limits.",
+      "Route technical controls/evidence to Eric and business disposition to Sara; keep execution separate."
+    ],
+    "completion_criteria": [
+      "Evidence-linked operational report or precise evidence/capability gap",
+      "Fact, hypothesis, and proposal are distinct",
+      "No unapproved mutation or notification"
+    ],
+    "known_limitations": [
+      "No runtime controller or telemetry connector claimed",
+      "Draft and uncertified; source example thresholds do not become policy"
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read",
+      "filesystem_write"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [
+      {
+        "key": "min_reasoning_tier",
+        "value": "balanced"
+      },
+      {
+        "key": "context_required",
+        "value": 32000
+      },
+      {
+        "key": "preferred_model",
+        "value": "gpt-6.1-sol"
+      }
+    ],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "required_certification_profiles": [],
+    "verification_refs": [
+      "references/eval-suite.yaml",
+      "references/upstream/SOURCE-MANIFEST.json"
+    ],
+    "suite_hash": "sha256:697cce209142e91b771a8e3a6a174c8a6fa962aab810063cd4068f0b9f4bc897"
+  },
+  "telemetry": {
+    "classification": "restricted",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_personal_data",
+      "strip_raw_documents",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain_minimized_ids_hashes_and_owner_approved_summary_only"
+  },
+  "fragments": [
+    {
+      "fragment_id": "skill-md",
+      "disclosure_level": 2,
+      "path": "SKILL.md"
+    },
+    {
+      "fragment_id": "operating-cards",
+      "disclosure_level": 3,
+      "path": "advanced/advanced.md"
+    }
+  ],
+  "release_channel": "development"
+}

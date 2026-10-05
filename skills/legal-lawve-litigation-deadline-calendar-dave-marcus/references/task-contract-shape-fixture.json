@@ -1,0 +1,89 @@
+{
+  "schema_version": "1.0",
+  "skill_id": "legal-lawve-litigation-deadline-calendar-dave-marcus",
+  "completed_input": {
+    "task_id": "20261004-1200-LEGAL-000001",
+    "request_ref": "synthetic-case-001",
+    "source_refs": [
+      "lawve-ai/awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290:skills/litigation-deadline-calendar-dave-marcus/SKILL.md"
+    ],
+    "data_classification": "synthetic",
+    "task_inputs": {
+      "scheduling_order": "Synthetic signed order dated 2026-09-01: expert reports due 2026-11-10; trial 2027-02-01; service-adjusted response deadline not stated.",
+      "forum_and_proceeding": "Caption identifies a state trial court; state/local rule source not supplied.",
+      "service_method": "Unknown; do not calculate derived dates.",
+      "known_modifications": "Order states no extension; later docket activity not supplied.",
+      "calendar_preferences": "Draft table only; no attendee invitations.",
+      "scope_and_as_of": "Synthetic scope only; law applicability unknown unless identified in the case facts."
+    }
+  },
+  "completed_output": {
+    "status": "completed_draft",
+    "artifact_type": "legal-lawve-litigation-deadline-calendar-dave-marcus",
+    "task_specific_deliverable": {
+      "order identity and forum": "Synthetic expected finding; see golden-case criteria for exact task outcome.",
+      "explicit dates extraction": "Synthetic expected finding; see golden-case criteria for exact task outcome.",
+      "rule-dependent calculations": "Synthetic expected finding; see golden-case criteria for exact task outcome.",
+      "dependency and holiday checks": "Synthetic expected finding; see golden-case criteria for exact task outcome.",
+      "calendar draft": "Synthetic expected finding; see golden-case criteria for exact task outcome.",
+      "attorney verification list": "Synthetic expected finding; see golden-case criteria for exact task outcome."
+    },
+    "evidence_trace": [
+      {
+        "claim": "Synthetic fixture fact was supplied",
+        "source_ref": "lawve-ai/awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290:skills/litigation-deadline-calendar-dave-marcus/SKILL.md",
+        "pinpoint": "synthetic input field",
+        "basis": "verified_fact"
+      }
+    ],
+    "uncertainties": [
+      "Any law/applicability not established by the synthetic fixture"
+    ],
+    "external_effects": [],
+    "mutations": []
+  },
+  "needs_context_input": {
+    "task_id": "20261004-1200-LEGAL-000001",
+    "request_ref": "synthetic-case-001",
+    "source_refs": [
+      "lawve-ai/awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290:skills/litigation-deadline-calendar-dave-marcus/SKILL.md"
+    ],
+    "data_classification": "synthetic",
+    "task_inputs": {
+      "scheduling_order": "UNKNOWN: not supplied in this synthetic needs-context fixture.",
+      "forum_and_proceeding": "UNKNOWN: not supplied in this synthetic needs-context fixture.",
+      "service_method": "UNKNOWN: not supplied in this synthetic needs-context fixture.",
+      "known_modifications": "UNKNOWN: not supplied in this synthetic needs-context fixture.",
+      "calendar_preferences": "UNKNOWN: not supplied in this synthetic needs-context fixture.",
+      "scope_and_as_of": "Synthetic scope only; law applicability unknown unless identified in the case facts."
+    }
+  },
+  "needs_context_output": {
+    "status": "needs_context",
+    "artifact_type": "legal-lawve-litigation-deadline-calendar-dave-marcus",
+    "task_specific_deliverable": {
+      "separable_work": "Complete unaffected portions and identify blocked section."
+    },
+    "evidence_trace": [],
+    "uncertainties": [
+      "Outcome-changing source/input unknown"
+    ],
+    "external_effects": [],
+    "mutations": []
+  },
+  "state_example": {
+    "task_id": "20261004-1200-LEGAL-000001",
+    "phase": "draft",
+    "source_refs": [
+      "lawve-ai/awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290:skills/litigation-deadline-calendar-dave-marcus/SKILL.md"
+    ],
+    "established_facts": [
+      "Synthetic facts only"
+    ],
+    "open_inputs": [
+      "Actual legal applicability not established"
+    ],
+    "next_action": "Request the exact missing evidence from the responsible owner.",
+    "last_updated": "2026-10-04T12:00:00Z"
+  }
+}

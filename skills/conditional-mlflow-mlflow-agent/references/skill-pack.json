@@ -1,0 +1,166 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "conditional-mlflow-mlflow-agent",
+  "display_name": "Conditional MLflow Agent Integration Planning",
+  "version": "0.1.0",
+  "description": "Plan use of an MLflow agent integration when Eric confirms the selected runtime/backend and native tool interface.",
+  "capability_category": "conditional_mlflow_mlflow_agent",
+  "lifecycle_state": "draft",
+  "format_profile": "heavy",
+  "compatible_runtime_profiles": [
+    "lisa-openclaw",
+    "cursor-macos"
+  ],
+  "min_capability_tier": "balanced",
+  "provenance": {
+    "author": "LiNKskills task adaptation",
+    "source": "https://github.com/mlflow/skills@0766761276a7dd378d88ac8aa7ca742c92b830fe:skills/mlflow-agent; exact source subtree copied in references/upstream/source/",
+    "license": "Notices and licenses are preserved where present; Carlos handles licensing; no clearance asserted."
+  },
+  "routing": {
+    "when_to_use": "Plan use of an MLflow agent integration when Eric confirms the selected runtime/backend and native tool interface.",
+    "when_not_to_use": [
+      "A different task requires a distinct skill",
+      "Unapproved external/legal/business action or missing approval",
+      "Required interface is unavailable"
+    ],
+    "tags": [
+      "mlflow",
+      "conditional",
+      "technical-library"
+    ],
+    "exclusion_rules": [
+      "Conditional on Eric-owned backend selection and currently visible native tool capabilities; no MLflow runtime or optional service is installed or claimed."
+    ],
+    "ambiguity_rules": [
+      "Require Eric-selected backend/version and current native interface; otherwise return a gap."
+    ],
+    "recommended_disclosure_level": 2
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "case_or_question",
+        "description": "case or question"
+      },
+      {
+        "name": "scope_or_context",
+        "description": "scope or context"
+      },
+      {
+        "name": "evidence_refs",
+        "description": "evidence refs"
+      },
+      {
+        "name": "backend_or_jurisdiction_state",
+        "description": "backend or jurisdiction state"
+      },
+      {
+        "name": "requested_work_product",
+        "description": "requested work product"
+      }
+    ],
+    "expected_outputs": [
+      {
+        "name": "task_analysis",
+        "description": "task analysis"
+      },
+      {
+        "name": "source_and_method",
+        "description": "source and method"
+      },
+      {
+        "name": "findings_or_proposal",
+        "description": "findings or proposal"
+      },
+      {
+        "name": "gaps_and_uncertainty",
+        "description": "gaps and uncertainty"
+      },
+      {
+        "name": "next_owner_actions",
+        "description": "next owner actions"
+      },
+      {
+        "name": "capability_status",
+        "description": "capability status"
+      }
+    ],
+    "forbidden_actions": [
+      "Install or invoke MLflow scripts/CLI/API or create remote data without owner approval",
+      "Unapproved legal filing, signature, external communication, profile mutation or technical side effect"
+    ],
+    "verification_steps": [
+      "1. Confirm the task-specific input and declared evidence bounds. 2. Check the active MLflow version and approved native interface from current owner tool schema/toolcard; never assume a command or endpoint. 3. Apply the task procedure in the active card to supplied or authorized evidence, retain identifiers and source refs, and minimize sensitive payloads. 4. Validate conclusions against returned records/documentation and report missing coverage. 5. Any read/write, code, dataset, scorer, tracing, connection, or deployment action requires the separately approved interface and scope; no auto-install or new dependency.",
+      "Validate evidence references, dates and uncertainty; no effect without a separately approved native interface."
+    ],
+    "completion_criteria": [
+      "Task-specific draft/evidence artifact or precise conditional gap returned",
+      "Original sources and license/notice provenance preserved",
+      "No unsupported authority, capability claim, installation or effect"
+    ],
+    "known_limitations": [
+      "Conditional on Eric-owned backend selection and currently visible native tool capabilities; no MLflow runtime or optional service is installed or claimed.",
+      "Draft and uncertified; no live connector/backend or current-law semantic certification claimed"
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read",
+      "filesystem_write"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [
+      {
+        "key": "min_reasoning_tier",
+        "value": "balanced"
+      },
+      {
+        "key": "context_required",
+        "value": 32000
+      },
+      {
+        "key": "preferred_model",
+        "value": "gpt-6.1-sol"
+      }
+    ],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "required_certification_profiles": [],
+    "verification_refs": [
+      "references/eval-suite.yaml",
+      "references/upstream/SOURCE-MANIFEST.json"
+    ],
+    "suite_hash": "sha256:697cce209142e91b771a8e3a6a174c8a6fa962aab810063cd4068f0b9f4bc897"
+  },
+  "telemetry": {
+    "classification": "restricted",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_personal_data",
+      "strip_raw_documents",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain_minimized_ids_hashes_and_owner_approved_summary_only"
+  },
+  "fragments": [
+    {
+      "fragment_id": "skill-md",
+      "disclosure_level": 2,
+      "path": "SKILL.md"
+    },
+    {
+      "fragment_id": "task-method",
+      "disclosure_level": 3,
+      "path": "advanced/advanced.md"
+    }
+  ],
+  "release_channel": "development"
+}

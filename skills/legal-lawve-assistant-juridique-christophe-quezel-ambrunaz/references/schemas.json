@@ -1,0 +1,235 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {},
+  "definitions": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "request_ref",
+        "source_refs",
+        "data_classification",
+        "task_inputs"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "request_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "data_classification": {
+          "type": "string",
+          "enum": [
+            "synthetic",
+            "redacted",
+            "restricted",
+            "sensitive",
+            "unknown"
+          ]
+        },
+        "task_inputs": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "research_question",
+            "facts_and_purpose",
+            "jurisdiction_scope",
+            "as_of_and_recency",
+            "available_sources",
+            "scope_and_as_of"
+          ],
+          "properties": {
+            "research_question": {
+              "type": "string",
+              "description": "One answerable legal question and requested depth."
+            },
+            "facts_and_purpose": {
+              "type": "string",
+              "description": "User-provided facts, intended decision and material uncertainties."
+            },
+            "jurisdiction_scope": {
+              "type": "string",
+              "description": "French law, EU law or specified relationship; do not infer."
+            },
+            "as_of_and_recency": {
+              "type": "string",
+              "description": "Required date and currentness needs."
+            },
+            "available_sources": {
+              "type": "string",
+              "description": "Authorized official legislation, court, regulator and secondary materials already supplied or reachable through granted native search."
+            },
+            "scope_and_as_of": {
+              "type": "string",
+              "description": "Applicable scope and date; state unknown rather than infer."
+            }
+          }
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "artifact_type",
+        "task_specific_deliverable",
+        "evidence_trace",
+        "uncertainties",
+        "external_effects",
+        "mutations"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "completed_draft",
+            "needs_context",
+            "not_applicable"
+          ]
+        },
+        "artifact_type": {
+          "const": "legal-lawve-assistant-juridique-christophe-quezel-ambrunaz"
+        },
+        "task_specific_deliverable": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "question_and_scope",
+            "authority_matrix",
+            "analysis_by_subissue",
+            "counterarguments_and_gaps",
+            "qualified_conclusion_and_next_questions"
+          ],
+          "properties": {
+            "question_and_scope": {
+              "type": "string"
+            },
+            "authority_matrix": {
+              "type": "string"
+            },
+            "analysis_by_subissue": {
+              "type": "string"
+            },
+            "counterarguments_and_gaps": {
+              "type": "string"
+            },
+            "qualified_conclusion_and_next_questions": {
+              "type": "string"
+            }
+          }
+        },
+        "evidence_trace": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "claim",
+              "source_ref",
+              "pinpoint",
+              "basis"
+            ],
+            "properties": {
+              "claim": {
+                "type": "string"
+              },
+              "source_ref": {
+                "type": "string"
+              },
+              "pinpoint": {
+                "type": "string"
+              },
+              "basis": {
+                "enum": [
+                  "verified_fact",
+                  "requestor_assertion",
+                  "inference",
+                  "proposal",
+                  "unknown"
+                ]
+              }
+            }
+          }
+        },
+        "uncertainties": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "external_effects": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "mutations": {
+          "type": "array",
+          "maxItems": 0
+        }
+      }
+    },
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "phase",
+        "source_refs",
+        "established_facts",
+        "open_inputs",
+        "next_action",
+        "last_updated"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string"
+        },
+        "phase": {
+          "enum": [
+            "intake",
+            "evidence",
+            "analysis",
+            "draft",
+            "verification",
+            "complete"
+          ]
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "established_facts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "open_inputs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "next_action": {
+          "type": "string"
+        },
+        "last_updated": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}

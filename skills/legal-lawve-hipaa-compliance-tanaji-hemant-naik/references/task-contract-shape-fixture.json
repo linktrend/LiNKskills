@@ -1,0 +1,89 @@
+{
+  "schema_version": "1.0",
+  "skill_id": "legal-lawve-hipaa-compliance-tanaji-hemant-naik",
+  "completed_input": {
+    "task_id": "20261004-1200-LEGAL-000001",
+    "request_ref": "synthetic-case-001",
+    "source_refs": [
+      "lawve-ai/awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290:skills/hipaa-compliance-tanaji-hemant-naik/SKILL.md"
+    ],
+    "data_classification": "synthetic",
+    "task_inputs": {
+      "entity_and_role": "Synthetic analytics vendor receives lab records from a hospital; covered entity/BA status and agreement unknown.",
+      "workflow_and_data": "CSV contains patient name and lab result; storage and deletion facts incomplete.",
+      "systems_and_controls": "Cloud bucket access log is partial; risk analysis, MFA and backup evidence absent.",
+      "business_associate_docs": "No BAA attached.",
+      "official_authority_snapshot": "No current HHS authority attached.",
+      "scope_and_as_of": "Synthetic scope only; law applicability unknown unless identified in the case facts."
+    }
+  },
+  "completed_output": {
+    "status": "completed_draft",
+    "artifact_type": "legal-lawve-hipaa-compliance-tanaji-hemant-naik",
+    "task_specific_deliverable": {
+      "entity/transaction scope": "Synthetic expected finding; see golden-case criteria for exact task outcome.",
+      "PHI and ePHI flow map": "Synthetic expected finding; see golden-case criteria for exact task outcome.",
+      "applicable rule inventory": "Synthetic expected finding; see golden-case criteria for exact task outcome.",
+      "administrative/physical/technical evidence": "Synthetic expected finding; see golden-case criteria for exact task outcome.",
+      "business-associate chain": "Synthetic expected finding; see golden-case criteria for exact task outcome.",
+      "gaps and owner actions": "Synthetic expected finding; see golden-case criteria for exact task outcome."
+    },
+    "evidence_trace": [
+      {
+        "claim": "Synthetic fixture fact was supplied",
+        "source_ref": "lawve-ai/awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290:skills/hipaa-compliance-tanaji-hemant-naik/SKILL.md",
+        "pinpoint": "synthetic input field",
+        "basis": "verified_fact"
+      }
+    ],
+    "uncertainties": [
+      "Any law/applicability not established by the synthetic fixture"
+    ],
+    "external_effects": [],
+    "mutations": []
+  },
+  "needs_context_input": {
+    "task_id": "20261004-1200-LEGAL-000001",
+    "request_ref": "synthetic-case-001",
+    "source_refs": [
+      "lawve-ai/awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290:skills/hipaa-compliance-tanaji-hemant-naik/SKILL.md"
+    ],
+    "data_classification": "synthetic",
+    "task_inputs": {
+      "entity_and_role": "UNKNOWN: not supplied in this synthetic needs-context fixture.",
+      "workflow_and_data": "UNKNOWN: not supplied in this synthetic needs-context fixture.",
+      "systems_and_controls": "UNKNOWN: not supplied in this synthetic needs-context fixture.",
+      "business_associate_docs": "UNKNOWN: not supplied in this synthetic needs-context fixture.",
+      "official_authority_snapshot": "UNKNOWN: not supplied in this synthetic needs-context fixture.",
+      "scope_and_as_of": "Synthetic scope only; law applicability unknown unless identified in the case facts."
+    }
+  },
+  "needs_context_output": {
+    "status": "needs_context",
+    "artifact_type": "legal-lawve-hipaa-compliance-tanaji-hemant-naik",
+    "task_specific_deliverable": {
+      "separable_work": "Complete unaffected portions and identify blocked section."
+    },
+    "evidence_trace": [],
+    "uncertainties": [
+      "Outcome-changing source/input unknown"
+    ],
+    "external_effects": [],
+    "mutations": []
+  },
+  "state_example": {
+    "task_id": "20261004-1200-LEGAL-000001",
+    "phase": "draft",
+    "source_refs": [
+      "lawve-ai/awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290:skills/hipaa-compliance-tanaji-hemant-naik/SKILL.md"
+    ],
+    "established_facts": [
+      "Synthetic facts only"
+    ],
+    "open_inputs": [
+      "Actual legal applicability not established"
+    ],
+    "next_action": "Request the exact missing evidence from the responsible owner.",
+    "last_updated": "2026-10-04T12:00:00Z"
+  }
+}

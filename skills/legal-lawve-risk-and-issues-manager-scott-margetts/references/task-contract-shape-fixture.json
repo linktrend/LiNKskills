@@ -1,0 +1,90 @@
+{
+  "schema_version": "1.0",
+  "skill_id": "legal-lawve-risk-and-issues-manager-scott-margetts",
+  "completed_input": {
+    "task_id": "20261004-1200-LEGAL-000001",
+    "request_ref": "synthetic-case-001",
+    "source_refs": [
+      "lawve-ai/awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290:skills/risk-and-issues-manager-scott-margetts/SKILL.md"
+    ],
+    "data_classification": "synthetic",
+    "task_inputs": {
+      "mode_and_goal": "Extract decisions and create draft RAID updates from synthetic meeting notes.",
+      "source_records": "Note says “we should probably use Vendor A”; later note says “Vendor A starts Monday”; no approval record.",
+      "objectives_and_scope": "Project launch target 1 December; approved scope baseline not attached.",
+      "owners_and_dates": "No item owners; deadline for Vendor A onboarding mentioned as 1 November.",
+      "output_destination": "Draft table in response; no system update.",
+      "scope_and_as_of": "Synthetic scope only; law applicability unknown unless identified in the case facts."
+    }
+  },
+  "completed_output": {
+    "status": "completed_draft",
+    "artifact_type": "legal-lawve-risk-and-issues-manager-scott-margetts",
+    "task_specific_deliverable": {
+      "mode selection": "Synthetic expected finding; see golden-case criteria for exact task outcome.",
+      "source evidence and coverage": "Synthetic expected finding; see golden-case criteria for exact task outcome.",
+      "IRAD classification": "Synthetic expected finding; see golden-case criteria for exact task outcome.",
+      "summary and counters": "Synthetic expected finding; see golden-case criteria for exact task outcome.",
+      "full record rows": "Synthetic expected finding; see golden-case criteria for exact task outcome.",
+      "scope signals and escalation": "Synthetic expected finding; see golden-case criteria for exact task outcome.",
+      "owner questions": "Synthetic expected finding; see golden-case criteria for exact task outcome."
+    },
+    "evidence_trace": [
+      {
+        "claim": "Synthetic fixture fact was supplied",
+        "source_ref": "lawve-ai/awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290:skills/risk-and-issues-manager-scott-margetts/SKILL.md",
+        "pinpoint": "synthetic input field",
+        "basis": "verified_fact"
+      }
+    ],
+    "uncertainties": [
+      "Any law/applicability not established by the synthetic fixture"
+    ],
+    "external_effects": [],
+    "mutations": []
+  },
+  "needs_context_input": {
+    "task_id": "20261004-1200-LEGAL-000001",
+    "request_ref": "synthetic-case-001",
+    "source_refs": [
+      "lawve-ai/awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290:skills/risk-and-issues-manager-scott-margetts/SKILL.md"
+    ],
+    "data_classification": "synthetic",
+    "task_inputs": {
+      "mode_and_goal": "UNKNOWN: not supplied in this synthetic needs-context fixture.",
+      "source_records": "UNKNOWN: not supplied in this synthetic needs-context fixture.",
+      "objectives_and_scope": "UNKNOWN: not supplied in this synthetic needs-context fixture.",
+      "owners_and_dates": "UNKNOWN: not supplied in this synthetic needs-context fixture.",
+      "output_destination": "UNKNOWN: not supplied in this synthetic needs-context fixture.",
+      "scope_and_as_of": "Synthetic scope only; law applicability unknown unless identified in the case facts."
+    }
+  },
+  "needs_context_output": {
+    "status": "needs_context",
+    "artifact_type": "legal-lawve-risk-and-issues-manager-scott-margetts",
+    "task_specific_deliverable": {
+      "separable_work": "Complete unaffected portions and identify blocked section."
+    },
+    "evidence_trace": [],
+    "uncertainties": [
+      "Outcome-changing source/input unknown"
+    ],
+    "external_effects": [],
+    "mutations": []
+  },
+  "state_example": {
+    "task_id": "20261004-1200-LEGAL-000001",
+    "phase": "draft",
+    "source_refs": [
+      "lawve-ai/awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290:skills/risk-and-issues-manager-scott-margetts/SKILL.md"
+    ],
+    "established_facts": [
+      "Synthetic facts only"
+    ],
+    "open_inputs": [
+      "Actual legal applicability not established"
+    ],
+    "next_action": "Request the exact missing evidence from the responsible owner.",
+    "last_updated": "2026-10-04T12:00:00Z"
+  }
+}

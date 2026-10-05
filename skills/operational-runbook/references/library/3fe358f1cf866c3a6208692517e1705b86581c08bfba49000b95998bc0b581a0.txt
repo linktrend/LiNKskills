@@ -1,0 +1,76 @@
+This sample template is designed to assist the user in performing a Business Impact Analysis (BIA) on an information system.  The template is meant only as a basic guide and may not apply equally to all systems.  The user may modify this template or the general BIA approach as required to best accommodate the specific system.  In this template, words in italics are for guidance only and should be deleted from the final version.  Regular (non-italic) text is intended to remain.
+1.	Overview
+This Business Impact Analysis (BIA) is developed as part of the contingency planning process for the {system name}{system acronym}.  It was prepared on {insert BIA completion date}.
+1.1	Purpose 
+The purpose of the BIA is to identify and prioritize system components by correlating them to the mission/business process(es) the system supports, and using this information to characterize the impact on the process(es) if the system were unavailable. 
+The BIA is composed of the following three steps: 
+Determine mission/business processes and recovery criticality.  Mission/business processes supported by the system are identified and the impact of a system disruption to those processes is determined along with outage impacts and estimated downtime.  The downtime should reflect the maximum that an organization can tolerate while still maintaining the mission. 
+Identify resource requirements.  Realistic recovery efforts require a thorough evaluation of the resources required to resume mission/business processes and related interdependencies as quickly as possible.  Examples of resources that should be identified include facilities, personnel, equipment, software, data files, system components, and vital records.
+Identify recovery priorities for system resources.  Based upon the results from the previous activities, system resources can more clearly be linked to critical mission/business processes.  Priority levels can be established for sequencing recovery activities and resources. 
+This document is used to build the {system name} Information System Contingency Plan (ISCP) and is included as a key component of the ISCP.  It also may be used to support the development of other contingency plans associated with the system, including, but not limited to, the Disaster Recovery Plan (DRP) or Cyber Incident Response Plan.
+2.	System Description
+Provide a general description of system architecture and functionality.  Indicate the operating environment, physical location, general location of users, and partnerships with external organizations/systems.  Include information regarding any other technical considerations that are important for recovery purposes, such as backup procedures.  Provide a diagram of the architecture, including inputs and outputs and telecommunications connections.  
+Note: Information for this section should be available from the system’s System Security Plan (SSP) and can be copied from the SSP, or reference the applicable section in the SSP and attach the latest version of the SSP to this contingency plan.
+3.	BIA Data Collection 
+Data collection can be accomplished through individual/group interviews, workshops, email, questionnaires, or any combination of these.  
+3.1	Determine Process and System Criticality 
+Step one of the BIA process - Working with input from users, managers, mission/business process owners, and other internal or external points of contact (POC), identify the specific mission/business processes that depend on or support the information system.
+If criticality of mission/business processes has not been determined outside of the BIA, the following subsections will help to determine criticality of mission/business processes that depend on or support the information system.
+3.1.1	Identify Outage Impacts and Estimated Downtime 
+This section identifies and characterizes the types of impact categories that a system disruption is likely to create in addition to those identified by the FIPS 199 impact level, as well as the estimated downtime that the organization can tolerate for a given process.  Impact categories should be created and values assigned to these categories in order to measure the level or type of impact a disruption may cause.  An example of cost as an impact category is provided. Organizations could consider other categories like harm to individuals and ability to perform mission. The template should be revised to reflect what is appropriate for the organization.
+Outage Impacts
+Impact categories and values should be created in order to characterize levels of severity to the organization that would result for that particular impact category if the mission/business process could not be performed.  These impact categories and values are samples and should be revised to reflect what is appropriate for the organization.  
+The following impact categories represent important areas for consideration in the event of a disruption or impact.
+Impact category: {insert category name}
+Impact values for assessing category impact:
+Severe = {insert value}
+Moderate = {insert value}
+Minimal = {insert value}  
+The table below summarizes the impact on each mission/business process if {system name} were unavailable, based on the following criteria:
+Estimated Downtime 
+Working directly with mission/business process owners, departmental staff, managers, and other stakeholders, estimate the downtime factors for consideration as a result of a disruptive event.
+Maximum Tolerable Downtime (MTD).  The MTD represents the total amount of time leaders/managers are willing to accept for a mission/business process outage or disruption and includes all impact considerations.  Determining MTD is important because it could leave continuity planners with imprecise direction on (1) selection of an appropriate recovery method, and (2) the depth of detail which will be required when developing recovery procedures, including their scope and content. 
+Recovery Time Objective (RTO).  RTO defines the maximum amount of time that a system resource can remain unavailable before there is an unacceptable impact on other system resources, supported mission/business processes, and the MTD.  Determining the information system resource RTO is important for selecting appropriate technologies that are best suited for meeting the MTD.
+Recovery Point Objective (RPO).  The RPO represents the point in time, prior to a disruption or system outage, to which mission/business process data must be recovered (given the most recent backup copy of the data) after an outage.   
+The table below identifies the MTD, RTO, and RPO (as applicable) for the organizational mission/business processes that rely on {system name}.  Values for MTDs and RPOs are expected to be specific time frames, identified in hourly increments (i.e., 8 hours, 36 hours, 97 hours, etc.).
+Include a description of the drivers for the MTD, RTO, and RPOs listed in the table above (e.g., mandate, workload, performance measure, etc.).
+Include a description of any alternate means (secondary processing or manual work-around) for recovering the mission/business process(es) that rely on the system.  If none exist, so state.
+3.2	Identify Resource Requirements
+The following table identifies the resources that compose {system name} including hardware, software, and other resources such as data files. 
+It is assumed that all identified resources support the mission/business processes identified in Section 3.1 unless otherwise stated. 
+Note: Information for this section should be available from the system’s System Security Plan (SSP) and can be copied from the SSP, or reference the applicable section in the SSP and attach the latest version of the SSP to this contingency plan.
+3.3	Identify Recovery Priorities for System Resources
+The table below lists the order of recovery for {system name} resources.  The table also identifies the expected time for recovering the resource following a “worst case” (complete rebuild/repair or replacement) disruption.
+Recovery Time Objective (RTO) - RTO defines the maximum amount of time that a system resource can remain unavailable before there is an unacceptable impact on other system resources, supported mission/business processes, and the MTD.  Determining the information system resource RTO is important for selecting appropriate technologies that are best suited for meeting the MTD.
+A system resource can be software, data files, servers, or other hardware and should be identified individually or as a logical group. 
+Identify any alternate strategies in place to meet expected RTOs.  This includes backup or spare equipment and vendor support contracts.
+--- Table 1 ---
+Mission/Business Process | Description
+Pay vendor invoice | Process of obligating funds, issuing check or electronic payment and acknowledging receipt
+ | 
+ | 
+ | 
+--- Table 2 ---
+Mission/Business Process | Impact Category | Impact Category | Impact Category | Impact Category | Impact Category
+Mission/Business Process | {insert} | {insert} | {insert} | {insert} | Impact
+Pay vendor invoice |  |  |  |  | 
+ |  |  |  |  | 
+ |  |  |  |  | 
+ |  |  |  |  | 
+--- Table 3 ---
+Mission/Business Process | MTD | RTO | RPO
+Pay vendor invoice | 72 hours | 48 hours | 12 hours (last backup)
+ |  |  | 
+ |  |  | 
+ |  |  | 
+--- Table 4 ---
+System Resource/Component | Platform/OS/Version (as applicable) | Description
+Web Server 1 | Optiplex GX280 | Web Site Host
+ |  | 
+ |  | 
+ |  | 
+--- Table 5 ---
+Priority | System Resource/Component | Recovery Time Objective
+Web Server 1 | Optiplex GX280 | 24 hours to rebuild or replace
+ |  | 
+ |  | 

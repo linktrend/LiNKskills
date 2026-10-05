@@ -1,0 +1,239 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {},
+  "definitions": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "request_ref",
+        "source_refs",
+        "data_classification",
+        "task_inputs"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "request_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "data_classification": {
+          "type": "string",
+          "enum": [
+            "synthetic",
+            "redacted",
+            "restricted",
+            "sensitive",
+            "unknown"
+          ]
+        },
+        "task_inputs": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "propositions",
+            "citations",
+            "jurisdiction_and_date",
+            "primary_source_access",
+            "document_context",
+            "scope_and_as_of"
+          ],
+          "properties": {
+            "propositions": {
+              "type": "string",
+              "description": "Exact legal sentences/claims to verify."
+            },
+            "citations": {
+              "type": "string",
+              "description": "Supplied case/statute/regulation/guidance references."
+            },
+            "jurisdiction_and_date": {
+              "type": "string",
+              "description": "Jurisdiction, forum and as-of date."
+            },
+            "primary_source_access": {
+              "type": "string",
+              "description": "Authorized current primary source text or search interface."
+            },
+            "document_context": {
+              "type": "string",
+              "description": "Draft or analysis context and any citation style."
+            },
+            "scope_and_as_of": {
+              "type": "string",
+              "description": "Applicable scope and date; state unknown rather than infer."
+            }
+          }
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "artifact_type",
+        "task_specific_deliverable",
+        "evidence_trace",
+        "uncertainties",
+        "external_effects",
+        "mutations"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "completed_draft",
+            "needs_context",
+            "not_applicable"
+          ]
+        },
+        "artifact_type": {
+          "const": "legal-lawve-mandatory-verification-larissa-meredith-flister"
+        },
+        "task_specific_deliverable": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "claim_to_authority_table",
+            "support_and_scope_findings",
+            "currentness_and_status",
+            "citation_corrections_or_gaps",
+            "unverified_claims",
+            "reviewer_next_steps"
+          ],
+          "properties": {
+            "claim_to_authority_table": {
+              "type": "string"
+            },
+            "support_and_scope_findings": {
+              "type": "string"
+            },
+            "currentness_and_status": {
+              "type": "string"
+            },
+            "citation_corrections_or_gaps": {
+              "type": "string"
+            },
+            "unverified_claims": {
+              "type": "string"
+            },
+            "reviewer_next_steps": {
+              "type": "string"
+            }
+          }
+        },
+        "evidence_trace": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "claim",
+              "source_ref",
+              "pinpoint",
+              "basis"
+            ],
+            "properties": {
+              "claim": {
+                "type": "string"
+              },
+              "source_ref": {
+                "type": "string"
+              },
+              "pinpoint": {
+                "type": "string"
+              },
+              "basis": {
+                "enum": [
+                  "verified_fact",
+                  "requestor_assertion",
+                  "inference",
+                  "proposal",
+                  "unknown"
+                ]
+              }
+            }
+          }
+        },
+        "uncertainties": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "external_effects": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "mutations": {
+          "type": "array",
+          "maxItems": 0
+        }
+      }
+    },
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "phase",
+        "source_refs",
+        "established_facts",
+        "open_inputs",
+        "next_action",
+        "last_updated"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string"
+        },
+        "phase": {
+          "enum": [
+            "intake",
+            "evidence",
+            "analysis",
+            "draft",
+            "verification",
+            "complete"
+          ]
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "established_facts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "open_inputs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "next_action": {
+          "type": "string"
+        },
+        "last_updated": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,239 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {},
+  "definitions": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "request_ref",
+        "source_refs",
+        "data_classification",
+        "task_inputs"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "request_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "data_classification": {
+          "type": "string",
+          "enum": [
+            "synthetic",
+            "redacted",
+            "restricted",
+            "sensitive",
+            "unknown"
+          ]
+        },
+        "task_inputs": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "invoice_and_lines",
+            "matter_and_firm",
+            "billing_guidelines",
+            "review_system",
+            "prior_invoice_evidence",
+            "scope_and_as_of"
+          ],
+          "properties": {
+            "invoice_and_lines": {
+              "type": "string",
+              "description": "Invoice ID, currency, billing period, line-item detail and totals."
+            },
+            "matter_and_firm": {
+              "type": "string",
+              "description": "Matter, law firm, staffing context and approved matter budget."
+            },
+            "billing_guidelines": {
+              "type": "string",
+              "description": "Current approved billing guidelines and engagement terms."
+            },
+            "review_system": {
+              "type": "string",
+              "description": "E-billing platform or manual process and available coding."
+            },
+            "prior_invoice_evidence": {
+              "type": "string",
+              "description": "Comparable invoice IDs or prior decisions, if authorized."
+            },
+            "scope_and_as_of": {
+              "type": "string",
+              "description": "Applicable scope and date; state unknown rather than infer."
+            }
+          }
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "artifact_type",
+        "task_specific_deliverable",
+        "evidence_trace",
+        "uncertainties",
+        "external_effects",
+        "mutations"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "completed_draft",
+            "needs_context",
+            "not_applicable"
+          ]
+        },
+        "artifact_type": {
+          "const": "legal-lawve-invoice-review-compliance-scott-margetts"
+        },
+        "task_specific_deliverable": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "invoice_reconciliation",
+            "line_item_findings",
+            "guideline_citations",
+            "draft_adjustment_summary",
+            "approval_note_draft",
+            "missing_evidence_and_escalations"
+          ],
+          "properties": {
+            "invoice_reconciliation": {
+              "type": "string"
+            },
+            "line_item_findings": {
+              "type": "string"
+            },
+            "guideline_citations": {
+              "type": "string"
+            },
+            "draft_adjustment_summary": {
+              "type": "string"
+            },
+            "approval_note_draft": {
+              "type": "string"
+            },
+            "missing_evidence_and_escalations": {
+              "type": "string"
+            }
+          }
+        },
+        "evidence_trace": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "claim",
+              "source_ref",
+              "pinpoint",
+              "basis"
+            ],
+            "properties": {
+              "claim": {
+                "type": "string"
+              },
+              "source_ref": {
+                "type": "string"
+              },
+              "pinpoint": {
+                "type": "string"
+              },
+              "basis": {
+                "enum": [
+                  "verified_fact",
+                  "requestor_assertion",
+                  "inference",
+                  "proposal",
+                  "unknown"
+                ]
+              }
+            }
+          }
+        },
+        "uncertainties": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "external_effects": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "mutations": {
+          "type": "array",
+          "maxItems": 0
+        }
+      }
+    },
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "phase",
+        "source_refs",
+        "established_facts",
+        "open_inputs",
+        "next_action",
+        "last_updated"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string"
+        },
+        "phase": {
+          "enum": [
+            "intake",
+            "evidence",
+            "analysis",
+            "draft",
+            "verification",
+            "complete"
+          ]
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "established_facts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "open_inputs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "next_action": {
+          "type": "string"
+        },
+        "last_updated": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}

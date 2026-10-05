@@ -1,0 +1,239 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {},
+  "definitions": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "request_ref",
+        "source_refs",
+        "data_classification",
+        "task_inputs"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "request_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "data_classification": {
+          "type": "string",
+          "enum": [
+            "synthetic",
+            "redacted",
+            "restricted",
+            "sensitive",
+            "unknown"
+          ]
+        },
+        "task_inputs": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "site_and_capture",
+            "operator_and_market",
+            "privacy_evidence",
+            "consumer_terms_evidence",
+            "authority_snapshot",
+            "scope_and_as_of"
+          ],
+          "properties": {
+            "site_and_capture": {
+              "type": "string",
+              "description": "URL, capture date, pages, languages and screenshot/source set."
+            },
+            "operator_and_market": {
+              "type": "string",
+              "description": "Seller/entity, customer locations, marketplace status and sale flow facts."
+            },
+            "privacy_evidence": {
+              "type": "string",
+              "description": "Privacy policy, cookie banner, consent interface, data handling facts."
+            },
+            "consumer_terms_evidence": {
+              "type": "string",
+              "description": "Terms, price, delivery, payment, withdrawal/returns, complaint and contact disclosure."
+            },
+            "authority_snapshot": {
+              "type": "string",
+              "description": "Current official Moroccan data-protection/consumer sources and date."
+            },
+            "scope_and_as_of": {
+              "type": "string",
+              "description": "Applicable scope and date; state unknown rather than infer."
+            }
+          }
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "artifact_type",
+        "task_specific_deliverable",
+        "evidence_trace",
+        "uncertainties",
+        "external_effects",
+        "mutations"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "completed_draft",
+            "needs_context",
+            "not_applicable"
+          ]
+        },
+        "artifact_type": {
+          "const": "legal-lawve-morocco-ecommerce-compliance-audit-omar-laftouh"
+        },
+        "task_specific_deliverable": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "site_and_market_scope",
+            "page_and_evidence_inventory",
+            "privacy_findings",
+            "consumer_disclosure_findings",
+            "authority_and_date_matrix",
+            "gaps_and_counsel_questions"
+          ],
+          "properties": {
+            "site_and_market_scope": {
+              "type": "string"
+            },
+            "page_and_evidence_inventory": {
+              "type": "string"
+            },
+            "privacy_findings": {
+              "type": "string"
+            },
+            "consumer_disclosure_findings": {
+              "type": "string"
+            },
+            "authority_and_date_matrix": {
+              "type": "string"
+            },
+            "gaps_and_counsel_questions": {
+              "type": "string"
+            }
+          }
+        },
+        "evidence_trace": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "claim",
+              "source_ref",
+              "pinpoint",
+              "basis"
+            ],
+            "properties": {
+              "claim": {
+                "type": "string"
+              },
+              "source_ref": {
+                "type": "string"
+              },
+              "pinpoint": {
+                "type": "string"
+              },
+              "basis": {
+                "enum": [
+                  "verified_fact",
+                  "requestor_assertion",
+                  "inference",
+                  "proposal",
+                  "unknown"
+                ]
+              }
+            }
+          }
+        },
+        "uncertainties": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "external_effects": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "mutations": {
+          "type": "array",
+          "maxItems": 0
+        }
+      }
+    },
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "phase",
+        "source_refs",
+        "established_facts",
+        "open_inputs",
+        "next_action",
+        "last_updated"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string"
+        },
+        "phase": {
+          "enum": [
+            "intake",
+            "evidence",
+            "analysis",
+            "draft",
+            "verification",
+            "complete"
+          ]
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "established_facts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "open_inputs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "next_action": {
+          "type": "string"
+        },
+        "last_updated": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}

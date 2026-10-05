@@ -1,0 +1,158 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "legal-privacy-use-case-triage",
+  "input_schema_ref": "references/schemas.json#/definitions/input",
+  "output_schema_ref": "references/schemas.json#/definitions/output",
+  "completion_required_fields": [
+    "privacy_route",
+    "trigger_and_scope_basis",
+    "conditions_and_controls"
+  ],
+  "fixtures": [
+    {
+      "fixture_id": "synthetic-task-shaped-completed",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261005-0900-SARA-123456",
+        "request_ref": "fixture:legal-privacy-use-case-triage:request",
+        "source_refs": [
+          "fixture:legal-privacy-use-case-triage:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "task_request": "A fictional analytics use case combines employee data and cross-border monitoring; classify privacy review needs and handoffs without asserting applicability.",
+          "source_documents": [
+            "Synthetic input fixture for legal-privacy-use-case-triage: source documents. Fictional test content only; no real-world facts."
+          ],
+          "company_context": "Synthetic input fixture for legal-privacy-use-case-triage: company context. Fictional test content only; no real-world facts.",
+          "applicability_context": "Synthetic input fixture for legal-privacy-use-case-triage: applicability context. Fictional test content only; no real-world facts.",
+          "review_owner": "Synthetic input fixture for legal-privacy-use-case-triage: review owner. Fictional test content only; no real-world facts.",
+          "processing_purpose": "Synthetic input fixture for legal-privacy-use-case-triage: processing purpose. Fictional test content only; no real-world facts.",
+          "data_subjects_and_data": "Synthetic input fixture for legal-privacy-use-case-triage: data subjects and data. Fictional test content only; no real-world facts.",
+          "roles_and_parties": "Synthetic input fixture for legal-privacy-use-case-triage: roles and parties. Fictional test content only; no real-world facts.",
+          "territories_and_scale": "Synthetic input fixture for legal-privacy-use-case-triage: territories and scale. Fictional test content only; no real-world facts.",
+          "existing_controls": "Synthetic input fixture for legal-privacy-use-case-triage: existing controls. Fictional test content only; no real-world facts."
+        }
+      },
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": "fixture:legal-privacy-use-case-triage:draft",
+        "evidence_refs": [
+          "fixture:legal-privacy-use-case-triage:source-1"
+        ],
+        "open_questions": [],
+        "review_owner_role": "Synthetic completed task for legal-privacy-use-case-triage: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "privacy_route": "Fictional legal-privacy-use-case-triage privacy route section. Scenario: A fictional analytics use case combines employee data and cross-border monitoring; classify privacy review needs and handoffs without asserting applicability. Expected handling: Produces the privacy processing use-case triage deliverable with task-specific fields and not a generic departmental summary. Cites supplied evidence and preserves unknown, conflicting or unsupported facts. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "trigger_and_scope_basis": "Fictional legal-privacy-use-case-triage trigger and scope basis section. Scenario: A fictional analytics use case combines employee data and cross-border monitoring; classify privacy review needs and handoffs without asserting applicability. Expected handling: Produces the privacy processing use-case triage deliverable with task-specific fields and not a generic departmental summary. Cites supplied evidence and preserves unknown, conflicting or unsupported facts. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "conditions_and_controls": [
+            "Fictional legal-privacy-use-case-triage conditions and controls section. Scenario: A fictional analytics use case combines employee data and cross-border monitoring; classify privacy review needs and handoffs without asserting applicability. Expected handling: Produces the privacy processing use-case triage deliverable with task-specific fields and not a generic departmental summary. Cites supplied evidence and preserves unknown, conflicting or unsupported facts. This is illustrative synthetic content only, not a real fact, legal authority, or executed result."
+          ],
+          "impact_assessment_questions": [],
+          "cross_functional_handoffs": "No unresolved item in this synthetic complete fixture.",
+          "partial_work": [],
+          "missing_inputs": [],
+          "unknown_facts": []
+        }
+      }
+    },
+    {
+      "fixture_id": "needs-context-preserves-partial-and-unknowns",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261005-0900-SARA-123456",
+        "request_ref": "fixture:legal-privacy-use-case-triage:request",
+        "source_refs": [
+          "fixture:legal-privacy-use-case-triage:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "task_request": "Prepare a synthetic legal-privacy-use-case-triage deliverable from this fictional test record; make no real-world factual or legal claim.",
+          "source_documents": [
+            "Synthetic input fixture for legal-privacy-use-case-triage: source documents. Fictional test content only; no real-world facts."
+          ],
+          "company_context": "Synthetic input fixture for legal-privacy-use-case-triage: company context. Fictional test content only; no real-world facts.",
+          "applicability_context": "Synthetic input fixture for legal-privacy-use-case-triage: applicability context. Fictional test content only; no real-world facts.",
+          "review_owner": "Synthetic input fixture for legal-privacy-use-case-triage: review owner. Fictional test content only; no real-world facts.",
+          "processing_purpose": "Synthetic input fixture for legal-privacy-use-case-triage: processing purpose. Fictional test content only; no real-world facts.",
+          "data_subjects_and_data": "Synthetic input fixture for legal-privacy-use-case-triage: data subjects and data. Fictional test content only; no real-world facts.",
+          "roles_and_parties": "Synthetic input fixture for legal-privacy-use-case-triage: roles and parties. Fictional test content only; no real-world facts.",
+          "territories_and_scale": "Synthetic input fixture for legal-privacy-use-case-triage: territories and scale. Fictional test content only; no real-world facts.",
+          "existing_controls": "Synthetic input fixture for legal-privacy-use-case-triage: existing controls. Fictional test content only; no real-world facts."
+        }
+      },
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "needs_context",
+        "artifact_ref": "fixture:legal-privacy-use-case-triage:partial",
+        "evidence_refs": [],
+        "open_questions": [
+          "Confirm the named missing input with its owner."
+        ],
+        "review_owner_role": "Synthetic completed task for legal-privacy-use-case-triage: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "privacy_route": "",
+          "trigger_and_scope_basis": "",
+          "conditions_and_controls": [],
+          "impact_assessment_questions": [],
+          "cross_functional_handoffs": "",
+          "partial_work": [
+            {
+              "section": "privacy_route",
+              "content": "Partial legal-privacy-use-case-triage fixture: source inventory recorded; one dependent conclusion remains unknown.",
+              "evidence_refs": [
+                "fixture:legal-privacy-use-case-triage:source-1"
+              ]
+            }
+          ],
+          "missing_inputs": [
+            {
+              "field": "authorized_source_or_material_fact",
+              "reason": "Synthetic missing-context scenario: The task arrives with a material missing fact or inaccessible authority needed for one conclusion. Complete separable source-grounded work and state the exact missing evidence, owner and next check.",
+              "requested_owner": "task owner"
+            }
+          ],
+          "unknown_facts": [
+            {
+              "fact": "task-specific applicability or evidence fact",
+              "why_unknown": "The edge scenario intentionally leaves this required fact or authority unresolved; preserve it as unknown.",
+              "evidence_refs": [
+                "fixture:legal-privacy-use-case-triage:source-1"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "fixture_id": "empty-completed-draft-rejected",
+      "expected_valid": false,
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": null,
+        "evidence_refs": [],
+        "open_questions": [],
+        "review_owner_role": "Synthetic completed task for legal-privacy-use-case-triage: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "privacy_route": "",
+          "trigger_and_scope_basis": "",
+          "conditions_and_controls": [],
+          "impact_assessment_questions": [],
+          "cross_functional_handoffs": "",
+          "partial_work": [],
+          "missing_inputs": [],
+          "unknown_facts": []
+        }
+      }
+    }
+  ],
+  "fixture_note": "All values are fictional task-shaped contract examples derived from this pack’s golden scenario and criteria; these files are schema evidence, not executed results or business/legal facts."
+}

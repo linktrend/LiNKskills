@@ -1,0 +1,467 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "legal-commercial-vendor-agreement-review",
+  "input_schema_ref": "references/schemas.json#/definitions/input",
+  "output_schema_ref": "references/schemas.json#/definitions/output",
+  "fixtures": [
+    {
+      "fixture_id": "typed-completed-task",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261004-1200-SARA-123456",
+        "request_ref": "fixture:legal-commercial-vendor-agreement-review",
+        "source_refs": [
+          "fixture:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "legal_commercial_vendor_agreement_review_task_payload": {
+            "vendor_agreement_and_schedules": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            },
+            "service_data_and_access_dependencies": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            },
+            "business_positions_and_fallbacks": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            },
+            "operational_owners": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            }
+          },
+          "task_request": "Synthetic unknown-context fixture for legal-commercial-vendor-agreement-review",
+          "company_or_matter_facts": "Synthetic unknown-context fixture for legal-commercial-vendor-agreement-review",
+          "source_documents": [
+            "fixture:source-1"
+          ],
+          "jurisdiction_and_as_of": {
+            "jurisdictions": [],
+            "as_of_date": null
+          },
+          "approved_positions_or_policy_ref": null
+        }
+      },
+      "output": {
+        "task_id": "20261004-1200-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": "fixture:legal-commercial-vendor-agreement-review",
+        "evidence_refs": [
+          "fixture:source-1"
+        ],
+        "open_questions": [],
+        "review_owner_role": "authorized human reviewer",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "legal_commercial_vendor_agreement_review_work_product": {
+            "vendor_agreement_issue_matrix": [
+              {
+                "content": "Synthetic task-shaped item; applicability unknown.",
+                "evidence_refs": [
+                  "fixture:source-1"
+                ],
+                "status": "unknown"
+              }
+            ],
+            "data_service_dependencies": [
+              {
+                "content": "Synthetic task-shaped item; applicability unknown.",
+                "evidence_refs": [
+                  "fixture:source-1"
+                ],
+                "status": "unknown"
+              }
+            ],
+            "clause_level_draft_edits": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "fallbacks": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "operational_owners": [
+              {
+                "content": "Synthetic task-shaped item; applicability unknown.",
+                "evidence_refs": [
+                  "fixture:source-1"
+                ],
+                "status": "unknown"
+              }
+            ],
+            "gaps": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "review_questions": [
+              {
+                "content": "Synthetic task-shaped item; applicability unknown.",
+                "evidence_refs": [
+                  "fixture:source-1"
+                ],
+                "status": "unknown"
+              }
+            ],
+            "evidence_trace": [
+              {
+                "source_ref": "fixture:source-1",
+                "location": null,
+                "supports": "Synthetic source only; no real legal fact."
+              }
+            ],
+            "jurisdiction_and_as_of": {
+              "jurisdictions": [],
+              "as_of_date": null
+            },
+            "assumptions_and_gaps": [
+              "All facts unknown in synthetic fixture."
+            ],
+            "proposed_next_steps": [
+              "Obtain source evidence."
+            ]
+          }
+        }
+      }
+    },
+    {
+      "fixture_id": "typed-needs-context-explicit-unknowns",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261004-1200-SARA-123456",
+        "request_ref": "fixture:legal-commercial-vendor-agreement-review",
+        "source_refs": [
+          "fixture:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "legal_commercial_vendor_agreement_review_task_payload": {
+            "vendor_agreement_and_schedules": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            },
+            "service_data_and_access_dependencies": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            },
+            "business_positions_and_fallbacks": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            },
+            "operational_owners": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            }
+          },
+          "task_request": "Synthetic unknown-context fixture for legal-commercial-vendor-agreement-review",
+          "company_or_matter_facts": "Synthetic unknown-context fixture for legal-commercial-vendor-agreement-review",
+          "source_documents": [
+            "fixture:source-1"
+          ],
+          "jurisdiction_and_as_of": {
+            "jurisdictions": [],
+            "as_of_date": null
+          },
+          "approved_positions_or_policy_ref": null
+        }
+      },
+      "output": {
+        "task_id": "20261004-1200-SARA-123456",
+        "status": "needs_context",
+        "artifact_ref": null,
+        "evidence_refs": [],
+        "open_questions": [
+          "Provide missing task evidence."
+        ],
+        "review_owner_role": "Sara",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "partial_work": "No substantive fact established.",
+          "missing_inputs": [
+            "vendor_agreement_and_schedules",
+            "service_data_and_access_dependencies",
+            "business_positions_and_fallbacks",
+            "operational_owners"
+          ],
+          "unknown_facts": [
+            "vendor_agreement_and_schedules",
+            "service_data_and_access_dependencies",
+            "business_positions_and_fallbacks",
+            "operational_owners"
+          ]
+        }
+      }
+    },
+    {
+      "fixture_id": "invalid-task-id-regex",
+      "expected_valid": false,
+      "input": {
+        "task_id": "bad-id",
+        "request_ref": "fixture:legal-commercial-vendor-agreement-review",
+        "source_refs": [
+          "fixture:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "legal_commercial_vendor_agreement_review_task_payload": {
+            "vendor_agreement_and_schedules": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            },
+            "service_data_and_access_dependencies": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            },
+            "business_positions_and_fallbacks": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            },
+            "operational_owners": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            }
+          },
+          "task_request": "Synthetic unknown-context fixture for legal-commercial-vendor-agreement-review",
+          "company_or_matter_facts": "Synthetic unknown-context fixture for legal-commercial-vendor-agreement-review",
+          "source_documents": [
+            "fixture:source-1"
+          ],
+          "jurisdiction_and_as_of": {
+            "jurisdictions": [],
+            "as_of_date": null
+          },
+          "approved_positions_or_policy_ref": null
+        }
+      },
+      "output": {
+        "task_id": "20261004-1200-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": "fixture:legal-commercial-vendor-agreement-review",
+        "evidence_refs": [
+          "fixture:source-1"
+        ],
+        "open_questions": [],
+        "review_owner_role": "authorized human reviewer",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "legal_commercial_vendor_agreement_review_work_product": {
+            "vendor_agreement_issue_matrix": [
+              {
+                "content": "Synthetic task-shaped item; applicability unknown.",
+                "evidence_refs": [
+                  "fixture:source-1"
+                ],
+                "status": "unknown"
+              }
+            ],
+            "data_service_dependencies": [
+              {
+                "content": "Synthetic task-shaped item; applicability unknown.",
+                "evidence_refs": [
+                  "fixture:source-1"
+                ],
+                "status": "unknown"
+              }
+            ],
+            "clause_level_draft_edits": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "fallbacks": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "operational_owners": [
+              {
+                "content": "Synthetic task-shaped item; applicability unknown.",
+                "evidence_refs": [
+                  "fixture:source-1"
+                ],
+                "status": "unknown"
+              }
+            ],
+            "gaps": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "review_questions": [
+              {
+                "content": "Synthetic task-shaped item; applicability unknown.",
+                "evidence_refs": [
+                  "fixture:source-1"
+                ],
+                "status": "unknown"
+              }
+            ],
+            "evidence_trace": [
+              {
+                "source_ref": "fixture:source-1",
+                "location": null,
+                "supports": "Synthetic source only; no real legal fact."
+              }
+            ],
+            "jurisdiction_and_as_of": {
+              "jurisdictions": [],
+              "as_of_date": null
+            },
+            "assumptions_and_gaps": [
+              "All facts unknown in synthetic fixture."
+            ],
+            "proposed_next_steps": [
+              "Obtain source evidence."
+            ]
+          }
+        }
+      }
+    },
+    {
+      "fixture_id": "missing-task-specific-input",
+      "expected_valid": false,
+      "input": {
+        "task_id": "20261004-1200-SARA-123456",
+        "request_ref": "fixture:legal-commercial-vendor-agreement-review",
+        "source_refs": [
+          "fixture:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "task_request": "Synthetic unknown-context fixture for legal-commercial-vendor-agreement-review",
+          "company_or_matter_facts": "Synthetic unknown-context fixture for legal-commercial-vendor-agreement-review",
+          "source_documents": [
+            "fixture:source-1"
+          ],
+          "jurisdiction_and_as_of": {
+            "jurisdictions": [],
+            "as_of_date": null
+          },
+          "approved_positions_or_policy_ref": null
+        }
+      },
+      "output": {
+        "task_id": "20261004-1200-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": "fixture:legal-commercial-vendor-agreement-review",
+        "evidence_refs": [
+          "fixture:source-1"
+        ],
+        "open_questions": [],
+        "review_owner_role": "authorized human reviewer",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "legal_commercial_vendor_agreement_review_work_product": {
+            "vendor_agreement_issue_matrix": [
+              {
+                "content": "Synthetic task-shaped item; applicability unknown.",
+                "evidence_refs": [
+                  "fixture:source-1"
+                ],
+                "status": "unknown"
+              }
+            ],
+            "data_service_dependencies": [
+              {
+                "content": "Synthetic task-shaped item; applicability unknown.",
+                "evidence_refs": [
+                  "fixture:source-1"
+                ],
+                "status": "unknown"
+              }
+            ],
+            "clause_level_draft_edits": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "fallbacks": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "operational_owners": [
+              {
+                "content": "Synthetic task-shaped item; applicability unknown.",
+                "evidence_refs": [
+                  "fixture:source-1"
+                ],
+                "status": "unknown"
+              }
+            ],
+            "gaps": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "review_questions": [
+              {
+                "content": "Synthetic task-shaped item; applicability unknown.",
+                "evidence_refs": [
+                  "fixture:source-1"
+                ],
+                "status": "unknown"
+              }
+            ],
+            "evidence_trace": [
+              {
+                "source_ref": "fixture:source-1",
+                "location": null,
+                "supports": "Synthetic source only; no real legal fact."
+              }
+            ],
+            "jurisdiction_and_as_of": {
+              "jurisdictions": [],
+              "as_of_date": null
+            },
+            "assumptions_and_gaps": [
+              "All facts unknown in synthetic fixture."
+            ],
+            "proposed_next_steps": [
+              "Obtain source evidence."
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

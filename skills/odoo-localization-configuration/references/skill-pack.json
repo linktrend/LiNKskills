@@ -1,0 +1,143 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "odoo-localization-configuration",
+  "display_name": "Odoo Localization Configuration Requirements",
+  "version": "1.0.0",
+  "description": "Build a versioned, jurisdiction-specific requirements and test plan from primary current authorities; never guess localization modules or file/submit returns.",
+  "capability_category": "conditional_finance_task",
+  "provenance": {
+    "author": "LiNKskills Library",
+    "source": "Pinned source subtree copied verbatim; see references/upstream/SOURCE-MANIFEST.json",
+    "license": "MIT; exact original notice preserved in references/upstream/_licenses"
+  },
+  "lifecycle_state": "draft",
+  "format_profile": "heavy",
+  "compatible_runtime_profiles": [
+    "lisa-openclaw",
+    "cursor-macos"
+  ],
+  "min_capability_tier": "balanced",
+  "routing": {
+    "when_to_use": "Use when preparing requirements for country-specific Odoo accounting/tax localization, fiscal positions, e-invoicing or reporting for a named entity and deployed version.",
+    "when_not_to_use": [
+      "Entity/fund/task applicability is not confirmed",
+      "A different atomic task has its own skill",
+      "Requested output is an unapproved action or external effect"
+    ],
+    "tags": [
+      "finance",
+      "conditional",
+      "task-specific"
+    ],
+    "exclusion_rules": [
+      "No pack text grants authority",
+      "No system mutation or external communication"
+    ],
+    "ambiguity_rules": [
+      "Continue unaffected work and request only facts that materially change the result"
+    ],
+    "recommended_disclosure_level": 2
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "scope_and_source_inputs",
+        "description": "entity legal location and establishments; jurisdictions/tax registrations; deployed Odoo exact version/edition; installed localization modules; transaction types/counterparties; applicable official tax/e-invoice/report specifications and dates; approved CoA/tax map; acceptance criteria."
+      }
+    ],
+    "expected_outputs": [
+      {
+        "name": "task_work_product",
+        "description": "jurisdiction matrix, source citations, candidate module/features verified against current official Odoo docs, required settings/data, test scenarios, unresolved accounting/legal decisions and Eric handoff."
+      }
+    ],
+    "forbidden_actions": [
+      "Mutation of company, fund, Odoo, accounting, payroll or source records",
+      "Payments, filings, signatures, publications, messages, approvals, trades or transaction commitments",
+      "Inventing current law, jurisdiction, entity/fund applicability or missing facts"
+    ],
+    "verification_steps": [
+      "1. Confirm entity, establishment, registration, transaction and reporting jurisdiction, effective date, Odoo version/edition and hosting. Unknown country or version blocks module-specific claims only. 2. Gather primary current tax authority and official Odoo version documentation for each requirement; record publication/effective dates. Treat copied country tables/examples as historical leads, not authority. 3. Map each obligation to source rule, business transaction, tax/account code, fiscal position/e-invoice/report output, required data, module/dependency and responsible owner. 4. Verify module names and functionality against official docs for the exact installed version; distinguish standard feature, add-on, custom work and unknown. Do not instruct installation or assume version compatibility. 5. Specify positive/negative acceptance tests with synthetic data: domestic, cross-border, exempt/zero-rated if applicable, credit note, validation failure, and reconciliation to accounting output. Jurisdiction branches only when applicability is evidenced. 6. Reconcile report/e-invoice output fields and totals to source invoice/ledger; define how failed submissions/rejections are surfaced, but do not submit. 7. Mark accountant/counsel decisions and unresolved jurisdiction interpretation; hand off technical changes to Eric. No credential/certificate access, install, config mutation, invoice transmission or filing.",
+      "Show formulas/denominators, evidence dates and assumptions; preserve unresolved conflicts.",
+      "Write only a requested private draft; no external effects."
+    ],
+    "completion_criteria": [
+      "Conditional task scope is evidenced or limitations explicitly bound",
+      "Task method and calculation are reproducible from cited inputs",
+      "Owner decisions, open issues and source limitations are explicit"
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read",
+      "filesystem_write"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [
+      {
+        "key": "min_reasoning_tier",
+        "value": "balanced"
+      },
+      {
+        "key": "context_required",
+        "value": 32000
+      },
+      {
+        "key": "preferred_model",
+        "value": "gpt-6.1-sol"
+      }
+    ],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "required_certification_profiles": [],
+    "verification_refs": [
+      "references/eval-suite.yaml",
+      "references/source-selection.md"
+    ]
+  },
+  "telemetry": {
+    "classification": "restricted",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_personal_data",
+      "strip_private_finance_data",
+      "strip_reasoning"
+    ],
+    "retention_policy": "opaque task/source IDs and hashes only"
+  },
+  "fragments": [
+    {
+      "fragment_id": "skill-md",
+      "disclosure_level": 2,
+      "path": "SKILL.md"
+    },
+    {
+      "fragment_id": "advanced",
+      "disclosure_level": 3,
+      "path": "advanced/advanced.md"
+    },
+    {
+      "fragment_id": "schemas",
+      "disclosure_level": 5,
+      "path": "references/schemas.json"
+    },
+    {
+      "fragment_id": "eval",
+      "disclosure_level": 3,
+      "path": "references/eval-suite.json"
+    },
+    {
+      "fragment_id": "source-selection",
+      "disclosure_level": 3,
+      "path": "references/source-selection.md"
+    }
+  ],
+  "release_channel": "development"
+}
