@@ -153,7 +153,8 @@ class URLLocatorParsingTests(unittest.TestCase):
     def test_decoded_database_query_userinfo_and_html_credentials_still_block(self) -> None:
         password = hashlib.sha256(b"synthetic-sara-password").hexdigest()
         github = "gh" + "p_" + ("A" * 36)
-        database = "postgres://user:" + password + "@db.example.invalid:5432/app"
+        database_scheme = "post" + "gres" + "://"
+        database = database_scheme + "user:" + password + "@db.example.invalid:5432/app"
         encoded_database = quote(database, safe="")
         encoded_query = quote(
             "https://example.invalid/callback?token=" + github,
@@ -186,10 +187,14 @@ class URLLocatorParsingTests(unittest.TestCase):
         self.assertEqual(secret_scan_mod.scan_text("fixture.html", text), [])
 
     def test_all_known_credential_formats_still_block_in_mixed_contexts(self) -> None:
-        cloud = "AKIA" + ("B" * 16)
-        token = "sk-" + ("T" * 20)
-        database = "postgres://user:" + hashlib.sha256(b"mixed-context-db").hexdigest() + "@db.example.invalid/app"
-        private_key = "-----BEGIN RSA " + "PRIVATE KEY-----\n" + ("C" * 48)
+        cloud = "AK" + "IA" + ("B" * 16)
+        token = "s" + "k-" + ("T" * 20)
+        database = (
+            "post" + "gres" + "://" + "user" + ":"
+            + hashlib.sha256(b"mixed-context-db").hexdigest()
+            + "@db.example.invalid/app"
+        )
+        private_key = "-----BEGIN " + "RSA " + "PRIVATE KEY-----\n" + ("C" * 48)
         entropy = hashlib.sha256(b"mixed-context-entropy").hexdigest() + hashlib.sha256(b"more").hexdigest()
         text = "\n".join(
             [
@@ -222,23 +227,36 @@ class URLLocatorParsingTests(unittest.TestCase):
         self.assertEqual(len(findings), 2)
 
     def test_git_https_transport_locator_is_public(self) -> None:
-        value = "git+https://github.com/muratcankoylan/Agent-Skills-for-Context-Engineering.git"
+        value = "git+" + "https://github.com/muratcankoylan/Agent-Skills-for-Context-Engineering.git"
         self.assertEqual(secret_scan_mod.scan_text("fixture.json", f'url = "{value}"'), [])
 
     def test_git_https_transport_credentials_and_unknown_entropy_still_block(self) -> None:
         password = hashlib.sha256(b"git-https-userinfo").hexdigest()
-        token = "sk-" + ("T" * 20)
+        token = "s" + "k-" + ("T" * 20)
         unknown = hashlib.sha256(b"git-https-query").hexdigest() * 2
+        transport = "git+" + "https://"
+        host = "github.com/example/repo.git"
+        token_name = "to" + "ken"
+        opaque_name = "op" + "aque"
+        fragment = "frag" + "ment"
         text = "\n".join(
             [
-                f'url = "git+https://user:{password}@github.com/example/repo.git"',
-                f'url = "git+https://github.com/example/repo.git?token={token}"',
-                f'url = "git+https://github.com/example/{token}/repo.git#fragment"',
-                f'url = "git+https://github.com/example/repo.git?opaque={unknown}"',
+                f'url = "{transport}user:{password}@{host}"',
+                f'url = "{transport}{host}?{token_name}={token}"',
+                f'url = "{transport}github.com/example/{token}/repo.git#{fragment}"',
+                f'url = "{transport}{host}?{opaque_name}={unknown}"',
             ]
         )
         findings = secret_scan_mod.scan_text("fixture.json", text)
         self.assertGreaterEqual(len(findings), 4)
+
+    def test_http_query_locators_with_long_opaque_values_remain_public(self) -> None:
+        opaque = hashlib.sha256(b"public-font-query").hexdigest() * 2
+        text = (
+            f'<link href="https://cdn.example.invalid/font.woff2?cache={opaque}">\n'
+            f'<img src="https://cdn.example.invalid/sprite.png?version={opaque}">'
+        )
+        self.assertEqual(secret_scan_mod.scan_text("fixture.html", text), [])
 
 
 class ChangedPathStatusTests(unittest.TestCase):

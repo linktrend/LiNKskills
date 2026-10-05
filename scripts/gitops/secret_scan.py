@@ -552,10 +552,13 @@ def _url_contains_credentials(value: str) -> bool:
     parsed = urlsplit(value if "://" in value else "https:" + value)
     if parsed.username is not None or parsed.password is not None:
         return True
+    scheme = parsed.scheme.casefold()
     for name, query_value in parse_qsl(parsed.query, keep_blank_values=True):
         if not query_value:
             continue
         if _is_credential_field(name) or (
+            scheme == "git+https"
+            and
             len(query_value) >= 40
             and _shannon(query_value) >= 3.5
             and not is_synthetic_value(query_value)
