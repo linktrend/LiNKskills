@@ -1,0 +1,143 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "odoo-payroll-configuration-requirements",
+  "display_name": "Odoo Payroll Configuration Requirements",
+  "version": "1.0.0",
+  "description": "Prepare a version- and jurisdiction-scoped Odoo payroll requirements/debugging brief; no payroll configuration or legal/tax determination.",
+  "capability_category": "conditional_finance_task",
+  "provenance": {
+    "author": "LiNKskills Library",
+    "source": "Pinned source subtree copied verbatim; see references/upstream/SOURCE-MANIFEST.json",
+    "license": "MIT; exact original notice preserved in references/upstream/_licenses"
+  },
+  "lifecycle_state": "draft",
+  "format_profile": "heavy",
+  "compatible_runtime_profiles": [
+    "lisa-openclaw",
+    "cursor-macos"
+  ],
+  "min_capability_tier": "balanced",
+  "routing": {
+    "when_to_use": "Use when translating an explicitly scoped payroll or time-off workflow into Odoo configuration requirements or diagnosing supplied Odoo payroll behavior.",
+    "when_not_to_use": [
+      "Entity/fund/task applicability is not confirmed",
+      "A different atomic task has its own skill",
+      "Requested output is an unapproved action or external effect"
+    ],
+    "tags": [
+      "finance",
+      "conditional",
+      "task-specific"
+    ],
+    "exclusion_rules": [
+      "No pack text grants authority",
+      "No system mutation or external communication"
+    ],
+    "ambiguity_rules": [
+      "Continue unaffected work and request only facts that materially change the result"
+    ],
+    "recommended_disclosure_level": 2
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "scope_and_source_inputs",
+        "description": "deployed Odoo exact version, edition and installed modules; entity and employee/work location jurisdictions; approved payroll/leave policy and effective dates; currency/pay period; redacted sample contract/payslip/rule; accounting map and acceptance criteria; primary current legal/Odoo docs."
+      }
+    ],
+    "expected_outputs": [
+      {
+        "name": "task_work_product",
+        "description": "requirements matrix with policy source, Odoo field/module expectation, rule ordering/data dependencies, test cases, open decisions and Eric handoff."
+      }
+    ],
+    "forbidden_actions": [
+      "Mutation of company, fund, Odoo, accounting, payroll or source records",
+      "Payments, filings, signatures, publications, messages, approvals, trades or transaction commitments",
+      "Inventing current law, jurisdiction, entity/fund applicability or missing facts"
+    ],
+    "verification_steps": [
+      "1. Confirm deployed version/edition (Payroll availability may differ), installed modules, company/entity and countries. Do not use generic source examples as current module facts. 2. Capture approved business rules for salary components, inputs, deductions, leave types/approval, contracts, pay period and accounting entries; separate policy from configuration. 3. For each requirement map source policy \u2192 expected model behavior \u2192 fields/module needed \u2192 input/outputs \u2192 acceptance test. No hardcoded rates, deduction formula, PTO days, or tax rules without approved policy/current primary authority. 4. For payslip issue, compare redacted inputs, contract wage period, salary structure/rule sequence, categories, inputs and resulting line arithmetic; isolate expected-vs-actual deltas. 5. For journal integration, reconcile debit/credit mapping to approved account map, prove balance and period; do not post. 6. Draft synthetic tests for gross, deductions, net, leave approval and journal mapping; include edge conditions like missing inputs, annual/monthly wage basis, retroactive dates and rounding. 7. Verify relevant Odoo docs for exact deployed version and cite current primary tax authority for jurisdiction-dependent rules. If authority unavailable, mark unresolved for payroll specialist/counsel. 8. Deliver requirements, acceptance tests and technical handoff to Eric; no module install, payroll run, payslip edit, or configuration write.",
+      "Show formulas/denominators, evidence dates and assumptions; preserve unresolved conflicts.",
+      "Write only a requested private draft; no external effects."
+    ],
+    "completion_criteria": [
+      "Conditional task scope is evidenced or limitations explicitly bound",
+      "Task method and calculation are reproducible from cited inputs",
+      "Owner decisions, open issues and source limitations are explicit"
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read",
+      "filesystem_write"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [
+      {
+        "key": "min_reasoning_tier",
+        "value": "balanced"
+      },
+      {
+        "key": "context_required",
+        "value": 32000
+      },
+      {
+        "key": "preferred_model",
+        "value": "gpt-6.1-sol"
+      }
+    ],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "required_certification_profiles": [],
+    "verification_refs": [
+      "references/eval-suite.yaml",
+      "references/source-selection.md"
+    ]
+  },
+  "telemetry": {
+    "classification": "restricted",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_personal_data",
+      "strip_private_finance_data",
+      "strip_reasoning"
+    ],
+    "retention_policy": "opaque task/source IDs and hashes only"
+  },
+  "fragments": [
+    {
+      "fragment_id": "skill-md",
+      "disclosure_level": 2,
+      "path": "SKILL.md"
+    },
+    {
+      "fragment_id": "advanced",
+      "disclosure_level": 3,
+      "path": "advanced/advanced.md"
+    },
+    {
+      "fragment_id": "schemas",
+      "disclosure_level": 5,
+      "path": "references/schemas.json"
+    },
+    {
+      "fragment_id": "eval",
+      "disclosure_level": 3,
+      "path": "references/eval-suite.json"
+    },
+    {
+      "fragment_id": "source-selection",
+      "disclosure_level": 3,
+      "path": "references/source-selection.md"
+    }
+  ],
+  "release_channel": "development"
+}

@@ -1,0 +1,403 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "request_ref",
+        "source_refs",
+        "data_classification",
+        "task_inputs"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string"
+        },
+        "request_ref": {
+          "type": "string"
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "data_classification": {
+          "type": "string",
+          "enum": [
+            "synthetic",
+            "redacted",
+            "restricted",
+            "sensitive",
+            "unknown"
+          ]
+        },
+        "task_inputs": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "task_request",
+            "source_documents",
+            "company_context",
+            "applicability_context",
+            "review_owner",
+            "current_policy",
+            "practice_records",
+            "last_review_and_scope",
+            "change_triggers"
+          ],
+          "properties": {
+            "task_request": {
+              "type": "string",
+              "minLength": 1
+            },
+            "source_documents": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "company_context": {
+              "type": "string"
+            },
+            "applicability_context": {
+              "type": "string"
+            },
+            "review_owner": {
+              "type": "string"
+            },
+            "current_policy": {
+              "type": "string",
+              "description": "Approved AI governance policy and version."
+            },
+            "practice_records": {
+              "type": "string",
+              "description": "Authorized evidence of current AI system use/practices since last review."
+            },
+            "last_review_and_scope": {
+              "type": "string",
+              "description": "Last sweep date, systems and sources covered."
+            },
+            "change_triggers": {
+              "type": "string",
+              "description": "New systems, incidents, approvals, policy or legal changes."
+            }
+          }
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "status",
+        "artifact_ref",
+        "evidence_refs",
+        "open_questions",
+        "review_owner_role",
+        "external_effects",
+        "mutations",
+        "work_product"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "completed_draft",
+            "needs_context",
+            "escalate",
+            "blocked"
+          ]
+        },
+        "artifact_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "open_questions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "review_owner_role": {
+          "type": "string"
+        },
+        "external_effects": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "mutations": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "work_product": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "practice_to_policy_diff",
+            "required_candidate_changes",
+            "advisable_candidates",
+            "source_coverage_and_gaps",
+            "policy_owner_questions"
+          ],
+          "properties": {
+            "practice_to_policy_diff": {
+              "type": "string",
+              "description": "Task-specific draft field: practice to policy diff"
+            },
+            "required_candidate_changes": {
+              "type": "string",
+              "description": "Task-specific draft field: required candidate changes"
+            },
+            "advisable_candidates": {
+              "type": "array",
+              "description": "Task-specific draft field: advisable candidates",
+              "items": {
+                "type": "string"
+              }
+            },
+            "source_coverage_and_gaps": {
+              "type": "array",
+              "description": "Task-specific draft field: source coverage and gaps",
+              "items": {
+                "type": "string"
+              }
+            },
+            "policy_owner_questions": {
+              "type": "array",
+              "description": "Task-specific draft field: policy owner questions",
+              "items": {
+                "type": "string"
+              }
+            },
+            "partial_work": {
+              "type": "array",
+              "description": "Separable work completed despite a material input gap; empty only when none was possible.",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "section",
+                  "content",
+                  "evidence_refs"
+                ],
+                "properties": {
+                  "section": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "content": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "evidence_refs": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "missing_inputs": {
+              "type": "array",
+              "description": "Exact absent or inaccessible input and why it blocks the dependent conclusion.",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "field",
+                  "reason"
+                ],
+                "properties": {
+                  "field": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "requested_owner": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                }
+              }
+            },
+            "unknown_facts": {
+              "type": "array",
+              "description": "Facts that remain unknown or conflicting; never fill them with invented values.",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "fact",
+                  "why_unknown",
+                  "evidence_refs"
+                ],
+                "properties": {
+                  "fact": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "why_unknown": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "evidence_refs": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "title": "sara-completed-draft-content",
+          "if": {
+            "properties": {
+              "status": {
+                "const": "completed_draft"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "evidence_refs": {
+                "minItems": 1
+              },
+              "work_product": {
+                "required": [
+                  "practice_to_policy_diff",
+                  "required_candidate_changes",
+                  "advisable_candidates"
+                ],
+                "properties": {
+                  "practice_to_policy_diff": {
+                    "minLength": 1
+                  },
+                  "required_candidate_changes": {
+                    "minLength": 1
+                  },
+                  "advisable_candidates": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "sara-needs-context-record",
+          "if": {
+            "properties": {
+              "status": {
+                "const": "needs_context"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "work_product": {
+                "required": [
+                  "partial_work",
+                  "missing_inputs",
+                  "unknown_facts"
+                ],
+                "properties": {
+                  "missing_inputs": {
+                    "minItems": 1
+                  },
+                  "unknown_facts": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "phase",
+        "status",
+        "checkpoint_ref",
+        "updated_at"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string"
+        },
+        "phase": {
+          "type": "string",
+          "enum": [
+            "intake",
+            "evidence",
+            "analysis",
+            "draft",
+            "review",
+            "delivered"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "in_progress",
+            "waiting_for_input",
+            "completed_draft",
+            "blocked"
+          ]
+        },
+        "checkpoint_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Consumer-owner checkpoint reference; no local runtime sidecar."
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "open_questions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

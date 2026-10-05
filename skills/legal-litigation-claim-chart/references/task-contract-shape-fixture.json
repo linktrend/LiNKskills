@@ -1,0 +1,136 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "legal-litigation-claim-chart",
+  "input_schema_ref": "references/schemas.json#/definitions/input",
+  "output_schema_ref": "references/schemas.json#/definitions/output",
+  "completion_required_fields": [
+    "element_chart"
+  ],
+  "fixtures": [
+    {
+      "fixture_id": "synthetic-task-shaped-completed",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261005-0900-SARA-123456",
+        "request_ref": "fixture:legal-litigation-claim-chart:request",
+        "source_refs": [
+          "fixture:legal-litigation-claim-chart:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "chart_mode": "Synthetic input fixture for legal-litigation-claim-chart: chart mode. Fictional test content only; no real-world facts.",
+          "claim_or_cause": "Synthetic input fixture for legal-litigation-claim-chart: claim or cause. Fictional test content only; no real-world facts.",
+          "target_and_product_or_record": "Synthetic input fixture for legal-litigation-claim-chart: target and product or record. Fictional test content only; no real-world facts.",
+          "governing_elements_and_authority": "Synthetic input fixture for legal-litigation-claim-chart: governing elements and authority. Fictional test content only; no real-world facts.",
+          "jurisdiction_forum_and_as_of_date": "Synthetic input fixture for legal-litigation-claim-chart: jurisdiction forum and as of date. Fictional test content only; no real-world facts.",
+          "citation_convention": "Synthetic input fixture for legal-litigation-claim-chart: citation convention. Fictional test content only; no real-world facts."
+        }
+      },
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": "fixture:legal-litigation-claim-chart:draft",
+        "evidence_refs": [
+          "fixture:legal-litigation-claim-chart:source-1"
+        ],
+        "open_questions": [],
+        "review_owner_role": "Synthetic completed task for legal-litigation-claim-chart: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "element_chart": "Fictional legal-litigation-claim-chart element chart section. Scenario: Fictional two-element claim chart request: supplied element list has 3 elements; evidence maps only to 1 and 3, while a target document is unavailable. Preserve the missing second element and inaccessible source as gaps; do not declare infringement. Expected handling: Every element/limitation is present and independently mapped or expressly marked unsupported. Pinpoints support the whole cited proposition; missing source is not counted as negative proof. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "gaps_and_assumptions": "No unresolved item in this synthetic complete fixture.",
+          "review_notes": "No unresolved item in this synthetic complete fixture.",
+          "partial_work": [],
+          "missing_inputs": [],
+          "unknown_facts": []
+        }
+      }
+    },
+    {
+      "fixture_id": "needs-context-preserves-partial-and-unknowns",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261005-0900-SARA-123456",
+        "request_ref": "fixture:legal-litigation-claim-chart:request",
+        "source_refs": [
+          "fixture:legal-litigation-claim-chart:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "chart_mode": "Synthetic input fixture for legal-litigation-claim-chart: chart mode. Fictional test content only; no real-world facts.",
+          "claim_or_cause": "Synthetic input fixture for legal-litigation-claim-chart: claim or cause. Fictional test content only; no real-world facts.",
+          "target_and_product_or_record": "Synthetic input fixture for legal-litigation-claim-chart: target and product or record. Fictional test content only; no real-world facts.",
+          "governing_elements_and_authority": "Synthetic input fixture for legal-litigation-claim-chart: governing elements and authority. Fictional test content only; no real-world facts.",
+          "jurisdiction_forum_and_as_of_date": "Synthetic input fixture for legal-litigation-claim-chart: jurisdiction forum and as of date. Fictional test content only; no real-world facts.",
+          "citation_convention": "Synthetic input fixture for legal-litigation-claim-chart: citation convention. Fictional test content only; no real-world facts."
+        }
+      },
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "needs_context",
+        "artifact_ref": "fixture:legal-litigation-claim-chart:partial",
+        "evidence_refs": [],
+        "open_questions": [
+          "Confirm the named missing input with its owner."
+        ],
+        "review_owner_role": "Synthetic completed task for legal-litigation-claim-chart: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "element_chart": "",
+          "gaps_and_assumptions": "",
+          "review_notes": "",
+          "partial_work": [
+            {
+              "section": "element_chart",
+              "content": "Partial legal-litigation-claim-chart fixture: source inventory recorded; one dependent conclusion remains unknown.",
+              "evidence_refs": [
+                "fixture:legal-litigation-claim-chart:source-1"
+              ]
+            }
+          ],
+          "missing_inputs": [
+            {
+              "field": "authorized_source_or_material_fact",
+              "reason": "Synthetic missing-context scenario: A material source or jurisdiction-specific fact is missing and another portion of the draft remains possible. Complete separable work and mark only dependent conclusions unresolved.",
+              "requested_owner": "task owner"
+            }
+          ],
+          "unknown_facts": [
+            {
+              "fact": "task-specific applicability or evidence fact",
+              "why_unknown": "The edge scenario intentionally leaves this required fact or authority unresolved; preserve it as unknown.",
+              "evidence_refs": [
+                "fixture:legal-litigation-claim-chart:source-1"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "fixture_id": "empty-completed-draft-rejected",
+      "expected_valid": false,
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": null,
+        "evidence_refs": [],
+        "open_questions": [],
+        "review_owner_role": "Synthetic completed task for legal-litigation-claim-chart: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "element_chart": "",
+          "gaps_and_assumptions": "",
+          "review_notes": "",
+          "partial_work": [],
+          "missing_inputs": [],
+          "unknown_facts": []
+        }
+      }
+    }
+  ],
+  "fixture_note": "All values are fictional task-shaped contract examples derived from this pack’s golden scenario and criteria; these files are schema evidence, not executed results or business/legal facts."
+}

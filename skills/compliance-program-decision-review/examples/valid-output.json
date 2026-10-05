@@ -1,0 +1,152 @@
+{
+  "task_id": "20261005-1000-SARA-654321",
+  "status": "completed_draft",
+  "artifact_ref": "fixture:decision-review:acme-draft",
+  "evidence_refs": [
+    "fixture:proposal-1",
+    "fixture:evidence-register",
+    "fixture:audit-calendar",
+    "fixture:mock-audit",
+    "fixture:management-review"
+  ],
+  "open_questions": [
+    "Which jurisdictions and obligations apply to Acme?",
+    "Who owns the audit-calendar decision and has the internal reviewer performed the work being reviewed?",
+    "What sample design and approved criteria govern interpretation of the mock-audit counts?"
+  ],
+  "decision_owner_role": "Fictional board risk committee; final individual owner unconfirmed",
+  "external_effects": [],
+  "mutations": [],
+  "work_product": {
+    "decision_requested": "Whether to investigate or defer the proposed voluntary Framework Cedar commitment, and how to resolve the draft audit calendar and evidence gaps before an owner decision.",
+    "question_assessments": [
+      {
+        "question_id": "framework_commitment_scope",
+        "status": "gap_identified",
+        "finding": "Framework Cedar is recorded as a voluntary proposal; the scope and jurisdiction/applicability review are not approved or evidenced.",
+        "evidence_refs": [
+          "fixture:proposal-1"
+        ],
+        "decision_or_action": "Board risk committee should decide whether to investigate or defer commitment after an applicability review.",
+        "unknowns": [
+          "Applicable jurisdictions and business obligations are not established."
+        ]
+      },
+      {
+        "question_id": "evidence_consolidation",
+        "status": "gap_identified",
+        "finding": "The access review log may be relevant to both proposed assurance activities, but equivalence, population, period, and test criteria have not been checked.",
+        "evidence_refs": [
+          "fixture:evidence-register",
+          "fixture:proposal-1"
+        ],
+        "decision_or_action": "Control owner to validate whether the same artifact is suitable for each specific control objective.",
+        "unknowns": [
+          "Framework control requirements and evidence acceptance criteria are not supplied."
+        ]
+      },
+      {
+        "question_id": "artifact_ownership_freshness",
+        "status": "gap_identified",
+        "finding": "One artifact has a role-level owner whose acceptance is unconfirmed; the exercise note has no owner or date.",
+        "evidence_refs": [
+          "fixture:evidence-register"
+        ],
+        "decision_or_action": "Assign accountable owners and confirm actual dates and refresh triggers.",
+        "unknowns": [
+          "Owner acceptance and freshness criteria are unknown."
+        ]
+      },
+      {
+        "question_id": "audit_calendar_independence",
+        "status": "unknown",
+        "finding": "Two reviews are listed in the same fictional week. The internal security lead may have performed related work, but the record does not establish whether they did.",
+        "evidence_refs": [
+          "fixture:audit-calendar"
+        ],
+        "decision_or_action": "Decision owner to resolve calendar capacity; independent reviewer to confirm any self-review relationship before scheduling.",
+        "unknowns": [
+          "Prior work and auditor-independence facts are not supplied."
+        ]
+      },
+      {
+        "question_id": "mock_audit_sample_findings",
+        "status": "supported",
+        "finding": "The supplied mock-audit note records 10 sampled items, 2 major, and 3 minor findings. The sample method and scoring criteria are absent, so this is a descriptive result only.",
+        "evidence_refs": [
+          "fixture:mock-audit"
+        ],
+        "decision_or_action": "Provide the sample plan and owner-approved criteria before interpreting significance or making a readiness judgment.",
+        "unknowns": [
+          "Population, sample method, test criteria, and approved severity thresholds are unknown."
+        ]
+      },
+      {
+        "question_id": "management_review_cadence_decisions",
+        "status": "gap_identified",
+        "finding": "The fictional minutes record one review and two open actions but do not establish a cadence, action owners, or framework decision.",
+        "evidence_refs": [
+          "fixture:management-review"
+        ],
+        "decision_or_action": "Review owner to confirm cadence, assign action owners, and record the authorized decision separately.",
+        "unknowns": [
+          "Required cadence, ownership, and decision authority are not evidenced."
+        ]
+      }
+    ],
+    "decision_options": [
+      {
+        "option": "Defer commitment pending applicability and scope review.",
+        "tradeoffs": [
+          "Preserves decision optionality",
+          "Requires owner and jurisdiction evidence before the next review"
+        ],
+        "owner_decision_needed": "Fictional board risk committee to choose whether to defer or authorize further review.",
+        "evidence_refs": [
+          "fixture:proposal-1"
+        ]
+      },
+      {
+        "option": "Authorize a bounded evidence and calendar verification step without adopting Framework Cedar.",
+        "tradeoffs": [
+          "Clarifies evidence reuse and auditor roles",
+          "Uses staff time before any framework commitment"
+        ],
+        "owner_decision_needed": "Fictional board risk committee to identify an accountable reviewer and scope for verification.",
+        "evidence_refs": [
+          "fixture:evidence-register",
+          "fixture:audit-calendar"
+        ]
+      }
+    ],
+    "conflicts": [
+      "The proposed review date overlaps another fictional review; the source does not show whether this is a real capacity conflict."
+    ],
+    "missing_inputs": [],
+    "unknown_facts": [
+      {
+        "fact": "Legal or contractual applicability of Framework Cedar",
+        "why_unknown": "No jurisdiction, regulator, contract, or current authority is supplied.",
+        "evidence_refs": [
+          "fixture:proposal-1"
+        ]
+      },
+      {
+        "fact": "Auditor independence for the internal security lead",
+        "why_unknown": "Prior work and reviewer relationship are not stated.",
+        "evidence_refs": [
+          "fixture:audit-calendar"
+        ]
+      },
+      {
+        "fact": "Mock-audit severity interpretation",
+        "why_unknown": "No sample method or owner-approved scoring criteria are supplied.",
+        "evidence_refs": [
+          "fixture:mock-audit"
+        ]
+      }
+    ],
+    "partial_work": [],
+    "owner_decision_status": "pending_authorized_decision"
+  }
+}

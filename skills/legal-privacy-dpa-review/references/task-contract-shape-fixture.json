@@ -1,0 +1,160 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "legal-privacy-dpa-review",
+  "input_schema_ref": "references/schemas.json#/definitions/input",
+  "output_schema_ref": "references/schemas.json#/definitions/output",
+  "completion_required_fields": [
+    "direction_and_scope",
+    "article_clause_inventory",
+    "proposed_redlines",
+    "privacy_policy_consistency"
+  ],
+  "fixtures": [
+    {
+      "fixture_id": "synthetic-task-shaped-completed",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261005-0900-SARA-123456",
+        "request_ref": "fixture:legal-privacy-dpa-review:request",
+        "source_refs": [
+          "fixture:legal-privacy-dpa-review:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "task_request": "A fictional controller reviews a vendor DPA with an incomplete subprocessor annex; identify clause gaps and operational questions without assuming governing law.",
+          "source_documents": [
+            "Synthetic input fixture for legal-privacy-dpa-review: source documents. Fictional test content only; no real-world facts."
+          ],
+          "company_context": "Synthetic input fixture for legal-privacy-dpa-review: company context. Fictional test content only; no real-world facts.",
+          "applicability_context": "Synthetic input fixture for legal-privacy-dpa-review: applicability context. Fictional test content only; no real-world facts.",
+          "review_owner": "Synthetic input fixture for legal-privacy-dpa-review: review owner. Fictional test content only; no real-world facts.",
+          "dpa_and_underlying_contract": "Synthetic input fixture for legal-privacy-dpa-review: dpa and underlying contract. Fictional test content only; no real-world facts.",
+          "party_roles": "Synthetic input fixture for legal-privacy-dpa-review: party roles. Fictional test content only; no real-world facts.",
+          "processing_details": "Synthetic input fixture for legal-privacy-dpa-review: processing details. Fictional test content only; no real-world facts.",
+          "positions_and_controls": "Synthetic input fixture for legal-privacy-dpa-review: positions and controls. Fictional test content only; no real-world facts.",
+          "sector_and_jurisdictions": "Synthetic input fixture for legal-privacy-dpa-review: sector and jurisdictions. Fictional test content only; no real-world facts."
+        }
+      },
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": "fixture:legal-privacy-dpa-review:draft",
+        "evidence_refs": [
+          "fixture:legal-privacy-dpa-review:source-1"
+        ],
+        "open_questions": [],
+        "review_owner_role": "Synthetic completed task for legal-privacy-dpa-review: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "direction_and_scope": "Fictional legal-privacy-dpa-review direction and scope section. Scenario: A fictional controller reviews a vendor DPA with an incomplete subprocessor annex; identify clause gaps and operational questions without assuming governing law. Expected handling: Produces the data processing agreement review deliverable with task-specific fields and not a generic departmental summary. Cites supplied evidence and preserves unknown, conflicting or unsupported facts. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "article_clause_inventory": "Fictional legal-privacy-dpa-review article clause inventory section. Scenario: A fictional controller reviews a vendor DPA with an incomplete subprocessor annex; identify clause gaps and operational questions without assuming governing law. Expected handling: Produces the data processing agreement review deliverable with task-specific fields and not a generic departmental summary. Cites supplied evidence and preserves unknown, conflicting or unsupported facts. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "risk_and_gap_matrix": "No unresolved item in this synthetic complete fixture.",
+          "proposed_redlines": "Fictional legal-privacy-dpa-review proposed redlines section. Scenario: A fictional controller reviews a vendor DPA with an incomplete subprocessor annex; identify clause gaps and operational questions without assuming governing law. Expected handling: Produces the data processing agreement review deliverable with task-specific fields and not a generic departmental summary. Cites supplied evidence and preserves unknown, conflicting or unsupported facts. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "privacy_policy_consistency": "Fictional legal-privacy-dpa-review privacy policy consistency section. Scenario: A fictional controller reviews a vendor DPA with an incomplete subprocessor annex; identify clause gaps and operational questions without assuming governing law. Expected handling: Produces the data processing agreement review deliverable with task-specific fields and not a generic departmental summary. Cites supplied evidence and preserves unknown, conflicting or unsupported facts. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "review_questions": [],
+          "partial_work": [],
+          "missing_inputs": [],
+          "unknown_facts": []
+        }
+      }
+    },
+    {
+      "fixture_id": "needs-context-preserves-partial-and-unknowns",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261005-0900-SARA-123456",
+        "request_ref": "fixture:legal-privacy-dpa-review:request",
+        "source_refs": [
+          "fixture:legal-privacy-dpa-review:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "task_request": "Prepare a synthetic legal-privacy-dpa-review deliverable from this fictional test record; make no real-world factual or legal claim.",
+          "source_documents": [
+            "Synthetic input fixture for legal-privacy-dpa-review: source documents. Fictional test content only; no real-world facts."
+          ],
+          "company_context": "Synthetic input fixture for legal-privacy-dpa-review: company context. Fictional test content only; no real-world facts.",
+          "applicability_context": "Synthetic input fixture for legal-privacy-dpa-review: applicability context. Fictional test content only; no real-world facts.",
+          "review_owner": "Synthetic input fixture for legal-privacy-dpa-review: review owner. Fictional test content only; no real-world facts.",
+          "dpa_and_underlying_contract": "Synthetic input fixture for legal-privacy-dpa-review: dpa and underlying contract. Fictional test content only; no real-world facts.",
+          "party_roles": "Synthetic input fixture for legal-privacy-dpa-review: party roles. Fictional test content only; no real-world facts.",
+          "processing_details": "Synthetic input fixture for legal-privacy-dpa-review: processing details. Fictional test content only; no real-world facts.",
+          "positions_and_controls": "Synthetic input fixture for legal-privacy-dpa-review: positions and controls. Fictional test content only; no real-world facts.",
+          "sector_and_jurisdictions": "Synthetic input fixture for legal-privacy-dpa-review: sector and jurisdictions. Fictional test content only; no real-world facts."
+        }
+      },
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "needs_context",
+        "artifact_ref": "fixture:legal-privacy-dpa-review:partial",
+        "evidence_refs": [],
+        "open_questions": [
+          "Confirm the named missing input with its owner."
+        ],
+        "review_owner_role": "Synthetic completed task for legal-privacy-dpa-review: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "direction_and_scope": "",
+          "article_clause_inventory": "",
+          "risk_and_gap_matrix": "",
+          "proposed_redlines": "",
+          "privacy_policy_consistency": "",
+          "review_questions": [],
+          "partial_work": [
+            {
+              "section": "direction_and_scope",
+              "content": "Partial legal-privacy-dpa-review fixture: source inventory recorded; one dependent conclusion remains unknown.",
+              "evidence_refs": [
+                "fixture:legal-privacy-dpa-review:source-1"
+              ]
+            }
+          ],
+          "missing_inputs": [
+            {
+              "field": "authorized_source_or_material_fact",
+              "reason": "Synthetic missing-context scenario: The task arrives with a material missing fact or inaccessible authority needed for one conclusion. Complete separable source-grounded work and state the exact missing evidence, owner and next check.",
+              "requested_owner": "task owner"
+            }
+          ],
+          "unknown_facts": [
+            {
+              "fact": "task-specific applicability or evidence fact",
+              "why_unknown": "The edge scenario intentionally leaves this required fact or authority unresolved; preserve it as unknown.",
+              "evidence_refs": [
+                "fixture:legal-privacy-dpa-review:source-1"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "fixture_id": "empty-completed-draft-rejected",
+      "expected_valid": false,
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": null,
+        "evidence_refs": [],
+        "open_questions": [],
+        "review_owner_role": "Synthetic completed task for legal-privacy-dpa-review: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "direction_and_scope": "",
+          "article_clause_inventory": "",
+          "risk_and_gap_matrix": "",
+          "proposed_redlines": "",
+          "privacy_policy_consistency": "",
+          "review_questions": [],
+          "partial_work": [],
+          "missing_inputs": [],
+          "unknown_facts": []
+        }
+      }
+    }
+  ],
+  "fixture_note": "All values are fictional task-shaped contract examples derived from this pack’s golden scenario and criteria; these files are schema evidence, not executed results or business/legal facts."
+}

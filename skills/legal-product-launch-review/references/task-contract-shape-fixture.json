@@ -1,0 +1,161 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "legal-product-launch-review",
+  "input_schema_ref": "references/schemas.json#/definitions/input",
+  "output_schema_ref": "references/schemas.json#/definitions/output",
+  "completion_required_fields": [
+    "scope_and_source_coverage",
+    "category_findings",
+    "cross_review_dependencies",
+    "launch_conditions_and_unresolved_risks"
+  ],
+  "fixtures": [
+    {
+      "fixture_id": "synthetic-task-shaped-completed",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261005-0900-SARA-123456",
+        "request_ref": "fixture:legal-product-launch-review:request",
+        "source_refs": [
+          "fixture:legal-product-launch-review:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "task_request": "A fictional app launch has a new data-sharing feature and two unresolved claims; identify linked review areas and evidence gaps rather than issue a launch decision.",
+          "source_documents": [
+            "Synthetic input fixture for legal-product-launch-review: source documents. Fictional test content only; no real-world facts."
+          ],
+          "company_context": "Synthetic input fixture for legal-product-launch-review: company context. Fictional test content only; no real-world facts.",
+          "applicability_context": "Synthetic input fixture for legal-product-launch-review: applicability context. Fictional test content only; no real-world facts.",
+          "review_owner": "Synthetic input fixture for legal-product-launch-review: review owner. Fictional test content only; no real-world facts.",
+          "product_and_release": "Synthetic input fixture for legal-product-launch-review: product and release. Fictional test content only; no real-world facts.",
+          "territories_and_audiences": "Synthetic input fixture for legal-product-launch-review: territories and audiences. Fictional test content only; no real-world facts.",
+          "evidence_set": "Synthetic input fixture for legal-product-launch-review: evidence set. Fictional test content only; no real-world facts.",
+          "launch_gates": "Synthetic input fixture for legal-product-launch-review: launch gates. Fictional test content only; no real-world facts.",
+          "current_authorities": "Synthetic input fixture for legal-product-launch-review: current authorities. Fictional test content only; no real-world facts."
+        }
+      },
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": "fixture:legal-product-launch-review:draft",
+        "evidence_refs": [
+          "fixture:legal-product-launch-review:source-1"
+        ],
+        "open_questions": [],
+        "review_owner_role": "Synthetic completed task for legal-product-launch-review: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "scope_and_source_coverage": "Fictional legal-product-launch-review scope and source coverage section. Scenario: A fictional app launch has a new data-sharing feature and two unresolved claims; identify linked review areas and evidence gaps rather than issue a launch decision. Expected handling: Produces the product launch legal review deliverable with task-specific fields and not a generic departmental summary. Cites supplied evidence and preserves unknown, conflicting or unsupported facts. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "category_findings": [
+            "Fictional legal-product-launch-review category findings section. Scenario: A fictional app launch has a new data-sharing feature and two unresolved claims; identify linked review areas and evidence gaps rather than issue a launch decision. Expected handling: Produces the product launch legal review deliverable with task-specific fields and not a generic departmental summary. Cites supplied evidence and preserves unknown, conflicting or unsupported facts. This is illustrative synthetic content only, not a real fact, legal authority, or executed result."
+          ],
+          "cross_review_dependencies": "Fictional legal-product-launch-review cross review dependencies section. Scenario: A fictional app launch has a new data-sharing feature and two unresolved claims; identify linked review areas and evidence gaps rather than issue a launch decision. Expected handling: Produces the product launch legal review deliverable with task-specific fields and not a generic departmental summary. Cites supplied evidence and preserves unknown, conflicting or unsupported facts. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "launch_conditions_and_unresolved_risks": [
+            "Fictional legal-product-launch-review launch conditions and unresolved risks section. Scenario: A fictional app launch has a new data-sharing feature and two unresolved claims; identify linked review areas and evidence gaps rather than issue a launch decision. Expected handling: Produces the product launch legal review deliverable with task-specific fields and not a generic departmental summary. Cites supplied evidence and preserves unknown, conflicting or unsupported facts. This is illustrative synthetic content only, not a real fact, legal authority, or executed result."
+          ],
+          "owner_decisions": [],
+          "partial_work": [],
+          "missing_inputs": [],
+          "unknown_facts": []
+        }
+      }
+    },
+    {
+      "fixture_id": "needs-context-preserves-partial-and-unknowns",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261005-0900-SARA-123456",
+        "request_ref": "fixture:legal-product-launch-review:request",
+        "source_refs": [
+          "fixture:legal-product-launch-review:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "task_request": "Prepare a synthetic legal-product-launch-review deliverable from this fictional test record; make no real-world factual or legal claim.",
+          "source_documents": [
+            "Synthetic input fixture for legal-product-launch-review: source documents. Fictional test content only; no real-world facts."
+          ],
+          "company_context": "Synthetic input fixture for legal-product-launch-review: company context. Fictional test content only; no real-world facts.",
+          "applicability_context": "Synthetic input fixture for legal-product-launch-review: applicability context. Fictional test content only; no real-world facts.",
+          "review_owner": "Synthetic input fixture for legal-product-launch-review: review owner. Fictional test content only; no real-world facts.",
+          "product_and_release": "Synthetic input fixture for legal-product-launch-review: product and release. Fictional test content only; no real-world facts.",
+          "territories_and_audiences": "Synthetic input fixture for legal-product-launch-review: territories and audiences. Fictional test content only; no real-world facts.",
+          "evidence_set": "Synthetic input fixture for legal-product-launch-review: evidence set. Fictional test content only; no real-world facts.",
+          "launch_gates": "Synthetic input fixture for legal-product-launch-review: launch gates. Fictional test content only; no real-world facts.",
+          "current_authorities": "Synthetic input fixture for legal-product-launch-review: current authorities. Fictional test content only; no real-world facts."
+        }
+      },
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "needs_context",
+        "artifact_ref": "fixture:legal-product-launch-review:partial",
+        "evidence_refs": [],
+        "open_questions": [
+          "Confirm the named missing input with its owner."
+        ],
+        "review_owner_role": "Synthetic completed task for legal-product-launch-review: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "scope_and_source_coverage": "",
+          "category_findings": [],
+          "cross_review_dependencies": "",
+          "launch_conditions_and_unresolved_risks": [],
+          "owner_decisions": [],
+          "partial_work": [
+            {
+              "section": "scope_and_source_coverage",
+              "content": "Partial legal-product-launch-review fixture: source inventory recorded; one dependent conclusion remains unknown.",
+              "evidence_refs": [
+                "fixture:legal-product-launch-review:source-1"
+              ]
+            }
+          ],
+          "missing_inputs": [
+            {
+              "field": "authorized_source_or_material_fact",
+              "reason": "Synthetic missing-context scenario: The task arrives with a material missing fact or inaccessible authority needed for one conclusion. Complete separable source-grounded work and state the exact missing evidence, owner and next check.",
+              "requested_owner": "task owner"
+            }
+          ],
+          "unknown_facts": [
+            {
+              "fact": "task-specific applicability or evidence fact",
+              "why_unknown": "The edge scenario intentionally leaves this required fact or authority unresolved; preserve it as unknown.",
+              "evidence_refs": [
+                "fixture:legal-product-launch-review:source-1"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "fixture_id": "empty-completed-draft-rejected",
+      "expected_valid": false,
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": null,
+        "evidence_refs": [],
+        "open_questions": [],
+        "review_owner_role": "Synthetic completed task for legal-product-launch-review: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "scope_and_source_coverage": "",
+          "category_findings": [],
+          "cross_review_dependencies": "",
+          "launch_conditions_and_unresolved_risks": [],
+          "owner_decisions": [],
+          "partial_work": [],
+          "missing_inputs": [],
+          "unknown_facts": []
+        }
+      }
+    }
+  ],
+  "fixture_note": "All values are fictional task-shaped contract examples derived from this pack’s golden scenario and criteria; these files are schema evidence, not executed results or business/legal facts."
+}

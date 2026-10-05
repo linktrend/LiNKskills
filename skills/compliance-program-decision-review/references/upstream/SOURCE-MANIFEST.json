@@ -1,0 +1,173 @@
+{
+  "schema_version": "0.1",
+  "adaptation_state": "candidate_staging_only",
+  "sources": [
+    {
+      "source_id": "alireza-compliance-readiness-six-question-review",
+      "source_repository": "https://github.com/alirezarezvani/claude-skills",
+      "source_commit": "19392f7a08264ed00486a251f5b2098321771f94",
+      "source_skill_path": "compliance-os/skills/compliance-readiness/SKILL.md",
+      "source_skill_sha256": "c6a621a1f6a708823d5f9548f0ae955d5aced533eba6ac027f235163f2db90aa",
+      "source_license": "MIT",
+      "license_copy": "references/upstream/licenses/alirezarezvani-claude-skills/LICENSE",
+      "license_sha256": "a20126646f93d32a8989c3cf4772d59194f405034f7babe7daebeac22b8ab151",
+      "preserved_files": [
+        {
+          "source_path": "compliance-os/skills/compliance-readiness/SKILL.md",
+          "copy_path": "references/upstream/source/alirezarezvani-claude-skills/compliance-os/skills/compliance-readiness/SKILL.md",
+          "sha256": "c6a621a1f6a708823d5f9548f0ae955d5aced533eba6ac027f235163f2db90aa",
+          "bytes": 5544
+        },
+        {
+          "source_path": "compliance-os/README.md",
+          "copy_path": "references/upstream/source/shared/compliance-os/README.md",
+          "sha256": "a4fc242ce9c6fbb5b72fd9bac7af7fc0ac0484951524eb1def8a0088c2a92a41",
+          "bytes": 3575
+        },
+        {
+          "source_path": "LICENSE",
+          "copy_path": "references/upstream/licenses/alirezarezvani-claude-skills/LICENSE",
+          "sha256": "a20126646f93d32a8989c3cf4772d59194f405034f7babe7daebeac22b8ab151",
+          "bytes": 1072
+        }
+      ],
+      "source_task_role": "current_task_owner",
+      "active_task_destination": "compliance-program-decision-review",
+      "task_contract": {
+        "trigger": "For an authorized decision-owner review on framework commitment/scope, an annual audit-calendar proposal, cross-framework evidence consolidation, mock-audit findings, management-review decisions, or certification-stage-1 sign-off.",
+        "inputs": [
+          "decision request and owner role or unknown",
+          "candidate frameworks with asserted basis, scope, evidence refs",
+          "authorized program source documents",
+          "evidence inventory with artifact, owner, period/date, source ref",
+          "proposed audit calendar with auditor role and source ref",
+          "mock-audit record or explicit absence",
+          "management-review record or explicit absence",
+          "jurisdiction/applicability and as-of facts or explicit unknowns"
+        ],
+        "output": "Six-question evidence-grounded review/decision packet with gaps, trade-offs, open facts and owner options; no option is selected.",
+        "non_goals": [
+          "No final framework applicability or legal determination without required review",
+          "No policy, budget, calendar or commitment approval",
+          "No certification, audit opinion or readiness declaration",
+          "No external effect or official record mutation"
+        ]
+      },
+      "support_files_note": "The source entrypoint cites a wider Compliance OS support package. The exact pinned 14-file compliance-os skill subtree is preserved as a separate archived_support source entry below; it is not part of this active six-question task and its scripts are not invoked or callable."
+    },
+    {
+      "source_id": "alireza-compliance-os-support-subtree",
+      "source_task_id": "compliance-framework-compliance-os",
+      "source_repository": "https://github.com/alirezarezvani/claude-skills",
+      "source_commit": "19392f7a08264ed00486a251f5b2098321771f94",
+      "source_skill_path": "compliance-os/skills/compliance-os/SKILL.md",
+      "source_skill_sha256": "0d05747013572dbcf093c05f3fd536f96b56e5bdd92bf780f0dfed9aaeb191bd",
+      "source_license": "MIT",
+      "license_copy": "references/upstream/licenses/alirezarezvani-claude-skills/LICENSE",
+      "license_sha256": "a20126646f93d32a8989c3cf4772d59194f405034f7babe7daebeac22b8ab151",
+      "source_task_role": "archived_support",
+      "active_task_destination": null,
+      "supports_source_id": "alireza-compliance-readiness-six-question-review",
+      "supporting_files": [
+        {
+          "source_path": "compliance-os/skills/compliance-os/SKILL.md",
+          "copy_path": "references/upstream/source/alirezarezvani_claude-skills/compliance-os/skills/compliance-os/SKILL.md",
+          "sha256": "0d05747013572dbcf093c05f3fd536f96b56e5bdd92bf780f0dfed9aaeb191bd",
+          "bytes": 13152
+        },
+        {
+          "source_path": "compliance-os/skills/compliance-os/assets/company_profile_template.json",
+          "copy_path": "references/upstream/source/alirezarezvani_claude-skills/compliance-os/skills/compliance-os/assets/company_profile_template.json",
+          "sha256": "c064e63b1528df579ee1fa3e0e9f505c6ef1876d6d488a09fea22310cef18e8b",
+          "bytes": 747
+        },
+        {
+          "source_path": "compliance-os/skills/compliance-os/assets/control_library_template.json",
+          "copy_path": "references/upstream/source/alirezarezvani_claude-skills/compliance-os/skills/compliance-os/assets/control_library_template.json",
+          "sha256": "0dd156370b2d7390452f33a0c034bbb6b0d7dc401ec88e91bad52eaa0e1786b7",
+          "bytes": 483
+        },
+        {
+          "source_path": "compliance-os/skills/compliance-os/assets/mock_audit_library.json",
+          "copy_path": "references/upstream/source/alirezarezvani_claude-skills/compliance-os/skills/compliance-os/assets/mock_audit_library.json",
+          "sha256": "ea76c99562840c4ebf8510c6f6304ea2103749a2efa98db21e985b2623170d8d",
+          "bytes": 88795
+        },
+        {
+          "source_path": "compliance-os/skills/compliance-os/references/audit_simulation_methodology.md",
+          "copy_path": "references/upstream/source/alirezarezvani_claude-skills/compliance-os/skills/compliance-os/references/audit_simulation_methodology.md",
+          "sha256": "0a93d364db922bd17952d21e8511e4561ecef22cd275c55c86ff596fc58e9241",
+          "bytes": 8270
+        },
+        {
+          "source_path": "compliance-os/skills/compliance-os/references/compliance_os_pattern.md",
+          "copy_path": "references/upstream/source/alirezarezvani_claude-skills/compliance-os/skills/compliance-os/references/compliance_os_pattern.md",
+          "sha256": "721e36478eb2fba2df6b499650d0e4a18417941e4aaaeeac21f67a5347148962",
+          "bytes": 9505
+        },
+        {
+          "source_path": "compliance-os/skills/compliance-os/references/cross_framework_overlap.md",
+          "copy_path": "references/upstream/source/alirezarezvani_claude-skills/compliance-os/skills/compliance-os/references/cross_framework_overlap.md",
+          "sha256": "f336600175ba1d94b4480d22669b3accf2971f62e1d36e43a3ef5d30c0e5ce7e",
+          "bytes": 7071
+        },
+        {
+          "source_path": "compliance-os/skills/compliance-os/references/evidence_artifact_reuse_index.md",
+          "copy_path": "references/upstream/source/alirezarezvani_claude-skills/compliance-os/skills/compliance-os/references/evidence_artifact_reuse_index.md",
+          "sha256": "ae11cc496bc2ce6829adf83574cf11ae393bac77df316014e892c694a5fcb285",
+          "bytes": 11363
+        },
+        {
+          "source_path": "compliance-os/skills/compliance-os/references/evidence_management.md",
+          "copy_path": "references/upstream/source/alirezarezvani_claude-skills/compliance-os/skills/compliance-os/references/evidence_management.md",
+          "sha256": "36aa35f08d6e84905ddc5e2de6159c5867c641f928f31609aa4797592e3db30c",
+          "bytes": 8475
+        },
+        {
+          "source_path": "compliance-os/skills/compliance-os/references/multi_framework_audit_playbook.md",
+          "copy_path": "references/upstream/source/alirezarezvani_claude-skills/compliance-os/skills/compliance-os/references/multi_framework_audit_playbook.md",
+          "sha256": "7bd867012a94688a7e83495d48957cc09fa1aff3744dd46175aaa51b4cd31935",
+          "bytes": 9298
+        },
+        {
+          "source_path": "compliance-os/skills/compliance-os/scripts/audit_simulator.py",
+          "copy_path": "references/upstream/source/alirezarezvani_claude-skills/compliance-os/skills/compliance-os/scripts/audit_simulator.py",
+          "sha256": "9c6b1949fe64882bab8b93241af883461b9389dcfa4fc567c13c9a0d09aa31dc",
+          "bytes": 16126
+        },
+        {
+          "source_path": "compliance-os/skills/compliance-os/scripts/cross_framework_mapper.py",
+          "copy_path": "references/upstream/source/alirezarezvani_claude-skills/compliance-os/skills/compliance-os/scripts/cross_framework_mapper.py",
+          "sha256": "885e1f48a6b22b2f93aaa2da17c02359f90e13aeb8725177bbfac3144e33a1b2",
+          "bytes": 22062
+        },
+        {
+          "source_path": "compliance-os/skills/compliance-os/scripts/evidence_pool_generator.py",
+          "copy_path": "references/upstream/source/alirezarezvani_claude-skills/compliance-os/skills/compliance-os/scripts/evidence_pool_generator.py",
+          "sha256": "e1b7c3d0b4af57b406134b8f388d265feeb6fad595de4faf1d357da1919ea1b6",
+          "bytes": 13748
+        },
+        {
+          "source_path": "compliance-os/skills/compliance-os/scripts/framework_selector.py",
+          "copy_path": "references/upstream/source/alirezarezvani_claude-skills/compliance-os/skills/compliance-os/scripts/framework_selector.py",
+          "sha256": "9dc2b07acfb160913b1855d97587b2bf305d22c5d4bd9efbb5f822b91ee28d36",
+          "bytes": 13474
+        }
+      ],
+      "use_limit": "Exact source bytes are retained for provenance only. The four Python utilities, assets and references are not executed, exposed as Sara tools, or used to assert current law, framework applicability, company facts, certification, or control effectiveness.",
+      "excluded_source_subtrees": [
+        "compliance-os/agents (role prompts are not required by the six-question review task)"
+      ],
+      "support_file_classes": {
+        "entrypoints": 1,
+        "scripts": 4,
+        "assets": 3,
+        "references": 6
+      }
+    }
+  ],
+  "source_copy_integrity": "All declared preserved source files verified by byte count and SHA-256 against the current pinned copies; both source-task roles are explicit.",
+  "semantic_reviewed": false,
+  "publication_or_admission_claimed": false,
+  "license_notes": "Exact MIT notice preserved. Carlos handles licensing; no new licensing approval gate is asserted."
+}

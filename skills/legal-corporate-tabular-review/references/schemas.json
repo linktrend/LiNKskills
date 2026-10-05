@@ -1,0 +1,740 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "request_ref",
+        "source_refs",
+        "data_classification",
+        "task_inputs"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "pattern": "^\\d{8}-\\d{4}-[A-Z0-9]+-\\d{6}$"
+        },
+        "request_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "data_classification": {
+          "type": "string",
+          "enum": [
+            "synthetic",
+            "redacted",
+            "restricted",
+            "sensitive",
+            "unknown"
+          ]
+        },
+        "task_inputs": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "legal_corporate_tabular_review_task_payload",
+            "task_request",
+            "source_documents",
+            "company_or_matter_facts",
+            "jurisdiction_and_as_of",
+            "approved_positions_or_policy_ref"
+          ],
+          "properties": {
+            "task_request": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Exact requested deliverable and boundaries."
+            },
+            "source_documents": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1,
+              "description": "Authorized document, record, or evidence references."
+            },
+            "company_or_matter_facts": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Founder-confirmed facts and company/matter context; unknowns remain explicit."
+            },
+            "jurisdiction_and_as_of": {
+              "type": [
+                "object",
+                "null"
+              ],
+              "description": "Only actual jurisdiction(s) supplied or established from authoritative evidence, plus as-of date. Null when not applicable/known.",
+              "properties": {
+                "jurisdictions": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "as_of_date": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date"
+                }
+              },
+              "required": [
+                "jurisdictions",
+                "as_of_date"
+              ],
+              "additionalProperties": false
+            },
+            "approved_positions_or_policy_ref": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "Approved policy/playbook/position reference, if supplied; absence is not permission to invent one."
+            },
+            "legal_corporate_tabular_review_task_payload": {
+              "type": "object",
+              "description": "Task-specific factual inputs for legal-corporate-tabular-review. Each named field records verified, principal-reported, proposed, conflicting, or explicitly unknown status and supporting evidence references.",
+              "additionalProperties": false,
+              "required": [
+                "source_table_and_schema",
+                "rows_and_fields_in_scope",
+                "validation_rules_or_reference_values",
+                "source_links_and_correction_authority"
+              ],
+              "properties": {
+                "source_table_and_schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "fact_status",
+                    "value",
+                    "evidence_refs"
+                  ],
+                  "properties": {
+                    "fact_status": {
+                      "type": "string",
+                      "enum": [
+                        "verified",
+                        "principal_reported",
+                        "proposed",
+                        "conflicting",
+                        "unknown"
+                      ],
+                      "description": "Explicitly distinguish source status; use unknown rather than infer."
+                    },
+                    "value": {
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "description": "source table and schema; null is valid when fact_status is unknown."
+                    },
+                    "evidence_refs": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "Source references supporting the value; empty when unknown."
+                    }
+                  }
+                },
+                "rows_and_fields_in_scope": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "fact_status",
+                    "value",
+                    "evidence_refs"
+                  ],
+                  "properties": {
+                    "fact_status": {
+                      "type": "string",
+                      "enum": [
+                        "verified",
+                        "principal_reported",
+                        "proposed",
+                        "conflicting",
+                        "unknown"
+                      ],
+                      "description": "Explicitly distinguish source status; use unknown rather than infer."
+                    },
+                    "value": {
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "description": "rows and fields in scope; null is valid when fact_status is unknown."
+                    },
+                    "evidence_refs": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "Source references supporting the value; empty when unknown."
+                    }
+                  }
+                },
+                "validation_rules_or_reference_values": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "fact_status",
+                    "value",
+                    "evidence_refs"
+                  ],
+                  "properties": {
+                    "fact_status": {
+                      "type": "string",
+                      "enum": [
+                        "verified",
+                        "principal_reported",
+                        "proposed",
+                        "conflicting",
+                        "unknown"
+                      ],
+                      "description": "Explicitly distinguish source status; use unknown rather than infer."
+                    },
+                    "value": {
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "description": "validation rules or reference values; null is valid when fact_status is unknown."
+                    },
+                    "evidence_refs": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "Source references supporting the value; empty when unknown."
+                    }
+                  }
+                },
+                "source_links_and_correction_authority": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "fact_status",
+                    "value",
+                    "evidence_refs"
+                  ],
+                  "properties": {
+                    "fact_status": {
+                      "type": "string",
+                      "enum": [
+                        "verified",
+                        "principal_reported",
+                        "proposed",
+                        "conflicting",
+                        "unknown"
+                      ],
+                      "description": "Explicitly distinguish source status; use unknown rather than infer."
+                    },
+                    "value": {
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "description": "source links and correction authority; null is valid when fact_status is unknown."
+                    },
+                    "evidence_refs": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "Source references supporting the value; empty when unknown."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "status",
+        "artifact_ref",
+        "evidence_refs",
+        "open_questions",
+        "review_owner_role",
+        "external_effects",
+        "mutations",
+        "work_product"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "completed_draft",
+            "needs_context",
+            "escalate",
+            "blocked"
+          ]
+        },
+        "artifact_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "open_questions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "review_owner_role": {
+          "type": "string"
+        },
+        "external_effects": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "mutations": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "work_product": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [],
+          "properties": {
+            "partial_work": {
+              "type": "string",
+              "minLength": 1
+            },
+            "missing_inputs": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "unknown_facts": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "legal_corporate_tabular_review_work_product": {
+              "type": "object",
+              "additionalProperties": false,
+              "description": "Task-specific output sections derived from the active method: row-level exception register, validated field coverage, source links, proposed corrections and unresolved interpretation questions.",
+              "properties": {
+                "row_level_exception_register": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "content",
+                      "evidence_refs"
+                    ],
+                    "properties": {
+                      "content": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "evidence_refs": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "verified",
+                          "principal_reported",
+                          "proposed",
+                          "conflicting",
+                          "unknown"
+                        ]
+                      }
+                    }
+                  },
+                  "description": "Rows/items for row-level exception register. Use status unknown and list the missing evidence rather than infer."
+                },
+                "validated_field_coverage": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "content",
+                      "evidence_refs"
+                    ],
+                    "properties": {
+                      "content": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "evidence_refs": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "verified",
+                          "principal_reported",
+                          "proposed",
+                          "conflicting",
+                          "unknown"
+                        ]
+                      }
+                    }
+                  },
+                  "description": "Rows/items for validated field coverage. Use status unknown and list the missing evidence rather than infer."
+                },
+                "source_links": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "content",
+                    "evidence_refs",
+                    "fact_status"
+                  ],
+                  "properties": {
+                    "content": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "evidence_refs": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "fact_status": {
+                      "type": "string",
+                      "enum": [
+                        "verified",
+                        "principal_reported",
+                        "proposed",
+                        "conflicting",
+                        "unknown"
+                      ]
+                    }
+                  },
+                  "description": "Section for source links. Keep uncertainty explicit."
+                },
+                "proposed_corrections": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "content",
+                    "evidence_refs",
+                    "fact_status"
+                  ],
+                  "properties": {
+                    "content": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "evidence_refs": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "fact_status": {
+                      "type": "string",
+                      "enum": [
+                        "verified",
+                        "principal_reported",
+                        "proposed",
+                        "conflicting",
+                        "unknown"
+                      ]
+                    }
+                  },
+                  "description": "Section for proposed corrections. Keep uncertainty explicit."
+                },
+                "unresolved_interpretation_questions": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "content",
+                      "evidence_refs"
+                    ],
+                    "properties": {
+                      "content": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "evidence_refs": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "verified",
+                          "principal_reported",
+                          "proposed",
+                          "conflicting",
+                          "unknown"
+                        ]
+                      }
+                    }
+                  },
+                  "description": "Rows/items for unresolved interpretation questions. Use status unknown and list the missing evidence rather than infer."
+                },
+                "evidence_trace": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "source_ref",
+                      "location",
+                      "supports"
+                    ],
+                    "properties": {
+                      "source_ref": {
+                        "type": "string"
+                      },
+                      "location": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "supports": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "jurisdiction_and_as_of": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "jurisdictions",
+                    "as_of_date"
+                  ],
+                  "properties": {
+                    "jurisdictions": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "as_of_date": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "format": "date"
+                    }
+                  }
+                },
+                "assumptions_and_gaps": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "proposed_next_steps": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "row_level_exception_register",
+                "validated_field_coverage",
+                "source_links",
+                "proposed_corrections",
+                "unresolved_interpretation_questions",
+                "evidence_trace",
+                "jurisdiction_and_as_of",
+                "assumptions_and_gaps",
+                "proposed_next_steps"
+              ]
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "completed_draft"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "work_product": {
+                "required": [
+                  "legal_corporate_tabular_review_work_product"
+                ],
+                "properties": {
+                  "legal_corporate_tabular_review_work_product": {
+                    "required": [
+                      "row_level_exception_register",
+                      "validated_field_coverage",
+                      "source_links",
+                      "proposed_corrections",
+                      "unresolved_interpretation_questions",
+                      "evidence_trace",
+                      "jurisdiction_and_as_of",
+                      "assumptions_and_gaps",
+                      "proposed_next_steps"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "needs_context"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "work_product": {
+                "required": [
+                  "partial_work",
+                  "missing_inputs",
+                  "unknown_facts"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "phase",
+        "status",
+        "checkpoint_ref",
+        "updated_at"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string"
+        },
+        "phase": {
+          "type": "string",
+          "enum": [
+            "intake",
+            "evidence",
+            "analysis",
+            "draft",
+            "quality_check",
+            "delivered"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "in_progress",
+            "waiting_for_input",
+            "completed_draft",
+            "blocked"
+          ]
+        },
+        "checkpoint_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Reference from consumer-owner supported checkpoint interface; never write local JSONL runtime state."
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}

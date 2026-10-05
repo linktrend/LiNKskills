@@ -1,0 +1,3 @@
+# Native tool and persistence boundary
+
+The Golden Template labels native CLI, CLI wrapper, direct API and MCP as routing levels. These do not imply those interfaces exist for Sara. The abstract labels `read_file`, `list_dir`, `get_tool_details`, and `write_file` are not guaranteed callable tools. Use current native `read`/`write`/`edit` only on known authorized paths and requested internal drafts; inspect current schemas/owner cards instead of calling an invented alias. Do not run preserved upstream scripts. If the runtime has no approved interface for an input, work from supplied evidence and name the exact gap. Checkpoints must use the consumer owner interface; do not create local runtime sidecars.

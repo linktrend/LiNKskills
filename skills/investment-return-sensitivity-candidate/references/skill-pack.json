@@ -1,0 +1,143 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "investment-return-sensitivity-candidate",
+  "display_name": "Investment Return Sensitivity Analysis",
+  "version": "1.0.0",
+  "description": "Calculate and compare investor returns for explicit cash flow assumptions; do not substitute for an LBO model or make an investment recommendation.",
+  "capability_category": "conditional_finance_task",
+  "provenance": {
+    "author": "LiNKskills Library",
+    "source": "Pinned source subtree copied verbatim; see references/upstream/SOURCE-MANIFEST.json",
+    "license": "Apache-2.0; exact original notice preserved in references/upstream/_licenses"
+  },
+  "lifecycle_state": "draft",
+  "format_profile": "heavy",
+  "compatible_runtime_profiles": [
+    "lisa-openclaw",
+    "cursor-macos"
+  ],
+  "min_capability_tier": "balanced",
+  "routing": {
+    "when_to_use": "Use when asked to calculate deal-level IRR/MOIC scenarios or sensitivity across entry/exit valuation, leverage, growth or hold period with supplied deal cash flows.",
+    "when_not_to_use": [
+      "Entity/fund/task applicability is not confirmed",
+      "A different atomic task has its own skill",
+      "Requested output is an unapproved action or external effect"
+    ],
+    "tags": [
+      "finance",
+      "conditional",
+      "task-specific"
+    ],
+    "exclusion_rules": [
+      "No pack text grants authority",
+      "No system mutation or external communication"
+    ],
+    "ambiguity_rules": [
+      "Continue unaffected work and request only facts that materially change the result"
+    ],
+    "recommended_disclosure_level": 2
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "scope_and_source_inputs",
+        "description": "dated/periodic investment outflows and distributions; entry/exit values/multiples; EBITDA/growth trajectory; net debt/leverage; fees/carry/rollover if relevant; hold period; scenario axes and intended gross/net basis."
+      }
+    ],
+    "expected_outputs": [
+      {
+        "name": "task_work_product",
+        "description": "base-case equity cash flow series, gross/net return metrics as supported, return attribution, sensitivity tables, scenario assumptions and limitations."
+      }
+    ],
+    "forbidden_actions": [
+      "Mutation of company, fund, Odoo, accounting, payroll or source records",
+      "Payments, filings, signatures, publications, messages, approvals, trades or transaction commitments",
+      "Inventing current law, jurisdiction, entity/fund applicability or missing facts"
+    ],
+    "verification_steps": [
+      "1. Define investor, equity basis, gross/net convention, dates, currency, and whether interim distributions or fees/carry are included. 2. Check entry EV, entry equity, fees, ownership and financing inputs; keep each unsupported component out of claimed results. 3. Project exit EBITDA from supplied growth/margin path; compute exit EV from multiple, subtract debt and other claims, add only documented distributions. 4. Build signed cash flow series: contributions negative, distributions/proceeds positive. MOIC = total positive proceeds / absolute total invested; IRR solves dated cash-flow NPV=0 (XIRR for uneven dates); for single terminal cash flow, IRR=(proceeds/investment)^(1/years)-1. 5. Explain return bridge using growth, multiple change, debt paydown and fee/expense drag; do not double-count overlapping components. 6. Create requested two-variable sensitivities for entry vs exit multiple, growth vs exit multiple, leverage vs exit multiple, or hold period vs exit multiple. Recompute full outputs in every cell. Show IRR/MOIC and anchor center cell to base. 7. Compare bear/base/bull with explicit assumptions, annotate nonlinearity/IRR limitations, and distinguish sensitivities from probability-weighted forecast. 8. Return a concise decision-support page; no investment vote, offer or transaction action.",
+      "Show formulas/denominators, evidence dates and assumptions; preserve unresolved conflicts.",
+      "Write only a requested private draft; no external effects."
+    ],
+    "completion_criteria": [
+      "Conditional task scope is evidenced or limitations explicitly bound",
+      "Task method and calculation are reproducible from cited inputs",
+      "Owner decisions, open issues and source limitations are explicit"
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read",
+      "filesystem_write"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [
+      {
+        "key": "min_reasoning_tier",
+        "value": "balanced"
+      },
+      {
+        "key": "context_required",
+        "value": 32000
+      },
+      {
+        "key": "preferred_model",
+        "value": "gpt-6.1-sol"
+      }
+    ],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "required_certification_profiles": [],
+    "verification_refs": [
+      "references/eval-suite.yaml",
+      "references/source-selection.md"
+    ]
+  },
+  "telemetry": {
+    "classification": "restricted",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_personal_data",
+      "strip_private_finance_data",
+      "strip_reasoning"
+    ],
+    "retention_policy": "opaque task/source IDs and hashes only"
+  },
+  "fragments": [
+    {
+      "fragment_id": "skill-md",
+      "disclosure_level": 2,
+      "path": "SKILL.md"
+    },
+    {
+      "fragment_id": "advanced",
+      "disclosure_level": 3,
+      "path": "advanced/advanced.md"
+    },
+    {
+      "fragment_id": "schemas",
+      "disclosure_level": 5,
+      "path": "references/schemas.json"
+    },
+    {
+      "fragment_id": "eval",
+      "disclosure_level": 3,
+      "path": "references/eval-suite.json"
+    },
+    {
+      "fragment_id": "source-selection",
+      "disclosure_level": 3,
+      "path": "references/source-selection.md"
+    }
+  ],
+  "release_channel": "development"
+}

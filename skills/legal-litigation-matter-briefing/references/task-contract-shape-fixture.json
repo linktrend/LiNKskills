@@ -1,0 +1,138 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "legal-litigation-matter-briefing",
+  "input_schema_ref": "references/schemas.json#/definitions/input",
+  "output_schema_ref": "references/schemas.json#/definitions/output",
+  "completion_required_fields": [
+    "matter_briefing",
+    "deadline_register"
+  ],
+  "fixtures": [
+    {
+      "fixture_id": "synthetic-task-shaped-completed",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261005-0900-SARA-123456",
+        "request_ref": "fixture:legal-litigation-matter-briefing:request",
+        "source_refs": [
+          "fixture:legal-litigation-matter-briefing:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "matter_ref": "Synthetic input fixture for legal-litigation-matter-briefing: matter ref. Fictional test content only; no real-world facts.",
+          "matter_and_history_refs": "Synthetic input fixture for legal-litigation-matter-briefing: matter and history refs. Fictional test content only; no real-world facts.",
+          "latest_source_refs": "Synthetic input fixture for legal-litigation-matter-briefing: latest source refs. Fictional test content only; no real-world facts.",
+          "risk_definitions": "Synthetic input fixture for legal-litigation-matter-briefing: risk definitions. Fictional test content only; no real-world facts.",
+          "jurisdiction_forum_and_as_of_date": "Synthetic input fixture for legal-litigation-matter-briefing: jurisdiction forum and as of date. Fictional test content only; no real-world facts."
+        }
+      },
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": "fixture:legal-litigation-matter-briefing:draft",
+        "evidence_refs": [
+          "fixture:legal-litigation-matter-briefing:source-1"
+        ],
+        "open_questions": [],
+        "review_owner_role": "Synthetic completed task for legal-litigation-matter-briefing: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "matter_briefing": "Fictional legal-litigation-matter-briefing matter briefing section. Scenario: Fictional matter has a 45-day-old status note, a new counsel email, and a court notice with a hearing date but no confirmed response rule. Summarize the update, quote the hearing date with its source, flag status staleness and leave any response deadline for counsel. Expected handling: All status changes link to dated sources. Deadlines are stated-versus-calculated and source separated. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "deadline_register": "Fictional legal-litigation-matter-briefing deadline register section. Scenario: Fictional matter has a 45-day-old status note, a new counsel email, and a court notice with a hearing date but no confirmed response rule. Summarize the update, quote the hearing date with its source, flag status staleness and leave any response deadline for counsel. Expected handling: All status changes link to dated sources. Deadlines are stated-versus-calculated and source separated. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "risk_and_decision_questions": "No unresolved item in this synthetic complete fixture.",
+          "open_items": "No unresolved item in this synthetic complete fixture.",
+          "partial_work": [],
+          "missing_inputs": [],
+          "unknown_facts": []
+        }
+      }
+    },
+    {
+      "fixture_id": "needs-context-preserves-partial-and-unknowns",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261005-0900-SARA-123456",
+        "request_ref": "fixture:legal-litigation-matter-briefing:request",
+        "source_refs": [
+          "fixture:legal-litigation-matter-briefing:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "matter_ref": "Synthetic input fixture for legal-litigation-matter-briefing: matter ref. Fictional test content only; no real-world facts.",
+          "matter_and_history_refs": "Synthetic input fixture for legal-litigation-matter-briefing: matter and history refs. Fictional test content only; no real-world facts.",
+          "latest_source_refs": "Synthetic input fixture for legal-litigation-matter-briefing: latest source refs. Fictional test content only; no real-world facts.",
+          "risk_definitions": "Synthetic input fixture for legal-litigation-matter-briefing: risk definitions. Fictional test content only; no real-world facts.",
+          "jurisdiction_forum_and_as_of_date": "Synthetic input fixture for legal-litigation-matter-briefing: jurisdiction forum and as of date. Fictional test content only; no real-world facts."
+        }
+      },
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "needs_context",
+        "artifact_ref": "fixture:legal-litigation-matter-briefing:partial",
+        "evidence_refs": [],
+        "open_questions": [
+          "Confirm the named missing input with its owner."
+        ],
+        "review_owner_role": "Synthetic completed task for legal-litigation-matter-briefing: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "matter_briefing": "",
+          "deadline_register": "",
+          "risk_and_decision_questions": "",
+          "open_items": "",
+          "partial_work": [
+            {
+              "section": "matter_briefing",
+              "content": "Partial legal-litigation-matter-briefing fixture: source inventory recorded; one dependent conclusion remains unknown.",
+              "evidence_refs": [
+                "fixture:legal-litigation-matter-briefing:source-1"
+              ]
+            }
+          ],
+          "missing_inputs": [
+            {
+              "field": "authorized_source_or_material_fact",
+              "reason": "Synthetic missing-context scenario: A material source or jurisdiction-specific fact is missing and another portion of the draft remains possible. Complete separable work and mark only dependent conclusions unresolved.",
+              "requested_owner": "task owner"
+            }
+          ],
+          "unknown_facts": [
+            {
+              "fact": "task-specific applicability or evidence fact",
+              "why_unknown": "The edge scenario intentionally leaves this required fact or authority unresolved; preserve it as unknown.",
+              "evidence_refs": [
+                "fixture:legal-litigation-matter-briefing:source-1"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "fixture_id": "empty-completed-draft-rejected",
+      "expected_valid": false,
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": null,
+        "evidence_refs": [],
+        "open_questions": [],
+        "review_owner_role": "Synthetic completed task for legal-litigation-matter-briefing: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "matter_briefing": "",
+          "deadline_register": "",
+          "risk_and_decision_questions": "",
+          "open_items": "",
+          "partial_work": [],
+          "missing_inputs": [],
+          "unknown_facts": []
+        }
+      }
+    }
+  ],
+  "fixture_note": "All values are fictional task-shaped contract examples derived from this pack’s golden scenario and criteria; these files are schema evidence, not executed results or business/legal facts."
+}

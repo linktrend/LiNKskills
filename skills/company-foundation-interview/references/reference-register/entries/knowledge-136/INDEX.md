@@ -1,0 +1,39 @@
+# NIST AI RMF Playbook
+
+- Metadata: `references/reference-register/entries/knowledge-136/metadata.json`.
+- Status: supplemental_official_publication_or_form_downloaded; source/reference, not canon.
+- Originals and exact provenance remain in metadata. Read text chunks only as needed.
+
+- Text 1: `references/reference-register/entries/knowledge-136/c942dec8a8f71300fea65b714d1c8ed878f6b138c9241e0698b5d3d4cad4c04b-txt-001.md`.
+- Text 2: `references/reference-register/entries/knowledge-136/c942dec8a8f71300fea65b714d1c8ed878f6b138c9241e0698b5d3d4cad4c04b-txt-002.md`.
+- Text 3: `references/reference-register/entries/knowledge-136/c942dec8a8f71300fea65b714d1c8ed878f6b138c9241e0698b5d3d4cad4c04b-txt-003.md`.
+- Text 4: `references/reference-register/entries/knowledge-136/c942dec8a8f71300fea65b714d1c8ed878f6b138c9241e0698b5d3d4cad4c04b-txt-004.md`.
+- Text 5: `references/reference-register/entries/knowledge-136/c942dec8a8f71300fea65b714d1c8ed878f6b138c9241e0698b5d3d4cad4c04b-txt-005.md`.
+- Text 6: `references/reference-register/entries/knowledge-136/c942dec8a8f71300fea65b714d1c8ed878f6b138c9241e0698b5d3d4cad4c04b-txt-006.md`.
+- Text 7: `references/reference-register/entries/knowledge-136/c942dec8a8f71300fea65b714d1c8ed878f6b138c9241e0698b5d3d4cad4c04b-txt-007.md`.
+- Text 8: `references/reference-register/entries/knowledge-136/c942dec8a8f71300fea65b714d1c8ed878f6b138c9241e0698b5d3d4cad4c04b-txt-008.md`.
+- Text 9: `references/reference-register/entries/knowledge-136/c942dec8a8f71300fea65b714d1c8ed878f6b138c9241e0698b5d3d4cad4c04b-txt-009.md`.
+- Text 10: `references/reference-register/entries/knowledge-136/c942dec8a8f71300fea65b714d1c8ed878f6b138c9241e0698b5d3d4cad4c04b-txt-010.md`.
+- Text 11: `references/reference-register/entries/knowledge-136/c942dec8a8f71300fea65b714d1c8ed878f6b138c9241e0698b5d3d4cad4c04b-txt-011.md`.
+- Text 12: `references/reference-register/entries/knowledge-136/c942dec8a8f71300fea65b714d1c8ed878f6b138c9241e0698b5d3d4cad4c04b-txt-012.md`.
+- Text 13: `references/reference-register/entries/knowledge-136/c942dec8a8f71300fea65b714d1c8ed878f6b138c9241e0698b5d3d4cad4c04b-txt-013.md`.
+- Text 14: `references/reference-register/entries/knowledge-136/c942dec8a8f71300fea65b714d1c8ed878f6b138c9241e0698b5d3d4cad4c04b-txt-014.md`.
+- Text 15: `references/reference-register/entries/knowledge-136/c942dec8a8f71300fea65b714d1c8ed878f6b138c9241e0698b5d3d4cad4c04b-txt-015.md`.
+- Text 16: `references/reference-register/entries/knowledge-136/c942dec8a8f71300fea65b714d1c8ed878f6b138c9241e0698b5d3d4cad4c04b-txt-016.md`.
+- Text 17: `references/reference-register/entries/knowledge-136/c942dec8a8f71300fea65b714d1c8ed878f6b138c9241e0698b5d3d4cad4c04b-txt-017.md`.
+- Text 18: `references/reference-register/entries/knowledge-136/c942dec8a8f71300fea65b714d1c8ed878f6b138c9241e0698b5d3d4cad4c04b-txt-018.md`.
+- Text 19: `references/reference-register/entries/knowledge-136/c942dec8a8f71300fea65b714d1c8ed878f6b138c9241e0698b5d3d4cad4c04b-txt-019.md`.
+- Text 20: `references/reference-register/entries/knowledge-136/c942dec8a8f71300fea65b714d1c8ed878f6b138c9241e0698b5d3d4cad4c04b-txt-020.md`.
+- Text 21: `references/reference-register/entries/knowledge-136/c942dec8a8f71300fea65b714d1c8ed878f6b138c9241e0698b5d3d4cad4c04b-txt-021.md`.
+- Text 22: `references/reference-register/entries/knowledge-136/c942dec8a8f71300fea65b714d1c8ed878f6b138c9241e0698b5d3d4cad4c04b-txt-022.md`.
+- Text 23: `references/reference-register/entries/knowledge-136/c942dec8a8f71300fea65b714d1c8ed878f6b138c9241e0698b5d3d4cad4c04b-txt-023.md`.
+- Text 24: `references/reference-register/entries/knowledge-136/c942dec8a8f71300fea65b714d1c8ed878f6b138c9241e0698b5d3d4cad4c04b-txt-024.md`.
+- Text 25: `references/reference-register/entries/knowledge-136/c942dec8a8f71300fea65b714d1c8ed878f6b138c9241e0698b5d3d4cad4c04b-txt-025.md`.
+- Text 26: `references/reference-register/entries/knowledge-136/c942dec8a8f71300fea65b714d1c8ed878f6b138c9241e0698b5d3d4cad4c04b-txt-026.md`.
+- Text 27: `references/reference-register/entries/knowledge-136/c942dec8a8f71300fea65b714d1c8ed878f6b138c9241e0698b5d3d4cad4c04b-txt-027.md`.
+- Text 28: `references/reference-register/entries/knowledge-136/c942dec8a8f71300fea65b714d1c8ed878f6b138c9241e0698b5d3d4cad4c04b-txt-028.md`.
+- Text 29: `references/reference-register/entries/knowledge-136/c942dec8a8f71300fea65b714d1c8ed878f6b138c9241e0698b5d3d4cad4c04b-txt-029.md`.
+- Text 30: `references/reference-register/entries/knowledge-136/c942dec8a8f71300fea65b714d1c8ed878f6b138c9241e0698b5d3d4cad4c04b-txt-030.md`.
+- Text 31: `references/reference-register/entries/knowledge-136/c942dec8a8f71300fea65b714d1c8ed878f6b138c9241e0698b5d3d4cad4c04b-txt-031.md`.
+- Text 32: `references/reference-register/entries/knowledge-136/c942dec8a8f71300fea65b714d1c8ed878f6b138c9241e0698b5d3d4cad4c04b-txt-032.md`.
+- Text 33: `references/reference-register/entries/knowledge-136/c942dec8a8f71300fea65b714d1c8ed878f6b138c9241e0698b5d3d4cad4c04b-txt-033.md`.

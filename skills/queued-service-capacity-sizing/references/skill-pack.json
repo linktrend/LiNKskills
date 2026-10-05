@@ -1,0 +1,153 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "queued-service-capacity-sizing",
+  "display_name": "Queued Service Capacity Sizing",
+  "version": "1.0.0",
+  "description": "Size a repeatable queued service using arrival/service distributions, queue assumptions, SLA waiting risk and effective capacity.",
+  "capability_category": "queued_service_capacity_sizing",
+  "provenance": {
+    "author": "LiNKskills Library",
+    "source": "Pinned upstream modules copied with licenses and exact commit identities; see references/upstream/SOURCE-MANIFEST.json",
+    "license": "See per-source upstream license copies and manifest"
+  },
+  "lifecycle_state": "draft",
+  "format_profile": "heavy",
+  "compatible_runtime_profiles": [
+    "lisa-openclaw",
+    "cursor-macos"
+  ],
+  "min_capability_tier": "balanced",
+  "routing": {
+    "when_to_use": "Size a repeatable queued service using arrival/service distributions, queue assumptions, SLA waiting risk and effective capacity.",
+    "when_not_to_use": [
+      "A different task requires its own skill",
+      "Unapproved consequential action",
+      "Unauthorized evidence or audience"
+    ],
+    "tags": [
+      "operations",
+      "task-specific",
+      "sara"
+    ],
+    "exclusion_rules": [
+      "Missing facts block the affected conclusion, not harmless drafting"
+    ],
+    "ambiguity_rules": [
+      "Read existing authorized evidence first; ask only material unanswered questions"
+    ],
+    "recommended_disclosure_level": 2
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "task_inputs",
+        "description": "queue class and observation window; arrival counts/timestamps and P50/P90/P99 demand; service duration distribution and units; concurrent server/worker counts, shrinkage and availability; waiting-time service objective and budget"
+      }
+    ],
+    "expected_outputs": [
+      {
+        "name": "work_product",
+        "description": "queue assumptions and input-quality assessment; arrival/service/utilization model; waiting-risk and capacity scenarios; ramp/availability sequence and decision package"
+      }
+    ],
+    "forbidden_actions": [
+      "Unapproved payments, filings, postings, signatures, purchases, external announcements or production changes",
+      "Inventing source facts, approval or canon",
+      "Accessing unrelated private history"
+    ],
+    "verification_steps": [
+      "Confirm this is queued service work rather than roadmap/commitment allocation. Select one compatible service class; separate priority classes and shared-provider constraints. Record observed period, timestamp/data quality, arrival distribution and accepted completion definition.",
+      "Measure arrival rate lambda and per-active-worker service rate mu in the same time unit. Show P50/P90/P99 observed demand separately; disclose forecast-derived demand when history is missing. Unknown demand distribution limits waiting-risk claims rather than justifying guessed certainty.",
+      "Calculate effective active service capacity after actual availability/shrinkage, separately from roster count. For AI workers use observed accepted completion rate, failures/rework, provider limits and concurrency; human hiring/ramp assumptions apply only to human capacity. Never apply a default human utilization threshold as an agent rule.",
+      "Use Erlang-C only when a steady-state M/M/s approximation is justified: stationary arrivals, exponential service approximation, interchangeable parallel workers and a pooled compatible queue. Compute offered load a=lambda/mu and rho=lambda/(s*mu). If rho>=1 report an unstable steady-state queue; do not report a finite steady-state wait.",
+      "For rho<1 compute C=(a^s/(s!*(1-rho)))/(sum(k=0..s-1,a^k/k!)+a^s/(s!*(1-rho))). Then P(wait>t)=C*exp(-(s*mu-lambda)*t) for a queue-wait objective t in the same units. Keep formula-model predictions distinct from measured breach rates and end-to-end service objectives.",
+      "Compare observed demand scenarios and active worker counts with wait, utilization, effective throughput, costs and assumptions. If distribution, priority or burstiness invalidates M/M/s, report the limitation and use observed queue/wait data for a bounded empirical recommendation; do not relabel it Erlang-C proof.",
+      "Where additional capacity is proposed, sequence ramp/availability and any human attrition evidence over the planning horizon. Return decision owner, source register, monitoring triggers and no-change alternative; no provisioning, hiring or spend enacted."
+    ],
+    "completion_criteria": [
+      "Task output meets contract and task-specific acceptance criteria",
+      "Sources, uncertainty, exact completion scope and remaining decisions visible",
+      "Any authorized draft write read back"
+    ],
+    "known_limitations": [
+      "Structural qualification does not prove every behavior",
+      "Source originals are provenance; canonical method owns execution",
+      "Specialist content/draft access may be Sara-mediated"
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read",
+      "filesystem_write",
+      "network"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [
+      {
+        "key": "min_reasoning_tier",
+        "value": "balanced"
+      },
+      {
+        "key": "context_required",
+        "value": 128000
+      },
+      {
+        "key": "preferred_model",
+        "value": "gpt-6.1-sol"
+      }
+    ],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "required_certification_profiles": [],
+    "verification_refs": [
+      "references/eval-suite.yaml",
+      "references/source-selection.md"
+    ]
+  },
+  "telemetry": {
+    "classification": "restricted",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_personal_data",
+      "strip_private_finance_tax_and_vendor_data",
+      "strip_raw_documents",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain opaque task/source ids and hashes only"
+  },
+  "fragments": [
+    {
+      "fragment_id": "skill-md",
+      "disclosure_level": 2,
+      "path": "SKILL.md"
+    },
+    {
+      "fragment_id": "advanced",
+      "disclosure_level": 3,
+      "path": "advanced/advanced.md"
+    },
+    {
+      "fragment_id": "schemas",
+      "disclosure_level": 5,
+      "path": "references/schemas.json"
+    },
+    {
+      "fragment_id": "source-selection",
+      "disclosure_level": 3,
+      "path": "references/source-selection.md"
+    },
+    {
+      "fragment_id": "api",
+      "disclosure_level": 3,
+      "path": "references/api-specs.md"
+    }
+  ],
+  "release_channel": "development"
+}

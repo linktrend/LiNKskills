@@ -1,0 +1,156 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "compliance-framework-iso13485-audit-prep",
+  "input_schema_ref": "references/schemas.json#/definitions/input",
+  "output_schema_ref": "references/schemas.json#/definitions/output",
+  "completion_required_fields": [
+    "audit_scope_and_criteria",
+    "design_traceability_samples",
+    "post_market_evidence"
+  ],
+  "fixtures": [
+    {
+      "fixture_id": "synthetic-task-shaped-completed",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261005-0900-SARA-123456",
+        "request_ref": "fixture:compliance-framework-iso13485-audit-prep:request",
+        "source_refs": [
+          "fixture:compliance-framework-iso13485-audit-prep:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "task_request": "A fictional medical-device team supplies two design files and CAPA records with incomplete traceability; create a sample-based gap list and mark conclusions limited to provided samples.",
+          "source_documents": [
+            "Synthetic input fixture for compliance-framework-iso13485-audit-prep: source documents. Fictional test content only; no real-world facts."
+          ],
+          "company_context": "Synthetic input fixture for compliance-framework-iso13485-audit-prep: company context. Fictional test content only; no real-world facts.",
+          "applicability_context": "Synthetic input fixture for compliance-framework-iso13485-audit-prep: applicability context. Fictional test content only; no real-world facts.",
+          "review_owner": "Synthetic input fixture for compliance-framework-iso13485-audit-prep: review owner. Fictional test content only; no real-world facts.",
+          "device_and_qms_scope": "Synthetic input fixture for compliance-framework-iso13485-audit-prep: device and qms scope. Fictional test content only; no real-world facts.",
+          "audit_stage": "Synthetic input fixture for compliance-framework-iso13485-audit-prep: audit stage. Fictional test content only; no real-world facts.",
+          "qms_samples": "Synthetic input fixture for compliance-framework-iso13485-audit-prep: qms samples. Fictional test content only; no real-world facts.",
+          "standard_version": "Synthetic input fixture for compliance-framework-iso13485-audit-prep: standard version. Fictional test content only; no real-world facts."
+        }
+      },
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": "fixture:compliance-framework-iso13485-audit-prep:draft",
+        "evidence_refs": [
+          "fixture:compliance-framework-iso13485-audit-prep:source-1"
+        ],
+        "open_questions": [],
+        "review_owner_role": "Synthetic completed task for compliance-framework-iso13485-audit-prep: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "audit_scope_and_criteria": "Fictional compliance-framework-iso13485-audit-prep audit scope and criteria section. Scenario: A fictional medical-device team supplies two design files and CAPA records with incomplete traceability; create a sample-based gap list and mark conclusions limited to provided samples. Expected handling: Produces the iso 13485 qms audit preparation deliverable with task-specific fields and not a generic departmental summary. Cites supplied evidence and preserves unknown, conflicting or unsupported facts. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "design_traceability_samples": "Fictional compliance-framework-iso13485-audit-prep design traceability samples section. Scenario: A fictional medical-device team supplies two design files and CAPA records with incomplete traceability; create a sample-based gap list and mark conclusions limited to provided samples. Expected handling: Produces the iso 13485 qms audit preparation deliverable with task-specific fields and not a generic departmental summary. Cites supplied evidence and preserves unknown, conflicting or unsupported facts. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "capa_validation_and_risk_gaps": [],
+          "post_market_evidence": [
+            "Fictional compliance-framework-iso13485-audit-prep post market evidence section. Scenario: A fictional medical-device team supplies two design files and CAPA records with incomplete traceability; create a sample-based gap list and mark conclusions limited to provided samples. Expected handling: Produces the iso 13485 qms audit preparation deliverable with task-specific fields and not a generic departmental summary. Cites supplied evidence and preserves unknown, conflicting or unsupported facts. This is illustrative synthetic content only, not a real fact, legal authority, or executed result."
+          ],
+          "readiness_questions": [],
+          "partial_work": [],
+          "missing_inputs": [],
+          "unknown_facts": []
+        }
+      }
+    },
+    {
+      "fixture_id": "needs-context-preserves-partial-and-unknowns",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261005-0900-SARA-123456",
+        "request_ref": "fixture:compliance-framework-iso13485-audit-prep:request",
+        "source_refs": [
+          "fixture:compliance-framework-iso13485-audit-prep:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "task_request": "Prepare a synthetic compliance-framework-iso13485-audit-prep deliverable from this fictional test record; make no real-world factual or legal claim.",
+          "source_documents": [
+            "Synthetic input fixture for compliance-framework-iso13485-audit-prep: source documents. Fictional test content only; no real-world facts."
+          ],
+          "company_context": "Synthetic input fixture for compliance-framework-iso13485-audit-prep: company context. Fictional test content only; no real-world facts.",
+          "applicability_context": "Synthetic input fixture for compliance-framework-iso13485-audit-prep: applicability context. Fictional test content only; no real-world facts.",
+          "review_owner": "Synthetic input fixture for compliance-framework-iso13485-audit-prep: review owner. Fictional test content only; no real-world facts.",
+          "device_and_qms_scope": "Synthetic input fixture for compliance-framework-iso13485-audit-prep: device and qms scope. Fictional test content only; no real-world facts.",
+          "audit_stage": "Synthetic input fixture for compliance-framework-iso13485-audit-prep: audit stage. Fictional test content only; no real-world facts.",
+          "qms_samples": "Synthetic input fixture for compliance-framework-iso13485-audit-prep: qms samples. Fictional test content only; no real-world facts.",
+          "standard_version": "Synthetic input fixture for compliance-framework-iso13485-audit-prep: standard version. Fictional test content only; no real-world facts."
+        }
+      },
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "needs_context",
+        "artifact_ref": "fixture:compliance-framework-iso13485-audit-prep:partial",
+        "evidence_refs": [],
+        "open_questions": [
+          "Confirm the named missing input with its owner."
+        ],
+        "review_owner_role": "Synthetic completed task for compliance-framework-iso13485-audit-prep: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "audit_scope_and_criteria": "",
+          "design_traceability_samples": "",
+          "capa_validation_and_risk_gaps": [],
+          "post_market_evidence": [],
+          "readiness_questions": [],
+          "partial_work": [
+            {
+              "section": "audit_scope_and_criteria",
+              "content": "Partial compliance-framework-iso13485-audit-prep fixture: source inventory recorded; one dependent conclusion remains unknown.",
+              "evidence_refs": [
+                "fixture:compliance-framework-iso13485-audit-prep:source-1"
+              ]
+            }
+          ],
+          "missing_inputs": [
+            {
+              "field": "authorized_source_or_material_fact",
+              "reason": "Synthetic missing-context scenario: The task arrives with a material missing fact or inaccessible authority needed for one conclusion. Complete separable source-grounded work and state the exact missing evidence, owner and next check.",
+              "requested_owner": "task owner"
+            }
+          ],
+          "unknown_facts": [
+            {
+              "fact": "task-specific applicability or evidence fact",
+              "why_unknown": "The edge scenario intentionally leaves this required fact or authority unresolved; preserve it as unknown.",
+              "evidence_refs": [
+                "fixture:compliance-framework-iso13485-audit-prep:source-1"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "fixture_id": "empty-completed-draft-rejected",
+      "expected_valid": false,
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": null,
+        "evidence_refs": [],
+        "open_questions": [],
+        "review_owner_role": "Synthetic completed task for compliance-framework-iso13485-audit-prep: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "audit_scope_and_criteria": "",
+          "design_traceability_samples": "",
+          "capa_validation_and_risk_gaps": [],
+          "post_market_evidence": [],
+          "readiness_questions": [],
+          "partial_work": [],
+          "missing_inputs": [],
+          "unknown_facts": []
+        }
+      }
+    }
+  ],
+  "fixture_note": "All values are fictional task-shaped contract examples derived from this pack’s golden scenario and criteria; these files are schema evidence, not executed results or business/legal facts."
+}

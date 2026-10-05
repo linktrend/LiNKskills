@@ -1,0 +1,305 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "request_ref",
+        "source_refs",
+        "data_classification",
+        "task_inputs"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "pattern": "^\\d{8}-\\d{4}-[A-Z0-9]+-\\d{6}$"
+        },
+        "request_ref": {
+          "type": "string"
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "data_classification": {
+          "type": "string",
+          "enum": [
+            "synthetic",
+            "redacted",
+            "restricted",
+            "sensitive",
+            "unknown"
+          ]
+        },
+        "task_inputs": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "agreement_ref",
+            "party_roles",
+            "transaction_context",
+            "governing_law_text",
+            "requested_analysis"
+          ],
+          "properties": {
+            "agreement_ref": {
+              "type": "string",
+              "minLength": 1
+            },
+            "party_roles": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 2
+            },
+            "transaction_context": {
+              "type": "string"
+            },
+            "governing_law_text": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "requested_analysis": {
+              "type": "string"
+            },
+            "approved_playbook_ref": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "amendments_and_schedules": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "status",
+        "artifact_ref",
+        "evidence_refs",
+        "open_questions",
+        "review_owner_role",
+        "external_effects",
+        "mutations",
+        "work_product"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "completed_draft",
+            "needs_context",
+            "escalate",
+            "blocked"
+          ]
+        },
+        "artifact_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "open_questions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "review_owner_role": {
+          "type": "string"
+        },
+        "external_effects": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "mutations": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "work_product": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "agreement_facts",
+            "scope_traps",
+            "clause_findings",
+            "proposed_redlines",
+            "jurisdiction_gaps",
+            "counsel_questions"
+          ],
+          "properties": {
+            "agreement_facts": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "scope_traps": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "section",
+                  "obligation",
+                  "why_out_of_nda_scope"
+                ],
+                "properties": {
+                  "section": {
+                    "type": "string"
+                  },
+                  "obligation": {
+                    "type": "string"
+                  },
+                  "why_out_of_nda_scope": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "clause_findings": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "section",
+                  "finding",
+                  "playbook_status",
+                  "risk_rationale"
+                ],
+                "properties": {
+                  "section": {
+                    "type": "string"
+                  },
+                  "finding": {
+                    "type": "string"
+                  },
+                  "playbook_status": {
+                    "type": "string",
+                    "enum": [
+                      "supported",
+                      "deviates",
+                      "silent",
+                      "not_provided"
+                    ]
+                  },
+                  "risk_rationale": {
+                    "type": "string"
+                  },
+                  "source_quote_or_summary": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "proposed_redlines": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "section",
+                  "preferred_language",
+                  "fallback",
+                  "objective"
+                ],
+                "properties": {
+                  "section": {
+                    "type": "string"
+                  },
+                  "preferred_language": {
+                    "type": "string"
+                  },
+                  "fallback": {
+                    "type": "string"
+                  },
+                  "objective": {
+                    "type": "string"
+                  },
+                  "bracketed_unknowns": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "jurisdiction_gaps": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "counsel_questions": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "state": {
+      "type": "object",
+      "required": [
+        "task_id",
+        "phase",
+        "status",
+        "updated_at"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string"
+        },
+        "phase": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "updated_at": {
+          "type": "string"
+        },
+        "completed_sections": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "open_questions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

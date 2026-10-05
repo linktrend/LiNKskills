@@ -1,0 +1,1 @@
+- 0.1.0 (2026-10-04): Single task adaptation across nine domain-specific context-workspace variants; draft and uncertified.

@@ -1,0 +1,440 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "legal-corporate-closing-checklist",
+  "input_schema_ref": "references/schemas.json#/definitions/input",
+  "output_schema_ref": "references/schemas.json#/definitions/output",
+  "fixtures": [
+    {
+      "fixture_id": "typed-completed-task",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261004-1200-SARA-123456",
+        "request_ref": "fixture:legal-corporate-closing-checklist",
+        "source_refs": [
+          "fixture:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "legal_corporate_closing_checklist_task_payload": {
+            "transaction_and_closing_date": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            },
+            "closing_conditions_and_documents": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            },
+            "evidence_of_completion_and_dependencies": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            },
+            "responsible_owners": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            }
+          },
+          "task_request": "Synthetic unknown-context fixture for legal-corporate-closing-checklist",
+          "company_or_matter_facts": "Synthetic unknown-context fixture for legal-corporate-closing-checklist",
+          "source_documents": [
+            "fixture:source-1"
+          ],
+          "jurisdiction_and_as_of": {
+            "jurisdictions": [],
+            "as_of_date": null
+          },
+          "approved_positions_or_policy_ref": null
+        }
+      },
+      "output": {
+        "task_id": "20261004-1200-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": "fixture:legal-corporate-closing-checklist",
+        "evidence_refs": [
+          "fixture:source-1"
+        ],
+        "open_questions": [],
+        "review_owner_role": "authorized human reviewer",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "legal_corporate_closing_checklist_work_product": {
+            "closing_checklist": [
+              {
+                "content": "Synthetic task-shaped item; applicability unknown.",
+                "evidence_refs": [
+                  "fixture:source-1"
+                ],
+                "status": "unknown"
+              }
+            ],
+            "conditions_precedent_matrix": [
+              {
+                "content": "Synthetic task-shaped item; applicability unknown.",
+                "evidence_refs": [
+                  "fixture:source-1"
+                ],
+                "status": "unknown"
+              }
+            ],
+            "document_status_evidence": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "dependency_sequence": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "unresolved_items": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "responsible_owners": [
+              {
+                "content": "Synthetic task-shaped item; applicability unknown.",
+                "evidence_refs": [
+                  "fixture:source-1"
+                ],
+                "status": "unknown"
+              }
+            ],
+            "evidence_trace": [
+              {
+                "source_ref": "fixture:source-1",
+                "location": null,
+                "supports": "Synthetic source only; no real legal fact."
+              }
+            ],
+            "jurisdiction_and_as_of": {
+              "jurisdictions": [],
+              "as_of_date": null
+            },
+            "assumptions_and_gaps": [
+              "All facts unknown in synthetic fixture."
+            ],
+            "proposed_next_steps": [
+              "Obtain source evidence."
+            ]
+          }
+        }
+      }
+    },
+    {
+      "fixture_id": "typed-needs-context-explicit-unknowns",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261004-1200-SARA-123456",
+        "request_ref": "fixture:legal-corporate-closing-checklist",
+        "source_refs": [
+          "fixture:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "legal_corporate_closing_checklist_task_payload": {
+            "transaction_and_closing_date": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            },
+            "closing_conditions_and_documents": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            },
+            "evidence_of_completion_and_dependencies": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            },
+            "responsible_owners": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            }
+          },
+          "task_request": "Synthetic unknown-context fixture for legal-corporate-closing-checklist",
+          "company_or_matter_facts": "Synthetic unknown-context fixture for legal-corporate-closing-checklist",
+          "source_documents": [
+            "fixture:source-1"
+          ],
+          "jurisdiction_and_as_of": {
+            "jurisdictions": [],
+            "as_of_date": null
+          },
+          "approved_positions_or_policy_ref": null
+        }
+      },
+      "output": {
+        "task_id": "20261004-1200-SARA-123456",
+        "status": "needs_context",
+        "artifact_ref": null,
+        "evidence_refs": [],
+        "open_questions": [
+          "Provide missing task evidence."
+        ],
+        "review_owner_role": "Sara",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "partial_work": "No substantive fact established.",
+          "missing_inputs": [
+            "transaction_and_closing_date",
+            "closing_conditions_and_documents",
+            "evidence_of_completion_and_dependencies",
+            "responsible_owners"
+          ],
+          "unknown_facts": [
+            "transaction_and_closing_date",
+            "closing_conditions_and_documents",
+            "evidence_of_completion_and_dependencies",
+            "responsible_owners"
+          ]
+        }
+      }
+    },
+    {
+      "fixture_id": "invalid-task-id-regex",
+      "expected_valid": false,
+      "input": {
+        "task_id": "bad-id",
+        "request_ref": "fixture:legal-corporate-closing-checklist",
+        "source_refs": [
+          "fixture:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "legal_corporate_closing_checklist_task_payload": {
+            "transaction_and_closing_date": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            },
+            "closing_conditions_and_documents": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            },
+            "evidence_of_completion_and_dependencies": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            },
+            "responsible_owners": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            }
+          },
+          "task_request": "Synthetic unknown-context fixture for legal-corporate-closing-checklist",
+          "company_or_matter_facts": "Synthetic unknown-context fixture for legal-corporate-closing-checklist",
+          "source_documents": [
+            "fixture:source-1"
+          ],
+          "jurisdiction_and_as_of": {
+            "jurisdictions": [],
+            "as_of_date": null
+          },
+          "approved_positions_or_policy_ref": null
+        }
+      },
+      "output": {
+        "task_id": "20261004-1200-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": "fixture:legal-corporate-closing-checklist",
+        "evidence_refs": [
+          "fixture:source-1"
+        ],
+        "open_questions": [],
+        "review_owner_role": "authorized human reviewer",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "legal_corporate_closing_checklist_work_product": {
+            "closing_checklist": [
+              {
+                "content": "Synthetic task-shaped item; applicability unknown.",
+                "evidence_refs": [
+                  "fixture:source-1"
+                ],
+                "status": "unknown"
+              }
+            ],
+            "conditions_precedent_matrix": [
+              {
+                "content": "Synthetic task-shaped item; applicability unknown.",
+                "evidence_refs": [
+                  "fixture:source-1"
+                ],
+                "status": "unknown"
+              }
+            ],
+            "document_status_evidence": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "dependency_sequence": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "unresolved_items": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "responsible_owners": [
+              {
+                "content": "Synthetic task-shaped item; applicability unknown.",
+                "evidence_refs": [
+                  "fixture:source-1"
+                ],
+                "status": "unknown"
+              }
+            ],
+            "evidence_trace": [
+              {
+                "source_ref": "fixture:source-1",
+                "location": null,
+                "supports": "Synthetic source only; no real legal fact."
+              }
+            ],
+            "jurisdiction_and_as_of": {
+              "jurisdictions": [],
+              "as_of_date": null
+            },
+            "assumptions_and_gaps": [
+              "All facts unknown in synthetic fixture."
+            ],
+            "proposed_next_steps": [
+              "Obtain source evidence."
+            ]
+          }
+        }
+      }
+    },
+    {
+      "fixture_id": "missing-task-specific-input",
+      "expected_valid": false,
+      "input": {
+        "task_id": "20261004-1200-SARA-123456",
+        "request_ref": "fixture:legal-corporate-closing-checklist",
+        "source_refs": [
+          "fixture:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "task_request": "Synthetic unknown-context fixture for legal-corporate-closing-checklist",
+          "company_or_matter_facts": "Synthetic unknown-context fixture for legal-corporate-closing-checklist",
+          "source_documents": [
+            "fixture:source-1"
+          ],
+          "jurisdiction_and_as_of": {
+            "jurisdictions": [],
+            "as_of_date": null
+          },
+          "approved_positions_or_policy_ref": null
+        }
+      },
+      "output": {
+        "task_id": "20261004-1200-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": "fixture:legal-corporate-closing-checklist",
+        "evidence_refs": [
+          "fixture:source-1"
+        ],
+        "open_questions": [],
+        "review_owner_role": "authorized human reviewer",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "legal_corporate_closing_checklist_work_product": {
+            "closing_checklist": [
+              {
+                "content": "Synthetic task-shaped item; applicability unknown.",
+                "evidence_refs": [
+                  "fixture:source-1"
+                ],
+                "status": "unknown"
+              }
+            ],
+            "conditions_precedent_matrix": [
+              {
+                "content": "Synthetic task-shaped item; applicability unknown.",
+                "evidence_refs": [
+                  "fixture:source-1"
+                ],
+                "status": "unknown"
+              }
+            ],
+            "document_status_evidence": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "dependency_sequence": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "unresolved_items": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "responsible_owners": [
+              {
+                "content": "Synthetic task-shaped item; applicability unknown.",
+                "evidence_refs": [
+                  "fixture:source-1"
+                ],
+                "status": "unknown"
+              }
+            ],
+            "evidence_trace": [
+              {
+                "source_ref": "fixture:source-1",
+                "location": null,
+                "supports": "Synthetic source only; no real legal fact."
+              }
+            ],
+            "jurisdiction_and_as_of": {
+              "jurisdictions": [],
+              "as_of_date": null
+            },
+            "assumptions_and_gaps": [
+              "All facts unknown in synthetic fixture."
+            ],
+            "proposed_next_steps": [
+              "Obtain source evidence."
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

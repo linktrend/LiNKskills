@@ -1,0 +1,35 @@
+# IRS Publication 15
+
+- Metadata: `references/reference-register/entries/knowledge-077/metadata.json`.
+- Status: downloaded_pending_content_review; source/reference, not canon.
+- Originals and exact provenance remain in metadata. Read text chunks only as needed.
+
+- Text 1: `references/reference-register/entries/knowledge-077/c33b8699c5aaa6710b184649b70f7fb9828fab98cd07a26667aa06a9ac854c06-txt-001.md`.
+- Text 2: `references/reference-register/entries/knowledge-077/c33b8699c5aaa6710b184649b70f7fb9828fab98cd07a26667aa06a9ac854c06-txt-002.md`.
+- Text 3: `references/reference-register/entries/knowledge-077/c33b8699c5aaa6710b184649b70f7fb9828fab98cd07a26667aa06a9ac854c06-txt-003.md`.
+- Text 4: `references/reference-register/entries/knowledge-077/c33b8699c5aaa6710b184649b70f7fb9828fab98cd07a26667aa06a9ac854c06-txt-004.md`.
+- Text 5: `references/reference-register/entries/knowledge-077/c33b8699c5aaa6710b184649b70f7fb9828fab98cd07a26667aa06a9ac854c06-txt-005.md`.
+- Text 6: `references/reference-register/entries/knowledge-077/c33b8699c5aaa6710b184649b70f7fb9828fab98cd07a26667aa06a9ac854c06-txt-006.md`.
+- Text 7: `references/reference-register/entries/knowledge-077/c33b8699c5aaa6710b184649b70f7fb9828fab98cd07a26667aa06a9ac854c06-txt-007.md`.
+- Text 8: `references/reference-register/entries/knowledge-077/c33b8699c5aaa6710b184649b70f7fb9828fab98cd07a26667aa06a9ac854c06-txt-008.md`.
+- Text 9: `references/reference-register/entries/knowledge-077/c33b8699c5aaa6710b184649b70f7fb9828fab98cd07a26667aa06a9ac854c06-txt-009.md`.
+- Text 10: `references/reference-register/entries/knowledge-077/c33b8699c5aaa6710b184649b70f7fb9828fab98cd07a26667aa06a9ac854c06-txt-010.md`.
+- Text 11: `references/reference-register/entries/knowledge-077/c33b8699c5aaa6710b184649b70f7fb9828fab98cd07a26667aa06a9ac854c06-txt-011.md`.
+- Text 12: `references/reference-register/entries/knowledge-077/c33b8699c5aaa6710b184649b70f7fb9828fab98cd07a26667aa06a9ac854c06-txt-012.md`.
+- Text 13: `references/reference-register/entries/knowledge-077/c33b8699c5aaa6710b184649b70f7fb9828fab98cd07a26667aa06a9ac854c06-txt-013.md`.
+- Text 14: `references/reference-register/entries/knowledge-077/c33b8699c5aaa6710b184649b70f7fb9828fab98cd07a26667aa06a9ac854c06-txt-014.md`.
+- Text 15: `references/reference-register/entries/knowledge-077/c33b8699c5aaa6710b184649b70f7fb9828fab98cd07a26667aa06a9ac854c06-txt-015.md`.
+- Text 16: `references/reference-register/entries/knowledge-077/c33b8699c5aaa6710b184649b70f7fb9828fab98cd07a26667aa06a9ac854c06-txt-016.md`.
+- Text 17: `references/reference-register/entries/knowledge-077/c33b8699c5aaa6710b184649b70f7fb9828fab98cd07a26667aa06a9ac854c06-txt-017.md`.
+- Text 18: `references/reference-register/entries/knowledge-077/c33b8699c5aaa6710b184649b70f7fb9828fab98cd07a26667aa06a9ac854c06-txt-018.md`.
+- Text 19: `references/reference-register/entries/knowledge-077/c33b8699c5aaa6710b184649b70f7fb9828fab98cd07a26667aa06a9ac854c06-txt-019.md`.
+- Text 20: `references/reference-register/entries/knowledge-077/c33b8699c5aaa6710b184649b70f7fb9828fab98cd07a26667aa06a9ac854c06-txt-020.md`.
+- Text 21: `references/reference-register/entries/knowledge-077/c33b8699c5aaa6710b184649b70f7fb9828fab98cd07a26667aa06a9ac854c06-txt-021.md`.
+- Text 22: `references/reference-register/entries/knowledge-077/c33b8699c5aaa6710b184649b70f7fb9828fab98cd07a26667aa06a9ac854c06-txt-022.md`.
+- Text 23: `references/reference-register/entries/knowledge-077/c33b8699c5aaa6710b184649b70f7fb9828fab98cd07a26667aa06a9ac854c06-txt-023.md`.
+- Text 24: `references/reference-register/entries/knowledge-077/c33b8699c5aaa6710b184649b70f7fb9828fab98cd07a26667aa06a9ac854c06-txt-024.md`.
+- Text 25: `references/reference-register/entries/knowledge-077/c33b8699c5aaa6710b184649b70f7fb9828fab98cd07a26667aa06a9ac854c06-txt-025.md`.
+- Text 26: `references/reference-register/entries/knowledge-077/c33b8699c5aaa6710b184649b70f7fb9828fab98cd07a26667aa06a9ac854c06-txt-026.md`.
+- Text 27: `references/reference-register/entries/knowledge-077/c33b8699c5aaa6710b184649b70f7fb9828fab98cd07a26667aa06a9ac854c06-txt-027.md`.
+- Text 28: `references/reference-register/entries/knowledge-077/c33b8699c5aaa6710b184649b70f7fb9828fab98cd07a26667aa06a9ac854c06-txt-028.md`.
+- Text 29: `references/reference-register/entries/knowledge-077/c33b8699c5aaa6710b184649b70f7fb9828fab98cd07a26667aa06a9ac854c06-txt-029.md`.

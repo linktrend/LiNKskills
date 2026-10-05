@@ -1,0 +1,67 @@
+{
+  "task_id": "20261005-1000-SARA-654321",
+  "request_ref": "fixture:request:decision-review",
+  "source_refs": [
+    "fixture:proposal-1",
+    "fixture:evidence-register",
+    "fixture:audit-calendar",
+    "fixture:mock-audit",
+    "fixture:management-review"
+  ],
+  "data_classification": "synthetic",
+  "task_inputs": {
+    "task_request": "Prepare a six-question review packet before the fictional Acme board decides whether to pursue voluntary Framework Cedar and approve the next audit calendar. Do not make the decision or claim compliance.",
+    "program_name": "Acme fictional compliance program",
+    "decision_owner": "Fictional board risk committee; final individual owner unconfirmed",
+    "company_context": "Fictional SaaS organization. No legal entity, industry-specific obligation, or operating policy is asserted by this fixture.",
+    "applicability_context": "Fictional internal proposal only. Jurisdiction and legal applicability are unknown; do not infer them.",
+    "candidate_frameworks": [
+      {
+        "name": "Framework Cedar",
+        "asserted_basis": "voluntary_standard",
+        "scope": "Proposed for discussion; scope has not been approved.",
+        "evidence_refs": [
+          "fixture:proposal-1"
+        ]
+      }
+    ],
+    "source_documents": [
+      "fixture:proposal-1",
+      "fixture:evidence-register",
+      "fixture:audit-calendar",
+      "fixture:mock-audit",
+      "fixture:management-review"
+    ],
+    "evidence_inventory": [
+      {
+        "artifact": "Quarterly access review log",
+        "owner": "IT operations role listed, owner acceptance unconfirmed",
+        "period_or_date": "Fictional Q3; exact completion date absent",
+        "source_ref": "fixture:evidence-register"
+      },
+      {
+        "artifact": "Incident response exercise note",
+        "owner": "Unknown",
+        "period_or_date": "No date recorded",
+        "source_ref": "fixture:evidence-register"
+      }
+    ],
+    "audit_calendar": [
+      {
+        "event": "Framework Cedar readiness review",
+        "period": "Fictional Q4 week 2",
+        "auditor_role": "Internal security lead; prior work role unknown",
+        "source_ref": "fixture:audit-calendar"
+      },
+      {
+        "event": "Financial control review",
+        "period": "Fictional Q4 week 2",
+        "auditor_role": "External reviewer role listed",
+        "source_ref": "fixture:audit-calendar"
+      }
+    ],
+    "mock_audit_record": "Fictional sample record: 10 items examined, 2 marked major and 3 marked minor. Population, sampling method, test criteria, and owner-approved severity thresholds are absent.",
+    "management_review_record": "Fictional minutes dated 2026-09-30 record one review and two open actions; cadence, accountable action owners, and framework applicability decision are not stated.",
+    "owner_approved_criteria": []
+  }
+}
