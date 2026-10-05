@@ -1,0 +1,314 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "request_ref",
+        "source_refs",
+        "data_classification",
+        "task_inputs"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "pattern": "^\\d{8}-\\d{4}-[A-Z0-9]+-\\d{6}$"
+        },
+        "request_ref": {
+          "type": "string"
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "data_classification": {
+          "type": "string",
+          "enum": [
+            "synthetic",
+            "redacted",
+            "restricted",
+            "sensitive",
+            "unknown"
+          ]
+        },
+        "task_inputs": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "role_context",
+            "approved_role_requirements",
+            "interview_stage",
+            "interview_duration_minutes",
+            "panel"
+          ],
+          "properties": {
+            "role_context": {
+              "type": "string",
+              "minLength": 1
+            },
+            "approved_role_requirements": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1
+            },
+            "interview_stage": {
+              "type": "string",
+              "minLength": 1
+            },
+            "interview_duration_minutes": {
+              "type": "integer",
+              "minimum": 15
+            },
+            "panel": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "source_versions": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "constraints": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "status",
+        "artifact_ref",
+        "evidence_refs",
+        "open_questions",
+        "review_owner_role",
+        "external_effects",
+        "mutations",
+        "work_product"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "completed_draft",
+            "needs_context",
+            "escalate",
+            "blocked"
+          ]
+        },
+        "artifact_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "open_questions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "review_owner_role": {
+          "type": "string"
+        },
+        "external_effects": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "mutations": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "work_product": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "competency_map",
+            "question_bank",
+            "agenda",
+            "scorecard",
+            "debrief_template",
+            "assumptions"
+          ],
+          "properties": {
+            "competency_map": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "competency",
+                  "role_requirement",
+                  "interviewer"
+                ],
+                "properties": {
+                  "competency": {
+                    "type": "string"
+                  },
+                  "role_requirement": {
+                    "type": "string"
+                  },
+                  "interviewer": {
+                    "type": "string"
+                  },
+                  "evidence_signals": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "question_bank": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "competency",
+                  "core_questions",
+                  "neutral_probes"
+                ],
+                "properties": {
+                  "competency": {
+                    "type": "string"
+                  },
+                  "core_questions": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "neutral_probes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "agenda": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "segment",
+                  "minutes",
+                  "interviewer"
+                ],
+                "properties": {
+                  "segment": {
+                    "type": "string"
+                  },
+                  "minutes": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "interviewer": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "scorecard": {
+              "type": "object",
+              "required": [
+                "scale",
+                "not_assessed_allowed"
+              ],
+              "properties": {
+                "scale": {
+                  "type": "array",
+                  "minItems": 4,
+                  "maxItems": 4,
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "not_assessed_allowed": {
+                  "type": "boolean"
+                },
+                "decision_rule": {
+                  "type": "string"
+                }
+              }
+            },
+            "debrief_template": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "assumptions": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "state": {
+      "type": "object",
+      "required": [
+        "task_id",
+        "phase",
+        "status",
+        "updated_at"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string"
+        },
+        "phase": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "updated_at": {
+          "type": "string"
+        },
+        "completed_sections": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "open_questions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

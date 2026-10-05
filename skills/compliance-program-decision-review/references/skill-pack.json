@@ -1,0 +1,214 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "compliance-program-decision-review",
+  "display_name": "Compliance Program Decision Review",
+  "version": "0.1.0",
+  "description": "Prepare a six-question evidence-grounded review packet for an authorized decision owner about compliance-framework commitment, an annual audit calendar, evidence consolidation, mock-audit review, management-review decisions, or certification-stage-1 sign-off.",
+  "capability_category": "compliance_program_decision_review",
+  "provenance": {
+    "author": "LiNKskills adaptation",
+    "source": "Pinned Alireza six-question entrypoint, package README, and exact MIT notice copied with file hashes in references/upstream/SOURCE-MANIFEST.json.",
+    "license": "See source manifest and exact notice. No separate license approval gate or publication clearance claim."
+  },
+  "lifecycle_state": "draft",
+  "format_profile": "heavy",
+  "compatible_runtime_profiles": [
+    "lisa-openclaw",
+    "cursor-macos"
+  ],
+  "min_capability_tier": "balanced",
+  "routing": {
+    "when_to_use": "Review a proposed compliance-program decision and prepare six evidence-backed question assessments and owner options.",
+    "when_not_to_use": [
+      "Named audit-window gap sequencing; route to compliance-framework-compliance-readiness.",
+      "Standing framework portfolio, control/evidence architecture, recurring program backlog, or annual calendar design; route to compliance-framework-compliance-os.",
+      "A request for binding legal determination, certification, official audit opinion, or policy adoption."
+    ],
+    "tags": [
+      "compliance",
+      "decision-review",
+      "task-specific",
+      "draft"
+    ],
+    "exclusion_rules": [
+      "Unknown applicability remains unknown until supported by current authority and company facts.",
+      "No approval or external effect."
+    ],
+    "ambiguity_rules": [
+      "Continue separable evidence review; record missing facts and owner roles."
+    ],
+    "recommended_disclosure_level": 2
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "task_request",
+        "description": "Decision under review and requested packet."
+      },
+      {
+        "name": "program_name",
+        "description": "Program/entity label from the request; may explicitly be unknown."
+      },
+      {
+        "name": "decision_owner",
+        "description": "Owner role or explicit unknown."
+      },
+      {
+        "name": "company_context",
+        "description": "Confirmed organizational facts or explicit unknowns."
+      },
+      {
+        "name": "applicability_context",
+        "description": "Jurisdictions, population, obligation, scope, and as-of facts or explicit unknowns."
+      },
+      {
+        "name": "candidate_frameworks",
+        "description": "Names, asserted basis, scope, and evidence references."
+      },
+      {
+        "name": "source_documents",
+        "description": "Authorized program evidence and source/date details."
+      },
+      {
+        "name": "evidence_inventory",
+        "description": "Artifact, owner, period/date, and source reference."
+      },
+      {
+        "name": "audit_calendar",
+        "description": "Proposed review events, dates, auditor roles, and source references."
+      },
+      {
+        "name": "mock_audit_record",
+        "description": "Observed sample and findings or explicit absence."
+      },
+      {
+        "name": "management_review_record",
+        "description": "Supplied cadence, decisions, actions, owners, or explicit absence."
+      }
+    ],
+    "expected_outputs": [
+      {
+        "name": "question_assessments",
+        "description": "Exactly six typed evidence and owner-decision assessments."
+      },
+      {
+        "name": "decision_options",
+        "description": "Nonbinding options with trade-offs and authorized decision-owner choices; none selected by this review."
+      },
+      {
+        "name": "conflicts",
+        "description": "Contradictions between supplied records, with source references."
+      },
+      {
+        "name": "missing_inputs",
+        "description": "Required unresolved facts and the owner role to obtain them."
+      },
+      {
+        "name": "unknown_facts",
+        "description": "Unknowns with explanation and source references."
+      },
+      {
+        "name": "open_questions_and_partial_work",
+        "description": "Questions for the owner and independently completed portions."
+      }
+    ],
+    "forbidden_actions": [
+      "This review does not choose, commit, schedule, certify, approve, sign, notify, file, or update official records. It records prior decisions only when authority is evidenced and preserves decisions reserved to Carlos.",
+      "No invented authority, applicability, policy, dates, thresholds, outcomes, or evidence.",
+      "No source scripts, unverified APIs, or connector aliases are callable task tools."
+    ],
+    "verification_steps": [
+      "Trace findings to supplied evidence references.",
+      "Check framework basis, jurisdiction and as-of details or mark unknown.",
+      "Check owner and auditor independence facts; do not infer from title alone.",
+      "Compare mock-audit findings only to supplied owner-approved criteria.",
+      "Validate all six question assessments, options, and empty effects/mutations."
+    ],
+    "completion_criteria": [
+      "All six assessments contain task-specific evidence-backed findings or explicit unknowns.",
+      "Decision options identify trade-offs and the authorized decision owner without selecting an option.",
+      "No unsupported applicability, readiness, compliance, or certification conclusion.",
+      "Typed output passes references/schemas.json and external_effects/mutations are empty."
+    ],
+    "known_limitations": [
+      "Candidate is draft-only and uncertified.",
+      "Copied upstream scripts are archived_support only and are not exposed or callable task tools.",
+      "No current-law, framework applicability, runtime, legal, audit, or semantic certification is asserted."
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [
+      {
+        "key": "min_reasoning_tier",
+        "value": "balanced"
+      },
+      {
+        "key": "context_required",
+        "value": 64000
+      },
+      {
+        "key": "preferred_model",
+        "value": "gpt-6.1-sol"
+      }
+    ],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "required_certification_profiles": [],
+    "verification_refs": [
+      "references/eval-suite.yaml",
+      "references/upstream/SOURCE-MANIFEST.json",
+      "references/task-contract-shape-fixture.json"
+    ],
+    "suite_hash": "sha256:9e3ca5cc4cd8eac6be2e1331eca1ee37afbe5e40469c8f91afdd1d8e7a940741"
+  },
+  "telemetry": {
+    "classification": "restricted",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_personal_data",
+      "strip_privileged_content",
+      "strip_raw_documents",
+      "strip_reasoning"
+    ],
+    "retention_policy": "retain opaque task/source ids and hashes only"
+  },
+  "fragments": [
+    {
+      "fragment_id": "skill-md",
+      "disclosure_level": 2,
+      "path": "SKILL.md"
+    },
+    {
+      "fragment_id": "advanced",
+      "disclosure_level": 3,
+      "path": "advanced/advanced.md"
+    },
+    {
+      "fragment_id": "contracts",
+      "disclosure_level": 4,
+      "path": "references/schemas.json"
+    },
+    {
+      "fragment_id": "eval",
+      "disclosure_level": 4,
+      "path": "references/eval-suite.json"
+    },
+    {
+      "fragment_id": "source-manifest",
+      "disclosure_level": 3,
+      "path": "references/upstream/SOURCE-MANIFEST.json"
+    }
+  ],
+  "release_channel": "development"
+}

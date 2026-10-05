@@ -1,0 +1,413 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "legal-ip-clearance",
+  "input_schema_ref": "references/schemas.json#/definitions/input",
+  "output_schema_ref": "references/schemas.json#/definitions/output",
+  "fixtures": [
+    {
+      "fixture_id": "typed-completed-task",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261004-1200-SARA-123456",
+        "request_ref": "fixture:legal-ip-clearance",
+        "source_refs": [
+          "fixture:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "legal_ip_clearance_task_payload": {
+            "mark_or_asset_and_goods_services_scope": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            },
+            "jurisdictions_and_search_date": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            },
+            "search_sources_and_candidate_records": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            },
+            "business_use_and_counsel_decisions": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            }
+          },
+          "task_request": "Synthetic unknown-context fixture for legal-ip-clearance",
+          "company_or_matter_facts": "Synthetic unknown-context fixture for legal-ip-clearance",
+          "source_documents": [
+            "fixture:source-1"
+          ],
+          "jurisdiction_and_as_of": {
+            "jurisdictions": [],
+            "as_of_date": null
+          },
+          "approved_positions_or_policy_ref": null
+        }
+      },
+      "output": {
+        "task_id": "20261004-1200-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": "fixture:legal-ip-clearance",
+        "evidence_refs": [
+          "fixture:source-1"
+        ],
+        "open_questions": [],
+        "review_owner_role": "authorized human reviewer",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "legal_ip_clearance_work_product": {
+            "clearance_search_log": [
+              {
+                "content": "Synthetic task-shaped item; applicability unknown.",
+                "evidence_refs": [
+                  "fixture:source-1"
+                ],
+                "status": "unknown"
+              }
+            ],
+            "candidate_conflicts": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "similarity_relevance_analysis": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "scope_coverage_limits": [
+              {
+                "content": "Synthetic task-shaped item; applicability unknown.",
+                "evidence_refs": [
+                  "fixture:source-1"
+                ],
+                "status": "unknown"
+              }
+            ],
+            "counsel_decision_points": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "evidence_trace": [
+              {
+                "source_ref": "fixture:source-1",
+                "location": null,
+                "supports": "Synthetic source only; no real legal fact."
+              }
+            ],
+            "jurisdiction_and_as_of": {
+              "jurisdictions": [],
+              "as_of_date": null
+            },
+            "assumptions_and_gaps": [
+              "All facts unknown in synthetic fixture."
+            ],
+            "proposed_next_steps": [
+              "Obtain source evidence."
+            ]
+          }
+        }
+      }
+    },
+    {
+      "fixture_id": "typed-needs-context-explicit-unknowns",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261004-1200-SARA-123456",
+        "request_ref": "fixture:legal-ip-clearance",
+        "source_refs": [
+          "fixture:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "legal_ip_clearance_task_payload": {
+            "mark_or_asset_and_goods_services_scope": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            },
+            "jurisdictions_and_search_date": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            },
+            "search_sources_and_candidate_records": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            },
+            "business_use_and_counsel_decisions": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            }
+          },
+          "task_request": "Synthetic unknown-context fixture for legal-ip-clearance",
+          "company_or_matter_facts": "Synthetic unknown-context fixture for legal-ip-clearance",
+          "source_documents": [
+            "fixture:source-1"
+          ],
+          "jurisdiction_and_as_of": {
+            "jurisdictions": [],
+            "as_of_date": null
+          },
+          "approved_positions_or_policy_ref": null
+        }
+      },
+      "output": {
+        "task_id": "20261004-1200-SARA-123456",
+        "status": "needs_context",
+        "artifact_ref": null,
+        "evidence_refs": [],
+        "open_questions": [
+          "Provide missing task evidence."
+        ],
+        "review_owner_role": "Sara",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "partial_work": "No substantive fact established.",
+          "missing_inputs": [
+            "mark_or_asset_and_goods_services_scope",
+            "jurisdictions_and_search_date",
+            "search_sources_and_candidate_records",
+            "business_use_and_counsel_decisions"
+          ],
+          "unknown_facts": [
+            "mark_or_asset_and_goods_services_scope",
+            "jurisdictions_and_search_date",
+            "search_sources_and_candidate_records",
+            "business_use_and_counsel_decisions"
+          ]
+        }
+      }
+    },
+    {
+      "fixture_id": "invalid-task-id-regex",
+      "expected_valid": false,
+      "input": {
+        "task_id": "bad-id",
+        "request_ref": "fixture:legal-ip-clearance",
+        "source_refs": [
+          "fixture:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "legal_ip_clearance_task_payload": {
+            "mark_or_asset_and_goods_services_scope": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            },
+            "jurisdictions_and_search_date": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            },
+            "search_sources_and_candidate_records": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            },
+            "business_use_and_counsel_decisions": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            }
+          },
+          "task_request": "Synthetic unknown-context fixture for legal-ip-clearance",
+          "company_or_matter_facts": "Synthetic unknown-context fixture for legal-ip-clearance",
+          "source_documents": [
+            "fixture:source-1"
+          ],
+          "jurisdiction_and_as_of": {
+            "jurisdictions": [],
+            "as_of_date": null
+          },
+          "approved_positions_or_policy_ref": null
+        }
+      },
+      "output": {
+        "task_id": "20261004-1200-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": "fixture:legal-ip-clearance",
+        "evidence_refs": [
+          "fixture:source-1"
+        ],
+        "open_questions": [],
+        "review_owner_role": "authorized human reviewer",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "legal_ip_clearance_work_product": {
+            "clearance_search_log": [
+              {
+                "content": "Synthetic task-shaped item; applicability unknown.",
+                "evidence_refs": [
+                  "fixture:source-1"
+                ],
+                "status": "unknown"
+              }
+            ],
+            "candidate_conflicts": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "similarity_relevance_analysis": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "scope_coverage_limits": [
+              {
+                "content": "Synthetic task-shaped item; applicability unknown.",
+                "evidence_refs": [
+                  "fixture:source-1"
+                ],
+                "status": "unknown"
+              }
+            ],
+            "counsel_decision_points": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "evidence_trace": [
+              {
+                "source_ref": "fixture:source-1",
+                "location": null,
+                "supports": "Synthetic source only; no real legal fact."
+              }
+            ],
+            "jurisdiction_and_as_of": {
+              "jurisdictions": [],
+              "as_of_date": null
+            },
+            "assumptions_and_gaps": [
+              "All facts unknown in synthetic fixture."
+            ],
+            "proposed_next_steps": [
+              "Obtain source evidence."
+            ]
+          }
+        }
+      }
+    },
+    {
+      "fixture_id": "missing-task-specific-input",
+      "expected_valid": false,
+      "input": {
+        "task_id": "20261004-1200-SARA-123456",
+        "request_ref": "fixture:legal-ip-clearance",
+        "source_refs": [
+          "fixture:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "task_request": "Synthetic unknown-context fixture for legal-ip-clearance",
+          "company_or_matter_facts": "Synthetic unknown-context fixture for legal-ip-clearance",
+          "source_documents": [
+            "fixture:source-1"
+          ],
+          "jurisdiction_and_as_of": {
+            "jurisdictions": [],
+            "as_of_date": null
+          },
+          "approved_positions_or_policy_ref": null
+        }
+      },
+      "output": {
+        "task_id": "20261004-1200-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": "fixture:legal-ip-clearance",
+        "evidence_refs": [
+          "fixture:source-1"
+        ],
+        "open_questions": [],
+        "review_owner_role": "authorized human reviewer",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "legal_ip_clearance_work_product": {
+            "clearance_search_log": [
+              {
+                "content": "Synthetic task-shaped item; applicability unknown.",
+                "evidence_refs": [
+                  "fixture:source-1"
+                ],
+                "status": "unknown"
+              }
+            ],
+            "candidate_conflicts": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "similarity_relevance_analysis": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "scope_coverage_limits": [
+              {
+                "content": "Synthetic task-shaped item; applicability unknown.",
+                "evidence_refs": [
+                  "fixture:source-1"
+                ],
+                "status": "unknown"
+              }
+            ],
+            "counsel_decision_points": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "evidence_trace": [
+              {
+                "source_ref": "fixture:source-1",
+                "location": null,
+                "supports": "Synthetic source only; no real legal fact."
+              }
+            ],
+            "jurisdiction_and_as_of": {
+              "jurisdictions": [],
+              "as_of_date": null
+            },
+            "assumptions_and_gaps": [
+              "All facts unknown in synthetic fixture."
+            ],
+            "proposed_next_steps": [
+              "Obtain source evidence."
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

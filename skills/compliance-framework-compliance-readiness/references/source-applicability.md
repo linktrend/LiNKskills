@@ -1,0 +1,8 @@
+# Source applicability and limits
+
+This draft pack uses Borghei as the current owner of multi-framework evidence strategy and named-milestone readiness sequencing. The Alireza six-question decision-review source remains preserved for lineage/support but is not an active readiness method; route that task to `compliance-program-decision-review`. Source roles and exact hashes are in `references/upstream/SOURCE-MANIFEST.json`. Source applicability is not a company-specific legal conclusion and does not establish that any law, standard, certification or framework applies to LiNKtrend. Verify the actual entity, activities, product/data, territories, role, threshold, current version and as-of date from authoritative evidence before making legal or audit conclusions. Unknown is an acceptable status.
+
+- `audit-prep-compliance-readiness` (`current_task_owner`; active destination `compliance-framework-compliance-readiness`): Conditional: use only for an organization actually pursuing multiple frameworks; named statutory/regulatory frameworks require current jurisdiction/applicability verification. Technical certification implementation belongs to assigned owners.
+- `compliance-framework-compliance-readiness` (`archived_support`; active task destination `compliance-program-decision-review`): preserved original source only; its six-question decision review is no longer the active method in this package.
+
+Do not reuse source-era deadlines, thresholds, risk scores, legal conclusions or sample company assumptions without current verification. Voluntary standards, customer requirements and laws must be labeled separately.

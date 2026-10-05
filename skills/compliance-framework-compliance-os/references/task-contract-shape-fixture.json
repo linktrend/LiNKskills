@@ -1,0 +1,164 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "compliance-framework-compliance-os",
+  "input_schema_ref": "references/schemas.json#/definitions/input",
+  "output_schema_ref": "references/schemas.json#/definitions/output",
+  "completion_required_fields": [
+    "candidate_framework_scope",
+    "control_overlap_map",
+    "evidence_reuse_candidates",
+    "mock_audit_design",
+    "integrated_calendar_options",
+    "program_backlog"
+  ],
+  "fixtures": [
+    {
+      "fixture_id": "synthetic-task-shaped-completed",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261005-0900-SARA-123456",
+        "request_ref": "fixture:compliance-framework-compliance-os:request",
+        "source_refs": [
+          "fixture:compliance-framework-compliance-os:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "task_request": "A fictional SaaS company asks for its standing multi-framework operating model: portfolio scope, shared-control/evidence architecture, recurring mock-audit cadence, annual calendar options and owner backlog; no single audit window is being assessed.",
+          "source_documents": [
+            "Synthetic input fixture for compliance-framework-compliance-os: source documents. Fictional test content only; no real-world facts."
+          ],
+          "company_context": "Synthetic input fixture for compliance-framework-compliance-os: company context. Fictional test content only; no real-world facts.",
+          "applicability_context": "Synthetic input fixture for compliance-framework-compliance-os: applicability context. Fictional test content only; no real-world facts.",
+          "review_owner": "Synthetic input fixture for compliance-framework-compliance-os: review owner. Fictional test content only; no real-world facts.",
+          "framework_candidates": "Synthetic input fixture for compliance-framework-compliance-os: framework candidates. Fictional test content only; no real-world facts.",
+          "organization_profile": "Synthetic input fixture for compliance-framework-compliance-os: organization profile. Fictional test content only; no real-world facts.",
+          "evidence_catalog": "Synthetic input fixture for compliance-framework-compliance-os: evidence catalog. Fictional test content only; no real-world facts.",
+          "calendar_and_capacity": "Synthetic input fixture for compliance-framework-compliance-os: calendar and capacity. Fictional test content only; no real-world facts."
+        }
+      },
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": "fixture:compliance-framework-compliance-os:draft",
+        "evidence_refs": [
+          "fixture:compliance-framework-compliance-os:source-1"
+        ],
+        "open_questions": [],
+        "review_owner_role": "Synthetic completed task for compliance-framework-compliance-os: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "candidate_framework_scope": "Fictional compliance-framework-compliance-os candidate framework scope section. Scenario: A fictional SaaS company asks for its standing multi-framework operating model: portfolio scope, shared-control/evidence architecture, recurring mock-audit cadence, annual calendar options and owner backlog; no single audit window is being assessed. Expected handling: Produces the multi-framework compliance program orchestration deliverable with task-specific fields and not a generic departmental summary. Cites supplied evidence and preserves unknown, conflicting or unsupported facts. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "control_overlap_map": "Fictional compliance-framework-compliance-os control overlap map section. Scenario: A fictional SaaS company asks for its standing multi-framework operating model: portfolio scope, shared-control/evidence architecture, recurring mock-audit cadence, annual calendar options and owner backlog; no single audit window is being assessed. Expected handling: Produces the multi-framework compliance program orchestration deliverable with task-specific fields and not a generic departmental summary. Cites supplied evidence and preserves unknown, conflicting or unsupported facts. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "evidence_reuse_candidates": [
+            "Fictional compliance-framework-compliance-os evidence reuse candidates section. Scenario: A fictional SaaS company asks for its standing multi-framework operating model: portfolio scope, shared-control/evidence architecture, recurring mock-audit cadence, annual calendar options and owner backlog; no single audit window is being assessed. Expected handling: Produces the multi-framework compliance program orchestration deliverable with task-specific fields and not a generic departmental summary. Cites supplied evidence and preserves unknown, conflicting or unsupported facts. This is illustrative synthetic content only, not a real fact, legal authority, or executed result."
+          ],
+          "mock_audit_design": "Fictional compliance-framework-compliance-os mock audit design section. Scenario: A fictional SaaS company asks for its standing multi-framework operating model: portfolio scope, shared-control/evidence architecture, recurring mock-audit cadence, annual calendar options and owner backlog; no single audit window is being assessed. Expected handling: Produces the multi-framework compliance program orchestration deliverable with task-specific fields and not a generic departmental summary. Cites supplied evidence and preserves unknown, conflicting or unsupported facts. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "integrated_calendar_options": [
+            "Fictional compliance-framework-compliance-os integrated calendar options section. Scenario: A fictional SaaS company asks for its standing multi-framework operating model: portfolio scope, shared-control/evidence architecture, recurring mock-audit cadence, annual calendar options and owner backlog; no single audit window is being assessed. Expected handling: Produces the multi-framework compliance program orchestration deliverable with task-specific fields and not a generic departmental summary. Cites supplied evidence and preserves unknown, conflicting or unsupported facts. This is illustrative synthetic content only, not a real fact, legal authority, or executed result."
+          ],
+          "program_backlog": "Fictional compliance-framework-compliance-os program backlog section. Scenario: A fictional SaaS company asks for its standing multi-framework operating model: portfolio scope, shared-control/evidence architecture, recurring mock-audit cadence, annual calendar options and owner backlog; no single audit window is being assessed. Expected handling: Produces the multi-framework compliance program orchestration deliverable with task-specific fields and not a generic departmental summary. Cites supplied evidence and preserves unknown, conflicting or unsupported facts. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "partial_work": [],
+          "missing_inputs": [],
+          "unknown_facts": []
+        }
+      }
+    },
+    {
+      "fixture_id": "needs-context-preserves-partial-and-unknowns",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261005-0900-SARA-123456",
+        "request_ref": "fixture:compliance-framework-compliance-os:request",
+        "source_refs": [
+          "fixture:compliance-framework-compliance-os:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "task_request": "Prepare a synthetic compliance-framework-compliance-os deliverable from this fictional test record; make no real-world factual or legal claim.",
+          "source_documents": [
+            "Synthetic input fixture for compliance-framework-compliance-os: source documents. Fictional test content only; no real-world facts."
+          ],
+          "company_context": "Synthetic input fixture for compliance-framework-compliance-os: company context. Fictional test content only; no real-world facts.",
+          "applicability_context": "Synthetic input fixture for compliance-framework-compliance-os: applicability context. Fictional test content only; no real-world facts.",
+          "review_owner": "Synthetic input fixture for compliance-framework-compliance-os: review owner. Fictional test content only; no real-world facts.",
+          "framework_candidates": "Synthetic input fixture for compliance-framework-compliance-os: framework candidates. Fictional test content only; no real-world facts.",
+          "organization_profile": "Synthetic input fixture for compliance-framework-compliance-os: organization profile. Fictional test content only; no real-world facts.",
+          "evidence_catalog": "Synthetic input fixture for compliance-framework-compliance-os: evidence catalog. Fictional test content only; no real-world facts.",
+          "calendar_and_capacity": "Synthetic input fixture for compliance-framework-compliance-os: calendar and capacity. Fictional test content only; no real-world facts."
+        }
+      },
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "needs_context",
+        "artifact_ref": "fixture:compliance-framework-compliance-os:partial",
+        "evidence_refs": [],
+        "open_questions": [
+          "Confirm the named missing input with its owner."
+        ],
+        "review_owner_role": "Synthetic completed task for compliance-framework-compliance-os: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "candidate_framework_scope": "",
+          "control_overlap_map": "",
+          "evidence_reuse_candidates": [],
+          "mock_audit_design": "",
+          "integrated_calendar_options": [],
+          "program_backlog": "",
+          "partial_work": [
+            {
+              "section": "candidate_framework_scope",
+              "content": "Partial compliance-framework-compliance-os fixture: source inventory recorded; one dependent conclusion remains unknown.",
+              "evidence_refs": [
+                "fixture:compliance-framework-compliance-os:source-1"
+              ]
+            }
+          ],
+          "missing_inputs": [
+            {
+              "field": "authorized_source_or_material_fact",
+              "reason": "Synthetic missing-context scenario: A material owner, source version or capacity input for the standing program is unavailable. Complete separable portfolio mapping; identify the missing source and do not score a specific certification milestone.",
+              "requested_owner": "task owner"
+            }
+          ],
+          "unknown_facts": [
+            {
+              "fact": "task-specific applicability or evidence fact",
+              "why_unknown": "The edge scenario intentionally leaves this required fact or authority unresolved; preserve it as unknown.",
+              "evidence_refs": [
+                "fixture:compliance-framework-compliance-os:source-1"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "fixture_id": "empty-completed-draft-rejected",
+      "expected_valid": false,
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": null,
+        "evidence_refs": [],
+        "open_questions": [],
+        "review_owner_role": "Synthetic completed task for compliance-framework-compliance-os: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "candidate_framework_scope": "",
+          "control_overlap_map": "",
+          "evidence_reuse_candidates": [],
+          "mock_audit_design": "",
+          "integrated_calendar_options": [],
+          "program_backlog": "",
+          "partial_work": [],
+          "missing_inputs": [],
+          "unknown_facts": []
+        }
+      }
+    }
+  ],
+  "fixture_note": "All values are fictional task-shaped contract examples derived from this pack’s golden scenario and criteria; these files are schema evidence, not executed results or business/legal facts."
+}

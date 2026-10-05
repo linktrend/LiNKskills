@@ -1,0 +1,261 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "legal-lawve-invoice-review-compliance-scott-margetts",
+  "display_name": "Outside Counsel Invoice Compliance Review",
+  "version": "0.1.0",
+  "description": "Review an outside-counsel invoice against supplied engagement terms and billing guidelines, producing line-item findings and an internal draft approval/rejection note.",
+  "capability_category": "conditional_legal_task",
+  "lifecycle_state": "draft",
+  "format_profile": "heavy",
+  "compatible_runtime_profiles": [
+    "lisa-openclaw",
+    "cursor-macos"
+  ],
+  "min_capability_tier": "balanced",
+  "provenance": {
+    "author": "LiNKskills adaptation",
+    "source": "lawve-ai/awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290:skills/invoice-review-compliance-scott-margetts/SKILL.md",
+    "license": "Source declarations and all original notices preserved; no license clearance claim."
+  },
+  "routing": {
+    "when_to_use": "Review an outside-counsel invoice against supplied engagement terms and billing guidelines, producing line-item findings and an internal draft approval/rejection note.",
+    "when_not_to_use": [
+      "A different, distinct task is requested",
+      "An unapproved external effect, final decision, signature or system mutation is required"
+    ],
+    "tags": [
+      "conditional",
+      "task-specific",
+      "draft"
+    ],
+    "exclusion_rules": [
+      "Do not infer legal, company or jurisdiction applicability.",
+      "No external effects, filing, signing, source-system mutation or compliance certification."
+    ],
+    "ambiguity_rules": [
+      "Read authorized evidence; ask only materially outcome-changing questions; complete separable work"
+    ],
+    "recommended_disclosure_level": 2
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "invoice_and_lines",
+        "description": "Invoice ID, currency, billing period, line-item detail and totals."
+      },
+      {
+        "name": "matter_and_firm",
+        "description": "Matter, law firm, staffing context and approved matter budget."
+      },
+      {
+        "name": "billing_guidelines",
+        "description": "Current approved billing guidelines and engagement terms."
+      },
+      {
+        "name": "review_system",
+        "description": "E-billing platform or manual process and available coding."
+      },
+      {
+        "name": "prior_invoice_evidence",
+        "description": "Comparable invoice IDs or prior decisions, if authorized."
+      },
+      {
+        "name": "scope_and_as_of",
+        "description": "Applicable scope and as-of date; unknown when unavailable."
+      }
+    ],
+    "expected_outputs": [
+      {
+        "name": "legal-lawve-invoice-review-compliance-scott-margetts_work_product",
+        "description": "Typed task output with evidence, gaps and owner questions."
+      }
+    ],
+    "forbidden_actions": [
+      "Unapproved external effects, signatures, filings, legal commitments or source-system mutations",
+      "Inventing facts, jurisdiction, legal authority, company policy or approval",
+      "Exposure of confidential or personal data outside authorized scope"
+    ],
+    "verification_steps": [
+      "Every non-compliance flag cites a supplied guideline/term.",
+      "Math ties to invoice line amount and rate.",
+      "No payment or external rejection communication occurs.",
+      "Verify primary legal authority and as-of date or mark the proposition unverified.",
+      "Keep external_effects and mutations empty."
+    ],
+    "completion_criteria": [
+      "Task-specific output complete or exact blocker identified.",
+      "Evidence, source currency and unknowns visible.",
+      "No unapproved effect or mutation."
+    ],
+    "known_limitations": [
+      "Draft/uncertified; structural validation does not prove legal accuracy or task performance.",
+      "No license-compliance or legal-clearance claim.",
+      "No live database, external research connector or business-system write assumed."
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read",
+      "filesystem_write"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [
+      {
+        "key": "min_reasoning_tier",
+        "value": "balanced"
+      },
+      {
+        "key": "context_required",
+        "value": 64000
+      },
+      {
+        "key": "preferred_model",
+        "value": "gpt-6.1-sol"
+      }
+    ],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "required_certification_profiles": [],
+    "verification_refs": [
+      "references/eval-suite.yaml",
+      "references/source-copy-manifest.json",
+      "references/upstream/SOURCE-MANIFEST.json"
+    ],
+    "suite_hash": "sha256:16f3e66e14d7e3599b9310967f3239ab98c66adc7fc8581e759e85e740f51a8d"
+  },
+  "telemetry": {
+    "classification": "restricted",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_personal_data",
+      "strip_raw_documents",
+      "strip_reasoning"
+    ],
+    "retention_policy": "opaque task/source ids and hashes only"
+  },
+  "fragments": [
+    {
+      "fragment_id": "_gitignore",
+      "disclosure_level": 3,
+      "path": ".gitignore"
+    },
+    {
+      "fragment_id": "SKILL_md",
+      "disclosure_level": 2,
+      "path": "SKILL.md"
+    },
+    {
+      "fragment_id": "advanced_advanced_md",
+      "disclosure_level": 2,
+      "path": "advanced/advanced.md"
+    },
+    {
+      "fragment_id": "examples_error-recovery_md",
+      "disclosure_level": 3,
+      "path": "examples/error-recovery.md"
+    },
+    {
+      "fragment_id": "examples_success-pattern_md",
+      "disclosure_level": 3,
+      "path": "examples/success-pattern.md"
+    },
+    {
+      "fragment_id": "examples_synthetic-example_json",
+      "disclosure_level": 3,
+      "path": "examples/synthetic-example.json"
+    },
+    {
+      "fragment_id": "examples_synthetic-example_md",
+      "disclosure_level": 3,
+      "path": "examples/synthetic-example.md"
+    },
+    {
+      "fragment_id": "references_api-specs_md",
+      "disclosure_level": 3,
+      "path": "references/api-specs.md"
+    },
+    {
+      "fragment_id": "references_changelog_md",
+      "disclosure_level": 3,
+      "path": "references/changelog.md"
+    },
+    {
+      "fragment_id": "references_eval-suite_json",
+      "disclosure_level": 3,
+      "path": "references/eval-suite.json"
+    },
+    {
+      "fragment_id": "references_eval-suite_yaml",
+      "disclosure_level": 3,
+      "path": "references/eval-suite.yaml"
+    },
+    {
+      "fragment_id": "references_execution-profile_json",
+      "disclosure_level": 3,
+      "path": "references/execution-profile.json"
+    },
+    {
+      "fragment_id": "references_old-patterns_md",
+      "disclosure_level": 3,
+      "path": "references/old-patterns.md"
+    },
+    {
+      "fragment_id": "references_schemas_json",
+      "disclosure_level": 3,
+      "path": "references/schemas.json"
+    },
+    {
+      "fragment_id": "references_source-applicability_md",
+      "disclosure_level": 3,
+      "path": "references/source-applicability.md"
+    },
+    {
+      "fragment_id": "references_source-copy-manifest_json",
+      "disclosure_level": 3,
+      "path": "references/source-copy-manifest.json"
+    },
+    {
+      "fragment_id": "references_task-contract-shape-fixture_json",
+      "disclosure_level": 3,
+      "path": "references/task-contract-shape-fixture.json"
+    },
+    {
+      "fragment_id": "references_upstream_LAWVE-COLLECTION-LICENSE",
+      "disclosure_level": 3,
+      "path": "references/upstream/LAWVE-COLLECTION-LICENSE"
+    },
+    {
+      "fragment_id": "references_upstream_SOURCE-MANIFEST_json",
+      "disclosure_level": 3,
+      "path": "references/upstream/SOURCE-MANIFEST.json"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_invoice-review-compliance-scott-margetts_README_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/invoice-review-compliance-scott-margetts/README.md"
+    },
+    {
+      "fragment_id": "references_upstream_lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290_source_skills_invoice-review-compliance-scott-margetts_SKILL_md",
+      "disclosure_level": 3,
+      "path": "references/upstream/lawve-ai-awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290/source/skills/invoice-review-compliance-scott-margetts/SKILL.md"
+    },
+    {
+      "fragment_id": "scripts_README_md",
+      "disclosure_level": 3,
+      "path": "scripts/README.md"
+    },
+    {
+      "fragment_id": "scripts_helper_tool_py",
+      "disclosure_level": 3,
+      "path": "scripts/helper_tool.py"
+    }
+  ],
+  "release_channel": "development"
+}

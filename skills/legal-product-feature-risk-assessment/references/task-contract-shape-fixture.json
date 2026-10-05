@@ -1,0 +1,161 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "legal-product-feature-risk-assessment",
+  "input_schema_ref": "references/schemas.json#/definitions/input",
+  "output_schema_ref": "references/schemas.json#/definitions/output",
+  "completion_required_fields": [
+    "feature_scope_and_domains",
+    "risk_and_evidence_matrix",
+    "calibration_and_uncertainty",
+    "launch_conditions_for_review"
+  ],
+  "fixtures": [
+    {
+      "fixture_id": "synthetic-task-shaped-completed",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261005-0900-SARA-123456",
+        "request_ref": "fixture:legal-product-feature-risk-assessment:request",
+        "source_refs": [
+          "fixture:legal-product-feature-risk-assessment:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "task_request": "A fictional feature uses generative summaries for users in unknown markets; map domains and tests, leaving legal thresholds unresolved.",
+          "source_documents": [
+            "Synthetic input fixture for legal-product-feature-risk-assessment: source documents. Fictional test content only; no real-world facts."
+          ],
+          "company_context": "Synthetic input fixture for legal-product-feature-risk-assessment: company context. Fictional test content only; no real-world facts.",
+          "applicability_context": "Synthetic input fixture for legal-product-feature-risk-assessment: applicability context. Fictional test content only; no real-world facts.",
+          "review_owner": "Synthetic input fixture for legal-product-feature-risk-assessment: review owner. Fictional test content only; no real-world facts.",
+          "feature_change": "Synthetic input fixture for legal-product-feature-risk-assessment: feature change. Fictional test content only; no real-world facts.",
+          "users_and_data": "Synthetic input fixture for legal-product-feature-risk-assessment: users and data. Fictional test content only; no real-world facts.",
+          "claims_and_controls": "Synthetic input fixture for legal-product-feature-risk-assessment: claims and controls. Fictional test content only; no real-world facts.",
+          "territories_and_channels": "Synthetic input fixture for legal-product-feature-risk-assessment: territories and channels. Fictional test content only; no real-world facts.",
+          "calibration_sources": "Synthetic input fixture for legal-product-feature-risk-assessment: calibration sources. Fictional test content only; no real-world facts."
+        }
+      },
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": "fixture:legal-product-feature-risk-assessment:draft",
+        "evidence_refs": [
+          "fixture:legal-product-feature-risk-assessment:source-1"
+        ],
+        "open_questions": [],
+        "review_owner_role": "Synthetic completed task for legal-product-feature-risk-assessment: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "feature_scope_and_domains": "Fictional legal-product-feature-risk-assessment feature scope and domains section. Scenario: A fictional feature uses generative summaries for users in unknown markets; map domains and tests, leaving legal thresholds unresolved. Expected handling: Produces the product feature legal risk assessment deliverable with task-specific fields and not a generic departmental summary. Cites supplied evidence and preserves unknown, conflicting or unsupported facts. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "risk_and_evidence_matrix": [
+            "Fictional legal-product-feature-risk-assessment risk and evidence matrix section. Scenario: A fictional feature uses generative summaries for users in unknown markets; map domains and tests, leaving legal thresholds unresolved. Expected handling: Produces the product feature legal risk assessment deliverable with task-specific fields and not a generic departmental summary. Cites supplied evidence and preserves unknown, conflicting or unsupported facts. This is illustrative synthetic content only, not a real fact, legal authority, or executed result."
+          ],
+          "calibration_and_uncertainty": "Fictional legal-product-feature-risk-assessment calibration and uncertainty section. Scenario: A fictional feature uses generative summaries for users in unknown markets; map domains and tests, leaving legal thresholds unresolved. Expected handling: Produces the product feature legal risk assessment deliverable with task-specific fields and not a generic departmental summary. Cites supplied evidence and preserves unknown, conflicting or unsupported facts. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "handoff_and_owner_options": [],
+          "launch_conditions_for_review": [
+            "Fictional legal-product-feature-risk-assessment launch conditions for review section. Scenario: A fictional feature uses generative summaries for users in unknown markets; map domains and tests, leaving legal thresholds unresolved. Expected handling: Produces the product feature legal risk assessment deliverable with task-specific fields and not a generic departmental summary. Cites supplied evidence and preserves unknown, conflicting or unsupported facts. This is illustrative synthetic content only, not a real fact, legal authority, or executed result."
+          ],
+          "partial_work": [],
+          "missing_inputs": [],
+          "unknown_facts": []
+        }
+      }
+    },
+    {
+      "fixture_id": "needs-context-preserves-partial-and-unknowns",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261005-0900-SARA-123456",
+        "request_ref": "fixture:legal-product-feature-risk-assessment:request",
+        "source_refs": [
+          "fixture:legal-product-feature-risk-assessment:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "task_request": "Prepare a synthetic legal-product-feature-risk-assessment deliverable from this fictional test record; make no real-world factual or legal claim.",
+          "source_documents": [
+            "Synthetic input fixture for legal-product-feature-risk-assessment: source documents. Fictional test content only; no real-world facts."
+          ],
+          "company_context": "Synthetic input fixture for legal-product-feature-risk-assessment: company context. Fictional test content only; no real-world facts.",
+          "applicability_context": "Synthetic input fixture for legal-product-feature-risk-assessment: applicability context. Fictional test content only; no real-world facts.",
+          "review_owner": "Synthetic input fixture for legal-product-feature-risk-assessment: review owner. Fictional test content only; no real-world facts.",
+          "feature_change": "Synthetic input fixture for legal-product-feature-risk-assessment: feature change. Fictional test content only; no real-world facts.",
+          "users_and_data": "Synthetic input fixture for legal-product-feature-risk-assessment: users and data. Fictional test content only; no real-world facts.",
+          "claims_and_controls": "Synthetic input fixture for legal-product-feature-risk-assessment: claims and controls. Fictional test content only; no real-world facts.",
+          "territories_and_channels": "Synthetic input fixture for legal-product-feature-risk-assessment: territories and channels. Fictional test content only; no real-world facts.",
+          "calibration_sources": "Synthetic input fixture for legal-product-feature-risk-assessment: calibration sources. Fictional test content only; no real-world facts."
+        }
+      },
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "needs_context",
+        "artifact_ref": "fixture:legal-product-feature-risk-assessment:partial",
+        "evidence_refs": [],
+        "open_questions": [
+          "Confirm the named missing input with its owner."
+        ],
+        "review_owner_role": "Synthetic completed task for legal-product-feature-risk-assessment: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "feature_scope_and_domains": "",
+          "risk_and_evidence_matrix": [],
+          "calibration_and_uncertainty": "",
+          "handoff_and_owner_options": [],
+          "launch_conditions_for_review": [],
+          "partial_work": [
+            {
+              "section": "feature_scope_and_domains",
+              "content": "Partial legal-product-feature-risk-assessment fixture: source inventory recorded; one dependent conclusion remains unknown.",
+              "evidence_refs": [
+                "fixture:legal-product-feature-risk-assessment:source-1"
+              ]
+            }
+          ],
+          "missing_inputs": [
+            {
+              "field": "authorized_source_or_material_fact",
+              "reason": "Synthetic missing-context scenario: The task arrives with a material missing fact or inaccessible authority needed for one conclusion. Complete separable source-grounded work and state the exact missing evidence, owner and next check.",
+              "requested_owner": "task owner"
+            }
+          ],
+          "unknown_facts": [
+            {
+              "fact": "task-specific applicability or evidence fact",
+              "why_unknown": "The edge scenario intentionally leaves this required fact or authority unresolved; preserve it as unknown.",
+              "evidence_refs": [
+                "fixture:legal-product-feature-risk-assessment:source-1"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "fixture_id": "empty-completed-draft-rejected",
+      "expected_valid": false,
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": null,
+        "evidence_refs": [],
+        "open_questions": [],
+        "review_owner_role": "Synthetic completed task for legal-product-feature-risk-assessment: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "feature_scope_and_domains": "",
+          "risk_and_evidence_matrix": [],
+          "calibration_and_uncertainty": "",
+          "handoff_and_owner_options": [],
+          "launch_conditions_for_review": [],
+          "partial_work": [],
+          "missing_inputs": [],
+          "unknown_facts": []
+        }
+      }
+    }
+  ],
+  "fixture_note": "All values are fictional task-shaped contract examples derived from this pack’s golden scenario and criteria; these files are schema evidence, not executed results or business/legal facts."
+}

@@ -22,6 +22,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from pathlib import PurePosixPath
 from typing import Any
+from urllib.parse import parse_qsl, unquote, urlsplit
 
 try:
     from scripts.gitops.generated_output_closure import (
@@ -109,6 +110,23 @@ CREDENTIAL_FIELDS = (
     "private-key",
 )
 GENERIC_REFERENCE_FIELDS = frozenset({"key", "url"})
+HTML_URL_REFERENCE_FIELDS = frozenset(
+    {
+        "action",
+        "cite",
+        "formaction",
+        "href",
+        "icon",
+        "longdesc",
+        "manifest",
+        "ping",
+        "poster",
+        "profile",
+        "src",
+        "usemap",
+        "xlink_href",
+    }
+)
 ANY_FIELD_RE = re.compile(r"(?i)\b(?P<field>[A-Za-z_][A-Za-z0-9_]*)\b")
 FIELD_RE = re.compile(
     r"(?i)\b(?P<field>"
@@ -486,11 +504,11 @@ def _is_reference_value(value: str) -> bool:
         return True
     if stripped.startswith(("$", "<")):
         return True
+    if _looks_like_url_locator(stripped):
+        return _is_public_url_locator(stripped)
     if re.fullmatch(r"[A-Z][A-Z0-9_]{2,}", stripped):
         return True
     if re.search(r"[A-Za-z_][A-Za-z0-9_]*\(", stripped):
-        return True
-    if re.match(r"(?i)(?:https?|git|ssh|file)://", stripped) and not DATABASE_RE.search(stripped):
         return True
     if stripped.startswith(("f\"", "f'", 'rf"', "fr\"", "F\"", "F'")):
         return True
@@ -508,10 +526,102 @@ def _is_reference_value(value: str) -> bool:
     return False
 
 
-def is_realistic_value(value: str) -> bool:
-    if GITHUB_RE.search(value) or CLOUD_RE.search(value) or TOKEN_RE.search(value):
+def _decoded_locator(value: str) -> str | None:
+    """Decode a bounded URL locator, rejecting malformed percent escapes."""
+    decoded = value.strip()
+    for _ in range(2):
+        if re.search(r"%(?![0-9A-Fa-f]{2})", decoded):
+            return None
+        next_value = unquote(decoded)
+        if next_value == decoded:
+            return decoded
+        decoded = next_value
+    return decoded
+
+
+def _url_contains_credentials(value: str) -> bool:
+    """Return true when a decoded URL contains credential-shaped material."""
+    if (
+        GITHUB_RE.search(value)
+        or CLOUD_RE.search(value)
+        or TOKEN_RE.search(value)
+        or DATABASE_RE.search(value)
+        or PRIVATE_KEY_RE.search(value)
+    ):
         return True
-    if DATABASE_RE.search(value) or PRIVATE_KEY_RE.search(value):
+    parsed = urlsplit(value if "://" in value else "https:" + value)
+    if parsed.username is not None or parsed.password is not None:
+        return True
+    scheme = parsed.scheme.casefold()
+    for name, query_value in parse_qsl(parsed.query, keep_blank_values=True):
+        if not query_value:
+            continue
+        if _is_credential_field(name) or (
+            scheme == "git+https"
+            and
+            len(query_value) >= 40
+            and _shannon(query_value) >= 3.5
+            and not is_synthetic_value(query_value)
+        ):
+            return True
+    return False
+
+
+def _is_public_url_locator(value: str) -> bool:
+    """Recognize public URL/path locators without exempting embedded secrets."""
+    decoded = _decoded_locator(value)
+    if decoded is None:
+        return False
+    stripped = decoded.strip()
+    if not stripped:
+        return True
+    if stripped.startswith(("/", "./", "../")):
+        if stripped.startswith("//"):
+            parsed = urlsplit("https:" + stripped)
+            return bool(parsed.netloc) and not _url_contains_credentials(stripped)
+        return not _url_contains_credentials("https://example.invalid" + stripped)
+    if stripped.lower().startswith("data:"):
+        return not _url_contains_credentials(stripped)
+    if not re.match(r"(?i)(?:https?|git\+https|git|ssh|file)://", stripped):
+        return False
+    parsed = urlsplit(stripped)
+    if not parsed.scheme or not parsed.netloc:
+        return False
+    return not _url_contains_credentials(stripped)
+
+
+def _looks_like_url_locator(value: str) -> bool:
+    """Identify URL-shaped input before deciding whether an HTML attribute is relevant."""
+    decoded = _decoded_locator(value)
+    if decoded is None:
+        return False
+    stripped = decoded.strip()
+    return stripped.startswith(
+        (
+            "/",
+            "./",
+            "../",
+            "http://",
+            "https://",
+            "git+https://",
+            "git://",
+            "ssh://",
+            "file://",
+            "data:",
+        )
+    )
+
+
+def is_realistic_value(value: str) -> bool:
+    decoded = _decoded_locator(value)
+    candidates = (value,) if decoded is None else (value, decoded)
+    if any(
+        pattern.search(candidate)
+        for candidate in candidates
+        for pattern in (GITHUB_RE, CLOUD_RE, TOKEN_RE, DATABASE_RE, PRIVATE_KEY_RE)
+    ):
+        return True
+    if decoded is not None and _url_contains_credentials(decoded):
         return True
     if _is_reference_value(value):
         return False
@@ -530,15 +640,17 @@ def is_synthetic_value(value: str) -> bool:
 
 
 def _rule_for_value(value: str, *, assigned: bool) -> str:
-    if GITHUB_RE.search(value):
+    decoded = _decoded_locator(value)
+    candidates = (value,) if decoded is None else (value, decoded)
+    if any(GITHUB_RE.search(candidate) for candidate in candidates):
         return RULE_FORMAT_GITHUB
-    if CLOUD_RE.search(value):
+    if any(CLOUD_RE.search(candidate) for candidate in candidates):
         return RULE_FORMAT_CLOUD
-    if TOKEN_RE.search(value):
+    if any(TOKEN_RE.search(candidate) for candidate in candidates):
         return RULE_FORMAT_SK
-    if DATABASE_RE.search(value):
+    if any(DATABASE_RE.search(candidate) for candidate in candidates):
         return RULE_FORMAT_DATABASE
-    if PRIVATE_KEY_RE.search(value):
+    if any(PRIVATE_KEY_RE.search(candidate) for candidate in candidates):
         return RULE_FORMAT_PEM
     if len(value) >= 40 and _shannon(value) >= 3.5 and not value.startswith(SYNTHETIC_PREFIX):
         return RULE_FORMAT_HIGH_ENTROPY
@@ -574,6 +686,27 @@ def _skip_ws(text: str, index: int) -> int:
     while index < len(text) and text[index] in " \t":
         index += 1
     return index
+
+
+def _quote_states(text: str) -> list[str | None]:
+    """Return the active quote, if any, at every character position."""
+    states: list[str | None] = [None] * len(text)
+    quote: str | None = None
+    escaped = False
+    for index, char in enumerate(text):
+        states[index] = quote
+        if escaped:
+            escaped = False
+            continue
+        if char == "\\" and quote is not None:
+            escaped = True
+            continue
+        if char in {"'", '"'}:
+            if quote is None:
+                quote = char
+            elif quote == char:
+                quote = None
+    return states
 
 
 def _read_quoted(text: str, index: int) -> tuple[str, int] | None:
@@ -635,7 +768,8 @@ def _is_credential_field(name: str) -> bool:
 
 
 def _is_generic_reference_field(name: str) -> bool:
-    return name.lower().replace("-", "_") in GENERIC_REFERENCE_FIELDS
+    normalized = name.lower().replace("-", "_")
+    return normalized in GENERIC_REFERENCE_FIELDS or normalized in HTML_URL_REFERENCE_FIELDS
 
 
 def _is_code_expression(value: str) -> bool:
@@ -658,6 +792,7 @@ def _is_code_expression(value: str) -> bool:
 
 def extract_assignments(line: str) -> list[tuple[str, str]]:
     found: list[tuple[str, str]] = []
+    quote_states = None
     for match in ANY_FIELD_RE.finditer(line):
         raw_field = match.group("field")
         field = raw_field.lower().replace("-", "_")
@@ -694,11 +829,36 @@ def extract_assignments(line: str) -> list[tuple[str, str]]:
                 continue
         credential_field = _is_credential_field(raw_field)
         generic_reference_field = _is_generic_reference_field(raw_field)
+        html_reference_field = field in HTML_URL_REFERENCE_FIELDS
         if not credential_field and not generic_reference_field and not is_synthetic_value(value):
+            continue
+        if quote_states is None and ("?" in line or "<" in line):
+            quote_states = _quote_states(line)
+        active_quote = quote_states[match.start()] if quote_states is not None else None
+        if active_quote is not None:
+            # Bash parameter expansion is code inside a quoted assignment.
+            if line.rfind("${", 0, match.start()) <= line.rfind("}", 0, match.start()):
+                cursor = _skip_ws(line, match.end())
+                if cursor >= len(line) or line[cursor] != active_quote:
+                    continue
+                cursor = _skip_ws(line, cursor + 1)
+                if cursor >= len(line) or line[cursor] not in {":", "="}:
+                    continue
+        if (
+            html_reference_field
+            and not _looks_like_url_locator(value)
+            and not any(pattern.search(value) for pattern in (GITHUB_RE, CLOUD_RE, TOKEN_RE, DATABASE_RE, PRIVATE_KEY_RE))
+            and not is_synthetic_value(value)
+        ):
+            continue
+        if generic_reference_field and _is_reference_value(value) and not is_synthetic_value(value):
             continue
         if generic_reference_field and not is_realistic_value(value) and not is_synthetic_value(value):
             continue
-        if _is_reference_value(value) and not is_realistic_value(value) and not is_synthetic_value(value):
+        if (
+            _is_reference_value(value)
+            and not is_synthetic_value(value)
+        ):
             continue
         if (
             _is_code_expression(value)

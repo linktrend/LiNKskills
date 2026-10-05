@@ -1,0 +1,156 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "legal-privacy-policy-monitor",
+  "input_schema_ref": "references/schemas.json#/definitions/input",
+  "output_schema_ref": "references/schemas.json#/definitions/output",
+  "completion_required_fields": [
+    "practice_to_policy_diff",
+    "required_candidate_updates",
+    "advisable_changes"
+  ],
+  "fixtures": [
+    {
+      "fixture_id": "synthetic-task-shaped-completed",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261005-0900-SARA-123456",
+        "request_ref": "fixture:legal-privacy-policy-monitor:request",
+        "source_refs": [
+          "fixture:legal-privacy-policy-monitor:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "task_request": "A fictional release introduces a new analytics recipient while the privacy notice is supplied; identify the diff and missing transfer/retention facts.",
+          "source_documents": [
+            "Synthetic input fixture for legal-privacy-policy-monitor: source documents. Fictional test content only; no real-world facts."
+          ],
+          "company_context": "Synthetic input fixture for legal-privacy-policy-monitor: company context. Fictional test content only; no real-world facts.",
+          "applicability_context": "Synthetic input fixture for legal-privacy-policy-monitor: applicability context. Fictional test content only; no real-world facts.",
+          "review_owner": "Synthetic input fixture for legal-privacy-policy-monitor: review owner. Fictional test content only; no real-world facts.",
+          "current_privacy_policy": "Synthetic input fixture for legal-privacy-policy-monitor: current privacy policy. Fictional test content only; no real-world facts.",
+          "practice_evidence": "Synthetic input fixture for legal-privacy-policy-monitor: practice evidence. Fictional test content only; no real-world facts.",
+          "processing_scope": "Synthetic input fixture for legal-privacy-policy-monitor: processing scope. Fictional test content only; no real-world facts.",
+          "last_sweep": "Synthetic input fixture for legal-privacy-policy-monitor: last sweep. Fictional test content only; no real-world facts.",
+          "legal_guidance_refs": "Synthetic input fixture for legal-privacy-policy-monitor: legal guidance refs. Fictional test content only; no real-world facts."
+        }
+      },
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": "fixture:legal-privacy-policy-monitor:draft",
+        "evidence_refs": [
+          "fixture:legal-privacy-policy-monitor:source-1"
+        ],
+        "open_questions": [],
+        "review_owner_role": "Synthetic completed task for legal-privacy-policy-monitor: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "practice_to_policy_diff": "Fictional legal-privacy-policy-monitor practice to policy diff section. Scenario: A fictional release introduces a new analytics recipient while the privacy notice is supplied; identify the diff and missing transfer/retention facts. Expected handling: Produces the privacy policy practice-diff review deliverable with task-specific fields and not a generic departmental summary. Cites supplied evidence and preserves unknown, conflicting or unsupported facts. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "required_candidate_updates": "Fictional legal-privacy-policy-monitor required candidate updates section. Scenario: A fictional release introduces a new analytics recipient while the privacy notice is supplied; identify the diff and missing transfer/retention facts. Expected handling: Produces the privacy policy practice-diff review deliverable with task-specific fields and not a generic departmental summary. Cites supplied evidence and preserves unknown, conflicting or unsupported facts. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "advisable_changes": "Fictional legal-privacy-policy-monitor advisable changes section. Scenario: A fictional release introduces a new analytics recipient while the privacy notice is supplied; identify the diff and missing transfer/retention facts. Expected handling: Produces the privacy policy practice-diff review deliverable with task-specific fields and not a generic departmental summary. Cites supplied evidence and preserves unknown, conflicting or unsupported facts. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "source_coverage_and_gaps": [],
+          "owner_and_counsel_questions": [],
+          "partial_work": [],
+          "missing_inputs": [],
+          "unknown_facts": []
+        }
+      }
+    },
+    {
+      "fixture_id": "needs-context-preserves-partial-and-unknowns",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261005-0900-SARA-123456",
+        "request_ref": "fixture:legal-privacy-policy-monitor:request",
+        "source_refs": [
+          "fixture:legal-privacy-policy-monitor:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "task_request": "Prepare a synthetic legal-privacy-policy-monitor deliverable from this fictional test record; make no real-world factual or legal claim.",
+          "source_documents": [
+            "Synthetic input fixture for legal-privacy-policy-monitor: source documents. Fictional test content only; no real-world facts."
+          ],
+          "company_context": "Synthetic input fixture for legal-privacy-policy-monitor: company context. Fictional test content only; no real-world facts.",
+          "applicability_context": "Synthetic input fixture for legal-privacy-policy-monitor: applicability context. Fictional test content only; no real-world facts.",
+          "review_owner": "Synthetic input fixture for legal-privacy-policy-monitor: review owner. Fictional test content only; no real-world facts.",
+          "current_privacy_policy": "Synthetic input fixture for legal-privacy-policy-monitor: current privacy policy. Fictional test content only; no real-world facts.",
+          "practice_evidence": "Synthetic input fixture for legal-privacy-policy-monitor: practice evidence. Fictional test content only; no real-world facts.",
+          "processing_scope": "Synthetic input fixture for legal-privacy-policy-monitor: processing scope. Fictional test content only; no real-world facts.",
+          "last_sweep": "Synthetic input fixture for legal-privacy-policy-monitor: last sweep. Fictional test content only; no real-world facts.",
+          "legal_guidance_refs": "Synthetic input fixture for legal-privacy-policy-monitor: legal guidance refs. Fictional test content only; no real-world facts."
+        }
+      },
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "needs_context",
+        "artifact_ref": "fixture:legal-privacy-policy-monitor:partial",
+        "evidence_refs": [],
+        "open_questions": [
+          "Confirm the named missing input with its owner."
+        ],
+        "review_owner_role": "Synthetic completed task for legal-privacy-policy-monitor: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "practice_to_policy_diff": "",
+          "required_candidate_updates": "",
+          "advisable_changes": "",
+          "source_coverage_and_gaps": [],
+          "owner_and_counsel_questions": [],
+          "partial_work": [
+            {
+              "section": "practice_to_policy_diff",
+              "content": "Partial legal-privacy-policy-monitor fixture: source inventory recorded; one dependent conclusion remains unknown.",
+              "evidence_refs": [
+                "fixture:legal-privacy-policy-monitor:source-1"
+              ]
+            }
+          ],
+          "missing_inputs": [
+            {
+              "field": "authorized_source_or_material_fact",
+              "reason": "Synthetic missing-context scenario: The task arrives with a material missing fact or inaccessible authority needed for one conclusion. Complete separable source-grounded work and state the exact missing evidence, owner and next check.",
+              "requested_owner": "task owner"
+            }
+          ],
+          "unknown_facts": [
+            {
+              "fact": "task-specific applicability or evidence fact",
+              "why_unknown": "The edge scenario intentionally leaves this required fact or authority unresolved; preserve it as unknown.",
+              "evidence_refs": [
+                "fixture:legal-privacy-policy-monitor:source-1"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "fixture_id": "empty-completed-draft-rejected",
+      "expected_valid": false,
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": null,
+        "evidence_refs": [],
+        "open_questions": [],
+        "review_owner_role": "Synthetic completed task for legal-privacy-policy-monitor: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "practice_to_policy_diff": "",
+          "required_candidate_updates": "",
+          "advisable_changes": "",
+          "source_coverage_and_gaps": [],
+          "owner_and_counsel_questions": [],
+          "partial_work": [],
+          "missing_inputs": [],
+          "unknown_facts": []
+        }
+      }
+    }
+  ],
+  "fixture_note": "All values are fictional task-shaped contract examples derived from this pack’s golden scenario and criteria; these files are schema evidence, not executed results or business/legal facts."
+}

@@ -1,0 +1,100 @@
+{
+  "schema_version": "1.0",
+  "skill_id": "legal-privacy-policy-drafting",
+  "completed_input": {
+    "task_id": "20261004-1200-PRIV-000001",
+    "request_ref": "synthetic-policy-brief-1",
+    "source_refs": [
+      "lawve-ai/awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290:skills/privacy-policy-stephane-boghossian/SKILL.md",
+      "lawve-ai/awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290:skills/privacy-policy-generator-malik-taiar/SKILL.md"
+    ],
+    "data_classification": "synthetic",
+    "task_inputs": {
+      "business_identity_and_contact": "Synthetic example: business_identity_and_contact",
+      "product_and_user_journeys": "Synthetic example: product_and_user_journeys",
+      "user_geographies_and_jurisdictions": "Synthetic: company and user locations conflict; applicable law unresolved.",
+      "data_categories_and_sources": "Synthetic example: data_categories_and_sources",
+      "purposes_and_basis_evidence": "Synthetic: order fulfillment is described; marketing basis undocumented.",
+      "vendors_and_transfers": "Synthetic example: vendors_and_transfers",
+      "cookies_and_platform_tools": "Synthetic example: cookies_and_platform_tools",
+      "retention_and_rights_processes": "Synthetic example: retention_and_rights_processes",
+      "approved_template": "Synthetic: counsel template v2 supplied; legal currency not independently verified.",
+      "review_mode": "Synthetic example: review_mode",
+      "authority_sources_and_as_of": "Synthetic example: authority_sources_and_as_of"
+    }
+  },
+  "completed_output": {
+    "status": "completed_draft",
+    "artifact_type": "legal-privacy-policy-drafting",
+    "task_specific_deliverable": {
+      "policy_draft": "Synthetic order-fulfillment only; marketing remains [GAP].",
+      "practice_to_clause_reconciliation": "Marketing basis missing; omit marketing clauses until confirmed."
+    },
+    "evidence_trace": [
+      {
+        "claim": "Order fulfillment is described",
+        "source_ref": "lawve-ai/awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290:skills/privacy-policy-stephane-boghossian/SKILL.md",
+        "pinpoint": "synthetic purposes input",
+        "basis": "requestor_assertion"
+      }
+    ],
+    "uncertainties": [
+      "Applicable law set unresolved",
+      "Marketing basis not documented"
+    ],
+    "external_effects": [],
+    "mutations": []
+  },
+  "needs_context_input": {
+    "task_id": "20261004-1200-PRIV-000001",
+    "request_ref": "synthetic-policy-brief-1",
+    "source_refs": [
+      "lawve-ai/awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290:skills/privacy-policy-stephane-boghossian/SKILL.md",
+      "lawve-ai/awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290:skills/privacy-policy-generator-malik-taiar/SKILL.md"
+    ],
+    "data_classification": "synthetic",
+    "task_inputs": {
+      "business_identity_and_contact": "Synthetic example: business_identity_and_contact",
+      "product_and_user_journeys": "Synthetic example: product_and_user_journeys",
+      "user_geographies_and_jurisdictions": "UNKNOWN",
+      "data_categories_and_sources": "Synthetic example: data_categories_and_sources",
+      "purposes_and_basis_evidence": "Synthetic: order fulfillment is described; marketing basis undocumented.",
+      "vendors_and_transfers": "Synthetic example: vendors_and_transfers",
+      "cookies_and_platform_tools": "Synthetic example: cookies_and_platform_tools",
+      "retention_and_rights_processes": "Synthetic example: retention_and_rights_processes",
+      "approved_template": "Synthetic: counsel template v2 supplied; legal currency not independently verified.",
+      "review_mode": "Synthetic example: review_mode",
+      "authority_sources_and_as_of": "Synthetic example: authority_sources_and_as_of"
+    }
+  },
+  "needs_context_output": {
+    "status": "needs_context",
+    "artifact_type": "legal-privacy-policy-drafting",
+    "task_specific_deliverable": {
+      "separable_work": "Prepare confirmed-practice inventory and template-independent sections."
+    },
+    "evidence_trace": [],
+    "uncertainties": [
+      "Jurisdiction is outcome-changing and absent"
+    ],
+    "external_effects": [],
+    "mutations": []
+  },
+  "state_example": {
+    "task_id": "20261004-1200-PRIV-000001",
+    "phase": "draft",
+    "source_refs": [
+      "lawve-ai/awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290:skills/privacy-policy-stephane-boghossian/SKILL.md",
+      "lawve-ai/awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290:skills/privacy-policy-generator-malik-taiar/SKILL.md"
+    ],
+    "established_facts": [
+      "Synthetic order-fulfillment purpose only"
+    ],
+    "open_inputs": [
+      "Jurisdiction",
+      "marketing basis"
+    ],
+    "next_action": "Obtain founder-confirmed locations and processing basis.",
+    "last_updated": "2026-10-04T12:00:00Z"
+  }
+}

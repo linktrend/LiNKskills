@@ -1,0 +1,232 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "request_ref",
+        "source_refs",
+        "data_classification",
+        "task_inputs"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "pattern": "^\\d{8}-\\d{4}-[A-Z0-9]+-\\d{6}$"
+        },
+        "request_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "data_classification": {
+          "enum": [
+            "synthetic",
+            "redacted",
+            "restricted",
+            "sensitive",
+            "unknown"
+          ]
+        },
+        "task_inputs": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "business_identity_and_contact",
+            "product_and_user_journeys",
+            "user_geographies_and_jurisdictions",
+            "data_categories_and_sources",
+            "purposes_and_basis_evidence",
+            "vendors_and_transfers",
+            "cookies_and_platform_tools",
+            "retention_and_rights_processes",
+            "approved_template",
+            "review_mode",
+            "authority_sources_and_as_of"
+          ],
+          "properties": {
+            "business_identity_and_contact": {
+              "type": "string",
+              "description": "Confirmed controller/entity identity, address and privacy contact/DPO status; unknowns remain placeholders."
+            },
+            "product_and_user_journeys": {
+              "type": "string",
+              "description": "Website/app/service type, account/transaction flows, audiences, features and relevant vendors."
+            },
+            "user_geographies_and_jurisdictions": {
+              "type": "string",
+              "description": "Where users are located/targeted, entity locations and actual territorial connections, supported by evidence."
+            },
+            "data_categories_and_sources": {
+              "type": "string",
+              "description": "Data categories, people, collection/source, sensitivity and whether children are in scope."
+            },
+            "purposes_and_basis_evidence": {
+              "type": "string",
+              "description": "Each processing purpose and confirmed legal basis/operational evidence; never assign on behalf of the business."
+            },
+            "vendors_and_transfers": {
+              "type": "string",
+              "description": "Processors/recipients, data locations, transfer routes and actual safeguards, if confirmed."
+            },
+            "cookies_and_platform_tools": {
+              "type": "string",
+              "description": "Observed/supplied cookies, SDKs, analytics, advertising, AI and platform-contract disclosures."
+            },
+            "retention_and_rights_processes": {
+              "type": "string",
+              "description": "Confirmed retention/deletion rules, rights channel, appeal/contact path and response owner."
+            },
+            "approved_template": {
+              "type": "string",
+              "description": "Existing counsel-approved template or explicit choice to use a reference structure; template status and version."
+            },
+            "review_mode": {
+              "type": "string",
+              "description": "Quick/batched or expert/detail review and requested policy language/output format."
+            },
+            "authority_sources_and_as_of": {
+              "type": "string",
+              "description": "Current official primary legal sources, regulator guidance where appropriate, retrieval date and jurisdiction."
+            }
+          }
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "artifact_type",
+        "task_specific_deliverable",
+        "evidence_trace",
+        "uncertainties",
+        "external_effects",
+        "mutations"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "completed_draft",
+            "needs_context",
+            "not_applicable"
+          ]
+        },
+        "artifact_type": {
+          "const": "legal-privacy-policy-drafting"
+        },
+        "task_specific_deliverable": {
+          "type": "object",
+          "minProperties": 1
+        },
+        "evidence_trace": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "claim",
+              "source_ref",
+              "pinpoint",
+              "basis"
+            ],
+            "properties": {
+              "claim": {
+                "type": "string"
+              },
+              "source_ref": {
+                "type": "string"
+              },
+              "pinpoint": {
+                "type": "string"
+              },
+              "basis": {
+                "enum": [
+                  "verified_fact",
+                  "requestor_assertion",
+                  "inference",
+                  "proposal",
+                  "unknown"
+                ]
+              }
+            }
+          }
+        },
+        "uncertainties": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "external_effects": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "mutations": {
+          "type": "array",
+          "maxItems": 0
+        }
+      }
+    },
+    "state": {
+      "type": "object",
+      "required": [
+        "task_id",
+        "phase",
+        "source_refs",
+        "established_facts",
+        "open_inputs",
+        "next_action",
+        "last_updated"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string"
+        },
+        "phase": {
+          "enum": [
+            "intake",
+            "evidence",
+            "analysis",
+            "draft",
+            "verification",
+            "complete"
+          ]
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "established_facts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "open_inputs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "next_action": {
+          "type": "string"
+        },
+        "last_updated": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}

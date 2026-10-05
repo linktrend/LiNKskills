@@ -1,0 +1,3 @@
+# Native Consumer Interface and Ownership
+
+`references/schemas.json` defines this pack's typed input/output/state artifacts. Required tooling labels in SKILL.md are contract vocabulary, not assertions that matching callable functions exist. Sara maps `read_file` to native `read`, `write_file` to native `write`/`edit` for an authorized user-facing draft, and `get_tool_details` to inspection of current native schemas and owner toolcards. `list_dir` is not callable; read a known path or report missing discovery. Checkpointing is through the consumer owner interface; OpenClaw runtime state remains SQLite-owned. No JSONL substitute, shell command, package install, or external service is introduced.

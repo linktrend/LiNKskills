@@ -1,0 +1,353 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "request_ref",
+        "source_refs",
+        "data_classification",
+        "task_inputs"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "request_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "data_classification": {
+          "type": "string",
+          "enum": [
+            "synthetic",
+            "redacted",
+            "restricted",
+            "sensitive",
+            "unknown"
+          ]
+        },
+        "task_inputs": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "task_request",
+            "agent_workforce_evaluation_benchmarking_payload"
+          ],
+          "properties": {
+            "task_request": {
+              "type": "string",
+              "minLength": 1
+            },
+            "agent_workforce_evaluation_benchmarking_payload": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "benchmark_identity",
+                "case_counts",
+                "metric_definitions",
+                "comparison_policy"
+              ],
+              "properties": {
+                "benchmark_identity": {
+                  "type": "object",
+                  "required": [
+                    "agent_id",
+                    "build_id",
+                    "suite_id",
+                    "suite_version",
+                    "case_set_hash",
+                    "run_date"
+                  ],
+                  "properties": {
+                    "agent_id": {
+                      "type": "string"
+                    },
+                    "build_id": {
+                      "type": "string"
+                    },
+                    "suite_id": {
+                      "type": "string"
+                    },
+                    "suite_version": {
+                      "type": "string"
+                    },
+                    "case_set_hash": {
+                      "type": "string"
+                    },
+                    "run_date": {
+                      "type": "string",
+                      "format": "date"
+                    }
+                  },
+                  "additionalProperties": true
+                },
+                "case_counts": {
+                  "type": "object",
+                  "required": [
+                    "planned",
+                    "attempted",
+                    "passed",
+                    "failed",
+                    "unrun"
+                  ],
+                  "properties": {
+                    "planned": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "attempted": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "passed": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "failed": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "unrun": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "metric_definitions": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "metric_id",
+                      "numerator",
+                      "denominator",
+                      "unit",
+                      "missingness_rule"
+                    ],
+                    "properties": {
+                      "metric_id": {
+                        "type": "string"
+                      },
+                      "numerator": {
+                        "type": "string"
+                      },
+                      "denominator": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "unit": {
+                        "type": "string"
+                      },
+                      "missingness_rule": {
+                        "type": "string"
+                      }
+                    },
+                    "additionalProperties": false
+                  }
+                },
+                "comparison_policy": {
+                  "type": "object",
+                  "required": [
+                    "baseline_ref",
+                    "comparability_conditions",
+                    "threshold_owner"
+                  ],
+                  "properties": {
+                    "baseline_ref": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "comparability_conditions": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "threshold_owner": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "status",
+        "artifact_ref",
+        "evidence_refs",
+        "open_questions",
+        "review_owner_role",
+        "external_effects",
+        "mutations",
+        "work_product"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "completed_draft",
+            "needs_context",
+            "escalate",
+            "blocked"
+          ]
+        },
+        "artifact_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "open_questions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "review_owner_role": {
+          "type": "string"
+        },
+        "external_effects": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "mutations": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "work_product": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "agent_workforce_evaluation_benchmarking_work_product"
+          ],
+          "properties": {
+            "agent_workforce_evaluation_benchmarking_work_product": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "register_spec",
+                "schema_exports",
+                "validation_report",
+                "scope_note"
+              ],
+              "properties": {
+                "register_spec": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "schema_exports": {
+                  "type": "object",
+                  "required": [
+                    "json_schema",
+                    "csv_columns",
+                    "sql_ddl_draft"
+                  ],
+                  "properties": {
+                    "json_schema": {
+                      "type": "string"
+                    },
+                    "csv_columns": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "sql_ddl_draft": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "validation_report": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "scope_note": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "phase",
+        "status",
+        "checkpoint_ref",
+        "updated_at"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string"
+        },
+        "phase": {
+          "enum": [
+            "intake",
+            "evidence",
+            "analysis",
+            "draft",
+            "quality_check",
+            "delivered"
+          ]
+        },
+        "status": {
+          "enum": [
+            "in_progress",
+            "waiting_for_input",
+            "completed_draft",
+            "blocked"
+          ]
+        },
+        "checkpoint_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,310 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "request_ref",
+        "data_classification",
+        "candidate",
+        "intended_behavior",
+        "frozen_suite",
+        "run_evidence"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string"
+        },
+        "request_ref": {
+          "type": "string"
+        },
+        "data_classification": {
+          "enum": [
+            "synthetic",
+            "redacted",
+            "restricted",
+            "sensitive",
+            "unknown"
+          ]
+        },
+        "candidate": {
+          "type": "object",
+          "required": [
+            "skill_id",
+            "version",
+            "immutable_hash"
+          ],
+          "properties": {
+            "skill_id": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "immutable_hash": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "intended_behavior": {
+          "type": "object",
+          "required": [
+            "trigger",
+            "task_outcome",
+            "input_contract_ref",
+            "output_contract_ref",
+            "scope_out"
+          ],
+          "properties": {
+            "trigger": {
+              "type": "string"
+            },
+            "task_outcome": {
+              "type": "string"
+            },
+            "input_contract_ref": {
+              "type": "string"
+            },
+            "output_contract_ref": {
+              "type": "string"
+            },
+            "scope_out": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "frozen_suite": {
+          "type": "object",
+          "required": [
+            "suite_id",
+            "version",
+            "suite_hash",
+            "cases"
+          ],
+          "properties": {
+            "suite_id": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "suite_hash": {
+              "type": "string"
+            },
+            "cases": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "case_id",
+                  "input_ref",
+                  "assertions"
+                ],
+                "properties": {
+                  "case_id": {
+                    "type": "string"
+                  },
+                  "input_ref": {
+                    "type": "string"
+                  },
+                  "assertions": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "run_evidence": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "case_id",
+              "release_hash",
+              "result_ref",
+              "status"
+            ],
+            "properties": {
+              "case_id": {
+                "type": "string"
+              },
+              "release_hash": {
+                "type": "string"
+              },
+              "result_ref": {
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "pass",
+                  "fail",
+                  "unrun",
+                  "unscored"
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "status",
+        "artifact_ref",
+        "evidence_refs",
+        "open_questions",
+        "review_owner_role",
+        "external_effects",
+        "mutations",
+        "evaluation_packet",
+        "outcome",
+        "qualification_claim"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "completed_draft",
+            "needs_context",
+            "blocked"
+          ]
+        },
+        "artifact_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "open_questions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "review_owner_role": {
+          "type": "string"
+        },
+        "external_effects": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "mutations": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "evaluation_packet": {
+          "type": "object",
+          "required": [
+            "case_results",
+            "aggregate_results",
+            "limitations",
+            "recommendations"
+          ],
+          "properties": {
+            "case_results": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            },
+            "aggregate_results": {
+              "type": "object"
+            },
+            "limitations": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "recommendations": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "outcome": {
+          "enum": [
+            "no_claim",
+            "hold",
+            "candidate_for_independent_review"
+          ]
+        },
+        "qualification_claim": {
+          "const": false
+        }
+      }
+    },
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "phase",
+        "status",
+        "checkpoint_ref",
+        "updated_at"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string"
+        },
+        "phase": {
+          "enum": [
+            "intake",
+            "suite_design",
+            "evidence",
+            "analysis",
+            "recommendation",
+            "delivered"
+          ]
+        },
+        "status": {
+          "enum": [
+            "in_progress",
+            "waiting_for_input",
+            "completed_draft",
+            "blocked"
+          ]
+        },
+        "checkpoint_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}

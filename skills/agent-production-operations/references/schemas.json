@@ -1,0 +1,217 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "request_ref",
+        "source_refs",
+        "data_classification",
+        "task_inputs"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "pattern": "^\\d{8}-\\d{4}-[A-Z0-9]+-\\d{6}$"
+        },
+        "request_ref": {
+          "type": "string"
+        },
+        "source_refs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "data_classification": {
+          "type": "string",
+          "enum": [
+            "synthetic",
+            "redacted",
+            "restricted",
+            "sensitive",
+            "unknown"
+          ]
+        },
+        "task_inputs": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "agent_identity",
+            "measurement_window",
+            "approved_baseline_ref",
+            "owner_thresholds_ref",
+            "run_trace_refs",
+            "current_native_capabilities"
+          ],
+          "properties": {
+            "agent_identity": {
+              "type": "string",
+              "description": "Agent release/version identity and autonomy class"
+            },
+            "measurement_window": {
+              "type": "string",
+              "description": "Cohort, time window, sample size"
+            },
+            "approved_baseline_ref": {
+              "type": "string",
+              "description": "Approved baseline and threshold policy source"
+            },
+            "owner_thresholds_ref": {
+              "type": "string",
+              "description": "Owner-approved metric definitions and boundaries or explicit unavailable"
+            },
+            "run_trace_refs": {
+              "type": "string",
+              "description": "Approved run/trace/incident evidence refs"
+            },
+            "current_native_capabilities": {
+              "type": "string",
+              "description": "Visible native interfaces/tool schemas available"
+            }
+          }
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "status",
+        "artifact_ref",
+        "evidence_refs",
+        "open_questions",
+        "review_owner_role",
+        "external_effects",
+        "mutations",
+        "work_product"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "completed_draft",
+            "needs_context",
+            "escalate",
+            "blocked"
+          ]
+        },
+        "artifact_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "open_questions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "review_owner_role": {
+          "type": "string"
+        },
+        "external_effects": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "mutations": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "work_product": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "operating_contract_gaps",
+            "metric_observations",
+            "quality_and_service_findings",
+            "authority_fallback_signals",
+            "trace_to_eval_proposals",
+            "owner_recommendations",
+            "capability_and_effect_status"
+          ],
+          "properties": {
+            "operating_contract_gaps": {
+              "type": "string",
+              "description": "Unknown authority, owners, policy or missing evidence"
+            },
+            "metric_observations": {
+              "type": "string",
+              "description": "Definitions, samples, observed values, baseline and threshold refs"
+            },
+            "quality_and_service_findings": {
+              "type": "string",
+              "description": "Evidence-linked task-quality/service findings and uncertainty"
+            },
+            "authority_fallback_signals": {
+              "type": "string",
+              "description": "Out-of-scope attempts, escalation/fallback evidence"
+            },
+            "trace_to_eval_proposals": {
+              "type": "string",
+              "description": "Minimized trace facts and candidate eval case proposal"
+            },
+            "owner_recommendations": {
+              "type": "string",
+              "description": "Sara/Eric/Librarian/counsel owner and proposed action"
+            },
+            "capability_and_effect_status": {
+              "type": "string",
+              "description": "Native access status; no runtime action unless separately authorized"
+            }
+          }
+        }
+      }
+    },
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "phase",
+        "status",
+        "updated_at"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string"
+        },
+        "phase": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "updated_at": {
+          "type": "string"
+        },
+        "completed_sections": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "open_questions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,5 @@
+# Offline validation helper
+
+Sara does not call this script as a runtime tool. `helper_tool.py` reads one JSON object from standard input and validates it against the complete input JSON Schema at `references/schemas.json#/definitions/input` using the installed `jsonschema` package. It returns field paths only, never echoes input values, performs no HR actions, and writes no files. This checks structural input validity only; it does not assess semantic quality or replace review of the interview kit.
+
+A schema-valid envelope returns exit code `0` and `status: ENVELOPE_PRESENT`. An invalid envelope returns exit code `3` and `status: NEEDS_CONTEXT`, with missing and invalid field paths only. Malformed JSON, a non-object input, or an unavailable/invalid schema returns exit code `2` and `status: FAILED`. Run from the LiNKskills validation environment, for example: `python3 scripts/helper_tool.py < /path/to/synthetic-input.json`. Sara's available native interfaces remain those documented in `SKILL.md`.
