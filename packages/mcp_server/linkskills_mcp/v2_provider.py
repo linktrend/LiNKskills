@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import base64
 from typing import Any, Mapping
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import parse_qs, unquote, urlparse
 
 from linkskills_core.provider_v2 import (
     CATALOG_OPERATIONS,
@@ -181,12 +181,12 @@ class ModernSkillsMcpServer:
         parts = [part for part in (parsed.netloc, *parsed.path.split("/")) if part]
         values: dict[str, Any] = {"uri": uri}
         if parts and parts[0] == "guide" and len(parts) >= 3 and parts[1] == "domains":
-            values["domain"] = parts[2]
+            values["domain"] = unquote(parts[2], errors="strict")
         if len(parts) >= 2 and parts[0] == "release":
             if len(parts) == 2:
-                values["skill_id"] = parts[1]
+                values["skill_id"] = unquote(parts[1], errors="strict")
             elif len(parts) >= 3:
-                values.update({"skill_id": parts[1], "version": parts[2]})
+                values.update({"skill_id": unquote(parts[1], errors="strict"), "version": unquote(parts[2], errors="strict")})
             if len(parts) >= 5:
                 values[
                     {
@@ -195,7 +195,7 @@ class ModernSkillsMcpServer:
                         "section": "section_id",
                         "fragment": "fragment_id",
                     }.get(parts[3], "resource_id")
-                ] = parts[4]
+                ] = unquote(parts[4], errors="strict")
             if len(parts) >= 4 and parts[3] == "manifest":
                 values["manifest"] = True
         query = parse_qs(parsed.query)

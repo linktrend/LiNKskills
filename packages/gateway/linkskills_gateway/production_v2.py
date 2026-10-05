@@ -11,6 +11,7 @@ from dataclasses import replace
 from pathlib import Path
 from typing import Any, Mapping
 
+from linkskills_core.mcp_v2 import release_resource_uri
 from linkskills_core.provider_v2 import PROTOCOL_VERSION, RESOURCE_OPERATIONS, V2Provider, WRITE_TOOLS, _normalize_release
 
 
@@ -758,7 +759,7 @@ class ProductionV2Provider:
                         byte_size = descriptor.get("byte_size")
                         if byte_size is None and descriptor.get("content_b64") is not None:
                             byte_size = len(base64.b64decode(descriptor["content_b64"], validate=True))
-                        descriptors.append({"schema_version": "0.1", "resource_id": resource_id, "release_id": release_id, "skill_id": manifest.get("skill_id"), "skill_version": manifest.get("version"), "resource_kind": descriptor.get("resource_kind", "entrypoint"), "resource_uri": f"skills://release/{manifest.get('skill_id')}/{manifest.get('version')}/resource/{resource_id}", "media_type": descriptor.get("media_type", "text/markdown"), "byte_size": byte_size, "content_digest": descriptor.get("content_digest"), "immutable": True, "disclosure_level": descriptor.get("disclosure_level", 3), "provenance": descriptor.get("provenance", manifest.get("provenance", {})), "licence": descriptor.get("licence", descriptor.get("license", {})), "trust_boundary": "linkskills-resource"})
+                        descriptors.append({"schema_version": "0.1", "resource_id": resource_id, "release_id": release_id, "skill_id": manifest.get("skill_id"), "skill_version": manifest.get("version"), "resource_kind": descriptor.get("resource_kind", "entrypoint"), "resource_uri": release_resource_uri(manifest.get("skill_id"), manifest.get("version"), resource_id), "media_type": descriptor.get("media_type", "text/markdown"), "byte_size": byte_size, "content_digest": descriptor.get("content_digest"), "immutable": True, "disclosure_level": descriptor.get("disclosure_level", 3), "provenance": descriptor.get("provenance", manifest.get("provenance", {})), "licence": descriptor.get("licence", descriptor.get("license", {})), "trust_boundary": "linkskills-resource"})
                     return {**envelope, **self._page(descriptors, request, snapshot_id)}
                 resource_id = request.get("resource_id") or request.get("content_id")
                 if operation == "skills_release_entrypoint_get" and not resource_id:

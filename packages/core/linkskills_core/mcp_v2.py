@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from typing import Any, Mapping
+from urllib.parse import quote
 
 from .release_v2 import ReleaseError, inventory_digest, sha256
 
@@ -26,6 +27,14 @@ def _values(value: Any) -> frozenset[str]:
         return frozenset(str(item) for item in value if item is not None and str(item))
     except TypeError:
         return frozenset({str(value)})
+
+
+def release_resource_uri(skill_id: str, version: str, resource_id: str) -> str:
+    """Encode opaque release identifiers as RFC 6570 simple path values."""
+    # Resource IDs retain nested source paths. Encoding keeps each ID in one
+    # URI slot so MCP reads cannot truncate it or treat its bytes as query data.
+    parts = (quote(value, safe="") for value in (skill_id, version, resource_id))
+    return "skills://release/{}/{}/resource/{}".format(*parts)
 
 
 @dataclass(frozen=True)
@@ -60,9 +69,7 @@ class ExactResource:
             "skill_id": skill_id,
             "skill_version": version,
             "resource_kind": self.resource_kind,
-            "resource_uri": (
-                f"skills://release/{skill_id}/{version}/resource/{self.resource_id}"
-            ),
+            "resource_uri": release_resource_uri(skill_id, version, self.resource_id),
             "media_type": self.media_type,
             "byte_size": len(self.body),
             "content_digest": self.content_digest,
@@ -160,4 +167,4 @@ def gate_denials(
     return tuple(denials)
 
 
-__all__ = ["ExactResource", "GovernedRelease", "gate_denials"]
+__all__ = ["ExactResource", "GovernedRelease", "gate_denials", "release_resource_uri"]

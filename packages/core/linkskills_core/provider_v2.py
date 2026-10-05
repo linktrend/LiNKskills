@@ -11,6 +11,7 @@ import re
 from dataclasses import dataclass, field
 from hashlib import sha256 as _sha256
 from typing import Any, Callable, Iterable, Mapping, Protocol
+from urllib.parse import unquote
 
 from .hashing import request_hash
 from .mcp_v2 import ExactResource, GovernedRelease, gate_denials
@@ -382,6 +383,19 @@ def _template_path_regex(template: str) -> re.Pattern[str]:
 def operation_from_resource_uri(uri: Any) -> str | None:
     """Return the server-owned resource operation for ``uri``, or ``None``."""
     if not isinstance(uri, str) or not uri.startswith("skills://"):
+        return None
+    # Invalid escapes/fragments must not change the selected resource or be
+    # silently stripped by an adapter. Percent decoding happens exactly once.
+    if "#" in uri or re.search(r"%(?![0-9a-fA-F]{2})", uri):
+        return None
+    if any(ord(char) <= 32 or ord(char) == 127 for char in uri):
+        return None
+    try:
+        uri.encode("utf-8")
+        decoded = unquote(uri, encoding="utf-8", errors="strict")
+    except UnicodeError:
+        return None
+    if any(ord(char) < 32 or ord(char) == 127 for char in decoded):
         return None
     path = uri.split("?", 1)[0]
     ranked: list[tuple[int, str]] = []
