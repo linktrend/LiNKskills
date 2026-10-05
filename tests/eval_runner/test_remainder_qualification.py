@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import subprocess
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -13,7 +14,9 @@ sys.path.insert(0, str(REPO / "packages" / "eval_runner"))
 sys.path.insert(0, str(REPO / "packages" / "core"))
 
 from linkskills_eval_runner.ed03 import INITIAL_RELEASE_PROFILES, REQUIRED_FAMILIES, case_records, classify_case_families
-from linkskills_eval_runner.remainder import qualify_remainder_release_profiles, remainder_skill_ids
+from linkskills_eval_runner.remainder import (
+    REMAINDER_SKILL_IDS, catalog_skill_ids, qualify_remainder_release_profiles, remainder_skill_ids,
+)
 
 
 INITIAL = {item["skillId"] for item in INITIAL_RELEASE_PROFILES}
@@ -24,7 +27,25 @@ class RemainderQualificationTests(unittest.TestCase):
         remaining = remainder_skill_ids(REPO)
         self.assertEqual(len(remaining), 54)
         self.assertTrue(INITIAL.isdisjoint(remaining))
-        self.assertEqual(len(list((REPO / "skills").glob("*/SKILL.md"))), 59)
+        self.assertEqual(len(INITIAL | set(remaining)), 59)
+        self.assertTrue((INITIAL | set(remaining)) <= set(catalog_skill_ids(REPO)))
+
+    def test_later_drafts_do_not_inherit_original_cohort_qualification(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            for skill_id in REMAINDER_SKILL_IDS | {"new-unqualified-draft"}:
+                folder = root / "skills" / skill_id
+                folder.mkdir(parents=True)
+                (folder / "SKILL.md").write_text("Unqualified source only\n", encoding="utf-8")
+            self.assertIn("new-unqualified-draft", catalog_skill_ids(root))
+            self.assertNotIn("new-unqualified-draft", remainder_skill_ids(root))
+            self.assertEqual(set(remainder_skill_ids(root)), REMAINDER_SKILL_IDS)
+
+    def test_missing_original_cohort_member_fails_closed(self) -> None:
+        from linkskills_eval_runner.ed03 import QualificationError
+        with tempfile.TemporaryDirectory() as tmp:
+            with self.assertRaisesRegex(QualificationError, "remainder_cohort_missing"):
+                remainder_skill_ids(Path(tmp))
 
     def test_every_remainder_suite_is_executable_and_complete(self) -> None:
         for skill_id in remainder_skill_ids(REPO):
@@ -41,6 +62,11 @@ class RemainderQualificationTests(unittest.TestCase):
         self.assertFalse(matrix["authorizesUsable"])
         self.assertEqual(matrix["usable"], [])
         self.assertEqual(matrix["remainderCount"], 54)
+        self.assertEqual(matrix["cohortId"], "original-catalog-remainder-54")
+        self.assertEqual(
+            set(matrix["outsideCohortSkillIds"]),
+            set(catalog_skill_ids(REPO)) - INITIAL - REMAINDER_SKILL_IDS,
+        )
         self.assertEqual(matrix["liveQualificationBoundary"], "server01_hosted_sealed_evaluator")
 
     def test_unknown_eval_case_fails_closed(self) -> None:
