@@ -1,0 +1,440 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "legal-employment-policy-drafting",
+  "input_schema_ref": "references/schemas.json#/definitions/input",
+  "output_schema_ref": "references/schemas.json#/definitions/output",
+  "fixtures": [
+    {
+      "fixture_id": "typed-completed-task",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261004-1200-SARA-123456",
+        "request_ref": "fixture:legal-employment-policy-drafting",
+        "source_refs": [
+          "fixture:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "legal_employment_policy_drafting_task_payload": {
+            "policy_topic_and_audience": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            },
+            "existing_policy_and_redline_scope": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            },
+            "verified_jurisdictions_and_authorities": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            },
+            "policy_choices_and_implementation_constraints": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            }
+          },
+          "task_request": "Synthetic unknown-context fixture for legal-employment-policy-drafting",
+          "company_or_matter_facts": "Synthetic unknown-context fixture for legal-employment-policy-drafting",
+          "source_documents": [
+            "fixture:source-1"
+          ],
+          "jurisdiction_and_as_of": {
+            "jurisdictions": [],
+            "as_of_date": null
+          },
+          "approved_positions_or_policy_ref": null
+        }
+      },
+      "output": {
+        "task_id": "20261004-1200-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": "fixture:legal-employment-policy-drafting",
+        "evidence_refs": [
+          "fixture:source-1"
+        ],
+        "open_questions": [],
+        "review_owner_role": "authorized human reviewer",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "legal_employment_policy_drafting_work_product": {
+            "policy_draft": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "authority": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "policy_choice_matrix": [
+              {
+                "content": "Synthetic task-shaped item; applicability unknown.",
+                "evidence_refs": [
+                  "fixture:source-1"
+                ],
+                "status": "unknown"
+              }
+            ],
+            "redline_against_supplied_policy": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "implementation_training_steps": [
+              {
+                "content": "Synthetic task-shaped item; applicability unknown.",
+                "evidence_refs": [
+                  "fixture:source-1"
+                ],
+                "status": "unknown"
+              }
+            ],
+            "unresolved_decisions": [
+              {
+                "content": "Synthetic task-shaped item; applicability unknown.",
+                "evidence_refs": [
+                  "fixture:source-1"
+                ],
+                "status": "unknown"
+              }
+            ],
+            "evidence_trace": [
+              {
+                "source_ref": "fixture:source-1",
+                "location": null,
+                "supports": "Synthetic source only; no real legal fact."
+              }
+            ],
+            "jurisdiction_and_as_of": {
+              "jurisdictions": [],
+              "as_of_date": null
+            },
+            "assumptions_and_gaps": [
+              "All facts unknown in synthetic fixture."
+            ],
+            "proposed_next_steps": [
+              "Obtain source evidence."
+            ]
+          }
+        }
+      }
+    },
+    {
+      "fixture_id": "typed-needs-context-explicit-unknowns",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261004-1200-SARA-123456",
+        "request_ref": "fixture:legal-employment-policy-drafting",
+        "source_refs": [
+          "fixture:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "legal_employment_policy_drafting_task_payload": {
+            "policy_topic_and_audience": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            },
+            "existing_policy_and_redline_scope": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            },
+            "verified_jurisdictions_and_authorities": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            },
+            "policy_choices_and_implementation_constraints": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            }
+          },
+          "task_request": "Synthetic unknown-context fixture for legal-employment-policy-drafting",
+          "company_or_matter_facts": "Synthetic unknown-context fixture for legal-employment-policy-drafting",
+          "source_documents": [
+            "fixture:source-1"
+          ],
+          "jurisdiction_and_as_of": {
+            "jurisdictions": [],
+            "as_of_date": null
+          },
+          "approved_positions_or_policy_ref": null
+        }
+      },
+      "output": {
+        "task_id": "20261004-1200-SARA-123456",
+        "status": "needs_context",
+        "artifact_ref": null,
+        "evidence_refs": [],
+        "open_questions": [
+          "Provide missing task evidence."
+        ],
+        "review_owner_role": "Sara",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "partial_work": "No substantive fact established.",
+          "missing_inputs": [
+            "policy_topic_and_audience",
+            "existing_policy_and_redline_scope",
+            "verified_jurisdictions_and_authorities",
+            "policy_choices_and_implementation_constraints"
+          ],
+          "unknown_facts": [
+            "policy_topic_and_audience",
+            "existing_policy_and_redline_scope",
+            "verified_jurisdictions_and_authorities",
+            "policy_choices_and_implementation_constraints"
+          ]
+        }
+      }
+    },
+    {
+      "fixture_id": "invalid-task-id-regex",
+      "expected_valid": false,
+      "input": {
+        "task_id": "bad-id",
+        "request_ref": "fixture:legal-employment-policy-drafting",
+        "source_refs": [
+          "fixture:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "legal_employment_policy_drafting_task_payload": {
+            "policy_topic_and_audience": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            },
+            "existing_policy_and_redline_scope": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            },
+            "verified_jurisdictions_and_authorities": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            },
+            "policy_choices_and_implementation_constraints": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            }
+          },
+          "task_request": "Synthetic unknown-context fixture for legal-employment-policy-drafting",
+          "company_or_matter_facts": "Synthetic unknown-context fixture for legal-employment-policy-drafting",
+          "source_documents": [
+            "fixture:source-1"
+          ],
+          "jurisdiction_and_as_of": {
+            "jurisdictions": [],
+            "as_of_date": null
+          },
+          "approved_positions_or_policy_ref": null
+        }
+      },
+      "output": {
+        "task_id": "20261004-1200-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": "fixture:legal-employment-policy-drafting",
+        "evidence_refs": [
+          "fixture:source-1"
+        ],
+        "open_questions": [],
+        "review_owner_role": "authorized human reviewer",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "legal_employment_policy_drafting_work_product": {
+            "policy_draft": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "authority": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "policy_choice_matrix": [
+              {
+                "content": "Synthetic task-shaped item; applicability unknown.",
+                "evidence_refs": [
+                  "fixture:source-1"
+                ],
+                "status": "unknown"
+              }
+            ],
+            "redline_against_supplied_policy": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "implementation_training_steps": [
+              {
+                "content": "Synthetic task-shaped item; applicability unknown.",
+                "evidence_refs": [
+                  "fixture:source-1"
+                ],
+                "status": "unknown"
+              }
+            ],
+            "unresolved_decisions": [
+              {
+                "content": "Synthetic task-shaped item; applicability unknown.",
+                "evidence_refs": [
+                  "fixture:source-1"
+                ],
+                "status": "unknown"
+              }
+            ],
+            "evidence_trace": [
+              {
+                "source_ref": "fixture:source-1",
+                "location": null,
+                "supports": "Synthetic source only; no real legal fact."
+              }
+            ],
+            "jurisdiction_and_as_of": {
+              "jurisdictions": [],
+              "as_of_date": null
+            },
+            "assumptions_and_gaps": [
+              "All facts unknown in synthetic fixture."
+            ],
+            "proposed_next_steps": [
+              "Obtain source evidence."
+            ]
+          }
+        }
+      }
+    },
+    {
+      "fixture_id": "missing-task-specific-input",
+      "expected_valid": false,
+      "input": {
+        "task_id": "20261004-1200-SARA-123456",
+        "request_ref": "fixture:legal-employment-policy-drafting",
+        "source_refs": [
+          "fixture:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "task_request": "Synthetic unknown-context fixture for legal-employment-policy-drafting",
+          "company_or_matter_facts": "Synthetic unknown-context fixture for legal-employment-policy-drafting",
+          "source_documents": [
+            "fixture:source-1"
+          ],
+          "jurisdiction_and_as_of": {
+            "jurisdictions": [],
+            "as_of_date": null
+          },
+          "approved_positions_or_policy_ref": null
+        }
+      },
+      "output": {
+        "task_id": "20261004-1200-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": "fixture:legal-employment-policy-drafting",
+        "evidence_refs": [
+          "fixture:source-1"
+        ],
+        "open_questions": [],
+        "review_owner_role": "authorized human reviewer",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "legal_employment_policy_drafting_work_product": {
+            "policy_draft": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "authority": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "policy_choice_matrix": [
+              {
+                "content": "Synthetic task-shaped item; applicability unknown.",
+                "evidence_refs": [
+                  "fixture:source-1"
+                ],
+                "status": "unknown"
+              }
+            ],
+            "redline_against_supplied_policy": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "implementation_training_steps": [
+              {
+                "content": "Synthetic task-shaped item; applicability unknown.",
+                "evidence_refs": [
+                  "fixture:source-1"
+                ],
+                "status": "unknown"
+              }
+            ],
+            "unresolved_decisions": [
+              {
+                "content": "Synthetic task-shaped item; applicability unknown.",
+                "evidence_refs": [
+                  "fixture:source-1"
+                ],
+                "status": "unknown"
+              }
+            ],
+            "evidence_trace": [
+              {
+                "source_ref": "fixture:source-1",
+                "location": null,
+                "supports": "Synthetic source only; no real legal fact."
+              }
+            ],
+            "jurisdiction_and_as_of": {
+              "jurisdictions": [],
+              "as_of_date": null
+            },
+            "assumptions_and_gaps": [
+              "All facts unknown in synthetic fixture."
+            ],
+            "proposed_next_steps": [
+              "Obtain source evidence."
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

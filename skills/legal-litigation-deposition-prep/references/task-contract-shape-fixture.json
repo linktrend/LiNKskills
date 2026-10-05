@@ -1,0 +1,138 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "legal-litigation-deposition-prep",
+  "input_schema_ref": "references/schemas.json#/definitions/input",
+  "output_schema_ref": "references/schemas.json#/definitions/output",
+  "completion_required_fields": [
+    "deposition_outline",
+    "document_and_impeachment_map"
+  ],
+  "fixtures": [
+    {
+      "fixture_id": "synthetic-task-shaped-completed",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261005-0900-SARA-123456",
+        "request_ref": "fixture:legal-litigation-deposition-prep:request",
+        "source_refs": [
+          "fixture:legal-litigation-deposition-prep:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "matter_and_witness": "Synthetic input fixture for legal-litigation-deposition-prep: matter and witness. Fictional test content only; no real-world facts.",
+          "theory_and_issues": "Synthetic input fixture for legal-litigation-deposition-prep: theory and issues. Fictional test content only; no real-world facts.",
+          "document_set_refs": "Synthetic input fixture for legal-litigation-deposition-prep: document set refs. Fictional test content only; no real-world facts.",
+          "deposition_scope": "Synthetic input fixture for legal-litigation-deposition-prep: deposition scope. Fictional test content only; no real-world facts.",
+          "jurisdiction_forum_and_as_of_date": "Synthetic input fixture for legal-litigation-deposition-prep: jurisdiction forum and as of date. Fictional test content only; no real-world facts."
+        }
+      },
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": "fixture:legal-litigation-deposition-prep:draft",
+        "evidence_refs": [
+          "fixture:legal-litigation-deposition-prep:source-1"
+        ],
+        "open_questions": [],
+        "review_owner_role": "Synthetic completed task for legal-litigation-deposition-prep: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "deposition_outline": "Fictional legal-litigation-deposition-prep deposition outline section. Scenario: Fictional witness has a calendar entry and two inconsistent emails; no transcript or sworn statement is supplied. Build neutral topics with exact references and label the inconsistency for counsel; do not infer a memory or provide a rehearsed answer. Expected handling: Every proposed topic ties to a stated issue or source. Questions are prompts, not fabricated witness answers. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "document_and_impeachment_map": "Fictional legal-litigation-deposition-prep document and impeachment map section. Scenario: Fictional witness has a calendar entry and two inconsistent emails; no transcript or sworn statement is supplied. Build neutral topics with exact references and label the inconsistency for counsel; do not infer a memory or provide a rehearsed answer. Expected handling: Every proposed topic ties to a stated issue or source. Questions are prompts, not fabricated witness answers. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "gaps_and_cautions": "No unresolved item in this synthetic complete fixture.",
+          "review_owner_questions": "No unresolved item in this synthetic complete fixture.",
+          "partial_work": [],
+          "missing_inputs": [],
+          "unknown_facts": []
+        }
+      }
+    },
+    {
+      "fixture_id": "needs-context-preserves-partial-and-unknowns",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261005-0900-SARA-123456",
+        "request_ref": "fixture:legal-litigation-deposition-prep:request",
+        "source_refs": [
+          "fixture:legal-litigation-deposition-prep:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "matter_and_witness": "Synthetic input fixture for legal-litigation-deposition-prep: matter and witness. Fictional test content only; no real-world facts.",
+          "theory_and_issues": "Synthetic input fixture for legal-litigation-deposition-prep: theory and issues. Fictional test content only; no real-world facts.",
+          "document_set_refs": "Synthetic input fixture for legal-litigation-deposition-prep: document set refs. Fictional test content only; no real-world facts.",
+          "deposition_scope": "Synthetic input fixture for legal-litigation-deposition-prep: deposition scope. Fictional test content only; no real-world facts.",
+          "jurisdiction_forum_and_as_of_date": "Synthetic input fixture for legal-litigation-deposition-prep: jurisdiction forum and as of date. Fictional test content only; no real-world facts."
+        }
+      },
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "needs_context",
+        "artifact_ref": "fixture:legal-litigation-deposition-prep:partial",
+        "evidence_refs": [],
+        "open_questions": [
+          "Confirm the named missing input with its owner."
+        ],
+        "review_owner_role": "Synthetic completed task for legal-litigation-deposition-prep: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "deposition_outline": "",
+          "document_and_impeachment_map": "",
+          "gaps_and_cautions": "",
+          "review_owner_questions": "",
+          "partial_work": [
+            {
+              "section": "deposition_outline",
+              "content": "Partial legal-litigation-deposition-prep fixture: source inventory recorded; one dependent conclusion remains unknown.",
+              "evidence_refs": [
+                "fixture:legal-litigation-deposition-prep:source-1"
+              ]
+            }
+          ],
+          "missing_inputs": [
+            {
+              "field": "authorized_source_or_material_fact",
+              "reason": "Synthetic missing-context scenario: A material source or jurisdiction-specific fact is missing and another portion of the draft remains possible. Complete separable work and mark only dependent conclusions unresolved.",
+              "requested_owner": "task owner"
+            }
+          ],
+          "unknown_facts": [
+            {
+              "fact": "task-specific applicability or evidence fact",
+              "why_unknown": "The edge scenario intentionally leaves this required fact or authority unresolved; preserve it as unknown.",
+              "evidence_refs": [
+                "fixture:legal-litigation-deposition-prep:source-1"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "fixture_id": "empty-completed-draft-rejected",
+      "expected_valid": false,
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": null,
+        "evidence_refs": [],
+        "open_questions": [],
+        "review_owner_role": "Synthetic completed task for legal-litigation-deposition-prep: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "deposition_outline": "",
+          "document_and_impeachment_map": "",
+          "gaps_and_cautions": "",
+          "review_owner_questions": "",
+          "partial_work": [],
+          "missing_inputs": [],
+          "unknown_facts": []
+        }
+      }
+    }
+  ],
+  "fixture_note": "All values are fictional task-shaped contract examples derived from this pack’s golden scenario and criteria; these files are schema evidence, not executed results or business/legal facts."
+}

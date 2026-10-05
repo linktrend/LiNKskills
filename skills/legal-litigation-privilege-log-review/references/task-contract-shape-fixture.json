@@ -1,0 +1,139 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "legal-litigation-privilege-log-review",
+  "input_schema_ref": "references/schemas.json#/definitions/input",
+  "output_schema_ref": "references/schemas.json#/definitions/output",
+  "completion_required_fields": [
+    "qa_table",
+    "attorney_review_queue",
+    "pattern_summary"
+  ],
+  "fixtures": [
+    {
+      "fixture_id": "synthetic-task-shaped-completed",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261005-0900-SARA-123456",
+        "request_ref": "fixture:legal-litigation-privilege-log-review:request",
+        "source_refs": [
+          "fixture:legal-litigation-privilege-log-review:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "log_ref_and_version": "Synthetic input fixture for legal-litigation-privilege-log-review: log ref and version. Fictional test content only; no real-world facts.",
+          "review_scope_and_protocol": "Synthetic input fixture for legal-litigation-privilege-log-review: review scope and protocol. Fictional test content only; no real-world facts.",
+          "jurisdiction_forum_and_as_of_date": "Synthetic input fixture for legal-litigation-privilege-log-review: jurisdiction forum and as of date. Fictional test content only; no real-world facts.",
+          "metadata_and_source_refs": "Synthetic input fixture for legal-litigation-privilege-log-review: metadata and source refs. Fictional test content only; no real-world facts.",
+          "attorney_decision_owner": "Synthetic input fixture for legal-litigation-privilege-log-review: attorney decision owner. Fictional test content only; no real-world facts."
+        }
+      },
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": "fixture:legal-litigation-privilege-log-review:draft",
+        "evidence_refs": [
+          "fixture:legal-litigation-privilege-log-review:source-1"
+        ],
+        "open_questions": [],
+        "review_owner_role": "Synthetic completed task for legal-litigation-privilege-log-review: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "qa_table": "Fictional legal-litigation-privilege-log-review qa table section. Scenario: Fictional log entry identifies lawyer/client email but omits date; another entry is a third-party vendor report addressed to counsel. Flag completeness and counsel review without deciding either item privileged. Expected handling: Every flag ties to an entry ID and supplied protocol/source. Ambiguous privilege status is routed to counsel rather than decided. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "attorney_review_queue": "Fictional legal-litigation-privilege-log-review attorney review queue section. Scenario: Fictional log entry identifies lawyer/client email but omits date; another entry is a third-party vendor report addressed to counsel. Flag completeness and counsel review without deciding either item privileged. Expected handling: Every flag ties to an entry ID and supplied protocol/source. Ambiguous privilege status is routed to counsel rather than decided. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "pattern_summary": "Fictional legal-litigation-privilege-log-review pattern summary section. Scenario: Fictional log entry identifies lawyer/client email but omits date; another entry is a third-party vendor report addressed to counsel. Flag completeness and counsel review without deciding either item privileged. Expected handling: Every flag ties to an entry ID and supplied protocol/source. Ambiguous privilege status is routed to counsel rather than decided. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "limitations": "No unresolved item in this synthetic complete fixture.",
+          "partial_work": [],
+          "missing_inputs": [],
+          "unknown_facts": []
+        }
+      }
+    },
+    {
+      "fixture_id": "needs-context-preserves-partial-and-unknowns",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261005-0900-SARA-123456",
+        "request_ref": "fixture:legal-litigation-privilege-log-review:request",
+        "source_refs": [
+          "fixture:legal-litigation-privilege-log-review:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "log_ref_and_version": "Synthetic input fixture for legal-litigation-privilege-log-review: log ref and version. Fictional test content only; no real-world facts.",
+          "review_scope_and_protocol": "Synthetic input fixture for legal-litigation-privilege-log-review: review scope and protocol. Fictional test content only; no real-world facts.",
+          "jurisdiction_forum_and_as_of_date": "Synthetic input fixture for legal-litigation-privilege-log-review: jurisdiction forum and as of date. Fictional test content only; no real-world facts.",
+          "metadata_and_source_refs": "Synthetic input fixture for legal-litigation-privilege-log-review: metadata and source refs. Fictional test content only; no real-world facts.",
+          "attorney_decision_owner": "Synthetic input fixture for legal-litigation-privilege-log-review: attorney decision owner. Fictional test content only; no real-world facts."
+        }
+      },
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "needs_context",
+        "artifact_ref": "fixture:legal-litigation-privilege-log-review:partial",
+        "evidence_refs": [],
+        "open_questions": [
+          "Confirm the named missing input with its owner."
+        ],
+        "review_owner_role": "Synthetic completed task for legal-litigation-privilege-log-review: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "qa_table": "",
+          "attorney_review_queue": "",
+          "pattern_summary": "",
+          "limitations": "",
+          "partial_work": [
+            {
+              "section": "qa_table",
+              "content": "Partial legal-litigation-privilege-log-review fixture: source inventory recorded; one dependent conclusion remains unknown.",
+              "evidence_refs": [
+                "fixture:legal-litigation-privilege-log-review:source-1"
+              ]
+            }
+          ],
+          "missing_inputs": [
+            {
+              "field": "authorized_source_or_material_fact",
+              "reason": "Synthetic missing-context scenario: A material source or jurisdiction-specific fact is missing and another portion of the draft remains possible. Complete separable work and mark only dependent conclusions unresolved.",
+              "requested_owner": "task owner"
+            }
+          ],
+          "unknown_facts": [
+            {
+              "fact": "task-specific applicability or evidence fact",
+              "why_unknown": "The edge scenario intentionally leaves this required fact or authority unresolved; preserve it as unknown.",
+              "evidence_refs": [
+                "fixture:legal-litigation-privilege-log-review:source-1"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "fixture_id": "empty-completed-draft-rejected",
+      "expected_valid": false,
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": null,
+        "evidence_refs": [],
+        "open_questions": [],
+        "review_owner_role": "Synthetic completed task for legal-litigation-privilege-log-review: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "qa_table": "",
+          "attorney_review_queue": "",
+          "pattern_summary": "",
+          "limitations": "",
+          "partial_work": [],
+          "missing_inputs": [],
+          "unknown_facts": []
+        }
+      }
+    }
+  ],
+  "fixture_note": "All values are fictional task-shaped contract examples derived from this pack’s golden scenario and criteria; these files are schema evidence, not executed results or business/legal facts."
+}

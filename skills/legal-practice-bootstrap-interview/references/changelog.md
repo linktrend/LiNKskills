@@ -1,0 +1,1 @@
+- 0.1.0 (2026-10-04): Initial shared lifecycle task with nine preserved domain variants; draft/unverified.

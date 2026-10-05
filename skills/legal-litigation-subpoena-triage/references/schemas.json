@@ -1,0 +1,366 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "request_ref",
+        "source_refs",
+        "data_classification",
+        "task_inputs"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "pattern": "^\\d{8}-\\d{4}-[A-Z0-9]+-\\d{6}$"
+        },
+        "request_ref": {
+          "type": "string"
+        },
+        "source_refs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "data_classification": {
+          "type": "string",
+          "enum": [
+            "synthetic",
+            "redacted",
+            "restricted",
+            "sensitive",
+            "unknown"
+          ]
+        },
+        "task_inputs": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "subpoena_ref",
+            "recipient_and_service_metadata",
+            "requests_and_stated_dates",
+            "jurisdiction_court_issuer",
+            "portfolio_and_hold_refs",
+            "review_owner"
+          ],
+          "properties": {
+            "subpoena_ref": {
+              "type": "string",
+              "description": "Exact document, attachments and envelope/service proof."
+            },
+            "recipient_and_service_metadata": {
+              "type": "string",
+              "description": "Named entity/person, service method/date/time, and source."
+            },
+            "requests_and_stated_dates": {
+              "type": "string",
+              "description": "Production/deposition/return dates printed in instrument."
+            },
+            "jurisdiction_court_issuer": {
+              "type": "string",
+              "description": "As stated on instrument; unknown remains explicit."
+            },
+            "portfolio_and_hold_refs": {
+              "type": "string",
+              "description": "Authorized related-matter and preservation records."
+            },
+            "review_owner": {
+              "type": "string",
+              "description": "Qualified counsel and internal response owner."
+            }
+          }
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "status",
+        "artifact_ref",
+        "evidence_refs",
+        "open_questions",
+        "review_owner_role",
+        "external_effects",
+        "mutations",
+        "work_product"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "completed_draft",
+            "needs_context",
+            "escalate",
+            "blocked"
+          ]
+        },
+        "artifact_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "open_questions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "review_owner_role": {
+          "type": "string"
+        },
+        "external_effects": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "mutations": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "work_product": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "subpoena_extract",
+            "triage_issues",
+            "deadline_and_escalation_register",
+            "response_plan_draft",
+            "handoff"
+          ],
+          "properties": {
+            "subpoena_extract": {
+              "type": "string",
+              "description": "Issuer, recipient, command, requests, service details and stated dates."
+            },
+            "triage_issues": {
+              "type": "string",
+              "description": "Scope, burden, privilege, confidentiality, custodians and preservation questions."
+            },
+            "deadline_and_escalation_register": {
+              "type": "string",
+              "description": "Face-of-document dates and counsel verification state."
+            },
+            "response_plan_draft": {
+              "type": "string",
+              "description": "Potential workstreams/owners, not a response or production."
+            },
+            "handoff": {
+              "type": "string",
+              "description": "Urgent counsel questions and source coverage."
+            },
+            "partial_work": {
+              "type": "array",
+              "description": "Separable work completed despite a material input gap; empty only when none was possible.",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "section",
+                  "content",
+                  "evidence_refs"
+                ],
+                "properties": {
+                  "section": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "content": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "evidence_refs": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "missing_inputs": {
+              "type": "array",
+              "description": "Exact absent or inaccessible input and why it blocks the dependent conclusion.",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "field",
+                  "reason"
+                ],
+                "properties": {
+                  "field": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "requested_owner": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                }
+              }
+            },
+            "unknown_facts": {
+              "type": "array",
+              "description": "Facts that remain unknown or conflicting; never fill them with invented values.",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "fact",
+                  "why_unknown",
+                  "evidence_refs"
+                ],
+                "properties": {
+                  "fact": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "why_unknown": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "evidence_refs": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "title": "sara-completed-draft-content",
+          "if": {
+            "properties": {
+              "status": {
+                "const": "completed_draft"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "evidence_refs": {
+                "minItems": 1
+              },
+              "work_product": {
+                "required": [
+                  "subpoena_extract",
+                  "triage_issues",
+                  "response_plan_draft"
+                ],
+                "properties": {
+                  "subpoena_extract": {
+                    "minLength": 1
+                  },
+                  "triage_issues": {
+                    "minLength": 1
+                  },
+                  "response_plan_draft": {
+                    "minLength": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "sara-needs-context-record",
+          "if": {
+            "properties": {
+              "status": {
+                "const": "needs_context"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "work_product": {
+                "required": [
+                  "partial_work",
+                  "missing_inputs",
+                  "unknown_facts"
+                ],
+                "properties": {
+                  "missing_inputs": {
+                    "minItems": 1
+                  },
+                  "unknown_facts": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "phase",
+        "status",
+        "updated_at",
+        "source_refs"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string"
+        },
+        "phase": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "updated_at": {
+          "type": "string"
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "open_questions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

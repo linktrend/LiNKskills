@@ -1,0 +1,167 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "legal-regulatory-gap-surfacer",
+  "input_schema_ref": "references/schemas.json#/definitions/input",
+  "output_schema_ref": "references/schemas.json#/definitions/output",
+  "completion_required_fields": [
+    "intake_proposals",
+    "dedupe_decisions",
+    "source_coverage_and_scope_limits",
+    "owner_notice_draft"
+  ],
+  "fixtures": [
+    {
+      "fixture_id": "synthetic-task-shaped-completed",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261005-0900-SARA-123456",
+        "request_ref": "fixture:legal-regulatory-gap-surfacer:request",
+        "source_refs": [
+          "fixture:legal-regulatory-gap-surfacer:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "policy_diff": "Synthetic input fixture for legal-regulatory-gap-surfacer: policy diff. Fictional test content only; no real-world facts.",
+          "register_snapshot": "Synthetic input fixture for legal-regulatory-gap-surfacer: register snapshot. Fictional test content only; no real-world facts.",
+          "authority_sources": [
+            "Synthetic input fixture for legal-regulatory-gap-surfacer: authority sources. Fictional test content only; no real-world facts."
+          ],
+          "scope_and_owner_context": "Synthetic input fixture for legal-regulatory-gap-surfacer: scope and owner context. Fictional test content only; no real-world facts.",
+          "notice_requested": true,
+          "review_owner": "Synthetic input fixture for legal-regulatory-gap-surfacer: review owner. Fictional test content only; no real-world facts.",
+          "task_request": "A scoped policy diff proposes three gaps: one verified, one duplicate in the supplied register, and one with an unverified citation. Request intake proposals and an owner notice but provide no recipient policy.",
+          "source_documents": [
+            "Synthetic input fixture for legal-regulatory-gap-surfacer: source documents. Fictional test content only; no real-world facts."
+          ],
+          "company_context": "Synthetic input fixture for legal-regulatory-gap-surfacer: company context. Fictional test content only; no real-world facts.",
+          "applicability_context": "Synthetic input fixture for legal-regulatory-gap-surfacer: applicability context. Fictional test content only; no real-world facts."
+        }
+      },
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": "fixture:legal-regulatory-gap-surfacer:draft",
+        "evidence_refs": [
+          "fixture:legal-regulatory-gap-surfacer:source-1"
+        ],
+        "open_questions": [],
+        "review_owner_role": "Synthetic completed task for legal-regulatory-gap-surfacer: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "intake_proposals": [
+            "Fictional legal-regulatory-gap-surfacer intake proposals section. Scenario: A scoped policy diff proposes three gaps: one verified, one duplicate in the supplied register, and one with an unverified citation. Request intake proposals and an owner notice but provide no recipient policy. Expected handling: Keeps policy-diff scope limitations visible. Separates verified requirements from unverified candidates. This is illustrative synthetic content only, not a real fact, legal authority, or executed result."
+          ],
+          "dedupe_decisions": [
+            "Fictional legal-regulatory-gap-surfacer dedupe decisions section. Scenario: A scoped policy diff proposes three gaps: one verified, one duplicate in the supplied register, and one with an unverified citation. Request intake proposals and an owner notice but provide no recipient policy. Expected handling: Keeps policy-diff scope limitations visible. Separates verified requirements from unverified candidates. This is illustrative synthetic content only, not a real fact, legal authority, or executed result."
+          ],
+          "source_coverage_and_scope_limits": [
+            "Fictional legal-regulatory-gap-surfacer source coverage and scope limits section. Scenario: A scoped policy diff proposes three gaps: one verified, one duplicate in the supplied register, and one with an unverified citation. Request intake proposals and an owner notice but provide no recipient policy. Expected handling: Keeps policy-diff scope limitations visible. Separates verified requirements from unverified candidates. This is illustrative synthetic content only, not a real fact, legal authority, or executed result."
+          ],
+          "owner_notice_draft": "Fictional legal-regulatory-gap-surfacer owner notice draft section. Scenario: A scoped policy diff proposes three gaps: one verified, one duplicate in the supplied register, and one with an unverified citation. Request intake proposals and an owner notice but provide no recipient policy. Expected handling: Keeps policy-diff scope limitations visible. Separates verified requirements from unverified candidates. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "counsel_and_owner_questions": [],
+          "partial_work": [],
+          "missing_inputs": [],
+          "unknown_facts": []
+        }
+      }
+    },
+    {
+      "fixture_id": "needs-context-preserves-partial-and-unknowns",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261005-0900-SARA-123456",
+        "request_ref": "fixture:legal-regulatory-gap-surfacer:request",
+        "source_refs": [
+          "fixture:legal-regulatory-gap-surfacer:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "policy_diff": "Synthetic input fixture for legal-regulatory-gap-surfacer: policy diff. Fictional test content only; no real-world facts.",
+          "register_snapshot": "Synthetic input fixture for legal-regulatory-gap-surfacer: register snapshot. Fictional test content only; no real-world facts.",
+          "authority_sources": [
+            "Synthetic input fixture for legal-regulatory-gap-surfacer: authority sources. Fictional test content only; no real-world facts."
+          ],
+          "scope_and_owner_context": "Synthetic input fixture for legal-regulatory-gap-surfacer: scope and owner context. Fictional test content only; no real-world facts.",
+          "notice_requested": true,
+          "review_owner": "Synthetic input fixture for legal-regulatory-gap-surfacer: review owner. Fictional test content only; no real-world facts.",
+          "task_request": "Prepare a synthetic legal-regulatory-gap-surfacer deliverable from this fictional test record; make no real-world factual or legal claim.",
+          "source_documents": [
+            "Synthetic input fixture for legal-regulatory-gap-surfacer: source documents. Fictional test content only; no real-world facts."
+          ],
+          "company_context": "Synthetic input fixture for legal-regulatory-gap-surfacer: company context. Fictional test content only; no real-world facts.",
+          "applicability_context": "Synthetic input fixture for legal-regulatory-gap-surfacer: applicability context. Fictional test content only; no real-world facts."
+        }
+      },
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "needs_context",
+        "artifact_ref": "fixture:legal-regulatory-gap-surfacer:partial",
+        "evidence_refs": [],
+        "open_questions": [
+          "Confirm the named missing input with its owner."
+        ],
+        "review_owner_role": "Synthetic completed task for legal-regulatory-gap-surfacer: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "intake_proposals": [],
+          "dedupe_decisions": [],
+          "source_coverage_and_scope_limits": [],
+          "owner_notice_draft": "",
+          "counsel_and_owner_questions": [],
+          "partial_work": [
+            {
+              "section": "intake_proposals",
+              "content": "Partial legal-regulatory-gap-surfacer fixture: source inventory recorded; one dependent conclusion remains unknown.",
+              "evidence_refs": [
+                "fixture:legal-regulatory-gap-surfacer:source-1"
+              ]
+            }
+          ],
+          "missing_inputs": [
+            {
+              "field": "authorized_source_or_material_fact",
+              "reason": "Synthetic missing-context scenario: Diff excludes one policy section at user direction.",
+              "requested_owner": "task owner"
+            }
+          ],
+          "unknown_facts": [
+            {
+              "fact": "task-specific applicability or evidence fact",
+              "why_unknown": "The edge scenario intentionally leaves this required fact or authority unresolved; preserve it as unknown.",
+              "evidence_refs": [
+                "fixture:legal-regulatory-gap-surfacer:source-1"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "fixture_id": "empty-completed-draft-rejected",
+      "expected_valid": false,
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": null,
+        "evidence_refs": [],
+        "open_questions": [],
+        "review_owner_role": "Synthetic completed task for legal-regulatory-gap-surfacer: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "intake_proposals": [],
+          "dedupe_decisions": [],
+          "source_coverage_and_scope_limits": [],
+          "owner_notice_draft": "",
+          "counsel_and_owner_questions": [],
+          "partial_work": [],
+          "missing_inputs": [],
+          "unknown_facts": []
+        }
+      }
+    }
+  ],
+  "fixture_note": "All values are fictional task-shaped contract examples derived from this pack’s golden scenario and criteria; these files are schema evidence, not executed results or business/legal facts."
+}

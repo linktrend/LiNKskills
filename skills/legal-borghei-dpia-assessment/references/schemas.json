@@ -1,0 +1,418 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "request_ref",
+        "source_refs",
+        "data_classification",
+        "task_inputs"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string"
+        },
+        "request_ref": {
+          "type": "string"
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "data_classification": {
+          "type": "string",
+          "enum": [
+            "synthetic",
+            "redacted",
+            "restricted",
+            "sensitive",
+            "unknown"
+          ]
+        },
+        "task_inputs": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "task_request",
+            "source_documents",
+            "company_context",
+            "applicability_context",
+            "review_owner",
+            "processing_activity",
+            "data_subjects_and_categories",
+            "roles_and_lawful_basis",
+            "necessity_and_safeguards",
+            "risk_evidence"
+          ],
+          "properties": {
+            "task_request": {
+              "type": "string",
+              "minLength": 1
+            },
+            "source_documents": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "company_context": {
+              "type": "string"
+            },
+            "applicability_context": {
+              "type": "string"
+            },
+            "review_owner": {
+              "type": "string"
+            },
+            "processing_activity": {
+              "type": "string",
+              "description": "Purpose, operations, systems and lifecycle."
+            },
+            "data_subjects_and_categories": {
+              "type": "string",
+              "description": "People affected, data categories, scale and vulnerable groups."
+            },
+            "roles_and_lawful_basis": {
+              "type": "string",
+              "description": "Controller/processor roles and supplied lawful-basis analysis."
+            },
+            "necessity_and_safeguards": {
+              "type": "string",
+              "description": "Alternatives, minimization, access, retention, security and rights measures."
+            },
+            "risk_evidence": {
+              "type": "string",
+              "description": "Impact scenarios, likelihood/severity basis and mitigation evidence."
+            }
+          }
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "status",
+        "artifact_ref",
+        "evidence_refs",
+        "open_questions",
+        "review_owner_role",
+        "external_effects",
+        "mutations",
+        "work_product"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "completed_draft",
+            "needs_context",
+            "escalate",
+            "blocked"
+          ]
+        },
+        "artifact_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "open_questions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "review_owner_role": {
+          "type": "string"
+        },
+        "external_effects": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "mutations": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "work_product": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "threshold_screen",
+            "processing_description",
+            "necessity_and_proportionality",
+            "data_subject_risk_register",
+            "mitigations_and_residual_risk",
+            "prior_consultation_questions"
+          ],
+          "properties": {
+            "threshold_screen": {
+              "type": "string",
+              "description": "Task-specific draft field: threshold screen"
+            },
+            "processing_description": {
+              "type": "string",
+              "description": "Task-specific draft field: processing description"
+            },
+            "necessity_and_proportionality": {
+              "type": "string",
+              "description": "Task-specific draft field: necessity and proportionality"
+            },
+            "data_subject_risk_register": {
+              "type": "string",
+              "description": "Task-specific draft field: data subject risk register"
+            },
+            "mitigations_and_residual_risk": {
+              "type": "array",
+              "description": "Task-specific draft field: mitigations and residual risk",
+              "items": {
+                "type": "string"
+              }
+            },
+            "prior_consultation_questions": {
+              "type": "array",
+              "description": "Task-specific draft field: prior consultation questions",
+              "items": {
+                "type": "string"
+              }
+            },
+            "partial_work": {
+              "type": "array",
+              "description": "Separable work completed despite a material input gap; empty only when none was possible.",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "section",
+                  "content",
+                  "evidence_refs"
+                ],
+                "properties": {
+                  "section": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "content": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "evidence_refs": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "missing_inputs": {
+              "type": "array",
+              "description": "Exact absent or inaccessible input and why it blocks the dependent conclusion.",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "field",
+                  "reason"
+                ],
+                "properties": {
+                  "field": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "requested_owner": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                }
+              }
+            },
+            "unknown_facts": {
+              "type": "array",
+              "description": "Facts that remain unknown or conflicting; never fill them with invented values.",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "fact",
+                  "why_unknown",
+                  "evidence_refs"
+                ],
+                "properties": {
+                  "fact": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "why_unknown": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "evidence_refs": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "title": "sara-completed-draft-content",
+          "if": {
+            "properties": {
+              "status": {
+                "const": "completed_draft"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "evidence_refs": {
+                "minItems": 1
+              },
+              "work_product": {
+                "required": [
+                  "threshold_screen",
+                  "processing_description",
+                  "necessity_and_proportionality",
+                  "data_subject_risk_register",
+                  "mitigations_and_residual_risk"
+                ],
+                "properties": {
+                  "threshold_screen": {
+                    "minLength": 1
+                  },
+                  "processing_description": {
+                    "minLength": 1
+                  },
+                  "necessity_and_proportionality": {
+                    "minLength": 1
+                  },
+                  "data_subject_risk_register": {
+                    "minLength": 1
+                  },
+                  "mitigations_and_residual_risk": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "sara-needs-context-record",
+          "if": {
+            "properties": {
+              "status": {
+                "const": "needs_context"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "work_product": {
+                "required": [
+                  "partial_work",
+                  "missing_inputs",
+                  "unknown_facts"
+                ],
+                "properties": {
+                  "missing_inputs": {
+                    "minItems": 1
+                  },
+                  "unknown_facts": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "phase",
+        "status",
+        "checkpoint_ref",
+        "updated_at"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string"
+        },
+        "phase": {
+          "type": "string",
+          "enum": [
+            "intake",
+            "evidence",
+            "analysis",
+            "draft",
+            "review",
+            "delivered"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "in_progress",
+            "waiting_for_input",
+            "completed_draft",
+            "blocked"
+          ]
+        },
+        "checkpoint_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Consumer-owner checkpoint reference; no local runtime sidecar."
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "open_questions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

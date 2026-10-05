@@ -1,0 +1,144 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "legal-litigation-subpoena-triage",
+  "input_schema_ref": "references/schemas.json#/definitions/input",
+  "output_schema_ref": "references/schemas.json#/definitions/output",
+  "completion_required_fields": [
+    "subpoena_extract",
+    "triage_issues",
+    "response_plan_draft"
+  ],
+  "fixtures": [
+    {
+      "fixture_id": "synthetic-task-shaped-completed",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261005-0900-SARA-123456",
+        "request_ref": "fixture:legal-litigation-subpoena-triage:request",
+        "source_refs": [
+          "fixture:legal-litigation-subpoena-triage:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "subpoena_ref": "Synthetic input fixture for legal-litigation-subpoena-triage: subpoena ref. Fictional test content only; no real-world facts.",
+          "recipient_and_service_metadata": "Synthetic input fixture for legal-litigation-subpoena-triage: recipient and service metadata. Fictional test content only; no real-world facts.",
+          "requests_and_stated_dates": "Synthetic input fixture for legal-litigation-subpoena-triage: requests and stated dates. Fictional test content only; no real-world facts.",
+          "jurisdiction_court_issuer": "Synthetic input fixture for legal-litigation-subpoena-triage: jurisdiction court issuer. Fictional test content only; no real-world facts.",
+          "portfolio_and_hold_refs": "Synthetic input fixture for legal-litigation-subpoena-triage: portfolio and hold refs. Fictional test content only; no real-world facts.",
+          "review_owner": "Synthetic input fixture for legal-litigation-subpoena-triage: review owner. Fictional test content only; no real-world facts."
+        }
+      },
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": "fixture:legal-litigation-subpoena-triage:draft",
+        "evidence_refs": [
+          "fixture:legal-litigation-subpoena-triage:source-1"
+        ],
+        "open_questions": [],
+        "review_owner_role": "Synthetic completed task for legal-litigation-subpoena-triage: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "subpoena_extract": "Fictional legal-litigation-subpoena-triage subpoena extract section. Scenario: Fictional subpoena names a company parent but is served at a subsidiary; return date is five days away, forum/valid-service status unconfirmed. Extract the face date and recipients, immediately escalate, mark deadline/service validity unverified, and do not produce or acknowledge. Expected handling: Instrument, service proof and printed dates are distinguished. No formal deadline or objection rule is invented. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "triage_issues": "Fictional legal-litigation-subpoena-triage triage issues section. Scenario: Fictional subpoena names a company parent but is served at a subsidiary; return date is five days away, forum/valid-service status unconfirmed. Extract the face date and recipients, immediately escalate, mark deadline/service validity unverified, and do not produce or acknowledge. Expected handling: Instrument, service proof and printed dates are distinguished. No formal deadline or objection rule is invented. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "deadline_and_escalation_register": "No unresolved item in this synthetic complete fixture.",
+          "response_plan_draft": "Fictional legal-litigation-subpoena-triage response plan draft section. Scenario: Fictional subpoena names a company parent but is served at a subsidiary; return date is five days away, forum/valid-service status unconfirmed. Extract the face date and recipients, immediately escalate, mark deadline/service validity unverified, and do not produce or acknowledge. Expected handling: Instrument, service proof and printed dates are distinguished. No formal deadline or objection rule is invented. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "handoff": "No unresolved item in this synthetic complete fixture.",
+          "partial_work": [],
+          "missing_inputs": [],
+          "unknown_facts": []
+        }
+      }
+    },
+    {
+      "fixture_id": "needs-context-preserves-partial-and-unknowns",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261005-0900-SARA-123456",
+        "request_ref": "fixture:legal-litigation-subpoena-triage:request",
+        "source_refs": [
+          "fixture:legal-litigation-subpoena-triage:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "subpoena_ref": "Synthetic input fixture for legal-litigation-subpoena-triage: subpoena ref. Fictional test content only; no real-world facts.",
+          "recipient_and_service_metadata": "Synthetic input fixture for legal-litigation-subpoena-triage: recipient and service metadata. Fictional test content only; no real-world facts.",
+          "requests_and_stated_dates": "Synthetic input fixture for legal-litigation-subpoena-triage: requests and stated dates. Fictional test content only; no real-world facts.",
+          "jurisdiction_court_issuer": "Synthetic input fixture for legal-litigation-subpoena-triage: jurisdiction court issuer. Fictional test content only; no real-world facts.",
+          "portfolio_and_hold_refs": "Synthetic input fixture for legal-litigation-subpoena-triage: portfolio and hold refs. Fictional test content only; no real-world facts.",
+          "review_owner": "Synthetic input fixture for legal-litigation-subpoena-triage: review owner. Fictional test content only; no real-world facts."
+        }
+      },
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "needs_context",
+        "artifact_ref": "fixture:legal-litigation-subpoena-triage:partial",
+        "evidence_refs": [],
+        "open_questions": [
+          "Confirm the named missing input with its owner."
+        ],
+        "review_owner_role": "Synthetic completed task for legal-litigation-subpoena-triage: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "subpoena_extract": "",
+          "triage_issues": "",
+          "deadline_and_escalation_register": "",
+          "response_plan_draft": "",
+          "handoff": "",
+          "partial_work": [
+            {
+              "section": "subpoena_extract",
+              "content": "Partial legal-litigation-subpoena-triage fixture: source inventory recorded; one dependent conclusion remains unknown.",
+              "evidence_refs": [
+                "fixture:legal-litigation-subpoena-triage:source-1"
+              ]
+            }
+          ],
+          "missing_inputs": [
+            {
+              "field": "authorized_source_or_material_fact",
+              "reason": "Synthetic missing-context scenario: A material source or jurisdiction-specific fact is missing and another portion of the draft remains possible. Complete separable work and mark only dependent conclusions unresolved.",
+              "requested_owner": "task owner"
+            }
+          ],
+          "unknown_facts": [
+            {
+              "fact": "task-specific applicability or evidence fact",
+              "why_unknown": "The edge scenario intentionally leaves this required fact or authority unresolved; preserve it as unknown.",
+              "evidence_refs": [
+                "fixture:legal-litigation-subpoena-triage:source-1"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "fixture_id": "empty-completed-draft-rejected",
+      "expected_valid": false,
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": null,
+        "evidence_refs": [],
+        "open_questions": [],
+        "review_owner_role": "Synthetic completed task for legal-litigation-subpoena-triage: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "subpoena_extract": "",
+          "triage_issues": "",
+          "deadline_and_escalation_register": "",
+          "response_plan_draft": "",
+          "handoff": "",
+          "partial_work": [],
+          "missing_inputs": [],
+          "unknown_facts": []
+        }
+      }
+    }
+  ],
+  "fixture_note": "All values are fictional task-shaped contract examples derived from this pack’s golden scenario and criteria; these files are schema evidence, not executed results or business/legal facts."
+}

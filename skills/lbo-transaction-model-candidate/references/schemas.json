@@ -1,0 +1,201 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_ref",
+        "request_ref",
+        "source_refs",
+        "data_classification",
+        "task_inputs",
+        "decision_owner_role"
+      ],
+      "properties": {
+        "task_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "request_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "data_classification": {
+          "enum": [
+            "synthetic",
+            "redacted",
+            "restricted",
+            "sensitive",
+            "unknown"
+          ]
+        },
+        "entity_or_fund_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "period_or_as_of": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "decision_owner_role": {
+          "type": "string",
+          "minLength": 1
+        },
+        "task_inputs": {
+          "type": "object",
+          "description": "provided template and its formulas; entry EBITDA/multiple, EV, debt/cash and equity check; fees/uses; debt tranches, rates, amortization and priority; operating and tax assumptions; cash sweep; exit multiple/timing; interim distributions; management rollover/carry; date and units."
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_ref",
+        "status",
+        "artifact_ref",
+        "evidence_refs",
+        "open_questions",
+        "review_owner_role",
+        "external_effects",
+        "mutations",
+        "work_product"
+      ],
+      "properties": {
+        "task_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": [
+            "COMPLETED",
+            "NEEDS_CONTEXT",
+            "PENDING_APPROVAL",
+            "REFUSED",
+            "FAILED"
+          ]
+        },
+        "artifact_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "open_questions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "review_owner_role": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "external_effects": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "mutations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "kind",
+              "artifact_ref"
+            ],
+            "properties": {
+              "kind": {
+                "const": "private_draft_artifact"
+              },
+              "artifact_ref": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "work_product": {
+          "type": "object",
+          "description": "balanced sources/uses; operating and cash flow case; debt schedule; returns cash flows, IRR/MOIC; sensitivity and formula checks; assumptions/gaps list."
+        }
+      }
+    },
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_ref",
+        "workflow_step",
+        "status",
+        "variables",
+        "last_updated"
+      ],
+      "properties": {
+        "task_ref": {
+          "type": "string"
+        },
+        "workflow_step": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "status": {
+          "enum": [
+            "INITIALIZED",
+            "IN_PROGRESS",
+            "COMPLETED",
+            "FAILED"
+          ]
+        },
+        "variables": {
+          "type": "object",
+          "properties": {
+            "source_refs": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "open_questions": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "artifact_refs": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "last_updated": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}

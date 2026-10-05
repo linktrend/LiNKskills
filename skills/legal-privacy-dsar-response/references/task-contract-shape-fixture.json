@@ -1,0 +1,160 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "legal-privacy-dsar-response",
+  "input_schema_ref": "references/schemas.json#/definitions/input",
+  "output_schema_ref": "references/schemas.json#/definitions/output",
+  "completion_required_fields": [
+    "request_classification",
+    "verification_and_scope_status",
+    "search_coverage_and_data_map",
+    "draft_acknowledgment_or_response"
+  ],
+  "fixtures": [
+    {
+      "fixture_id": "synthetic-task-shaped-completed",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261005-0900-SARA-123456",
+        "request_ref": "fixture:legal-privacy-dsar-response:request",
+        "source_refs": [
+          "fixture:legal-privacy-dsar-response:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "task_request": "A fictional access request is from an unverified representative and may include held records; prepare the intake/verification and search plan, not a disclosure.",
+          "source_documents": [
+            "Synthetic input fixture for legal-privacy-dsar-response: source documents. Fictional test content only; no real-world facts."
+          ],
+          "company_context": "Synthetic input fixture for legal-privacy-dsar-response: company context. Fictional test content only; no real-world facts.",
+          "applicability_context": "Synthetic input fixture for legal-privacy-dsar-response: applicability context. Fictional test content only; no real-world facts.",
+          "review_owner": "Synthetic input fixture for legal-privacy-dsar-response: review owner. Fictional test content only; no real-world facts.",
+          "request_and_receipt": "Synthetic input fixture for legal-privacy-dsar-response: request and receipt. Fictional test content only; no real-world facts.",
+          "identity_and_authority": "Synthetic input fixture for legal-privacy-dsar-response: identity and authority. Fictional test content only; no real-world facts.",
+          "request_scope": "Synthetic input fixture for legal-privacy-dsar-response: request scope. Fictional test content only; no real-world facts.",
+          "systems_and_data_map": "Synthetic input fixture for legal-privacy-dsar-response: systems and data map. Fictional test content only; no real-world facts.",
+          "holds_exemptions_and_jurisdictions": "Synthetic input fixture for legal-privacy-dsar-response: holds exemptions and jurisdictions. Fictional test content only; no real-world facts."
+        }
+      },
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": "fixture:legal-privacy-dsar-response:draft",
+        "evidence_refs": [
+          "fixture:legal-privacy-dsar-response:source-1"
+        ],
+        "open_questions": [],
+        "review_owner_role": "Synthetic completed task for legal-privacy-dsar-response: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "request_classification": "Fictional legal-privacy-dsar-response request classification section. Scenario: A fictional access request is from an unverified representative and may include held records; prepare the intake/verification and search plan, not a disclosure. Expected handling: Produces the data subject request response preparation deliverable with task-specific fields and not a generic departmental summary. Cites supplied evidence and preserves unknown, conflicting or unsupported facts. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "verification_and_scope_status": "Fictional legal-privacy-dsar-response verification and scope status section. Scenario: A fictional access request is from an unverified representative and may include held records; prepare the intake/verification and search plan, not a disclosure. Expected handling: Produces the data subject request response preparation deliverable with task-specific fields and not a generic departmental summary. Cites supplied evidence and preserves unknown, conflicting or unsupported facts. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "search_coverage_and_data_map": "Fictional legal-privacy-dsar-response search coverage and data map section. Scenario: A fictional access request is from an unverified representative and may include held records; prepare the intake/verification and search plan, not a disclosure. Expected handling: Produces the data subject request response preparation deliverable with task-specific fields and not a generic departmental summary. Cites supplied evidence and preserves unknown, conflicting or unsupported facts. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "exemption_questions": [],
+          "draft_acknowledgment_or_response": "Fictional legal-privacy-dsar-response draft acknowledgment or response section. Scenario: A fictional access request is from an unverified representative and may include held records; prepare the intake/verification and search plan, not a disclosure. Expected handling: Produces the data subject request response preparation deliverable with task-specific fields and not a generic departmental summary. Cites supplied evidence and preserves unknown, conflicting or unsupported facts. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "deadline_and_counsel_escalations": "No unresolved item in this synthetic complete fixture.",
+          "partial_work": [],
+          "missing_inputs": [],
+          "unknown_facts": []
+        }
+      }
+    },
+    {
+      "fixture_id": "needs-context-preserves-partial-and-unknowns",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261005-0900-SARA-123456",
+        "request_ref": "fixture:legal-privacy-dsar-response:request",
+        "source_refs": [
+          "fixture:legal-privacy-dsar-response:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "task_request": "Prepare a synthetic legal-privacy-dsar-response deliverable from this fictional test record; make no real-world factual or legal claim.",
+          "source_documents": [
+            "Synthetic input fixture for legal-privacy-dsar-response: source documents. Fictional test content only; no real-world facts."
+          ],
+          "company_context": "Synthetic input fixture for legal-privacy-dsar-response: company context. Fictional test content only; no real-world facts.",
+          "applicability_context": "Synthetic input fixture for legal-privacy-dsar-response: applicability context. Fictional test content only; no real-world facts.",
+          "review_owner": "Synthetic input fixture for legal-privacy-dsar-response: review owner. Fictional test content only; no real-world facts.",
+          "request_and_receipt": "Synthetic input fixture for legal-privacy-dsar-response: request and receipt. Fictional test content only; no real-world facts.",
+          "identity_and_authority": "Synthetic input fixture for legal-privacy-dsar-response: identity and authority. Fictional test content only; no real-world facts.",
+          "request_scope": "Synthetic input fixture for legal-privacy-dsar-response: request scope. Fictional test content only; no real-world facts.",
+          "systems_and_data_map": "Synthetic input fixture for legal-privacy-dsar-response: systems and data map. Fictional test content only; no real-world facts.",
+          "holds_exemptions_and_jurisdictions": "Synthetic input fixture for legal-privacy-dsar-response: holds exemptions and jurisdictions. Fictional test content only; no real-world facts."
+        }
+      },
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "needs_context",
+        "artifact_ref": "fixture:legal-privacy-dsar-response:partial",
+        "evidence_refs": [],
+        "open_questions": [
+          "Confirm the named missing input with its owner."
+        ],
+        "review_owner_role": "Synthetic completed task for legal-privacy-dsar-response: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "request_classification": "",
+          "verification_and_scope_status": "",
+          "search_coverage_and_data_map": "",
+          "exemption_questions": [],
+          "draft_acknowledgment_or_response": "",
+          "deadline_and_counsel_escalations": "",
+          "partial_work": [
+            {
+              "section": "request_classification",
+              "content": "Partial legal-privacy-dsar-response fixture: source inventory recorded; one dependent conclusion remains unknown.",
+              "evidence_refs": [
+                "fixture:legal-privacy-dsar-response:source-1"
+              ]
+            }
+          ],
+          "missing_inputs": [
+            {
+              "field": "authorized_source_or_material_fact",
+              "reason": "Synthetic missing-context scenario: The task arrives with a material missing fact or inaccessible authority needed for one conclusion. Complete separable source-grounded work and state the exact missing evidence, owner and next check.",
+              "requested_owner": "task owner"
+            }
+          ],
+          "unknown_facts": [
+            {
+              "fact": "task-specific applicability or evidence fact",
+              "why_unknown": "The edge scenario intentionally leaves this required fact or authority unresolved; preserve it as unknown.",
+              "evidence_refs": [
+                "fixture:legal-privacy-dsar-response:source-1"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "fixture_id": "empty-completed-draft-rejected",
+      "expected_valid": false,
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": null,
+        "evidence_refs": [],
+        "open_questions": [],
+        "review_owner_role": "Synthetic completed task for legal-privacy-dsar-response: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "request_classification": "",
+          "verification_and_scope_status": "",
+          "search_coverage_and_data_map": "",
+          "exemption_questions": [],
+          "draft_acknowledgment_or_response": "",
+          "deadline_and_counsel_escalations": "",
+          "partial_work": [],
+          "missing_inputs": [],
+          "unknown_facts": []
+        }
+      }
+    }
+  ],
+  "fixture_note": "All values are fictional task-shaped contract examples derived from this pack’s golden scenario and criteria; these files are schema evidence, not executed results or business/legal facts."
+}

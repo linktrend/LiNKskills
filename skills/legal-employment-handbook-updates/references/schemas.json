@@ -1,0 +1,740 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "request_ref",
+        "source_refs",
+        "data_classification",
+        "task_inputs"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "pattern": "^\\d{8}-\\d{4}-[A-Z0-9]+-\\d{6}$"
+        },
+        "request_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "data_classification": {
+          "type": "string",
+          "enum": [
+            "synthetic",
+            "redacted",
+            "restricted",
+            "sensitive",
+            "unknown"
+          ]
+        },
+        "task_inputs": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "legal_employment_handbook_updates_task_payload",
+            "task_request",
+            "source_documents",
+            "company_or_matter_facts",
+            "jurisdiction_and_as_of",
+            "approved_positions_or_policy_ref"
+          ],
+          "properties": {
+            "task_request": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Exact requested deliverable and boundaries."
+            },
+            "source_documents": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1,
+              "description": "Authorized document, record, or evidence references."
+            },
+            "company_or_matter_facts": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Founder-confirmed facts and company/matter context; unknowns remain explicit."
+            },
+            "jurisdiction_and_as_of": {
+              "type": [
+                "object",
+                "null"
+              ],
+              "description": "Only actual jurisdiction(s) supplied or established from authoritative evidence, plus as-of date. Null when not applicable/known.",
+              "properties": {
+                "jurisdictions": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "as_of_date": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date"
+                }
+              },
+              "required": [
+                "jurisdictions",
+                "as_of_date"
+              ],
+              "additionalProperties": false
+            },
+            "approved_positions_or_policy_ref": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "Approved policy/playbook/position reference, if supplied; absence is not permission to invent one."
+            },
+            "legal_employment_handbook_updates_task_payload": {
+              "type": "object",
+              "description": "Task-specific factual inputs for legal-employment-handbook-updates. Each named field records verified, principal-reported, proposed, conflicting, or explicitly unknown status and supporting evidence references.",
+              "additionalProperties": false,
+              "required": [
+                "current_handbook_and_version",
+                "requested_sections_and_change_trigger",
+                "jurisdictions_and_primary_authorities",
+                "approved_policy_choices_and_implementation_owners"
+              ],
+              "properties": {
+                "current_handbook_and_version": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "fact_status",
+                    "value",
+                    "evidence_refs"
+                  ],
+                  "properties": {
+                    "fact_status": {
+                      "type": "string",
+                      "enum": [
+                        "verified",
+                        "principal_reported",
+                        "proposed",
+                        "conflicting",
+                        "unknown"
+                      ],
+                      "description": "Explicitly distinguish source status; use unknown rather than infer."
+                    },
+                    "value": {
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "description": "current handbook and version; null is valid when fact_status is unknown."
+                    },
+                    "evidence_refs": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "Source references supporting the value; empty when unknown."
+                    }
+                  }
+                },
+                "requested_sections_and_change_trigger": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "fact_status",
+                    "value",
+                    "evidence_refs"
+                  ],
+                  "properties": {
+                    "fact_status": {
+                      "type": "string",
+                      "enum": [
+                        "verified",
+                        "principal_reported",
+                        "proposed",
+                        "conflicting",
+                        "unknown"
+                      ],
+                      "description": "Explicitly distinguish source status; use unknown rather than infer."
+                    },
+                    "value": {
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "description": "requested sections and change trigger; null is valid when fact_status is unknown."
+                    },
+                    "evidence_refs": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "Source references supporting the value; empty when unknown."
+                    }
+                  }
+                },
+                "jurisdictions_and_primary_authorities": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "fact_status",
+                    "value",
+                    "evidence_refs"
+                  ],
+                  "properties": {
+                    "fact_status": {
+                      "type": "string",
+                      "enum": [
+                        "verified",
+                        "principal_reported",
+                        "proposed",
+                        "conflicting",
+                        "unknown"
+                      ],
+                      "description": "Explicitly distinguish source status; use unknown rather than infer."
+                    },
+                    "value": {
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "description": "jurisdictions and primary authorities; null is valid when fact_status is unknown."
+                    },
+                    "evidence_refs": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "Source references supporting the value; empty when unknown."
+                    }
+                  }
+                },
+                "approved_policy_choices_and_implementation_owners": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "fact_status",
+                    "value",
+                    "evidence_refs"
+                  ],
+                  "properties": {
+                    "fact_status": {
+                      "type": "string",
+                      "enum": [
+                        "verified",
+                        "principal_reported",
+                        "proposed",
+                        "conflicting",
+                        "unknown"
+                      ],
+                      "description": "Explicitly distinguish source status; use unknown rather than infer."
+                    },
+                    "value": {
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "description": "approved policy choices and implementation owners; null is valid when fact_status is unknown."
+                    },
+                    "evidence_refs": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "Source references supporting the value; empty when unknown."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "status",
+        "artifact_ref",
+        "evidence_refs",
+        "open_questions",
+        "review_owner_role",
+        "external_effects",
+        "mutations",
+        "work_product"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "completed_draft",
+            "needs_context",
+            "escalate",
+            "blocked"
+          ]
+        },
+        "artifact_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "open_questions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "review_owner_role": {
+          "type": "string"
+        },
+        "external_effects": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "mutations": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "work_product": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [],
+          "properties": {
+            "partial_work": {
+              "type": "string",
+              "minLength": 1
+            },
+            "missing_inputs": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "unknown_facts": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "legal_employment_handbook_updates_work_product": {
+              "type": "object",
+              "additionalProperties": false,
+              "description": "Task-specific output sections derived from the active method: section-by-section change matrix, draft redline, jurisdiction/source basis, implementation checklist and unresolved counsel/HR decisions.",
+              "properties": {
+                "section_by_section_change_matrix": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "content",
+                      "evidence_refs"
+                    ],
+                    "properties": {
+                      "content": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "evidence_refs": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "verified",
+                          "principal_reported",
+                          "proposed",
+                          "conflicting",
+                          "unknown"
+                        ]
+                      }
+                    }
+                  },
+                  "description": "Rows/items for section-by-section change matrix. Use status unknown and list the missing evidence rather than infer."
+                },
+                "draft_redline": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "content",
+                    "evidence_refs",
+                    "fact_status"
+                  ],
+                  "properties": {
+                    "content": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "evidence_refs": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "fact_status": {
+                      "type": "string",
+                      "enum": [
+                        "verified",
+                        "principal_reported",
+                        "proposed",
+                        "conflicting",
+                        "unknown"
+                      ]
+                    }
+                  },
+                  "description": "Section for draft redline. Keep uncertainty explicit."
+                },
+                "jurisdiction_source_basis": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "content",
+                    "evidence_refs",
+                    "fact_status"
+                  ],
+                  "properties": {
+                    "content": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "evidence_refs": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "fact_status": {
+                      "type": "string",
+                      "enum": [
+                        "verified",
+                        "principal_reported",
+                        "proposed",
+                        "conflicting",
+                        "unknown"
+                      ]
+                    }
+                  },
+                  "description": "Section for jurisdiction/source basis. Keep uncertainty explicit."
+                },
+                "implementation_checklist": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "content",
+                      "evidence_refs"
+                    ],
+                    "properties": {
+                      "content": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "evidence_refs": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "verified",
+                          "principal_reported",
+                          "proposed",
+                          "conflicting",
+                          "unknown"
+                        ]
+                      }
+                    }
+                  },
+                  "description": "Rows/items for implementation checklist. Use status unknown and list the missing evidence rather than infer."
+                },
+                "unresolved_counsel_hr_decisions": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "content",
+                      "evidence_refs"
+                    ],
+                    "properties": {
+                      "content": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "evidence_refs": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "verified",
+                          "principal_reported",
+                          "proposed",
+                          "conflicting",
+                          "unknown"
+                        ]
+                      }
+                    }
+                  },
+                  "description": "Rows/items for unresolved counsel/HR decisions. Use status unknown and list the missing evidence rather than infer."
+                },
+                "evidence_trace": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "source_ref",
+                      "location",
+                      "supports"
+                    ],
+                    "properties": {
+                      "source_ref": {
+                        "type": "string"
+                      },
+                      "location": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "supports": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "jurisdiction_and_as_of": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "jurisdictions",
+                    "as_of_date"
+                  ],
+                  "properties": {
+                    "jurisdictions": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "as_of_date": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "format": "date"
+                    }
+                  }
+                },
+                "assumptions_and_gaps": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "proposed_next_steps": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "section_by_section_change_matrix",
+                "draft_redline",
+                "jurisdiction_source_basis",
+                "implementation_checklist",
+                "unresolved_counsel_hr_decisions",
+                "evidence_trace",
+                "jurisdiction_and_as_of",
+                "assumptions_and_gaps",
+                "proposed_next_steps"
+              ]
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "completed_draft"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "work_product": {
+                "required": [
+                  "legal_employment_handbook_updates_work_product"
+                ],
+                "properties": {
+                  "legal_employment_handbook_updates_work_product": {
+                    "required": [
+                      "section_by_section_change_matrix",
+                      "draft_redline",
+                      "jurisdiction_source_basis",
+                      "implementation_checklist",
+                      "unresolved_counsel_hr_decisions",
+                      "evidence_trace",
+                      "jurisdiction_and_as_of",
+                      "assumptions_and_gaps",
+                      "proposed_next_steps"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "needs_context"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "work_product": {
+                "required": [
+                  "partial_work",
+                  "missing_inputs",
+                  "unknown_facts"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "phase",
+        "status",
+        "checkpoint_ref",
+        "updated_at"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string"
+        },
+        "phase": {
+          "type": "string",
+          "enum": [
+            "intake",
+            "evidence",
+            "analysis",
+            "draft",
+            "quality_check",
+            "delivered"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "in_progress",
+            "waiting_for_input",
+            "completed_draft",
+            "blocked"
+          ]
+        },
+        "checkpoint_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Reference from consumer-owner supported checkpoint interface; never write local JSONL runtime state."
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}

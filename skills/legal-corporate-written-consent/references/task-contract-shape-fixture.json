@@ -1,0 +1,428 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "legal-corporate-written-consent",
+  "input_schema_ref": "references/schemas.json#/definitions/input",
+  "output_schema_ref": "references/schemas.json#/definitions/output",
+  "fixtures": [
+    {
+      "fixture_id": "typed-completed-task",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261004-1200-SARA-123456",
+        "request_ref": "fixture:legal-corporate-written-consent",
+        "source_refs": [
+          "fixture:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "legal_corporate_written_consent_task_payload": {
+            "entity_and_governing_documents": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            },
+            "proposed_actions_and_approval_evidence": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            },
+            "required_approvers_and_signatories": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            },
+            "filing_or_notice_requirements_if_verified": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            }
+          },
+          "task_request": "Synthetic unknown-context fixture for legal-corporate-written-consent",
+          "company_or_matter_facts": "Synthetic unknown-context fixture for legal-corporate-written-consent",
+          "source_documents": [
+            "fixture:source-1"
+          ],
+          "jurisdiction_and_as_of": {
+            "jurisdictions": [],
+            "as_of_date": null
+          },
+          "approved_positions_or_policy_ref": null
+        }
+      },
+      "output": {
+        "task_id": "20261004-1200-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": "fixture:legal-corporate-written-consent",
+        "evidence_refs": [
+          "fixture:source-1"
+        ],
+        "open_questions": [],
+        "review_owner_role": "authorized human reviewer",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "legal_corporate_written_consent_work_product": {
+            "draft_consent": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "authority_approval_analysis": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "source_to_recital": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "resolution_trace": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "signature_filing_checklist": [
+              {
+                "content": "Synthetic task-shaped item; applicability unknown.",
+                "evidence_refs": [
+                  "fixture:source-1"
+                ],
+                "status": "unknown"
+              }
+            ],
+            "missing_facts": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "evidence_trace": [
+              {
+                "source_ref": "fixture:source-1",
+                "location": null,
+                "supports": "Synthetic source only; no real legal fact."
+              }
+            ],
+            "jurisdiction_and_as_of": {
+              "jurisdictions": [],
+              "as_of_date": null
+            },
+            "assumptions_and_gaps": [
+              "All facts unknown in synthetic fixture."
+            ],
+            "proposed_next_steps": [
+              "Obtain source evidence."
+            ]
+          }
+        }
+      }
+    },
+    {
+      "fixture_id": "typed-needs-context-explicit-unknowns",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261004-1200-SARA-123456",
+        "request_ref": "fixture:legal-corporate-written-consent",
+        "source_refs": [
+          "fixture:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "legal_corporate_written_consent_task_payload": {
+            "entity_and_governing_documents": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            },
+            "proposed_actions_and_approval_evidence": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            },
+            "required_approvers_and_signatories": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            },
+            "filing_or_notice_requirements_if_verified": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            }
+          },
+          "task_request": "Synthetic unknown-context fixture for legal-corporate-written-consent",
+          "company_or_matter_facts": "Synthetic unknown-context fixture for legal-corporate-written-consent",
+          "source_documents": [
+            "fixture:source-1"
+          ],
+          "jurisdiction_and_as_of": {
+            "jurisdictions": [],
+            "as_of_date": null
+          },
+          "approved_positions_or_policy_ref": null
+        }
+      },
+      "output": {
+        "task_id": "20261004-1200-SARA-123456",
+        "status": "needs_context",
+        "artifact_ref": null,
+        "evidence_refs": [],
+        "open_questions": [
+          "Provide missing task evidence."
+        ],
+        "review_owner_role": "Sara",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "partial_work": "No substantive fact established.",
+          "missing_inputs": [
+            "entity_and_governing_documents",
+            "proposed_actions_and_approval_evidence",
+            "required_approvers_and_signatories",
+            "filing_or_notice_requirements_if_verified"
+          ],
+          "unknown_facts": [
+            "entity_and_governing_documents",
+            "proposed_actions_and_approval_evidence",
+            "required_approvers_and_signatories",
+            "filing_or_notice_requirements_if_verified"
+          ]
+        }
+      }
+    },
+    {
+      "fixture_id": "invalid-task-id-regex",
+      "expected_valid": false,
+      "input": {
+        "task_id": "bad-id",
+        "request_ref": "fixture:legal-corporate-written-consent",
+        "source_refs": [
+          "fixture:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "legal_corporate_written_consent_task_payload": {
+            "entity_and_governing_documents": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            },
+            "proposed_actions_and_approval_evidence": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            },
+            "required_approvers_and_signatories": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            },
+            "filing_or_notice_requirements_if_verified": {
+              "fact_status": "unknown",
+              "value": null,
+              "evidence_refs": []
+            }
+          },
+          "task_request": "Synthetic unknown-context fixture for legal-corporate-written-consent",
+          "company_or_matter_facts": "Synthetic unknown-context fixture for legal-corporate-written-consent",
+          "source_documents": [
+            "fixture:source-1"
+          ],
+          "jurisdiction_and_as_of": {
+            "jurisdictions": [],
+            "as_of_date": null
+          },
+          "approved_positions_or_policy_ref": null
+        }
+      },
+      "output": {
+        "task_id": "20261004-1200-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": "fixture:legal-corporate-written-consent",
+        "evidence_refs": [
+          "fixture:source-1"
+        ],
+        "open_questions": [],
+        "review_owner_role": "authorized human reviewer",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "legal_corporate_written_consent_work_product": {
+            "draft_consent": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "authority_approval_analysis": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "source_to_recital": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "resolution_trace": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "signature_filing_checklist": [
+              {
+                "content": "Synthetic task-shaped item; applicability unknown.",
+                "evidence_refs": [
+                  "fixture:source-1"
+                ],
+                "status": "unknown"
+              }
+            ],
+            "missing_facts": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "evidence_trace": [
+              {
+                "source_ref": "fixture:source-1",
+                "location": null,
+                "supports": "Synthetic source only; no real legal fact."
+              }
+            ],
+            "jurisdiction_and_as_of": {
+              "jurisdictions": [],
+              "as_of_date": null
+            },
+            "assumptions_and_gaps": [
+              "All facts unknown in synthetic fixture."
+            ],
+            "proposed_next_steps": [
+              "Obtain source evidence."
+            ]
+          }
+        }
+      }
+    },
+    {
+      "fixture_id": "missing-task-specific-input",
+      "expected_valid": false,
+      "input": {
+        "task_id": "20261004-1200-SARA-123456",
+        "request_ref": "fixture:legal-corporate-written-consent",
+        "source_refs": [
+          "fixture:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "task_request": "Synthetic unknown-context fixture for legal-corporate-written-consent",
+          "company_or_matter_facts": "Synthetic unknown-context fixture for legal-corporate-written-consent",
+          "source_documents": [
+            "fixture:source-1"
+          ],
+          "jurisdiction_and_as_of": {
+            "jurisdictions": [],
+            "as_of_date": null
+          },
+          "approved_positions_or_policy_ref": null
+        }
+      },
+      "output": {
+        "task_id": "20261004-1200-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": "fixture:legal-corporate-written-consent",
+        "evidence_refs": [
+          "fixture:source-1"
+        ],
+        "open_questions": [],
+        "review_owner_role": "authorized human reviewer",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "legal_corporate_written_consent_work_product": {
+            "draft_consent": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "authority_approval_analysis": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "source_to_recital": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "resolution_trace": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "signature_filing_checklist": [
+              {
+                "content": "Synthetic task-shaped item; applicability unknown.",
+                "evidence_refs": [
+                  "fixture:source-1"
+                ],
+                "status": "unknown"
+              }
+            ],
+            "missing_facts": {
+              "content": "Synthetic task-shaped draft section; applicability unknown.",
+              "evidence_refs": [
+                "fixture:source-1"
+              ],
+              "fact_status": "unknown"
+            },
+            "evidence_trace": [
+              {
+                "source_ref": "fixture:source-1",
+                "location": null,
+                "supports": "Synthetic source only; no real legal fact."
+              }
+            ],
+            "jurisdiction_and_as_of": {
+              "jurisdictions": [],
+              "as_of_date": null
+            },
+            "assumptions_and_gaps": [
+              "All facts unknown in synthetic fixture."
+            ],
+            "proposed_next_steps": [
+              "Obtain source evidence."
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

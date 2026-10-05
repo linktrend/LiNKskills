@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0",
+  "skill_id": "legal-employment-log-leave",
+  "copy_policy": "Complete selected skill task subtree, linked support context, and repository notice are copied byte-for-byte at pinned commit. Source data remains unchanged; the active method is separately adapted.",
+  "sources": [
+    {
+      "repository": "anthropics/claude-for-legal",
+      "commit": "4a6c651889c97cc9140580363c73e0eb17379c2b",
+      "source_path": "employment-legal/skills/log-leave/SKILL.md",
+      "source_tree_root": "employment-legal/skills/log-leave",
+      "source_task_tree": [
+        {
+          "source_path": "employment-legal/skills/log-leave/SKILL.md",
+          "copied_path": "references/upstream/anthropics-claude-for-legal/employment-legal/skills/log-leave/SKILL.md",
+          "git_blob": "e30bcff7acf21db1cd6ed34f9955fee80cdefde1",
+          "sha256": "8d2b8a8b92d8b54988db303c1a772e1afddc41ea42f18ef60665a1598e6fba98",
+          "bytes": 2531,
+          "mode": "100644"
+        }
+      ],
+      "repository_notices": [
+        {
+          "source_path": "LICENSE",
+          "copied_path": "references/upstream/anthropics-claude-for-legal/_notices/LICENSE",
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+          "bytes": 11358
+        }
+      ],
+      "supporting_context": [
+        {
+          "source_path": "employment-legal/CLAUDE.md",
+          "copied_path": "references/upstream/anthropics-claude-for-legal-context/employment-legal/CLAUDE.md",
+          "sha256": "da705fdfbd2612d52721fa210731c629ad0fdf9150e75002bdf6295ba63e3270",
+          "bytes": 39871,
+          "role": "upstream generic profile template, provenance only; never current company policy"
+        }
+      ],
+      "task_role": "primary"
+    }
+  ]
+}
