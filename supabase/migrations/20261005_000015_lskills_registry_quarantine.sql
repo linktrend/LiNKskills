@@ -27,7 +27,10 @@ begin
   select count(*) into check_count
   from pg_constraint c join pg_class r on r.oid=c.conrelid join pg_namespace n on n.oid=r.relnamespace
   where n.nspname='lskills' and r.relname='releases' and c.contype='c'
-    and pg_get_constraintdef(c.oid) like '%registry_lifecycle%';
+    and pg_get_constraintdef(c.oid) like '%registry_lifecycle%'
+    and pg_get_constraintdef(c.oid) like '%quarantined%'
+    and pg_get_constraintdef(c.oid) like '%published%'
+    and pg_get_constraintdef(c.oid) like '%retired%';
   if check_count = 0 then
     raise exception 'registry_lifecycle allowed-values check is missing';
   end if;
