@@ -1,0 +1,143 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "comparable-company-valuation-candidate",
+  "display_name": "Comparable Company Valuation Analysis",
+  "version": "1.0.0",
+  "description": "Assess peer comparability, normalize sourced values and calculate relative metrics/statistics; do not infer intrinsic value or investment suitability from multiples alone.",
+  "capability_category": "conditional_finance_task",
+  "provenance": {
+    "author": "LiNKskills Library",
+    "source": "Pinned source subtree copied verbatim; see references/upstream/SOURCE-MANIFEST.json",
+    "license": "Apache-2.0; exact original notice preserved in references/upstream/_licenses"
+  },
+  "lifecycle_state": "draft",
+  "format_profile": "heavy",
+  "compatible_runtime_profiles": [
+    "lisa-openclaw",
+    "cursor-macos"
+  ],
+  "min_capability_tier": "balanced",
+  "routing": {
+    "when_to_use": "Use when building a selected peer set and comparing sourced operating metrics and valuation multiples as of a defined date.",
+    "when_not_to_use": [
+      "Entity/fund/task applicability is not confirmed",
+      "A different atomic task has its own skill",
+      "Requested output is an unapproved action or external effect"
+    ],
+    "tags": [
+      "finance",
+      "conditional",
+      "task-specific"
+    ],
+    "exclusion_rules": [
+      "No pack text grants authority",
+      "No system mutation or external communication"
+    ],
+    "ambiguity_rules": [
+      "Continue unaffected work and request only facts that materially change the result"
+    ],
+    "recommended_disclosure_level": 2
+  },
+  "execution": {
+    "required_inputs": [
+      {
+        "name": "scope_and_source_inputs",
+        "description": "target entity/question; valuation date; peer candidates and selection rationale; consistent period/units/currency; sourced market cap, debt/cash, revenue, EBITDA, net income and any industry metrics; definitions/adjustments; audience."
+      }
+    ],
+    "expected_outputs": [
+      {
+        "name": "task_work_product",
+        "description": "peer-selection table, raw inputs and sources, normalized operating/valuation metrics, median/quartile distribution, outlier/exclusion notes and interpretation limits."
+      }
+    ],
+    "forbidden_actions": [
+      "Mutation of company, fund, Odoo, accounting, payroll or source records",
+      "Payments, filings, signatures, publications, messages, approvals, trades or transaction commitments",
+      "Inventing current law, jurisdiction, entity/fund applicability or missing facts"
+    ],
+    "verification_steps": [
+      "1. Define question (valuation, growth, efficiency, cash generation), date, audience, industry and target scope. 2. Establish peer criteria before gathering values: business model, product mix, scale, geography, growth, margins and fiscal period. Exclude or flag conglomerates/distressed/non-comparable names; do not force peer counts. 3. Collect market and financial inputs from available authorized institutional sources or cited filings; record each as-of date, currency, period, reported/adjusted basis and source. If current/market data is unavailable, use supplied snapshots and label stale. 4. Normalize currency, units, fiscal timing, LTM/annual basis and one-time items using transparent adjustments; do not merge quarter and LTM values. 5. Compute margin/growth and EV = market capitalization + debt \u2212 cash; multiples use EV numerator with revenue/EBITDA, P/E with market cap/net income. Show formulas and mark not meaningful if denominator\u22640. 6. Select 5\u201310 relevant operating/valuation metrics based on the question; industry metrics only when defined/sourced. Compute median and quartiles for comparable ratios/multiples; report sample size and exclusions. Do not use arithmetic average of percentages as the default benchmark. 7. Analyze range and distribution, explain comparability limitations and avoid calling low multiple \u201cundervalued\u201d without a causal thesis. 8. Provide source table, formulas, peer rationale and sensitivity if requested; no trade/deal instruction.",
+      "Show formulas/denominators, evidence dates and assumptions; preserve unresolved conflicts.",
+      "Write only a requested private draft; no external effects."
+    ],
+    "completion_criteria": [
+      "Conditional task scope is evidenced or limitations explicitly bound",
+      "Task method and calculation are reproducible from cited inputs",
+      "Owner decisions, open issues and source limitations are explicit"
+    ]
+  },
+  "dependencies": {
+    "schema_version": "0.1",
+    "skill_dependencies": [],
+    "packaged_tools": [],
+    "host_capabilities": [
+      "filesystem_read",
+      "filesystem_write"
+    ],
+    "external_services": [],
+    "library_assets": [],
+    "runtime_requirements": [
+      {
+        "key": "min_reasoning_tier",
+        "value": "balanced"
+      },
+      {
+        "key": "context_required",
+        "value": 32000
+      },
+      {
+        "key": "preferred_model",
+        "value": "gpt-6.1-sol"
+      }
+    ],
+    "optional_dependencies": []
+  },
+  "eval": {
+    "suite_path": "references/eval-suite.json",
+    "suite_schema_version": "0.1",
+    "required_certification_profiles": [],
+    "verification_refs": [
+      "references/eval-suite.yaml",
+      "references/source-selection.md"
+    ]
+  },
+  "telemetry": {
+    "classification": "restricted",
+    "redaction_rules": [
+      "strip_secrets",
+      "strip_personal_data",
+      "strip_private_finance_data",
+      "strip_reasoning"
+    ],
+    "retention_policy": "opaque task/source IDs and hashes only"
+  },
+  "fragments": [
+    {
+      "fragment_id": "skill-md",
+      "disclosure_level": 2,
+      "path": "SKILL.md"
+    },
+    {
+      "fragment_id": "advanced",
+      "disclosure_level": 3,
+      "path": "advanced/advanced.md"
+    },
+    {
+      "fragment_id": "schemas",
+      "disclosure_level": 5,
+      "path": "references/schemas.json"
+    },
+    {
+      "fragment_id": "eval",
+      "disclosure_level": 3,
+      "path": "references/eval-suite.json"
+    },
+    {
+      "fragment_id": "source-selection",
+      "disclosure_level": 3,
+      "path": "references/source-selection.md"
+    }
+  ],
+  "release_channel": "development"
+}

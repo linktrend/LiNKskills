@@ -12,7 +12,8 @@ import pytest
 
 from linkskills_core.provider_v2 import InMemoryProviderStore, PROTOCOL_VERSION
 from linkskills_gateway.production_v2 import (
-    PostgresProviderStore, ProductionV2Provider, decode_release, manifest_digest,
+    CATALOG_PLACEMENTS, CATALOG_FLOORS, PostgresProviderStore, ProductionV2Provider,
+    catalog_families, decode_release, decode_split_release, filed_releases, manifest_digest,
 )
 
 
@@ -51,6 +52,21 @@ class Store(InMemoryProviderStore):
                                              "release_ids": [self.row["release_id"]]}
 
 
+class MetadataStore(Store):
+    """Exercise the production metadata/lazy-release path without Postgres."""
+
+    def snapshot_metadata(self, claims):
+        manifest = self.row["manifest"]
+        return ([{k: v for k, v in manifest.items() if k != "resources"}
+                 | {"release_id": self.row["release_id"], "lifecycle_state": "qualified"}],
+                {"runtime_profile": "cursor-macos", "release_ids": [self.row["release_id"]]})
+
+    def fetch_release(self, claims, release_id, resource_ids=None):
+        if release_id != self.row["release_id"]:
+            raise ValueError("not_found")
+        return {"row": self.row, "binding": {"runtime_profile": "cursor-macos", "release_ids": [release_id]}}
+
+
 def runtime():
     auth = Mock()
     auth.verify.return_value = SimpleNamespace(
@@ -58,6 +74,16 @@ def runtime():
         scopes={"skills:read", "skills:write"}, permitted_operations={"read", "execute"},
     )
     store = Store()
+    return ProductionV2Provider(auth, store), auth, store
+
+
+def metadata_runtime():
+    auth = Mock()
+    auth.verify.return_value = SimpleNamespace(
+        org_id="org-a", actor_id="actor-a", runtime_binding_id="binding-a",
+        scopes={"skills:read", "skills:write"}, permitted_operations={"read", "execute"},
+    )
+    store = MetadataStore()
     return ProductionV2Provider(auth, store), auth, store
 
 
@@ -95,6 +121,118 @@ def test_tampered_manifest_or_bytes_rejected():
     corrupted["manifest_sha256"] = manifest_digest(corrupted["manifest"])
     with pytest.raises(ValueError, match="integrity_mismatch"):
         decode_release(corrupted)
+
+
+def test_exact_resource_decode_does_not_decode_unrequested_resources():
+    row = publication()
+    row["manifest"]["resources"]["large.bin"] = {
+        "content_b64": "not-base64",
+        "content_digest": "sha256:" + "0" * 64,
+    }
+    row["manifest_sha256"] = manifest_digest(row["manifest"])
+    release = decode_release(row, {"SKILL.md"})
+    assert set(release["resources"]) == {"SKILL.md"}
+
+
+def test_exact_resource_decode_still_rejects_tampered_requested_bytes():
+    row = publication()
+    row["manifest"]["resources"]["SKILL.md"]["content_b64"] = base64.b64encode(b"tampered").decode()
+    row["manifest_sha256"] = manifest_digest(row["manifest"])
+    with pytest.raises(ValueError, match="integrity_mismatch"):
+        decode_release(row, {"SKILL.md"})
+
+
+def test_metadata_path_does_not_call_full_snapshot():
+    provider, _, store = metadata_runtime()
+    store.snapshot = Mock(side_effect=AssertionError("metadata path must not decode all releases"))
+    result = provider.handle(request("skills_release_list", limit=10))
+    assert result["ok"] is True
+    assert result["items"][0]["release_id"] == "git-safeguard@1.1.0"
+
+
+def test_metadata_path_preserves_catalog_pagination_validation():
+    provider, _, _ = metadata_runtime()
+    assert provider.handle(request("skills_release_list", limit=10))["items"]
+    assert provider.handle(request("skills_release_list", limit=0))["error"] == "validation_failed"
+    assert provider.handle(request("skills_release_list", cursor="snapshot:wrong:1"))["error"] == "validation_failed"
+
+
+def test_live_catalog_floors_and_draft_placement_contract():
+    families = catalog_families()
+    assert len(families) == 22
+    assert {family["family_id"] for family in families} == {
+        "operations", "finance", "company-legal-and-records", "customers-and-marketing",
+        "product", "research", "trading", "software-development", "linkdeveloper",
+        "linkresearch", "linksites", "linktarget", "linksales", "linkclient",
+        "linkeditorial", "linkcontent", "linkpublish", "linkchannel", "linkcampaign",
+        "linktrading", "linklegal", "systems",
+    }
+    counts = {family["family_id"]: len(family["subcategories"]) for family in families}
+    assert {k: counts[k] for k in ("operations", "finance", "company-legal-and-records", "research", "software-development", "systems")} == {
+        "operations": 4, "finance": 3, "company-legal-and-records": 4,
+        "research": 3, "software-development": 2, "systems": 10,
+    }
+    filed = filed_releases([{"skill_id": "git-safeguard", "version": "1.1.0", "lifecycle_state": "qualified", "qualification": "qualified"}])
+    assert filed[0]["family_id"] == "software-development"
+    assert any(row["lifecycle_state"] == "draft" and row["skill_id"] in CATALOG_PLACEMENTS for row in filed)
+    assert CATALOG_PLACEMENTS["git-safeguard"] == ("software-development", "coding")
+
+
+def test_capabilities_refresh_denies_disabled_binding():
+    provider, _, store = metadata_runtime()
+    store.snapshot_metadata = Mock(side_effect=ValueError("forbidden"))
+    assert provider.handle(request("skills_capabilities_get")) == {"ok": False, "error": "forbidden"}
+
+
+def test_missing_requested_resource_is_not_found():
+    row = publication()
+    with pytest.raises(ValueError, match="not_found"):
+        decode_release(row, {"missing.txt"})
+
+
+def test_manifest_and_section_aliases_use_requested_resource():
+    row = publication()
+    body = b"manifest bytes"
+    row["manifest"]["resources"]["manifest"] = {
+        "content_b64": base64.b64encode(body).decode(),
+        "content_digest": "sha256:" + hashlib.sha256(body).hexdigest(),
+    }
+    row["manifest"]["resources"]["section-1"] = {
+        "content_b64": base64.b64encode(body).decode(),
+        "content_digest": "sha256:" + hashlib.sha256(body).hexdigest(),
+        "resource_kind": "section",
+    }
+    row["manifest_sha256"] = manifest_digest(row["manifest"])
+    provider, _, store = metadata_runtime()
+    store.row = row
+    assert provider.handle(request("skills_release_entrypoint_get", skill_id="git-safeguard", version="1.1.0", manifest=True))["resource_id"] == "manifest"
+    assert provider.handle(request("skills_release_section_get", skill_id="git-safeguard", version="1.1.0", section_id="section-1"))["resource_id"] == "section-1"
+
+
+def test_capabilities_path_does_not_load_release_bodies():
+    provider, _, store = metadata_runtime()
+    store.snapshot = Mock(side_effect=AssertionError("capabilities must not decode all releases"))
+    result = provider.handle(request("skills_capabilities_get"))
+    assert result["ok"] is True
+    assert result["legacy_execution"] is False
+
+
+def test_split_release_decodes_only_selected_resource_and_checks_digest():
+    row = publication()
+    body = base64.b64decode(row["manifest"]["resources"]["SKILL.md"]["content_b64"])
+    decoded = decode_split_release(
+        {k: row[k] for k in ("release_id", "manifest", "manifest_sha256", "lifecycle")},
+        [{"resource_id": "SKILL.md", "content_digest": row["manifest"]["resources"]["SKILL.md"]["content_digest"],
+          "media_type": "text/markdown", "content": body}],
+        {"SKILL.md"},
+    )
+    assert decoded["resources"]["SKILL.md"]["body"] == body
+    with pytest.raises(ValueError, match="integrity_mismatch"):
+        decode_split_release(
+            {k: row[k] for k in ("release_id", "manifest", "manifest_sha256", "lifecycle")},
+            [{"resource_id": "SKILL.md", "content_digest": "sha256:" + "0" * 64,
+              "media_type": "text/markdown", "content": body}],
+        )
 
 
 def test_database_errors_do_not_leak():

@@ -1,0 +1,214 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "definitions": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "request_ref",
+        "source_refs",
+        "data_classification",
+        "task_inputs"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "pattern": "^\\d{8}-\\d{4}-[A-Z0-9]+-\\d{6}$"
+        },
+        "request_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "data_classification": {
+          "type": "string",
+          "enum": [
+            "synthetic",
+            "redacted",
+            "restricted",
+            "sensitive",
+            "unknown"
+          ]
+        },
+        "task_inputs": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "site_materials",
+            "site_languages",
+            "audience_and_market",
+            "processing_context",
+            "audit_depth",
+            "as_of_date",
+            "scope_and_as_of"
+          ],
+          "properties": {
+            "site_materials": {
+              "type": "string",
+              "description": "Fetched/supplied page text, screenshots, URLs and capture date; retain language."
+            },
+            "site_languages": {
+              "type": "string",
+              "description": "Original document languages; do not score machine translation as source text."
+            },
+            "audience_and_market": {
+              "type": "string",
+              "description": "Verified AZ-only, EU/EEA-targeted, both, or unknown audience evidence."
+            },
+            "processing_context": {
+              "type": "string",
+              "description": "Business model, controller identity, data categories and observed trackers; unknowns explicit."
+            },
+            "audit_depth": {
+              "type": "string",
+              "description": "Executive summary, evidence table, or both."
+            },
+            "as_of_date": {
+              "type": "string",
+              "description": "Review date and current primary authorities available."
+            },
+            "scope_and_as_of": {
+              "type": "string",
+              "description": "Actual scope, jurisdiction and as-of date if relevant; state unknown rather than infer."
+            }
+          }
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "artifact_type",
+        "task_specific_deliverable",
+        "evidence_trace",
+        "uncertainties",
+        "external_effects",
+        "mutations"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "completed_draft",
+            "needs_context",
+            "not_applicable"
+          ]
+        },
+        "artifact_type": {
+          "const": "legal-lawve-az-eu-website-privacy-audit-mirza-chiragov"
+        },
+        "task_specific_deliverable": {
+          "type": "object",
+          "minProperties": 1
+        },
+        "evidence_trace": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "claim",
+              "source_ref",
+              "pinpoint",
+              "basis"
+            ],
+            "properties": {
+              "claim": {
+                "type": "string"
+              },
+              "source_ref": {
+                "type": "string"
+              },
+              "pinpoint": {
+                "type": "string"
+              },
+              "basis": {
+                "enum": [
+                  "verified_fact",
+                  "requestor_assertion",
+                  "inference",
+                  "proposal",
+                  "unknown"
+                ]
+              }
+            }
+          }
+        },
+        "uncertainties": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "external_effects": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "mutations": {
+          "type": "array",
+          "maxItems": 0
+        }
+      }
+    },
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "phase",
+        "source_refs",
+        "established_facts",
+        "open_inputs",
+        "next_action",
+        "last_updated"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string"
+        },
+        "phase": {
+          "enum": [
+            "intake",
+            "evidence",
+            "analysis",
+            "draft",
+            "verification",
+            "complete"
+          ]
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "established_facts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "open_inputs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "next_action": {
+          "type": "string"
+        },
+        "last_updated": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}

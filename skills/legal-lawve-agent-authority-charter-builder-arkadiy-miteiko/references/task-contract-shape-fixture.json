@@ -1,0 +1,92 @@
+{
+  "schema_version": "1.0",
+  "skill_id": "legal-lawve-agent-authority-charter-builder-arkadiy-miteiko",
+  "completed_input": {
+    "task_id": "20261004-1200-LEGAL-000001",
+    "request_ref": "synthetic-case-001",
+    "source_refs": [
+      "lawve-ai/awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290:skills/agent-authority-charter-builder-arkadiy-miteiko/SKILL.md"
+    ],
+    "data_classification": "synthetic",
+    "task_inputs": {
+      "agent_identity": "Synthetic refund assistant v2; staging only; purpose is to draft refund recommendations.",
+      "principal_and_delegation": "No signed delegation supplied; product manager says refunds under $20 are allowed.",
+      "systems_and_data": "Read order records; can draft case notes; no payment write interface supplied.",
+      "action_inventory": "Read order, draft recommendation, approve refund, initiate payment, close case.",
+      "human_controls": "Finance owner not named; support lead can review draft; suspension route unknown.",
+      "evidence_requirements": "Case ID, source records, reviewer identity, approval timestamp, policy version.",
+      "scope_and_as_of": "Synthetic scope only; law applicability unknown unless identified in the case facts."
+    }
+  },
+  "completed_output": {
+    "status": "completed_draft",
+    "artifact_type": "legal-lawve-agent-authority-charter-builder-arkadiy-miteiko",
+    "task_specific_deliverable": {
+      "agent identity and purpose": "Synthetic expected finding; see golden-case criteria for exact task outcome.",
+      "principal and delegation source": "Synthetic expected finding; see golden-case criteria for exact task outcome.",
+      "scope and permitted action matrix": "Synthetic expected finding; see golden-case criteria for exact task outcome.",
+      "prohibited actions": "Synthetic expected finding; see golden-case criteria for exact task outcome.",
+      "approval gates and escalation": "Synthetic expected finding; see golden-case criteria for exact task outcome.",
+      "evidence/audit requirements": "Synthetic expected finding; see golden-case criteria for exact task outcome.",
+      "suspension, revocation and deployment conditions": "Synthetic expected finding; see golden-case criteria for exact task outcome."
+    },
+    "evidence_trace": [
+      {
+        "claim": "Synthetic fixture fact was supplied",
+        "source_ref": "lawve-ai/awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290:skills/agent-authority-charter-builder-arkadiy-miteiko/SKILL.md",
+        "pinpoint": "synthetic input field",
+        "basis": "verified_fact"
+      }
+    ],
+    "uncertainties": [
+      "Any law/applicability not established by the synthetic fixture"
+    ],
+    "external_effects": [],
+    "mutations": []
+  },
+  "needs_context_input": {
+    "task_id": "20261004-1200-LEGAL-000001",
+    "request_ref": "synthetic-case-001",
+    "source_refs": [
+      "lawve-ai/awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290:skills/agent-authority-charter-builder-arkadiy-miteiko/SKILL.md"
+    ],
+    "data_classification": "synthetic",
+    "task_inputs": {
+      "agent_identity": "UNKNOWN: not supplied in this synthetic needs-context fixture.",
+      "principal_and_delegation": "UNKNOWN: not supplied in this synthetic needs-context fixture.",
+      "systems_and_data": "UNKNOWN: not supplied in this synthetic needs-context fixture.",
+      "action_inventory": "UNKNOWN: not supplied in this synthetic needs-context fixture.",
+      "human_controls": "UNKNOWN: not supplied in this synthetic needs-context fixture.",
+      "evidence_requirements": "UNKNOWN: not supplied in this synthetic needs-context fixture.",
+      "scope_and_as_of": "Synthetic scope only; law applicability unknown unless identified in the case facts."
+    }
+  },
+  "needs_context_output": {
+    "status": "needs_context",
+    "artifact_type": "legal-lawve-agent-authority-charter-builder-arkadiy-miteiko",
+    "task_specific_deliverable": {
+      "separable_work": "Complete unaffected portions and identify blocked section."
+    },
+    "evidence_trace": [],
+    "uncertainties": [
+      "Outcome-changing source/input unknown"
+    ],
+    "external_effects": [],
+    "mutations": []
+  },
+  "state_example": {
+    "task_id": "20261004-1200-LEGAL-000001",
+    "phase": "draft",
+    "source_refs": [
+      "lawve-ai/awesome-legal-skills@045f738df65ae53867c2f69f7e8a1e4f61816290:skills/agent-authority-charter-builder-arkadiy-miteiko/SKILL.md"
+    ],
+    "established_facts": [
+      "Synthetic facts only"
+    ],
+    "open_inputs": [
+      "Actual legal applicability not established"
+    ],
+    "next_action": "Request the exact missing evidence from the responsible owner.",
+    "last_updated": "2026-10-04T12:00:00Z"
+  }
+}

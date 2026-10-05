@@ -1,0 +1,145 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "legal-litigation-demand-received",
+  "input_schema_ref": "references/schemas.json#/definitions/input",
+  "output_schema_ref": "references/schemas.json#/definitions/output",
+  "completion_required_fields": [
+    "extracted_claim_summary",
+    "urgency_and_deadline_register",
+    "portfolio_crosscheck",
+    "response_options"
+  ],
+  "fixtures": [
+    {
+      "fixture_id": "synthetic-task-shaped-completed",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261005-0900-SARA-123456",
+        "request_ref": "fixture:legal-litigation-demand-received:request",
+        "source_refs": [
+          "fixture:legal-litigation-demand-received:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "incoming_demand_ref": "Synthetic input fixture for legal-litigation-demand-received: incoming demand ref. Fictional test content only; no real-world facts.",
+          "receipt_metadata": "Synthetic input fixture for legal-litigation-demand-received: receipt metadata. Fictional test content only; no real-world facts.",
+          "portfolio_refs": "Synthetic input fixture for legal-litigation-demand-received: portfolio refs. Fictional test content only; no real-world facts.",
+          "governing_documents": "Synthetic input fixture for legal-litigation-demand-received: governing documents. Fictional test content only; no real-world facts.",
+          "jurisdiction_forum_and_as_of_date": "Synthetic input fixture for legal-litigation-demand-received: jurisdiction forum and as of date. Fictional test content only; no real-world facts.",
+          "review_owner": "Synthetic input fixture for legal-litigation-demand-received: review owner. Fictional test content only; no real-world facts."
+        }
+      },
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": "fixture:legal-litigation-demand-received:draft",
+        "evidence_refs": [
+          "fixture:legal-litigation-demand-received:source-1"
+        ],
+        "open_questions": [],
+        "review_owner_role": "Synthetic completed task for legal-litigation-demand-received: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "extracted_claim_summary": "Fictional legal-litigation-demand-received extracted claim summary section. Scenario: Fictional letter demands payment “within 10 days” with no service date and mentions an affiliate not in the supplied matter log. Extract the stated deadline, do not calculate a formal due date, mark the affiliate link uncertain and escalate for counsel review. Expected handling: Claims and deadlines distinguish document text from verified facts and legal calculations. No response deadline is invented; possible urgency goes to counsel. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "urgency_and_deadline_register": "Fictional legal-litigation-demand-received urgency and deadline register section. Scenario: Fictional letter demands payment “within 10 days” with no service date and mentions an affiliate not in the supplied matter log. Extract the stated deadline, do not calculate a formal due date, mark the affiliate link uncertain and escalate for counsel review. Expected handling: Claims and deadlines distinguish document text from verified facts and legal calculations. No response deadline is invented; possible urgency goes to counsel. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "portfolio_crosscheck": "Fictional legal-litigation-demand-received portfolio crosscheck section. Scenario: Fictional letter demands payment “within 10 days” with no service date and mentions an affiliate not in the supplied matter log. Extract the stated deadline, do not calculate a formal due date, mark the affiliate link uncertain and escalate for counsel review. Expected handling: Claims and deadlines distinguish document text from verified facts and legal calculations. No response deadline is invented; possible urgency goes to counsel. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "response_options": "Fictional legal-litigation-demand-received response options section. Scenario: Fictional letter demands payment “within 10 days” with no service date and mentions an affiliate not in the supplied matter log. Extract the stated deadline, do not calculate a formal due date, mark the affiliate link uncertain and escalate for counsel review. Expected handling: Claims and deadlines distinguish document text from verified facts and legal calculations. No response deadline is invented; possible urgency goes to counsel. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "handoff_questions": "No unresolved item in this synthetic complete fixture.",
+          "partial_work": [],
+          "missing_inputs": [],
+          "unknown_facts": []
+        }
+      }
+    },
+    {
+      "fixture_id": "needs-context-preserves-partial-and-unknowns",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261005-0900-SARA-123456",
+        "request_ref": "fixture:legal-litigation-demand-received:request",
+        "source_refs": [
+          "fixture:legal-litigation-demand-received:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "incoming_demand_ref": "Synthetic input fixture for legal-litigation-demand-received: incoming demand ref. Fictional test content only; no real-world facts.",
+          "receipt_metadata": "Synthetic input fixture for legal-litigation-demand-received: receipt metadata. Fictional test content only; no real-world facts.",
+          "portfolio_refs": "Synthetic input fixture for legal-litigation-demand-received: portfolio refs. Fictional test content only; no real-world facts.",
+          "governing_documents": "Synthetic input fixture for legal-litigation-demand-received: governing documents. Fictional test content only; no real-world facts.",
+          "jurisdiction_forum_and_as_of_date": "Synthetic input fixture for legal-litigation-demand-received: jurisdiction forum and as of date. Fictional test content only; no real-world facts.",
+          "review_owner": "Synthetic input fixture for legal-litigation-demand-received: review owner. Fictional test content only; no real-world facts."
+        }
+      },
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "needs_context",
+        "artifact_ref": "fixture:legal-litigation-demand-received:partial",
+        "evidence_refs": [],
+        "open_questions": [
+          "Confirm the named missing input with its owner."
+        ],
+        "review_owner_role": "Synthetic completed task for legal-litigation-demand-received: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "extracted_claim_summary": "",
+          "urgency_and_deadline_register": "",
+          "portfolio_crosscheck": "",
+          "response_options": "",
+          "handoff_questions": "",
+          "partial_work": [
+            {
+              "section": "extracted_claim_summary",
+              "content": "Partial legal-litigation-demand-received fixture: source inventory recorded; one dependent conclusion remains unknown.",
+              "evidence_refs": [
+                "fixture:legal-litigation-demand-received:source-1"
+              ]
+            }
+          ],
+          "missing_inputs": [
+            {
+              "field": "authorized_source_or_material_fact",
+              "reason": "Synthetic missing-context scenario: A material source or jurisdiction-specific fact is missing and another portion of the draft remains possible. Complete separable work and mark only dependent conclusions unresolved.",
+              "requested_owner": "task owner"
+            }
+          ],
+          "unknown_facts": [
+            {
+              "fact": "task-specific applicability or evidence fact",
+              "why_unknown": "The edge scenario intentionally leaves this required fact or authority unresolved; preserve it as unknown.",
+              "evidence_refs": [
+                "fixture:legal-litigation-demand-received:source-1"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "fixture_id": "empty-completed-draft-rejected",
+      "expected_valid": false,
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": null,
+        "evidence_refs": [],
+        "open_questions": [],
+        "review_owner_role": "Synthetic completed task for legal-litigation-demand-received: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "extracted_claim_summary": "",
+          "urgency_and_deadline_register": "",
+          "portfolio_crosscheck": "",
+          "response_options": "",
+          "handoff_questions": "",
+          "partial_work": [],
+          "missing_inputs": [],
+          "unknown_facts": []
+        }
+      }
+    }
+  ],
+  "fixture_note": "All values are fictional task-shaped contract examples derived from this pack’s golden scenario and criteria; these files are schema evidence, not executed results or business/legal facts."
+}

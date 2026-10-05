@@ -1,0 +1,140 @@
+{
+  "schema_version": "0.1",
+  "skill_id": "legal-litigation-portfolio-status",
+  "input_schema_ref": "references/schemas.json#/definitions/input",
+  "output_schema_ref": "references/schemas.json#/definitions/output",
+  "completion_required_fields": [
+    "portfolio_rollup",
+    "upcoming_date_table",
+    "anomaly_register",
+    "scope_and_method"
+  ],
+  "fixtures": [
+    {
+      "fixture_id": "synthetic-task-shaped-completed",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261005-0900-SARA-123456",
+        "request_ref": "fixture:legal-litigation-portfolio-status:request",
+        "source_refs": [
+          "fixture:legal-litigation-portfolio-status:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "portfolio_record_ref": "Synthetic input fixture for legal-litigation-portfolio-status: portfolio record ref. Fictional test content only; no real-world facts.",
+          "as_of_date": "Synthetic input fixture for legal-litigation-portfolio-status: as of date. Fictional test content only; no real-world facts.",
+          "risk_and_staleness_definitions": "Synthetic input fixture for legal-litigation-portfolio-status: risk and staleness definitions. Fictional test content only; no real-world facts.",
+          "date_authority_refs": "Synthetic input fixture for legal-litigation-portfolio-status: date authority refs. Fictional test content only; no real-world facts.",
+          "scope_filter": "Synthetic input fixture for legal-litigation-portfolio-status: scope filter. Fictional test content only; no real-world facts."
+        }
+      },
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": "fixture:legal-litigation-portfolio-status:draft",
+        "evidence_refs": [
+          "fixture:legal-litigation-portfolio-status:source-1"
+        ],
+        "open_questions": [],
+        "review_owner_role": "Synthetic completed task for legal-litigation-portfolio-status: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "portfolio_rollup": "Fictional legal-litigation-portfolio-status portfolio rollup section. Scenario: Fictional five-row register has one blank risk, one unknown next date, two stale records and one closed case. Report denominators, exclude closed case only if scope says active, and avoid treating blank risk/date as low/no deadline. Expected handling: All counts state denominator and as-of date. Unknown and missing values are not treated as zero/low/no issue. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "upcoming_date_table": "Fictional legal-litigation-portfolio-status upcoming date table section. Scenario: Fictional five-row register has one blank risk, one unknown next date, two stale records and one closed case. Report denominators, exclude closed case only if scope says active, and avoid treating blank risk/date as low/no deadline. Expected handling: All counts state denominator and as-of date. Unknown and missing values are not treated as zero/low/no issue. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "anomaly_register": "Fictional legal-litigation-portfolio-status anomaly register section. Scenario: Fictional five-row register has one blank risk, one unknown next date, two stale records and one closed case. Report denominators, exclude closed case only if scope says active, and avoid treating blank risk/date as low/no deadline. Expected handling: All counts state denominator and as-of date. Unknown and missing values are not treated as zero/low/no issue. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "scope_and_method": "Fictional legal-litigation-portfolio-status scope and method section. Scenario: Fictional five-row register has one blank risk, one unknown next date, two stale records and one closed case. Report denominators, exclude closed case only if scope says active, and avoid treating blank risk/date as low/no deadline. Expected handling: All counts state denominator and as-of date. Unknown and missing values are not treated as zero/low/no issue. This is illustrative synthetic content only, not a real fact, legal authority, or executed result.",
+          "partial_work": [],
+          "missing_inputs": [],
+          "unknown_facts": []
+        }
+      }
+    },
+    {
+      "fixture_id": "needs-context-preserves-partial-and-unknowns",
+      "expected_valid": true,
+      "input": {
+        "task_id": "20261005-0900-SARA-123456",
+        "request_ref": "fixture:legal-litigation-portfolio-status:request",
+        "source_refs": [
+          "fixture:legal-litigation-portfolio-status:source-1"
+        ],
+        "data_classification": "synthetic",
+        "task_inputs": {
+          "portfolio_record_ref": "Synthetic input fixture for legal-litigation-portfolio-status: portfolio record ref. Fictional test content only; no real-world facts.",
+          "as_of_date": "Synthetic input fixture for legal-litigation-portfolio-status: as of date. Fictional test content only; no real-world facts.",
+          "risk_and_staleness_definitions": "Synthetic input fixture for legal-litigation-portfolio-status: risk and staleness definitions. Fictional test content only; no real-world facts.",
+          "date_authority_refs": "Synthetic input fixture for legal-litigation-portfolio-status: date authority refs. Fictional test content only; no real-world facts.",
+          "scope_filter": "Synthetic input fixture for legal-litigation-portfolio-status: scope filter. Fictional test content only; no real-world facts."
+        }
+      },
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "needs_context",
+        "artifact_ref": "fixture:legal-litigation-portfolio-status:partial",
+        "evidence_refs": [],
+        "open_questions": [
+          "Confirm the named missing input with its owner."
+        ],
+        "review_owner_role": "Synthetic completed task for legal-litigation-portfolio-status: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "portfolio_rollup": "",
+          "upcoming_date_table": "",
+          "anomaly_register": "",
+          "scope_and_method": "",
+          "partial_work": [
+            {
+              "section": "portfolio_rollup",
+              "content": "Partial legal-litigation-portfolio-status fixture: source inventory recorded; one dependent conclusion remains unknown.",
+              "evidence_refs": [
+                "fixture:legal-litigation-portfolio-status:source-1"
+              ]
+            }
+          ],
+          "missing_inputs": [
+            {
+              "field": "authorized_source_or_material_fact",
+              "reason": "Synthetic missing-context scenario: A material source or jurisdiction-specific fact is missing and another portion of the draft remains possible. Complete separable work and mark only dependent conclusions unresolved.",
+              "requested_owner": "task owner"
+            }
+          ],
+          "unknown_facts": [
+            {
+              "fact": "task-specific applicability or evidence fact",
+              "why_unknown": "The edge scenario intentionally leaves this required fact or authority unresolved; preserve it as unknown.",
+              "evidence_refs": [
+                "fixture:legal-litigation-portfolio-status:source-1"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "fixture_id": "empty-completed-draft-rejected",
+      "expected_valid": false,
+      "output": {
+        "task_id": "20261005-0900-SARA-123456",
+        "status": "completed_draft",
+        "artifact_ref": null,
+        "evidence_refs": [],
+        "open_questions": [],
+        "review_owner_role": "Synthetic completed task for legal-litigation-portfolio-status: review owner role. Fictional test content only; no real-world facts.",
+        "external_effects": [],
+        "mutations": [],
+        "work_product": {
+          "portfolio_rollup": "",
+          "upcoming_date_table": "",
+          "anomaly_register": "",
+          "scope_and_method": "",
+          "partial_work": [],
+          "missing_inputs": [],
+          "unknown_facts": []
+        }
+      }
+    }
+  ],
+  "fixture_note": "All values are fictional task-shaped contract examples derived from this pack’s golden scenario and criteria; these files are schema evidence, not executed results or business/legal facts."
+}

@@ -1,0 +1,27 @@
+# finance.accounting_and_treasury
+
+- Purchase-order and requisition templates — ic-purchase-requisition-template-9181.xlsx: `references/reference-register/entries/template-018/INDEX.md`.
+- Small-business bookkeeping templates — IC-12-Month-Cash-Flow-Forecast-11306.xlsx: `references/reference-register/entries/template-019/INDEX.md`.
+- Financial-statement templates — IC-Financial-Statements-Template-Set-12375.xlsx: `references/reference-register/entries/template-020/INDEX.md`.
+- Sample fiscal-management policy — PDF: `references/reference-register/entries/template-028/INDEX.md`.
+- Financial-policy guidelines and example — PDF: `references/reference-register/entries/template-029/INDEX.md`.
+- SJSU journal-upload template — Excel: `references/reference-register/entries/template-030/INDEX.md`.
+- Equipment inventory and depreciation schedule — Excel: `references/reference-register/entries/template-032/INDEX.md`.
+- Credit-card expense report — PDF: `references/reference-register/entries/template-034/INDEX.md`.
+- SJSU billing-request template — Excel: `references/reference-register/entries/template-035/INDEX.md`.
+- Monthly bank reconciliation — Excel: `references/reference-register/entries/template-036/INDEX.md`.
+- Credit-card reconciliation — Excel: `references/reference-register/entries/template-037/INDEX.md`.
+- 12-month cash-flow forecast — Excel: `references/reference-register/entries/template-038/INDEX.md`.
+- Purchase-order and requisition templates — ic-basic-purchase-order-form-template-example-9181.xlsx: `references/reference-register/entries/template-064/INDEX.md`.
+- Small-business bookkeeping templates — IC-Accounting-Journal-11306.xlsx: `references/reference-register/entries/template-066/INDEX.md`.
+- Small-business bookkeeping templates — IC-Income-Statement-11306.xlsx: `references/reference-register/entries/template-067/INDEX.md`.
+- Financial-statement templates — IC-Small-Business-Balance-Sheet-12375_Example.xlsx: `references/reference-register/entries/template-068/INDEX.md`.
+- Author-neutral synthetic filled journal example: `references/reference-register/entries/template-086/INDEX.md`.
+- Finance function charter — author-neutral original: `references/reference-register/entries/template-087/INDEX.md`.
+- Fictional finance function charter example — author-neutral original: `references/reference-register/entries/template-088/INDEX.md`.
+- Accounts payable tracker — author-neutral original: `references/reference-register/entries/template-089/INDEX.md`.
+- Accounts receivable tracker — author-neutral original: `references/reference-register/entries/template-090/INDEX.md`.
+- Loan schedule record — author-neutral original: `references/reference-register/entries/template-091/INDEX.md`.
+- Period close checklist — author-neutral original: `references/reference-register/entries/template-092/INDEX.md`.
+- Payroll register outline — author-neutral original: `references/reference-register/entries/template-093/INDEX.md`.
+- Payroll accounting support schedule — author-neutral original: `references/reference-register/entries/template-094/INDEX.md`.

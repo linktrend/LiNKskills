@@ -1,0 +1,239 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {},
+  "definitions": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "request_ref",
+        "source_refs",
+        "data_classification",
+        "task_inputs"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "request_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "data_classification": {
+          "type": "string",
+          "enum": [
+            "synthetic",
+            "redacted",
+            "restricted",
+            "sensitive",
+            "unknown"
+          ]
+        },
+        "task_inputs": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "topic_and_question",
+            "jurisdictions",
+            "time_window",
+            "facts_and_worker_groups",
+            "source_policy",
+            "scope_and_as_of"
+          ],
+          "properties": {
+            "topic_and_question": {
+              "type": "string",
+              "description": "Specific employment law issue and decision purpose."
+            },
+            "jurisdictions": {
+              "type": "string",
+              "description": "Federal, named states and named cities/counties; no default survey."
+            },
+            "time_window": {
+              "type": "string",
+              "description": "As-of date, requested lookback or pending-law scope."
+            },
+            "facts_and_worker_groups": {
+              "type": "string",
+              "description": "Relevant employer, worker classification, workforce locations and facts."
+            },
+            "source_policy": {
+              "type": "string",
+              "description": "Allowed primary and secondary source classes and citations required."
+            },
+            "scope_and_as_of": {
+              "type": "string",
+              "description": "Applicable scope and date; state unknown rather than infer."
+            }
+          }
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "artifact_type",
+        "task_specific_deliverable",
+        "evidence_trace",
+        "uncertainties",
+        "external_effects",
+        "mutations"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "completed_draft",
+            "needs_context",
+            "not_applicable"
+          ]
+        },
+        "artifact_type": {
+          "const": "legal-lawve-employment-law-research-yue-deng-wu"
+        },
+        "task_specific_deliverable": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "scope_and_jurisdictions",
+            "primary_authority_findings",
+            "secondary_source_context",
+            "comparison_table",
+            "effective_date_and_status",
+            "open_factual_or_legal_questions"
+          ],
+          "properties": {
+            "scope_and_jurisdictions": {
+              "type": "string"
+            },
+            "primary_authority_findings": {
+              "type": "string"
+            },
+            "secondary_source_context": {
+              "type": "string"
+            },
+            "comparison_table": {
+              "type": "string"
+            },
+            "effective_date_and_status": {
+              "type": "string"
+            },
+            "open_factual_or_legal_questions": {
+              "type": "string"
+            }
+          }
+        },
+        "evidence_trace": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "claim",
+              "source_ref",
+              "pinpoint",
+              "basis"
+            ],
+            "properties": {
+              "claim": {
+                "type": "string"
+              },
+              "source_ref": {
+                "type": "string"
+              },
+              "pinpoint": {
+                "type": "string"
+              },
+              "basis": {
+                "enum": [
+                  "verified_fact",
+                  "requestor_assertion",
+                  "inference",
+                  "proposal",
+                  "unknown"
+                ]
+              }
+            }
+          }
+        },
+        "uncertainties": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "external_effects": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "mutations": {
+          "type": "array",
+          "maxItems": 0
+        }
+      }
+    },
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "phase",
+        "source_refs",
+        "established_facts",
+        "open_inputs",
+        "next_action",
+        "last_updated"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string"
+        },
+        "phase": {
+          "enum": [
+            "intake",
+            "evidence",
+            "analysis",
+            "draft",
+            "verification",
+            "complete"
+          ]
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "established_facts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "open_inputs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "next_action": {
+          "type": "string"
+        },
+        "last_updated": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}

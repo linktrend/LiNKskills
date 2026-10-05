@@ -1275,7 +1275,14 @@ def validate_execution_ledger(
 def discover_skill_dirs(skills_root: Path) -> List[Path]:
     if not skills_root.exists():
         return []
-    discovered = {path.parent.resolve() for path in skills_root.rglob("SKILL.md")}
+    # The registry, like catalog discovery, owns /skills/<id>/SKILL.md.
+    # Nested upstream SKILL.md files are immutable supporting references, not
+    # independent LiNKskills packages subject to our package template.
+    discovered = {
+        path.parent.resolve()
+        for path in skills_root.glob("*/SKILL.md")
+        if path.is_file()
+    }
     return sorted(discovered)
 
 

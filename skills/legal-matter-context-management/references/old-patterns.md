@@ -1,0 +1,4 @@
+- Do not assume private-practice vs in-house mode; ask the founder or use verified company facts.
+- Do not use Claude profile paths or mutate native OpenClaw runtime configuration.
+- Do not retrieve another matter without explicit authorized scope.
+- Do not create JSONL or sidecar runtime state.
