@@ -1,7 +1,7 @@
 """Remainder (54-skill) qualification matrix.
 
 The five production-successor releases stay owned by ``ed03``. This module
-inventories every other catalog skill, requires executable confined cases, and
+inventories the original closed 54-skill cohort, requires executable confined cases, and
 never mints ``usable`` from filesystem presence, source helper output, or
 reused five-release evidence.
 """
@@ -40,6 +40,29 @@ from .ed03 import (
 REMAINDER_KIND = "remainder-release-profile-matrix"
 INITIAL_SKILL_IDS = frozenset(item["skillId"] for item in INITIAL_RELEASE_PROFILES)
 REQUIRED_REMAINDER_COUNT = 54
+# Original cohort retained on protected development a6e6ecb2305b809100cee9f9217451624717ad4d.
+# Later catalog additions have independent qualification/admission lanes and
+# must never silently inherit this cohort's executable cases or completion.
+REMAINDER_SKILL_IDS = frozenset((
+    "agent-workforce-management", "audit-protocol", "awesome-design-presets",
+    "blocker-resolution", "canary-echo", "channel-ops", "citation-enforcer",
+    "commercial-contracts-legal-operations", "company-communication",
+    "company-incident-continuity", "company-planning-performance",
+    "compliance-guardian", "creative-director", "creative-qa", "department-head",
+    "devops-sre", "emil-design-engineering", "engagement-to-strategy-loop",
+    "executive-decisions-governance", "executive-sync-8am",
+    "finance-accounting-operations", "google-workspace-operations",
+    "governed-browser-use", "hybrid-development-methods", "impeccable-design-system",
+    "lead-engineer", "market-analyst", "marketing-strategist", "meeting-management",
+    "operational-reporting", "personal-compliance", "prd-architect",
+    "private-health-wellbeing", "procurement-vendor-management", "research",
+    "revenue-adapter-base", "sales-customer-management", "search-strategy",
+    "self-critique-loop", "self-improvement", "seo-semantic-auditor", "skill-architect",
+    "smart-file-clerk", "software-pm", "studio-architect", "studio-controller",
+    "studio-health-reporting", "target-assessment-prioritization",
+    "target-definition-segmentation", "task-decomposition", "taste-design-exploration",
+    "time-management", "ui-ux-guardian", "workflow-architect",
+))
 
 
 def catalog_skill_ids(root: Path) -> list[str]:
@@ -48,7 +71,12 @@ def catalog_skill_ids(root: Path) -> list[str]:
 
 
 def remainder_skill_ids(root: Path) -> list[str]:
-    return [skill_id for skill_id in catalog_skill_ids(root) if skill_id not in INITIAL_SKILL_IDS]
+    if len(REMAINDER_SKILL_IDS) != REQUIRED_REMAINDER_COUNT or REMAINDER_SKILL_IDS & INITIAL_SKILL_IDS:
+        raise QualificationError("remainder_cohort_definition_invalid")
+    missing = REMAINDER_SKILL_IDS - set(catalog_skill_ids(root))
+    if missing:
+        raise QualificationError(f"remainder_cohort_missing:{','.join(sorted(missing))}")
+    return sorted(REMAINDER_SKILL_IDS)
 
 
 def declared_remainder_profiles(root: Path) -> list[dict[str, str]]:
@@ -125,6 +153,8 @@ def qualify_remainder_release_profiles(
     return {
         "schemaVersion": SCHEMA_VERSION,
         "kind": REMAINDER_KIND,
+        "cohortId": "original-catalog-remainder-54",
+        "outsideCohortSkillIds": sorted(set(catalog_skill_ids(root)) - INITIAL_SKILL_IDS - REMAINDER_SKILL_IDS),
         "complete": len(rows) == REQUIRED_REMAINDER_COUNT,
         "ok": len(rows) == REQUIRED_REMAINDER_COUNT
         and not missing_execute
