@@ -685,13 +685,28 @@ class SkillsApiV2:
         return release
 
     def _authorize_release(
-        self, release: Any, identity: TrustedIdentity, request: Mapping[str, Any]
+        self, release: Any, identity: TrustedIdentity, request: Mapping[str, Any], operation: str | None = None
     ) -> None:
         """Apply independent Platform, Skills, profile, role, and tool gates."""
         if release.lifecycle_state in {"revoked", "withdrawn"}:
             raise ValueError("revoked_release")
         if release.lifecycle_state == "expired":
             raise ValueError("expired_release")
+        if release.qualification == "founder_admitted_read_only":
+            if (
+                operation not in RESOURCE_OPERATIONS
+                or release.lifecycle_state != "founder_admitted_read_only"
+                or identity.audience != "lskills-api"
+                or "skills.read" not in identity.capabilities
+                or release.release_id not in identity.activated_release_ids
+                or not release.runtime_profiles.intersection(identity.runtime_profiles)
+                or release.consumer_profile_activation
+                or release.consumer_tool_authority
+                or release.skills_release_selectability
+                or release.platform_technical_eligibility
+            ):
+                raise ValueError("forbidden")
+            return
         denials = gate_denials(
             release,
             roles=identity.roles,
@@ -782,7 +797,7 @@ class SkillsApiV2:
             }
         if operation == "skills_release_verify":
             release = self._release(request.get("skill_id"), request.get("version"))
-            self._authorize_release(release, identity, request)
+            self._authorize_release(release, identity, request, operation)
             body = b"".join(resource.body for resource in release.resources)
             digest = _digest(body)
             release.verify_inventory()
@@ -1004,7 +1019,7 @@ class SkillsApiV2:
                 result.update(self._page(entries, offset, limit))
                 return result
             release = self._release(request.get("skill_id"), request.get("version"))
-            self._authorize_release(release, identity, request)
+            self._authorize_release(release, identity, request, operation)
             if operation == "skills_release_describe":
                 result.update(
                     {

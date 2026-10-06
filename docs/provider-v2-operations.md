@@ -16,3 +16,11 @@ deployment or production readiness.
 Source proof does not activate a trusted signing key, sandbox container,
 database migration, hosted Librarian runner, consumer connection, availability
 target, alert receiver, backup/restore system, stage/prod release, or canary.
+
+Founder Bootstrap publications use the explicit `founder_admitted_read_only`
+qualification and lifecycle values. They are exact-release-bound resource
+reads only: they carry no evaluation result, are not selectable or activated,
+and do not grant tool authority. Publication requires the additive provider-v2
+migration and an existing Platform actor/org/runtime binding.
+Use `skills_release_list` with an optional `query` to find exact skill IDs, then
+use the exact version in the resource read operations.
